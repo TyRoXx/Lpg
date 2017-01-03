@@ -372,7 +372,11 @@ void expression_free(expression *this)
 
 void print_char(char c)
 {
-    _putch(c);
+    DWORD written;
+    if (!WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), &c, 1, &written, NULL))
+    {
+        abort();
+    }
 }
 
 void render(expression const *source)
@@ -530,7 +534,18 @@ void run_editor(expression *source)
                     {
                         abort();
                     }
+                    if (!SetConsoleTextAttribute(
+                            consoleOutput, FOREGROUND_BLUE))
+                    {
+                        abort();
+                    }
                     render(source);
+                    if (!SetConsoleTextAttribute(
+                            consoleOutput, FOREGROUND_BLUE | FOREGROUND_GREEN |
+                                               FOREGROUND_RED))
+                    {
+                        abort();
+                    }
                     break;
                 }
 
