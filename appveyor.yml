@@ -1,0 +1,38 @@
+# version format
+version: 0.1.{build}-{branch}
+
+skip_tags: true
+
+clone_depth: 1
+
+os: Windows Server 2012 R2
+
+environment:
+  matrix:
+  - BUILD_TYPE: Debug
+  - BUILD_TYPE: Release
+
+before_build:
+  - mkdir build
+  - cd build
+  - cmake -G "Visual Studio 14" ..
+  - cd ..
+
+build_script:
+  - cd build
+  - cmake --build . --config %BUILD_TYPE%
+  - cd ..
+
+after_build:
+
+before_test:
+
+test_script:
+  - cd build\tests
+  - .\%BUILD_TYPE%\tests.exe
+
+after_test:
+
+on_success:
+on_failure:
+on_finish:
