@@ -473,41 +473,89 @@ void render(expression const *source)
 void run_editor(expression *source)
 {
     render(source);
-    HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+    if (!SetConsoleMode(consoleInput, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT |
+                                          ENABLE_EXTENDED_FLAGS |
+                                          ENABLE_INSERT_MODE))
+    {
+        abort();
+    }
+
     for (;;)
     {
-        wint_t c = _getwch();
-        switch (c)
+        INPUT_RECORD input;
+        DWORD inputEvents;
+        if (!ReadConsoleInput(consoleInput, &input, 1, &inputEvents))
         {
-        case 13:
+            abort();
+        }
+
+        switch (input.EventType)
         {
-            CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
-            if (!GetConsoleScreenBufferInfo(console, &consoleScreenBufferInfo))
+        case KEY_EVENT:
+        {
+            if (!input.Event.KeyEvent.bKeyDown)
             {
-                abort();
+                if ((input.Event.KeyEvent.wVirtualKeyCode == 0x53) &&
+                    (input.Event.KeyEvent.dwControlKeyState &
+                     (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)))
+                {
+                    printf("Save\n");
+                    break;
+                }
+
+                WCHAR c = input.Event.KeyEvent.uChar.UnicodeChar;
+                switch (c)
+                {
+                case 13:
+                {
+                    CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
+                    if (!GetConsoleScreenBufferInfo(
+                            consoleOutput, &consoleScreenBufferInfo))
+                    {
+                        abort();
+                    }
+                    const COORD zero = {0, 0};
+                    DWORD written = 0;
+                    if (!FillConsoleOutputCharacter(
+                            consoleOutput, ' ',
+                            consoleScreenBufferInfo.dwSize.X *
+                                consoleScreenBufferInfo.dwSize.Y,
+                            zero, &written))
+                    {
+                        abort();
+                    }
+                    if (!SetConsoleCursorPosition(consoleOutput, zero))
+                    {
+                        abort();
+                    }
+                    render(source);
+                    break;
+                }
+
+                case 27:
+                    return;
+
+                default:
+                    _putwch(c);
+                    break;
+                }
             }
-            const COORD zero = {0, 0};
-            DWORD written = 0;
-            if (!FillConsoleOutputCharacter(
-                    console, ' ', consoleScreenBufferInfo.dwSize.X *
-                                      consoleScreenBufferInfo.dwSize.Y,
-                    zero, &written))
-            {
-                abort();
-            }
-            if (!SetConsoleCursorPosition(console, zero))
-            {
-                abort();
-            }
-            render(source);
             break;
         }
 
-        case 27:
-            return;
+        case MOUSE_EVENT:
+            break;
+
+        case WINDOW_BUFFER_SIZE_EVENT:
+            break;
+
+        case FOCUS_EVENT:
+            break;
 
         default:
-            _putwch(c);
+            printf("Unknown event\n");
             break;
         }
     }
