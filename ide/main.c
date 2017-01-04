@@ -122,6 +122,66 @@ void render(expression const *source)
     print_to_console(cells, console_width, console_height);
 }
 
+typedef enum key_event_handler_result
+{
+    continue_running,
+    stop_running
+} key_event_handler_result;
+
+key_event_handler_result handle_key_event(KEY_EVENT_RECORD event,
+                                          HANDLE consoleOutput,
+                                          expression const *source)
+{
+    if (event.bKeyDown)
+    {
+        return continue_running;
+    }
+    if ((event.wVirtualKeyCode == 0x53) &&
+        (event.dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)))
+    {
+        printf("Save\n");
+        return continue_running;
+    }
+    WCHAR const c = event.uChar.UnicodeChar;
+    if (c == 27)
+    {
+        return stop_running;
+    }
+    if (c != 13)
+    {
+        return continue_running;
+    }
+    CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
+    if (!GetConsoleScreenBufferInfo(consoleOutput, &consoleScreenBufferInfo))
+    {
+        abort();
+    }
+    const COORD zero = {0, 0};
+    DWORD written = 0;
+    if (!FillConsoleOutputCharacter(
+            consoleOutput, ' ',
+            consoleScreenBufferInfo.dwSize.X * consoleScreenBufferInfo.dwSize.Y,
+            zero, &written))
+    {
+        abort();
+    }
+    if (!SetConsoleCursorPosition(consoleOutput, zero))
+    {
+        abort();
+    }
+    if (!SetConsoleTextAttribute(consoleOutput, FOREGROUND_BLUE))
+    {
+        abort();
+    }
+    render(source);
+    if (!SetConsoleTextAttribute(
+            consoleOutput, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED))
+    {
+        abort();
+    }
+    return continue_running;
+}
+
 void run_editor(expression *source)
 {
     render(source);
@@ -146,63 +206,16 @@ void run_editor(expression *source)
         switch (input.EventType)
         {
         case KEY_EVENT:
-        {
-            if (!input.Event.KeyEvent.bKeyDown)
+            switch (
+                handle_key_event(input.Event.KeyEvent, consoleOutput, source))
             {
-                if ((input.Event.KeyEvent.wVirtualKeyCode == 0x53) &&
-                    (input.Event.KeyEvent.dwControlKeyState &
-                     (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)))
-                {
-                    printf("Save\n");
-                    break;
-                }
+            case continue_running:
+                break;
 
-                WCHAR c = input.Event.KeyEvent.uChar.UnicodeChar;
-                switch (c)
-                {
-                case 13:
-                {
-                    CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
-                    if (!GetConsoleScreenBufferInfo(
-                            consoleOutput, &consoleScreenBufferInfo))
-                    {
-                        abort();
-                    }
-                    const COORD zero = {0, 0};
-                    DWORD written = 0;
-                    if (!FillConsoleOutputCharacter(
-                            consoleOutput, ' ',
-                            consoleScreenBufferInfo.dwSize.X *
-                                consoleScreenBufferInfo.dwSize.Y,
-                            zero, &written))
-                    {
-                        abort();
-                    }
-                    if (!SetConsoleCursorPosition(consoleOutput, zero))
-                    {
-                        abort();
-                    }
-                    if (!SetConsoleTextAttribute(
-                            consoleOutput, FOREGROUND_BLUE))
-                    {
-                        abort();
-                    }
-                    render(source);
-                    if (!SetConsoleTextAttribute(
-                            consoleOutput, FOREGROUND_BLUE | FOREGROUND_GREEN |
-                                               FOREGROUND_RED))
-                    {
-                        abort();
-                    }
-                    break;
-                }
-
-                case 27:
-                    return;
-                }
+            case stop_running:
+                return;
             }
             break;
-        }
 
         case MOUSE_EVENT:
             break;
