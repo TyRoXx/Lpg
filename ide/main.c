@@ -26,7 +26,7 @@ void deallocate(void *memory)
 }
 
 #define LPG_FOR(type, counter, count)                                          \
-    for (type counter = 0; counter < count; ++counter)
+    for (type counter = 0; counter < (count); ++counter)
 
 typedef struct expression expression;
 
@@ -370,45 +370,151 @@ void expression_free(expression *this)
     }
 }
 
-void print_char(char c)
+typedef enum console_color
 {
-    DWORD written;
-    if (!WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE), &c, 1, &written, NULL))
+    console_color_red,
+    console_color_grey,
+    console_color_white,
+    console_color_cyan
+} console_color;
+
+typedef uint32_t unicode_code_point;
+
+typedef struct console_cell
+{
+    unicode_code_point text;
+    console_color text_color;
+} console_cell;
+
+typedef struct console_printer
+{
+    console_cell *first_cell;
+    size_t line_length;
+    size_t number_of_lines;
+    size_t current_line;
+    size_t position_in_line;
+} console_printer;
+
+unicode_code_point restrict_console_text(unicode_code_point original)
+{
+    if (original <= 31)
     {
-        abort();
+        return '?';
+    }
+    return original;
+}
+
+void console_print_char(console_printer *printer, unicode_code_point text,
+                        console_color text_color)
+{
+    if (printer->current_line == printer->number_of_lines)
+    {
+        return;
+    }
+    if (printer->position_in_line == printer->line_length)
+    {
+        return;
+    }
+    console_cell *cell =
+        printer->first_cell + ((printer->current_line * printer->line_length) +
+                               printer->position_in_line);
+    cell->text = restrict_console_text(text);
+    cell->text_color = text_color;
+    ++printer->position_in_line;
+    if (printer->position_in_line == printer->line_length)
+    {
+        printer->position_in_line = 0;
+        ++printer->current_line;
     }
 }
 
-void render(expression const *source)
+void console_new_line(console_printer *printer)
+{
+    if (printer->current_line == printer->number_of_lines)
+    {
+        return;
+    }
+    printer->position_in_line = 0;
+    ++printer->current_line;
+}
+
+WORD to_win32_console_color(console_color color)
+{
+    switch (color)
+    {
+    case console_color_cyan:
+        return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+    case console_color_grey:
+        return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
+    case console_color_red:
+        return FOREGROUND_RED | FOREGROUND_INTENSITY;
+    case console_color_white:
+        return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED |
+               FOREGROUND_INTENSITY;
+    }
+    abort();
+}
+
+void print_to_console(console_cell const *cells, size_t line_length,
+                      size_t number_of_lines)
+{
+    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    LPG_FOR(size_t, y, number_of_lines)
+    {
+        LPG_FOR(size_t, x, line_length)
+        {
+            console_cell const *cell = cells + (y * line_length) + x;
+            if (!SetConsoleTextAttribute(
+                    consoleOutput, to_win32_console_color(cell->text_color)))
+            {
+                abort();
+            }
+
+            WCHAR c = (WCHAR)cell->text;
+            DWORD written;
+            if (!WriteConsoleW(consoleOutput, &c, 1, &written, NULL))
+            {
+                abort();
+            }
+        }
+        COORD position = {0, (SHORT)(y + 1)};
+        if (!SetConsoleCursorPosition(consoleOutput, position))
+        {
+            abort();
+        }
+    }
+}
+
+void render_expression(console_printer *printer, expression const *source)
 {
     switch (source->type)
     {
     case expression_type_lambda:
-        print_char('/');
-        render(source->lambda.parameter_type);
-        print_char(' ');
-        render(source->lambda.parameter_name);
-        print_char('\n');
-        print_char('\t');
-        render(source->lambda.result);
+        console_print_char(printer, '/', console_color_cyan);
+        render_expression(printer, source->lambda.parameter_type);
+        console_print_char(printer, ' ', console_color_grey);
+        render_expression(printer, source->lambda.parameter_name);
+        console_new_line(printer);
+        console_print_char(printer, ' ', console_color_grey);
+        render_expression(printer, source->lambda.result);
         break;
 
     case expression_type_builtin:
         switch (source->builtin)
         {
         case builtin_unit:
-            print_char('(');
-            print_char(')');
+            console_print_char(printer, '(', console_color_grey);
+            console_print_char(printer, ')', console_color_grey);
             break;
 
         case builtin_empty_structure:
-            print_char('{');
-            print_char('}');
+            console_print_char(printer, '{', console_color_grey);
+            console_print_char(printer, '}', console_color_grey);
             break;
 
         case builtin_empty_variant:
-            print_char('[');
-            print_char(']');
+            console_print_char(printer, '[', console_color_grey);
+            console_print_char(printer, ']', console_color_grey);
             break;
         }
         break;
@@ -431,9 +537,9 @@ void render(expression const *source)
         {
             abort();
         }
-        LPG_FOR(size_t, i, sizeof(buffer))
+        LPG_FOR(size_t, i, sizeof(buffer) - 1)
         {
-            print_char(buffer[i]);
+            console_print_char(printer, buffer[i], console_color_white);
         }
         break;
     }
@@ -468,10 +574,34 @@ void render(expression const *source)
     case expression_type_utf8_literal:
         LPG_FOR(size_t, i, source->utf8_literal.length)
         {
-            print_char(source->utf8_literal.data[i]);
+            console_print_char(
+                printer, source->utf8_literal.data[i], console_color_white);
         }
         break;
     }
+}
+
+enum
+{
+    console_width = 80,
+    console_height = 24
+};
+
+void render(expression const *source)
+{
+    console_cell cells[console_width * console_height];
+    LPG_FOR(size_t, y, console_height)
+    {
+        LPG_FOR(size_t, x, console_width)
+        {
+            console_cell *cell = &cells[(y * console_width) + x];
+            cell->text = ' ';
+            cell->text_color = console_color_white;
+        }
+    }
+    console_printer printer = {&cells[0], console_width, console_height, 0, 0};
+    render_expression(&printer, source);
+    print_to_console(cells, console_width, console_height);
 }
 
 void run_editor(expression *source)
