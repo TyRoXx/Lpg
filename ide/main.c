@@ -244,9 +244,8 @@ void run_editor(expression *source)
 {
     render(source);
     HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
-    if (!SetConsoleMode(consoleInput, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT |
-                                          ENABLE_EXTENDED_FLAGS |
-                                          ENABLE_INSERT_MODE))
+    if (!SetConsoleMode(
+            consoleInput, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
     {
         abort();
     }
@@ -260,9 +259,7 @@ void run_editor(expression *source)
             abort();
         }
 
-        switch (input.EventType)
-        {
-        case KEY_EVENT:
+        if (input.EventType == KEY_EVENT)
         {
             optional_key_event const key =
                 from_win32_key_event(input.Event.KeyEvent);
@@ -282,21 +279,6 @@ void run_editor(expression *source)
                 }
                 break;
             }
-            break;
-        }
-
-        case MOUSE_EVENT:
-            break;
-
-        case WINDOW_BUFFER_SIZE_EVENT:
-            break;
-
-        case FOCUS_EVENT:
-            break;
-
-        default:
-            printf("Unknown event\n");
-            break;
         }
     }
 }
