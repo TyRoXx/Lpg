@@ -128,22 +128,111 @@ typedef enum key_event_handler_result
     stop_running
 } key_event_handler_result;
 
-key_event_handler_result handle_key_event(KEY_EVENT_RECORD event,
-                                          HANDLE consoleOutput,
+typedef enum key
+{
+    key_s,
+    key_escape
+} key;
+
+typedef enum key_state
+{
+    key_state_down,
+    key_state_up
+} key_state;
+
+typedef enum optional
+{
+    optional_set,
+    optional_empty
+} optional;
+
+typedef struct key_event
+{
+    key_state main_state;
+    key main_key;
+    key_state control;
+} key_event;
+
+typedef struct optional_key_event
+{
+    optional state;
+    key_event value;
+} optional_key_event;
+
+optional_key_event const optional_key_event_empty = {
+    optional_empty, {key_state_down, key_escape, key_state_down}};
+
+optional_key_event make_optional_key_event(key_event value)
+{
+    optional_key_event result = {optional_set, value};
+    return result;
+}
+
+typedef struct optional_key
+{
+    optional state;
+    key value;
+} optional_key;
+
+optional_key const optional_key_empty = {optional_empty, key_escape};
+
+optional_key make_optional_key(key value)
+{
+    optional_key result = {optional_set, value};
+    return result;
+}
+
+optional_key from_win32_key(WORD code)
+{
+    switch (code)
+    {
+    case 27:
+        return make_optional_key(key_escape);
+
+    case 83:
+        return make_optional_key(key_s);
+    }
+    return optional_key_empty;
+}
+
+optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
+{
+    optional_key const key = from_win32_key(event.wVirtualKeyCode);
+    switch (key.state)
+    {
+    case optional_empty:
+        return optional_key_event_empty;
+
+    case optional_set:
+    {
+        key_event result = {
+            event.bKeyDown ? key_state_down : key_state_up, key.value,
+            (event.dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+                ? key_state_down
+                : key_state_up};
+        return make_optional_key_event(result);
+    }
+    }
+    abort();
+}
+
+key_event_handler_result handle_key_event(key_event event, HANDLE consoleOutput,
                                           expression const *source)
 {
-    if (event.bKeyDown)
+    switch (event.main_state)
     {
+    case key_state_down:
         return continue_running;
+
+    case key_state_up:
+        break;
     }
-    if ((event.wVirtualKeyCode == 0x53) &&
-        (event.dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED)))
+    if ((event.main_key == key_s) && (event.control == key_state_down))
     {
         printf("Save\n");
         return continue_running;
     }
-    WCHAR const c = event.uChar.UnicodeChar;
-    if (c == 27)
+    if (event.main_key == key_escape)
     {
         return stop_running;
     }
@@ -180,16 +269,27 @@ void run_editor(expression *source)
         switch (input.EventType)
         {
         case KEY_EVENT:
-            switch (
-                handle_key_event(input.Event.KeyEvent, consoleOutput, source))
+        {
+            optional_key_event const key =
+                from_win32_key_event(input.Event.KeyEvent);
+            switch (key.state)
             {
-            case continue_running:
+            case optional_empty:
                 break;
 
-            case stop_running:
-                return;
+            case optional_set:
+                switch (handle_key_event(key.value, consoleOutput, source))
+                {
+                case continue_running:
+                    break;
+
+                case stop_running:
+                    return;
+                }
+                break;
             }
             break;
+        }
 
         case MOUSE_EVENT:
             break;
