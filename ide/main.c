@@ -147,38 +147,12 @@ key_event_handler_result handle_key_event(KEY_EVENT_RECORD event,
     {
         return stop_running;
     }
-    if (c != 13)
-    {
-        return continue_running;
-    }
-    CONSOLE_SCREEN_BUFFER_INFO consoleScreenBufferInfo;
-    if (!GetConsoleScreenBufferInfo(consoleOutput, &consoleScreenBufferInfo))
-    {
-        abort();
-    }
     const COORD zero = {0, 0};
-    DWORD written = 0;
-    if (!FillConsoleOutputCharacter(
-            consoleOutput, ' ',
-            consoleScreenBufferInfo.dwSize.X * consoleScreenBufferInfo.dwSize.Y,
-            zero, &written))
-    {
-        abort();
-    }
     if (!SetConsoleCursorPosition(consoleOutput, zero))
     {
         abort();
     }
-    if (!SetConsoleTextAttribute(consoleOutput, FOREGROUND_BLUE))
-    {
-        abort();
-    }
     render(source);
-    if (!SetConsoleTextAttribute(
-            consoleOutput, FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED))
-    {
-        abort();
-    }
     return continue_running;
 }
 
