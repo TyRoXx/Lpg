@@ -216,7 +216,7 @@ optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
     abort();
 }
 
-key_event_handler_result handle_key_event(key_event event, HANDLE consoleOutput,
+key_event_handler_result handle_key_event(key_event event,
                                           expression const *source)
 {
     switch (event.main_state)
@@ -236,11 +236,6 @@ key_event_handler_result handle_key_event(key_event event, HANDLE consoleOutput,
     {
         return stop_running;
     }
-    const COORD zero = {0, 0};
-    if (!SetConsoleCursorPosition(consoleOutput, zero))
-    {
-        abort();
-    }
     render(source);
     return continue_running;
 }
@@ -248,7 +243,6 @@ key_event_handler_result handle_key_event(key_event event, HANDLE consoleOutput,
 void run_editor(expression *source)
 {
     render(source);
-    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     if (!SetConsoleMode(consoleInput, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT |
                                           ENABLE_EXTENDED_FLAGS |
@@ -278,7 +272,7 @@ void run_editor(expression *source)
                 break;
 
             case optional_set:
-                switch (handle_key_event(key.value, consoleOutput, source))
+                switch (handle_key_event(key.value, source))
                 {
                 case continue_running:
                     break;

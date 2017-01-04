@@ -96,6 +96,11 @@ inline void print_to_console(console_cell const *cells, size_t line_length,
     HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     LPG_FOR(size_t, y, number_of_lines)
     {
+        COORD position = {0, (SHORT)y};
+        if (!SetConsoleCursorPosition(consoleOutput, position))
+        {
+            abort();
+        }
         LPG_FOR(size_t, x, line_length)
         {
             console_cell const *cell = cells + (y * line_length) + x;
@@ -111,11 +116,6 @@ inline void print_to_console(console_cell const *cells, size_t line_length,
             {
                 abort();
             }
-        }
-        COORD position = {0, (SHORT)(y + 1)};
-        if (!SetConsoleCursorPosition(consoleOutput, position))
-        {
-            abort();
         }
     }
 }
