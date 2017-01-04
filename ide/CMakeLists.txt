@@ -1,1 +1,2 @@
-add_executable(ide main.c)
+file(GLOB sources "*.c" "*.h")
+add_executable(ide ${sources})
