@@ -216,6 +216,22 @@ optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
     abort();
 }
 
+optional_key_event wait_for_key_event(void)
+{
+    HANDLE const consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+    INPUT_RECORD input;
+    DWORD inputEvents;
+    if (!ReadConsoleInput(consoleInput, &input, 1, &inputEvents))
+    {
+        abort();
+    }
+    if (input.EventType == KEY_EVENT)
+    {
+        return from_win32_key_event(input.Event.KeyEvent);
+    }
+    return optional_key_event_empty;
+}
+
 key_event_handler_result handle_key_event(key_event event,
                                           expression const *source)
 {
@@ -240,45 +256,38 @@ key_event_handler_result handle_key_event(key_event event,
     return continue_running;
 }
 
-void run_editor(expression *source)
+void prepare_win32_console(void)
 {
-    render(source);
     HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     if (!SetConsoleMode(
             consoleInput, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
     {
         abort();
     }
+}
 
+void run_editor(expression *source)
+{
+    render(source);
+    prepare_win32_console();
     for (;;)
     {
-        INPUT_RECORD input;
-        DWORD inputEvents;
-        if (!ReadConsoleInput(consoleInput, &input, 1, &inputEvents))
+        optional_key_event const key = wait_for_key_event();
+        switch (key.state)
         {
-            abort();
-        }
+        case optional_empty:
+            break;
 
-        if (input.EventType == KEY_EVENT)
-        {
-            optional_key_event const key =
-                from_win32_key_event(input.Event.KeyEvent);
-            switch (key.state)
+        case optional_set:
+            switch (handle_key_event(key.value, source))
             {
-            case optional_empty:
+            case continue_running:
                 break;
 
-            case optional_set:
-                switch (handle_key_event(key.value, source))
-                {
-                case continue_running:
-                    break;
-
-                case stop_running:
-                    return;
-                }
-                break;
+            case stop_running:
+                return;
             }
+            break;
         }
     }
 }
