@@ -119,3 +119,117 @@ inline void print_to_console(console_cell const *cells, size_t line_length,
         }
     }
 }
+
+inline void prepare_win32_console(void)
+{
+    HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+    if (!SetConsoleMode(
+            consoleInput, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
+    {
+        abort();
+    }
+}
+
+typedef enum key
+{
+    key_s,
+    key_escape
+} key;
+
+typedef enum key_state
+{
+    key_state_down,
+    key_state_up
+} key_state;
+
+typedef enum optional
+{
+    optional_set,
+    optional_empty
+} optional;
+
+typedef struct key_event
+{
+    key_state main_state;
+    key main_key;
+    key_state control;
+} key_event;
+
+typedef struct optional_key_event
+{
+    optional state;
+    key_event value;
+} optional_key_event;
+
+optional_key_event const optional_key_event_empty = {
+    optional_empty, {key_state_down, key_escape, key_state_down}};
+
+inline optional_key_event make_optional_key_event(key_event value)
+{
+    optional_key_event result = {optional_set, value};
+    return result;
+}
+
+typedef struct optional_key
+{
+    optional state;
+    key value;
+} optional_key;
+
+optional_key const optional_key_empty = {optional_empty, key_escape};
+
+inline optional_key make_optional_key(key value)
+{
+    optional_key result = {optional_set, value};
+    return result;
+}
+
+inline optional_key from_win32_key(WORD code)
+{
+    switch (code)
+    {
+    case 27:
+        return make_optional_key(key_escape);
+
+    case 83:
+        return make_optional_key(key_s);
+    }
+    return optional_key_empty;
+}
+
+inline optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
+{
+    optional_key const key = from_win32_key(event.wVirtualKeyCode);
+    switch (key.state)
+    {
+    case optional_empty:
+        return optional_key_event_empty;
+
+    case optional_set:
+    {
+        key_event result = {
+            event.bKeyDown ? key_state_down : key_state_up, key.value,
+            (event.dwControlKeyState & (LEFT_CTRL_PRESSED | RIGHT_CTRL_PRESSED))
+                ? key_state_down
+                : key_state_up};
+        return make_optional_key_event(result);
+    }
+    }
+    abort();
+}
+
+inline optional_key_event wait_for_key_event(void)
+{
+    HANDLE const consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+    INPUT_RECORD input;
+    DWORD inputEvents;
+    if (!ReadConsoleInput(consoleInput, &input, 1, &inputEvents))
+    {
+        abort();
+    }
+    if (input.EventType == KEY_EVENT)
+    {
+        return from_win32_key_event(input.Event.KeyEvent);
+    }
+    return optional_key_event_empty;
+}
