@@ -1,8 +1,14 @@
 #pragma once
 #include "lpg_for.h"
+#ifdef _WIN32
 #include <Windows.h>
+#endif
+#ifdef __linux__
+#include <unistd.h>
+#endif
 #include <stdlib.h>
 #include <stdint.h>
+#include <assert.h>
 
 typedef enum console_color
 {
@@ -29,7 +35,7 @@ typedef struct console_printer
     size_t position_in_line;
 } console_printer;
 
-inline unicode_code_point restrict_console_text(unicode_code_point original)
+static unicode_code_point restrict_console_text(unicode_code_point original)
 {
     if (original <= 31)
     {
@@ -38,7 +44,7 @@ inline unicode_code_point restrict_console_text(unicode_code_point original)
     return original;
 }
 
-inline void console_print_char(console_printer *printer,
+static void console_print_char(console_printer *printer,
                                unicode_code_point text,
                                console_color text_color)
 {
@@ -63,7 +69,7 @@ inline void console_print_char(console_printer *printer,
     }
 }
 
-inline void console_new_line(console_printer *printer)
+static void console_new_line(console_printer *printer)
 {
     if (printer->current_line == printer->number_of_lines)
     {
@@ -73,7 +79,8 @@ inline void console_new_line(console_printer *printer)
     ++printer->current_line;
 }
 
-inline WORD to_win32_console_color(console_color color)
+#ifdef _WIN32
+static WORD to_win32_console_color(console_color color)
 {
     switch (color)
     {
@@ -89,10 +96,12 @@ inline WORD to_win32_console_color(console_color color)
     }
     abort();
 }
+#endif
 
-inline void print_to_console(console_cell const *cells, size_t line_length,
+static void print_to_console(console_cell const *cells, size_t line_length,
                              size_t number_of_lines)
 {
+#ifdef _WIN32
     HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     LPG_FOR(size_t, y, number_of_lines)
     {
@@ -118,9 +127,42 @@ inline void print_to_console(console_cell const *cells, size_t line_length,
             }
         }
     }
+#endif
+
+#ifdef __linux__
+    static char const clear[] = "\033[H\033[J";
+    if (write(STDOUT_FILENO, &clear[0], sizeof(clear) - 1) !=
+        (sizeof(clear) - 1))
+    {
+        abort();
+    }
+    LPG_FOR(size_t, y, number_of_lines)
+    {
+        if (y != 0)
+        {
+            char const new_line = '\n';
+            if (write(STDOUT_FILENO, &new_line, 1) != 1)
+            {
+                abort();
+            }
+        }
+        LPG_FOR(size_t, x, line_length)
+        {
+            console_cell const *cell = cells + (y * line_length) + x;
+            char c = (char)cell->text;
+            /*assume ASCII for now*/
+            assert((unicode_code_point)c == cell->text);
+            if (write(STDOUT_FILENO, &c, 1) != 1)
+            {
+                abort();
+            }
+        }
+    }
+#endif
 }
 
-inline void prepare_win32_console(void)
+#ifdef _WIN32
+static void prepare_win32_console(void)
 {
     HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     if (!SetConsoleMode(
@@ -129,6 +171,7 @@ inline void prepare_win32_console(void)
         abort();
     }
 }
+#endif
 
 typedef enum key
 {
@@ -164,11 +207,13 @@ typedef struct optional_key_event
 optional_key_event const optional_key_event_empty = {
     optional_empty, {key_state_down, key_escape, key_state_down}};
 
-inline optional_key_event make_optional_key_event(key_event value)
+#ifdef _WIN32
+static optional_key_event make_optional_key_event(key_event value)
 {
     optional_key_event result = {optional_set, value};
     return result;
 }
+#endif
 
 typedef struct optional_key
 {
@@ -178,13 +223,14 @@ typedef struct optional_key
 
 optional_key const optional_key_empty = {optional_empty, key_escape};
 
-inline optional_key make_optional_key(key value)
+#ifdef _WIN32
+static optional_key make_optional_key(key value)
 {
     optional_key result = {optional_set, value};
     return result;
 }
 
-inline optional_key from_win32_key(WORD code)
+static optional_key from_win32_key(WORD code)
 {
     switch (code)
     {
@@ -197,7 +243,7 @@ inline optional_key from_win32_key(WORD code)
     return optional_key_empty;
 }
 
-inline optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
+static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 {
     optional_key const key = from_win32_key(event.wVirtualKeyCode);
     switch (key.state)
@@ -217,9 +263,11 @@ inline optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
     }
     abort();
 }
+#endif
 
-inline optional_key_event wait_for_key_event(void)
+static optional_key_event wait_for_key_event(void)
 {
+#ifdef _WIN32
     HANDLE const consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     INPUT_RECORD input;
     DWORD inputEvents;
@@ -232,4 +280,15 @@ inline optional_key_event wait_for_key_event(void)
         return from_win32_key_event(input.Event.KeyEvent);
     }
     return optional_key_event_empty;
+#endif
+
+#ifdef __linux__
+    char input[1];
+    ssize_t bytes_read = read(STDIN_FILENO, input, sizeof(input));
+    if (bytes_read < 0)
+    {
+        abort();
+    }
+    return optional_key_event_empty;
+#endif
 }

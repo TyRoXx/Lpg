@@ -1,11 +1,12 @@
 #pragma once
 #include "lpg_allocate.h"
+#include <string.h>
 
 typedef struct expression expression;
 
-void expression_free(expression *this);
+static void expression_free(expression *this);
 
-inline void expression_deallocate(expression *this)
+static void expression_deallocate(expression *this)
 {
     expression_free(this);
     deallocate(this);
@@ -17,7 +18,7 @@ typedef struct utf8_string
     size_t length;
 } utf8_string;
 
-inline utf8_string utf8_string_from_c_str(const char *c_str)
+static utf8_string utf8_string_from_c_str(const char *c_str)
 {
     utf8_string result;
     result.length = strlen(c_str);
@@ -26,7 +27,7 @@ inline utf8_string utf8_string_from_c_str(const char *c_str)
     return result;
 }
 
-inline void utf8_string_free(utf8_string *s)
+static void utf8_string_free(utf8_string *s)
 {
     deallocate(s->data);
 }
@@ -38,7 +39,7 @@ typedef struct lambda
     expression *result;
 } lambda;
 
-inline void lambda_free(lambda *this)
+static void lambda_free(lambda *this)
 {
     expression_deallocate(this->parameter_type);
     expression_deallocate(this->parameter_name);
@@ -51,7 +52,7 @@ typedef struct integer
     uint64_t low;
 } integer;
 
-inline integer integer_create(uint64_t high, uint64_t low)
+static integer integer_create(uint64_t high, uint64_t low)
 {
     integer result = {high, low};
     return result;
@@ -102,7 +103,7 @@ typedef struct function
     expression *parameter;
 } function;
 
-inline void function_free(function *this)
+static void function_free(function *this)
 {
     expression_deallocate(this->result);
     expression_deallocate(this->parameter);
@@ -115,7 +116,7 @@ typedef struct add_member
     expression *type;
 } add_member;
 
-inline void add_member_free(add_member *this)
+static void add_member_free(add_member *this)
 {
     expression_deallocate(this->base);
     expression_deallocate(this->name);
@@ -188,21 +189,23 @@ struct expression
     };
 };
 
-inline expression expression_from_builtin(builtin value)
+static expression expression_from_builtin(builtin value)
 {
-    expression result = {expression_type_builtin};
+    expression result;
+    result.type = expression_type_builtin;
     result.builtin = value;
     return result;
 }
 
-inline expression expression_from_integer_literal(integer value)
+static expression expression_from_integer_literal(integer value)
 {
-    expression result = {expression_type_integer_literal};
+    expression result;
+    result.type = expression_type_integer_literal;
     result.integer_literal = value;
     return result;
 }
 
-inline void call_free(call *this)
+static void call_free(call *this)
 {
     expression_deallocate(this->callee);
     LPG_FOR(size_t, i, this->number_of_arguments)
@@ -212,7 +215,7 @@ inline void call_free(call *this)
     deallocate(this->arguments);
 }
 
-inline void fill_structure_free(fill_structure *this)
+static void fill_structure_free(fill_structure *this)
 {
     LPG_FOR(size_t, i, this->number_of_members)
     {
@@ -221,19 +224,19 @@ inline void fill_structure_free(fill_structure *this)
     deallocate(this->members);
 }
 
-inline void access_structure_free(access_structure *this)
+static void access_structure_free(access_structure *this)
 {
     expression_deallocate(this->object);
     utf8_string_free(&this->member);
 }
 
-inline void add_to_variant_free(add_to_variant *this)
+static void add_to_variant_free(add_to_variant *this)
 {
     expression_deallocate(this->base);
     expression_deallocate(this->new_type);
 }
 
-inline void match_free(match *this)
+static void match_free(match *this)
 {
     expression_deallocate(this->input);
     LPG_FOR(size_t, i, this->number_of_cases)
@@ -244,7 +247,7 @@ inline void match_free(match *this)
     deallocate(this->cases);
 }
 
-inline void sequence_free(sequence *this)
+static void sequence_free(sequence *this)
 {
     LPG_FOR(size_t, i, this->number_of_elements)
     {
@@ -253,34 +256,35 @@ inline void sequence_free(sequence *this)
     deallocate(this->elements);
 }
 
-inline void assignment_free(assignment *this)
+static void assignment_free(assignment *this)
 {
     expression_deallocate(this->variable);
     expression_deallocate(this->new_value);
 }
 
-inline expression expression_from_lambda(lambda lambda)
+static expression expression_from_lambda(lambda lambda)
 {
     expression result = {expression_type_lambda};
     result.lambda = lambda;
     return result;
 }
 
-inline expression expression_from_utf8_string(utf8_string value)
+static expression expression_from_utf8_string(utf8_string value)
 {
-    expression result = {expression_type_utf8_literal};
+    expression result;
+    result.type = expression_type_utf8_literal;
     result.utf8_literal = value;
     return result;
 }
 
-inline expression *expression_allocate(expression value)
+static expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
     *result = value;
     return result;
 }
 
-inline void expression_free(expression *this)
+static void expression_free(expression *this)
 {
     switch (this->type)
     {

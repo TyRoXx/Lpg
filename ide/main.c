@@ -57,7 +57,8 @@ void render_expression(console_printer *printer, expression const *source)
         }
         LPG_FOR(size_t, i, sizeof(buffer) - 1)
         {
-            console_print_char(printer, buffer[i], console_color_white);
+            console_print_char(
+                printer, (unicode_code_point)buffer[i], console_color_white);
         }
         break;
     }
@@ -92,8 +93,10 @@ void render_expression(console_printer *printer, expression const *source)
     case expression_type_utf8_literal:
         LPG_FOR(size_t, i, source->utf8_literal.length)
         {
-            console_print_char(
-                printer, source->utf8_literal.data[i], console_color_white);
+            /*TODO: decode UTF-8*/
+            console_print_char(printer,
+                               (unicode_code_point)source->utf8_literal.data[i],
+                               console_color_white);
         }
         break;
     }
@@ -155,7 +158,9 @@ key_event_handler_result handle_key_event(key_event event,
 void run_editor(expression *source)
 {
     render(source);
+#ifdef _WIN32
     prepare_win32_console();
+#endif
     for (;;)
     {
         optional_key_event const key = wait_for_key_event();
@@ -180,12 +185,13 @@ void run_editor(expression *source)
 
 int main(void)
 {
-    lambda main = {expression_allocate(expression_from_builtin(builtin_unit)),
-                   expression_allocate(expression_from_utf8_string(
-                       utf8_string_from_c_str("argument"))),
-                   expression_allocate(expression_from_integer_literal(
-                       integer_create(0, 123)))};
-    expression root = expression_from_lambda(main);
+    lambda root_function = {
+        expression_allocate(expression_from_builtin(builtin_unit)),
+        expression_allocate(
+            expression_from_utf8_string(utf8_string_from_c_str("argument"))),
+        expression_allocate(
+            expression_from_integer_literal(integer_create(0, 123)))};
+    expression root = expression_from_lambda(root_function);
     run_editor(&root);
     expression_free(&root);
     check_allocations();
