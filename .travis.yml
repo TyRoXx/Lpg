@@ -1,0 +1,30 @@
+language: c
+os:
+ - linux
+sudo: false
+notifications:
+ email:
+  on_success: change # [always|never|change] # default: change
+  on_failure: always # [always|never|change] # default: always
+
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - gcc-5
+    - clang
+
+env:
+ - MYCC=gcc-5   BUILD_TYPE=Release
+ - MYCC=gcc-5   BUILD_TYPE=Debug
+ - MYCC=clang   BUILD_TYPE=Release
+ - MYCC=clang   BUILD_TYPE=Debug
+
+script:
+ - mkdir build
+ - cd build
+ - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE || exit 1
+ - cmake --build . -- -j2 || exit 1
+ - cd tests
+ - ./tests || exit 1
