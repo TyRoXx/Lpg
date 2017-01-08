@@ -5,6 +5,7 @@
 #endif
 #ifdef __linux__
 #include <unistd.h>
+#include <termios.h>
 #endif
 #include <stdlib.h>
 #include <stdint.h>
@@ -161,17 +162,32 @@ static void print_to_console(console_cell const *cells, size_t line_length,
 #endif
 }
 
-#ifdef _WIN32
-static void prepare_win32_console(void)
+static void prepare_console(void)
 {
+#ifdef _WIN32
     HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     if (!SetConsoleMode(
             consoleInput, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
     {
         abort();
     }
-}
 #endif
+
+#ifdef __linux__
+    struct termios old_tio;
+    struct termios new_tio;
+    if (tcgetattr(STDIN_FILENO, &old_tio) != 0)
+    {
+        abort();
+    }
+    new_tio = old_tio;
+    new_tio.c_lflag &= (tcflag_t)(~ICANON & ~ECHO);
+    if (tcsetattr(STDIN_FILENO, TCSANOW, &new_tio) != 0)
+    {
+        abort();
+    }
+#endif
+}
 
 typedef enum key
 {
@@ -207,13 +223,11 @@ typedef struct optional_key_event
 optional_key_event const optional_key_event_empty = {
     optional_empty, {key_state_down, key_escape, key_state_down}};
 
-#ifdef _WIN32
 static optional_key_event make_optional_key_event(key_event value)
 {
     optional_key_event result = {optional_set, value};
     return result;
 }
-#endif
 
 typedef struct optional_key
 {
@@ -265,6 +279,18 @@ static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 }
 #endif
 
+#ifdef __linux__
+static optional_key_event from_linux_key_event(char input)
+{
+    if (input == 27)
+    {
+        key_event result = {key_state_up, key_escape, key_state_up};
+        return make_optional_key_event(result);
+    }
+    return optional_key_event_empty;
+}
+#endif
+
 static optional_key_event wait_for_key_event(void)
 {
 #ifdef _WIN32
@@ -289,6 +315,6 @@ static optional_key_event wait_for_key_event(void)
     {
         abort();
     }
-    return optional_key_event_empty;
+    return from_linux_key_event(input[0]);
 #endif
 }

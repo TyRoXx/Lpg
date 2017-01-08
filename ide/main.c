@@ -158,9 +158,7 @@ key_event_handler_result handle_key_event(key_event event,
 void run_editor(expression *source)
 {
     render(source);
-#ifdef _WIN32
-    prepare_win32_console();
-#endif
+    prepare_console();
     for (;;)
     {
         optional_key_event const key = wait_for_key_event();
