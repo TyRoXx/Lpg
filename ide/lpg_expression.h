@@ -264,7 +264,8 @@ static void assignment_free(assignment *this)
 
 static expression expression_from_lambda(lambda lambda)
 {
-    expression result = {expression_type_lambda};
+    expression result;
+    result.type = expression_type_lambda;
     result.lambda = lambda;
     return result;
 }
