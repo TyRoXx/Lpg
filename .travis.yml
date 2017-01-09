@@ -22,6 +22,13 @@ env:
  - MYCC=clang   BUILD_TYPE=Release
  - MYCC=clang   BUILD_TYPE=Debug
 
+matrix:
+  exclude:
+    - os: osx
+      env: MYCC=gcc-5   BUILD_TYPE=Release
+    - os: osx
+      env: MYCC=gcc-5   BUILD_TYPE=Debug
+
 script:
  - mkdir build
  - cd build
