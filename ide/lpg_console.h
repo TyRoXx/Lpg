@@ -3,7 +3,12 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#ifdef __linux__
+#if defined(__linux__) || defined(__APPLE__)
+#define LPG_UNIX_CONSOLE 1
+#else
+#define LPG_UNIX_CONSOLE 0
+#endif
+#if LPG_UNIX_CONSOLE
 #include <unistd.h>
 #include <termios.h>
 #endif
@@ -130,7 +135,7 @@ static void print_to_console(console_cell const *cells, size_t line_length,
     }
 #endif
 
-#ifdef __linux__
+#if LPG_UNIX_CONSOLE
     static char const clear[] = "\033[H\033[J";
     if (write(STDOUT_FILENO, &clear[0], sizeof(clear) - 1) !=
         (sizeof(clear) - 1))
@@ -173,7 +178,7 @@ static void prepare_console(void)
     }
 #endif
 
-#ifdef __linux__
+#if LPG_UNIX_CONSOLE
     struct termios old_tio;
     struct termios new_tio;
     if (tcgetattr(STDIN_FILENO, &old_tio) != 0)
@@ -279,8 +284,8 @@ static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 }
 #endif
 
-#ifdef __linux__
-static optional_key_event from_linux_key_event(char input)
+#if LPG_UNIX_CONSOLE
+static optional_key_event from_unix_key_event(char input)
 {
     if (input == 27)
     {
@@ -308,13 +313,13 @@ static optional_key_event wait_for_key_event(void)
     return optional_key_event_empty;
 #endif
 
-#ifdef __linux__
+#if LPG_UNIX_CONSOLE
     char input[1];
     ssize_t bytes_read = read(STDIN_FILENO, input, sizeof(input));
     if (bytes_read < 0)
     {
         abort();
     }
-    return from_linux_key_event(input[0]);
+    return from_unix_key_event(input[0]);
 #endif
 }
