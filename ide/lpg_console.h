@@ -21,7 +21,8 @@ typedef enum console_color
     console_color_red,
     console_color_grey,
     console_color_white,
-    console_color_cyan
+    console_color_cyan,
+    console_color_yellow
 } console_color;
 
 typedef uint32_t unicode_code_point;
@@ -91,7 +92,7 @@ static WORD to_win32_console_color(console_color color)
     switch (color)
     {
     case console_color_cyan:
-        return FOREGROUND_BLUE | FOREGROUND_INTENSITY;
+        return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY;
     case console_color_grey:
         return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED;
     case console_color_red:
@@ -99,6 +100,8 @@ static WORD to_win32_console_color(console_color color)
     case console_color_white:
         return FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_RED |
                FOREGROUND_INTENSITY;
+    case console_color_yellow:
+        return FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY;
     }
     abort();
 }

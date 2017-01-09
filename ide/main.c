@@ -1,20 +1,49 @@
 #include "lpg_console.h"
-#include "lpg_expression.h"
+#include "lpg_cursor.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
 
-void render_expression(console_printer *printer, expression const *source)
+typedef struct cursor_list
+{
+    cursor_link const *head;
+    size_t size;
+} cursor_list;
+
+static cursor_list descend(cursor_list cursor, size_t const rendered_child)
+{
+    static cursor_list const empty_cursor_list = {NULL, 0};
+    if (!cursor.head)
+    {
+        return empty_cursor_list;
+    }
+    if (cursor.head->child != rendered_child)
+    {
+        return empty_cursor_list;
+    }
+    --cursor.size;
+    if (cursor.size == 0)
+    {
+        return empty_cursor_list;
+    }
+    ++cursor.head;
+    return cursor;
+}
+
+void render_expression(console_printer *const printer,
+                       expression const *const source, cursor_list const cursor)
 {
     switch (source->type)
     {
     case expression_type_lambda:
         console_print_char(printer, '/', console_color_cyan);
-        render_expression(printer, source->lambda.parameter_type);
+        render_expression(
+            printer, source->lambda.parameter_type, descend(cursor, 0));
         console_print_char(printer, ' ', console_color_grey);
-        render_expression(printer, source->lambda.parameter_name);
+        render_expression(
+            printer, source->lambda.parameter_name, descend(cursor, 1));
         console_new_line(printer);
         console_print_char(printer, ' ', console_color_grey);
-        render_expression(printer, source->lambda.result);
+        render_expression(printer, source->lambda.result, descend(cursor, 2));
         break;
 
     case expression_type_builtin:
@@ -93,6 +122,10 @@ void render_expression(console_printer *printer, expression const *source)
     case expression_type_utf8_literal:
         LPG_FOR(size_t, i, source->utf8_literal.length)
         {
+            if (cursor.size == 1 && (cursor.head->child == i))
+            {
+                console_print_char(printer, '>', console_color_yellow);
+            }
             /*TODO: decode UTF-8*/
             console_print_char(printer,
                                (unicode_code_point)source->utf8_literal.data[i],
@@ -108,7 +141,7 @@ enum
     console_height = 24
 };
 
-void render(expression const *source)
+void render(expression const *source, cursor_list const cursors)
 {
     console_cell cells[console_width * console_height];
     LPG_FOR(size_t, y, console_height)
@@ -121,7 +154,7 @@ void render(expression const *source)
         }
     }
     console_printer printer = {&cells[0], console_width, console_height, 0, 0};
-    render_expression(&printer, source);
+    render_expression(&printer, source, cursors);
     print_to_console(cells, console_width, console_height);
 }
 
@@ -132,7 +165,8 @@ typedef enum key_event_handler_result
 } key_event_handler_result;
 
 key_event_handler_result handle_key_event(key_event event,
-                                          expression const *source)
+                                          expression const *source,
+                                          cursor_list *cursors)
 {
     switch (event.main_state)
     {
@@ -151,13 +185,15 @@ key_event_handler_result handle_key_event(key_event event,
     {
         return stop_running;
     }
-    render(source);
+    render(source, *cursors);
     return continue_running;
 }
 
 void run_editor(expression *source)
 {
-    render(source);
+    cursor_link cursor_links[2] = {{1}, {3}};
+    cursor_list cursors = {&cursor_links[0], 2};
+    render(source, cursors);
     prepare_console();
     for (;;)
     {
@@ -168,7 +204,7 @@ void run_editor(expression *source)
             break;
 
         case optional_set:
-            switch (handle_key_event(key.value, source))
+            switch (handle_key_event(key.value, source, &cursors))
             {
             case continue_running:
                 break;
