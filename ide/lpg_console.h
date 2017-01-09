@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <assert.h>
+#include <stdio.h>
 
 typedef enum console_color
 {
@@ -200,7 +201,11 @@ static void prepare_console(void)
 typedef enum key
 {
     key_s,
-    key_escape
+    key_escape,
+    key_left,
+    key_up,
+    key_right,
+    key_down
 } key;
 
 typedef enum key_state
@@ -259,9 +264,24 @@ static optional_key from_win32_key(WORD code)
     case 27:
         return make_optional_key(key_escape);
 
+    case 37:
+        return make_optional_key(key_left);
+
+    case 38:
+        return make_optional_key(key_up);
+
+    case 39:
+        return make_optional_key(key_right);
+
+    case 40:
+        return make_optional_key(key_down);
+
     case 83:
         return make_optional_key(key_s);
     }
+    char line[256];
+    snprintf(line, sizeof(line), "Unhandled key code: %d\n", code);
+    OutputDebugStringA(line);
     return optional_key_empty;
 }
 

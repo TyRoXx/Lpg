@@ -15,6 +15,22 @@ void *allocate(size_t size)
     return memory;
 }
 
+void *reallocate(void *memory, size_t new_size)
+{
+    int const was_null = (memory == NULL);
+    void *const new_memory = realloc(memory, new_size);
+    if (!new_memory)
+    {
+        --active_allocations;
+        return NULL;
+    }
+    if (was_null)
+    {
+        ++active_allocations;
+    }
+    return new_memory;
+}
+
 void deallocate(void *memory)
 {
     --active_allocations;
