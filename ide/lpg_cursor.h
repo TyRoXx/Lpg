@@ -3,5 +3,5 @@
 
 typedef struct cursor_link
 {
-        size_t child;
-}cursor_link;
+    size_t child;
+} cursor_link;
