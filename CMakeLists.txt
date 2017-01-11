@@ -9,7 +9,7 @@ add_custom_target(clang-format COMMAND ${LPG_CLANG_FORMAT} -i ${formatted} WORKI
 if(MSVC)
 	add_definitions(/Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221 /WX /D_WIN32_WINNT_WINTHRESHOLD=0 /DNTDDI_WIN7SP1=0 /DWINAPI_PARTITION_SYSTEM=0)
 else()
-	add_definitions(-std=gnu99 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef)
+	add_definitions(-std=gnu99 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
 endif()
 
 add_subdirectory(ide)
