@@ -173,7 +173,8 @@ key_event_handler_result handle_key_event(key_event event,
     case key_state_up:
         break;
     }
-    if (event.main_key == key_escape)
+    if ((event.main_key.type == virtual_key_type_unicode) &&
+        (event.main_key.unicode == 27))
     {
         return stop_running;
     }

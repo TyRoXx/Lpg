@@ -198,15 +198,27 @@ static void prepare_console(void)
 #endif
 }
 
-typedef enum key
+typedef enum virtual_key_type
 {
-    key_s,
-    key_escape,
-    key_left,
-    key_up,
-    key_right,
-    key_down
-} key;
+    virtual_key_type_unicode,
+    virtual_key_type_left,
+    virtual_key_type_up,
+    virtual_key_type_right,
+    virtual_key_type_down
+} virtual_key_type;
+
+typedef struct virtual_key
+{
+    virtual_key_type type;
+    unicode_code_point unicode;
+} virtual_key;
+
+static virtual_key make_virtual_key(virtual_key_type type,
+                                    unicode_code_point unicode)
+{
+    virtual_key result = {type, unicode};
+    return result;
+}
 
 typedef enum key_state
 {
@@ -223,7 +235,7 @@ typedef enum optional
 typedef struct key_event
 {
     key_state main_state;
-    key main_key;
+    virtual_key main_key;
     key_state control;
 } key_event;
 
@@ -234,7 +246,8 @@ typedef struct optional_key_event
 } optional_key_event;
 
 optional_key_event const optional_key_event_empty = {
-    optional_empty, {key_state_down, key_escape, key_state_down}};
+    optional_empty,
+    {key_state_down, {virtual_key_type_left, 0}, key_state_down}};
 
 static optional_key_event make_optional_key_event(key_event value)
 {
@@ -242,42 +255,46 @@ static optional_key_event make_optional_key_event(key_event value)
     return result;
 }
 
-typedef struct optional_key
+typedef struct optional_virtual_key
 {
     optional state;
-    key value;
-} optional_key;
+    virtual_key value;
+} optional_virtual_key;
 
-optional_key const optional_key_empty = {optional_empty, key_escape};
+optional_virtual_key const optional_key_empty = {
+    optional_empty, {virtual_key_type_left, 0}};
 
 #ifdef _WIN32
-static optional_key make_optional_key(key value)
+static optional_virtual_key make_optional_virtual_key(virtual_key value)
 {
-    optional_key result = {optional_set, value};
+    optional_virtual_key result = {optional_set, value};
     return result;
 }
 
-static optional_key from_win32_key(WORD code)
+static optional_virtual_key from_win32_key(WORD code, WCHAR unicode)
 {
+    if (unicode != 0)
+    {
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_unicode, unicode));
+    }
     switch (code)
     {
-    case 27:
-        return make_optional_key(key_escape);
-
     case 37:
-        return make_optional_key(key_left);
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_left, 0));
 
     case 38:
-        return make_optional_key(key_up);
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_up, 0));
 
     case 39:
-        return make_optional_key(key_right);
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_right, 0));
 
     case 40:
-        return make_optional_key(key_down);
-
-    case 83:
-        return make_optional_key(key_s);
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_down, 0));
     }
     char line[256];
     snprintf(line, sizeof(line), "Unhandled key code: %d\n", code);
@@ -287,7 +304,8 @@ static optional_key from_win32_key(WORD code)
 
 static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 {
-    optional_key const key = from_win32_key(event.wVirtualKeyCode);
+    optional_virtual_key const key =
+        from_win32_key(event.wVirtualKeyCode, event.uChar.UnicodeChar);
     switch (key.state)
     {
     case optional_empty:

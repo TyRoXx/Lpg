@@ -108,13 +108,13 @@ static editing_input_result handle_editing_input(key_event event,
     case expression_type_lambda:
         if ((cursors->size - 1) == level)
         {
-            switch (event.main_key)
+            switch (event.main_key.type)
             {
-            case key_left:
+            case virtual_key_type_left:
                 --cursors->size;
                 return editing_input_result_go_left;
 
-            case key_right:
+            case virtual_key_type_right:
                 --cursors->size;
                 return editing_input_result_go_right;
 
@@ -186,13 +186,13 @@ static editing_input_result handle_editing_input(key_event event,
         }
 
     case expression_type_builtin:
-        switch (event.main_key)
+        switch (event.main_key.type)
         {
-        case key_left:
+        case virtual_key_type_left:
             --cursors->size;
             return editing_input_result_go_left;
 
-        case key_right:
+        case virtual_key_type_right:
             --cursors->size;
             return editing_input_result_go_right;
 
@@ -205,13 +205,13 @@ static editing_input_result handle_editing_input(key_event event,
         abort();
 
     case expression_type_integer_literal:
-        switch (event.main_key)
+        switch (event.main_key.type)
         {
-        case key_left:
+        case virtual_key_type_left:
             --cursors->size;
             return editing_input_result_go_left;
 
-        case key_right:
+        case virtual_key_type_right:
             --cursors->size;
             return editing_input_result_go_right;
 
@@ -232,9 +232,9 @@ static editing_input_result handle_editing_input(key_event event,
 
     case expression_type_utf8_literal:
         assert((cursors->size - 1) == level);
-        switch (event.main_key)
+        switch (event.main_key.type)
         {
-        case key_left:
+        case virtual_key_type_left:
             if (cursors->head[level].child == 0)
             {
                 --cursors->size;
@@ -243,7 +243,7 @@ static editing_input_result handle_editing_input(key_event event,
             --cursors->head[level].child;
             break;
 
-        case key_right:
+        case virtual_key_type_right:
             ++cursors->head[level].child;
             if (cursors->head[level].child > source->utf8_literal.length)
             {
