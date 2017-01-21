@@ -42,7 +42,7 @@ static void add_link(cursor_list *const cursors, size_t const child)
 {
     ++cursors->size;
     cursors->head =
-        reallocate(cursors->head, sizeof(*cursors->head) * cursors->size);
+        reallocate_array(cursors->head, cursors->size, sizeof(*cursors->head));
     cursors->head[cursors->size - 1].child = child;
 }
 

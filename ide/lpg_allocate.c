@@ -42,6 +42,22 @@ void *reallocate(void *memory, size_t new_size)
     return new_memory;
 }
 
+void *reallocate_array(void *memory, size_t new_size, size_t element)
+{
+    int const was_null = (memory == NULL);
+    void *const new_memory = _recalloc(memory, new_size, element);
+    if (!new_memory)
+    {
+        --active_allocations;
+        return NULL;
+    }
+    if (was_null)
+    {
+        ++active_allocations;
+    }
+    return new_memory;
+}
+
 void deallocate(void *memory)
 {
     --active_allocations;

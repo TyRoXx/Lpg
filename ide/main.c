@@ -193,7 +193,7 @@ key_event_handler_result handle_key_event(key_event event, expression *source,
 
 void run_editor(expression *source)
 {
-    cursor_list cursors = {allocate(sizeof(*cursors.head) * 2), 2};
+    cursor_list cursors = {allocate_array(2, sizeof(*cursors.head)), 2};
     cursors.head[0].child = 1;
     cursors.head[1].child = 3;
     render(source, cursors);
