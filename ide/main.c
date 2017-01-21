@@ -14,8 +14,7 @@ static console_color yellow_or(int const condition,
 }
 
 static void render_expression(console_printer *const printer,
-                              expression const *const source,
-                              cursor_list const cursor)
+                       expression const *const source, cursor_list const cursor)
 {
     int const is_selected = (cursor.size == 1);
     switch (source->type)
@@ -167,11 +166,6 @@ key_event_handler_result handle_key_event(key_event event,
 
     case key_state_up:
         break;
-    }
-    if ((event.main_key == key_s) && (event.control == key_state_down))
-    {
-        printf("Save\n");
-        return continue_running;
     }
     if (event.main_key == key_escape)
     {
