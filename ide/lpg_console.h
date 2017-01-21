@@ -348,7 +348,7 @@ static optional_key_event wait_for_key_event(void)
     HANDLE const consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     INPUT_RECORD input;
     DWORD inputEvents;
-    if (!ReadConsoleInput(consoleInput, &input, 1, &inputEvents))
+    if (!ReadConsoleInputW(consoleInput, &input, 1, &inputEvents))
     {
         abort();
     }

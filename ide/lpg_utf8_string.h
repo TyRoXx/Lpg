@@ -25,7 +25,7 @@ static void utf8_string_insert(utf8_string *const s, size_t const position,
     {
         abort();
     }
-    char *new_data = allocate(s->length + 1);
+    char *const new_data = allocate(s->length + 1);
     memcpy(new_data, s->data, position);
     new_data[position] = (char)inserted;
     memcpy(new_data + position + 1, s->data + position, s->length - position);
