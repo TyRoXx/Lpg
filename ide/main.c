@@ -164,19 +164,18 @@ typedef enum key_event_handler_result
 key_event_handler_result handle_key_event(key_event event, expression *source,
                                           cursor_list *cursors)
 {
-    switch (event.main_state)
-    {
-    case key_state_down:
-        return continue_running;
-
-    case key_state_up:
-        break;
-    }
     const unicode_code_point escape = 27;
     if ((event.main_key.type == virtual_key_type_unicode) &&
         (event.main_key.unicode == escape))
     {
-        return stop_running;
+        switch (event.main_state)
+        {
+        case key_state_down:
+            return continue_running;
+
+        case key_state_up:
+            return stop_running;
+        }
     }
     switch (handle_editing_input(event, source, cursors, 0))
     {

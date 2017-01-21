@@ -103,6 +103,14 @@ static editing_input_result handle_editing_input(key_event event,
                                                  cursor_list *cursors,
                                                  size_t const level)
 {
+    switch (event.main_state)
+    {
+    case key_state_up:
+        return editing_input_result_ok;
+
+    case key_state_down:
+        break;
+    }
     switch (source->type)
     {
     case expression_type_lambda:
