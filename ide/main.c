@@ -14,7 +14,8 @@ static console_color yellow_or(int const condition,
 }
 
 static void render_expression(console_printer *const printer,
-                       expression const *const source, cursor_list const cursor)
+                              expression const *const source,
+                              cursor_list const cursor)
 {
     int const is_selected = (cursor.size == 1);
     switch (source->type)
@@ -121,6 +122,11 @@ static void render_expression(console_printer *const printer,
             console_print_char(printer,
                                (unicode_code_point)source->utf8_literal.data[i],
                                console_color_white);
+        }
+        if (cursor.size == 1 &&
+            (cursor.head->child == source->utf8_literal.length))
+        {
+            console_print_char(printer, '>', console_color_yellow);
         }
         break;
     }

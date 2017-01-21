@@ -84,7 +84,7 @@ static void enter_expression(expression const *source,
             break;
 
         case horizontal_end_right:
-            add_link(cursors, (source->utf8_literal.length - 1));
+            add_link(cursors, source->utf8_literal.length);
             break;
         }
         break;
@@ -245,7 +245,7 @@ static editing_input_result handle_editing_input(key_event event,
 
         case key_right:
             ++cursors->head[level].child;
-            if (cursors->head[level].child == source->utf8_literal.length)
+            if (cursors->head[level].child > source->utf8_literal.length)
             {
                 --cursors->size;
                 return editing_input_result_go_right;
