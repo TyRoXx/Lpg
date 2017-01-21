@@ -1,6 +1,5 @@
 #pragma once
-#include "lpg_allocate.h"
-#include <string.h>
+#include "lpg_utf8_string.h"
 
 typedef struct expression expression;
 
@@ -10,26 +9,6 @@ static void expression_deallocate(expression *this)
 {
     expression_free(this);
     deallocate(this);
-}
-
-typedef struct utf8_string
-{
-    char *data;
-    size_t length;
-} utf8_string;
-
-static utf8_string utf8_string_from_c_str(const char *c_str)
-{
-    utf8_string result;
-    result.length = strlen(c_str);
-    result.data = allocate(result.length);
-    memcpy(result.data, c_str, result.length);
-    return result;
-}
-
-static void utf8_string_free(utf8_string *s)
-{
-    deallocate(s->data);
 }
 
 typedef struct lambda

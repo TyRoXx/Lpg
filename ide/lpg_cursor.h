@@ -99,7 +99,7 @@ typedef enum editing_input_result
 } editing_input_result;
 
 static editing_input_result handle_editing_input(key_event event,
-                                                 expression const *source,
+                                                 expression *source,
                                                  cursor_list *cursors,
                                                  size_t const level)
 {
@@ -250,6 +250,13 @@ static editing_input_result handle_editing_input(key_event event,
                 --cursors->size;
                 return editing_input_result_go_right;
             }
+            break;
+
+        case virtual_key_type_unicode:
+            utf8_string_insert(&source->utf8_literal,
+                               cursors->head[level].child,
+                               event.main_key.unicode);
+            ++cursors->head[level].child;
             break;
 
         default:

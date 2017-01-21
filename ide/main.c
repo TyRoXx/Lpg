@@ -161,8 +161,7 @@ typedef enum key_event_handler_result
     stop_running
 } key_event_handler_result;
 
-key_event_handler_result handle_key_event(key_event event,
-                                          expression const *source,
+key_event_handler_result handle_key_event(key_event event, expression *source,
                                           cursor_list *cursors)
 {
     switch (event.main_state)
@@ -173,8 +172,9 @@ key_event_handler_result handle_key_event(key_event event,
     case key_state_up:
         break;
     }
+    const unicode_code_point escape = 27;
     if ((event.main_key.type == virtual_key_type_unicode) &&
-        (event.main_key.unicode == 27))
+        (event.main_key.unicode == escape))
     {
         return stop_running;
     }
