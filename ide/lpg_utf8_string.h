@@ -20,6 +20,7 @@ static utf8_string utf8_string_from_c_str(const char *c_str)
 static void utf8_string_insert(utf8_string *const s, size_t const position,
                                unicode_code_point const inserted)
 {
+    assert(position <= s->length);
     if (inserted > 0x9F)
     {
         abort();
@@ -31,6 +32,14 @@ static void utf8_string_insert(utf8_string *const s, size_t const position,
     deallocate(s->data);
     s->data = new_data;
     s->length++;
+}
+
+static void utf8_string_erase(utf8_string *const s, size_t const position)
+{
+    assert(position < s->length);
+    memmove(
+        s->data + position, s->data + position + 1, s->length - position - 1);
+    --s->length;
 }
 
 static void utf8_string_free(utf8_string *s)

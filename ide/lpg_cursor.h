@@ -252,11 +252,36 @@ static editing_input_result handle_editing_input(key_event event,
             }
             break;
 
+        case virtual_key_type_delete:
+            if (cursors->head[level].child < source->utf8_literal.length)
+            {
+                utf8_string_erase(
+                    &source->utf8_literal, cursors->head[level].child);
+            }
+            break;
+
         case virtual_key_type_unicode:
-            utf8_string_insert(&source->utf8_literal,
-                               cursors->head[level].child,
-                               event.main_key.unicode);
-            ++cursors->head[level].child;
+            switch (event.main_key.unicode)
+            {
+            case 10:
+                break;
+
+            case 8:
+                if (cursors->head[level].child > 0)
+                {
+                    utf8_string_erase(
+                        &source->utf8_literal, cursors->head[level].child - 1);
+                    --cursors->head[level].child;
+                }
+                break;
+
+            default:
+                utf8_string_insert(&source->utf8_literal,
+                                   cursors->head[level].child,
+                                   event.main_key.unicode);
+                ++cursors->head[level].child;
+                break;
+            }
             break;
 
         default:

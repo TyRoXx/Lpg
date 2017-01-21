@@ -204,7 +204,8 @@ typedef enum virtual_key_type
     virtual_key_type_left,
     virtual_key_type_up,
     virtual_key_type_right,
-    virtual_key_type_down
+    virtual_key_type_down,
+    virtual_key_type_delete
 } virtual_key_type;
 
 typedef struct virtual_key
@@ -295,6 +296,10 @@ static optional_virtual_key from_win32_key(WORD code, WCHAR unicode)
     case 40:
         return make_optional_virtual_key(
             make_virtual_key(virtual_key_type_down, 0));
+
+    case 46:
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_delete, 0));
     }
     char line[256];
     snprintf(line, sizeof(line), "Unhandled key code: %d\n", code);
