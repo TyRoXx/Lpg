@@ -309,6 +309,7 @@ static optional_virtual_key from_win32_key(WORD code, WCHAR unicode)
 
 static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 {
+    /*TODO: handle event.wRepeatCount > 1*/
     optional_virtual_key const key =
         from_win32_key(event.wVirtualKeyCode, event.uChar.UnicodeChar);
     switch (key.state)
