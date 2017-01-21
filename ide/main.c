@@ -111,20 +111,17 @@ static void render_expression(console_printer *const printer,
     case expression_type_assignment:
         abort();
 
-    case expression_type_utf8_literal:
-        LPG_FOR(size_t, i, source->utf8_literal.length)
+    case expression_type_string:
+        LPG_FOR(size_t, i, source->string.length)
         {
             if (cursor.size == 1 && (cursor.head->child == i))
             {
                 console_print_char(printer, '>', console_color_yellow);
             }
-            /*TODO: decode UTF-8*/
-            console_print_char(printer,
-                               (unicode_code_point)source->utf8_literal.data[i],
-                               console_color_white);
+            console_print_char(
+                printer, source->string.data[i], console_color_white);
         }
-        if (cursor.size == 1 &&
-            (cursor.head->child == source->utf8_literal.length))
+        if (cursor.size == 1 && (cursor.head->child == source->string.length))
         {
             console_print_char(printer, '>', console_color_yellow);
         }
@@ -228,8 +225,8 @@ int main(void)
 {
     lambda root_function = {
         expression_allocate(expression_from_builtin(builtin_unit)),
-        expression_allocate(
-            expression_from_utf8_string(utf8_string_from_c_str("argument"))),
+        expression_allocate(expression_from_unicode_string(
+            unicode_string_from_c_str("argument"))),
         expression_allocate(
             expression_from_integer_literal(integer_create(0, 123)))};
     expression root = expression_from_lambda(root_function);

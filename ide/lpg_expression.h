@@ -1,5 +1,5 @@
 #pragma once
-#include "lpg_utf8_string.h"
+#include "lpg_unicode_string.h"
 
 typedef struct expression expression;
 
@@ -59,7 +59,7 @@ typedef enum expression_type
     expression_type_match,
     expression_type_sequence,
     expression_type_assignment,
-    expression_type_utf8_literal
+    expression_type_string
 } expression_type;
 
 typedef enum builtin
@@ -111,7 +111,7 @@ typedef struct fill_structure
 typedef struct access_structure
 {
     expression *object;
-    utf8_string member;
+    unicode_string member;
 } access_structure;
 
 typedef struct add_to_variant
@@ -164,7 +164,7 @@ struct expression
         match match;
         sequence sequence;
         assignment assignment;
-        utf8_string utf8_literal;
+        unicode_string string;
     };
 };
 
@@ -206,7 +206,7 @@ static void fill_structure_free(fill_structure *this)
 static void access_structure_free(access_structure *this)
 {
     expression_deallocate(this->object);
-    utf8_string_free(&this->member);
+    unicode_string_free(&this->member);
 }
 
 static void add_to_variant_free(add_to_variant *this)
@@ -249,11 +249,11 @@ static expression expression_from_lambda(lambda lambda)
     return result;
 }
 
-static expression expression_from_utf8_string(utf8_string value)
+static expression expression_from_unicode_string(unicode_string value)
 {
     expression result;
-    result.type = expression_type_utf8_literal;
-    result.utf8_literal = value;
+    result.type = expression_type_string;
+    result.string = value;
     return result;
 }
 
@@ -321,8 +321,8 @@ static void expression_free(expression *this)
         assignment_free(&this->assignment);
         break;
 
-    case expression_type_utf8_literal:
-        utf8_string_free(&this->utf8_literal);
+    case expression_type_string:
+        unicode_string_free(&this->string);
         break;
     }
 }

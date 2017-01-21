@@ -1,5 +1,6 @@
 #pragma once
 #include "lpg_for.h"
+#include "lpg_unicode_string.h"
 #ifdef _WIN32
 #include <Windows.h>
 #endif
@@ -25,8 +26,6 @@ typedef enum console_color
     console_color_cyan,
     console_color_yellow
 } console_color;
-
-typedef uint32_t unicode_code_point;
 
 typedef struct console_cell
 {

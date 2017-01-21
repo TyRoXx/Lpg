@@ -76,7 +76,7 @@ static void enter_expression(expression const *source,
     case expression_type_assignment:
         abort();
 
-    case expression_type_utf8_literal:
+    case expression_type_string:
         switch (entered_from)
         {
         case horizontal_end_left:
@@ -84,7 +84,7 @@ static void enter_expression(expression const *source,
             break;
 
         case horizontal_end_right:
-            add_link(cursors, source->utf8_literal.length);
+            add_link(cursors, source->string.length);
             break;
         }
         break;
@@ -238,7 +238,7 @@ static editing_input_result handle_editing_input(key_event event,
     case expression_type_assignment:
         abort();
 
-    case expression_type_utf8_literal:
+    case expression_type_string:
         assert((cursors->size - 1) == level);
         switch (event.main_key.type)
         {
@@ -253,7 +253,7 @@ static editing_input_result handle_editing_input(key_event event,
 
         case virtual_key_type_right:
             ++cursors->head[level].child;
-            if (cursors->head[level].child > source->utf8_literal.length)
+            if (cursors->head[level].child > source->string.length)
             {
                 --cursors->size;
                 return editing_input_result_go_right;
@@ -261,10 +261,10 @@ static editing_input_result handle_editing_input(key_event event,
             break;
 
         case virtual_key_type_delete:
-            if (cursors->head[level].child < source->utf8_literal.length)
+            if (cursors->head[level].child < source->string.length)
             {
-                utf8_string_erase(
-                    &source->utf8_literal, cursors->head[level].child);
+                unicode_string_erase(
+                    &source->string, cursors->head[level].child);
             }
             break;
 
@@ -277,16 +277,16 @@ static editing_input_result handle_editing_input(key_event event,
             case 8:
                 if (cursors->head[level].child > 0)
                 {
-                    utf8_string_erase(
-                        &source->utf8_literal, cursors->head[level].child - 1);
+                    unicode_string_erase(
+                        &source->string, cursors->head[level].child - 1);
                     --cursors->head[level].child;
                 }
                 break;
 
             default:
-                utf8_string_insert(&source->utf8_literal,
-                                   cursors->head[level].child,
-                                   event.main_key.unicode);
+                unicode_string_insert(&source->string,
+                                      cursors->head[level].child,
+                                      event.main_key.unicode);
                 ++cursors->head[level].child;
                 break;
             }

@@ -15,6 +15,17 @@ void *allocate(size_t size)
     return memory;
 }
 
+void *allocate_array(size_t size, size_t element)
+{
+    void *memory = calloc(size, element);
+    if (!memory)
+    {
+        abort();
+    }
+    ++active_allocations;
+    return memory;
+}
+
 void *reallocate(void *memory, size_t new_size)
 {
     int const was_null = (memory == NULL);
