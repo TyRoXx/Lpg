@@ -45,7 +45,16 @@ void *reallocate(void *memory, size_t new_size)
 void *reallocate_array(void *memory, size_t new_size, size_t element)
 {
     int const was_null = (memory == NULL);
+#ifdef _WIN32
     void *const new_memory = _recalloc(memory, new_size, element);
+#else
+    size_t const total_size = (new_size * element);
+    if ((element != 0) && ((total_size / element) != new_size))
+    {
+        return NULL;
+    }
+    void *const new_memory = realloc(memory, total_size);
+#endif
     if (!new_memory)
     {
         --active_allocations;
