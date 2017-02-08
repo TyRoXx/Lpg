@@ -1,4 +1,5 @@
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
 #include <stdlib.h>
 #include <assert.h>
 
@@ -7,10 +8,7 @@ static size_t active_allocations = 0;
 void *allocate(size_t size)
 {
     void *memory = malloc(size);
-    if (!memory)
-    {
-        abort();
-    }
+    ASSERT(memory);
     ++active_allocations;
     return memory;
 }
@@ -18,10 +16,7 @@ void *allocate(size_t size)
 void *allocate_array(size_t size, size_t element)
 {
     void *memory = calloc(size, element);
-    if (!memory)
-    {
-        abort();
-    }
+    ASSERT(memory);
     ++active_allocations;
     return memory;
 }
@@ -30,10 +25,7 @@ void *reallocate(void *memory, size_t new_size)
 {
     int const was_null = (memory == NULL);
     void *const new_memory = realloc(memory, new_size);
-    if (!new_memory)
-    {
-        abort();
-    }
+    ASSERT(new_memory);
     if (was_null)
     {
         ++active_allocations;
@@ -48,16 +40,10 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
     void *const new_memory = _recalloc(memory, new_size, element);
 #else
     size_t const total_size = (new_size * element);
-    if ((element != 0) && ((total_size / element) != new_size))
-    {
-        return NULL;
-    }
+    ASSERT((element == = 0) || ((total_size / element) == new_size));
     void *const new_memory = realloc(memory, total_size);
 #endif
-    if (!new_memory)
-    {
-        abort();
-    }
+    ASSERT(new_memory);
     if (was_null)
     {
         ++active_allocations;
