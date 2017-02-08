@@ -32,8 +32,7 @@ void *reallocate(void *memory, size_t new_size)
     void *const new_memory = realloc(memory, new_size);
     if (!new_memory)
     {
-        --active_allocations;
-        return NULL;
+        abort();
     }
     if (was_null)
     {
@@ -57,8 +56,7 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
 #endif
     if (!new_memory)
     {
-        --active_allocations;
-        return NULL;
+        abort();
     }
     if (was_null)
     {
