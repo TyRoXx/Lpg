@@ -213,12 +213,14 @@ typedef struct virtual_key
     unicode_code_point unicode;
 } virtual_key;
 
+#ifdef _WIN32
 static virtual_key make_virtual_key(virtual_key_type type,
                                     unicode_code_point unicode)
 {
     virtual_key result = {type, unicode};
     return result;
 }
+#endif
 
 typedef enum key_state
 {
@@ -335,7 +337,8 @@ static optional_key_event from_unix_key_event(char input)
 {
     if (input == 27)
     {
-        key_event result = {key_state_up, key_escape, key_state_up};
+        key_event result = {
+            key_state_up, {virtual_key_type_unicode, 27}, key_state_up};
         return make_optional_key_event(result);
     }
     return optional_key_event_empty;

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <assert.h>
+#include "lpg_assert.h"
 
 typedef uint32_t unicode_code_point;
 
@@ -19,7 +20,8 @@ static unicode_string unicode_string_from_c_str(const char *c_str)
     result.data = allocate_array(result.length, sizeof(*result.data));
     for (size_t i = 0; i < result.length; ++i)
     {
-        result.data[i] = c_str[i];
+        result.data[i] = (unsigned char)c_str[i];
+        ASSUME(result.data[i] <= 127);
     }
     return result;
 }
