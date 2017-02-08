@@ -40,7 +40,7 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
     void *const new_memory = _recalloc(memory, new_size, element);
 #else
     size_t const total_size = (new_size * element);
-    ASSERT((element == = 0) || ((total_size / element) == new_size));
+    ASSERT((element == 0) || ((total_size / element) == new_size));
     void *const new_memory = realloc(memory, total_size);
 #endif
     ASSERT(new_memory);
