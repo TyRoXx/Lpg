@@ -53,11 +53,12 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
 
 void deallocate(void *memory)
 {
+    ASSERT(active_allocations > 0);
     --active_allocations;
     free(memory);
 }
 
 void check_allocations()
 {
-    assert(active_allocations == 0);
+    ASSERT(active_allocations == 0);
 }
