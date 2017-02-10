@@ -26,8 +26,8 @@ matrix:
   exclude:
     - os: osx
       env: MYCC=gcc-5   BUILD_TYPE=Release
-#    - os: osx
-#      env: MYCC=gcc-5   BUILD_TYPE=Debug
+    - os: osx
+      env: MYCC=gcc-5   BUILD_TYPE=Debug
 
 script:
  - mkdir build
