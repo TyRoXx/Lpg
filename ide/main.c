@@ -198,9 +198,11 @@ void run_editor(expression *source)
     cursors.head[1].child = 3;
     render(source, cursors);
     prepare_console();
+    console_key_parser key_parser;
+    memset(&key_parser, 0, sizeof(key_parser));
     for (;;)
     {
-        optional_key_event const key = wait_for_key_event();
+        optional_key_event const key = wait_for_key_event(&key_parser);
         switch (key.state)
         {
         case optional_empty:

@@ -268,19 +268,19 @@ static editing_input_result handle_editing_input(key_event event,
             }
             break;
 
+        case virtual_key_type_backspace:
+            if (cursors->head[level].child > 0)
+            {
+                unicode_string_erase(
+                    &source->string, cursors->head[level].child - 1);
+                --cursors->head[level].child;
+            }
+            break;
+
         case virtual_key_type_unicode:
             switch (event.main_key.unicode)
             {
             case 10:
-                break;
-
-            case 8:
-                if (cursors->head[level].child > 0)
-                {
-                    unicode_string_erase(
-                        &source->string, cursors->head[level].child - 1);
-                    --cursors->head[level].child;
-                }
                 break;
 
             default:

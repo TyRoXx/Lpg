@@ -204,7 +204,8 @@ typedef enum virtual_key_type
     virtual_key_type_up,
     virtual_key_type_right,
     virtual_key_type_down,
-    virtual_key_type_delete
+    virtual_key_type_delete,
+    virtual_key_type_backspace
 } virtual_key_type;
 
 typedef struct virtual_key
@@ -282,6 +283,10 @@ static optional_virtual_key from_win32_key(WORD code, WCHAR unicode)
     }
     switch (code)
     {
+    case 8:
+        return make_optional_virtual_key(
+            make_virtual_key(virtual_key_type_backspace, 0));
+
     case 37:
         return make_optional_virtual_key(
             make_virtual_key(virtual_key_type_left, 0));
@@ -332,22 +337,105 @@ static optional_key_event from_win32_key_event(KEY_EVENT_RECORD event)
 }
 #endif
 
-#if LPG_UNIX_CONSOLE
-static optional_key_event from_unix_key_event(char input)
+typedef struct console_key_parser
 {
-    if (input == 27)
+#if LPG_UNIX_CONSOLE
+    char sequence[2];
+    char ignore_next;
+#else
+    char unused;
+#endif
+} console_key_parser;
+
+#if LPG_UNIX_CONSOLE
+static optional_key_event make_special_key(virtual_key_type const key)
+{
+    key_event result = {key_state_down, {key, 0}, key_state_up};
+    return make_optional_key_event(result);
+}
+
+static optional_key_event parse_unix_console_key(console_key_parser *parser,
+                                                 char input)
+{
+    if (parser->ignore_next)
     {
-        key_event result = {
-            key_state_up, {virtual_key_type_unicode, 27}, key_state_up};
+        parser->ignore_next = 0;
+        return optional_key_event_empty;
+    }
+    if (parser->sequence[0])
+    {
+        if (parser->sequence[1])
+        {
+            memset(parser->sequence, 0, sizeof(parser->sequence));
+            switch (input)
+            {
+            case 65:
+                return make_special_key(virtual_key_type_up);
+
+            case 66:
+                return make_special_key(virtual_key_type_down);
+
+            case 67:
+                return make_special_key(virtual_key_type_right);
+
+            case 68:
+                return make_special_key(virtual_key_type_left);
+
+            case 51:
+                parser->ignore_next = 1;
+                return make_special_key(virtual_key_type_delete);
+
+            default:
+                return optional_key_event_empty;
+            }
+        }
+        else
+        {
+            switch (input)
+            {
+            case 91:
+                parser->sequence[1] = input;
+                return optional_key_event_empty;
+
+            case 27:
+            {
+                memset(parser->sequence, 0, sizeof(parser->sequence));
+                key_event result = {
+                    key_state_up, {virtual_key_type_unicode, 27}, key_state_up};
+                return make_optional_key_event(result);
+            }
+
+            default:
+                memset(parser->sequence, 0, sizeof(parser->sequence));
+                return optional_key_event_empty;
+            }
+        }
+    }
+    else
+    {
+        if (input == 27)
+        {
+            parser->sequence[0] = input;
+            return optional_key_event_empty;
+        }
+        if (input == 127)
+        {
+            return make_special_key(virtual_key_type_backspace);
+        }
+        memset(parser->sequence, 0, sizeof(parser->sequence));
+        key_event result = {key_state_down,
+                            {virtual_key_type_unicode,
+                             /*TODO: decode UTF-8*/ (unicode_code_point)input},
+                            key_state_up};
         return make_optional_key_event(result);
     }
-    return optional_key_event_empty;
 }
 #endif
 
-static optional_key_event wait_for_key_event(void)
+static optional_key_event wait_for_key_event(console_key_parser *parser)
 {
 #ifdef _WIN32
+    (void)parser;
     HANDLE const consoleInput = GetStdHandle(STD_INPUT_HANDLE);
     INPUT_RECORD input;
     DWORD inputEvents;
@@ -369,6 +457,6 @@ static optional_key_event wait_for_key_event(void)
     {
         abort();
     }
-    return from_unix_key_event(input[0]);
+    return parse_unix_console_key(parser, input[0]);
 #endif
 }
