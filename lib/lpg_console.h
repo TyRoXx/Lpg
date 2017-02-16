@@ -107,6 +107,22 @@ static WORD to_win32_console_color(console_color color)
 }
 #endif
 
+#if LPG_UNIX_CONSOLE
+static void write_stdout(char const *data, size_t size)
+{
+    ssize_t rc = write(STDOUT_FILENO, data, size);
+    if (rc < 0)
+    {
+        abort();
+    }
+    if ((size_t)rc != size)
+    {
+        abort();
+    }
+}
+
+#endif
+
 static void print_to_console(console_cell const *cells, size_t line_length,
                              size_t number_of_lines)
 {
@@ -145,6 +161,8 @@ static void print_to_console(console_cell const *cells, size_t line_length,
     {
         abort();
     }
+    console_color previous_color = console_color_white;
+    write_stdout("\033[37m", 5);
     LPG_FOR(size_t, y, number_of_lines)
     {
         if (y != 0)
@@ -158,13 +176,36 @@ static void print_to_console(console_cell const *cells, size_t line_length,
         LPG_FOR(size_t, x, line_length)
         {
             console_cell const *cell = cells + (y * line_length) + x;
+            if (cell->text_color != previous_color)
+            {
+                previous_color = cell->text_color;
+                switch (previous_color)
+                {
+                case console_color_cyan:
+                    write_stdout("\033[36m", 5);
+                    break;
+
+                case console_color_grey:
+                    write_stdout("\033[37m", 5);
+                    break;
+
+                case console_color_red:
+                    write_stdout("\033[31m", 5);
+                    break;
+
+                case console_color_white:
+                    write_stdout("\033[37m", 5);
+                    break;
+
+                case console_color_yellow:
+                    write_stdout("\033[33m", 5);
+                    break;
+                }
+            }
             char c = (char)cell->text;
             /*assume ASCII for now*/
             assert((unicode_code_point)c == cell->text);
-            if (write(STDOUT_FILENO, &c, 1) != 1)
-            {
-                abort();
-            }
+            write_stdout(&c, 1);
         }
     }
 #endif
