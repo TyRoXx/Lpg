@@ -1,6 +1,7 @@
 #include "lpg_allocate.h"
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define REQUIRE(x)                                                             \
     if (!(x))                                                                  \
@@ -74,5 +75,6 @@ int main(void)
         deallocate(m);
     }
     check_allocations();
+    printf("All tests passed\n");
     return 0;
 }
