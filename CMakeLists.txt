@@ -12,6 +12,6 @@ else()
 	add_definitions(-std=gnu99 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
 endif()
 
-add_subdirectory(lib)
+add_subdirectory(generic)
 add_subdirectory(ide)
 add_subdirectory(tests)

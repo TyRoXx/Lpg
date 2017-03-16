@@ -1,4 +1,5 @@
 include_directories(../lib)
+include_directories(../generic)
 file(GLOB sources "*.c" "*.h")
 add_executable(ide ${sources})
-target_link_libraries(ide lib)
+target_link_libraries(ide generic)
