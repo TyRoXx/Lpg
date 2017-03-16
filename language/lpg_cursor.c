@@ -23,7 +23,7 @@ cursor_list descend(cursor_list cursor, size_t const rendered_child)
     return cursor;
 }
 
-void add_link(cursor_list *const cursors, size_t const child)
+static void add_link(cursor_list *const cursors, size_t const child)
 {
     ++cursors->size;
     cursors->head =

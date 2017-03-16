@@ -20,7 +20,6 @@ typedef struct cursor_list
 } cursor_list;
 
 cursor_list descend(cursor_list cursor, size_t const rendered_child);
-void add_link(cursor_list *const cursors, size_t const child);
 void enter_expression(expression const *source, cursor_list *const cursors,
                       horizontal_end const entered_from);
 

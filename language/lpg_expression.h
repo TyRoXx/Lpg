@@ -3,7 +3,6 @@
 
 typedef struct expression expression;
 
-void expression_free(expression *this);
 void expression_deallocate(expression *this);
 
 typedef struct lambda
