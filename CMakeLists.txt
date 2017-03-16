@@ -3,7 +3,7 @@ project(Lpg)
 
 file(GLOB_RECURSE formatted "*.c" "*.h")
 
-find_program(LPG_CLANG_FORMAT NAMES clang-format clang-format-3.7 clang-format-3.6 PATHS "C:/Program Files/LLVM/bin")
+find_program(LPG_CLANG_FORMAT NAMES clang-format clang-format-3.7 PATHS "C:/Program Files/LLVM/bin")
 add_custom_target(clang-format COMMAND ${LPG_CLANG_FORMAT} -i ${formatted} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 
 if(MSVC)
