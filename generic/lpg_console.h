@@ -284,7 +284,7 @@ typedef struct optional_key_event
     key_event value;
 } optional_key_event;
 
-optional_key_event const optional_key_event_empty = {
+static optional_key_event const optional_key_event_empty = {
     optional_empty,
     {key_state_down, {virtual_key_type_left, 0}, key_state_down}};
 
@@ -300,7 +300,7 @@ typedef struct optional_virtual_key
     virtual_key value;
 } optional_virtual_key;
 
-optional_virtual_key const optional_key_empty = {
+static optional_virtual_key const optional_key_empty = {
     optional_empty, {virtual_key_type_left, 0}};
 
 #ifdef _WIN32
