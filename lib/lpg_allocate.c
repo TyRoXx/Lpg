@@ -1,5 +1,6 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_arithmetic.h"
 #include <stdlib.h>
 #include <assert.h>
 
@@ -36,13 +37,9 @@ void *reallocate(void *memory, size_t new_size)
 void *reallocate_array(void *memory, size_t new_size, size_t element)
 {
     int const was_null = (memory == NULL);
-#ifdef _WIN32
-    void *const new_memory = _recalloc(memory, new_size, element);
-#else
-    size_t const total_size = (new_size * element);
-    ASSERT((element == 0) || ((total_size / element) == new_size));
-    void *const new_memory = realloc(memory, total_size);
-#endif
+    optional_size const total_size = size_multiply(new_size, element);
+    ASSERT(total_size.state == optional_set);
+    void *const new_memory = realloc(memory, total_size.value_if_set);
     ASSERT(new_memory);
     if (was_null)
     {

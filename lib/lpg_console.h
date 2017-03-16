@@ -1,5 +1,6 @@
 #pragma once
 #include "lpg_for.h"
+#include "lpg_optional.h"
 #include "lpg_unicode_string.h"
 #ifdef _WIN32
 #include <Windows.h>
@@ -269,12 +270,6 @@ typedef enum key_state
     key_state_down,
     key_state_up
 } key_state;
-
-typedef enum optional
-{
-    optional_set,
-    optional_empty
-} optional;
 
 typedef struct key_event
 {

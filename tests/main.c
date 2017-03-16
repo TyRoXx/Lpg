@@ -2,12 +2,21 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "lpg_arithmetic.h"
 
+#if defined(NDEBUG) || !defined(_MSC_VER)
 #define REQUIRE(x)                                                             \
     if (!(x))                                                                  \
     {                                                                          \
         abort();                                                               \
     }
+#else
+#define REQUIRE(x)                                                             \
+    if (!(x))                                                                  \
+    {                                                                          \
+        __debugbreak();                                                        \
+    }
+#endif
 
 int main(void)
 {
@@ -73,6 +82,33 @@ int main(void)
         REQUIRE(m[2] == 'c');
         REQUIRE(m[3] == 'd');
         deallocate(m);
+    }
+    {
+        optional_size const product = size_multiply(0, 0);
+        REQUIRE(product.state == optional_set);
+        REQUIRE(product.value_if_set == 0);
+    }
+    {
+        optional_size const product = size_multiply(SIZE_MAX, 0);
+        REQUIRE(product.state == optional_set);
+        REQUIRE(product.value_if_set == 0);
+    }
+    {
+        optional_size const product = size_multiply(SIZE_MAX, 1);
+        REQUIRE(product.state == optional_set);
+        REQUIRE(product.value_if_set == SIZE_MAX);
+    }
+    {
+        optional_size const product = size_multiply(SIZE_MAX, 2);
+        REQUIRE(product.state == optional_empty);
+    }
+    {
+        optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX / 2);
+        REQUIRE(product.state == optional_empty);
+    }
+    {
+        optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX);
+        REQUIRE(product.state == optional_empty);
     }
     check_allocations();
     printf("All tests passed\n");
