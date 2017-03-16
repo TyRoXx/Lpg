@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <limits.h>
 #include "lpg_arithmetic.h"
 
 #if defined(NDEBUG) || !defined(_MSC_VER)
