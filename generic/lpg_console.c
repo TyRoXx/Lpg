@@ -13,6 +13,7 @@
 #include <stdint.h>
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
 
 static unicode_code_point restrict_console_text(unicode_code_point original)
 {
