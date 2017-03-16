@@ -2,6 +2,9 @@
 #include "lpg_cursor.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
+#include "lpg_for.h"
+#include <stdlib.h>
+#include <string.h>
 
 static console_color yellow_or(int const condition,
                                console_color const otherwise)
