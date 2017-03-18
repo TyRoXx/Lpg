@@ -5,6 +5,10 @@
 #include <limits.h>
 #include "lpg_arithmetic.h"
 
+#ifndef SIZE_MAX
+#define SIZE_MAX ((size_t)-1)
+#endif
+
 #if defined(NDEBUG) || !defined(_MSC_VER)
 #define REQUIRE(x)                                                             \
     if (!(x))                                                                  \

@@ -210,6 +210,12 @@ void prepare_console(void)
 #endif
 }
 
+static optional_key_event make_optional_key_event(key_event value)
+{
+    optional_key_event result = {optional_set, value};
+    return result;
+}
+
 #ifdef _WIN32
 static virtual_key make_virtual_key(virtual_key_type type,
                                     unicode_code_point unicode)

@@ -82,12 +82,6 @@ static optional_key_event const optional_key_event_empty = {
     optional_empty,
     {key_state_down, {virtual_key_type_left, 0}, key_state_down}};
 
-static optional_key_event make_optional_key_event(key_event value)
-{
-    optional_key_event result = {optional_set, value};
-    return result;
-}
-
 typedef struct optional_virtual_key
 {
     optional state;
