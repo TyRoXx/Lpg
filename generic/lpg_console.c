@@ -186,11 +186,23 @@ void print_to_console(console_cell const *cells, size_t line_length,
 void prepare_console(void)
 {
 #ifdef _WIN32
-    HANDLE consoleInput = GetStdHandle(STD_INPUT_HANDLE);
-    if (!SetConsoleMode(
-            consoleInput, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
     {
-        abort();
+        HANDLE console_input = GetStdHandle(STD_INPUT_HANDLE);
+        if (!SetConsoleMode(
+                console_input, ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE))
+        {
+            abort();
+        }
+    }
+    {
+        HANDLE console_output = GetStdHandle(STD_OUTPUT_HANDLE);
+        CONSOLE_CURSOR_INFO info;
+        info.dwSize = 100;
+        info.bVisible = FALSE;
+        if (!SetConsoleCursorInfo(console_output, &info))
+        {
+            abort();
+        }
     }
 #endif
 
