@@ -99,11 +99,11 @@ void print_to_console(console_cell const *cells, size_t line_length,
                       size_t number_of_lines)
 {
 #ifdef _WIN32
-    HANDLE consoleOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE console_output = GetStdHandle(STD_OUTPUT_HANDLE);
     LPG_FOR(size_t, y, number_of_lines)
     {
         COORD position = {0, (SHORT)y};
-        if (!SetConsoleCursorPosition(consoleOutput, position))
+        if (!SetConsoleCursorPosition(console_output, position))
         {
             abort();
         }
@@ -111,14 +111,14 @@ void print_to_console(console_cell const *cells, size_t line_length,
         {
             console_cell const *cell = cells + (y * line_length) + x;
             if (!SetConsoleTextAttribute(
-                    consoleOutput, to_win32_console_color(cell->text_color)))
+                    console_output, to_win32_console_color(cell->text_color)))
             {
                 abort();
             }
 
             WCHAR c = (WCHAR)cell->text;
             DWORD written;
-            if (!WriteConsoleW(consoleOutput, &c, 1, &written, NULL))
+            if (!WriteConsoleW(console_output, &c, 1, &written, NULL))
             {
                 abort();
             }
