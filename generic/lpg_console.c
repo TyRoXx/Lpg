@@ -245,7 +245,7 @@ static optional_virtual_key make_optional_virtual_key(virtual_key value)
 
 static optional_virtual_key from_win32_key(WORD code, WCHAR unicode)
 {
-    if (unicode != 0)
+    if ((unicode != 0) && (code != 8) && (code != 13))
     {
         return make_optional_virtual_key(
             make_virtual_key(virtual_key_type_unicode, unicode));
