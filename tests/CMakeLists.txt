@@ -1,4 +1,5 @@
 include_directories(../language)
 include_directories(../generic)
-add_executable(tests main.c)
-target_link_libraries(tests generic)
+file(GLOB sources "*.c" "*.h")
+add_executable(tests ${sources})
+target_link_libraries(tests language)

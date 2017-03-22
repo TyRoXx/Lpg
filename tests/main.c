@@ -4,24 +4,8 @@
 #include <stdio.h>
 #include <limits.h>
 #include "lpg_arithmetic.h"
-
-#ifndef SIZE_MAX
-#define SIZE_MAX ((size_t)-1)
-#endif
-
-#if defined(NDEBUG) || !defined(_MSC_VER)
-#define REQUIRE(x)                                                             \
-    if (!(x))                                                                  \
-    {                                                                          \
-        abort();                                                               \
-    }
-#else
-#define REQUIRE(x)                                                             \
-    if (!(x))                                                                  \
-    {                                                                          \
-        __debugbreak();                                                        \
-    }
-#endif
+#include "save_expression.h"
+#include "test.h"
 
 int main(void)
 {
@@ -115,6 +99,7 @@ int main(void)
         optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX);
         REQUIRE(product.state == optional_empty);
     }
+    test_save_expression();
     check_allocations();
     printf("All tests passed\n");
     return 0;
