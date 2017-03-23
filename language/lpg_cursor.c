@@ -72,6 +72,9 @@ void enter_expression(expression const *source, cursor_list *const cursors,
             break;
         }
         break;
+
+    case expression_type_identifier:
+        abort();
     }
 }
 
@@ -273,6 +276,8 @@ editing_input_result handle_editing_input(key_event event, expression *source,
             break;
         }
         return editing_input_result_ok;
+    case expression_type_identifier:
+        abort();
     }
     abort();
 }

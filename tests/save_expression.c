@@ -25,6 +25,12 @@ static success_indicator stream_writer_write_string(stream_writer writer,
     return writer.write(writer.user, c_str, strlen(c_str));
 }
 
+static success_indicator
+stream_writer_write_bytes(stream_writer writer, char const *data, size_t size)
+{
+    return writer.write(writer.user, data, size);
+}
+
 static success_indicator stream_writer_write_utf8(stream_writer writer,
                                                   unicode_code_point code_point)
 {
@@ -82,13 +88,31 @@ static stream_writer memory_writer_erase(memory_writer *writer)
     return result;
 }
 
+#define LPG_TRY(expression)                                                    \
+    \
+switch(expression)                                                             \
+    \
+{                                                                       \
+        \
+case failure : return failure;                                                 \
+        \
+case success : break;                                                          \
+    \
+}
+
 static success_indicator save_expression(stream_writer const to,
                                          expression const *value)
 {
     switch (value->type)
     {
     case expression_type_lambda:
-        UNREACHABLE();
+        LPG_TRY(stream_writer_write_string(to, "("));
+        LPG_TRY(save_expression(to, value->lambda.parameter_name));
+        LPG_TRY(stream_writer_write_string(to, ": "));
+        LPG_TRY(save_expression(to, value->lambda.parameter_type));
+        LPG_TRY(stream_writer_write_string(to, ") => "));
+        LPG_TRY(save_expression(to, value->lambda.result));
+        return success;
 
     case expression_type_builtin:
         switch (value->builtin)
@@ -105,56 +129,43 @@ static success_indicator save_expression(stream_writer const to,
         UNREACHABLE();
 
     case expression_type_call:
-        switch (save_expression(to, value->call.callee))
-        {
-        case failure:
-            return failure;
-
-        case success:
-            break;
-        }
-        switch (stream_writer_write_string(to, "("))
-        {
-        case failure:
-            return failure;
-
-        case success:
-            break;
-        }
+        LPG_TRY(save_expression(to, value->call.callee));
+        LPG_TRY(stream_writer_write_string(to, "("));
         LPG_FOR(size_t, i, value->call.number_of_arguments)
         {
             if (i > 0)
             {
-                switch (stream_writer_write_string(to, ", "))
-                {
-                case failure:
-                    return failure;
-
-                case success:
-                    break;
-                }
+                LPG_TRY(stream_writer_write_string(to, ", "));
             }
-            switch (save_expression(to, &value->call.arguments[i]))
-            {
-            case failure:
-                return failure;
-
-            case success:
-                break;
-            }
+            LPG_TRY(save_expression(to, &value->call.arguments[i]));
         }
-        switch (stream_writer_write_string(to, ")"))
-        {
-        case failure:
-            return failure;
-
-        case success:
-            break;
-        }
+        LPG_TRY(stream_writer_write_string(to, ")"));
         return success;
 
     case expression_type_local:
+        UNREACHABLE();
+
     case expression_type_integer_literal:
+    {
+        char formatted[100];
+        size_t next_digit = sizeof(formatted) - 1;
+        integer rest = value->integer_literal;
+        for (;;)
+        {
+            integer_division const divided =
+                integer_divide(rest, integer_create(0, 10));
+            formatted[next_digit] = ((divided.remainder.low % 10u) + '0');
+            --next_digit;
+            rest = divided.quotient;
+            if (rest.high == 0 && rest.low == 0)
+            {
+                break;
+            }
+        }
+        return stream_writer_write_bytes(
+            to, formatted + next_digit + 1, sizeof(formatted) - next_digit - 1);
+    }
+
     case expression_type_integer_range:
     case expression_type_function:
     case expression_type_add_member:
@@ -182,46 +193,18 @@ static success_indicator save_expression(stream_writer const to,
             case '\"':
             case '\'':
             case '\\':
-                switch (stream_writer_write_string(to, "\\"))
-                {
-                case failure:
-                    return failure;
-
-                case success:
-                    break;
-                }
+                LPG_TRY(stream_writer_write_string(to, "\\"));
                 break;
             }
-            switch (stream_writer_write_utf8(to, value->string.data[i]))
-            {
-            case failure:
-                return failure;
-
-            case success:
-                break;
-            }
+            LPG_TRY(stream_writer_write_utf8(to, value->string.data[i]));
         }
-        switch (stream_writer_write_string(to, "\""))
-        {
-        case failure:
-            return failure;
-
-        case success:
-            break;
-        }
+        LPG_TRY(stream_writer_write_string(to, "\""));
         return success;
 
     case expression_type_identifier:
         LPG_FOR(size_t, i, value->identifier.length)
         {
-            switch (stream_writer_write_utf8(to, value->string.data[i]))
-            {
-            case failure:
-                return failure;
-
-            case success:
-                break;
-            }
+            LPG_TRY(stream_writer_write_utf8(to, value->string.data[i]));
         }
         return success;
     }
@@ -252,6 +235,24 @@ void test_save_expression(void)
     check_expression_rendering(
         expression_from_unicode_string(unicode_string_from_c_str("\"\'\\")),
         "\"\\\"\\\'\\\\\"");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 0)), "0");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 1)), "1");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 9)), "9");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 10)), "10");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 11)), "11");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(0, 1000)), "1000");
+    check_expression_rendering(
+        expression_from_integer_literal(integer_create(1, 0)),
+        "18446744073709551616");
+    check_expression_rendering(expression_from_integer_literal(integer_create(
+                                   0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu)),
+                               "340282366920938463463374607431768211455");
     {
         expression *const arguments = allocate_array(2, sizeof(*arguments));
         arguments[0] =
@@ -264,5 +265,16 @@ void test_save_expression(void)
                     expression_from_identifier(unicode_string_from_c_str("f"))),
                 arguments, 2)),
             "f(\"test\", a)");
+    }
+    {
+        check_expression_rendering(
+            expression_from_lambda(lambda_create(
+                expression_allocate(expression_from_identifier(
+                    unicode_string_from_c_str("uint32"))),
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(0, 1234))))),
+            "(a: uint32) => 1234");
     }
 }

@@ -6,6 +6,7 @@
 #include "lpg_arithmetic.h"
 #include "save_expression.h"
 #include "test.h"
+#include "integer.h"
 
 int main(void)
 {
@@ -99,6 +100,7 @@ int main(void)
         optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX);
         REQUIRE(product.state == optional_empty);
     }
+    test_integer();
     test_save_expression();
     check_allocations();
     printf("All tests passed\n");
