@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include "lpg_assert.h"
+#include "lpg_for.h"
 
 typedef enum success_indicator
 {
@@ -22,6 +23,15 @@ static success_indicator stream_writer_write_string(stream_writer writer,
                                                     char const *c_str)
 {
     return writer.write(writer.user, c_str, strlen(c_str));
+}
+
+static success_indicator stream_writer_write_utf8(stream_writer writer,
+                                                  unicode_code_point code_point)
+{
+    char code_units[4];
+    code_units[0] = (char)code_point;
+    /*TODO: encode UTF-8 properly*/
+    return writer.write(writer.user, code_units, 1);
 }
 
 typedef struct memory_writer
@@ -106,19 +116,63 @@ static success_indicator save_expression(stream_writer const to,
     case expression_type_match:
     case expression_type_sequence:
     case expression_type_assignment:
-    case expression_type_string:
         UNREACHABLE();
+
+    case expression_type_string:
+        switch (stream_writer_write_string(to, "\""))
+        {
+        case failure:
+            return failure;
+
+        case success:
+            break;
+        }
+        LPG_FOR(size_t, i, value->string.length)
+        {
+            switch (value->string.data[i])
+            {
+            case '\"':
+            case '\'':
+            case '\\':
+                switch (stream_writer_write_string(to, "\\"))
+                {
+                case failure:
+                    return failure;
+
+                case success:
+                    break;
+                }
+                break;
+            }
+            switch (stream_writer_write_utf8(to, value->string.data[i]))
+            {
+            case failure:
+                return failure;
+
+            case success:
+                break;
+            }
+        }
+        switch (stream_writer_write_string(to, "\""))
+        {
+        case failure:
+            return failure;
+
+        case success:
+            break;
+        }
+        return success;
     }
     UNREACHABLE();
 }
 
-static void check_expression_rendering(expression const tree,
-                                       char const *expected)
+static void check_expression_rendering(expression tree, char const *expected)
 {
     memory_writer buffer = {NULL, 0, 0};
     REQUIRE(save_expression(memory_writer_erase(&buffer), &tree) == success);
     REQUIRE(memory_writer_equals(buffer, expected));
     memory_writer_free(&buffer);
+    expression_free(&tree);
 }
 
 void test_save_expression(void)
@@ -128,4 +182,12 @@ void test_save_expression(void)
         expression_from_builtin(builtin_empty_structure), "{}");
     check_expression_rendering(
         expression_from_builtin(builtin_empty_variant), "{}");
+    check_expression_rendering(
+        expression_from_unicode_string(unicode_string_from_c_str("")), "\"\"");
+    check_expression_rendering(
+        expression_from_unicode_string(unicode_string_from_c_str("abc")),
+        "\"abc\"");
+    check_expression_rendering(
+        expression_from_unicode_string(unicode_string_from_c_str("\"\'\\")),
+        "\"\\\"\\\'\\\\\"");
 }
