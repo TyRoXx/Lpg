@@ -105,6 +105,54 @@ static success_indicator save_expression(stream_writer const to,
         UNREACHABLE();
 
     case expression_type_call:
+        switch (save_expression(to, value->call.callee))
+        {
+        case failure:
+            return failure;
+
+        case success:
+            break;
+        }
+        switch (stream_writer_write_string(to, "("))
+        {
+        case failure:
+            return failure;
+
+        case success:
+            break;
+        }
+        LPG_FOR(size_t, i, value->call.number_of_arguments)
+        {
+            if (i > 0)
+            {
+                switch (stream_writer_write_string(to, ", "))
+                {
+                case failure:
+                    return failure;
+
+                case success:
+                    break;
+                }
+            }
+            switch (save_expression(to, &value->call.arguments[i]))
+            {
+            case failure:
+                return failure;
+
+            case success:
+                break;
+            }
+        }
+        switch (stream_writer_write_string(to, ")"))
+        {
+        case failure:
+            return failure;
+
+        case success:
+            break;
+        }
+        return success;
+
     case expression_type_local:
     case expression_type_integer_literal:
     case expression_type_integer_range:
@@ -162,6 +210,20 @@ static success_indicator save_expression(stream_writer const to,
             break;
         }
         return success;
+
+    case expression_type_identifier:
+        LPG_FOR(size_t, i, value->identifier.length)
+        {
+            switch (stream_writer_write_utf8(to, value->string.data[i]))
+            {
+            case failure:
+                return failure;
+
+            case success:
+                break;
+            }
+        }
+        return success;
     }
     UNREACHABLE();
 }
@@ -190,4 +252,17 @@ void test_save_expression(void)
     check_expression_rendering(
         expression_from_unicode_string(unicode_string_from_c_str("\"\'\\")),
         "\"\\\"\\\'\\\\\"");
+    {
+        expression *const arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] =
+            expression_from_unicode_string(unicode_string_from_c_str("test"));
+        arguments[1] =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        check_expression_rendering(
+            expression_from_call(call_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("f"))),
+                arguments, 2)),
+            "f(\"test\", a)");
+    }
 }

@@ -21,6 +21,13 @@ integer integer_create(uint64_t high, uint64_t low)
     return result;
 }
 
+call call_create(expression *callee, expression *arguments,
+                 size_t number_of_arguments)
+{
+    call result = {callee, arguments, number_of_arguments};
+    return result;
+}
+
 void function_free(function *this)
 {
     expression_deallocate(this->result);
@@ -123,6 +130,22 @@ expression expression_from_unicode_string(unicode_string value)
     return result;
 }
 
+expression expression_from_call(call value)
+{
+    expression result;
+    result.type = expression_type_call;
+    result.call = value;
+    return result;
+}
+
+expression expression_from_identifier(unicode_string identifier)
+{
+    expression result;
+    result.type = expression_type_identifier;
+    result.identifier = identifier;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -189,6 +212,10 @@ void expression_free(expression *this)
 
     case expression_type_string:
         unicode_string_free(&this->string);
+        break;
+
+    case expression_type_identifier:
+        unicode_string_free(&this->identifier);
         break;
     }
 }

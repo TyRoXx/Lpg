@@ -44,7 +44,8 @@ typedef enum expression_type
     expression_type_match,
     expression_type_sequence,
     expression_type_assignment,
-    expression_type_string
+    expression_type_string,
+    expression_type_identifier
 } expression_type;
 
 typedef enum builtin
@@ -60,6 +61,9 @@ typedef struct call
     expression *arguments;
     size_t number_of_arguments;
 } call;
+
+call call_create(expression *callee, expression *arguments,
+                 size_t number_of_arguments);
 
 typedef struct function
 {
@@ -141,6 +145,7 @@ struct expression
         sequence sequence;
         assignment assignment;
         unicode_string string;
+        unicode_string identifier;
     };
 };
 
@@ -155,5 +160,7 @@ void sequence_free(sequence *this);
 void assignment_free(assignment *this);
 expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
+expression expression_from_call(call value);
+expression expression_from_identifier(unicode_string identifier);
 expression *expression_allocate(expression value);
 void expression_free(expression *this);
