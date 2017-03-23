@@ -147,7 +147,7 @@ static success_indicator save_expression(stream_writer const to,
 
     case expression_type_integer_literal:
     {
-        char formatted[100];
+        char formatted[39];
         size_t next_digit = sizeof(formatted) - 1;
         integer rest = value->integer_literal;
         for (;;)
@@ -155,15 +155,15 @@ static success_indicator save_expression(stream_writer const to,
             integer_division const divided =
                 integer_divide(rest, integer_create(0, 10));
             formatted[next_digit] = (char)((divided.remainder.low % 10u) + '0');
-            --next_digit;
             rest = divided.quotient;
             if (rest.high == 0 && rest.low == 0)
             {
                 break;
             }
+            --next_digit;
         }
         return stream_writer_write_bytes(
-            to, formatted + next_digit + 1, sizeof(formatted) - next_digit - 1);
+            to, formatted + next_digit, sizeof(formatted) - next_digit);
     }
 
     case expression_type_integer_range:
