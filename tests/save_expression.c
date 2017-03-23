@@ -178,14 +178,7 @@ static success_indicator save_expression(stream_writer const to,
         UNREACHABLE();
 
     case expression_type_string:
-        switch (stream_writer_write_string(to, "\""))
-        {
-        case failure:
-            return failure;
-
-        case success:
-            break;
-        }
+        LPG_TRY(stream_writer_write_string(to, "\""));
         LPG_FOR(size_t, i, value->string.length)
         {
             switch (value->string.data[i])
