@@ -112,14 +112,20 @@ static success_indicator save_expression(stream_writer const to,
     UNREACHABLE();
 }
 
+static void check_expression_rendering(expression const tree,
+                                       char const *expected)
+{
+    memory_writer buffer = {NULL, 0, 0};
+    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree) == success);
+    REQUIRE(memory_writer_equals(buffer, expected));
+    memory_writer_free(&buffer);
+}
+
 void test_save_expression(void)
 {
-    {
-        memory_writer buffer = {NULL, 0, 0};
-        expression const tree = expression_from_builtin(builtin_unit);
-        REQUIRE(save_expression(memory_writer_erase(&buffer), &tree) ==
-                success);
-        REQUIRE(memory_writer_equals(buffer, "()"));
-        memory_writer_free(&buffer);
-    }
+    check_expression_rendering(expression_from_builtin(builtin_unit), "()");
+    check_expression_rendering(
+        expression_from_builtin(builtin_empty_structure), "{}");
+    check_expression_rendering(
+        expression_from_builtin(builtin_empty_variant), "{}");
 }
