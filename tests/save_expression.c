@@ -154,7 +154,7 @@ static success_indicator save_expression(stream_writer const to,
         {
             integer_division const divided =
                 integer_divide(rest, integer_create(0, 10));
-            formatted[next_digit] = ((divided.remainder.low % 10u) + '0');
+            formatted[next_digit] = (char)((divided.remainder.low % 10u) + '0');
             --next_digit;
             rest = divided.quotient;
             if (rest.high == 0 && rest.low == 0)
