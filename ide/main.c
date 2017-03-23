@@ -129,6 +129,9 @@ static void render_expression(console_printer *const printer,
             console_print_char(printer, '>', console_color_yellow);
         }
         break;
+
+    case expression_type_identifier:
+        abort();
     }
 }
 
