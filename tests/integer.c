@@ -15,18 +15,37 @@ void test_integer(void)
     REQUIRE(!integer_less(integer_create(111, 112), integer_create(111, 111)));
     REQUIRE(!integer_less(integer_create(0, 5), integer_create(0, 4)));
     REQUIRE(!integer_less(integer_create(2, 0), integer_create(1, 0)));
+
     REQUIRE(integer_equal(integer_create(0, 0), integer_create(0, 0)));
     REQUIRE(integer_equal(integer_create(1, 1), integer_create(1, 1)));
     REQUIRE(!integer_equal(integer_create(1, 0), integer_create(0, 0)));
     REQUIRE(!integer_equal(integer_create(0, 1), integer_create(0, 0)));
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(1, 0)));
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(0, 1)));
+
     REQUIRE(integer_equal(
         integer_shift_left(integer_create(0, 1), 0), integer_create(0, 1)));
     REQUIRE(integer_equal(
         integer_shift_left(integer_create(0, 1), 1), integer_create(0, 2)));
     REQUIRE(integer_equal(
         integer_shift_left(integer_create(0, 1), 64), integer_create(1, 0)));
+
+    REQUIRE(integer_equal(
+        integer_create(0, 0),
+        integer_subtract(integer_create(0, 0), integer_create(0, 0))));
+    REQUIRE(integer_equal(
+        integer_create(0, 1),
+        integer_subtract(integer_create(0, 1), integer_create(0, 0))));
+    REQUIRE(integer_equal(
+        integer_create(0, 0),
+        integer_subtract(integer_create(1, 0), integer_create(1, 0))));
+    REQUIRE(integer_equal(
+        integer_create(~(uint64_t)0, ~(uint64_t)0),
+        integer_subtract(integer_create(0, 0), integer_create(0, 1))));
+    REQUIRE(integer_equal(
+        integer_create(~(uint64_t)0, ~(uint64_t)0 - 1u),
+        integer_subtract(integer_create(0, 0), integer_create(0, 2))));
+
     {
         integer_division result =
             integer_divide(integer_create(0, 0), integer_create(0, 1));
@@ -93,5 +112,12 @@ void test_integer(void)
         REQUIRE(buffer == formatted);
         REQUIRE(!memcmp(
             buffer, "ffffffffffffffffffffffffffffffff", sizeof(buffer)));
+    }
+    {
+        char buffer[38];
+        REQUIRE(NULL ==
+                integer_format(
+                    integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+                    lower_case_digits, 10, buffer, sizeof(buffer)));
     }
 }
