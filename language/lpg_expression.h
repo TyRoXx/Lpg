@@ -1,5 +1,6 @@
 #pragma once
 #include "lpg_unicode_string.h"
+#include "lpg_integer.h"
 
 typedef struct expression expression;
 
@@ -15,28 +16,6 @@ typedef struct lambda
 lambda lambda_create(expression *parameter_type, expression *parameter_name,
                      expression *result);
 void lambda_free(lambda *this);
-
-typedef struct integer
-{
-    uint64_t high;
-    uint64_t low;
-} integer;
-
-integer integer_create(uint64_t high, uint64_t low);
-integer integer_shift_left(integer value, uint32_t bits);
-unsigned integer_bit(integer value, uint32_t bit);
-void integer_set_bit(integer *target, uint32_t bit, unsigned value);
-unsigned integer_equal(integer left, integer right);
-unsigned integer_less(integer left, integer right);
-integer integer_subtract(integer minuend, integer subtrahend);
-
-typedef struct integer_division
-{
-    integer quotient;
-    integer remainder;
-} integer_division;
-
-integer_division integer_divide(integer numerator, integer denominator);
 
 typedef struct integer_range
 {

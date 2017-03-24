@@ -1,6 +1,6 @@
 #include "integer.h"
 #include "test.h"
-#include "lpg_expression.h"
+#include "lpg_integer.h"
 
 void test_integer(void)
 {
