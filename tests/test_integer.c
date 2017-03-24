@@ -1,4 +1,4 @@
-#include "integer.h"
+#include "test_integer.h"
 #include "test.h"
 #include "lpg_integer.h"
 #include <string.h>

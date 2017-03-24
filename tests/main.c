@@ -4,9 +4,9 @@
 #include <stdio.h>
 #include <limits.h>
 #include "lpg_arithmetic.h"
-#include "save_expression.h"
+#include "test_save_expression.h"
 #include "test.h"
-#include "integer.h"
+#include "test_integer.h"
 
 int main(void)
 {
