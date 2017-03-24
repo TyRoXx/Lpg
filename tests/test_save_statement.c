@@ -21,8 +21,13 @@ static success_indicator save_statement(stream_writer to,
         return stream_writer_write_string(to, "\n");
 
     case statement_return:
+        LPG_TRY(stream_writer_write_string(to, "return "));
+        LPG_TRY(save_expression(to, value->return_));
+        return stream_writer_write_string(to, "\n");
+
     case statement_expression:
-        abort();
+        LPG_TRY(save_expression(to, value->expression));
+        return stream_writer_write_string(to, "\n");
     }
     UNREACHABLE();
 }
@@ -46,5 +51,17 @@ void test_save_statement(void)
                 expression_allocate(
                     expression_from_integer_literal(integer_create(0, 123))))),
             "a = 123\n");
+    }
+    {
+        check_statement_rendering(
+            statement_from_return(expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a")))),
+            "return a\n");
+    }
+    {
+        check_statement_rendering(
+            statement_from_expression(expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a")))),
+            "a\n");
     }
 }
