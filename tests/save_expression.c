@@ -8,18 +8,6 @@
 #include "lpg_for.h"
 #include "lpg_stream_writer.h"
 
-#define LPG_TRY(expression)                                                    \
-    \
-switch(expression)                                                             \
-    \
-{                                                                       \
-        \
-case failure : return failure;                                                 \
-        \
-case success : break;                                                          \
-    \
-}
-
 static success_indicator save_expression(stream_writer const to,
                                          expression const *value)
 {

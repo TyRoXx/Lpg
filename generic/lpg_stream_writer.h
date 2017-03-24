@@ -8,6 +8,15 @@ typedef enum success_indicator
     failure
 } success_indicator;
 
+#define LPG_TRY(expression)                                                    \
+    switch (expression)                                                        \
+    {                                                                          \
+    case failure:                                                              \
+        return failure;                                                        \
+    case success:                                                              \
+        break;                                                                 \
+    }
+
 typedef struct stream_writer
 {
     success_indicator (*write)(void *user, char const *data, size_t length);
