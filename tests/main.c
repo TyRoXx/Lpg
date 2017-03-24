@@ -7,6 +7,7 @@
 #include "test_save_expression.h"
 #include "test.h"
 #include "test_integer.h"
+#include "test_save_statement.h"
 
 int main(void)
 {
@@ -100,8 +101,12 @@ int main(void)
         optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX);
         REQUIRE(product.state == optional_empty);
     }
+    check_allocations();
     test_integer();
+    check_allocations();
     test_save_expression();
+    check_allocations();
+    test_save_statement();
     check_allocations();
     printf("All tests passed\n");
     return 0;
