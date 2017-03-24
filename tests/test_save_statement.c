@@ -17,50 +17,44 @@ static void check_statement_rendering(statement tree, char const *expected)
 
 void test_save_statement(void)
 {
-    {
-        check_statement_rendering(
-            statement_from_assign(assign_create(
+    check_statement_rendering(
+        statement_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))))),
+        "a = 123\n");
+
+    check_statement_rendering(
+        statement_from_return(expression_allocate(
+            expression_from_identifier(unicode_string_from_c_str("a")))),
+        "return a\n");
+
+    check_statement_rendering(
+        statement_from_expression(expression_allocate(
+            expression_from_identifier(unicode_string_from_c_str("a")))),
+        "a\n");
+
+    check_statement_rendering(
+        statement_from_loop(statement_allocate(statement_from_assign(
+            assign_create(expression_allocate(expression_from_identifier(
+                              unicode_string_from_c_str("a"))),
+                          expression_allocate(expression_from_integer_literal(
+                              integer_create(0, 123))))))),
+        "loop\n"
+        "    a = 123\n");
+
+    check_statement_rendering(
+        statement_from_loop(statement_allocate(statement_from_loop(
+            statement_allocate(statement_from_assign(assign_create(
                 expression_allocate(
                     expression_from_identifier(unicode_string_from_c_str("a"))),
-                expression_allocate(
-                    expression_from_integer_literal(integer_create(0, 123))))),
-            "a = 123\n");
-    }
-    {
-        check_statement_rendering(
-            statement_from_return(expression_allocate(
-                expression_from_identifier(unicode_string_from_c_str("a")))),
-            "return a\n");
-    }
-    {
-        check_statement_rendering(
-            statement_from_expression(expression_allocate(
-                expression_from_identifier(unicode_string_from_c_str("a")))),
-            "a\n");
-    }
-    {
-        check_statement_rendering(
-            statement_from_loop(
-                statement_allocate(statement_from_assign(assign_create(
-                    expression_allocate(expression_from_identifier(
-                        unicode_string_from_c_str("a"))),
-                    expression_allocate(expression_from_integer_literal(
-                        integer_create(0, 123))))))),
-            "loop\n"
-            "    a = 123\n");
-    }
-    {
-        check_statement_rendering(
-            statement_from_loop(statement_allocate(statement_from_loop(
-                statement_allocate(statement_from_assign(assign_create(
-                    expression_allocate(expression_from_identifier(
-                        unicode_string_from_c_str("a"))),
-                    expression_allocate(expression_from_integer_literal(
-                        integer_create(0, 123))))))))),
-            "loop\n"
-            "    loop\n"
-            "        a = 123\n");
-    }
+                expression_allocate(expression_from_integer_literal(
+                    integer_create(0, 123))))))))),
+        "loop\n"
+        "    loop\n"
+        "        a = 123\n");
+
     {
         statement *body = allocate_array(2, sizeof(*body));
         body[0] = statement_from_assign(assign_create(
@@ -93,7 +87,5 @@ void test_save_statement(void)
             "    loop\n"
             "        break\n");
     }
-    {
-        check_statement_rendering(statement_from_break(), "break\n");
-    }
+    check_statement_rendering(statement_from_break(), "break\n");
 }
