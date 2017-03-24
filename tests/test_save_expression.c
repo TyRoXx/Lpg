@@ -60,7 +60,7 @@ static success_indicator save_expression(stream_writer const to,
             integer_format(value->integer_literal, lower_case_digits, 10,
                            buffer, sizeof(buffer));
         return stream_writer_write_bytes(
-            to, formatted, (buffer + sizeof(buffer) - formatted));
+            to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
     }
 
     case expression_type_integer_range:
