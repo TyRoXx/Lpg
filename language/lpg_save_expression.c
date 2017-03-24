@@ -64,7 +64,6 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_access_structure:
     case expression_type_add_to_variant:
     case expression_type_match:
-    case expression_type_sequence:
     case expression_type_assignment:
         UNREACHABLE();
 

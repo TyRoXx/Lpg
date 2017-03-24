@@ -56,7 +56,6 @@ void enter_expression(expression const *source, cursor_list *const cursors,
     case expression_type_access_structure:
     case expression_type_add_to_variant:
     case expression_type_match:
-    case expression_type_sequence:
     case expression_type_assignment:
         abort();
 
@@ -213,7 +212,6 @@ editing_input_result handle_editing_input(key_event event, expression *source,
     case expression_type_access_structure:
     case expression_type_add_to_variant:
     case expression_type_match:
-    case expression_type_sequence:
     case expression_type_assignment:
         abort();
 

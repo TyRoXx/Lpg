@@ -1,9 +1,16 @@
 #include "lpg_statement.h"
 #include "lpg_allocate.h"
+#include "lpg_for.h"
 
 assign assign_create(expression *left, expression *right)
 {
     assign result = {left, right};
+    return result;
+}
+
+sequence sequence_create(statement *elements, size_t length)
+{
+    sequence result = {elements, length};
     return result;
 }
 
@@ -46,6 +53,14 @@ statement statement_from_break()
     return result;
 }
 
+statement statement_from_sequence(sequence value)
+{
+    statement result;
+    result.type = statement_sequence;
+    result.sequence = value;
+    return result;
+}
+
 void statement_free(statement *s)
 {
     switch (s->type)
@@ -68,6 +83,14 @@ void statement_free(statement *s)
         break;
 
     case statement_break:
+        break;
+
+    case statement_sequence:
+        LPG_FOR(size_t, i, s->sequence.length)
+        {
+            statement_free(s->sequence.elements + i);
+        }
+        deallocate(s->sequence.elements);
         break;
     }
 }

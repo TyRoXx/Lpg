@@ -101,15 +101,6 @@ void match_free(match *this)
     deallocate(this->cases);
 }
 
-void sequence_free(sequence *this)
-{
-    LPG_FOR(size_t, i, this->number_of_elements)
-    {
-        expression_free(this->elements + i);
-    }
-    deallocate(this->elements);
-}
-
 void assignment_free(assignment *this)
 {
     expression_deallocate(this->variable);
@@ -202,10 +193,6 @@ void expression_free(expression *this)
 
     case expression_type_match:
         match_free(&this->match);
-        break;
-
-    case expression_type_sequence:
-        sequence_free(&this->sequence);
         break;
 
     case expression_type_assignment:

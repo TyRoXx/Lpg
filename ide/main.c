@@ -108,9 +108,6 @@ static void render_expression(console_printer *const printer,
     case expression_type_match:
         abort();
 
-    case expression_type_sequence:
-        abort();
-
     case expression_type_assignment:
         abort();
 

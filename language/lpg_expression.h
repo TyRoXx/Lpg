@@ -37,7 +37,6 @@ typedef enum expression_type
     expression_type_access_structure,
     expression_type_add_to_variant,
     expression_type_match,
-    expression_type_sequence,
     expression_type_assignment,
     expression_type_string,
     expression_type_identifier
@@ -108,12 +107,6 @@ typedef struct match
     size_t number_of_cases;
 } match;
 
-typedef struct sequence
-{
-    expression *elements;
-    size_t number_of_elements;
-} sequence;
-
 typedef struct assignment
 {
     expression *variable;
@@ -137,7 +130,6 @@ struct expression
         access_structure access_structure;
         add_to_variant add_to_variant;
         match match;
-        sequence sequence;
         assignment assignment;
         unicode_string string;
         unicode_string identifier;
@@ -151,7 +143,6 @@ void fill_structure_free(fill_structure *this);
 void access_structure_free(access_structure *this);
 void add_to_variant_free(add_to_variant *this);
 void match_free(match *this);
-void sequence_free(sequence *this);
 void assignment_free(assignment *this);
 expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
