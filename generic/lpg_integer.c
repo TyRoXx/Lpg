@@ -91,3 +91,32 @@ integer_division integer_divide(integer numerator, integer denominator)
     }
     return result;
 }
+
+char const lower_case_digits[] = "0123456789abcdef";
+
+char *integer_format(integer const value, char const *digits, unsigned base,
+                     char *buffer, size_t buffer_size)
+{
+    ASSUME(base >= 2);
+    ASSUME(base <= 16);
+    ASSUME(buffer_size > 0);
+    size_t next_digit = buffer_size - 1;
+    integer rest = value;
+    for (;;)
+    {
+        integer_division const divided =
+            integer_divide(rest, integer_create(0, base));
+        buffer[next_digit] = digits[divided.remainder.low];
+        rest = divided.quotient;
+        if (rest.high == 0 && rest.low == 0)
+        {
+            break;
+        }
+        if (next_digit == 0)
+        {
+            return NULL;
+        }
+        --next_digit;
+    }
+    return buffer + next_digit;
+}

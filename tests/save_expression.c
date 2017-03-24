@@ -55,23 +55,12 @@ static success_indicator save_expression(stream_writer const to,
 
     case expression_type_integer_literal:
     {
-        char formatted[39];
-        size_t next_digit = sizeof(formatted) - 1;
-        integer rest = value->integer_literal;
-        for (;;)
-        {
-            integer_division const divided =
-                integer_divide(rest, integer_create(0, 10));
-            formatted[next_digit] = (char)((divided.remainder.low % 10u) + '0');
-            rest = divided.quotient;
-            if (rest.high == 0 && rest.low == 0)
-            {
-                break;
-            }
-            --next_digit;
-        }
+        char buffer[39];
+        char *const formatted =
+            integer_format(value->integer_literal, lower_case_digits, 10,
+                           buffer, sizeof(buffer));
         return stream_writer_write_bytes(
-            to, formatted + next_digit, sizeof(formatted) - next_digit);
+            to, formatted, (buffer + sizeof(buffer) - formatted));
     }
 
     case expression_type_integer_range:

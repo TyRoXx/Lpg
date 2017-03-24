@@ -22,3 +22,8 @@ typedef struct integer_division
 } integer_division;
 
 integer_division integer_divide(integer numerator, integer denominator);
+
+extern char const lower_case_digits[];
+
+char *integer_format(integer const value, char const *digits, unsigned base,
+                     char *buffer, size_t buffer_size);

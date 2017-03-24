@@ -1,6 +1,7 @@
 #include "integer.h"
 #include "test.h"
 #include "lpg_integer.h"
+#include <string.h>
 
 void test_integer(void)
 {
@@ -62,5 +63,35 @@ void test_integer(void)
         REQUIRE(integer_equal(
             result.quotient, integer_create(0, 1844674407370955161)));
         REQUIRE(integer_equal(result.remainder, integer_create(0, 6)));
+    }
+    for (unsigned base = 2; base <= 16; ++base)
+    {
+        for (unsigned value = 2; value < base; ++value)
+        {
+            char buffer[1];
+            char *formatted =
+                integer_format(integer_create(0, value), lower_case_digits,
+                               base, buffer, sizeof(buffer));
+            REQUIRE(formatted == buffer);
+            REQUIRE(buffer[0] == lower_case_digits[value]);
+        }
+    }
+    {
+        char buffer[39];
+        char *formatted = integer_format(
+            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+            lower_case_digits, 10, buffer, sizeof(buffer));
+        REQUIRE(buffer == formatted);
+        REQUIRE(!memcmp(
+            buffer, "340282366920938463463374607431768211455", sizeof(buffer)));
+    }
+    {
+        char buffer[32];
+        char *formatted = integer_format(
+            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+            lower_case_digits, 16, buffer, sizeof(buffer));
+        REQUIRE(buffer == formatted);
+        REQUIRE(!memcmp(
+            buffer, "ffffffffffffffffffffffffffffffff", sizeof(buffer)));
     }
 }
