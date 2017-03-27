@@ -39,7 +39,12 @@ typedef enum expression_type
     expression_type_match,
     expression_type_assignment,
     expression_type_string,
-    expression_type_identifier
+    expression_type_identifier,
+    expression_assign,
+    expression_return,
+    expression_loop,
+    expression_break,
+    expression_sequence
 } expression_type;
 
 typedef enum builtin
@@ -113,6 +118,27 @@ typedef struct assignment
     expression *new_value;
 } assignment;
 
+typedef struct assign
+{
+    expression *left;
+    expression *right;
+} assign;
+
+assign assign_create(expression *left, expression *right);
+
+typedef struct sequence
+{
+    expression *elements;
+    size_t length;
+} sequence;
+
+sequence sequence_create(expression *elements, size_t length);
+expression expression_from_assign(assign value);
+expression expression_from_return(expression *value);
+expression expression_from_loop(expression *body);
+expression expression_from_break(void);
+expression expression_from_sequence(sequence value);
+
 struct expression
 {
     expression_type type;
@@ -133,6 +159,10 @@ struct expression
         assignment assignment;
         unicode_string string;
         unicode_string identifier;
+        assign assign;
+        expression *return_;
+        expression *loop_body;
+        sequence sequence;
     };
 };
 

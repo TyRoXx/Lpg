@@ -12,7 +12,7 @@
 static void check_expression_rendering(expression tree, char const *expected)
 {
     memory_writer buffer = {NULL, 0, 0};
-    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree) == success);
+    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree, 0) == success);
     REQUIRE(memory_writer_equals(buffer, expected));
     memory_writer_free(&buffer);
     expression_free(&tree);
@@ -75,4 +75,70 @@ void test_save_expression(void)
                     expression_from_integer_literal(integer_create(0, 1234))))),
             "(a: uint32) => 1234");
     }
+    check_expression_rendering(
+        expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))))),
+        "a = 123\n");
+
+    check_expression_rendering(
+        expression_from_return(expression_allocate(
+            expression_from_identifier(unicode_string_from_c_str("a")))),
+        "return a\n");
+
+    check_expression_rendering(
+        expression_from_loop(expression_allocate(expression_from_assign(
+            assign_create(expression_allocate(expression_from_identifier(
+                              unicode_string_from_c_str("a"))),
+                          expression_allocate(expression_from_integer_literal(
+                              integer_create(0, 123))))))),
+        "loop\n"
+        "    a = 123\n");
+
+    check_expression_rendering(
+        expression_from_loop(expression_allocate(expression_from_loop(
+            expression_allocate(expression_from_assign(assign_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                expression_allocate(expression_from_integer_literal(
+                    integer_create(0, 123))))))))),
+        "loop\n"
+        "    loop\n"
+        "        a = 123\n");
+
+    {
+        expression *body = allocate_array(2, sizeof(*body));
+        body[0] = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123)))));
+        body[1] = expression_from_break();
+        check_expression_rendering(
+            expression_from_loop(expression_allocate(
+                expression_from_sequence(sequence_create(body, 2)))),
+            "loop\n"
+            "    a = 123\n"
+            "    break\n");
+    }
+    {
+        expression *body = allocate_array(2, sizeof(*body));
+        body[0] = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123)))));
+        body[1] =
+            expression_from_loop(expression_allocate(expression_from_break()));
+        check_expression_rendering(
+            expression_from_loop(expression_allocate(
+                expression_from_sequence(sequence_create(body, 2)))),
+            "loop\n"
+            "    a = 123\n"
+            "    loop\n"
+            "        break\n");
+    }
+    check_expression_rendering(expression_from_break(), "break\n");
 }

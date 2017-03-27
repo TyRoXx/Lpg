@@ -43,6 +43,57 @@ void add_member_free(add_member *this)
     expression_deallocate(this->type);
 }
 
+assign assign_create(expression *left, expression *right)
+{
+    assign result = {left, right};
+    return result;
+}
+
+sequence sequence_create(expression *elements, size_t length)
+{
+    sequence result = {elements, length};
+    return result;
+}
+
+expression expression_from_assign(assign value)
+{
+    expression result;
+    result.type = expression_assign;
+    result.assign = value;
+    return result;
+}
+
+expression expression_from_return(expression *value)
+{
+    expression result;
+    result.type = expression_return;
+    result.return_ = value;
+    return result;
+}
+
+expression expression_from_loop(expression *body)
+{
+    expression result;
+    result.type = expression_loop;
+    result.loop_body = body;
+    return result;
+}
+
+expression expression_from_break()
+{
+    expression result;
+    result.type = expression_break;
+    return result;
+}
+
+expression expression_from_sequence(sequence value)
+{
+    expression result;
+    result.type = expression_sequence;
+    result.sequence = value;
+    return result;
+}
+
 expression expression_from_builtin(builtin value)
 {
     expression result;
@@ -205,6 +256,30 @@ void expression_free(expression *this)
 
     case expression_type_identifier:
         unicode_string_free(&this->identifier);
+        break;
+
+    case expression_assign:
+        expression_deallocate(this->assign.left);
+        expression_deallocate(this->assign.right);
+        break;
+
+    case expression_return:
+        expression_deallocate(this->return_);
+        break;
+
+    case expression_loop:
+        expression_deallocate(this->loop_body);
+        break;
+
+    case expression_break:
+        break;
+
+    case expression_sequence:
+        LPG_FOR(size_t, i, this->sequence.length)
+        {
+            expression_free(this->sequence.elements + i);
+        }
+        deallocate(this->sequence.elements);
         break;
     }
 }
