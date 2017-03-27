@@ -69,19 +69,13 @@ static void render_expression(console_printer *const printer,
 
     case expression_type_integer_literal:
     {
-        char buffer[2 + (4 * 8) + 1];
-        if (snprintf(buffer, sizeof(buffer), "0x%08X%08X%08X%08X",
-                     (unsigned)(source->integer_literal.high >> 32u),
-                     (unsigned)source->integer_literal.high,
-                     (unsigned)(source->integer_literal.low >> 32u),
-                     (unsigned)source->integer_literal.low) !=
-            (sizeof(buffer) - 1))
+        char buffer[39];
+        char *formatted =
+            integer_format(source->integer_literal, lower_case_digits, 10,
+                           buffer, sizeof(buffer));
+        for (char *end = buffer + sizeof(buffer); formatted != end; ++formatted)
         {
-            abort();
-        }
-        LPG_FOR(size_t, i, sizeof(buffer) - 1)
-        {
-            console_print_char(printer, (unicode_code_point)buffer[i],
+            console_print_char(printer, (unicode_code_point)*formatted,
                                yellow_or(is_selected, console_color_white));
         }
         break;
