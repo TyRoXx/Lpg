@@ -279,7 +279,13 @@ editing_input_result handle_editing_input(key_event event, expression *source,
             break;
         }
         return editing_input_result_ok;
+
     case expression_type_identifier:
+    case expression_assign:
+    case expression_return:
+    case expression_loop:
+    case expression_break:
+    case expression_sequence:
         abort();
     }
     abort();
