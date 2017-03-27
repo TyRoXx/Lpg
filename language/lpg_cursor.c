@@ -73,6 +73,11 @@ void enter_expression(expression const *source, cursor_list *const cursors,
         break;
 
     case expression_type_identifier:
+    case expression_assign:
+    case expression_return:
+    case expression_loop:
+    case expression_break:
+    case expression_sequence:
         abort();
     }
 }
