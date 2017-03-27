@@ -58,7 +58,7 @@ sequence sequence_create(expression *elements, size_t length)
 expression expression_from_assign(assign value)
 {
     expression result;
-    result.type = expression_assign;
+    result.type = expression_type_assign;
     result.assign = value;
     return result;
 }
@@ -66,7 +66,7 @@ expression expression_from_assign(assign value)
 expression expression_from_return(expression *value)
 {
     expression result;
-    result.type = expression_return;
+    result.type = expression_type_return;
     result.return_ = value;
     return result;
 }
@@ -74,7 +74,7 @@ expression expression_from_return(expression *value)
 expression expression_from_loop(expression *body)
 {
     expression result;
-    result.type = expression_loop;
+    result.type = expression_type_loop;
     result.loop_body = body;
     return result;
 }
@@ -82,14 +82,14 @@ expression expression_from_loop(expression *body)
 expression expression_from_break()
 {
     expression result;
-    result.type = expression_break;
+    result.type = expression_type_break;
     return result;
 }
 
 expression expression_from_sequence(sequence value)
 {
     expression result;
-    result.type = expression_sequence;
+    result.type = expression_type_sequence;
     result.sequence = value;
     return result;
 }
@@ -258,23 +258,23 @@ void expression_free(expression *this)
         unicode_string_free(&this->identifier);
         break;
 
-    case expression_assign:
+    case expression_type_assign:
         expression_deallocate(this->assign.left);
         expression_deallocate(this->assign.right);
         break;
 
-    case expression_return:
+    case expression_type_return:
         expression_deallocate(this->return_);
         break;
 
-    case expression_loop:
+    case expression_type_loop:
         expression_deallocate(this->loop_body);
         break;
 
-    case expression_break:
+    case expression_type_break:
         break;
 
-    case expression_sequence:
+    case expression_type_sequence:
         LPG_FOR(size_t, i, this->sequence.length)
         {
             expression_free(this->sequence.elements + i);

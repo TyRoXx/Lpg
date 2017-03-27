@@ -40,11 +40,11 @@ typedef enum expression_type
     expression_type_assignment,
     expression_type_string,
     expression_type_identifier,
-    expression_assign,
-    expression_return,
-    expression_loop,
-    expression_break,
-    expression_sequence
+    expression_type_assign,
+    expression_type_return,
+    expression_type_loop,
+    expression_type_break,
+    expression_type_sequence
 } expression_type;
 
 typedef enum builtin

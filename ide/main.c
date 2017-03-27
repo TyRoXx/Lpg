@@ -122,11 +122,11 @@ static void render_expression(console_printer *const printer,
         break;
 
     case expression_type_identifier:
-    case expression_assign:
-    case expression_return:
-    case expression_loop:
-    case expression_break:
-    case expression_sequence:
+    case expression_type_assign:
+    case expression_type_return:
+    case expression_type_loop:
+    case expression_type_break:
+    case expression_type_sequence:
         abort();
     }
 }
