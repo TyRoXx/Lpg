@@ -7,15 +7,18 @@
 #endif
 
 #if defined(NDEBUG) || !defined(_MSC_VER)
-#define REQUIRE(x)                                                             \
-    if (!(x))                                                                  \
-    {                                                                          \
-        abort();                                                               \
-    }
+#define LPG_ABORT() abort()
 #else
-#define REQUIRE(x)                                                             \
-    if (!(x))                                                                  \
+#define LPG_ABORT()                                                            \
+    do                                                                         \
     {                                                                          \
         __debugbreak();                                                        \
-    }
+        abort();                                                               \
+    } while (0)
 #endif
+
+#define REQUIRE(x)                                                             \
+    if (!(x))                                                                  \
+    {                                                                          \
+        LPG_ABORT();                                                           \
+    }
