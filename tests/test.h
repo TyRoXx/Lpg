@@ -17,8 +17,11 @@
     } while (0)
 #endif
 
+int lpg_check(int success);
+int lpg_print_test_summary(void);
+
 #define REQUIRE(x)                                                             \
-    if (!(x))                                                                  \
+    if (!lpg_check(!!(x)))                                                     \
     {                                                                          \
         LPG_ABORT();                                                           \
     }

@@ -105,6 +105,5 @@ int main(void)
     check_allocations();
     test_save_expression();
     check_allocations();
-    printf("All tests passed\n");
-    return 0;
+    return lpg_print_test_summary();
 }
