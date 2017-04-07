@@ -70,6 +70,9 @@ void enter_expression(expression const *source, cursor_list *const cursors,
     case expression_type_loop:
     case expression_type_break:
     case expression_type_sequence:
+    case expression_type_make_identifier:
+    case expression_type_declare:
+    case expression_type_tuple:
         abort();
     }
 }
