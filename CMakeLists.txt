@@ -1,6 +1,15 @@
 cmake_minimum_required(VERSION 2.8)
 project(Lpg C)
 
+if(MSVC)
+	option(LPG_WITH_VLD "use Visual Leak Detector" OFF)
+endif()
+if(LPG_WITH_VLD)
+	add_definitions(-DLPG_WITH_VLD=1)
+else()
+	add_definitions(-DLPG_WITH_VLD=0)
+endif()
+
 file(GLOB_RECURSE formatted "*.c" "*.h")
 
 find_program(LPG_CLANG_FORMAT NAMES clang-format-3.7 clang-format PATHS "C:/Program Files/LLVM/bin")
