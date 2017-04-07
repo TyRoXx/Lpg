@@ -82,13 +82,11 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_assign:
         LPG_TRY(save_expression(to, value->assign.left, indentation));
         LPG_TRY(stream_writer_write_string(to, " = "));
-        LPG_TRY(save_expression(to, value->assign.right, indentation));
-        return stream_writer_write_string(to, "\n");
+        return save_expression(to, value->assign.right, indentation);
 
     case expression_type_return:
         LPG_TRY(stream_writer_write_string(to, "return "));
-        LPG_TRY(save_expression(to, value->return_, indentation));
-        return stream_writer_write_string(to, "\n");
+        return save_expression(to, value->return_, indentation);
 
     case expression_type_loop:
         LPG_TRY(stream_writer_write_string(to, "loop\n"));
@@ -99,7 +97,7 @@ success_indicator save_expression(stream_writer const to,
         return save_expression(to, value->loop_body, indentation + 1);
 
     case expression_type_break:
-        return stream_writer_write_string(to, "break\n");
+        return stream_writer_write_string(to, "break");
 
     case expression_type_sequence:
         LPG_FOR(size_t, i, value->sequence.length)
@@ -113,6 +111,7 @@ success_indicator save_expression(stream_writer const to,
             }
             LPG_TRY(
                 save_expression(to, value->sequence.elements + i, indentation));
+            LPG_TRY(stream_writer_write_string(to, "\n"));
         }
         return success;
 

@@ -110,7 +110,7 @@ void test_save_expression(void)
                 expression_from_identifier(unicode_string_from_c_str("a"))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
-        "a = 123\n");
+        "a = 123");
 
     check_expression_rendering(
         expression_from_assign(assign_create(
@@ -119,7 +119,7 @@ void test_save_expression(void)
                     unicode_string_from_c_str("a"))))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
-        "*a = 123\n");
+        "*a = 123");
 
     check_expression_rendering(
         expression_from_assign(assign_create(
@@ -129,7 +129,7 @@ void test_save_expression(void)
                 expression_allocate(expression_from_make_identifier(
                     expression_allocate(expression_from_identifier(
                         unicode_string_from_c_str("b"))))))))),
-        "a = **b\n");
+        "a = **b");
 
     check_expression_rendering(
         expression_from_assign(assign_create(
@@ -141,7 +141,7 @@ void test_save_expression(void)
                         unicode_string_from_c_str("m")))))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
-        "a.m = 123\n");
+        "a.m = 123");
 
     check_expression_rendering(
         expression_from_assign(assign_create(
@@ -154,12 +154,12 @@ void test_save_expression(void)
                             unicode_string_from_c_str("m")))))))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
-        "a.*m = 123\n");
+        "a.*m = 123");
 
     check_expression_rendering(
         expression_from_return(expression_allocate(
             expression_from_identifier(unicode_string_from_c_str("a")))),
-        "return a\n");
+        "return a");
 
     check_expression_rendering(
         expression_from_loop(expression_allocate(expression_from_assign(
@@ -168,7 +168,7 @@ void test_save_expression(void)
                           expression_allocate(expression_from_integer_literal(
                               integer_create(0, 123))))))),
         "loop\n"
-        "    a = 123\n");
+        "    a = 123");
 
     check_expression_rendering(
         expression_from_loop(expression_allocate(expression_from_loop(
@@ -179,7 +179,7 @@ void test_save_expression(void)
                     integer_create(0, 123))))))))),
         "loop\n"
         "    loop\n"
-        "        a = 123\n");
+        "        a = 123");
 
     {
         expression *body = allocate_array(2, sizeof(*body));
@@ -213,7 +213,7 @@ void test_save_expression(void)
             "    loop\n"
             "        break\n");
     }
-    check_expression_rendering(expression_from_break(), "break\n");
+    check_expression_rendering(expression_from_break(), "break");
     {
         expression *body = allocate_array(2, sizeof(*body));
         body[0] = expression_from_assign(assign_create(
