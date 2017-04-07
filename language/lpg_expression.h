@@ -17,12 +17,6 @@ lambda lambda_create(expression *parameter_type, expression *parameter_name,
                      expression *result);
 void lambda_free(lambda *this);
 
-typedef struct integer_range
-{
-    integer minimum;
-    integer maximum;
-} integer_range;
-
 typedef enum expression_type
 {
     expression_type_lambda,
