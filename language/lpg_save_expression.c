@@ -17,20 +17,6 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(save_expression(to, value->lambda.result, indentation));
         return success;
 
-    case expression_type_builtin:
-        switch (value->builtin)
-        {
-        case builtin_unit:
-            return stream_writer_write_string(to, "()");
-
-        case builtin_empty_structure:
-            return stream_writer_write_string(to, "{}");
-
-        case builtin_empty_variant:
-            return stream_writer_write_string(to, "{}");
-        }
-        UNREACHABLE();
-
     case expression_type_call:
         LPG_TRY(save_expression(to, value->call.callee, indentation));
         LPG_TRY(stream_writer_write_string(to, "("));

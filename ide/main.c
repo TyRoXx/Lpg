@@ -36,32 +36,6 @@ static void render_expression(console_printer *const printer,
         render_expression(printer, source->lambda.result, descend(cursor, 2));
         break;
 
-    case expression_type_builtin:
-        switch (source->builtin)
-        {
-        case builtin_unit:
-            console_print_char(
-                printer, '(', yellow_or(is_selected, console_color_grey));
-            console_print_char(
-                printer, ')', yellow_or(is_selected, console_color_grey));
-            break;
-
-        case builtin_empty_structure:
-            console_print_char(
-                printer, '{', yellow_or(is_selected, console_color_grey));
-            console_print_char(
-                printer, '}', yellow_or(is_selected, console_color_grey));
-            break;
-
-        case builtin_empty_variant:
-            console_print_char(
-                printer, '[', yellow_or(is_selected, console_color_grey));
-            console_print_char(
-                printer, ']', yellow_or(is_selected, console_color_grey));
-            break;
-        }
-        break;
-
     case expression_type_call:
         abort();
 
@@ -220,7 +194,7 @@ void run_editor(expression *source)
 int main(void)
 {
     lambda root_function = {
-        expression_allocate(expression_from_builtin(builtin_unit)),
+        expression_allocate(expression_from_tuple(tuple_create(NULL, 0))),
         expression_allocate(expression_from_unicode_string(
             unicode_string_from_c_str("argument"))),
         expression_allocate(

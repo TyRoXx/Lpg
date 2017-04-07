@@ -37,7 +37,6 @@ void enter_expression(expression const *source, cursor_list *const cursors,
     switch (source->type)
     {
     case expression_type_lambda:
-    case expression_type_builtin:
         add_link(cursors, 0);
         break;
 
@@ -171,21 +170,6 @@ editing_input_result handle_editing_input(key_event event, expression *source,
 
         default:
             abort();
-        }
-
-    case expression_type_builtin:
-        switch (event.main_key.type)
-        {
-        case virtual_key_type_left:
-            --cursors->size;
-            return editing_input_result_go_left;
-
-        case virtual_key_type_right:
-            --cursors->size;
-            return editing_input_result_go_right;
-
-        default:
-            return editing_input_result_ok;
         }
 
     case expression_type_call:

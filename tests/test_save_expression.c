@@ -20,11 +20,6 @@ static void check_expression_rendering(expression tree, char const *expected)
 
 void test_save_expression(void)
 {
-    check_expression_rendering(expression_from_builtin(builtin_unit), "()");
-    check_expression_rendering(
-        expression_from_builtin(builtin_empty_structure), "{}");
-    check_expression_rendering(
-        expression_from_builtin(builtin_empty_variant), "{}");
     check_expression_rendering(
         expression_from_unicode_string(unicode_string_from_c_str("")), "\"\"");
     check_expression_rendering(

@@ -26,7 +26,6 @@ typedef struct integer_range
 typedef enum expression_type
 {
     expression_type_lambda,
-    expression_type_builtin,
     expression_type_call,
     expression_type_integer_literal,
     expression_type_integer_range,
@@ -46,13 +45,6 @@ typedef enum expression_type
     expression_type_declare,
     expression_type_tuple
 } expression_type;
-
-typedef enum builtin
-{
-    builtin_unit,
-    builtin_empty_structure,
-    builtin_empty_variant
-} builtin;
 
 typedef struct call
 {
@@ -154,7 +146,6 @@ struct expression
     union
     {
         lambda lambda;
-        builtin builtin;
         call call;
         integer integer_literal;
         integer_range integer_range;
@@ -175,7 +166,6 @@ struct expression
     };
 };
 
-expression expression_from_builtin(builtin value);
 expression expression_from_integer_literal(integer value);
 void call_free(call *this);
 void fill_structure_free(fill_structure *this);

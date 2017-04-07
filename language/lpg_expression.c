@@ -145,14 +145,6 @@ expression expression_from_declare(declare value)
     return result;
 }
 
-expression expression_from_builtin(builtin value)
-{
-    expression result;
-    result.type = expression_type_builtin;
-    result.builtin = value;
-    return result;
-}
-
 expression expression_from_integer_literal(integer value)
 {
     expression result;
@@ -264,9 +256,6 @@ void expression_free(expression *this)
     {
     case expression_type_lambda:
         lambda_free(&this->lambda);
-        break;
-
-    case expression_type_builtin:
         break;
 
     case expression_type_call:
