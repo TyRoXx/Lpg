@@ -61,6 +61,23 @@ sequence sequence_create(expression *elements, size_t length)
     return result;
 }
 
+declare declare_create(expression *name, expression *type,
+                       expression *optional_initializer)
+{
+    declare result = {name, type, optional_initializer};
+    return result;
+}
+
+void declare_free(declare *value)
+{
+    expression_deallocate(value->name);
+    expression_deallocate(value->type);
+    if (value->optional_initializer)
+    {
+        expression_deallocate(value->optional_initializer);
+    }
+}
+
 expression expression_from_assign(assign value)
 {
     expression result;
@@ -105,6 +122,14 @@ expression expression_from_access_structure(access_structure value)
     expression result;
     result.type = expression_type_access_structure;
     result.access_structure = value;
+    return result;
+}
+
+expression expression_from_declare(declare value)
+{
+    expression result;
+    result.type = expression_type_declare;
+    result.declare = value;
     return result;
 }
 
@@ -280,6 +305,10 @@ void expression_free(expression *this)
             expression_free(this->sequence.elements + i);
         }
         deallocate(this->sequence.elements);
+        break;
+
+    case expression_type_declare:
+        declare_free(&this->declare);
         break;
     }
 }

@@ -75,6 +75,40 @@ void test_save_expression(void)
                     expression_from_integer_literal(integer_create(0, 1234))))),
             "(a: uint32) => 1234");
     }
+
+    {
+        expression *arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] = expression_from_integer_literal(integer_create(0, 0));
+        arguments[1] = expression_from_integer_literal(integer_create(0, 10));
+        check_expression_rendering(
+            expression_from_declare(declare_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                expression_allocate(expression_from_call(
+                    call_create(expression_allocate(expression_from_identifier(
+                                    unicode_string_from_c_str("integer"))),
+                                arguments, 2))),
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(0, 6))))),
+            "a: integer(0, 10) = 6");
+    }
+
+    {
+        expression *arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] = expression_from_integer_literal(integer_create(0, 0));
+        arguments[1] = expression_from_integer_literal(integer_create(0, 10));
+        check_expression_rendering(
+            expression_from_declare(declare_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                expression_allocate(expression_from_call(
+                    call_create(expression_allocate(expression_from_identifier(
+                                    unicode_string_from_c_str("integer"))),
+                                arguments, 2))),
+                NULL)),
+            "a: integer(0, 10)");
+    }
+
     check_expression_rendering(
         expression_from_assign(assign_create(
             expression_allocate(

@@ -61,6 +61,7 @@ static void render_expression(console_printer *const printer,
             break;
         }
         break;
+
     case expression_type_call:
         abort();
 

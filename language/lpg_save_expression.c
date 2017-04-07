@@ -144,6 +144,18 @@ success_indicator save_expression(stream_writer const to,
                 save_expression(to, value->sequence.elements + i, indentation));
         }
         return success;
+
+    case expression_type_declare:
+        LPG_TRY(save_expression(to, value->declare.name, indentation));
+        LPG_TRY(stream_writer_write_string(to, ": "));
+        LPG_TRY(save_expression(to, value->declare.type, indentation));
+        if (value->declare.optional_initializer)
+        {
+            LPG_TRY(stream_writer_write_string(to, " = "));
+            LPG_TRY(save_expression(
+                to, value->declare.optional_initializer, indentation));
+        }
+        return success;
     }
     UNREACHABLE();
 }
