@@ -171,12 +171,6 @@ void access_structure_free(access_structure *this)
     expression_deallocate(this->member);
 }
 
-void add_to_variant_free(add_to_variant *this)
-{
-    expression_deallocate(this->base);
-    expression_deallocate(this->new_type);
-}
-
 void match_free(match *this)
 {
     expression_deallocate(this->input);
@@ -264,10 +258,6 @@ void expression_free(expression *this)
 
     case expression_type_access_structure:
         access_structure_free(&this->access_structure);
-        break;
-
-    case expression_type_add_to_variant:
-        add_to_variant_free(&this->add_to_variant);
         break;
 
     case expression_type_match:

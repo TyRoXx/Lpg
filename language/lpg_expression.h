@@ -70,12 +70,6 @@ typedef struct access_structure
 access_structure access_structure_create(expression *object,
                                          expression *member);
 
-typedef struct add_to_variant
-{
-    expression *base;
-    expression *new_type;
-} add_to_variant;
-
 typedef struct match_case
 {
     expression *key;
@@ -140,7 +134,6 @@ struct expression
         integer integer_literal;
         fill_structure fill_structure;
         access_structure access_structure;
-        add_to_variant add_to_variant;
         match match;
         unicode_string string;
         unicode_string identifier;
@@ -158,7 +151,6 @@ expression expression_from_integer_literal(integer value);
 void call_free(call *this);
 void fill_structure_free(fill_structure *this);
 void access_structure_free(access_structure *this);
-void add_to_variant_free(add_to_variant *this);
 void match_free(match *this);
 expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
