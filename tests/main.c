@@ -12,6 +12,7 @@
 #include "test_arithmetic.h"
 #include "test_stream_writer.h"
 #include "test_identifier.h"
+#include "lpg_assert.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 static void check_allocations_maybe(void)
@@ -20,7 +21,7 @@ static void check_allocations_maybe(void)
 #else
 static void check_allocations_maybe(void)
 {
-    check_allocations();
+    ASSERT(count_active_allocations() == 0);
 }
 #endif
 
@@ -41,5 +42,6 @@ int main(void)
     check_allocations_maybe();
     test_identifier();
     check_allocations_maybe();
+    printf("Dynamic allocations: %zu\n", count_total_allocations());
     return lpg_print_test_summary();
 }

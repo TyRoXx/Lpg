@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <assert.h>
 
+static size_t total_allocations = 0;
 static size_t active_allocations = 0;
 
 void *allocate(size_t size)
@@ -11,6 +12,7 @@ void *allocate(size_t size)
     void *memory = malloc(size);
     ASSERT(memory);
     ++active_allocations;
+    ++total_allocations;
     return memory;
 }
 
@@ -19,6 +21,7 @@ void *allocate_array(size_t size, size_t element)
     void *memory = calloc(size, element);
     ASSERT(memory);
     ++active_allocations;
+    ++total_allocations;
     return memory;
 }
 
@@ -31,6 +34,7 @@ void *reallocate(void *memory, size_t new_size)
     {
         ++active_allocations;
     }
+    ++total_allocations;
     return new_memory;
 }
 
@@ -45,6 +49,7 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
     {
         ++active_allocations;
     }
+    ++total_allocations;
     return new_memory;
 }
 
@@ -56,7 +61,12 @@ void deallocate(void *memory)
     free(memory);
 }
 
-void check_allocations()
+size_t count_total_allocations()
 {
-    ASSERT(active_allocations == 0);
+    return total_allocations;
+}
+
+size_t count_active_allocations()
+{
+    return active_allocations;
 }

@@ -5,6 +5,7 @@
 #include "lpg_for.h"
 #include <stdlib.h>
 #include <string.h>
+#include "lpg_assert.h"
 
 static console_color yellow_or(int const condition,
                                console_color const otherwise)
@@ -191,6 +192,6 @@ int main(void)
     expression root = expression_from_lambda(root_function);
     run_editor(&root);
     expression_free(&root);
-    check_allocations();
+    ASSERT(count_active_allocations() == 0);
     return 0;
 }
