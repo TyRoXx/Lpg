@@ -42,17 +42,12 @@ success_indicator save_expression(stream_writer const to,
             to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
     }
 
-    case expression_type_add_member:
-    case expression_type_fill_structure:
-        UNREACHABLE();
-
     case expression_type_access_structure:
         LPG_TRY(
             save_expression(to, value->access_structure.object, indentation));
         LPG_TRY(stream_writer_write_string(to, "."));
         return save_expression(to, value->access_structure.member, indentation);
 
-    case expression_type_add_to_variant:
     case expression_type_match:
         UNREACHABLE();
 

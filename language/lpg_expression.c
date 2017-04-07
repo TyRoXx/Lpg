@@ -156,15 +156,6 @@ void call_free(call *this)
     deallocate(this->arguments);
 }
 
-void fill_structure_free(fill_structure *this)
-{
-    LPG_FOR(size_t, i, this->number_of_members)
-    {
-        expression_free(this->members + i);
-    }
-    deallocate(this->members);
-}
-
 void access_structure_free(access_structure *this)
 {
     expression_deallocate(this->object);
@@ -250,10 +241,6 @@ void expression_free(expression *this)
         break;
 
     case expression_type_integer_literal:
-        break;
-
-    case expression_type_fill_structure:
-        fill_structure_free(&this->fill_structure);
         break;
 
     case expression_type_access_structure:

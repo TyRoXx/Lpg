@@ -28,10 +28,7 @@ typedef enum expression_type
     expression_type_lambda,
     expression_type_call,
     expression_type_integer_literal,
-    expression_type_add_member,
-    expression_type_fill_structure,
     expression_type_access_structure,
-    expression_type_add_to_variant,
     expression_type_match,
     expression_type_string,
     expression_type_identifier,
@@ -54,12 +51,6 @@ typedef struct call
 
 call call_create(expression *callee, expression *arguments,
                  size_t number_of_arguments);
-
-typedef struct fill_structure
-{
-    expression *members;
-    size_t number_of_members;
-} fill_structure;
 
 typedef struct access_structure
 {
@@ -132,7 +123,6 @@ struct expression
         lambda lambda;
         call call;
         integer integer_literal;
-        fill_structure fill_structure;
         access_structure access_structure;
         match match;
         unicode_string string;
@@ -149,7 +139,6 @@ struct expression
 
 expression expression_from_integer_literal(integer value);
 void call_free(call *this);
-void fill_structure_free(fill_structure *this);
 void access_structure_free(access_structure *this);
 void match_free(match *this);
 expression expression_from_lambda(lambda lambda);

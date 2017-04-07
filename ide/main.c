@@ -53,10 +53,7 @@ static void render_expression(console_printer *const printer,
         break;
     }
 
-    case expression_type_add_member:
-    case expression_type_fill_structure:
     case expression_type_access_structure:
-    case expression_type_add_to_variant:
     case expression_type_match:
         abort();
 
@@ -82,6 +79,9 @@ static void render_expression(console_printer *const printer,
     case expression_type_loop:
     case expression_type_break:
     case expression_type_sequence:
+    case expression_type_make_identifier:
+    case expression_type_declare:
+    case expression_type_tuple:
         abort();
     }
 }
