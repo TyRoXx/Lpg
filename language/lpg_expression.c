@@ -30,12 +30,6 @@ call call_create(expression *callee, expression *arguments,
     return result;
 }
 
-void function_free(function *this)
-{
-    expression_deallocate(this->result);
-    expression_deallocate(this->parameter);
-}
-
 void add_member_free(add_member *this)
 {
     expression_deallocate(this->base);
@@ -283,10 +277,6 @@ void expression_free(expression *this)
         break;
 
     case expression_type_integer_range:
-        break;
-
-    case expression_type_function:
-        function_free(&this->function);
         break;
 
     case expression_type_add_member:

@@ -30,7 +30,6 @@ typedef enum expression_type
     expression_type_call,
     expression_type_integer_literal,
     expression_type_integer_range,
-    expression_type_function,
     expression_type_add_member,
     expression_type_fill_structure,
     expression_type_access_structure,
@@ -64,14 +63,6 @@ typedef struct call
 
 call call_create(expression *callee, expression *arguments,
                  size_t number_of_arguments);
-
-typedef struct function
-{
-    expression *result;
-    expression *parameter;
-} function;
-
-void function_free(function *this);
 
 typedef struct add_member
 {
@@ -167,7 +158,6 @@ struct expression
         call call;
         integer integer_literal;
         integer_range integer_range;
-        function function;
         add_member add_member;
         fill_structure fill_structure;
         access_structure access_structure;

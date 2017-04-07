@@ -57,7 +57,6 @@ success_indicator save_expression(stream_writer const to,
     }
 
     case expression_type_integer_range:
-    case expression_type_function:
     case expression_type_add_member:
     case expression_type_fill_structure:
         UNREACHABLE();

@@ -82,9 +82,6 @@ static void render_expression(console_printer *const printer,
     case expression_type_integer_range:
         abort();
 
-    case expression_type_function:
-        abort();
-
     case expression_type_add_member:
         abort();
 
