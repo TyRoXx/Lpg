@@ -53,21 +53,10 @@ static void render_expression(console_printer *const printer,
         break;
     }
 
-    case expression_type_integer_range:
-        abort();
-
     case expression_type_add_member:
-        abort();
-
     case expression_type_fill_structure:
-        abort();
-
     case expression_type_access_structure:
-        abort();
-
     case expression_type_add_to_variant:
-        abort();
-
     case expression_type_match:
         abort();
 

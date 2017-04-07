@@ -28,7 +28,6 @@ typedef enum expression_type
     expression_type_lambda,
     expression_type_call,
     expression_type_integer_literal,
-    expression_type_integer_range,
     expression_type_add_member,
     expression_type_fill_structure,
     expression_type_access_structure,
@@ -148,7 +147,6 @@ struct expression
         lambda lambda;
         call call;
         integer integer_literal;
-        integer_range integer_range;
         add_member add_member;
         fill_structure fill_structure;
         access_structure access_structure;

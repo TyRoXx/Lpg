@@ -265,9 +265,6 @@ void expression_free(expression *this)
     case expression_type_integer_literal:
         break;
 
-    case expression_type_integer_range:
-        break;
-
     case expression_type_add_member:
         add_member_free(&this->add_member);
         break;

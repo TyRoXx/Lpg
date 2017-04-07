@@ -42,7 +42,6 @@ success_indicator save_expression(stream_writer const to,
             to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
     }
 
-    case expression_type_integer_range:
     case expression_type_add_member:
     case expression_type_fill_structure:
         UNREACHABLE();

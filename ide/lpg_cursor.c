@@ -47,7 +47,6 @@ void enter_expression(expression const *source, cursor_list *const cursors,
         add_link(cursors, 0);
         break;
 
-    case expression_type_integer_range:
     case expression_type_add_member:
     case expression_type_fill_structure:
     case expression_type_access_structure:
@@ -190,7 +189,6 @@ editing_input_result handle_editing_input(key_event event, expression *source,
             return editing_input_result_ok;
         }
 
-    case expression_type_integer_range:
     case expression_type_add_member:
     case expression_type_fill_structure:
     case expression_type_access_structure:
