@@ -90,8 +90,11 @@ typedef struct fill_structure
 typedef struct access_structure
 {
     expression *object;
-    unicode_string member;
+    expression *member;
 } access_structure;
+
+access_structure access_structure_create(expression *object,
+                                         expression *member);
 
 typedef struct add_to_variant
 {
@@ -138,6 +141,7 @@ expression expression_from_return(expression *value);
 expression expression_from_loop(expression *body);
 expression expression_from_break(void);
 expression expression_from_sequence(sequence value);
+expression expression_from_access_structure(access_structure value);
 
 struct expression
 {

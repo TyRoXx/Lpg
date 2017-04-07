@@ -1,6 +1,7 @@
 #include "lpg_save_expression.h"
 #include "lpg_assert.h"
 #include "lpg_for.h"
+#include "lpg_identifier.h"
 
 success_indicator save_expression(stream_writer const to,
                                   expression const *value, size_t indentation)
@@ -62,7 +63,26 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_function:
     case expression_type_add_member:
     case expression_type_fill_structure:
+        UNREACHABLE();
+
     case expression_type_access_structure:
+        LPG_TRY(
+            save_expression(to, value->access_structure.object, indentation));
+        LPG_TRY(stream_writer_write_string(to, "."));
+        if (value->access_structure.member->type == expression_type_string)
+        {
+            unicode_string const *name =
+                &value->access_structure.member->string;
+            ASSERT(name->length >= 1);
+            if (is_identifier(name->data, name->length))
+            {
+                return stream_writer_write_utf8_string(
+                    to, name->data, name->length);
+            }
+        }
+        LPG_TRY(stream_writer_write_string(to, "*"));
+        return save_expression(to, value->access_structure.member, indentation);
+
     case expression_type_add_to_variant:
     case expression_type_match:
     case expression_type_assignment:

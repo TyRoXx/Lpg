@@ -43,6 +43,12 @@ void add_member_free(add_member *this)
     expression_deallocate(this->type);
 }
 
+access_structure access_structure_create(expression *object, expression *member)
+{
+    access_structure result = {object, member};
+    return result;
+}
+
 assign assign_create(expression *left, expression *right)
 {
     assign result = {left, right};
@@ -94,6 +100,14 @@ expression expression_from_sequence(sequence value)
     return result;
 }
 
+expression expression_from_access_structure(access_structure value)
+{
+    expression result;
+    result.type = expression_type_access_structure;
+    result.access_structure = value;
+    return result;
+}
+
 expression expression_from_builtin(builtin value)
 {
     expression result;
@@ -132,7 +146,7 @@ void fill_structure_free(fill_structure *this)
 void access_structure_free(access_structure *this)
 {
     expression_deallocate(this->object);
-    unicode_string_free(&this->member);
+    expression_deallocate(this->member);
 }
 
 void add_to_variant_free(add_to_variant *this)

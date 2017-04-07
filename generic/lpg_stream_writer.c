@@ -23,6 +23,17 @@ success_indicator stream_writer_write_utf8(stream_writer writer,
     return writer.write(writer.user, code_units, 1);
 }
 
+success_indicator
+stream_writer_write_utf8_string(stream_writer writer,
+                                unicode_code_point const *data, size_t size)
+{
+    for (size_t i = 0; i < size; ++i)
+    {
+        LPG_TRY(stream_writer_write_utf8(writer, data[i]));
+    }
+    return success;
+}
+
 void memory_writer_free(memory_writer *writer)
 {
     deallocate(writer->data);

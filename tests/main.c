@@ -11,6 +11,7 @@
 #include "test_allocator.h"
 #include "test_arithmetic.h"
 #include "test_stream_writer.h"
+#include "test_identifier.h"
 
 int main(void)
 {
@@ -26,6 +27,8 @@ int main(void)
     test_arithmetic();
     check_allocations();
     test_stream_writer();
+    check_allocations();
+    test_identifier();
     check_allocations();
     return lpg_print_test_summary();
 }
