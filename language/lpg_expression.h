@@ -28,7 +28,6 @@ typedef enum expression_type
     expression_type_lambda,
     expression_type_builtin,
     expression_type_call,
-    expression_type_local,
     expression_type_integer_literal,
     expression_type_integer_range,
     expression_type_function,
@@ -144,7 +143,6 @@ struct expression
         lambda lambda;
         builtin builtin;
         call call;
-        expression *local;
         integer integer_literal;
         integer_range integer_range;
         function function;

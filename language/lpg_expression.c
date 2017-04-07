@@ -220,10 +220,6 @@ void expression_free(expression *this)
         call_free(&this->call);
         break;
 
-    case expression_type_local:
-        expression_free(this->local);
-        break;
-
     case expression_type_integer_literal:
         break;
 

@@ -64,9 +64,6 @@ static void render_expression(console_printer *const printer,
     case expression_type_call:
         abort();
 
-    case expression_type_local:
-        abort();
-
     case expression_type_integer_literal:
     {
         char buffer[39];

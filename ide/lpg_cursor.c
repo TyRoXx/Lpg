@@ -42,7 +42,6 @@ void enter_expression(expression const *source, cursor_list *const cursors,
         break;
 
     case expression_type_call:
-    case expression_type_local:
         abort();
 
     case expression_type_integer_literal:
@@ -191,7 +190,6 @@ editing_input_result handle_editing_input(key_event event, expression *source,
         }
 
     case expression_type_call:
-    case expression_type_local:
         abort();
 
     case expression_type_integer_literal:

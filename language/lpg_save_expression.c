@@ -46,9 +46,6 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(stream_writer_write_string(to, ")"));
         return success;
 
-    case expression_type_local:
-        UNREACHABLE();
-
     case expression_type_integer_literal:
     {
         char buffer[39];
