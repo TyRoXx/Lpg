@@ -177,4 +177,26 @@ void test_save_expression(void)
             "        break\n");
     }
     check_expression_rendering(expression_from_break(), "break\n");
+    {
+        expression *body = allocate_array(2, sizeof(*body));
+        body[0] = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123)))));
+        body[1] =
+            expression_from_loop(expression_allocate(expression_from_break()));
+        check_expression_rendering(
+            expression_from_lambda(lambda_create(
+                expression_allocate(expression_from_identifier(
+                    unicode_string_from_c_str("uint32"))),
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                expression_allocate(expression_from_loop(expression_allocate(
+                    expression_from_sequence(sequence_create(body, 2))))))),
+            "(a: uint32) => loop\n"
+            "    a = 123\n"
+            "    loop\n"
+            "        break\n");
+    }
 }
