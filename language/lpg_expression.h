@@ -55,15 +55,6 @@ typedef struct call
 call call_create(expression *callee, expression *arguments,
                  size_t number_of_arguments);
 
-typedef struct add_member
-{
-    expression *base;
-    expression *name;
-    expression *type;
-} add_member;
-
-void add_member_free(add_member *this);
-
 typedef struct fill_structure
 {
     expression *members;
@@ -147,7 +138,6 @@ struct expression
         lambda lambda;
         call call;
         integer integer_literal;
-        add_member add_member;
         fill_structure fill_structure;
         access_structure access_structure;
         add_to_variant add_to_variant;

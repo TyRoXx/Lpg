@@ -30,13 +30,6 @@ call call_create(expression *callee, expression *arguments,
     return result;
 }
 
-void add_member_free(add_member *this)
-{
-    expression_deallocate(this->base);
-    expression_deallocate(this->name);
-    expression_deallocate(this->type);
-}
-
 access_structure access_structure_create(expression *object, expression *member)
 {
     access_structure result = {object, member};
@@ -263,10 +256,6 @@ void expression_free(expression *this)
         break;
 
     case expression_type_integer_literal:
-        break;
-
-    case expression_type_add_member:
-        add_member_free(&this->add_member);
         break;
 
     case expression_type_fill_structure:
