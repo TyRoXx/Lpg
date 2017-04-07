@@ -119,11 +119,30 @@ void test_save_expression(void)
 
     check_expression_rendering(
         expression_from_assign(assign_create(
+            expression_allocate(expression_from_make_identifier(
+                expression_allocate(expression_from_identifier(
+                    unicode_string_from_c_str("a"))))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))))),
+        "*a = 123\n");
+
+    check_expression_rendering(
+        expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(expression_from_make_identifier(
+                expression_allocate(expression_from_make_identifier(
+                    expression_allocate(expression_from_identifier(
+                        unicode_string_from_c_str("b"))))))))),
+        "a = **b\n");
+
+    check_expression_rendering(
+        expression_from_assign(assign_create(
             expression_allocate(
                 expression_from_access_structure(access_structure_create(
                     expression_allocate(expression_from_identifier(
                         unicode_string_from_c_str("a"))),
-                    expression_allocate(expression_from_unicode_string(
+                    expression_allocate(expression_from_identifier(
                         unicode_string_from_c_str("m")))))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
@@ -135,23 +154,12 @@ void test_save_expression(void)
                 expression_from_access_structure(access_structure_create(
                     expression_allocate(expression_from_identifier(
                         unicode_string_from_c_str("a"))),
-                    expression_allocate(expression_from_identifier(
-                        unicode_string_from_c_str("m")))))),
+                    expression_allocate(expression_from_make_identifier(
+                        expression_allocate(expression_from_identifier(
+                            unicode_string_from_c_str("m")))))))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123))))),
         "a.*m = 123\n");
-
-    check_expression_rendering(
-        expression_from_assign(assign_create(
-            expression_allocate(
-                expression_from_access_structure(access_structure_create(
-                    expression_allocate(expression_from_identifier(
-                        unicode_string_from_c_str("a"))),
-                    expression_allocate(expression_from_unicode_string(
-                        unicode_string_from_c_str("$")))))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 123))))),
-        "a.*\"$\" = 123\n");
 
     check_expression_rendering(
         expression_from_return(expression_allocate(

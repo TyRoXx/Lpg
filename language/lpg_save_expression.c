@@ -66,18 +66,6 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(
             save_expression(to, value->access_structure.object, indentation));
         LPG_TRY(stream_writer_write_string(to, "."));
-        if (value->access_structure.member->type == expression_type_string)
-        {
-            unicode_string const *name =
-                &value->access_structure.member->string;
-            ASSERT(name->length >= 1);
-            if (is_identifier(name->data, name->length))
-            {
-                return stream_writer_write_utf8_string(
-                    to, name->data, name->length);
-            }
-        }
-        LPG_TRY(stream_writer_write_string(to, "*"));
         return save_expression(to, value->access_structure.member, indentation);
 
     case expression_type_add_to_variant:
@@ -107,6 +95,10 @@ success_indicator save_expression(stream_writer const to,
             LPG_TRY(stream_writer_write_utf8(to, value->string.data[i]));
         }
         return success;
+
+    case expression_type_make_identifier:
+        LPG_TRY(stream_writer_write_string(to, "*"));
+        return save_expression(to, value->make_identifier, indentation);
 
     case expression_type_assign:
         LPG_TRY(save_expression(to, value->assign.left, indentation));

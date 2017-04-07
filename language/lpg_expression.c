@@ -223,6 +223,14 @@ expression expression_from_identifier(unicode_string identifier)
     return result;
 }
 
+expression expression_from_make_identifier(expression *value)
+{
+    expression result;
+    result.type = expression_type_make_identifier;
+    result.make_identifier = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -281,6 +289,10 @@ void expression_free(expression *this)
 
     case expression_type_identifier:
         unicode_string_free(&this->identifier);
+        break;
+
+    case expression_type_make_identifier:
+        expression_deallocate(this->make_identifier);
         break;
 
     case expression_type_assign:
