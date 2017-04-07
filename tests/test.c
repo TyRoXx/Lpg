@@ -7,10 +7,7 @@ static size_t failures;
 int lpg_check(int success)
 {
     ++total_checks;
-    if (!success)
-    {
-        ++failures;
-    }
+    failures += !success;
     return success;
 }
 

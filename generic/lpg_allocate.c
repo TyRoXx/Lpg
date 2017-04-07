@@ -50,6 +50,7 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
 
 void deallocate(void *memory)
 {
+    ASSERT(memory != NULL);
     ASSERT(active_allocations > 0);
     --active_allocations;
     free(memory);
