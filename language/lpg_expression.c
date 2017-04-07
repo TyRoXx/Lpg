@@ -78,6 +78,24 @@ void declare_free(declare *value)
     }
 }
 
+tuple tuple_create(expression *elements, size_t length)
+{
+    tuple result = {elements, length};
+    return result;
+}
+
+void tuple_free(tuple *value)
+{
+    LPG_FOR(size_t, i, value->length)
+    {
+        expression_free(value->elements + i);
+    }
+    if (value->length > 0)
+    {
+        deallocate(value->elements);
+    }
+}
+
 expression expression_from_assign(assign value)
 {
     expression result;
@@ -231,6 +249,14 @@ expression expression_from_make_identifier(expression *value)
     return result;
 }
 
+expression expression_from_tuple(tuple value)
+{
+    expression result;
+    result.type = expression_type_tuple;
+    result.tuple = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -321,6 +347,10 @@ void expression_free(expression *this)
 
     case expression_type_declare:
         declare_free(&this->declare);
+        break;
+
+    case expression_type_tuple:
+        tuple_free(&this->tuple);
         break;
     }
 }

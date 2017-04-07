@@ -148,6 +148,19 @@ success_indicator save_expression(stream_writer const to,
                 to, value->declare.optional_initializer, indentation));
         }
         return success;
+
+    case expression_type_tuple:
+        LPG_TRY(stream_writer_write_string(to, "("));
+        LPG_FOR(size_t, i, value->tuple.length)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(to, ", "));
+            }
+            LPG_TRY(
+                save_expression(to, value->tuple.elements + i, indentation));
+        }
+        return stream_writer_write_string(to, ")");
     }
     UNREACHABLE();
 }

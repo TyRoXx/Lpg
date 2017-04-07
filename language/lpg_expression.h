@@ -44,7 +44,8 @@ typedef enum expression_type
     expression_type_loop,
     expression_type_break,
     expression_type_sequence,
-    expression_type_declare
+    expression_type_declare,
+    expression_type_tuple
 } expression_type;
 
 typedef enum builtin
@@ -136,10 +137,18 @@ typedef struct declare
     expression *optional_initializer;
 } declare;
 
+typedef struct tuple
+{
+    expression *elements;
+    size_t length;
+} tuple;
+
 sequence sequence_create(expression *elements, size_t length);
 declare declare_create(expression *name, expression *type,
                        expression *optional_initializer);
 void declare_free(declare *value);
+tuple tuple_create(expression *elements, size_t length);
+void tuple_free(tuple *value);
 expression expression_from_assign(assign value);
 expression expression_from_return(expression *value);
 expression expression_from_loop(expression *body);
@@ -172,6 +181,7 @@ struct expression
         expression *loop_body;
         sequence sequence;
         declare declare;
+        tuple tuple;
     };
 };
 
@@ -187,5 +197,6 @@ expression expression_from_unicode_string(unicode_string value);
 expression expression_from_call(call value);
 expression expression_from_identifier(unicode_string identifier);
 expression expression_from_make_identifier(expression *value);
+expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
 void expression_free(expression *this);

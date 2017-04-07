@@ -241,4 +241,24 @@ void test_save_expression(void)
             "    loop\n"
             "        break\n");
     }
+
+    check_expression_rendering(
+        expression_from_tuple(tuple_create(NULL, 0)), "()");
+
+    {
+        expression *elements = allocate_array(1, sizeof(*elements));
+        elements[0] =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        check_expression_rendering(
+            expression_from_tuple(tuple_create(elements, 1)), "(a)");
+    }
+
+    {
+        expression *elements = allocate_array(2, sizeof(*elements));
+        elements[0] =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        elements[1] = expression_from_integer_literal(integer_create(0, 123));
+        check_expression_rendering(
+            expression_from_tuple(tuple_create(elements, 2)), "(a, 123)");
+    }
 }

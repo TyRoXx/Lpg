@@ -282,6 +282,9 @@ editing_input_result handle_editing_input(key_event event, expression *source,
     case expression_type_loop:
     case expression_type_break:
     case expression_type_sequence:
+    case expression_type_make_identifier:
+    case expression_type_declare:
+    case expression_type_tuple:
         abort();
     }
     abort();
