@@ -102,9 +102,6 @@ static void render_expression(console_printer *const printer,
     case expression_type_match:
         abort();
 
-    case expression_type_assignment:
-        abort();
-
     case expression_type_string:
         LPG_FOR(size_t, i, source->string.length)
         {

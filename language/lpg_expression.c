@@ -166,12 +166,6 @@ void match_free(match *this)
     deallocate(this->cases);
 }
 
-void assignment_free(assignment *this)
-{
-    expression_deallocate(this->variable);
-    expression_deallocate(this->new_value);
-}
-
 expression expression_from_lambda(lambda lambda)
 {
     expression result;
@@ -258,10 +252,6 @@ void expression_free(expression *this)
 
     case expression_type_match:
         match_free(&this->match);
-        break;
-
-    case expression_type_assignment:
-        assignment_free(&this->assignment);
         break;
 
     case expression_type_string:
