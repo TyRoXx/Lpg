@@ -164,25 +164,33 @@ void test_save_expression(void)
             expression_from_identifier(unicode_string_from_c_str("a")))),
         "return a");
 
-    check_expression_rendering(
-        expression_from_loop(expression_allocate(expression_from_assign(
-            assign_create(expression_allocate(expression_from_identifier(
-                              unicode_string_from_c_str("a"))),
-                          expression_allocate(expression_from_integer_literal(
-                              integer_create(0, 123))))))),
-        "loop\n"
-        "    a = 123");
+    {
+        expression *loop_body = allocate_array(1, sizeof(*loop_body));
+        loop_body[0] = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123)))));
+        check_expression_rendering(
+            expression_from_loop(sequence_create(loop_body, 1)), "loop\n"
+                                                                 "    a = 123");
+    }
 
-    check_expression_rendering(
-        expression_from_loop(expression_allocate(expression_from_loop(
-            expression_allocate(expression_from_assign(assign_create(
-                expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("a"))),
-                expression_allocate(expression_from_integer_literal(
-                    integer_create(0, 123))))))))),
-        "loop\n"
-        "    loop\n"
-        "        a = 123");
+    {
+        expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
+        inner_loop[0] = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123)))));
+        expression *outer_loop = allocate_array(1, sizeof(*outer_loop));
+        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
+        check_expression_rendering(
+            expression_from_loop(sequence_create(outer_loop, 1)),
+            "loop\n"
+            "    loop\n"
+            "        a = 123");
+    }
 
     {
         expression *body = allocate_array(2, sizeof(*body));
@@ -193,41 +201,41 @@ void test_save_expression(void)
                 expression_from_integer_literal(integer_create(0, 123)))));
         body[1] = expression_from_break();
         check_expression_rendering(
-            expression_from_loop(expression_allocate(
-                expression_from_sequence(sequence_create(body, 2)))),
-            "loop\n"
-            "    a = 123\n"
-            "    break\n");
+            expression_from_loop(sequence_create(body, 2)), "loop\n"
+                                                            "    a = 123\n"
+                                                            "    break");
     }
     {
-        expression *body = allocate_array(2, sizeof(*body));
-        body[0] = expression_from_assign(assign_create(
+        expression *inner_loop = allocate_array(2, sizeof(*inner_loop));
+        inner_loop[0] = expression_from_break();
+        expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
+        outer_loop[0] = expression_from_assign(assign_create(
             expression_allocate(
                 expression_from_identifier(unicode_string_from_c_str("a"))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123)))));
-        body[1] =
-            expression_from_loop(expression_allocate(expression_from_break()));
+        outer_loop[1] = expression_from_loop(sequence_create(inner_loop, 1));
         check_expression_rendering(
-            expression_from_loop(expression_allocate(
-                expression_from_sequence(sequence_create(body, 2)))),
+            expression_from_loop(sequence_create(outer_loop, 2)),
             "loop\n"
             "    a = 123\n"
             "    loop\n"
-            "        break\n");
+            "        break");
     }
 
     check_expression_rendering(expression_from_break(), "break");
 
     {
-        expression *body = allocate_array(2, sizeof(*body));
-        body[0] = expression_from_assign(assign_create(
+        expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
+        inner_loop[0] = expression_from_break();
+
+        expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
+        outer_loop[0] = expression_from_assign(assign_create(
             expression_allocate(
                 expression_from_identifier(unicode_string_from_c_str("a"))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123)))));
-        body[1] =
-            expression_from_loop(expression_allocate(expression_from_break()));
+        outer_loop[1] = expression_from_loop(sequence_create(inner_loop, 1));
 
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = parameter_create(
@@ -238,13 +246,12 @@ void test_save_expression(void)
 
         check_expression_rendering(
             expression_from_lambda(lambda_create(
-                parameters, 1,
-                expression_allocate(expression_from_loop(expression_allocate(
-                    expression_from_sequence(sequence_create(body, 2))))))),
+                parameters, 1, expression_allocate(expression_from_loop(
+                                   sequence_create(outer_loop, 2))))),
             "(a: uint32) => loop\n"
             "    a = 123\n"
             "    loop\n"
-            "        break\n");
+            "        break");
     }
 
     {
@@ -348,8 +355,8 @@ void test_save_expression(void)
                 cases, 2)),
             "match 123\n"
             "    case 123: 456\n"
-            "    case 124: break\n"
+            "    case 124: \n"
             "        break\n"
-            "\n");
+            "        break\n");
     }
 }

@@ -83,6 +83,18 @@ sequence sequence_create(expression *elements, size_t length)
     return result;
 }
 
+void sequence_free(sequence *value)
+{
+    LPG_FOR(size_t, i, value->length)
+    {
+        expression_free(value->elements + i);
+    }
+    if (value->elements)
+    {
+        deallocate(value->elements);
+    }
+}
+
 declare declare_create(expression *name, expression *type,
                        expression *optional_initializer)
 {
@@ -134,7 +146,7 @@ expression expression_from_return(expression *value)
     return result;
 }
 
-expression expression_from_loop(expression *body)
+expression expression_from_loop(sequence body)
 {
     expression result;
     result.type = expression_type_loop;
@@ -311,18 +323,14 @@ void expression_free(expression *this)
         break;
 
     case expression_type_loop:
-        expression_deallocate(this->loop_body);
+        sequence_free(&this->loop_body);
         break;
 
     case expression_type_break:
         break;
 
     case expression_type_sequence:
-        LPG_FOR(size_t, i, this->sequence.length)
-        {
-            expression_free(this->sequence.elements + i);
-        }
-        deallocate(this->sequence.elements);
+        sequence_free(&this->sequence);
         break;
 
     case expression_type_declare:

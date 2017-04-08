@@ -109,6 +109,7 @@ typedef struct declare
 } declare;
 
 sequence sequence_create(expression *elements, size_t length);
+void sequence_free(sequence *value);
 declare declare_create(expression *name, expression *type,
                        expression *optional_initializer);
 void declare_free(declare *value);
@@ -116,7 +117,7 @@ tuple tuple_create(expression *elements, size_t length);
 void tuple_free(tuple *value);
 expression expression_from_assign(assign value);
 expression expression_from_return(expression *value);
-expression expression_from_loop(expression *body);
+expression expression_from_loop(sequence body);
 expression expression_from_break(void);
 expression expression_from_sequence(sequence value);
 expression expression_from_access_structure(access_structure value);
@@ -138,7 +139,7 @@ struct expression
         expression *make_identifier;
         assign assign;
         expression *return_;
-        expression *loop_body;
+        sequence loop_body;
         sequence sequence;
         declare declare;
         tuple tuple;
