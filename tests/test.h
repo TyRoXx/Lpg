@@ -20,8 +20,10 @@
 int lpg_check(int success);
 int lpg_print_test_summary(void);
 
+#define FAIL() LPG_ABORT()
+
 #define REQUIRE(x)                                                             \
     if (!lpg_check(!!(x)))                                                     \
     {                                                                          \
-        LPG_ABORT();                                                           \
+        FAIL();                                                                \
     }

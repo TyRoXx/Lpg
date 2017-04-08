@@ -2,18 +2,28 @@
 #include "lpg_expression.h"
 #include "test.h"
 #include "lpg_allocate.h"
-#include <string.h>
-#include <stdlib.h>
 #include "lpg_assert.h"
 #include "lpg_for.h"
 #include "lpg_stream_writer.h"
 #include "lpg_save_expression.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 static void check_expression_rendering(expression tree, char const *expected)
 {
     memory_writer buffer = {NULL, 0, 0};
-    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree, 0) == success);
-    REQUIRE(memory_writer_equals(buffer, expected));
+    whitespace_state whitespace = {0, 0};
+    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree, whitespace) ==
+            success);
+    if (!memory_writer_equals(buffer, expected))
+    {
+        printf("Expected  (%zu): [%s]\n", strlen(expected), expected);
+        printf("Generated (%zu): [", buffer.used);
+        fwrite(buffer.data, 1, buffer.used, stdout);
+        printf("]\n");
+        FAIL();
+    }
     memory_writer_free(&buffer);
     expression_free(&tree);
 }
@@ -355,7 +365,7 @@ void test_save_expression(void)
                 cases, 2)),
             "match 123\n"
             "    case 123: 456\n"
-            "    case 124: \n"
+            "    case 124:\n"
             "        break\n"
             "        break\n");
     }

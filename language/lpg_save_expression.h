@@ -2,5 +2,12 @@
 #include "lpg_stream_writer.h"
 #include "lpg_expression.h"
 
+typedef struct whitespace_state
+{
+    size_t indentation_depth;
+    int pending_space;
+} whitespace_state;
+
 success_indicator save_expression(stream_writer const to,
-                                  expression const *value, size_t indentation);
+                                  expression const *value,
+                                  whitespace_state whitespace);
