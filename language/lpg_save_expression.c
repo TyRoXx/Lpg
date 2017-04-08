@@ -10,9 +10,17 @@ success_indicator save_expression(stream_writer const to,
     {
     case expression_type_lambda:
         LPG_TRY(stream_writer_write_string(to, "("));
-        LPG_TRY(save_expression(to, value->lambda.parameter_name, indentation));
-        LPG_TRY(stream_writer_write_string(to, ": "));
-        LPG_TRY(save_expression(to, value->lambda.parameter_type, indentation));
+        LPG_FOR(size_t, i, value->lambda.parameter_count)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(to, ", "));
+            }
+            parameter const *param = value->lambda.parameters + i;
+            LPG_TRY(save_expression(to, param->name, indentation));
+            LPG_TRY(stream_writer_write_string(to, ": "));
+            LPG_TRY(save_expression(to, param->type, indentation));
+        }
         LPG_TRY(stream_writer_write_string(to, ") => "));
         LPG_TRY(save_expression(to, value->lambda.result, indentation));
         return success;

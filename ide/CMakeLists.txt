@@ -1,8 +1,0 @@
-include_directories(../language)
-include_directories(../generic)
-file(GLOB sources "*.c" "*.h")
-add_executable(ide ${sources})
-target_link_libraries(ide language)
-if(LPG_CLANG_FORMAT)
-	add_dependencies(ide clang-format)
-endif()

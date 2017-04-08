@@ -9,17 +9,35 @@ void expression_deallocate(expression *this)
     deallocate(this);
 }
 
-lambda lambda_create(expression *parameter_type, expression *parameter_name,
+parameter parameter_create(expression *name, expression *type)
+{
+    parameter result = {name, type};
+    return result;
+}
+
+void parameter_free(parameter *value)
+{
+    expression_deallocate(value->name);
+    expression_deallocate(value->type);
+}
+
+lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result)
 {
-    lambda returning = {parameter_type, parameter_name, result};
+    lambda returning = {parameters, parameter_count, result};
     return returning;
 }
 
 void lambda_free(lambda *this)
 {
-    expression_deallocate(this->parameter_type);
-    expression_deallocate(this->parameter_name);
+    LPG_FOR(size_t, i, this->parameter_count)
+    {
+        parameter_free(this->parameters + i);
+    }
+    if (this->parameters)
+    {
+        deallocate(this->parameters);
+    }
     expression_deallocate(this->result);
 }
 

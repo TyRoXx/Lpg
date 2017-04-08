@@ -25,5 +25,4 @@ endif()
 
 add_subdirectory(generic)
 add_subdirectory(language)
-add_subdirectory(ide)
 add_subdirectory(tests)

@@ -6,14 +6,23 @@ typedef struct expression expression;
 
 void expression_deallocate(expression *this);
 
+typedef struct parameter
+{
+    expression *name;
+    expression *type;
+} parameter;
+
+parameter parameter_create(expression *name, expression *type);
+void parameter_free(parameter *value);
+
 typedef struct lambda
 {
-    expression *parameter_type;
-    expression *parameter_name;
+    parameter *parameters;
+    size_t parameter_count;
     expression *result;
 } lambda;
 
-lambda lambda_create(expression *parameter_type, expression *parameter_name,
+lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result);
 void lambda_free(lambda *this);
 
