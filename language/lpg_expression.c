@@ -53,6 +53,24 @@ access_structure access_structure_create(expression *object, expression *member)
     return result;
 }
 
+match_case match_case_create(expression *key, expression *action)
+{
+    match_case result = {key, action};
+    return result;
+}
+
+void match_case_free(match_case *value)
+{
+    expression_deallocate(value->key);
+    expression_deallocate(value->action);
+}
+
+match match_create(expression *input, match_case *cases, size_t number_of_cases)
+{
+    match result = {input, cases, number_of_cases};
+    return result;
+}
+
 assign assign_create(expression *left, expression *right)
 {
     assign result = {left, right};
@@ -155,6 +173,14 @@ expression expression_from_declare(declare value)
     return result;
 }
 
+expression expression_from_match(match value)
+{
+    expression result;
+    result.type = expression_type_match;
+    result.match = value;
+    return result;
+}
+
 expression expression_from_integer_literal(integer value)
 {
     expression result;
@@ -180,8 +206,7 @@ void match_free(match *this)
     expression_deallocate(this->input);
     LPG_FOR(size_t, i, this->number_of_cases)
     {
-        expression_free(this->cases[i].key);
-        expression_free(this->cases[i].action);
+        match_case_free(this->cases + i);
     }
     deallocate(this->cases);
 }

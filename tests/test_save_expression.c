@@ -287,4 +287,69 @@ void test_save_expression(void)
         check_expression_rendering(
             expression_from_tuple(tuple_create(elements, 2)), "(a, 123)");
     }
+
+    {
+        match_case *cases = allocate_array(1, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 456))));
+        check_expression_rendering(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(0, 123))),
+                cases, 1)),
+            "match 123\n"
+            "    case 123: 456\n");
+    }
+
+    {
+        match_case *cases = allocate_array(2, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 456))));
+        cases[1] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 124))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 457))));
+        check_expression_rendering(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(0, 123))),
+                cases, 2)),
+            "match 123\n"
+            "    case 123: 456\n"
+            "    case 124: 457\n");
+    }
+
+    {
+        match_case *cases = allocate_array(2, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 123))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 456))));
+        expression *const sequence = allocate_array(2, sizeof(*sequence));
+        sequence[0] = expression_from_break();
+        sequence[1] = expression_from_break();
+        cases[1] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 124))),
+            expression_allocate(
+                expression_from_sequence(sequence_create(sequence, 2))));
+        check_expression_rendering(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(0, 123))),
+                cases, 2)),
+            "match 123\n"
+            "    case 123: 456\n"
+            "    case 124: break\n"
+            "        break\n"
+            "\n");
+    }
 }

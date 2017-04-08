@@ -3,6 +3,16 @@
 #include "lpg_for.h"
 #include "lpg_identifier.h"
 
+static success_indicator indent(const stream_writer to,
+                                size_t const indentation)
+{
+    LPG_FOR(size_t, j, indentation)
+    {
+        LPG_TRY(stream_writer_write_string(to, "    "));
+    }
+    return success;
+}
+
 success_indicator save_expression(stream_writer const to,
                                   expression const *value, size_t indentation)
 {
@@ -50,7 +60,21 @@ success_indicator save_expression(stream_writer const to,
         return save_expression(to, value->access_structure.member, indentation);
 
     case expression_type_match:
-        UNREACHABLE();
+        LPG_TRY(stream_writer_write_string(to, "match "));
+        LPG_TRY(save_expression(to, value->match.input, indentation));
+        LPG_TRY(stream_writer_write_string(to, "\n"));
+        LPG_FOR(size_t, i, value->match.number_of_cases)
+        {
+            LPG_TRY(indent(to, indentation + 1));
+            LPG_TRY(stream_writer_write_string(to, "case "));
+            LPG_TRY(save_expression(
+                to, value->match.cases[i].key, indentation + 2));
+            LPG_TRY(stream_writer_write_string(to, ": "));
+            LPG_TRY(save_expression(
+                to, value->match.cases[i].action, indentation + 2));
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+        }
+        return success;
 
     case expression_type_string:
         LPG_TRY(stream_writer_write_string(to, "\""));
@@ -91,10 +115,7 @@ success_indicator save_expression(stream_writer const to,
 
     case expression_type_loop:
         LPG_TRY(stream_writer_write_string(to, "loop\n"));
-        LPG_FOR(size_t, i, (indentation + 1))
-        {
-            LPG_TRY(stream_writer_write_string(to, "    "));
-        }
+        indent(to, indentation + 1);
         return save_expression(to, value->loop_body, indentation + 1);
 
     case expression_type_break:
@@ -105,10 +126,7 @@ success_indicator save_expression(stream_writer const to,
         {
             if (i > 0)
             {
-                LPG_FOR(size_t, j, indentation)
-                {
-                    LPG_TRY(stream_writer_write_string(to, "    "));
-                }
+                LPG_TRY(indent(to, indentation));
             }
             LPG_TRY(
                 save_expression(to, value->sequence.elements + i, indentation));

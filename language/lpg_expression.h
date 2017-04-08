@@ -74,12 +74,18 @@ typedef struct match_case
     expression *action;
 } match_case;
 
+match_case match_case_create(expression *key, expression *action);
+void match_case_free(match_case *value);
+
 typedef struct match
 {
     expression *input;
     match_case *cases;
     size_t number_of_cases;
 } match;
+
+match match_create(expression *input, match_case *cases,
+                   size_t number_of_cases);
 
 typedef struct assign
 {
@@ -115,6 +121,7 @@ expression expression_from_break(void);
 expression expression_from_sequence(sequence value);
 expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
+expression expression_from_match(match value);
 
 struct expression
 {
