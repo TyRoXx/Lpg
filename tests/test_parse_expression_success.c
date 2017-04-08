@@ -15,11 +15,10 @@ static rich_token find_next_token(callback_user user)
         tokenize(parser_user->remaining_input, parser_user->remaining_size);
     REQUIRE(tokenized.status == tokenize_success);
     REQUIRE(tokenized.length <= parser_user->remaining_size);
-    rich_token result = {tokenized.status,
-                         tokenized.token,
-                         parser_user->remaining_input,
-                         tokenized.length,
-                         {0, 0}};
+    rich_token result = rich_token_create(
+        tokenized.status, tokenized.token,
+        unicode_view_create(parser_user->remaining_input, tokenized.length),
+        source_location_create(0, 0));
     parser_user->remaining_input += tokenized.length;
     parser_user->remaining_size -= tokenized.length;
     return result;

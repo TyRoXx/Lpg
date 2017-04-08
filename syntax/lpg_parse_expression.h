@@ -12,6 +12,8 @@ typedef struct source_location
     column_number approximate_column;
 } source_location;
 
+source_location source_location_create(line_number line,
+                                       column_number approximate_column);
 int source_location_equals(source_location left, source_location right);
 
 typedef struct rich_token
@@ -22,6 +24,8 @@ typedef struct rich_token
     source_location where;
 } rich_token;
 
+rich_token rich_token_create(tokenize_status status, token_type token,
+                             unicode_view content, source_location where);
 int is_end_of_file(rich_token const *token);
 
 typedef struct parse_error
