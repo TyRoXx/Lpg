@@ -27,8 +27,11 @@ expression_parser expression_parser_create(rich_token_producer find_next_token,
                                            parse_error_handler on_error,
                                            callback_user user)
 {
-    expression_parser result = {
-        find_next_token, on_error, user, 0, {token_space, 0, {NULL, 0}}};
+    expression_parser result = {find_next_token,
+                                on_error,
+                                user,
+                                0,
+                                {token_space, 0, {NULL, 0}, {0, 0}}};
     return result;
 }
 
