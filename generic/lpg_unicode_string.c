@@ -4,6 +4,14 @@
 #include "lpg_assert.h"
 #include <assert.h>
 
+unicode_string unicode_string_from_range(unicode_code_point const *data,
+                                         size_t length)
+{
+    unicode_string result = {allocate_array(length, sizeof(*data)), length};
+    memcpy(result.data, data, length * sizeof(*data));
+    return result;
+}
+
 unicode_string unicode_string_from_c_str(const char *c_str)
 {
     unicode_string result;
@@ -40,7 +48,7 @@ void unicode_string_erase(unicode_string *const s, size_t const position)
     --s->length;
 }
 
-void unicode_string_free(unicode_string *s)
+void unicode_string_free(unicode_string const *s)
 {
     deallocate(s->data);
 }

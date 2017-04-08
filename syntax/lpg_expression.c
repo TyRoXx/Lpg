@@ -2,6 +2,7 @@
 #include "lpg_for.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_unicode_view.h"
 
 void expression_deallocate(expression *this)
 {
@@ -341,4 +342,41 @@ void expression_free(expression *this)
         tuple_free(&this->tuple);
         break;
     }
+}
+
+int expression_equals(expression const *left, expression const *right)
+{
+    if (left->type != right->type)
+    {
+        return 0;
+    }
+    switch (left->type)
+    {
+    case expression_type_lambda:
+    case expression_type_call:
+    case expression_type_integer_literal:
+    case expression_type_access_structure:
+    case expression_type_match:
+    case expression_type_string:
+        UNREACHABLE();
+
+    case expression_type_identifier:
+        return unicode_view_equals(unicode_view_from_string(left->identifier),
+                                   unicode_view_from_string(right->identifier));
+
+    case expression_type_make_identifier:
+    case expression_type_assign:
+    case expression_type_return:
+    case expression_type_loop:
+        UNREACHABLE();
+
+    case expression_type_break:
+        return 1;
+
+    case expression_type_sequence:
+    case expression_type_declare:
+    case expression_type_tuple:
+        UNREACHABLE();
+    }
+    UNREACHABLE();
 }

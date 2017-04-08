@@ -158,3 +158,4 @@ expression expression_from_make_identifier(expression *value);
 expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
 void expression_free(expression *this);
+int expression_equals(expression const *left, expression const *right);
