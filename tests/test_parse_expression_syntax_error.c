@@ -63,8 +63,8 @@ static void test_syntax_error(parse_error const *expected_errors,
                               size_t const expected_count,
                               expression *const expected, unicode_string input)
 {
-    test_parser_user user = {
-        input.data, input.length, expected_errors, expected_count};
+    test_parser_user user = {input.data, input.length, expected_errors,
+                             expected_count, source_location_create(0, 0)};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
     expression_parser_result result = parse_expression(&parser);
