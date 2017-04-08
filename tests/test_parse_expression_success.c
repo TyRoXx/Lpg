@@ -1,4 +1,4 @@
-#include "test_parse_expression.h"
+#include "test_parse_expression_success.h"
 #include "test.h"
 #include "lpg_parse_expression.h"
 
@@ -43,7 +43,7 @@ static void test_successful_parse(expression expected, unicode_string input)
     unicode_string_free(&input);
 }
 
-void test_parse_expression(void)
+void test_parse_expression_success(void)
 {
     test_successful_parse(
         expression_from_break(), unicode_string_from_c_str("break"));

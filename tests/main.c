@@ -14,8 +14,10 @@
 #include "test_identifier.h"
 #include "lpg_assert.h"
 #include "test_tokenize.h"
-#include "test_parse_expression.h"
 #include "test_unicode_view.h"
+#include "test_parse_expression_success.h"
+#include "test_parse_expression_syntax_error.h"
+#include "test_parse_expression_lexical_error.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 static void check_allocations_maybe(void)
@@ -47,7 +49,11 @@ int main(void)
     check_allocations_maybe();
     test_tokenize();
     check_allocations_maybe();
-    test_parse_expression();
+    test_parse_expression_success();
+    check_allocations_maybe();
+    test_parse_expression_syntax_error();
+    check_allocations_maybe();
+    test_parse_expression_lexical_error();
     check_allocations_maybe();
     test_unicode_view();
     check_allocations_maybe();

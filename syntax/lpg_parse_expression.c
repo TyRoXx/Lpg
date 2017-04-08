@@ -49,8 +49,13 @@ static expression_parser_result handle_first_token(expression_parser *parser,
     case token_newline:
     case token_space:
     case token_indentation:
-    case token_operator:
         UNREACHABLE();
+
+    case token_operator:
+    {
+        expression_parser_result result = {0, expression_from_break()};
+        return result;
+    }
     }
     UNREACHABLE();
 }
