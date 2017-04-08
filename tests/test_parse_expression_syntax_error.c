@@ -87,38 +87,48 @@ static void test_syntax_error(parse_error const *expected_errors,
 void test_parse_expression_syntax_error(void)
 {
     {
-        parse_error const expected_error = {0, 0};
+        parse_error const expected_error =
+            parse_error_create(source_location_create(0, 0));
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(
             &expected_error, 1, &expected, unicode_string_from_c_str("=> a"));
     }
     {
-        parse_error const expected_errors[] = {{0, 0}, {0, 2}};
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(0, 2))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("=>"));
     }
     {
-        parse_error const expected_errors[] = {{0, 0}, {1, 4}};
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(1, 4))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("=>\n    "));
     }
     {
-        parse_error const expected_error = {1, 0};
+        parse_error const expected_error =
+            parse_error_create(source_location_create(1, 0));
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(
             &expected_error, 1, &expected, unicode_string_from_c_str("\n=> a"));
     }
     {
-        parse_error const expected_error = {1, 4};
+        parse_error const expected_error =
+            parse_error_create(source_location_create(1, 4));
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(&expected_error, 1, &expected,
                           unicode_string_from_c_str("\n    => a"));
     }
     {
-        parse_error const expected_errors[] = {{0, 0}, {1, 0}, {2, 0}};
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(1, 0)),
+            parse_error_create(source_location_create(2, 0))};
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
