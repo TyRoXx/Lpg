@@ -13,6 +13,7 @@
 #include "test_stream_writer.h"
 #include "test_identifier.h"
 #include "lpg_assert.h"
+#include "test_tokenize.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 static void check_allocations_maybe(void)
@@ -41,6 +42,8 @@ int main(void)
     test_stream_writer();
     check_allocations_maybe();
     test_identifier();
+    check_allocations_maybe();
+    test_tokenize();
     check_allocations_maybe();
     printf("Dynamic allocations: %zu\n", count_total_allocations());
     return lpg_print_test_summary();

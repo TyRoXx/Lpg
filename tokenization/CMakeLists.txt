@@ -1,0 +1,7 @@
+include_directories(../generic)
+file(GLOB sources "*.c" "*.h")
+add_library(tokenization ${sources})
+target_link_libraries(tokenization generic)
+if(LPG_CLANG_FORMAT)
+	add_dependencies(tokenization clang-format)
+endif()

@@ -1,5 +1,6 @@
 include_directories(../language)
 include_directories(../generic)
+include_directories(../tokenization)
 file(GLOB sources "*.c" "*.h")
 add_executable(tests ${sources})
 target_link_libraries(tests language)

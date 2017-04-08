@@ -24,5 +24,6 @@ else()
 endif()
 
 add_subdirectory(generic)
+add_subdirectory(tokenization)
 add_subdirectory(language)
 add_subdirectory(tests)
