@@ -1,9 +1,26 @@
 #include "lpg_parse_expression.h"
 #include "lpg_assert.h"
 
+int source_location_equals(source_location left, source_location right)
+{
+    return (left.line == right.line) &&
+           (left.approximate_column == right.approximate_column);
+}
+
 int is_end_of_file(rich_token const *token)
 {
     return (token->status == tokenize_success) && (token->content.length == 0);
+}
+
+parse_error parse_error_create(source_location where)
+{
+    parse_error result = {where};
+    return result;
+}
+
+int parse_error_equals(parse_error left, parse_error right)
+{
+    return source_location_equals(left.where, right.where);
 }
 
 expression_parser expression_parser_create(rich_token_producer find_next_token,
@@ -26,53 +43,64 @@ static rich_token peek(expression_parser *parser)
     return parser->cached_token;
 }
 
-static expression_parser_result handle_first_token(expression_parser *parser,
-                                                   token_type const token,
-                                                   unicode_view const content)
+static void pop(expression_parser *parser)
 {
-    (void)parser;
-    switch (token)
-    {
-    case token_identifier:
-        if (unicode_view_equals_c_str(content, "break"))
-        {
-            expression_parser_result result = {1, expression_from_break()};
-            return result;
-        }
-        else
-        {
-            expression_parser_result result = {
-                1, expression_from_identifier(unicode_view_copy(content))};
-            return result;
-        }
-
-    case token_newline:
-    case token_space:
-    case token_indentation:
-        UNREACHABLE();
-
-    case token_operator:
-    {
-        expression_parser_result result = {0, expression_from_break()};
-        return result;
-    }
-    }
-    UNREACHABLE();
+    ASSUME(parser->has_cached_token);
+    parser->has_cached_token = 0;
 }
 
 expression_parser_result parse_expression(expression_parser *parser)
 {
-    rich_token const head = peek(parser);
-    switch (head.status)
+    for (;;)
     {
-    case tokenize_success:
-        return handle_first_token(parser, head.token, head.content);
+        rich_token const head = peek(parser);
+        if (is_end_of_file(&head))
+        {
+            pop(parser);
+            parser->on_error(parse_error_create(head.where), parser->user);
+            expression_parser_result const result = {
+                0, expression_from_break()};
+            return result;
+        }
+        switch (head.status)
+        {
+        case tokenize_success:
+            switch (head.token)
+            {
+            case token_identifier:
+                if (unicode_view_equals_c_str(head.content, "break"))
+                {
+                    expression_parser_result result = {
+                        1, expression_from_break()};
+                    return result;
+                }
+                else
+                {
+                    expression_parser_result result = {
+                        1, expression_from_identifier(
+                               unicode_view_copy(head.content))};
+                    return result;
+                }
 
-    case tokenize_invalid:
-    {
-        expression_parser_result const result = {0, expression_from_break()};
-        return result;
+            case token_newline:
+            case token_space:
+            case token_indentation:
+                pop(parser);
+                break;
+
+            case token_operator:
+                pop(parser);
+                parser->on_error(parse_error_create(head.where), parser->user);
+                break;
+            }
+            break;
+
+        case tokenize_invalid:
+        {
+            expression_parser_result const result = {
+                0, expression_from_break()};
+            return result;
+        }
+        }
     }
-    }
-    UNREACHABLE();
 }
