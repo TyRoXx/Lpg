@@ -32,31 +32,23 @@ static void check_allocations_maybe(void)
 
 int main(void)
 {
-    check_allocations_maybe();
-    test_integer();
-    check_allocations_maybe();
-    test_save_expression();
-    check_allocations_maybe();
-    test_unicode_string();
-    check_allocations_maybe();
-    test_allocator();
-    check_allocations_maybe();
-    test_arithmetic();
-    check_allocations_maybe();
-    test_stream_writer();
-    check_allocations_maybe();
-    test_identifier();
-    check_allocations_maybe();
-    test_tokenize();
-    check_allocations_maybe();
-    test_parse_expression_success();
-    check_allocations_maybe();
-    test_parse_expression_syntax_error();
-    check_allocations_maybe();
-    test_parse_expression_lexical_error();
-    check_allocations_maybe();
-    test_unicode_view();
-    check_allocations_maybe();
+    static void (*tests[])(void) = {test_integer,
+                                    test_save_expression,
+                                    test_unicode_string,
+                                    test_allocator,
+                                    test_arithmetic,
+                                    test_stream_writer,
+                                    test_identifier,
+                                    test_tokenize,
+                                    test_parse_expression_success,
+                                    test_parse_expression_syntax_error,
+                                    test_parse_expression_lexical_error,
+                                    test_unicode_view};
+    for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
+    {
+        tests[i]();
+        check_allocations_maybe();
+    }
     printf("Dynamic allocations: %zu\n", count_total_allocations());
     return lpg_print_test_summary();
 }
