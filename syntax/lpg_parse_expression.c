@@ -45,7 +45,7 @@ expression_parser expression_parser_create(rich_token_producer find_next_token,
                                 on_error,
                                 user,
                                 0,
-                                {token_space, 0, {NULL, 0}, {0, 0}}};
+                                {tokenize_success, 0, {NULL, 0}, {0, 0}}};
     return result;
 }
 
