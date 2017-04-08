@@ -155,7 +155,7 @@ expression expression_from_loop(sequence body)
     return result;
 }
 
-expression expression_from_break()
+expression expression_from_break(void)
 {
     expression result;
     result.type = expression_type_break;
