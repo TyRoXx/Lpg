@@ -17,9 +17,10 @@ static rich_token find_next_token(callback_user user)
     test_parser_user *const parser_user = user;
     if (parser_user->remaining_size == 0)
     {
-        rich_token result = {tokenize_success, token_space,
-                             parser_user->remaining_input, 0,
-                             parser_user->current_location};
+        rich_token result = rich_token_create(
+            tokenize_success, token_space,
+            unicode_view_create(parser_user->remaining_input, 0),
+            parser_user->current_location);
         return result;
     }
     tokenize_result tokenized =
