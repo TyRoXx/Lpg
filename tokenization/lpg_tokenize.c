@@ -38,9 +38,17 @@ tokenize_result tokenize(unicode_code_point const *input, size_t length)
     {
     case '\n':
         return make_success(token_newline, 1);
+
     case '(':
     case ')':
     case ':':
+        return make_success(token_operator, 1);
+
+    case '=':
+        if ((length >= 2) && (input[1] == '>'))
+        {
+            return make_success(token_operator, 2);
+        }
         return make_success(token_operator, 1);
     }
     tokenize_result result = {tokenize_invalid, token_space, 0};

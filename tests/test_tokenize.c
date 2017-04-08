@@ -46,6 +46,9 @@ void test_tokenize(void)
     test_single_token(token_operator, 1, ":");
     test_single_token(token_operator, 1, ":a");
     test_single_token(token_operator, 1, "::");
+    test_single_token(token_operator, 1, "=");
+    test_single_token(token_operator, 1, "==");
+    test_single_token(token_operator, 2, "=>");
     test_invalid("?");
     test_invalid("\t");
     test_invalid("'aaa");
