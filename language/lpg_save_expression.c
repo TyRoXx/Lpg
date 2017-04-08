@@ -18,19 +18,12 @@ success_indicator save_expression(stream_writer const to,
         return success;
 
     case expression_type_call:
+    {
         LPG_TRY(save_expression(to, value->call.callee, indentation));
-        LPG_TRY(stream_writer_write_string(to, "("));
-        LPG_FOR(size_t, i, value->call.number_of_arguments)
-        {
-            if (i > 0)
-            {
-                LPG_TRY(stream_writer_write_string(to, ", "));
-            }
-            LPG_TRY(
-                save_expression(to, &value->call.arguments[i], indentation));
-        }
-        LPG_TRY(stream_writer_write_string(to, ")"));
-        return success;
+        expression const arguments =
+            expression_from_tuple(value->call.arguments);
+        return save_expression(to, &arguments, indentation);
+    }
 
     case expression_type_integer_literal:
     {

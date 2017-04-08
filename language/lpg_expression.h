@@ -36,15 +36,19 @@ typedef enum expression_type
     expression_type_tuple
 } expression_type;
 
+typedef struct tuple
+{
+    expression *elements;
+    size_t length;
+} tuple;
+
 typedef struct call
 {
     expression *callee;
-    expression *arguments;
-    size_t number_of_arguments;
+    tuple arguments;
 } call;
 
-call call_create(expression *callee, expression *arguments,
-                 size_t number_of_arguments);
+call call_create(expression *callee, tuple arguments);
 
 typedef struct access_structure
 {
@@ -88,12 +92,6 @@ typedef struct declare
     expression *type;
     expression *optional_initializer;
 } declare;
-
-typedef struct tuple
-{
-    expression *elements;
-    size_t length;
-} tuple;
 
 sequence sequence_create(expression *elements, size_t length);
 declare declare_create(expression *name, expression *type,

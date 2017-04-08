@@ -23,10 +23,9 @@ void lambda_free(lambda *this)
     expression_deallocate(this->result);
 }
 
-call call_create(expression *callee, expression *arguments,
-                 size_t number_of_arguments)
+call call_create(expression *callee, tuple arguments)
 {
-    call result = {callee, arguments, number_of_arguments};
+    call result = {callee, arguments};
     return result;
 }
 
@@ -149,11 +148,7 @@ expression expression_from_integer_literal(integer value)
 void call_free(call *this)
 {
     expression_deallocate(this->callee);
-    LPG_FOR(size_t, i, this->number_of_arguments)
-    {
-        expression_free(this->arguments + i);
-    }
-    deallocate(this->arguments);
+    tuple_free(&this->arguments);
 }
 
 void access_structure_free(access_structure *this)
