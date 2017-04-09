@@ -33,7 +33,7 @@ matrix:
 script:
  - mkdir build
  - cd build
- - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE || exit 1
+ - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF || exit 1
  - cmake --build . -- -j2 || exit 1
  - cd tests
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then

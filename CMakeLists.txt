@@ -12,9 +12,12 @@ endif()
 
 file(GLOB_RECURSE formatted "*.c" "*.h")
 
-find_program(LPG_CLANG_FORMAT NAMES clang-format-3.7 clang-format PATHS "C:/Program Files/LLVM/bin")
-if(LPG_CLANG_FORMAT)
-	add_custom_target(clang-format COMMAND ${LPG_CLANG_FORMAT} -i ${formatted} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+option(LPG_WITH_CLANG_FORMAT "use clang-format to format the source code automatically on build" ON)
+if(LPG_WITH_CLANG_FORMAT)
+	find_program(LPG_CLANG_FORMAT NAMES clang-format-3.7 clang-format PATHS "C:/Program Files/LLVM/bin")
+	if(LPG_CLANG_FORMAT)
+		add_custom_target(clang-format COMMAND ${LPG_CLANG_FORMAT} -i ${formatted} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
+	endif()
 endif()
 
 if(MSVC)
