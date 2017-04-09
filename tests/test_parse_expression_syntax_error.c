@@ -109,6 +109,24 @@ void test_parse_expression_syntax_error(void)
                           NULL, unicode_string_from_c_str("=>\n    "));
     }
     {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(0, 39))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str(
+                                    "340282366920938463463374607431768211456"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(0, 95))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
+            unicode_string_from_c_str("3402823669209384634633746074317682114569"
+                                      "9999999999999999999999999999999999999999"
+                                      "999999999999999"));
+    }
+    {
         parse_error const expected_error =
             parse_error_create(source_location_create(1, 0));
         expression expected =

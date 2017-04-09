@@ -85,6 +85,7 @@ expression_parser_result parse_expression(expression_parser *parser)
             switch (head.token)
             {
             case token_identifier:
+                pop(parser);
                 if (unicode_view_equals_c_str(head.content, "break"))
                 {
                     expression_parser_result result = {
@@ -112,17 +113,23 @@ expression_parser_result parse_expression(expression_parser *parser)
 
             case token_integer:
             {
+                pop(parser);
                 integer value;
-                ASSERT(integer_parse(&value, head.content));
-                expression_parser_result result = {
-                    1, expression_from_integer_literal(value)};
-                return result;
+                if (integer_parse(&value, head.content))
+                {
+                    expression_parser_result result = {
+                        1, expression_from_integer_literal(value)};
+                    return result;
+                }
+                parser->on_error(parse_error_create(head.where), parser->user);
+                break;
             }
             }
             break;
 
         case tokenize_invalid:
         {
+            pop(parser);
             expression_parser_result const result = {
                 0, expression_from_break()};
             return result;
