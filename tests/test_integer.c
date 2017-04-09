@@ -53,6 +53,14 @@ static void test_parse_integer(integer expected, char const *input)
     unicode_string_free(&input_string);
 }
 
+static void test_parse_integer_overflow(char const *input)
+{
+    integer parsed;
+    unicode_string input_string = unicode_string_from_c_str(input);
+    REQUIRE(!integer_parse(&parsed, unicode_view_from_string(input_string)));
+    unicode_string_free(&input_string);
+}
+
 void test_integer(void)
 {
     REQUIRE(integer_less(integer_create(0, 0), integer_create(0, 1)));
@@ -233,6 +241,9 @@ void test_integer(void)
         integer_create(0, 1), 127, integer_create(0x8000000000000000u, 0));
     test_shift_left_overflow(integer_create(0, 1), 128);
     test_shift_left_overflow(integer_create(0, 2), 127);
+    test_shift_left_overflow(integer_create(1, 0), 64);
+    test_shift_left_overflow(integer_create(1, 0), 65);
+    test_shift_left_overflow(integer_create(2, 0), 63);
 
     test_parse_integer(integer_create(0, 0), "0");
     test_parse_integer(integer_create(0, 1), "1");
@@ -240,4 +251,14 @@ void test_integer(void)
     test_parse_integer(integer_create(0, 42), "42");
     test_parse_integer(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
                        "340282366920938463463374607431768211455");
+    test_parse_integer_overflow("340282366920938463463374607431768211456");
+    test_parse_integer_overflow("340282366920938463463374607431768211457");
+    test_parse_integer_overflow("340282366920938463463374607431768211458");
+    test_parse_integer_overflow("340282366920938463463374607431768211459");
+    test_parse_integer_overflow("340282366920938463463374607431768211460");
+    test_parse_integer_overflow("340282366920938463463374607431768211461");
+    test_parse_integer_overflow("340282366920938463463374607431768211462");
+    test_parse_integer_overflow("340282366920938463463374607431768211463");
+    test_parse_integer_overflow("340282366920938463463374607431768211464");
+    test_parse_integer_overflow("340282366920938463463374607431768211465");
 }

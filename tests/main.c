@@ -18,6 +18,7 @@
 #include "test_parse_expression_success.h"
 #include "test_parse_expression_syntax_error.h"
 #include "test_parse_expression_lexical_error.h"
+#include "test_expression.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 static void check_allocations_maybe(void)
@@ -33,17 +34,18 @@ static void check_allocations_maybe(void)
 int main(void)
 {
     static void (*tests[])(void) = {test_integer,
-                                    test_save_expression,
-                                    test_unicode_string,
                                     test_allocator,
+                                    test_unicode_string,
+                                    test_unicode_view,
                                     test_arithmetic,
                                     test_stream_writer,
                                     test_identifier,
+                                    test_expression,
+                                    test_save_expression,
                                     test_tokenize,
                                     test_parse_expression_success,
                                     test_parse_expression_syntax_error,
-                                    test_parse_expression_lexical_error,
-                                    test_unicode_view};
+                                    test_parse_expression_lexical_error};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();
