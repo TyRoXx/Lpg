@@ -7,7 +7,7 @@ integer integer_create(uint64_t high, uint64_t low)
     return result;
 }
 
-integer integer_shift_left(integer value, uint32_t bits)
+integer integer_shift_left_truncate(integer value, uint32_t bits)
 {
     if (bits == 0)
     {
@@ -18,10 +18,37 @@ integer integer_shift_left(integer value, uint32_t bits)
         integer result = {value.low, 0};
         return result;
     }
+    if (bits > 64)
+    {
+        value.high = value.low;
+        value.low = 0;
+        bits -= 64;
+    }
     integer result = {((value.high << bits) | ((value.low >> (64u - bits)) &
                                                ((uint64_t)-1) >> (64u - bits))),
                       (value.low << bits)};
     return result;
+}
+
+int integer_shift_left(integer *value, uint32_t bits)
+{
+    if (bits >= 64)
+    {
+        if (value->high != 0)
+        {
+            return 0;
+        }
+        if ((bits > 64) && value->low & (UINT64_MAX << (128u - bits)))
+        {
+            return 0;
+        }
+    }
+    if ((bits > 0) && (value->high & (UINT64_MAX << (64u - bits))))
+    {
+        return 0;
+    }
+    *value = integer_shift_left_truncate(*value, bits);
+    return 1;
 }
 
 unsigned integer_bit(integer value, uint32_t bit)
@@ -75,13 +102,77 @@ integer integer_subtract(integer minuend, integer subtrahend)
     return result;
 }
 
+int integer_multiply(integer *left, integer right)
+{
+    integer product = integer_create(0, 0);
+    for (uint32_t i = 0; i < 128; ++i)
+    {
+        if (integer_bit(right, i))
+        {
+            integer summand = *left;
+            if (!integer_shift_left(&summand, i))
+            {
+                return 0;
+            }
+            if (!integer_add(&product, summand))
+            {
+                return 0;
+            }
+        }
+    }
+    *left = product;
+    return 1;
+}
+
+int integer_add(integer *left, integer right)
+{
+    uint64_t low = (left->low + right.low);
+    uint64_t high = left->high;
+    if (low < right.low)
+    {
+        if (high == UINT64_MAX)
+        {
+            return 0;
+        }
+        ++high;
+    }
+    high += right.high;
+    if (high >= right.high)
+    {
+        left->high = high;
+        left->low = low;
+        return 1;
+    }
+    return 0;
+}
+
+int integer_parse(integer *into, unicode_view from)
+{
+    ASSUME(into);
+    ASSUME(from.length >= 1);
+    integer result = integer_create(0, 0);
+    for (size_t i = 0; i < from.length; ++i)
+    {
+        if (!integer_multiply(&result, integer_create(0, 10)))
+        {
+            return 0;
+        }
+        if (!integer_add(&result, integer_create(0, (from.begin[i] - '0'))))
+        {
+            return 0;
+        }
+    }
+    *into = result;
+    return 1;
+}
+
 integer_division integer_divide(integer numerator, integer denominator)
 {
     ASSERT(denominator.low || denominator.high);
     integer_division result = {{0, 0}, {0, 0}};
     for (unsigned i = 127; i < 128; --i)
     {
-        result.remainder = integer_shift_left(result.remainder, 1);
+        result.remainder = integer_shift_left_truncate(result.remainder, 1);
         result.remainder.low |= integer_bit(numerator, i);
         if (!integer_less(result.remainder, denominator))
         {

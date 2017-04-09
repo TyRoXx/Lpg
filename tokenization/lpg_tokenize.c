@@ -8,6 +8,33 @@ static tokenize_result make_success(enum token_type token, size_t length)
     return result;
 }
 
+static int is_digit(unicode_code_point c)
+{
+    return (c >= '0') && (c <= '9');
+}
+
+static int can_follow_integer(unicode_code_point c)
+{
+    ASSUME(!is_digit(c));
+    if (is_identifier_middle(c))
+    {
+        return 0;
+    }
+    switch (c)
+    {
+    case ' ':
+    case '\n':
+    case '(':
+    case ')':
+    case '=':
+    case ':':
+        return 1;
+
+    default:
+        return 0;
+    }
+}
+
 tokenize_result tokenize(unicode_code_point const *input, size_t length)
 {
     ASSUME(length > 0);
@@ -33,6 +60,19 @@ tokenize_result tokenize(unicode_code_point const *input, size_t length)
         {
         }
         return make_success(token_identifier, i);
+    }
+    if (is_digit(*input))
+    {
+        size_t i;
+        for (i = 1; (i < length) && is_digit(input[i]); ++i)
+        {
+        }
+        if ((i < length) && !can_follow_integer(input[i]))
+        {
+            tokenize_result result = {tokenize_invalid, token_space, 0};
+            return result;
+        }
+        return make_success(token_integer, i);
     }
     switch (*input)
     {

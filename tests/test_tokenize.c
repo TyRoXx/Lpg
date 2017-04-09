@@ -49,7 +49,13 @@ void test_tokenize(void)
     test_single_token(token_operator, 1, "=");
     test_single_token(token_operator, 1, "==");
     test_single_token(token_operator, 2, "=>");
+    test_single_token(token_integer, 1, "1");
+    test_single_token(token_integer, 1, "1)");
+    test_single_token(token_integer, 1, "1 a");
+    test_single_token(token_integer, 2, "12");
+    test_single_token(token_integer, 3, "123 456");
     test_invalid("?");
     test_invalid("\t");
     test_invalid("'aaa");
+    test_invalid("1a");
 }

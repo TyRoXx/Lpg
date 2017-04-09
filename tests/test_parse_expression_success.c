@@ -52,4 +52,7 @@ void test_parse_expression_success(void)
     test_successful_parse(
         expression_from_identifier(unicode_string_from_c_str("a")),
         unicode_string_from_c_str("a"));
+    test_successful_parse(
+        expression_from_integer_literal(integer_create(0, 123)),
+        unicode_string_from_c_str("123"));
 }

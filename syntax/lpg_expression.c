@@ -354,7 +354,11 @@ int expression_equals(expression const *left, expression const *right)
     {
     case expression_type_lambda:
     case expression_type_call:
+        UNREACHABLE();
+
     case expression_type_integer_literal:
+        return integer_equal(left->integer_literal, right->integer_literal);
+
     case expression_type_access_structure:
     case expression_type_match:
     case expression_type_string:

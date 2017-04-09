@@ -109,6 +109,15 @@ expression_parser_result parse_expression(expression_parser *parser)
                 pop(parser);
                 parser->on_error(parse_error_create(head.where), parser->user);
                 break;
+
+            case token_integer:
+            {
+                integer value;
+                ASSUME(integer_parse(&value, head.content));
+                expression_parser_result result = {
+                    1, expression_from_integer_literal(value)};
+                return result;
+            }
             }
             break;
 

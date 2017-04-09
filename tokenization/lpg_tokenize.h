@@ -10,7 +10,8 @@ typedef enum token_type
     token_space,
     token_indentation,
     token_identifier,
-    token_operator
+    token_operator,
+    token_integer
 } token_type;
 
 typedef enum tokenize_status

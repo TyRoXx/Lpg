@@ -3,6 +3,56 @@
 #include "lpg_integer.h"
 #include <string.h>
 
+static void test_add_success(integer left, integer right, integer expected)
+{
+    REQUIRE(integer_add(&left, right));
+    REQUIRE(integer_equal(left, expected));
+}
+
+static void test_add_overflow(integer left, integer right)
+{
+    integer result = left;
+    REQUIRE(!integer_add(&result, right));
+    REQUIRE(integer_equal(result, left));
+}
+
+static void test_multiply_success(integer left, integer right, integer expected)
+{
+    REQUIRE(integer_multiply(&left, right));
+    REQUIRE(integer_equal(left, expected));
+}
+
+static void test_multiply_overflow(integer left, integer right)
+{
+    integer result = left;
+    REQUIRE(!integer_multiply(&result, right));
+    REQUIRE(integer_equal(result, left));
+}
+
+static void test_shift_left_success(integer left, uint32_t bits,
+                                    integer expected)
+{
+    integer result = left;
+    REQUIRE(integer_shift_left(&result, bits));
+    REQUIRE(integer_equal(result, expected));
+}
+
+static void test_shift_left_overflow(integer left, uint32_t bits)
+{
+    integer result = left;
+    REQUIRE(!integer_shift_left(&result, bits));
+    REQUIRE(integer_equal(result, left));
+}
+
+static void test_parse_integer(integer expected, char const *input)
+{
+    integer parsed;
+    unicode_string input_string = unicode_string_from_c_str(input);
+    REQUIRE(integer_parse(&parsed, unicode_view_from_string(input_string)));
+    REQUIRE(integer_equal(expected, parsed));
+    unicode_string_free(&input_string);
+}
+
 void test_integer(void)
 {
     REQUIRE(integer_less(integer_create(0, 0), integer_create(0, 1)));
@@ -23,12 +73,12 @@ void test_integer(void)
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(1, 0)));
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(0, 1)));
 
-    REQUIRE(integer_equal(
-        integer_shift_left(integer_create(0, 1), 0), integer_create(0, 1)));
-    REQUIRE(integer_equal(
-        integer_shift_left(integer_create(0, 1), 1), integer_create(0, 2)));
-    REQUIRE(integer_equal(
-        integer_shift_left(integer_create(0, 1), 64), integer_create(1, 0)));
+    REQUIRE(integer_equal(integer_shift_left_truncate(integer_create(0, 1), 0),
+                          integer_create(0, 1)));
+    REQUIRE(integer_equal(integer_shift_left_truncate(integer_create(0, 1), 1),
+                          integer_create(0, 2)));
+    REQUIRE(integer_equal(integer_shift_left_truncate(integer_create(0, 1), 64),
+                          integer_create(1, 0)));
 
     REQUIRE(integer_equal(
         integer_create(0, 0),
@@ -120,4 +170,74 @@ void test_integer(void)
                     integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
                     lower_case_digits, 10, buffer, sizeof(buffer)));
     }
+
+    test_add_success(
+        integer_create(0, 0), integer_create(0, 0), integer_create(0, 0));
+    test_add_success(
+        integer_create(0, 1), integer_create(0, 0), integer_create(0, 1));
+    test_add_success(
+        integer_create(0, 0), integer_create(0, 1), integer_create(0, 1));
+    test_add_success(
+        integer_create(0, 1), integer_create(0, 1), integer_create(0, 2));
+    test_add_success(
+        integer_create(1, 0), integer_create(0, 0), integer_create(1, 0));
+    test_add_success(
+        integer_create(0, 0), integer_create(1, 0), integer_create(1, 0));
+    test_add_success(
+        integer_create(1, 0), integer_create(1, 0), integer_create(2, 0));
+    test_add_success(integer_create(0, 0xFFFFFFFFFFFFFFFFu),
+                     integer_create(0, 0xFFFFFFFFFFFFFFFFu),
+                     integer_create(1, 0xFFFFFFFFFFFFFFFEu));
+    test_add_overflow(integer_create(0xFFFFFFFFFFFFFFFFu, 0),
+                      integer_create(0xFFFFFFFFFFFFFFFFu, 0));
+    test_add_overflow(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+                      integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu));
+
+    test_multiply_success(
+        integer_create(0, 0), integer_create(0, 0), integer_create(0, 0));
+    test_multiply_success(
+        integer_create(0, 1), integer_create(0, 0), integer_create(0, 0));
+    test_multiply_success(
+        integer_create(0, 0), integer_create(0, 1), integer_create(0, 0));
+    test_multiply_success(
+        integer_create(0, 1), integer_create(0, 1), integer_create(0, 1));
+    test_multiply_success(
+        integer_create(0, 3), integer_create(0, 4), integer_create(0, 12));
+    test_multiply_success(integer_create(0, 2),
+                          integer_create(0, 0xFFFFFFFFFFFFFFFFu),
+                          integer_create(1, 0xFFFFFFFFFFFFFFFEu));
+    test_multiply_success(
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+        integer_create(0, 1),
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu));
+    test_multiply_overflow(
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu));
+    test_multiply_overflow(
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+        integer_create(0, 2));
+
+    for (uint32_t i = 0; i <= 128; ++i)
+    {
+        test_shift_left_success(integer_create(0, 0), i, integer_create(0, 0));
+    }
+    test_shift_left_success(integer_create(0, 1), 0, integer_create(0, 1));
+    test_shift_left_success(integer_create(0, 1), 1, integer_create(0, 2));
+    test_shift_left_success(integer_create(0, 1), 2, integer_create(0, 4));
+    test_shift_left_success(integer_create(0, 1), 3, integer_create(0, 8));
+    test_shift_left_success(integer_create(0, 1), 4, integer_create(0, 16));
+    test_shift_left_success(integer_create(0, 1), 64, integer_create(1, 0));
+    test_shift_left_success(
+        integer_create(0, 3), 63, integer_create(1, 0x8000000000000000u));
+    test_shift_left_success(
+        integer_create(0, 1), 127, integer_create(0x8000000000000000u, 0));
+    test_shift_left_overflow(integer_create(0, 1), 128);
+    test_shift_left_overflow(integer_create(0, 2), 127);
+
+    test_parse_integer(integer_create(0, 0), "0");
+    test_parse_integer(integer_create(0, 1), "1");
+    test_parse_integer(integer_create(0, 10), "10");
+    test_parse_integer(integer_create(0, 42), "42");
+    test_parse_integer(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu),
+                       "340282366920938463463374607431768211455");
 }
