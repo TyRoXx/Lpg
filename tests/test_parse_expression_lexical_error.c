@@ -46,4 +46,7 @@ void test_parse_expression_lexical_error(void)
     test_lexical_error(unicode_string_from_c_str("?"));
     test_lexical_error(unicode_string_from_c_str("?a"));
     test_lexical_error(unicode_string_from_c_str("?break"));
+    test_lexical_error(unicode_string_from_c_str("1a"));
+    test_lexical_error(unicode_string_from_c_str("1?"));
+    test_lexical_error(unicode_string_from_c_str("12345a"));
 }
