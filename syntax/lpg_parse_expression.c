@@ -113,7 +113,7 @@ expression_parser_result parse_expression(expression_parser *parser)
             case token_integer:
             {
                 integer value;
-                ASSUME(integer_parse(&value, head.content));
+                ASSERT(integer_parse(&value, head.content));
                 expression_parser_result result = {
                     1, expression_from_integer_literal(value)};
                 return result;
