@@ -72,12 +72,12 @@ void integer_set_bit(integer *target, uint32_t bit, unsigned value)
     }
 }
 
-unsigned integer_equal(integer left, integer right)
+int integer_equal(integer left, integer right)
 {
     return (left.high == right.high) && (left.low == right.low);
 }
 
-unsigned integer_less(integer left, integer right)
+int integer_less(integer left, integer right)
 {
     if (left.high < right.high)
     {
