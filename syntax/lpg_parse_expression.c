@@ -62,17 +62,8 @@ static rich_token peek(expression_parser *parser)
             break;
 
         case tokenize_invalid:
-            switch (parser->on_error(
-                parse_error_create(parser->cached_token.where), parser->user))
-            {
-            case continue_yes:
-                break;
-
-            case continue_no:
-                return rich_token_create(tokenize_success, token_space,
-                                         unicode_view_create(NULL, 0),
-                                         parser->cached_token.where);
-            }
+            parser->on_error(
+                parse_error_create(parser->cached_token.where), parser->user);
             break;
         }
     }

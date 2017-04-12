@@ -36,16 +36,10 @@ typedef struct parse_error
 parse_error parse_error_create(source_location where);
 int parse_error_equals(parse_error left, parse_error right);
 
-typedef enum continue_flag
-{
-    continue_yes,
-    continue_no
-} continue_flag;
-
 typedef void *callback_user;
 
 typedef rich_token (*rich_token_producer)(callback_user);
-typedef continue_flag (*parse_error_handler)(parse_error, callback_user);
+typedef void (*parse_error_handler)(parse_error, callback_user);
 
 typedef struct expression_parser
 {
