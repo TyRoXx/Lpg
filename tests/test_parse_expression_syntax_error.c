@@ -2,6 +2,7 @@
 #include "test.h"
 #include "lpg_parse_expression.h"
 #include "lpg_array_size.h"
+#include "lpg_allocate.h"
 
 typedef struct test_parser_user
 {
@@ -202,5 +203,17 @@ void test_parse_expression_syntax_error(void)
                           &expected, unicode_string_from_c_str("=>\n"
                                                                "=>\n"
                                                                "=> a"));
+    }
+    {
+        parse_error const expected_error =
+            parse_error_create(source_location_create(0, 4));
+        expression *arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
+        expression expected = expression_from_call(call_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("f"))),
+            tuple_create(arguments, 1)));
+        test_syntax_error(
+            &expected_error, 1, &expected, unicode_string_from_c_str("f(1,)"));
     }
 }

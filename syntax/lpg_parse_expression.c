@@ -108,19 +108,17 @@ static expression_parser_result parse_callable(expression_parser *parser)
         switch (head.token)
         {
         case token_identifier:
+        {
             pop(parser);
             if (unicode_view_equals_c_str(head.content, "break"))
             {
                 expression_parser_result result = {1, expression_from_break()};
                 return result;
             }
-            else
-            {
-                expression_parser_result result = {
-                    1, expression_from_identifier(
-                           unicode_view_copy(head.content))};
-                return result;
-            }
+            expression_parser_result result = {
+                1, expression_from_identifier(unicode_view_copy(head.content))};
+            return result;
+        }
 
         case token_newline:
         case token_space:
@@ -173,30 +171,24 @@ expression_parser_result parse_expression(expression_parser *parser)
         pop(parser);
         expression *arguments = NULL;
         size_t argument_count = 0;
-        int expect_end_of_arguments = 0;
+        int expect_another_argument = 0;
         for (;;)
         {
-            rich_token const maybe_close = peek(parser);
-            if (maybe_close.token == token_right_parenthesis)
             {
-                pop(parser);
-                result.success = expression_from_call(
-                    call_create(expression_allocate(result.success),
-                                tuple_create(arguments, argument_count)));
-                break;
-            }
-            if (expect_end_of_arguments)
-            {
-                switch (parser->on_error(
-                    parse_error_create(maybe_close.where), parser->user))
+                rich_token const maybe_close = peek(parser);
+                if (maybe_close.token == token_right_parenthesis)
                 {
-                case continue_no:
-                    return expression_parser_result_failure();
-
-                case continue_yes:
-                    return result;
+                    pop(parser);
+                    if (expect_another_argument)
+                    {
+                        parser->on_error(parse_error_create(maybe_close.where),
+                                         parser->user);
+                    }
+                    result.success = expression_from_call(
+                        call_create(expression_allocate(result.success),
+                                    tuple_create(arguments, argument_count)));
+                    break;
                 }
-                UNREACHABLE();
             }
             expression_parser_result const argument = parse_expression(parser);
             if (argument.is_success)
@@ -210,11 +202,12 @@ expression_parser_result parse_expression(expression_parser *parser)
             rich_token const maybe_comma = peek(parser);
             if (maybe_comma.token == token_comma)
             {
+                expect_another_argument = 1;
                 pop(parser);
             }
             else
             {
-                expect_end_of_arguments = 1;
+                expect_another_argument = 0;
             }
         }
     }
