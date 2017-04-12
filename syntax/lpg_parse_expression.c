@@ -1,5 +1,6 @@
 #include "lpg_parse_expression.h"
 #include "lpg_assert.h"
+#include "lpg_allocate.h"
 
 source_location source_location_create(line_number line,
                                        column_number approximate_column)
@@ -51,12 +52,31 @@ expression_parser expression_parser_create(rich_token_producer find_next_token,
 
 static rich_token peek(expression_parser *parser)
 {
-    if (parser->has_cached_token)
+    while (!parser->has_cached_token)
     {
-        return parser->cached_token;
+        parser->cached_token = parser->find_next_token(parser->user);
+        switch (parser->cached_token.status)
+        {
+        case tokenize_success:
+            parser->has_cached_token = 1;
+            break;
+
+        case tokenize_invalid:
+            switch (parser->on_error(
+                parse_error_create(parser->cached_token.where), parser->user))
+            {
+            case continue_yes:
+                break;
+
+            case continue_no:
+                return rich_token_create(tokenize_success, token_space,
+                                         unicode_view_create(NULL, 0),
+                                         parser->cached_token.where);
+            }
+            break;
+        }
     }
-    parser->cached_token = parser->find_next_token(parser->user);
-    parser->has_cached_token = 1;
+    ASSUME(parser->cached_token.status == tokenize_success);
     return parser->cached_token;
 }
 
@@ -66,7 +86,13 @@ static void pop(expression_parser *parser)
     parser->has_cached_token = 0;
 }
 
-expression_parser_result parse_expression(expression_parser *parser)
+static expression_parser_result expression_parser_result_failure()
+{
+    expression_parser_result const result = {0, expression_from_break()};
+    return result;
+}
+
+static expression_parser_result parse_callable(expression_parser *parser)
 {
     for (;;)
     {
@@ -79,61 +105,117 @@ expression_parser_result parse_expression(expression_parser *parser)
                 0, expression_from_break()};
             return result;
         }
-        switch (head.status)
+        switch (head.token)
         {
-        case tokenize_success:
-            switch (head.token)
+        case token_identifier:
+            pop(parser);
+            if (unicode_view_equals_c_str(head.content, "break"))
             {
-            case token_identifier:
-                pop(parser);
-                if (unicode_view_equals_c_str(head.content, "break"))
-                {
-                    expression_parser_result result = {
-                        1, expression_from_break()};
-                    return result;
-                }
-                else
-                {
-                    expression_parser_result result = {
-                        1, expression_from_identifier(
-                               unicode_view_copy(head.content))};
-                    return result;
-                }
-
-            case token_newline:
-            case token_space:
-            case token_indentation:
-                pop(parser);
-                break;
-
-            case token_operator:
-                pop(parser);
-                parser->on_error(parse_error_create(head.where), parser->user);
-                break;
-
-            case token_integer:
+                expression_parser_result result = {1, expression_from_break()};
+                return result;
+            }
+            else
             {
-                pop(parser);
-                integer value;
-                if (integer_parse(&value, head.content))
-                {
-                    expression_parser_result result = {
-                        1, expression_from_integer_literal(value)};
-                    return result;
-                }
-                parser->on_error(parse_error_create(head.where), parser->user);
-                break;
+                expression_parser_result result = {
+                    1, expression_from_identifier(
+                           unicode_view_copy(head.content))};
+                return result;
             }
-            }
+
+        case token_newline:
+        case token_space:
+        case token_indentation:
+            pop(parser);
             break;
 
-        case tokenize_invalid:
+        case token_left_parenthesis:
+        case token_right_parenthesis:
+        case token_colon:
+        case token_comma:
+        case token_assign:
+        case token_fat_arrow:
+            pop(parser);
+            parser->on_error(parse_error_create(head.where), parser->user);
+            break;
+
+        case token_integer:
         {
             pop(parser);
-            expression_parser_result const result = {
-                0, expression_from_break()};
+            integer value;
+            if (integer_parse(&value, head.content))
+            {
+                expression_parser_result result = {
+                    1, expression_from_integer_literal(value)};
+                return result;
+            }
+            parser->on_error(parse_error_create(head.where), parser->user);
+            break;
+        }
+        }
+    }
+}
+
+expression_parser_result parse_expression(expression_parser *parser)
+{
+    expression_parser_result callee = parse_callable(parser);
+    if (!callee.is_success)
+    {
+        return callee;
+    }
+    expression_parser_result result = callee;
+    for (;;)
+    {
+        rich_token const maybe_open = peek(parser);
+        if (maybe_open.token != token_left_parenthesis)
+        {
             return result;
         }
+        pop(parser);
+        expression *arguments = NULL;
+        size_t argument_count = 0;
+        int expect_end_of_arguments = 0;
+        for (;;)
+        {
+            rich_token const maybe_close = peek(parser);
+            if (maybe_close.token == token_right_parenthesis)
+            {
+                pop(parser);
+                result.success = expression_from_call(
+                    call_create(expression_allocate(result.success),
+                                tuple_create(arguments, argument_count)));
+                break;
+            }
+            if (expect_end_of_arguments)
+            {
+                switch (parser->on_error(
+                    parse_error_create(maybe_close.where), parser->user))
+                {
+                case continue_no:
+                    return expression_parser_result_failure();
+
+                case continue_yes:
+                    return result;
+                }
+                UNREACHABLE();
+            }
+            expression_parser_result const argument = parse_expression(parser);
+            if (argument.is_success)
+            {
+                /*TODO: avoid O(N^2)*/
+                arguments = reallocate_array(
+                    arguments, argument_count + 1, sizeof(*arguments));
+                arguments[argument_count] = argument.success;
+                argument_count++;
+            }
+            rich_token const maybe_comma = peek(parser);
+            if (maybe_comma.token == token_comma)
+            {
+                pop(parser);
+            }
+            else
+            {
+                expect_end_of_arguments = 1;
+            }
         }
     }
 }

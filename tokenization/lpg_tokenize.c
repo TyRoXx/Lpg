@@ -28,6 +28,7 @@ static int can_follow_integer(unicode_code_point c)
     case ')':
     case '=':
     case ':':
+    case ',':
         return 1;
 
     default:
@@ -69,7 +70,7 @@ tokenize_result tokenize(unicode_code_point const *input, size_t length)
         }
         if ((i < length) && !can_follow_integer(input[i]))
         {
-            tokenize_result result = {tokenize_invalid, token_space, 0};
+            tokenize_result result = {tokenize_invalid, token_space, i};
             return result;
         }
         return make_success(token_integer, i);
@@ -80,17 +81,24 @@ tokenize_result tokenize(unicode_code_point const *input, size_t length)
         return make_success(token_newline, 1);
 
     case '(':
+        return make_success(token_left_parenthesis, 1);
+
     case ')':
+        return make_success(token_right_parenthesis, 1);
+
     case ':':
-        return make_success(token_operator, 1);
+        return make_success(token_colon, 1);
+
+    case ',':
+        return make_success(token_comma, 1);
 
     case '=':
         if ((length >= 2) && (input[1] == '>'))
         {
-            return make_success(token_operator, 2);
+            return make_success(token_fat_arrow, 2);
         }
-        return make_success(token_operator, 1);
+        return make_success(token_assign, 1);
     }
-    tokenize_result result = {tokenize_invalid, token_space, 0};
+    tokenize_result result = {tokenize_invalid, token_space, 1};
     return result;
 }

@@ -10,7 +10,12 @@ typedef enum token_type
     token_space,
     token_indentation,
     token_identifier,
-    token_operator,
+    token_left_parenthesis,
+    token_right_parenthesis,
+    token_comma,
+    token_colon,
+    token_assign,
+    token_fat_arrow,
     token_integer
 } token_type;
 

@@ -353,8 +353,26 @@ int expression_equals(expression const *left, expression const *right)
     switch (left->type)
     {
     case expression_type_lambda:
-    case expression_type_call:
         UNREACHABLE();
+
+    case expression_type_call:
+        if (!expression_equals(left->call.callee, right->call.callee))
+        {
+            return 0;
+        }
+        if (left->call.arguments.length != right->call.arguments.length)
+        {
+            return 0;
+        }
+        LPG_FOR(size_t, i, left->call.arguments.length)
+        {
+            if (!expression_equals(left->call.arguments.elements + i,
+                                   right->call.arguments.elements + i))
+            {
+                return 0;
+            }
+        }
+        return 1;
 
     case expression_type_integer_literal:
         return integer_equal(left->integer_literal, right->integer_literal);

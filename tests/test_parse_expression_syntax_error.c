@@ -25,24 +25,21 @@ static rich_token find_next_token(callback_user user)
     }
     tokenize_result tokenized =
         tokenize(parser_user->remaining_input, parser_user->remaining_size);
-    REQUIRE(tokenized.status == tokenize_success);
+    REQUIRE(tokenized.length >= 1);
     REQUIRE(tokenized.length <= parser_user->remaining_size);
     rich_token result = rich_token_create(
         tokenized.status, tokenized.token,
         unicode_view_create(parser_user->remaining_input, tokenized.length),
         parser_user->current_location);
-    if (tokenized.status == tokenize_success)
+    if ((tokenized.status == tokenize_success) &&
+        (tokenized.token == token_newline))
     {
-        if (tokenized.token == token_newline)
-        {
-            ++parser_user->current_location.line;
-            parser_user->current_location.approximate_column = 0;
-        }
-        else
-        {
-            parser_user->current_location.approximate_column +=
-                tokenized.length;
-        }
+        ++parser_user->current_location.line;
+        parser_user->current_location.approximate_column = 0;
+    }
+    else
+    {
+        parser_user->current_location.approximate_column += tokenized.length;
     }
     parser_user->remaining_input += tokenized.length;
     parser_user->remaining_size -= tokenized.length;
@@ -86,6 +83,58 @@ static void test_syntax_error(parse_error const *expected_errors,
 
 void test_parse_expression_syntax_error(void)
 {
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(0, 1))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("?"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("?a"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0))};
+        expression expected = expression_from_break();
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("?break"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("1a"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0)),
+            parse_error_create(source_location_create(0, 1)),
+            parse_error_create(source_location_create(0, 2))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("1?"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(source_location_create(0, 0))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("12345a"));
+    }
+
     {
         parse_error const expected_error =
             parse_error_create(source_location_create(0, 0));
