@@ -157,7 +157,8 @@ int integer_parse(integer *into, unicode_view from)
         {
             return 0;
         }
-        if (!integer_add(&result, integer_create(0, (from.begin[i] - '0'))))
+        if (!integer_add(
+                &result, integer_create(0, (uint64_t)(from.begin[i] - '0'))))
         {
             return 0;
         }

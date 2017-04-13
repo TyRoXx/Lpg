@@ -16,11 +16,7 @@ unicode_string unicode_string_from_c_str(const char *c_str)
     unicode_string result;
     result.length = strlen(c_str);
     result.data = allocate_array(result.length, sizeof(*result.data));
-    for (size_t i = 0; i < result.length; ++i)
-    {
-        result.data[i] = (unsigned char)c_str[i];
-        ASSUME(result.data[i] <= 127);
-    }
+    memcpy(result.data, c_str, result.length);
     return result;
 }
 
