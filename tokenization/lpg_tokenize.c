@@ -8,7 +8,7 @@ static tokenize_result make_success(enum token_type token, size_t length)
     return result;
 }
 
-static int is_digit(unicode_code_point c)
+static int is_digit(char c)
 {
     return (c >= '0') && (c <= '9');
 }
