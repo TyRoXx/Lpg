@@ -77,12 +77,6 @@ static void pop(expression_parser *parser)
     parser->has_cached_token = 0;
 }
 
-static expression_parser_result expression_parser_result_failure()
-{
-    expression_parser_result const result = {0, expression_from_break()};
-    return result;
-}
-
 static expression_parser_result parse_callable(expression_parser *parser)
 {
     for (;;)
