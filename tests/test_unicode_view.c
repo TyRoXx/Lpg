@@ -21,7 +21,7 @@ void test_unicode_view(void)
     }
     {
         unicode_view first = unicode_view_create(NULL, 0);
-        unicode_code_point const a = 'a';
+        char const a = 'a';
         unicode_view second = unicode_view_create(&a, 1);
         REQUIRE(!unicode_view_equals(first, second));
         REQUIRE(unicode_view_equals(first, first));

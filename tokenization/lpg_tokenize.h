@@ -32,4 +32,4 @@ typedef struct tokenize_result
     size_t length;
 } tokenize_result;
 
-tokenize_result tokenize(unicode_code_point const *input, size_t length);
+tokenize_result tokenize(char const *input, size_t length);

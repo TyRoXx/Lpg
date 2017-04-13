@@ -1,7 +1,7 @@
 #include "lpg_unicode_view.h"
 #include <string.h>
 
-unicode_view unicode_view_create(unicode_code_point const *begin, size_t length)
+unicode_view unicode_view_create(char const *begin, size_t length)
 {
     unicode_view result = {begin, length};
     return result;

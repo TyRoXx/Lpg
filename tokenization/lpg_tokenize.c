@@ -13,7 +13,7 @@ static int is_digit(unicode_code_point c)
     return (c >= '0') && (c <= '9');
 }
 
-static int can_follow_integer(unicode_code_point c)
+static int can_follow_integer(char c)
 {
     ASSUME(!is_digit(c));
     if (is_identifier_middle(c))
@@ -36,7 +36,7 @@ static int can_follow_integer(unicode_code_point c)
     }
 }
 
-tokenize_result tokenize(unicode_code_point const *input, size_t length)
+tokenize_result tokenize(char const *input, size_t length)
 {
     ASSUME(length > 0);
     if (*input == ' ')

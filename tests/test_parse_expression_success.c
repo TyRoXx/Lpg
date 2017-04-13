@@ -5,7 +5,7 @@
 
 typedef struct test_parser_user
 {
-    unicode_code_point const *remaining_input;
+    char const *remaining_input;
     size_t remaining_size;
 } test_parser_user;
 
