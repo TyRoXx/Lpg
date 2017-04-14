@@ -161,6 +161,17 @@ expression_parser_result parse_expression(expression_parser *parser)
         {
             {
                 rich_token const maybe_close = peek(parser);
+                if (is_end_of_file(&maybe_close))
+                {
+                    pop(parser);
+                    parser->on_error(
+                        parse_error_create(maybe_close.where), parser->user);
+                    if (arguments)
+                    {
+                        deallocate(arguments);
+                    }
+                    return result;
+                }
                 if (maybe_close.token == token_right_parenthesis)
                 {
                     pop(parser);
@@ -185,6 +196,17 @@ expression_parser_result parse_expression(expression_parser *parser)
                 argument_count++;
             }
             rich_token const maybe_comma = peek(parser);
+            if (is_end_of_file(&maybe_comma))
+            {
+                pop(parser);
+                parser->on_error(
+                    parse_error_create(maybe_comma.where), parser->user);
+                if (arguments)
+                {
+                    deallocate(arguments);
+                }
+                return result;
+            }
             if (maybe_comma.token == token_comma)
             {
                 expect_another_argument = 1;
