@@ -18,6 +18,7 @@
 #include "test_parse_expression_success.h"
 #include "test_parse_expression_syntax_error.h"
 #include "test_expression.h"
+#include "test_semantics.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 static void check_allocations_maybe(void)
@@ -43,7 +44,8 @@ int main(void)
                                     test_save_expression,
                                     test_tokenize,
                                     test_parse_expression_success,
-                                    test_parse_expression_syntax_error};
+                                    test_parse_expression_syntax_error,
+                                    test_semantics};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();
