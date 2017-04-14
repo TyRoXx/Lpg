@@ -330,18 +330,18 @@ expression_parser_result parse_expression(expression_parser *parser,
                 continue;
             }
         }
-        if ((maybe_operator.token == token_assign) ||
-            ((maybe_operator.token == token_space) &&
-             (maybe_operator.content.length == 1)))
+        if (maybe_operator.token == token_assign)
         {
             pop(parser);
-            if (maybe_operator.token == token_assign)
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space,
-                                                    maybe_operator.where),
-                                 parser->user);
-            }
-            else
+            parser->on_error(parse_error_create(parse_error_expected_space,
+                                                maybe_operator.where),
+                             parser->user);
+            return parse_assignment(parser, indentation, result.success);
+        }
+        if ((maybe_operator.token == token_space) &&
+            (maybe_operator.content.length == 1))
+        {
+            pop(parser);
             {
                 rich_token const assign = peek(parser);
                 pop(parser);
