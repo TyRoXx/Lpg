@@ -43,7 +43,7 @@ static void test_successful_parse(expression expected, unicode_string input)
     test_parser_user user = {input.data, input.length};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
-    expression_parser_result result = parse_expression(&parser);
+    expression_parser_result result = parse_expression(&parser, 0);
     REQUIRE(result.is_success);
     REQUIRE(user.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
@@ -104,5 +104,59 @@ void test_parse_expression_success(void)
                     expression_from_identifier(unicode_string_from_c_str("f"))),
                 arguments_tuple)),
             unicode_string_from_c_str("f(1,2)"));
+    }
+    {
+        expression *elements = allocate_array(1, sizeof(*elements));
+        elements[0] = expression_from_break();
+        test_successful_parse(
+            expression_from_loop(sequence_create(elements, 1)),
+            unicode_string_from_c_str("loop\n"
+                                      "    break"));
+    }
+    {
+        expression *elements = allocate_array(2, sizeof(*elements));
+        elements[0] =
+            expression_from_identifier(unicode_string_from_c_str("f"));
+        elements[1] = expression_from_break();
+        test_successful_parse(
+            expression_from_loop(sequence_create(elements, 2)),
+            unicode_string_from_c_str("loop\n"
+                                      "    f\n"
+                                      "    break"));
+    }
+    {
+        expression *elements = allocate_array(2, sizeof(*elements));
+        elements[0] =
+            expression_from_identifier(unicode_string_from_c_str("f"));
+        elements[1] = expression_from_break();
+        test_successful_parse(
+            expression_from_loop(sequence_create(elements, 2)),
+            unicode_string_from_c_str("loop\n"
+                                      "    f\n"
+                                      "    break\n"));
+    }
+    {
+        expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
+        inner_loop[0] = expression_from_break();
+        expression *outer_loop = allocate_array(1, sizeof(*outer_loop));
+        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
+        test_successful_parse(
+            expression_from_loop(sequence_create(outer_loop, 1)),
+            unicode_string_from_c_str("loop\n"
+                                      "    loop\n"
+                                      "        break\n"));
+    }
+    {
+        expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
+        inner_loop[0] = expression_from_break();
+        expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
+        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
+        outer_loop[1] = expression_from_break();
+        test_successful_parse(
+            expression_from_loop(sequence_create(outer_loop, 2)),
+            unicode_string_from_c_str("loop\n"
+                                      "    loop\n"
+                                      "        break\n"
+                                      "    break\n"));
     }
 }

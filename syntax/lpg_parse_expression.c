@@ -1,6 +1,7 @@
 #include "lpg_parse_expression.h"
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_for.h"
 
 source_location source_location_create(line_number line,
                                        column_number approximate_column)
@@ -79,7 +80,62 @@ static void pop(expression_parser *parser)
     parser->has_cached_token = 0;
 }
 
-static expression_parser_result parse_callable(expression_parser *parser)
+static sequence parse_sequence(expression_parser *parser, size_t indentation)
+{
+    expression *elements = NULL;
+    size_t element_count = 0;
+    for (;;)
+    {
+        rich_token const indentation_token = peek(parser);
+        if ((indentation_token.token == token_indentation) &&
+            (indentation_token.content.length ==
+             (indentation * spaces_for_indentation)))
+        {
+            pop(parser);
+            expression_parser_result const element =
+                parse_expression(parser, indentation);
+            if (element.is_success)
+            {
+                /*TODO: avoid O(N^2)*/
+                elements = reallocate_array(
+                    elements, (element_count + 1), sizeof(*elements));
+                elements[element_count] = element.success;
+                ++element_count;
+            }
+            rich_token const maybe_newline = peek(parser);
+            if (maybe_newline.token == token_newline)
+            {
+                pop(parser);
+            }
+        }
+        else
+        {
+            break;
+        }
+    }
+    return sequence_create(elements, element_count);
+}
+
+static expression_parser_result parse_loop(expression_parser *parser,
+                                           size_t indentation)
+{
+    rich_token const maybe_newline = peek(parser);
+    pop(parser);
+    if (maybe_newline.token != token_newline)
+    {
+        parser->on_error(parse_error_create(
+                             parse_error_expected_newline, maybe_newline.where),
+                         parser->user);
+        expression_parser_result const result = {0, expression_from_break()};
+        return result;
+    }
+    expression_parser_result const result = {
+        1, expression_from_loop(parse_sequence(parser, (indentation + 1)))};
+    return result;
+}
+
+static expression_parser_result parse_callable(expression_parser *parser,
+                                               size_t indentation)
 {
     for (;;)
     {
@@ -103,6 +159,10 @@ static expression_parser_result parse_callable(expression_parser *parser)
             {
                 expression_parser_result result = {1, expression_from_break()};
                 return result;
+            }
+            if (unicode_view_equals_c_str(head.content, "loop"))
+            {
+                return parse_loop(parser, indentation);
             }
             expression_parser_result result = {
                 1, expression_from_identifier(unicode_view_copy(head.content))};
@@ -147,9 +207,10 @@ static expression_parser_result parse_callable(expression_parser *parser)
     }
 }
 
-expression_parser_result parse_expression(expression_parser *parser)
+expression_parser_result parse_expression(expression_parser *parser,
+                                          size_t indentation)
 {
-    expression_parser_result callee = parse_callable(parser);
+    expression_parser_result callee = parse_callable(parser, indentation);
     if (!callee.is_success)
     {
         return callee;
@@ -199,7 +260,8 @@ expression_parser_result parse_expression(expression_parser *parser)
                     break;
                 }
             }
-            expression_parser_result const argument = parse_expression(parser);
+            expression_parser_result const argument =
+                parse_expression(parser, indentation);
             if (argument.is_success)
             {
                 /*TODO: avoid O(N^2)*/

@@ -35,7 +35,8 @@ void test_tokenize(void)
     test_single_token(token_space, 1, " ?\n");
     test_single_token(token_indentation, 4, "    ");
     test_single_token(token_indentation, 4, "    a");
-    test_single_token(token_indentation, 4, "         ");
+    test_single_token(token_indentation, 8, "         ");
+    test_single_token(token_indentation, 12, "             ");
     test_single_token(token_identifier, 1, "a");
     test_single_token(token_identifier, 1, "a ");
     test_single_token(token_identifier, 2, "ab");

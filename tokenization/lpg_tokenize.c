@@ -43,14 +43,17 @@ tokenize_result tokenize(char const *input, size_t length)
     {
         if (length >= spaces_for_indentation)
         {
-            for (size_t i = 1; i < spaces_for_indentation; ++i)
+            size_t i = 1;
+            while (input[i] == ' ')
             {
-                if (input[i] != ' ')
-                {
-                    return make_success(token_space, 1);
-                }
+                ++i;
             }
-            return make_success(token_indentation, spaces_for_indentation);
+            if (i < spaces_for_indentation)
+            {
+                return make_success(token_space, 1);
+            }
+            return make_success(
+                token_indentation, (i - (i % spaces_for_indentation)));
         }
         return make_success(token_space, 1);
     }

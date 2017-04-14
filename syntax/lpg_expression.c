@@ -344,6 +344,22 @@ void expression_free(expression *this)
     }
 }
 
+static int sequence_equals(sequence const left, sequence const right)
+{
+    if (left.length != right.length)
+    {
+        return 0;
+    }
+    LPG_FOR(size_t, i, left.length)
+    {
+        if (!expression_equals(left.elements + i, right.elements + i))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int expression_equals(expression const *left, expression const *right)
 {
     if (left->type != right->type)
@@ -389,8 +405,10 @@ int expression_equals(expression const *left, expression const *right)
     case expression_type_make_identifier:
     case expression_type_assign:
     case expression_type_return:
-    case expression_type_loop:
         UNREACHABLE();
+
+    case expression_type_loop:
+        return sequence_equals(left->loop_body, right->loop_body);
 
     case expression_type_break:
         return 1;

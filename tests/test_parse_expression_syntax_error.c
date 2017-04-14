@@ -64,7 +64,7 @@ static void test_syntax_error(parse_error const *expected_errors,
                              expected_count, source_location_create(0, 0)};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
-    expression_parser_result result = parse_expression(&parser);
+    expression_parser_result result = parse_expression(&parser, 0);
     if (expected)
     {
         REQUIRE(result.is_success);
@@ -271,5 +271,24 @@ void test_parse_expression_syntax_error(void)
             expression_from_identifier(unicode_string_from_c_str("f"));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("f(,"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 4)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 5)),
+            parse_error_create(
+                parse_error_expected_arguments, source_location_create(0, 5))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("f"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("f(1,,"));
+    }
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_newline, source_location_create(0, 4))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("loop"));
     }
 }
