@@ -207,6 +207,35 @@ static expression_parser_result parse_callable(expression_parser *parser,
     }
 }
 
+static expression_parser_result parse_assignment(expression_parser *parser,
+                                                 size_t indentation,
+                                                 expression const left_side)
+{
+    rich_token const space = peek(parser);
+    if (space.token == token_space)
+    {
+        pop(parser);
+    }
+    else
+    {
+        parser->on_error(
+            parse_error_create(parse_error_expected_space, space.where),
+            parser->user);
+    }
+    expression_parser_result const value =
+        parse_expression(parser, indentation);
+    if (value.is_success)
+    {
+        expression_parser_result assign_result = {
+            1, expression_from_assign(
+                   assign_create(expression_allocate(left_side),
+                                 expression_allocate(value.success)))};
+        return assign_result;
+    }
+    expression_parser_result result = {1, left_side};
+    return result;
+}
+
 expression_parser_result parse_expression(expression_parser *parser,
                                           size_t indentation)
 {
@@ -319,27 +348,7 @@ expression_parser_result parse_expression(expression_parser *parser,
                     return result;
                 }
             }
-            rich_token const space = peek(parser);
-            if (space.token == token_space)
-            {
-                pop(parser);
-            }
-            else
-            {
-                parser->on_error(
-                    parse_error_create(parse_error_expected_space, space.where),
-                    parser->user);
-            }
-            expression_parser_result const value =
-                parse_expression(parser, indentation);
-            if (value.is_success)
-            {
-                expression_parser_result assign_result = {
-                    1, expression_from_assign(
-                           assign_create(expression_allocate(result.success),
-                                         expression_allocate(value.success)))};
-                return assign_result;
-            }
+            return parse_assignment(parser, indentation, result.success);
         }
         return result;
     }
