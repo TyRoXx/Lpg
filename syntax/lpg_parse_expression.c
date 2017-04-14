@@ -340,7 +340,6 @@ expression_parser_result parse_expression(expression_parser *parser,
                                          expression_allocate(value.success)))};
                 return assign_result;
             }
-            return value;
         }
         return result;
     }

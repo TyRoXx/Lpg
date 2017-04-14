@@ -327,4 +327,23 @@ void test_parse_expression_syntax_error(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("a= 1"));
     }
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_assignment, source_location_create(0, 2))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("a "));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_invalid_token, source_location_create(0, 4)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 5))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("a = ?"));
+    }
 }
