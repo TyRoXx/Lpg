@@ -56,12 +56,27 @@ void test_parse_expression_success(void)
 {
     test_successful_parse(
         expression_from_break(), unicode_string_from_c_str("break"));
+
+    test_successful_parse(
+        expression_from_return(expression_allocate(
+            expression_from_integer_literal(integer_create(0, 123)))),
+        unicode_string_from_c_str("return 123"));
+
+    test_successful_parse(
+        expression_from_return(expression_allocate(expression_from_call(
+            call_create(expression_allocate(expression_from_identifier(
+                            unicode_string_from_c_str("f"))),
+                        tuple_create(NULL, 0))))),
+        unicode_string_from_c_str("return f()"));
+
     test_successful_parse(
         expression_from_identifier(unicode_string_from_c_str("a")),
         unicode_string_from_c_str("a"));
+
     test_successful_parse(
         expression_from_integer_literal(integer_create(0, 123)),
         unicode_string_from_c_str("123"));
+
     {
         tuple arguments = tuple_create(NULL, 0);
         test_successful_parse(

@@ -454,7 +454,7 @@ int expression_equals(expression const *left, expression const *right)
         return assign_equals(left->assign, right->assign);
 
     case expression_type_return:
-        UNREACHABLE();
+        return expression_equals(left->return_, right->return_);
 
     case expression_type_loop:
         return sequence_equals(left->loop_body, right->loop_body);

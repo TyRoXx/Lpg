@@ -546,9 +546,9 @@ static expression_parser_result parse_declaration(expression_parser *parser,
     return assign_result;
 }
 
-expression_parser_result parse_expression(expression_parser *parser,
-                                          size_t indentation,
-                                          int may_be_statement)
+static expression_parser_result parse_returnable(expression_parser *parser,
+                                                 size_t indentation,
+                                                 int may_be_statement)
 {
     expression_parser_result callee = parse_callable(parser, indentation);
     if (!callee.is_success)
@@ -611,4 +611,35 @@ expression_parser_result parse_expression(expression_parser *parser,
         }
         return result;
     }
+}
+
+expression_parser_result parse_expression(expression_parser *parser,
+                                          size_t indentation,
+                                          int may_be_statement)
+{
+    rich_token const return_ = peek(parser);
+    if ((return_.token == token_identifier) &&
+        unicode_view_equals_c_str(return_.content, "return"))
+    {
+        pop(parser);
+        rich_token const space = peek(parser);
+        pop(parser);
+        if ((space.token == token_space) && (space.content.length == 1))
+        {
+            expression_parser_result result =
+                parse_returnable(parser, indentation, 0);
+            if (result.is_success)
+            {
+                result.success =
+                    expression_from_return(expression_allocate(result.success));
+            }
+            return result;
+        }
+        parser->on_error(
+            parse_error_create(parse_error_expected_space, space.where),
+            parser->user);
+        expression_parser_result result = {0, expression_from_break()};
+        return result;
+    }
+    return parse_returnable(parser, indentation, may_be_statement);
 }
