@@ -147,8 +147,7 @@ static int parse_match_cases(expression_parser *parser,
         {
             pop(parser);
             rich_token const expected_case = peek(parser);
-            if ((expected_case.token == token_identifier) &&
-                unicode_view_equals_c_str(expected_case.content, "case"))
+            if (expected_case.token == token_case)
             {
                 pop(parser);
                 {
@@ -312,23 +311,25 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_identifier:
         {
             pop(parser);
-            if (unicode_view_equals_c_str(head.content, "break"))
-            {
-                expression_parser_result result = {1, expression_from_break()};
-                return result;
-            }
-            if (unicode_view_equals_c_str(head.content, "loop"))
-            {
-                return parse_loop(parser, indentation);
-            }
-            if (unicode_view_equals_c_str(head.content, "match"))
-            {
-                return parse_match(parser, indentation);
-            }
             expression_parser_result result = {
                 1, expression_from_identifier(unicode_view_copy(head.content))};
             return result;
         }
+
+        case token_break:
+        {
+            pop(parser);
+            expression_parser_result result = {1, expression_from_break()};
+            return result;
+        }
+
+        case token_loop:
+            pop(parser);
+            return parse_loop(parser, indentation);
+
+        case token_match:
+            pop(parser);
+            return parse_match(parser, indentation);
 
         case token_newline:
         case token_space:
@@ -339,6 +340,8 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_comma:
         case token_assign:
         case token_fat_arrow:
+        case token_return:
+        case token_case:
             pop(parser);
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),
@@ -617,29 +620,31 @@ expression_parser_result parse_expression(expression_parser *parser,
                                           size_t indentation,
                                           int may_be_statement)
 {
-    rich_token const return_ = peek(parser);
-    if ((return_.token == token_identifier) &&
-        unicode_view_equals_c_str(return_.content, "return"))
+    if (may_be_statement)
     {
-        pop(parser);
-        rich_token const space = peek(parser);
-        pop(parser);
-        if ((space.token == token_space) && (space.content.length == 1))
+        rich_token const return_ = peek(parser);
+        if (return_.token == token_return)
         {
-            expression_parser_result result =
-                parse_returnable(parser, indentation, 0);
-            if (result.is_success)
+            pop(parser);
+            rich_token const space = peek(parser);
+            pop(parser);
+            if ((space.token == token_space) && (space.content.length == 1))
             {
-                result.success =
-                    expression_from_return(expression_allocate(result.success));
+                expression_parser_result result =
+                    parse_returnable(parser, indentation, 0);
+                if (result.is_success)
+                {
+                    result.success = expression_from_return(
+                        expression_allocate(result.success));
+                }
+                return result;
             }
+            parser->on_error(
+                parse_error_create(parse_error_expected_space, space.where),
+                parser->user);
+            expression_parser_result result = {0, expression_from_break()};
             return result;
         }
-        parser->on_error(
-            parse_error_create(parse_error_expected_space, space.where),
-            parser->user);
-        expression_parser_result result = {0, expression_from_break()};
-        return result;
     }
     return parse_returnable(parser, indentation, may_be_statement);
 }

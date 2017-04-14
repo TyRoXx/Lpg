@@ -565,4 +565,17 @@ void test_parse_expression_syntax_error(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("return "));
     }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 7)),
+            parse_error_create(parse_error_expected_expression,
+                               source_location_create(0, 13))};
+        expression expected = expression_from_return(expression_allocate(
+            expression_from_integer_literal(integer_create(0, 123))));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected,
+                          unicode_string_from_c_str("return return 123"));
+    }
 }

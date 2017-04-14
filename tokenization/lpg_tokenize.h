@@ -16,7 +16,12 @@ typedef enum token_type
     token_colon,
     token_assign,
     token_fat_arrow,
-    token_integer
+    token_integer,
+    token_match,
+    token_return,
+    token_case,
+    token_loop,
+    token_break
 } token_type;
 
 typedef enum tokenize_status

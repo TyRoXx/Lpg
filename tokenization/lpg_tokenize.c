@@ -1,6 +1,7 @@
 #include "lpg_tokenize.h"
 #include "lpg_assert.h"
 #include "lpg_identifier.h"
+#include "lpg_unicode_view.h"
 
 static tokenize_result make_success(enum token_type token, size_t length)
 {
@@ -62,6 +63,27 @@ tokenize_result tokenize(char const *input, size_t length)
         size_t i;
         for (i = 1; (i < length) && is_identifier_middle(input[i]); ++i)
         {
+        }
+        unicode_view const content = unicode_view_create(input, i);
+        if (unicode_view_equals_c_str(content, "case"))
+        {
+            return make_success(token_case, content.length);
+        }
+        if (unicode_view_equals_c_str(content, "break"))
+        {
+            return make_success(token_break, content.length);
+        }
+        if (unicode_view_equals_c_str(content, "loop"))
+        {
+            return make_success(token_loop, content.length);
+        }
+        if (unicode_view_equals_c_str(content, "match"))
+        {
+            return make_success(token_match, content.length);
+        }
+        if (unicode_view_equals_c_str(content, "return"))
+        {
+            return make_success(token_return, content.length);
         }
         return make_success(token_identifier, i);
     }
