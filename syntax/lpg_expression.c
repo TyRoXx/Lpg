@@ -29,7 +29,7 @@ lambda lambda_create(parameter *parameters, size_t parameter_count,
     return returning;
 }
 
-void lambda_free(lambda *this)
+void lambda_free(lambda const *this)
 {
     LPG_FOR(size_t, i, this->parameter_count)
     {
@@ -84,7 +84,7 @@ sequence sequence_create(expression *elements, size_t length)
     return result;
 }
 
-void sequence_free(sequence *value)
+void sequence_free(sequence const *value)
 {
     LPG_FOR(size_t, i, value->length)
     {
@@ -97,20 +97,20 @@ void sequence_free(sequence *value)
 }
 
 declare declare_create(expression *name, expression *type,
-                       expression *optional_initializer)
+                       expression *initializer)
 {
-    declare result = {name, type, optional_initializer};
+    ASSUME(name);
+    ASSUME(type);
+    ASSUME(initializer);
+    declare result = {name, type, initializer};
     return result;
 }
 
-void declare_free(declare *value)
+void declare_free(declare const *value)
 {
     expression_deallocate(value->name);
     expression_deallocate(value->type);
-    if (value->optional_initializer)
-    {
-        expression_deallocate(value->optional_initializer);
-    }
+    expression_deallocate(value->initializer);
 }
 
 tuple tuple_create(expression *elements, size_t length)
@@ -119,7 +119,7 @@ tuple tuple_create(expression *elements, size_t length)
     return result;
 }
 
-void tuple_free(tuple *value)
+void tuple_free(tuple const *value)
 {
     LPG_FOR(size_t, i, value->length)
     {
@@ -202,19 +202,19 @@ expression expression_from_integer_literal(integer value)
     return result;
 }
 
-void call_free(call *this)
+void call_free(call const *this)
 {
     expression_deallocate(this->callee);
     tuple_free(&this->arguments);
 }
 
-void access_structure_free(access_structure *this)
+void access_structure_free(access_structure const *this)
 {
     expression_deallocate(this->object);
     expression_deallocate(this->member);
 }
 
-void match_free(match *this)
+void match_free(match const *this)
 {
     expression_deallocate(this->input);
     LPG_FOR(size_t, i, this->number_of_cases)
@@ -279,7 +279,7 @@ expression *expression_allocate(expression value)
     return result;
 }
 
-void expression_free(expression *this)
+void expression_free(expression const *this)
 {
     switch (this->type)
     {
@@ -360,6 +360,12 @@ int sequence_equals(sequence const left, sequence const right)
     return 1;
 }
 
+int declare_equals(declare const left, declare const right)
+{
+    return expression_equals(left.name, right.name) &&
+           expression_equals(left.type, right.type);
+}
+
 int assign_equals(assign const left, assign const right)
 {
     return expression_equals(left.left, right.left) &&
@@ -427,6 +433,8 @@ int expression_equals(expression const *left, expression const *right)
         return sequence_equals(left->sequence, right->sequence);
 
     case expression_type_declare:
+        return declare_equals(left->declare, right->declare);
+
     case expression_type_tuple:
         UNREACHABLE();
     }

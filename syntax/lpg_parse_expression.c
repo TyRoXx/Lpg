@@ -93,7 +93,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         {
             pop(parser);
             expression_parser_result const element =
-                parse_expression(parser, indentation);
+                parse_expression(parser, indentation, 1);
             if (element.is_success)
             {
                 /*TODO: avoid O(N^2)*/
@@ -247,7 +247,7 @@ static int parse_call(expression_parser *parser, size_t indentation,
             }
         }
         expression_parser_result const argument =
-            parse_expression(parser, indentation);
+            parse_expression(parser, indentation, 1);
         if (argument.is_success)
         {
             /*TODO: avoid O(N^2)*/
@@ -297,7 +297,7 @@ static expression_parser_result parse_assignment(expression_parser *parser,
             parser->user);
     }
     expression_parser_result const value =
-        parse_expression(parser, indentation);
+        parse_expression(parser, indentation, 0);
     if (value.is_success)
     {
         expression_parser_result assign_result = {
@@ -310,8 +310,87 @@ static expression_parser_result parse_assignment(expression_parser *parser,
     return result;
 }
 
+static expression_parser_result parse_declaration(expression_parser *parser,
+                                                  size_t indentation,
+                                                  expression const name)
+{
+    {
+        rich_token const space = peek(parser);
+        if (space.token == token_space)
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(
+                parse_error_create(parse_error_expected_space, space.where),
+                parser->user);
+        }
+    }
+    expression_parser_result const type =
+        parse_expression(parser, indentation, 0);
+    if (!type.is_success)
+    {
+        expression_parser_result result = {1, name};
+        return result;
+    }
+    {
+        rich_token const expected_space = peek(parser);
+        if (expected_space.token == token_space)
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space,
+                                                expected_space.where),
+                             parser->user);
+        }
+    }
+    {
+        rich_token const expected_assign = peek(parser);
+        if (expected_assign.token == token_assign)
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_assignment,
+                                                expected_assign.where),
+                             parser->user);
+        }
+    }
+    {
+        rich_token const expected_space = peek(parser);
+        if (expected_space.token == token_space)
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space,
+                                                expected_space.where),
+                             parser->user);
+        }
+    }
+    expression_parser_result const value =
+        parse_expression(parser, indentation, 0);
+    if (!value.is_success)
+    {
+        expression_free(&name);
+        expression_free(&type.success);
+        return value;
+    }
+    expression_parser_result assign_result = {
+        1, expression_from_declare(declare_create(
+               expression_allocate(name), expression_allocate(type.success),
+               expression_allocate(value.success)))};
+    return assign_result;
+}
+
 expression_parser_result parse_expression(expression_parser *parser,
-                                          size_t indentation)
+                                          size_t indentation,
+                                          int may_be_statement)
 {
     expression_parser_result callee = parse_callable(parser, indentation);
     if (!callee.is_success)
@@ -330,31 +409,47 @@ expression_parser_result parse_expression(expression_parser *parser,
                 continue;
             }
         }
-        if (maybe_operator.token == token_assign)
+        if (may_be_statement)
         {
-            pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_space,
-                                                maybe_operator.where),
-                             parser->user);
-            return parse_assignment(parser, indentation, result.success);
-        }
-        if ((maybe_operator.token == token_space) &&
-            (maybe_operator.content.length == 1))
-        {
-            pop(parser);
+            if (maybe_operator.token == token_assign)
             {
-                rich_token const assign = peek(parser);
                 pop(parser);
-                if (assign.token != token_assign)
-                {
-                    parser->on_error(
-                        parse_error_create(
-                            parse_error_expected_assignment, assign.where),
-                        parser->user);
-                    return result;
-                }
+                parser->on_error(parse_error_create(parse_error_expected_space,
+                                                    maybe_operator.where),
+                                 parser->user);
+                return parse_assignment(parser, indentation, result.success);
             }
-            return parse_assignment(parser, indentation, result.success);
+            if (maybe_operator.token == token_colon)
+            {
+                pop(parser);
+                parser->on_error(parse_error_create(parse_error_expected_space,
+                                                    maybe_operator.where),
+                                 parser->user);
+                return parse_declaration(parser, indentation, result.success);
+            }
+            if ((maybe_operator.token == token_space) &&
+                (maybe_operator.content.length == 1))
+            {
+                pop(parser);
+                rich_token const next_operator = peek(parser);
+                pop(parser);
+                if (next_operator.token == token_assign)
+                {
+                    return parse_assignment(
+                        parser, indentation, result.success);
+                }
+                if (next_operator.token == token_colon)
+                {
+                    return parse_declaration(
+                        parser, indentation, result.success);
+                }
+                parser->on_error(
+                    parse_error_create(
+                        parse_error_expected_declaration_or_assignment,
+                        next_operator.where),
+                    parser->user);
+                return result;
+            }
         }
         return result;
     }

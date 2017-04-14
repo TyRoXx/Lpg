@@ -174,12 +174,8 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(save_expression(to, value->declare.name, whitespace));
         LPG_TRY(stream_writer_write_string(to, ": "));
         LPG_TRY(save_expression(to, value->declare.type, whitespace));
-        if (value->declare.optional_initializer)
-        {
-            LPG_TRY(stream_writer_write_string(to, " = "));
-            LPG_TRY(save_expression(
-                to, value->declare.optional_initializer, whitespace));
-        }
+        LPG_TRY(stream_writer_write_string(to, " = "));
+        LPG_TRY(save_expression(to, value->declare.initializer, whitespace));
         return success;
 
     case expression_type_tuple:

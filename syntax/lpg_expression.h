@@ -24,7 +24,7 @@ typedef struct lambda
 
 lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result);
-void lambda_free(lambda *this);
+void lambda_free(lambda const *this);
 
 typedef enum expression_type
 {
@@ -105,16 +105,16 @@ typedef struct declare
 {
     expression *name;
     expression *type;
-    expression *optional_initializer;
+    expression *initializer;
 } declare;
 
 sequence sequence_create(expression *elements, size_t length);
-void sequence_free(sequence *value);
+void sequence_free(sequence const *value);
 declare declare_create(expression *name, expression *type,
-                       expression *optional_initializer);
-void declare_free(declare *value);
+                       expression *initializer);
+void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);
-void tuple_free(tuple *value);
+void tuple_free(tuple const *value);
 expression expression_from_assign(assign value);
 expression expression_from_return(expression *value);
 expression expression_from_loop(sequence body);
@@ -147,9 +147,9 @@ struct expression
 };
 
 expression expression_from_integer_literal(integer value);
-void call_free(call *this);
-void access_structure_free(access_structure *this);
-void match_free(match *this);
+void call_free(call const *this);
+void access_structure_free(access_structure const *this);
+void match_free(match const *this);
 expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
 expression expression_from_call(call value);
@@ -157,7 +157,8 @@ expression expression_from_identifier(unicode_string identifier);
 expression expression_from_make_identifier(expression *value);
 expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
-void expression_free(expression *this);
+void expression_free(expression const *this);
 int sequence_equals(sequence const left, sequence const right);
+int declare_equals(declare const left, declare const right);
 int assign_equals(assign const left, assign const right);
 int expression_equals(expression const *left, expression const *right);

@@ -43,7 +43,7 @@ static void test_successful_parse(expression expected, unicode_string input)
     test_parser_user user = {input.data, input.length};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
-    expression_parser_result result = parse_expression(&parser, 0);
+    expression_parser_result result = parse_expression(&parser, 0, 1);
     REQUIRE(result.is_success);
     REQUIRE(user.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
@@ -159,6 +159,7 @@ void test_parse_expression_success(void)
                                       "        break\n"
                                       "    break\n"));
     }
+
     test_successful_parse(
         expression_from_assign(assign_create(
             expression_allocate(
@@ -166,4 +167,14 @@ void test_parse_expression_success(void)
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("a = 1"));
+
+    test_successful_parse(
+        expression_from_declare(declare_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("int"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))))),
+        unicode_string_from_c_str("a : int = 1"));
 }
