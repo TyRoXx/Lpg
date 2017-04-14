@@ -76,6 +76,7 @@ typedef struct match_case
 
 match_case match_case_create(expression *key, expression *action);
 void match_case_free(match_case *value);
+int match_case_equals(match_case const left, match_case const right);
 
 typedef struct match
 {
@@ -161,4 +162,5 @@ void expression_free(expression const *this);
 int sequence_equals(sequence const left, sequence const right);
 int declare_equals(declare const left, declare const right);
 int assign_equals(assign const left, assign const right);
+int match_equals(match const left, match const right);
 int expression_equals(expression const *left, expression const *right);

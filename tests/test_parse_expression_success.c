@@ -177,4 +177,48 @@ void test_parse_expression_success(void)
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("a : int = 1"));
+
+    test_successful_parse(expression_from_match(match_create(
+                              expression_allocate(expression_from_identifier(
+                                  unicode_string_from_c_str("a"))),
+                              NULL, 0)),
+                          unicode_string_from_c_str("match a\n"));
+
+    {
+        match_case *const cases = allocate_array(1, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 2))));
+        test_successful_parse(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                cases, 1)),
+            unicode_string_from_c_str("match a\n"
+                                      "    case 1: 2\n"));
+    }
+
+    {
+        match_case *const cases = allocate_array(2, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 2))));
+        cases[1] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 3))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 4))));
+        test_successful_parse(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                cases, 2)),
+            unicode_string_from_c_str("match a\n"
+                                      "    case 1: 2\n"
+                                      "    case 3: 4\n"));
+    }
 }

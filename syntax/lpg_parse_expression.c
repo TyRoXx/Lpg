@@ -36,7 +36,7 @@ parse_error parse_error_create(parse_error_type type, source_location where)
 
 int parse_error_equals(parse_error left, parse_error right)
 {
-    return (left.type == right.type) ==
+    return (left.type == right.type) &&
            source_location_equals(left.where, right.where);
 }
 
@@ -134,6 +134,163 @@ static expression_parser_result parse_loop(expression_parser *parser,
     return result;
 }
 
+static int parse_match_cases(expression_parser *parser,
+                             size_t const indentation, match_case **cases,
+                             size_t *case_count)
+{
+    for (;;)
+    {
+        rich_token const indentation_token = peek(parser);
+        if ((indentation_token.token == token_indentation) &&
+            (indentation_token.content.length ==
+             (indentation * spaces_for_indentation)))
+        {
+            pop(parser);
+            rich_token const expected_case = peek(parser);
+            if ((expected_case.token == token_identifier) &&
+                unicode_view_equals_c_str(expected_case.content, "case"))
+            {
+                pop(parser);
+                {
+                    rich_token const space = peek(parser);
+                    pop(parser);
+                    if (space.token != token_space)
+                    {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_space, space.where),
+                            parser->user);
+                        return 0;
+                    }
+                }
+                expression_parser_result const key =
+                    parse_expression(parser, indentation, 0);
+                if (!key.is_success)
+                {
+                    return 0;
+                }
+                {
+                    rich_token const colon = peek(parser);
+                    pop(parser);
+                    if (colon.token != token_colon)
+                    {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_colon, colon.where),
+                            parser->user);
+                        return 0;
+                    }
+                }
+                {
+                    rich_token const space = peek(parser);
+                    pop(parser);
+                    if (space.token != token_space)
+                    {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_space, space.where),
+                            parser->user);
+                        return 0;
+                    }
+                }
+                expression_parser_result const value =
+                    parse_expression(parser, indentation, 0);
+                if (!value.is_success)
+                {
+                    return 0;
+                }
+                {
+                    rich_token const newline = peek(parser);
+                    pop(parser);
+                    if (newline.token != token_newline)
+                    {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_newline, newline.where),
+                            parser->user);
+                        return 0;
+                    }
+                }
+                *cases = reallocate_array(
+                    *cases, (*case_count + 1), sizeof(**cases));
+                (*cases)[*case_count] =
+                    match_case_create(expression_allocate(key.success),
+                                      expression_allocate(value.success));
+                ++(*case_count);
+            }
+            else
+            {
+                parser->on_error(parse_error_create(parse_error_expected_case,
+                                                    expected_case.where),
+                                 parser->user);
+                return 0;
+            }
+        }
+        else
+        {
+            return 1;
+        }
+    }
+}
+
+static expression_parser_result parse_match(expression_parser *parser,
+                                            size_t const indentation)
+{
+    {
+        rich_token const space = peek(parser);
+        pop(parser);
+        if (space.token != token_space)
+        {
+            parser->on_error(
+                parse_error_create(parse_error_expected_space, space.where),
+                parser->user);
+            expression_parser_result const result = {
+                0, expression_from_break()};
+            return result;
+        }
+    }
+    expression_parser_result const input =
+        parse_expression(parser, indentation, 0);
+    if (!input.is_success)
+    {
+        return input;
+    }
+    {
+        rich_token const newline = peek(parser);
+        pop(parser);
+        if (newline.token != token_newline)
+        {
+            parser->on_error(
+                parse_error_create(parse_error_expected_newline, newline.where),
+                parser->user);
+            expression_parser_result const result = {
+                0, expression_from_break()};
+            expression_free(&input.success);
+            return result;
+        }
+    }
+    match_case *cases = NULL;
+    size_t case_count = 0;
+    if (parse_match_cases(parser, (indentation + 1), &cases, &case_count))
+    {
+        expression_parser_result const result = {
+            1, expression_from_match(match_create(
+                   expression_allocate(input.success), cases, case_count))};
+        return result;
+    }
+    expression_free(&input.success);
+    LPG_FOR(size_t, i, case_count)
+    {
+        match_case_free(cases + i);
+    }
+    if (cases)
+    {
+        deallocate(cases);
+    }
+    expression_parser_result const result = {0, expression_from_break()};
+    return result;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser,
                                                size_t indentation)
 {
@@ -164,6 +321,10 @@ static expression_parser_result parse_callable(expression_parser *parser,
             {
                 return parse_loop(parser, indentation);
             }
+            if (unicode_view_equals_c_str(head.content, "match"))
+            {
+                return parse_match(parser, indentation);
+            }
             expression_parser_result result = {
                 1, expression_from_identifier(unicode_view_copy(head.content))};
             return result;
@@ -172,9 +333,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_newline:
         case token_space:
         case token_indentation:
-            pop(parser);
-            break;
-
         case token_left_parenthesis:
         case token_right_parenthesis:
         case token_colon:

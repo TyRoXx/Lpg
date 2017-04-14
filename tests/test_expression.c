@@ -77,4 +77,48 @@ void test_expression(void)
             expression_from_sequence(sequence_create(elements_left, 1)),
             expression_from_sequence(sequence_create(elements_right, 1)));
     }
+    {
+        match_case *cases = allocate_array(1, sizeof(*cases));
+        cases[0] =
+            match_case_create(expression_allocate(expression_from_break()),
+                              expression_allocate(expression_from_break()));
+        test_not_equal(
+            expression_from_match(match_create(
+                expression_allocate(expression_from_break()), cases, 1)),
+            expression_from_match(match_create(
+                expression_allocate(expression_from_break()), NULL, 0)));
+    }
+    {
+        match_case *left = allocate_array(1, sizeof(*left));
+        left[0] =
+            match_case_create(expression_allocate(expression_from_break()),
+                              expression_allocate(expression_from_break()));
+        match_case *right = allocate_array(1, sizeof(*right));
+        right[0] = match_case_create(
+            expression_allocate(expression_from_break()),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))));
+        test_not_equal(
+            expression_from_match(match_create(
+                expression_allocate(expression_from_break()), left, 1)),
+            expression_from_match(match_create(
+                expression_allocate(expression_from_break()), right, 1)));
+    }
+    {
+        match_case *left = allocate_array(1, sizeof(*left));
+        left[0] =
+            match_case_create(expression_allocate(expression_from_break()),
+                              expression_allocate(expression_from_break()));
+        match_case *right = allocate_array(1, sizeof(*right));
+        right[0] =
+            match_case_create(expression_allocate(expression_from_break()),
+                              expression_allocate(expression_from_break()));
+        test_not_equal(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_integer_literal(integer_create(1, 2))),
+                left, 1)),
+            expression_from_match(match_create(
+                expression_allocate(expression_from_break()), right, 1)));
+    }
 }

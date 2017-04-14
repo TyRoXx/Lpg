@@ -66,6 +66,12 @@ void match_case_free(match_case *value)
     expression_deallocate(value->action);
 }
 
+int match_case_equals(match_case const left, match_case const right)
+{
+    return expression_equals(left.key, right.key) &&
+           expression_equals(left.action, right.action);
+}
+
 match match_create(expression *input, match_case *cases, size_t number_of_cases)
 {
     match result = {input, cases, number_of_cases};
@@ -221,7 +227,10 @@ void match_free(match const *this)
     {
         match_case_free(this->cases + i);
     }
-    deallocate(this->cases);
+    if (this->cases)
+    {
+        deallocate(this->cases);
+    }
 }
 
 expression expression_from_lambda(lambda lambda)
@@ -372,6 +381,26 @@ int assign_equals(assign const left, assign const right)
            expression_equals(left.right, right.right);
 }
 
+int match_equals(match const left, match const right)
+{
+    if (!expression_equals(left.input, right.input))
+    {
+        return 0;
+    }
+    if (left.number_of_cases != right.number_of_cases)
+    {
+        return 0;
+    }
+    LPG_FOR(size_t, i, left.number_of_cases)
+    {
+        if (!match_case_equals(left.cases[i], right.cases[i]))
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int expression_equals(expression const *left, expression const *right)
 {
     if (left->type != right->type)
@@ -406,7 +435,11 @@ int expression_equals(expression const *left, expression const *right)
         return integer_equal(left->integer_literal, right->integer_literal);
 
     case expression_type_access_structure:
+        UNREACHABLE();
+
     case expression_type_match:
+        return match_equals(left->match, right->match);
+
     case expression_type_string:
         UNREACHABLE();
 

@@ -141,12 +141,16 @@ void test_parse_expression_syntax_error(void)
     }
 
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 0));
+
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 2))};
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
-        test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("=> a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("=> a"));
     }
     {
         parse_error const expected_errors[] = {
@@ -161,6 +165,10 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {
             parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 2)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 0)),
             parse_error_create(
                 parse_error_expected_expression, source_location_create(1, 4))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
@@ -189,29 +197,48 @@ void test_parse_expression_syntax_error(void)
                                       "999999999999999"));
     }
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_expression, source_location_create(1, 0));
-        expression expected =
-            expression_from_identifier(unicode_string_from_c_str("a"));
-        test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("\n=> a"));
-    }
-    {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_expression, source_location_create(1, 4));
-        expression expected =
-            expression_from_identifier(unicode_string_from_c_str("a"));
-        test_syntax_error(&expected_error, 1, &expected,
-                          unicode_string_from_c_str("\n    => a"));
-    }
-    {
         parse_error const expected_errors[] = {
             parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 0)),
             parse_error_create(
                 parse_error_expected_expression, source_location_create(1, 0)),
             parse_error_create(
-                parse_error_expected_expression, source_location_create(2, 0))};
+                parse_error_expected_expression, source_location_create(1, 2))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("\n=> a"));
+    }
+    {
+
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 4)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 6))};
+        expression expected =
+            expression_from_identifier(unicode_string_from_c_str("a"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("\n    => a"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 2)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 2)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(2, 0)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(2, 2))};
         expression expected =
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
@@ -413,7 +440,11 @@ void test_parse_expression_syntax_error(void)
             parse_error_create(
                 parse_error_invalid_token, source_location_create(0, 4)),
             parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 5)),
+            parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 6)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 7)),
             parse_error_create(
                 parse_error_expected_assignment, source_location_create(0, 9)),
             parse_error_create(
@@ -428,5 +459,96 @@ void test_parse_expression_syntax_error(void)
             expression_from_identifier(unicode_string_from_c_str("a"));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("a : "));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(0, 5))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match:a\n"
+                                                          "    case 1: 2\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_newline, source_location_create(0, 7))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a:\n"
+                                                          "    case 1: 2\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_case, source_location_create(1, 4))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    \n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_expression, source_location_create(0, 6))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match "));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(1, 8))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_expression, source_location_create(2, 9))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 0: 2\n"
+                                                          "    case "));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_colon, source_location_create(1, 10))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 1\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(1, 11))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 1:\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_expression, source_location_create(1, 12))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 1: "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(1, 12)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(2, 0))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 1: \n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_newline, source_location_create(1, 13))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("match a\n"
+                                                          "    case 1: 2"));
     }
 }
