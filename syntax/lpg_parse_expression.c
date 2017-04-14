@@ -27,15 +27,16 @@ int is_end_of_file(rich_token const *token)
     return (token->status == tokenize_success) && (token->content.length == 0);
 }
 
-parse_error parse_error_create(source_location where)
+parse_error parse_error_create(parse_error_type type, source_location where)
 {
-    parse_error result = {where};
+    parse_error result = {type, where};
     return result;
 }
 
 int parse_error_equals(parse_error left, parse_error right)
 {
-    return source_location_equals(left.where, right.where);
+    return (left.type == right.type) ==
+           source_location_equals(left.where, right.where);
 }
 
 expression_parser expression_parser_create(rich_token_producer find_next_token,
@@ -62,8 +63,9 @@ static rich_token peek(expression_parser *parser)
             break;
 
         case tokenize_invalid:
-            parser->on_error(
-                parse_error_create(parser->cached_token.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_invalid_token,
+                                                parser->cached_token.where),
+                             parser->user);
             break;
         }
     }
@@ -85,7 +87,9 @@ static expression_parser_result parse_callable(expression_parser *parser)
         if (is_end_of_file(&head))
         {
             pop(parser);
-            parser->on_error(parse_error_create(head.where), parser->user);
+            parser->on_error(
+                parse_error_create(parse_error_expected_expression, head.where),
+                parser->user);
             expression_parser_result const result = {
                 0, expression_from_break()};
             return result;
@@ -118,7 +122,9 @@ static expression_parser_result parse_callable(expression_parser *parser)
         case token_assign:
         case token_fat_arrow:
             pop(parser);
-            parser->on_error(parse_error_create(head.where), parser->user);
+            parser->on_error(
+                parse_error_create(parse_error_expected_expression, head.where),
+                parser->user);
             break;
 
         case token_integer:
@@ -131,7 +137,10 @@ static expression_parser_result parse_callable(expression_parser *parser)
                     1, expression_from_integer_literal(value)};
                 return result;
             }
-            parser->on_error(parse_error_create(head.where), parser->user);
+            parser->on_error(
+                parse_error_create(
+                    parse_error_integer_literal_out_of_range, head.where),
+                parser->user);
             break;
         }
         }
@@ -165,7 +174,9 @@ expression_parser_result parse_expression(expression_parser *parser)
                 {
                     pop(parser);
                     parser->on_error(
-                        parse_error_create(maybe_close.where), parser->user);
+                        parse_error_create(
+                            parse_error_expected_arguments, maybe_close.where),
+                        parser->user);
                     if (arguments)
                     {
                         deallocate(arguments);
@@ -177,8 +188,10 @@ expression_parser_result parse_expression(expression_parser *parser)
                     pop(parser);
                     if (expect_another_argument)
                     {
-                        parser->on_error(parse_error_create(maybe_close.where),
-                                         parser->user);
+                        parser->on_error(
+                            parse_error_create(parse_error_expected_expression,
+                                               maybe_close.where),
+                            parser->user);
                     }
                     result.success = expression_from_call(
                         call_create(expression_allocate(result.success),
@@ -200,7 +213,9 @@ expression_parser_result parse_expression(expression_parser *parser)
             {
                 pop(parser);
                 parser->on_error(
-                    parse_error_create(maybe_comma.where), parser->user);
+                    parse_error_create(
+                        parse_error_expected_arguments, maybe_comma.where),
+                    parser->user);
                 if (arguments)
                 {
                     deallocate(arguments);

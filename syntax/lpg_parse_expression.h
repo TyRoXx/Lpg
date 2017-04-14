@@ -28,12 +28,21 @@ rich_token rich_token_create(tokenize_status status, token_type token,
                              unicode_view content, source_location where);
 int is_end_of_file(rich_token const *token);
 
+typedef enum parse_error_type
+{
+    parse_error_invalid_token,
+    parse_error_expected_expression,
+    parse_error_expected_arguments,
+    parse_error_integer_literal_out_of_range
+} parse_error_type;
+
 typedef struct parse_error
 {
+    parse_error_type type;
     source_location where;
 } parse_error;
 
-parse_error parse_error_create(source_location where);
+parse_error parse_error_create(parse_error_type type, source_location where);
 int parse_error_equals(parse_error left, parse_error right);
 
 typedef void *callback_user;
