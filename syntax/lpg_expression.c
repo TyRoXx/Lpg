@@ -360,6 +360,12 @@ int sequence_equals(sequence const left, sequence const right)
     return 1;
 }
 
+int assign_equals(assign const left, assign const right)
+{
+    return expression_equals(left.left, right.left) &&
+           expression_equals(left.right, right.right);
+}
+
 int expression_equals(expression const *left, expression const *right)
 {
     if (left->type != right->type)
@@ -403,7 +409,11 @@ int expression_equals(expression const *left, expression const *right)
                                    unicode_view_from_string(right->identifier));
 
     case expression_type_make_identifier:
+        UNREACHABLE();
+
     case expression_type_assign:
+        return assign_equals(left->assign, right->assign);
+
     case expression_type_return:
         UNREACHABLE();
 

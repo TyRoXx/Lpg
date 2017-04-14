@@ -218,25 +218,64 @@ expression_parser_result parse_expression(expression_parser *parser,
     expression_parser_result result = callee;
     for (;;)
     {
-        rich_token const maybe_open = peek(parser);
-        if (maybe_open.token != token_left_parenthesis)
+        rich_token const maybe_operator = peek(parser);
+        if (maybe_operator.token == token_left_parenthesis)
         {
-            return result;
-        }
-        pop(parser);
-        expression *arguments = NULL;
-        size_t argument_count = 0;
-        int expect_another_argument = 0;
-        for (;;)
-        {
+            pop(parser);
+            expression *arguments = NULL;
+            size_t argument_count = 0;
+            int expect_another_argument = 0;
+            for (;;)
             {
-                rich_token const maybe_close = peek(parser);
-                if (is_end_of_file(&maybe_close))
+                {
+                    rich_token const maybe_close = peek(parser);
+                    if (is_end_of_file(&maybe_close))
+                    {
+                        pop(parser);
+                        parser->on_error(
+                            parse_error_create(parse_error_expected_arguments,
+                                               maybe_close.where),
+                            parser->user);
+                        if (arguments)
+                        {
+                            deallocate(arguments);
+                        }
+                        return result;
+                    }
+                    if (maybe_close.token == token_right_parenthesis)
+                    {
+                        pop(parser);
+                        if (expect_another_argument)
+                        {
+                            parser->on_error(
+                                parse_error_create(
+                                    parse_error_expected_expression,
+                                    maybe_close.where),
+                                parser->user);
+                        }
+                        result.success = expression_from_call(call_create(
+                            expression_allocate(result.success),
+                            tuple_create(arguments, argument_count)));
+                        break;
+                    }
+                }
+                expression_parser_result const argument =
+                    parse_expression(parser, indentation);
+                if (argument.is_success)
+                {
+                    /*TODO: avoid O(N^2)*/
+                    arguments = reallocate_array(
+                        arguments, argument_count + 1, sizeof(*arguments));
+                    arguments[argument_count] = argument.success;
+                    argument_count++;
+                }
+                rich_token const maybe_comma = peek(parser);
+                if (is_end_of_file(&maybe_comma))
                 {
                     pop(parser);
                     parser->on_error(
                         parse_error_create(
-                            parse_error_expected_arguments, maybe_close.where),
+                            parse_error_expected_arguments, maybe_comma.where),
                         parser->user);
                     if (arguments)
                     {
@@ -244,55 +283,65 @@ expression_parser_result parse_expression(expression_parser *parser,
                     }
                     return result;
                 }
-                if (maybe_close.token == token_right_parenthesis)
+                if (maybe_comma.token == token_comma)
                 {
+                    expect_another_argument = 1;
                     pop(parser);
-                    if (expect_another_argument)
-                    {
-                        parser->on_error(
-                            parse_error_create(parse_error_expected_expression,
-                                               maybe_close.where),
-                            parser->user);
-                    }
-                    result.success = expression_from_call(
-                        call_create(expression_allocate(result.success),
-                                    tuple_create(arguments, argument_count)));
-                    break;
                 }
-            }
-            expression_parser_result const argument =
-                parse_expression(parser, indentation);
-            if (argument.is_success)
-            {
-                /*TODO: avoid O(N^2)*/
-                arguments = reallocate_array(
-                    arguments, argument_count + 1, sizeof(*arguments));
-                arguments[argument_count] = argument.success;
-                argument_count++;
-            }
-            rich_token const maybe_comma = peek(parser);
-            if (is_end_of_file(&maybe_comma))
-            {
-                pop(parser);
-                parser->on_error(
-                    parse_error_create(
-                        parse_error_expected_arguments, maybe_comma.where),
-                    parser->user);
-                if (arguments)
+                else
                 {
-                    deallocate(arguments);
+                    expect_another_argument = 0;
                 }
-                return result;
             }
-            if (maybe_comma.token == token_comma)
+            continue;
+        }
+        if ((maybe_operator.token == token_assign) ||
+            ((maybe_operator.token == token_space) &&
+             (maybe_operator.content.length == 1)))
+        {
+            pop(parser);
+            if (maybe_operator.token == token_assign)
             {
-                expect_another_argument = 1;
+                parser->on_error(parse_error_create(parse_error_expected_space,
+                                                    maybe_operator.where),
+                                 parser->user);
+            }
+            else
+            {
+                rich_token const assign = peek(parser);
+                pop(parser);
+                if (assign.token != token_assign)
+                {
+                    parser->on_error(
+                        parse_error_create(
+                            parse_error_expected_assignment, assign.where),
+                        parser->user);
+                    return result;
+                }
+            }
+            rich_token const space = peek(parser);
+            if (space.token == token_space)
+            {
                 pop(parser);
             }
             else
             {
-                expect_another_argument = 0;
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, space.where),
+                    parser->user);
             }
+            expression_parser_result const value =
+                parse_expression(parser, indentation);
+            if (value.is_success)
+            {
+                expression_parser_result assign_result = {
+                    1, expression_from_assign(
+                           assign_create(expression_allocate(result.success),
+                                         expression_allocate(value.success)))};
+                return assign_result;
+            }
+            return value;
         }
+        return result;
     }
 }

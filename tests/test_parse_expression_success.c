@@ -159,4 +159,11 @@ void test_parse_expression_success(void)
                                       "        break\n"
                                       "    break\n"));
     }
+    test_successful_parse(
+        expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))))),
+        unicode_string_from_c_str("a = 1"));
 }

@@ -159,4 +159,5 @@ expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
 void expression_free(expression *this);
 int sequence_equals(sequence const left, sequence const right);
+int assign_equals(assign const left, assign const right);
 int expression_equals(expression const *left, expression const *right);

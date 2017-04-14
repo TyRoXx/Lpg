@@ -291,4 +291,40 @@ void test_parse_expression_syntax_error(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("loop"));
     }
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(0, 3))};
+        expression expected = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1)))));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("a =1"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_space, source_location_create(0, 1)),
+            parse_error_create(
+                parse_error_expected_space, source_location_create(0, 2))};
+        expression expected = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1)))));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("a=1"));
+    }
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(0, 1))};
+        expression expected = expression_from_assign(assign_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1)))));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("a= 1"));
+    }
 }
