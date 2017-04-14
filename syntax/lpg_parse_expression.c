@@ -87,11 +87,19 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
     for (;;)
     {
         rich_token const indentation_token = peek(parser);
-        if ((indentation_token.token == token_indentation) &&
-            (indentation_token.content.length ==
-             (indentation * spaces_for_indentation)))
+        if (is_end_of_file(&indentation_token))
         {
-            pop(parser);
+            break;
+        }
+        if ((indentation == 0) ||
+            ((indentation_token.token == token_indentation) &&
+             (indentation_token.content.length ==
+              (indentation * spaces_for_indentation))))
+        {
+            if (indentation > 0)
+            {
+                pop(parser);
+            }
             expression_parser_result const element =
                 parse_expression(parser, indentation, 1);
             if (element.is_success)
@@ -660,4 +668,9 @@ expression_parser_result parse_expression(expression_parser *parser,
         }
     }
     return parse_returnable(parser, indentation, may_be_statement);
+}
+
+sequence parse_program(expression_parser *parser)
+{
+    return parse_sequence(parser, 0);
 }

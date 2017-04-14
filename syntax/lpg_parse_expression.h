@@ -78,3 +78,5 @@ typedef struct expression_parser_result
 expression_parser_result parse_expression(expression_parser *parser,
                                           size_t indentation,
                                           int may_be_statement);
+
+sequence parse_program(expression_parser *parser);
