@@ -141,94 +141,107 @@ static int parse_match_cases(expression_parser *parser,
     for (;;)
     {
         rich_token const indentation_token = peek(parser);
-        if ((indentation_token.token == token_indentation) &&
-            (indentation_token.content.length ==
+        if ((indentation_token.token != token_indentation) ||
+            (indentation_token.content.length !=
              (indentation * spaces_for_indentation)))
-        {
-            pop(parser);
-            rich_token const expected_case = peek(parser);
-            if (expected_case.token == token_case)
-            {
-                pop(parser);
-                {
-                    rich_token const space = peek(parser);
-                    pop(parser);
-                    if (space.token != token_space)
-                    {
-                        parser->on_error(
-                            parse_error_create(
-                                parse_error_expected_space, space.where),
-                            parser->user);
-                        return 0;
-                    }
-                }
-                expression_parser_result const key =
-                    parse_expression(parser, indentation, 0);
-                if (!key.is_success)
-                {
-                    return 0;
-                }
-                {
-                    rich_token const colon = peek(parser);
-                    pop(parser);
-                    if (colon.token != token_colon)
-                    {
-                        parser->on_error(
-                            parse_error_create(
-                                parse_error_expected_colon, colon.where),
-                            parser->user);
-                        return 0;
-                    }
-                }
-                {
-                    rich_token const space = peek(parser);
-                    pop(parser);
-                    if (space.token != token_space)
-                    {
-                        parser->on_error(
-                            parse_error_create(
-                                parse_error_expected_space, space.where),
-                            parser->user);
-                        return 0;
-                    }
-                }
-                expression_parser_result const value =
-                    parse_expression(parser, indentation, 0);
-                if (!value.is_success)
-                {
-                    return 0;
-                }
-                {
-                    rich_token const newline = peek(parser);
-                    pop(parser);
-                    if (newline.token != token_newline)
-                    {
-                        parser->on_error(
-                            parse_error_create(
-                                parse_error_expected_newline, newline.where),
-                            parser->user);
-                        return 0;
-                    }
-                }
-                *cases = reallocate_array(
-                    *cases, (*case_count + 1), sizeof(**cases));
-                (*cases)[*case_count] =
-                    match_case_create(expression_allocate(key.success),
-                                      expression_allocate(value.success));
-                ++(*case_count);
-            }
-            else
-            {
-                parser->on_error(parse_error_create(parse_error_expected_case,
-                                                    expected_case.where),
-                                 parser->user);
-                return 0;
-            }
-        }
-        else
         {
             return 1;
         }
+        pop(parser);
+        rich_token const expected_case = peek(parser);
+        if (expected_case.token != token_case)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_case,
+                                                expected_case.where),
+                             parser->user);
+            return 0;
+        }
+        pop(parser);
+        {
+            rich_token const space = peek(parser);
+            pop(parser);
+            if (space.token != token_space)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, space.where),
+                    parser->user);
+                return 0;
+            }
+        }
+        expression_parser_result const key =
+            parse_expression(parser, indentation, 0);
+        if (!key.is_success)
+        {
+            return 0;
+        }
+        {
+            rich_token const colon = peek(parser);
+            pop(parser);
+            if (colon.token != token_colon)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_colon, colon.where),
+                    parser->user);
+                return 0;
+            }
+        }
+        rich_token const space = peek(parser);
+        if (space.token == token_newline)
+        {
+            pop(parser);
+            sequence const value = parse_sequence(parser, (indentation + 1));
+            if (value.length < 1)
+            {
+                parser->on_error(
+                    parse_error_create(
+                        parse_error_expected_expression, peek(parser).where),
+                    parser->user);
+                return 0;
+            }
+            *cases =
+                reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
+            (*cases)[*case_count] = match_case_create(
+                expression_allocate(key.success),
+                expression_allocate(expression_from_sequence(value)));
+        }
+        else
+        {
+            if (space.token == token_space)
+            {
+                pop(parser);
+            }
+            else
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, space.where),
+                    parser->user);
+            }
+
+            expression_parser_result const value =
+                parse_expression(parser, indentation, 0);
+            if (!value.is_success)
+            {
+                return 0;
+            }
+            {
+                rich_token const newline = peek(parser);
+                pop(parser);
+                if (newline.token != token_newline)
+                {
+                    parser->on_error(
+                        parse_error_create(
+                            parse_error_expected_newline, newline.where),
+                        parser->user);
+                    return 0;
+                }
+            }
+            *cases =
+                reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
+            (*cases)[*case_count] =
+                match_case_create(expression_allocate(key.success),
+                                  expression_allocate(value.success));
+        }
+        ++(*case_count);
     }
 }
 

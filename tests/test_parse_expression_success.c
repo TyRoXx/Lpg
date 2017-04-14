@@ -2,6 +2,7 @@
 #include "test.h"
 #include "lpg_parse_expression.h"
 #include "lpg_allocate.h"
+#include "lpg_save_expression.h"
 
 typedef struct test_parser_user
 {
@@ -234,6 +235,31 @@ void test_parse_expression_success(void)
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"
+                                      "    case 3: 4\n"));
+    }
+
+    {
+        match_case *const cases = allocate_array(2, sizeof(*cases));
+        expression *sequence = allocate_array(1, sizeof(*sequence));
+        sequence[0] = expression_from_integer_literal(integer_create(0, 2));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))),
+            expression_allocate(
+                expression_from_sequence(sequence_create(sequence, 1))));
+        cases[1] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 3))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 4))));
+        test_successful_parse(
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                cases, 2)),
+            unicode_string_from_c_str("match a\n"
+                                      "    case 1:\n"
+                                      "        2\n"
                                       "    case 3: 4\n"));
     }
 }

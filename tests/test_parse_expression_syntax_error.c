@@ -519,7 +519,7 @@ void test_parse_expression_syntax_error(void)
 
     {
         parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(1, 11))};
+            parse_error_expected_expression, source_location_create(2, 0))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("match a\n"
                                                           "    case 1:\n"));
@@ -550,6 +550,25 @@ void test_parse_expression_syntax_error(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("match a\n"
                                                           "    case 1: 2"));
+    }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(1, 11))};
+        match_case *const cases = allocate_array(1, sizeof(*cases));
+        cases[0] = match_case_create(
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 1))),
+            expression_allocate(
+                expression_from_integer_literal(integer_create(0, 2))));
+        expression expected = expression_from_match(match_create(
+            expression_allocate(
+                expression_from_identifier(unicode_string_from_c_str("a"))),
+            cases, 1));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected,
+                          unicode_string_from_c_str("match a\n"
+                                                    "    case 1:2\n"));
     }
 
     {
