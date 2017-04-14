@@ -44,7 +44,7 @@ tokenize_result tokenize(char const *input, size_t length)
         if (length >= spaces_for_indentation)
         {
             size_t i = 1;
-            while (input[i] == ' ')
+            while ((i < length) && (input[i] == ' '))
             {
                 ++i;
             }
