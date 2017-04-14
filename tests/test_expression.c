@@ -60,4 +60,21 @@ void test_expression(void)
                                unicode_string_from_c_str("f"))),
                            tuple_create(arguments_right, 1))));
     }
+    {
+        expression *elements_left = allocate_array(1, sizeof(*elements_left));
+        elements_left[0] = expression_from_break();
+        test_not_equal(
+            expression_from_sequence(sequence_create(elements_left, 1)),
+            expression_from_sequence(sequence_create(NULL, 0)));
+    }
+    {
+        expression *elements_left = allocate_array(1, sizeof(*elements_left));
+        elements_left[0] = expression_from_break();
+        expression *elements_right = allocate_array(1, sizeof(*elements_right));
+        elements_right[0] =
+            expression_from_integer_literal(integer_create(0, 1));
+        test_not_equal(
+            expression_from_sequence(sequence_create(elements_left, 1)),
+            expression_from_sequence(sequence_create(elements_right, 1)));
+    }
 }

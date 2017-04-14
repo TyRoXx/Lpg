@@ -344,7 +344,7 @@ void expression_free(expression *this)
     }
 }
 
-static int sequence_equals(sequence const left, sequence const right)
+int sequence_equals(sequence const left, sequence const right)
 {
     if (left.length != right.length)
     {
@@ -414,6 +414,8 @@ int expression_equals(expression const *left, expression const *right)
         return 1;
 
     case expression_type_sequence:
+        return sequence_equals(left->sequence, right->sequence);
+
     case expression_type_declare:
     case expression_type_tuple:
         UNREACHABLE();
