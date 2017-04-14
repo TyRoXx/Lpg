@@ -14,15 +14,6 @@ success_indicator stream_writer_write_bytes(stream_writer writer,
     return writer.write(writer.user, data, size);
 }
 
-success_indicator stream_writer_write_utf8(stream_writer writer,
-                                           unicode_code_point code_point)
-{
-    char code_units[4];
-    code_units[0] = (char)code_point;
-    /*TODO: encode UTF-8 properly*/
-    return writer.write(writer.user, code_units, 1);
-}
-
 void memory_writer_free(memory_writer *writer)
 {
     deallocate(writer->data);

@@ -27,8 +27,6 @@ success_indicator stream_writer_write_string(stream_writer writer,
                                              char const *c_str);
 success_indicator stream_writer_write_bytes(stream_writer writer,
                                             char const *data, size_t size);
-success_indicator stream_writer_write_utf8(stream_writer writer,
-                                           unicode_code_point code_point);
 
 typedef struct memory_writer
 {

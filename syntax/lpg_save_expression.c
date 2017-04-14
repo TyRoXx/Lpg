@@ -120,18 +120,14 @@ success_indicator save_expression(stream_writer const to,
                 LPG_TRY(stream_writer_write_string(to, "\\"));
                 break;
             }
-            LPG_TRY(stream_writer_write_utf8(to, value->string.data[i]));
+            LPG_TRY(stream_writer_write_bytes(to, (value->string.data + i), 1));
         }
-        LPG_TRY(stream_writer_write_string(to, "\""));
-        return success;
+        return stream_writer_write_string(to, "\"");
 
     case expression_type_identifier:
         LPG_TRY(space_here(to, &whitespace));
-        LPG_FOR(size_t, i, value->identifier.length)
-        {
-            LPG_TRY(stream_writer_write_utf8(to, value->string.data[i]));
-        }
-        return success;
+        return stream_writer_write_bytes(
+            to, value->identifier.data, value->identifier.length);
 
     case expression_type_make_identifier:
         LPG_TRY(space_here(to, &whitespace));
