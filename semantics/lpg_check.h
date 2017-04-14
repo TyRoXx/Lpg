@@ -3,15 +3,21 @@
 
 typedef enum instruction_type
 {
-    instruction_call
+    instruction_call,
+    instruction_jump
 } instruction_type;
+
+typedef uint32_t jump_address;
 
 typedef struct instruction
 {
     instruction_type type;
+    jump_address jump_destination;
 } instruction;
 
-instruction instruction_create(instruction_type type);
+instruction instruction_create_call(void);
+instruction instruction_create_jump(jump_address destination);
+int instruction_equals(instruction const left, instruction const right);
 
 typedef struct checked_function
 {

@@ -11,6 +11,8 @@ static void add_instruction(checked_function *function, instruction added)
     ++(function->size);
 }
 
+static void check_sequence(checked_function *function, sequence const input);
+
 static void sequence_element(checked_function *function,
                              expression const element)
 {
@@ -20,7 +22,7 @@ static void sequence_element(checked_function *function,
         UNREACHABLE();
 
     case expression_type_call:
-        add_instruction(function, instruction_create(instruction_call));
+        add_instruction(function, instruction_create_call());
         break;
 
     case expression_type_integer_literal:
@@ -31,7 +33,16 @@ static void sequence_element(checked_function *function,
     case expression_type_make_identifier:
     case expression_type_assign:
     case expression_type_return:
+        UNREACHABLE();
+
     case expression_type_loop:
+    {
+        jump_address const top = (jump_address)function->size;
+        check_sequence(function, element.loop_body);
+        add_instruction(function, instruction_create_jump(top));
+        break;
+    }
+
     case expression_type_break:
     case expression_type_sequence:
     case expression_type_declare:
@@ -40,20 +51,41 @@ static void sequence_element(checked_function *function,
     }
 }
 
-static checked_function function(sequence const input)
+static void check_sequence(checked_function *function, sequence const input)
 {
-    checked_function result = {NULL, 0};
     LPG_FOR(size_t, i, input.length)
     {
-        sequence_element(&result, input.elements[i]);
+        sequence_element(function, input.elements[i]);
     }
+}
+
+instruction instruction_create_call(void)
+{
+    instruction result = {instruction_call, 0};
     return result;
 }
 
-instruction instruction_create(instruction_type type)
+instruction instruction_create_jump(jump_address destination)
 {
-    instruction result = {type};
+    instruction result = {instruction_jump, destination};
     return result;
+}
+
+int instruction_equals(instruction const left, instruction const right)
+{
+    if (left.type != right.type)
+    {
+        return 0;
+    }
+    switch (left.type)
+    {
+    case instruction_call:
+        return 1;
+
+    case instruction_jump:
+        return (left.jump_destination == right.jump_destination);
+    }
+    UNREACHABLE();
 }
 
 void checked_function_free(checked_function const *function)
@@ -80,6 +112,8 @@ checked_program check(sequence const root)
 {
     checked_program program = {
         allocate_array(1, sizeof(struct checked_function)), 1};
-    program.functions[0] = function(root);
+    program.functions[0].body = NULL;
+    program.functions[0].size = 0;
+    check_sequence(&program.functions[0], root);
     return program;
 }

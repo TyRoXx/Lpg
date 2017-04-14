@@ -3,6 +3,8 @@
 #include "lpg_check.h"
 #include "lpg_parse_expression.h"
 #include <string.h>
+#include "lpg_array_size.h"
+#include "lpg_for.h"
 
 typedef struct test_parser_user
 {
@@ -66,6 +68,22 @@ void test_semantics(void)
         REQUIRE(checked.function_count == 1);
         REQUIRE(checked.functions[0].size == 1);
         REQUIRE(checked.functions[0].body[0].type == instruction_call);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("loop\n"
+                              "    f()");
+        checked_program checked = check(root);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction const expected_body[] = {
+            instruction_create_call(), instruction_create_jump(0)};
+        REQUIRE(LPG_ARRAY_SIZE(expected_body) == checked.functions[0].size);
+        LPG_FOR(size_t, i, LPG_ARRAY_SIZE(expected_body))
+        {
+            REQUIRE(instruction_equals(
+                expected_body[i], checked.functions[0].body[i]));
+        }
         checked_program_free(&checked);
     }
 }
