@@ -18,22 +18,19 @@ addons:
     - valgrind
 
 env:
-# - MYCC=gcc-5   BUILD_TYPE=Release
- - MYCC=gcc-5   BUILD_TYPE=Debug
- - MYCC=clang   BUILD_TYPE=Release
-# - MYCC=clang   BUILD_TYPE=Debug
+ - MYCC=gcc-5 BUILD_TYPE=Release COVERAGE=NO
+ - MYCC=gcc-5 BUILD_TYPE=Debug   COVERAGE=YES
+ - MYCC=clang BUILD_TYPE=Release COVERAGE=NO
 
 matrix:
   exclude:
     - os: osx
-      env: MYCC=gcc-5   BUILD_TYPE=Release
-    - os: osx
-      env: MYCC=gcc-5   BUILD_TYPE=Debug
+      env: MYCC=gcc-5 BUILD_TYPE=Release COVERAGE=NO
 
 script:
  - mkdir build
  - cd build
- - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF || exit 1
+ - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_GCOV=$COVERAGE || exit 1
  - cmake --build . -- -j2 || exit 1
  - cd tests
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
@@ -41,4 +38,8 @@ script:
    else
      valgrind --error-exitcode=42 --leak-check=full ./tests || exit 1;
    fi
-
+ - if [ $COVERAGE == "YES" ]; then
+     curl -s https://codecov.io/bash > codecov.sh || exit 1;
+     chmod +x codecov.sh || exit 1;
+     ./codecov.sh -x gcov-5.4 || exit 1;
+   fi

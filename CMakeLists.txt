@@ -10,6 +10,13 @@ else()
 	add_definitions(-DLPG_WITH_VLD=0)
 endif()
 
+if(UNIX)
+	option(LPG_WITH_GCOV "compile with gcov support" OFF)
+    if(LPG_WITH_GCOV)
+        add_definitions(-coverage)
+    endif()
+endif()
+
 file(GLOB_RECURSE formatted "*.c" "*.h")
 
 option(LPG_WITH_CLANG_FORMAT "use clang-format to format the source code" ON)
