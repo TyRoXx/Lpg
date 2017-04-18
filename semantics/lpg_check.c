@@ -3,17 +3,17 @@
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
 
-static void add_instruction(checked_function *function, instruction added)
+static void add_instruction(instruction_sequence *to, instruction const added)
 {
-    function->body = reallocate_array(
-        function->body, function->size + 1, sizeof(*function->body));
-    function->body[function->size] = added;
-    ++(function->size);
+    to->elements =
+        reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
+    to->elements[to->length] = added;
+    ++(to->length);
 }
 
-static void check_sequence(checked_function *function, sequence const input);
+static void check_sequence(instruction_sequence *output, sequence const input);
 
-static void sequence_element(checked_function *function,
+static void sequence_element(instruction_sequence *function,
                              expression const element)
 {
     switch (element.type)
@@ -37,9 +37,9 @@ static void sequence_element(checked_function *function,
 
     case expression_type_loop:
     {
-        jump_address const top = (jump_address)function->size;
-        check_sequence(function, element.loop_body);
-        add_instruction(function, instruction_create_jump(top));
+        instruction_sequence body = {NULL, 0};
+        check_sequence(&body, element.loop_body);
+        add_instruction(function, instruction_create_loop(body));
         break;
     }
 
@@ -51,12 +51,48 @@ static void sequence_element(checked_function *function,
     }
 }
 
-static void check_sequence(checked_function *function, sequence const input)
+static void check_sequence(instruction_sequence *output, sequence const input)
 {
     LPG_FOR(size_t, i, input.length)
     {
-        sequence_element(function, input.elements[i]);
+        sequence_element(output, input.elements[i]);
     }
+}
+
+instruction_sequence instruction_sequence_create(instruction *elements,
+                                                 size_t length)
+{
+    instruction_sequence result = {elements, length};
+    return result;
+}
+
+void instruction_sequence_free(instruction_sequence const *value)
+{
+    LPG_FOR(size_t, i, value->length)
+    {
+        instruction_free(value->elements + i);
+    }
+    if (value->elements)
+    {
+        deallocate(value->elements);
+    }
+}
+
+int instruction_sequence_equals(instruction_sequence const *left,
+                                instruction_sequence const *right)
+{
+    if (left->length != right->length)
+    {
+        return 0;
+    }
+    LPG_FOR(size_t, i, left->length)
+    {
+        if (!instruction_equals(left->elements[i], right->elements[i]))
+        {
+            return 0;
+        }
+    }
+    return 1;
 }
 
 instruction instruction_create_call(void)
@@ -65,10 +101,23 @@ instruction instruction_create_call(void)
     return result;
 }
 
-instruction instruction_create_jump(jump_address destination)
+instruction instruction_create_loop(instruction_sequence body)
 {
-    instruction result = {instruction_jump, destination};
+    instruction result = {instruction_loop, body};
     return result;
+}
+
+void instruction_free(instruction const *value)
+{
+    switch (value->type)
+    {
+    case instruction_call:
+        break;
+
+    case instruction_loop:
+        instruction_sequence_free(&value->loop);
+        break;
+    }
 }
 
 int instruction_equals(instruction const left, instruction const right)
@@ -82,18 +131,15 @@ int instruction_equals(instruction const left, instruction const right)
     case instruction_call:
         return 1;
 
-    case instruction_jump:
-        return (left.jump_destination == right.jump_destination);
+    case instruction_loop:
+        return instruction_sequence_equals(&left.loop, &right.loop);
     }
     UNREACHABLE();
 }
 
 void checked_function_free(checked_function const *function)
 {
-    if (function->body)
-    {
-        deallocate(function->body);
-    }
+    instruction_sequence_free(&function->body);
 }
 
 void checked_program_free(checked_program const *program)
@@ -112,8 +158,7 @@ checked_program check(sequence const root)
 {
     checked_program program = {
         allocate_array(1, sizeof(struct checked_function)), 1};
-    program.functions[0].body = NULL;
-    program.functions[0].size = 0;
-    check_sequence(&program.functions[0], root);
+    program.functions[0].body = instruction_sequence_create(NULL, 0);
+    check_sequence(&program.functions[0].body, root);
     return program;
 }

@@ -5,6 +5,7 @@
 #include <string.h>
 #include "lpg_array_size.h"
 #include "lpg_for.h"
+#include "lpg_allocate.h"
 
 typedef struct test_parser_user
 {
@@ -53,12 +54,36 @@ static sequence parse(char const *input)
 
 void test_semantics(void)
 {
+    REQUIRE(!instruction_equals(
+        instruction_create_loop(instruction_sequence_create(NULL, 0)),
+        instruction_create_call()));
+    {
+        instruction_sequence const left = instruction_sequence_create(NULL, 0);
+        instruction_sequence const right = instruction_sequence_create(
+            allocate_array(1, sizeof(*right.elements)), 1);
+        right.elements[0] = instruction_create_call();
+        REQUIRE(!instruction_sequence_equals(&left, &right));
+        instruction_sequence_free(&left);
+        instruction_sequence_free(&right);
+    }
+    {
+        instruction_sequence const left = instruction_sequence_create(
+            allocate_array(1, sizeof(*left.elements)), 1);
+        left.elements[0] =
+            instruction_create_loop(instruction_sequence_create(NULL, 0));
+        instruction_sequence const right = instruction_sequence_create(
+            allocate_array(1, sizeof(*right.elements)), 1);
+        right.elements[0] = instruction_create_call();
+        REQUIRE(!instruction_sequence_equals(&left, &right));
+        instruction_sequence_free(&left);
+        instruction_sequence_free(&right);
+    }
     {
         sequence root = sequence_create(NULL, 0);
         checked_program checked = check(root);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].size == 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -66,8 +91,8 @@ void test_semantics(void)
         checked_program checked = check(root);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].size == 1);
-        REQUIRE(checked.functions[0].body[0].type == instruction_call);
+        REQUIRE(checked.functions[0].body.length == 1);
+        REQUIRE(checked.functions[0].body.elements[0].type == instruction_call);
         checked_program_free(&checked);
     }
     {
@@ -76,14 +101,17 @@ void test_semantics(void)
         checked_program checked = check(root);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        instruction const expected_body[] = {
-            instruction_create_call(), instruction_create_jump(0)};
-        REQUIRE(LPG_ARRAY_SIZE(expected_body) == checked.functions[0].size);
-        LPG_FOR(size_t, i, LPG_ARRAY_SIZE(expected_body))
-        {
-            REQUIRE(instruction_equals(
-                expected_body[i], checked.functions[0].body[i]));
-        }
+        instruction *const loop_body = allocate_array(1, sizeof(*loop_body));
+        loop_body[0] = instruction_create_call();
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] =
+            instruction_create_loop(instruction_sequence_create(loop_body, 1));
+        instruction_sequence const expected_body =
+            instruction_sequence_create(expected_body_elements, 1);
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
     }
 }
