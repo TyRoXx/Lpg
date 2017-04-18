@@ -114,4 +114,25 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+    {
+        sequence root = parse("loop\n"
+                              "    f()"
+                              "    g()");
+        checked_program checked = check(root);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction *const loop_body = allocate_array(2, sizeof(*loop_body));
+        loop_body[0] = instruction_create_call();
+        loop_body[1] = instruction_create_call();
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] =
+            instruction_create_loop(instruction_sequence_create(loop_body, 2));
+        instruction_sequence const expected_body =
+            instruction_sequence_create(expected_body_elements, 1);
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
 }
