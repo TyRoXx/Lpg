@@ -14,6 +14,7 @@ if(UNIX)
 	option(LPG_WITH_GCOV "compile with gcov support" OFF)
     if(LPG_WITH_GCOV)
         add_definitions(-coverage)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage")
     endif()
 endif()
 
