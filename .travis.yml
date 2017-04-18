@@ -43,5 +43,5 @@ script:
  - if [ $COVERAGE == "YES" ]; then
      curl -s https://codecov.io/bash > codecov.sh || exit 1;
      chmod +x codecov.sh || exit 1;
-     ./codecov.sh -x gcov-5.4 || exit 1;
+     ./codecov.sh || exit 1;
    fi
