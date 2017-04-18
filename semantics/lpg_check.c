@@ -97,7 +97,8 @@ int instruction_sequence_equals(instruction_sequence const *left,
 
 instruction instruction_create_call(void)
 {
-    instruction result = {instruction_call, 0};
+    instruction result = {
+        instruction_call, instruction_sequence_create(NULL, 0)};
     return result;
 }
 
