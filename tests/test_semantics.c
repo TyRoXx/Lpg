@@ -2,10 +2,8 @@
 #include "test.h"
 #include "lpg_check.h"
 #include "lpg_parse_expression.h"
-#include <string.h>
-#include "lpg_array_size.h"
-#include "lpg_for.h"
 #include "lpg_allocate.h"
+#include <string.h>
 
 typedef struct test_parser_user
 {
