@@ -19,7 +19,7 @@ static void sequence_element(instruction_sequence *function,
     switch (element.type)
     {
     case expression_type_lambda:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_call:
         add_instruction(function, instruction_create_call());
@@ -33,7 +33,7 @@ static void sequence_element(instruction_sequence *function,
     case expression_type_make_identifier:
     case expression_type_assign:
     case expression_type_return:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_loop:
     {
@@ -47,7 +47,7 @@ static void sequence_element(instruction_sequence *function,
     case expression_type_sequence:
     case expression_type_declare:
     case expression_type_tuple:
-        UNREACHABLE();
+        LPG_TO_DO();
     }
 }
 

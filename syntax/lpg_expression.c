@@ -410,7 +410,7 @@ int expression_equals(expression const *left, expression const *right)
     switch (left->type)
     {
     case expression_type_lambda:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_call:
         if (!expression_equals(left->call.callee, right->call.callee))
@@ -435,20 +435,20 @@ int expression_equals(expression const *left, expression const *right)
         return integer_equal(left->integer_literal, right->integer_literal);
 
     case expression_type_access_structure:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_match:
         return match_equals(left->match, right->match);
 
     case expression_type_string:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_identifier:
         return unicode_view_equals(unicode_view_from_string(left->identifier),
                                    unicode_view_from_string(right->identifier));
 
     case expression_type_make_identifier:
-        UNREACHABLE();
+        LPG_TO_DO();
 
     case expression_type_assign:
         return assign_equals(left->assign, right->assign);
@@ -469,7 +469,7 @@ int expression_equals(expression const *left, expression const *right)
         return declare_equals(left->declare, right->declare);
 
     case expression_type_tuple:
-        UNREACHABLE();
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }

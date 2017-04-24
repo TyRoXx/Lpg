@@ -36,3 +36,5 @@
 #else
 #define UNREACHABLE() ASSERT(0)
 #endif
+
+#define LPG_TO_DO() UNREACHABLE()
