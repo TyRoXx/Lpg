@@ -89,9 +89,15 @@ void test_semantics(void)
         checked_program checked = check(root);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 1);
-        REQUIRE(checked.functions[0].body.elements[0].type == instruction_call);
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_call();
+        instruction_sequence const expected_body =
+            instruction_sequence_create(expected_body_elements, 1);
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("loop\n"
