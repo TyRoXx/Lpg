@@ -15,16 +15,12 @@ unicode_view unicode_view_from_string(unicode_string string)
 
 int unicode_view_equals_c_str(unicode_view left, char const *right)
 {
-    size_t i;
-    for (i = 0; (i < left.length) && (right[i] != '\0'); ++i)
+    size_t const length = strlen(right);
+    if (left.length != length)
     {
-        /*TODO implement UTF-8*/
-        if (left.begin[i] != (unsigned char)right[i])
-        {
-            return 0;
-        }
+        return 0;
     }
-    return (i == left.length) && (right[i] == '\0');
+    return !memcmp(left.begin, right, length);
 }
 
 int unicode_view_equals(unicode_view left, unicode_view right)
