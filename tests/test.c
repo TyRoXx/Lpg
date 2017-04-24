@@ -13,11 +13,6 @@ int lpg_check(int success)
 
 int lpg_print_test_summary(void)
 {
-    if (failures)
-    {
-        printf("Checks failed: %zu of %zu\n", failures, total_checks);
-        return 1;
-    }
-    printf("All checks succeeded: %zu\n", total_checks);
-    return 0;
+    printf("%zu of %zu checks failed\n", failures, total_checks);
+    return failures != 0;
 }

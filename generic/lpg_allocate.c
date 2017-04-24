@@ -65,8 +65,3 @@ size_t count_total_allocations(void)
 {
     return total_allocations;
 }
-
-size_t count_active_allocations(void)
-{
-    return active_allocations;
-}
