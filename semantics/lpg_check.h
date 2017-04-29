@@ -28,7 +28,8 @@ typedef enum type_kind
 {
     type_kind_structure,
     type_kind_function_pointer,
-    type_kind_unit
+    type_kind_unit,
+    type_kind_string_ref
 } type_kind;
 
 struct type
@@ -45,6 +46,7 @@ void type_free(type const *value);
 void type_deallocate(type *value);
 type type_from_function_pointer(function_pointer value);
 type type_from_unit(void);
+type type_from_string_ref(void);
 type *type_allocate(type const value);
 
 function_pointer function_pointer_create(type *result, type *arguments,
@@ -80,7 +82,8 @@ typedef enum instruction_type
     instruction_loop,
     instruction_global,
     instruction_read_struct,
-    instruction_unit
+    instruction_unit,
+    instruction_string_literal
 } instruction_type;
 
 typedef uint32_t register_id;
@@ -122,6 +125,18 @@ read_struct_instruction read_struct_instruction_create(register_id from_object,
 int read_struct_instruction_equals(read_struct_instruction const left,
                                    read_struct_instruction const right);
 
+typedef struct string_literal_instruction
+{
+    unicode_string value;
+    register_id into;
+} string_literal_instruction;
+
+string_literal_instruction
+string_literal_instruction_create(unicode_string value, register_id into);
+void string_literal_instruction_free(string_literal_instruction const *value);
+int string_literal_instruction_equals(string_literal_instruction const left,
+                                      string_literal_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -132,6 +147,7 @@ struct instruction
         register_id global_into;
         read_struct_instruction read_struct;
         register_id unit;
+        string_literal_instruction string_literal;
     };
 };
 
@@ -140,6 +156,7 @@ instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_unit(register_id into);
+instruction instruction_create_string_literal(string_literal_instruction value);
 void instruction_free(instruction const *value);
 int instruction_equals(instruction const left, instruction const right);
 

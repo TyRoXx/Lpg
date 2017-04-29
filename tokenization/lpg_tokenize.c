@@ -123,6 +123,25 @@ tokenize_result tokenize(char const *input, size_t length)
             return make_success(token_fat_arrow, 2);
         }
         return make_success(token_assign, 1);
+
+    case '"':
+    {
+        size_t i;
+        for (i = 1;; ++i)
+        {
+            if (i == length)
+            {
+                tokenize_result result = {tokenize_invalid, token_space, i};
+                return result;
+            }
+            if (input[i] == '"')
+            {
+                ++i;
+                break;
+            }
+        }
+        return make_success(token_string, i);
+    }
     }
     tokenize_result result = {tokenize_invalid, token_space, 1};
     return result;

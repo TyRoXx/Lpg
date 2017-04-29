@@ -21,7 +21,8 @@ typedef enum token_type
     token_return,
     token_case,
     token_loop,
-    token_break
+    token_break,
+    token_string
 } token_type;
 
 typedef enum tokenize_status

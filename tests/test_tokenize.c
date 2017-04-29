@@ -61,8 +61,13 @@ void test_tokenize(void)
     test_single_token(token_loop, 4, "loop");
     test_single_token(token_return, 6, "return");
     test_single_token(token_match, 5, "match");
+    test_single_token(token_string, 2, "\"\"");
+    test_single_token(token_string, 3, "\"a\"");
+    test_single_token(token_string, 5, "\"abc\"");
     test_invalid("?");
     test_invalid("\t");
     test_invalid("'aaa");
     test_invalid("1a");
+    test_invalid("\"");
+    test_invalid("\"a");
 }

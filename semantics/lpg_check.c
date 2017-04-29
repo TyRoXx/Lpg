@@ -32,6 +32,9 @@ void type_free(type const *value)
 
     case type_kind_unit:
         break;
+
+    case type_kind_string_ref:
+        break;
     }
 }
 
@@ -53,6 +56,13 @@ type type_from_unit(void)
 {
     type result;
     result.kind = type_kind_unit;
+    return result;
+}
+
+type type_from_string_ref(void)
+{
+    type result;
+    result.kind = type_kind_string_ref;
     return result;
 }
 
@@ -138,6 +148,12 @@ static optional_register_id check_sequence(function_checking_state *state,
                                            instruction_sequence *output,
                                            sequence const input);
 
+static unicode_string decode_string_literal(unicode_view const literal)
+{
+    ASSUME(literal.length >= 2);
+    return unicode_string_from_range(literal.begin + 1, literal.length - 2);
+}
+
 static optional_register_id evaluate_expression(function_checking_state *state,
                                                 instruction_sequence *function,
                                                 expression const element)
@@ -178,8 +194,18 @@ static optional_register_id evaluate_expression(function_checking_state *state,
     case expression_type_integer_literal:
     case expression_type_access_structure:
     case expression_type_match:
-    case expression_type_string:
         LPG_TO_DO();
+
+    case expression_type_string:
+    {
+        register_id const result = allocate_register(state);
+        add_instruction(
+            function,
+            instruction_create_string_literal(string_literal_instruction_create(
+                decode_string_literal(unicode_view_from_string(element.string)),
+                result)));
+        return optional_register_id_create(result);
+    }
 
     case expression_type_identifier:
     {
@@ -306,6 +332,25 @@ int read_struct_instruction_equals(read_struct_instruction const left,
            (left.member == right.member) && (left.into == right.into);
 }
 
+string_literal_instruction
+string_literal_instruction_create(unicode_string value, register_id into)
+{
+    string_literal_instruction result = {value, into};
+    return result;
+}
+
+void string_literal_instruction_free(string_literal_instruction const *value)
+{
+    unicode_string_free(&value->value);
+}
+
+int string_literal_instruction_equals(string_literal_instruction const left,
+                                      string_literal_instruction const right)
+{
+    return unicode_string_equals(left.value, right.value) &&
+           (left.into == right.into);
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -346,6 +391,14 @@ instruction instruction_create_unit(register_id into)
     return result;
 }
 
+instruction instruction_create_string_literal(string_literal_instruction value)
+{
+    instruction result;
+    result.type = instruction_string_literal;
+    result.string_literal = value;
+    return result;
+}
+
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -365,6 +418,10 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_unit:
+        break;
+
+    case instruction_string_literal:
+        string_literal_instruction_free(&value->string_literal);
         break;
     }
 }
@@ -392,6 +449,10 @@ int instruction_equals(instruction const left, instruction const right)
 
     case instruction_unit:
         return (left.unit == right.unit);
+
+    case instruction_string_literal:
+        return string_literal_instruction_equals(
+            left.string_literal, right.string_literal);
     }
     UNREACHABLE();
 }

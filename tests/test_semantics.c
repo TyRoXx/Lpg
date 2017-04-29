@@ -85,7 +85,7 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
 
-    structure_member *globals = allocate_array(2, sizeof(*globals));
+    structure_member *globals = allocate_array(3, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
@@ -94,7 +94,12 @@ void test_semantics(void)
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
         unicode_string_from_c_str("g"));
-    structure const non_empty_global = structure_create(globals, 2);
+    globals[2] = structure_member_create(
+        type_from_function_pointer(
+            function_pointer_create(type_allocate(type_from_unit()),
+                                    type_allocate(type_from_string_ref()), 1)),
+        unicode_string_from_c_str("print"));
+    structure const non_empty_global = structure_create(globals, 3);
 
     {
         sequence root = parse("f()");
@@ -167,7 +172,7 @@ void test_semantics(void)
     }
     {
         sequence root = parse("loop\n"
-                              "    f()"
+                              "    f()\n"
                               "    g()");
         checked_program checked =
             check(root, non_empty_global, expect_no_errors, NULL);
@@ -190,6 +195,34 @@ void test_semantics(void)
             instruction_create_loop(instruction_sequence_create(loop_body, 6));
         instruction_sequence const expected_body =
             instruction_sequence_create(expected_body_elements, 1);
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
+    {
+        sequence root = parse("print(\"hello, world!\")");
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction *const expected_body_elements =
+            allocate_array(4, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_global(0);
+        expected_body_elements[1] = instruction_create_read_struct(
+            read_struct_instruction_create(0, 2, 1));
+        expected_body_elements[2] =
+            instruction_create_string_literal(string_literal_instruction_create(
+                unicode_string_from_c_str("hello, world!"), 2));
+        {
+            register_id *const arguments =
+                allocate_array(1, sizeof(*arguments));
+            arguments[0] = 2;
+            expected_body_elements[3] = instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3));
+        }
+        instruction_sequence const expected_body =
+            instruction_sequence_create(expected_body_elements, 4);
         REQUIRE(instruction_sequence_equals(
             &expected_body, &checked.functions[0].body));
         checked_program_free(&checked);

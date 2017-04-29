@@ -373,6 +373,15 @@ static expression_parser_result parse_callable(expression_parser *parser,
                 parser->user);
             break;
         }
+
+        case token_string:
+        {
+            pop(parser);
+            expression_parser_result result = {
+                1, expression_from_unicode_string(
+                       unicode_view_copy(head.content))};
+            return result;
+        }
         }
     }
 }
