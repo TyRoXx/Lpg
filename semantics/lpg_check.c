@@ -107,7 +107,7 @@ struct function_checking_state;
 
 typedef optional_register_id
 read_variable_function(struct function_checking_state *, instruction_sequence *,
-                       unicode_view);
+                       unicode_view, source_location);
 
 typedef struct function_checking_state
 {
@@ -183,9 +183,10 @@ static optional_register_id evaluate_expression(function_checking_state *state,
 
     case expression_type_identifier:
     {
-        unicode_view const name = unicode_view_from_string(element.identifier);
-        optional_register_id address =
-            state->read_variable(state, function, name);
+        unicode_view const name =
+            unicode_view_from_string(element.identifier.value);
+        optional_register_id address = state->read_variable(
+            state, function, name, element.identifier.source);
         return address;
     }
 
@@ -414,7 +415,8 @@ void checked_program_free(checked_program const *program)
 
 static optional_register_id read_variable(function_checking_state *state,
                                           instruction_sequence *to,
-                                          unicode_view name)
+                                          unicode_view name,
+                                          source_location where)
 {
     structure const globals = *state->global;
     LPG_FOR(struct_member_id, i, globals.count)
@@ -431,7 +433,7 @@ static optional_register_id read_variable(function_checking_state *state,
             return optional_register_id_create(result);
         }
     }
-    state->on_error(source_location_create(0, 0), state->user);
+    state->on_error(where, state->user);
     return optional_register_id_empty;
 }
 

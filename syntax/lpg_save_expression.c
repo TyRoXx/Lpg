@@ -127,7 +127,7 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_identifier:
         LPG_TRY(space_here(to, &whitespace));
         return stream_writer_write_bytes(
-            to, value->identifier.data, value->identifier.length);
+            to, value->identifier.value.data, value->identifier.value.length);
 
     case expression_type_make_identifier:
         LPG_TRY(space_here(to, &whitespace));

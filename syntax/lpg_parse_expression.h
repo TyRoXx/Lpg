@@ -1,20 +1,8 @@
 #pragma once
+#include "lpg_source_location.h"
 #include "lpg_expression.h"
 #include "lpg_tokenize.h"
 #include "lpg_unicode_view.h"
-
-typedef size_t line_number;
-typedef size_t column_number;
-
-typedef struct source_location
-{
-    line_number line;
-    column_number approximate_column;
-} source_location;
-
-source_location source_location_create(line_number line,
-                                       column_number approximate_column);
-int source_location_equals(source_location left, source_location right);
 
 typedef struct rich_token
 {

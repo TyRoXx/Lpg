@@ -1,6 +1,7 @@
 #pragma once
 #include "lpg_unicode_string.h"
 #include "lpg_integer.h"
+#include "lpg_source_location.h"
 
 typedef struct expression expression;
 
@@ -125,6 +126,16 @@ expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
 expression expression_from_match(match value);
 
+typedef struct identifier_expression
+{
+    unicode_string value;
+    source_location source;
+} identifier_expression;
+
+identifier_expression identifier_expression_create(unicode_string value,
+                                                   source_location source);
+void identifier_expression_free(identifier_expression const *value);
+
 struct expression
 {
     expression_type type;
@@ -136,7 +147,7 @@ struct expression
         access_structure access_structure;
         match match;
         unicode_string string;
-        unicode_string identifier;
+        identifier_expression identifier;
         expression *make_identifier;
         assign assign;
         expression *return_;
@@ -154,7 +165,7 @@ void match_free(match const *this);
 expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
 expression expression_from_call(call value);
-expression expression_from_identifier(unicode_string identifier);
+expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_make_identifier(expression *value);
 expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);

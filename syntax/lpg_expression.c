@@ -200,6 +200,18 @@ expression expression_from_match(match value)
     return result;
 }
 
+identifier_expression identifier_expression_create(unicode_string value,
+                                                   source_location source)
+{
+    identifier_expression result = {value, source};
+    return result;
+}
+
+void identifier_expression_free(identifier_expression const *value)
+{
+    unicode_string_free(&value->value);
+}
+
 expression expression_from_integer_literal(integer value)
 {
     expression result;
@@ -257,7 +269,7 @@ expression expression_from_call(call value)
     return result;
 }
 
-expression expression_from_identifier(unicode_string identifier)
+expression expression_from_identifier(identifier_expression identifier)
 {
     expression result;
     result.type = expression_type_identifier;
@@ -316,7 +328,7 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_identifier:
-        unicode_string_free(&this->identifier);
+        identifier_expression_free(&this->identifier);
         break;
 
     case expression_type_make_identifier:
@@ -444,8 +456,11 @@ int expression_equals(expression const *left, expression const *right)
         LPG_TO_DO();
 
     case expression_type_identifier:
-        return unicode_view_equals(unicode_view_from_string(left->identifier),
-                                   unicode_view_from_string(right->identifier));
+        return unicode_view_equals(
+                   unicode_view_from_string(left->identifier.value),
+                   unicode_view_from_string(right->identifier.value)) &&
+               source_location_equals(
+                   left->identifier.source, right->identifier.source);
 
     case expression_type_make_identifier:
         LPG_TO_DO();

@@ -66,12 +66,15 @@ void test_parse_expression_success(void)
     test_successful_parse(
         expression_from_return(expression_allocate(expression_from_call(
             call_create(expression_allocate(expression_from_identifier(
-                            unicode_string_from_c_str("f"))),
+                            identifier_expression_create(
+                                unicode_string_from_c_str("f"),
+                                source_location_create(0, 0)))),
                         tuple_create(NULL, 0))))),
         unicode_string_from_c_str("return f()"));
 
     test_successful_parse(
-        expression_from_identifier(unicode_string_from_c_str("a")),
+        expression_from_identifier(identifier_expression_create(
+            unicode_string_from_c_str("a"), source_location_create(0, 0))),
         unicode_string_from_c_str("a"));
 
     test_successful_parse(
@@ -83,7 +86,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("f"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("f"),
+                        source_location_create(0, 0)))),
                 arguments)),
             unicode_string_from_c_str("f()"));
     }
@@ -91,10 +96,12 @@ void test_parse_expression_success(void)
         tuple arguments = tuple_create(NULL, 0);
         test_successful_parse(
             expression_from_call(call_create(
-                expression_allocate(expression_from_call(
-                    call_create(expression_allocate(expression_from_identifier(
-                                    unicode_string_from_c_str("f"))),
-                                arguments))),
+                expression_allocate(expression_from_call(call_create(
+                    expression_allocate(
+                        expression_from_identifier(identifier_expression_create(
+                            unicode_string_from_c_str("f"),
+                            source_location_create(0, 0)))),
+                    arguments))),
                 arguments)),
             unicode_string_from_c_str("f()()"));
     }
@@ -105,7 +112,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("f"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("f"),
+                        source_location_create(0, 0)))),
                 arguments_tuple)),
             unicode_string_from_c_str("f(1)"));
     }
@@ -117,7 +126,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("f"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("f"),
+                        source_location_create(0, 0)))),
                 arguments_tuple)),
             unicode_string_from_c_str("f(1,2)"));
     }
@@ -131,8 +142,8 @@ void test_parse_expression_success(void)
     }
     {
         expression *elements = allocate_array(2, sizeof(*elements));
-        elements[0] =
-            expression_from_identifier(unicode_string_from_c_str("f"));
+        elements[0] = expression_from_identifier(identifier_expression_create(
+            unicode_string_from_c_str("f"), source_location_create(0, 0)));
         elements[1] = expression_from_break();
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
@@ -142,8 +153,8 @@ void test_parse_expression_success(void)
     }
     {
         expression *elements = allocate_array(2, sizeof(*elements));
-        elements[0] =
-            expression_from_identifier(unicode_string_from_c_str("f"));
+        elements[0] = expression_from_identifier(identifier_expression_create(
+            unicode_string_from_c_str("f"), source_location_create(0, 0)));
         elements[1] = expression_from_break();
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
@@ -178,27 +189,32 @@ void test_parse_expression_success(void)
 
     test_successful_parse(
         expression_from_assign(assign_create(
-            expression_allocate(
-                expression_from_identifier(unicode_string_from_c_str("a"))),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"),
+                                             source_location_create(0, 0)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("a = 1"));
 
     test_successful_parse(
         expression_from_declare(declare_create(
-            expression_allocate(
-                expression_from_identifier(unicode_string_from_c_str("a"))),
-            expression_allocate(
-                expression_from_identifier(unicode_string_from_c_str("int"))),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"),
+                                             source_location_create(0, 0)))),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("int"),
+                                             source_location_create(0, 0)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("a : int = 1"));
 
-    test_successful_parse(expression_from_match(match_create(
-                              expression_allocate(expression_from_identifier(
-                                  unicode_string_from_c_str("a"))),
-                              NULL, 0)),
-                          unicode_string_from_c_str("match a\n"));
+    test_successful_parse(
+        expression_from_match(match_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"),
+                                             source_location_create(0, 0)))),
+            NULL, 0)),
+        unicode_string_from_c_str("match a\n"));
 
     {
         match_case *const cases = allocate_array(1, sizeof(*cases));
@@ -210,7 +226,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("a"),
+                        source_location_create(0, 0)))),
                 cases, 1)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"));
@@ -231,7 +249,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("a"),
+                        source_location_create(0, 0)))),
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"
@@ -255,7 +275,9 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(
-                    expression_from_identifier(unicode_string_from_c_str("a"))),
+                    expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("a"),
+                        source_location_create(0, 0)))),
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1:\n"
