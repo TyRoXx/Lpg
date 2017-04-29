@@ -51,11 +51,11 @@ function_pointer function_pointer_create(type *result, type *arguments,
                                          size_t arity);
 void function_pointer_free(function_pointer const *value);
 
-typedef struct structure_member
+struct structure_member
 {
     type what;
     unicode_string name;
-} structure_member;
+};
 
 structure_member structure_member_create(type what, unicode_string name);
 void struct_member_free(structure_member const *value);
