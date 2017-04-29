@@ -216,12 +216,14 @@ static optional_register_id check_sequence(function_checking_state *state,
                                            instruction_sequence *output,
                                            sequence const input)
 {
-    optional_register_id final_result;
     if (input.length == 0)
     {
-        final_result = optional_register_id_create(allocate_register(state));
+        optional_register_id const final_result =
+            optional_register_id_create(allocate_register(state));
         add_instruction(output, instruction_create_unit(final_result.value));
+        return final_result;
     }
+    optional_register_id final_result = optional_register_id_empty;
     LPG_FOR(size_t, i, input.length)
     {
         final_result = evaluate_expression(state, output, input.elements[i]);
