@@ -1,47 +1,14 @@
+#include "find_next_token.h"
 #include "test_parse_expression_success.h"
 #include "test.h"
 #include "lpg_parse_expression.h"
 #include "lpg_allocate.h"
 #include "lpg_save_expression.h"
 
-typedef struct test_parser_user
-{
-    char const *remaining_input;
-    size_t remaining_size;
-} test_parser_user;
-
-static rich_token find_next_token(callback_user user)
-{
-    test_parser_user *const parser_user = user;
-    if (parser_user->remaining_size == 0)
-    {
-        return rich_token_create(tokenize_success, token_space,
-                                 unicode_view_create(NULL, 0),
-                                 source_location_create(0, 0));
-    }
-    tokenize_result tokenized =
-        tokenize(parser_user->remaining_input, parser_user->remaining_size);
-    REQUIRE(tokenized.status == tokenize_success);
-    REQUIRE(tokenized.length <= parser_user->remaining_size);
-    rich_token result = rich_token_create(
-        tokenize_success, tokenized.token,
-        unicode_view_create(parser_user->remaining_input, tokenized.length),
-        source_location_create(0, 0));
-    parser_user->remaining_input += tokenized.length;
-    parser_user->remaining_size -= tokenized.length;
-    return result;
-}
-
-static void handle_error(parse_error const error, callback_user user)
-{
-    (void)error;
-    (void)user;
-    FAIL();
-}
-
 static void test_successful_parse(expression expected, unicode_string input)
 {
-    test_parser_user user = {input.data, input.length};
+    test_parser_user user = {
+        input.data, input.length, NULL, 0, source_location_create(0, 0)};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
     expression_parser_result result = parse_expression(&parser, 0, 1);
@@ -68,7 +35,7 @@ void test_parse_expression_success(void)
             call_create(expression_allocate(expression_from_identifier(
                             identifier_expression_create(
                                 unicode_string_from_c_str("f"),
-                                source_location_create(0, 0)))),
+                                source_location_create(0, 7)))),
                         tuple_create(NULL, 0))))),
         unicode_string_from_c_str("return f()"));
 
@@ -143,7 +110,7 @@ void test_parse_expression_success(void)
     {
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_identifier(identifier_expression_create(
-            unicode_string_from_c_str("f"), source_location_create(0, 0)));
+            unicode_string_from_c_str("f"), source_location_create(1, 4)));
         elements[1] = expression_from_break();
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
@@ -154,7 +121,7 @@ void test_parse_expression_success(void)
     {
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_identifier(identifier_expression_create(
-            unicode_string_from_c_str("f"), source_location_create(0, 0)));
+            unicode_string_from_c_str("f"), source_location_create(1, 4)));
         elements[1] = expression_from_break();
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
@@ -203,7 +170,7 @@ void test_parse_expression_success(void)
                                              source_location_create(0, 0)))),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
-                                             source_location_create(0, 0)))),
+                                             source_location_create(0, 4)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("a : int = 1"));
@@ -212,7 +179,7 @@ void test_parse_expression_success(void)
         expression_from_match(match_create(
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
+                                             source_location_create(0, 6)))),
             NULL, 0)),
         unicode_string_from_c_str("match a\n"));
 
@@ -228,7 +195,7 @@ void test_parse_expression_success(void)
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
-                        source_location_create(0, 0)))),
+                        source_location_create(0, 6)))),
                 cases, 1)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"));
@@ -251,7 +218,7 @@ void test_parse_expression_success(void)
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
-                        source_location_create(0, 0)))),
+                        source_location_create(0, 6)))),
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"
@@ -277,7 +244,7 @@ void test_parse_expression_success(void)
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
-                        source_location_create(0, 0)))),
+                        source_location_create(0, 6)))),
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1:\n"
