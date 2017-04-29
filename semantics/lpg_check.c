@@ -105,22 +105,25 @@ static void add_instruction(instruction_sequence *to, instruction const added)
 
 struct function_checking_state;
 
-typedef register_id read_variable_function(struct function_checking_state *,
-                                           instruction_sequence *,
-                                           unicode_view);
+typedef optional_register_id
+read_variable_function(struct function_checking_state *, instruction_sequence *,
+                       unicode_view);
 
 typedef struct function_checking_state
 {
     register_id used_registers;
     read_variable_function *read_variable;
     structure const *global;
+    check_error_handler *on_error;
+    void *user;
 } function_checking_state;
 
 static function_checking_state
 function_checking_state_create(read_variable_function *read_variable,
-                               structure const *global)
+                               structure const *global,
+                               check_error_handler *on_error, void *user)
 {
-    function_checking_state result = {0, read_variable, global};
+    function_checking_state result = {0, read_variable, global, on_error, user};
     return result;
 }
 
@@ -131,13 +134,13 @@ static register_id allocate_register(function_checking_state *state)
     return id;
 }
 
-static register_id check_sequence(function_checking_state *state,
-                                  instruction_sequence *output,
-                                  sequence const input);
+static optional_register_id check_sequence(function_checking_state *state,
+                                           instruction_sequence *output,
+                                           sequence const input);
 
-static register_id evaluate_expression(function_checking_state *state,
-                                       instruction_sequence *function,
-                                       expression const element)
+static optional_register_id evaluate_expression(function_checking_state *state,
+                                                instruction_sequence *function,
+                                                expression const element)
 {
     switch (element.type)
     {
@@ -146,21 +149,30 @@ static register_id evaluate_expression(function_checking_state *state,
 
     case expression_type_call:
     {
-        register_id const callee =
+        optional_register_id const callee =
             evaluate_expression(state, function, *element.call.callee);
+        if (!callee.is_set)
+        {
+            return optional_register_id_empty;
+        }
         register_id *const arguments =
             allocate_array(element.call.arguments.length, sizeof(*arguments));
         LPG_FOR(size_t, i, element.call.arguments.length)
         {
-            arguments[i] = evaluate_expression(
+            optional_register_id argument = evaluate_expression(
                 state, function, element.call.arguments.elements[i]);
+            if (!argument.is_set)
+            {
+                return optional_register_id_empty;
+            }
+            arguments[i] = argument.value;
         }
         register_id const result = allocate_register(state);
         add_instruction(
-            function,
-            instruction_create_call(call_instruction_create(
-                callee, arguments, element.call.arguments.length, result)));
-        return result;
+            function, instruction_create_call(call_instruction_create(
+                          callee.value, arguments,
+                          element.call.arguments.length, result)));
+        return optional_register_id_create(result);
     }
 
     case expression_type_integer_literal:
@@ -172,7 +184,8 @@ static register_id evaluate_expression(function_checking_state *state,
     case expression_type_identifier:
     {
         unicode_view const name = unicode_view_from_string(element.identifier);
-        register_id address = state->read_variable(state, function, name);
+        optional_register_id address =
+            state->read_variable(state, function, name);
         return address;
     }
 
@@ -184,7 +197,7 @@ static register_id evaluate_expression(function_checking_state *state,
     case expression_type_loop:
     {
         instruction_sequence body = {NULL, 0};
-        register_id const result =
+        optional_register_id const result =
             check_sequence(state, &body, element.loop_body);
         add_instruction(function, instruction_create_loop(body));
         return result;
@@ -199,15 +212,15 @@ static register_id evaluate_expression(function_checking_state *state,
     UNREACHABLE();
 }
 
-static register_id check_sequence(function_checking_state *state,
-                                  instruction_sequence *output,
-                                  sequence const input)
+static optional_register_id check_sequence(function_checking_state *state,
+                                           instruction_sequence *output,
+                                           sequence const input)
 {
-    register_id final_result = 0;
+    optional_register_id final_result;
     if (input.length == 0)
     {
-        final_result = allocate_register(state);
-        add_instruction(output, instruction_create_unit(final_result));
+        final_result = optional_register_id_create(allocate_register(state));
+        add_instruction(output, instruction_create_unit(final_result.value));
     }
     LPG_FOR(size_t, i, input.length)
     {
@@ -250,6 +263,12 @@ int instruction_sequence_equals(instruction_sequence const *left,
         }
     }
     return 1;
+}
+
+optional_register_id optional_register_id_create(register_id value)
+{
+    optional_register_id result = {1, value};
+    return result;
 }
 
 call_instruction call_instruction_create(register_id callee,
@@ -391,8 +410,9 @@ void checked_program_free(checked_program const *program)
     }
 }
 
-static register_id read_variable(function_checking_state *state,
-                                 instruction_sequence *to, unicode_view name)
+static optional_register_id read_variable(function_checking_state *state,
+                                          instruction_sequence *to,
+                                          unicode_view name)
 {
     structure const globals = *state->global;
     LPG_FOR(struct_member_id, i, globals.count)
@@ -406,19 +426,21 @@ static register_id read_variable(function_checking_state *state,
             add_instruction(
                 to, instruction_create_read_struct(
                         read_struct_instruction_create(global, i, result)));
-            return result;
+            return optional_register_id_create(result);
         }
     }
-    LPG_TO_DO();
+    state->on_error(source_location_create(0, 0), state->user);
+    return optional_register_id_empty;
 }
 
-checked_program check(sequence const root, structure const global)
+checked_program check(sequence const root, structure const global,
+                      check_error_handler *on_error, void *user)
 {
     checked_program program = {
         allocate_array(1, sizeof(struct checked_function)), 1};
     program.functions[0].body = instruction_sequence_create(NULL, 0);
     function_checking_state state =
-        function_checking_state_create(read_variable, &global);
+        function_checking_state_create(read_variable, &global, on_error, user);
     check_sequence(&state, &program.functions[0].body, root);
     return program;
 }

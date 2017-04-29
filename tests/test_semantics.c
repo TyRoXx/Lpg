@@ -50,6 +50,28 @@ static sequence parse(char const *input)
     return result;
 }
 
+static void expect_no_errors(source_location where, void *user)
+{
+    (void)where;
+    (void)user;
+    FAIL();
+}
+
+typedef struct expected_errors
+{
+    source_location const *locations;
+    size_t count;
+} expected_errors;
+
+static void expect_errors(source_location where, void *user)
+{
+    expected_errors *expected = user;
+    REQUIRE(expected->count >= 1);
+    REQUIRE(source_location_equals(where, expected->locations[0]));
+    ++expected->locations;
+    --expected->count;
+}
+
 void test_semantics(void)
 {
     REQUIRE(!instruction_equals(
@@ -81,7 +103,8 @@ void test_semantics(void)
     {
         structure const empty_global = structure_create(NULL, 0);
         sequence root = sequence_create(NULL, 0);
-        checked_program checked = check(root, empty_global);
+        checked_program checked =
+            check(root, empty_global, expect_no_errors, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction *const expected_body_elements =
@@ -94,6 +117,7 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+
     structure_member *globals = allocate_array(2, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_function_pointer(
@@ -104,9 +128,11 @@ void test_semantics(void)
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
         unicode_string_from_c_str("g"));
     structure const non_empty_global = structure_create(globals, 2);
+
     {
         sequence root = parse("f()");
-        checked_program checked = check(root, non_empty_global);
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction *const expected_body_elements =
@@ -124,9 +150,28 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
     {
+        structure const empty_global = structure_create(NULL, 0);
+        sequence root = parse("f()");
+        source_location const expected_error_locations[] = {
+            source_location_create(0, 0)};
+        expected_errors expected = {expected_error_locations, 1};
+        checked_program checked =
+            check(root, empty_global, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction_sequence const expected_body =
+            instruction_sequence_create(NULL, 0);
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
+    {
         sequence root = parse("loop\n"
                               "    f()");
-        checked_program checked = check(root, non_empty_global);
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction *const loop_body = allocate_array(3, sizeof(*loop_body));
@@ -150,7 +195,8 @@ void test_semantics(void)
         sequence root = parse("loop\n"
                               "    f()"
                               "    g()");
-        checked_program checked = check(root, non_empty_global);
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction *const loop_body = allocate_array(6, sizeof(*loop_body));

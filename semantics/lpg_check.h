@@ -1,5 +1,6 @@
 #pragma once
 #include "lpg_expression.h"
+#include "lpg_parse_expression.h"
 
 typedef uint32_t struct_member_id;
 
@@ -84,6 +85,16 @@ typedef enum instruction_type
 
 typedef uint32_t register_id;
 
+typedef struct optional_register_id
+{
+    int is_set;
+    register_id value;
+} optional_register_id;
+
+optional_register_id optional_register_id_create(register_id value);
+
+static optional_register_id const optional_register_id_empty = {0, 0};
+
 typedef struct call_instruction
 {
     register_id callee;
@@ -145,5 +156,8 @@ typedef struct checked_program
     size_t function_count;
 } checked_program;
 
+typedef void check_error_handler(source_location, void *);
+
 void checked_program_free(checked_program const *program);
-checked_program check(sequence const root, structure const global);
+checked_program check(sequence const root, structure const global,
+                      check_error_handler *on_error, void *user);
