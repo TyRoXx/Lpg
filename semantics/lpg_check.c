@@ -421,5 +421,6 @@ checked_program check(sequence const root, structure const global,
     function_checking_state state =
         function_checking_state_create(read_variable, &global, on_error, user);
     check_sequence(&state, &program.functions[0].body, root);
+    program.functions[0].number_of_registers = state.used_registers;
     return program;
 }

@@ -103,6 +103,7 @@ bool instruction_equals(instruction const left, instruction const right);
 typedef struct checked_function
 {
     instruction_sequence body;
+    register_id number_of_registers;
 } checked_function;
 
 void checked_function_free(checked_function const *function);
