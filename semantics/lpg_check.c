@@ -360,6 +360,20 @@ void checked_function_free(checked_function const *function)
     instruction_sequence_free(&function->body);
 }
 
+semantic_error semantic_error_create(semantic_error_type type,
+                                     source_location where)
+{
+    semantic_error result = {type, where};
+    return result;
+}
+
+bool semantic_error_equals(semantic_error const left,
+                           semantic_error const right)
+{
+    return (left.type == right.type) &&
+           source_location_equals(left.where, right.where);
+}
+
 void checked_program_free(checked_program const *program)
 {
     LPG_FOR(size_t, i, program->function_count)
@@ -392,7 +406,9 @@ static optional_register_id read_variable(function_checking_state *state,
             return optional_register_id_create(result);
         }
     }
-    state->on_error(where, state->user);
+    state->on_error(
+        semantic_error_create(semantic_error_unknown_identifier, where),
+        state->user);
     return optional_register_id_empty;
 }
 

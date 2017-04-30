@@ -113,7 +113,23 @@ typedef struct checked_program
     size_t function_count;
 } checked_program;
 
-typedef void check_error_handler(source_location, void *);
+typedef enum semantic_error_type
+{
+    semantic_error_unknown_identifier
+} semantic_error_type;
+
+typedef struct semantic_error
+{
+    semantic_error_type type;
+    source_location where;
+} semantic_error;
+
+semantic_error semantic_error_create(semantic_error_type type,
+                                     source_location where);
+bool semantic_error_equals(semantic_error const left,
+                           semantic_error const right);
+
+typedef void check_error_handler(semantic_error, void *);
 
 void checked_program_free(checked_program const *program);
 checked_program check(sequence const root, structure const global,

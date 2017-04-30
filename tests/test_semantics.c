@@ -17,25 +17,25 @@ static sequence parse(char const *input)
     return result;
 }
 
-static void expect_no_errors(source_location where, void *user)
+static void expect_no_errors(semantic_error const error, void *user)
 {
-    (void)where;
+    (void)error;
     (void)user;
     FAIL();
 }
 
 typedef struct expected_errors
 {
-    source_location const *locations;
+    semantic_error const *errors;
     size_t count;
 } expected_errors;
 
-static void expect_errors(source_location where, void *user)
+static void expect_errors(semantic_error const error, void *user)
 {
     expected_errors *expected = user;
     REQUIRE(expected->count >= 1);
-    REQUIRE(source_location_equals(where, expected->locations[0]));
-    ++expected->locations;
+    REQUIRE(semantic_error_equals(error, expected->errors[0]));
+    ++expected->errors;
     --expected->count;
 }
 
@@ -124,9 +124,9 @@ void test_semantics(void)
     {
         sequence root = parse("f()\n"
                               "h()");
-        source_location const expected_error_locations[] = {
-            source_location_create(1, 0)};
-        expected_errors expected = {expected_error_locations, 1};
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_unknown_identifier, source_location_create(1, 0))};
+        expected_errors expected = {errors, 1};
         checked_program checked =
             check(root, non_empty_global, expect_errors, &expected);
         REQUIRE(expected.count == 0);
