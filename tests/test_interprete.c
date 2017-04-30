@@ -49,7 +49,7 @@ void test_interprete(void)
         check(root, non_empty_global, expect_no_errors, NULL);
     sequence_free(&root);
     structure_free(&non_empty_global);
-    memory_writer print_buffer = {NULL, 0};
+    memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
     value const globals_values[1] = {value_from_function_pointer(
         function_pointer_value_from_external(print, &print_destination))};
