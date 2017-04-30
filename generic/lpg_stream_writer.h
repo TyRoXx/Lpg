@@ -2,6 +2,7 @@
 
 #include "lpg_try.h"
 #include "lpg_unicode_string.h"
+#include <stdbool.h>
 
 typedef struct stream_writer
 {
@@ -24,5 +25,5 @@ typedef struct memory_writer
 void memory_writer_free(memory_writer *writer);
 success_indicator memory_writer_write(void *user, char const *data,
                                       size_t length);
-int memory_writer_equals(memory_writer const writer, char const *c_str);
+bool memory_writer_equals(memory_writer const writer, char const *c_str);
 stream_writer memory_writer_erase(memory_writer *writer);

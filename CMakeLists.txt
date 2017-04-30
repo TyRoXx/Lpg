@@ -32,7 +32,7 @@ endif()
 if(MSVC)
 	add_definitions(/WX /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221 /D_WIN32_WINNT_WINTHRESHOLD=0 /DNTDDI_WIN7SP1=0 /DWINAPI_PARTITION_SYSTEM=0)
 else()
-	add_definitions(-std=gnu99 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
+	add_definitions(-std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
 endif()
 
 add_subdirectory(generic)

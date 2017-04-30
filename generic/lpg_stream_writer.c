@@ -39,7 +39,7 @@ success_indicator memory_writer_write(void *user, char const *data,
     return success;
 }
 
-int memory_writer_equals(memory_writer const writer, char const *c_str)
+bool memory_writer_equals(memory_writer const writer, char const *c_str)
 {
     size_t length = strlen(c_str);
     if (length != writer.used)
