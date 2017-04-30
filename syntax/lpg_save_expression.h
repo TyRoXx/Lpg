@@ -5,7 +5,7 @@
 typedef struct whitespace_state
 {
     size_t indentation_depth;
-    int pending_space;
+    bool pending_space;
 } whitespace_state;
 
 success_indicator save_expression(stream_writer const to,

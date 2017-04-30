@@ -3,6 +3,7 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_unicode_view.h"
+#include <stdbool.h>
 
 void expression_deallocate(expression *this)
 {
@@ -66,7 +67,7 @@ void match_case_free(match_case *value)
     expression_deallocate(value->action);
 }
 
-int match_case_equals(match_case const left, match_case const right)
+bool match_case_equals(match_case const left, match_case const right)
 {
     return expression_equals(left.key, right.key) &&
            expression_equals(left.action, right.action);
@@ -365,7 +366,7 @@ void expression_free(expression const *this)
     }
 }
 
-int sequence_equals(sequence const left, sequence const right)
+bool sequence_equals(sequence const left, sequence const right)
 {
     if (left.length != right.length)
     {
@@ -381,39 +382,39 @@ int sequence_equals(sequence const left, sequence const right)
     return 1;
 }
 
-int declare_equals(declare const left, declare const right)
+bool declare_equals(declare const left, declare const right)
 {
     return expression_equals(left.name, right.name) &&
            expression_equals(left.type, right.type);
 }
 
-int assign_equals(assign const left, assign const right)
+bool assign_equals(assign const left, assign const right)
 {
     return expression_equals(left.left, right.left) &&
            expression_equals(left.right, right.right);
 }
 
-int match_equals(match const left, match const right)
+bool match_equals(match const left, match const right)
 {
     if (!expression_equals(left.input, right.input))
     {
-        return 0;
+        return false;
     }
     if (left.number_of_cases != right.number_of_cases)
     {
-        return 0;
+        return false;
     }
     LPG_FOR(size_t, i, left.number_of_cases)
     {
         if (!match_case_equals(left.cases[i], right.cases[i]))
         {
-            return 0;
+            return false;
         }
     }
-    return 1;
+    return true;
 }
 
-int expression_equals(expression const *left, expression const *right)
+bool expression_equals(expression const *left, expression const *right)
 {
     if (left->type != right->type)
     {

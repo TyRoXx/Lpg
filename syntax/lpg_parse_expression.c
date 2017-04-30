@@ -10,7 +10,7 @@ rich_token rich_token_create(tokenize_status status, token_type token,
     return result;
 }
 
-int is_end_of_file(rich_token const *token)
+bool is_end_of_file(rich_token const *token)
 {
     return (token->status == tokenize_success) && (token->content.length == 0);
 }
@@ -21,7 +21,7 @@ parse_error parse_error_create(parse_error_type type, source_location where)
     return result;
 }
 
-int parse_error_equals(parse_error left, parse_error right)
+bool parse_error_equals(parse_error left, parse_error right)
 {
     return (left.type == right.type) &&
            source_location_equals(left.where, right.where);
@@ -636,7 +636,7 @@ static expression_parser_result parse_returnable(expression_parser *parser,
 
 expression_parser_result parse_expression(expression_parser *parser,
                                           size_t indentation,
-                                          int may_be_statement)
+                                          bool may_be_statement)
 {
     if (may_be_statement)
     {

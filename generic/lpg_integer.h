@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "lpg_unicode_view.h"
+#include <stdbool.h>
 
 typedef struct integer
 {
@@ -11,15 +12,15 @@ typedef struct integer
 
 integer integer_create(uint64_t high, uint64_t low);
 integer integer_shift_left_truncate(integer value, uint32_t bits);
-int integer_shift_left(integer *value, uint32_t bits);
+bool integer_shift_left(integer *value, uint32_t bits);
 unsigned integer_bit(integer value, uint32_t bit);
 void integer_set_bit(integer *target, uint32_t bit, unsigned value);
-int integer_equal(integer left, integer right);
-int integer_less(integer left, integer right);
+bool integer_equal(integer left, integer right);
+bool integer_less(integer left, integer right);
 integer integer_subtract(integer minuend, integer subtrahend);
-int integer_multiply(integer *left, integer right);
-int integer_add(integer *left, integer right);
-int integer_parse(integer *into, unicode_view from);
+bool integer_multiply(integer *left, integer right);
+bool integer_add(integer *left, integer right);
+bool integer_parse(integer *into, unicode_view from);
 
 typedef struct integer_division
 {

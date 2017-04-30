@@ -30,7 +30,7 @@ integer integer_shift_left_truncate(integer value, uint32_t bits)
     return result;
 }
 
-int integer_shift_left(integer *value, uint32_t bits)
+bool integer_shift_left(integer *value, uint32_t bits)
 {
     if (bits >= 64)
     {
@@ -72,12 +72,12 @@ void integer_set_bit(integer *target, uint32_t bit, unsigned value)
     }
 }
 
-int integer_equal(integer left, integer right)
+bool integer_equal(integer left, integer right)
 {
     return (left.high == right.high) && (left.low == right.low);
 }
 
-int integer_less(integer left, integer right)
+bool integer_less(integer left, integer right)
 {
     if (left.high < right.high)
     {
@@ -102,7 +102,7 @@ integer integer_subtract(integer minuend, integer subtrahend)
     return result;
 }
 
-int integer_multiply(integer *left, integer right)
+bool integer_multiply(integer *left, integer right)
 {
     integer product = integer_create(0, 0);
     for (uint32_t i = 0; i < 128; ++i)
@@ -124,7 +124,7 @@ int integer_multiply(integer *left, integer right)
     return 1;
 }
 
-int integer_add(integer *left, integer right)
+bool integer_add(integer *left, integer right)
 {
     uint64_t low = (left->low + right.low);
     uint64_t high = left->high;
@@ -146,7 +146,7 @@ int integer_add(integer *left, integer right)
     return 0;
 }
 
-int integer_parse(integer *into, unicode_view from)
+bool integer_parse(integer *into, unicode_view from)
 {
     ASSUME(into);
     ASSUME(from.length >= 1);

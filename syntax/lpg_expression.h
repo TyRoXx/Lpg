@@ -2,6 +2,7 @@
 #include "lpg_unicode_string.h"
 #include "lpg_integer.h"
 #include "lpg_source_location.h"
+#include <stdbool.h>
 
 typedef struct expression expression;
 
@@ -77,7 +78,7 @@ typedef struct match_case
 
 match_case match_case_create(expression *key, expression *action);
 void match_case_free(match_case *value);
-int match_case_equals(match_case const left, match_case const right);
+bool match_case_equals(match_case const left, match_case const right);
 
 typedef struct match
 {
@@ -170,8 +171,8 @@ expression expression_from_make_identifier(expression *value);
 expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
 void expression_free(expression const *this);
-int sequence_equals(sequence const left, sequence const right);
-int declare_equals(declare const left, declare const right);
-int assign_equals(assign const left, assign const right);
-int match_equals(match const left, match const right);
-int expression_equals(expression const *left, expression const *right);
+bool sequence_equals(sequence const left, sequence const right);
+bool declare_equals(declare const left, declare const right);
+bool assign_equals(assign const left, assign const right);
+bool match_equals(match const left, match const right);
+bool expression_equals(expression const *left, expression const *right);

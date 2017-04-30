@@ -175,8 +175,8 @@ void instruction_sequence_free(instruction_sequence const *value)
     }
 }
 
-int instruction_sequence_equals(instruction_sequence const *left,
-                                instruction_sequence const *right)
+bool instruction_sequence_equals(instruction_sequence const *left,
+                                 instruction_sequence const *right)
 {
     if (left->length != right->length)
     {
@@ -223,8 +223,8 @@ read_struct_instruction read_struct_instruction_create(register_id from_object,
     return result;
 }
 
-int read_struct_instruction_equals(read_struct_instruction const left,
-                                   read_struct_instruction const right)
+bool read_struct_instruction_equals(read_struct_instruction const left,
+                                    read_struct_instruction const right)
 {
     return (left.from_object == right.from_object) &&
            (left.member == right.member) && (left.into == right.into);
@@ -242,8 +242,8 @@ void string_literal_instruction_free(string_literal_instruction const *value)
     unicode_string_free(&value->value);
 }
 
-int string_literal_instruction_equals(string_literal_instruction const left,
-                                      string_literal_instruction const right)
+bool string_literal_instruction_equals(string_literal_instruction const left,
+                                       string_literal_instruction const right)
 {
     return unicode_string_equals(left.value, right.value) &&
            (left.into == right.into);
@@ -324,7 +324,7 @@ void instruction_free(instruction const *value)
     }
 }
 
-int instruction_equals(instruction const left, instruction const right)
+bool instruction_equals(instruction const left, instruction const right)
 {
     if (left.type != right.type)
     {

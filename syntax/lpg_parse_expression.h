@@ -14,7 +14,7 @@ typedef struct rich_token
 
 rich_token rich_token_create(tokenize_status status, token_type token,
                              unicode_view content, source_location where);
-int is_end_of_file(rich_token const *token);
+bool is_end_of_file(rich_token const *token);
 
 typedef enum parse_error_type
 {
@@ -37,7 +37,7 @@ typedef struct parse_error
 } parse_error;
 
 parse_error parse_error_create(parse_error_type type, source_location where);
-int parse_error_equals(parse_error left, parse_error right);
+bool parse_error_equals(parse_error left, parse_error right);
 
 typedef void *callback_user;
 
@@ -49,7 +49,7 @@ typedef struct expression_parser
     rich_token_producer find_next_token;
     parse_error_handler on_error;
     callback_user user;
-    int has_cached_token;
+    bool has_cached_token;
     rich_token cached_token;
 } expression_parser;
 
@@ -59,12 +59,12 @@ expression_parser expression_parser_create(rich_token_producer find_next_token,
 
 typedef struct expression_parser_result
 {
-    int is_success;
+    bool is_success;
     expression success;
 } expression_parser_result;
 
 expression_parser_result parse_expression(expression_parser *parser,
                                           size_t indentation,
-                                          int may_be_statement);
+                                          bool may_be_statement);
 
 sequence parse_program(expression_parser *parser);

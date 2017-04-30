@@ -25,7 +25,8 @@ void unicode_string_free(unicode_string const *s)
     deallocate(s->data);
 }
 
-int unicode_string_equals(unicode_string const left, unicode_string const right)
+bool unicode_string_equals(unicode_string const left,
+                           unicode_string const right)
 {
     return (left.length == right.length) &&
            !memcmp(left.data, right.data, left.length);

@@ -13,7 +13,7 @@ unicode_view unicode_view_from_string(unicode_string string)
     return result;
 }
 
-int unicode_view_equals_c_str(unicode_view left, char const *right)
+bool unicode_view_equals_c_str(unicode_view left, char const *right)
 {
     size_t const length = strlen(right);
     if (left.length != length)
@@ -23,7 +23,7 @@ int unicode_view_equals_c_str(unicode_view left, char const *right)
     return !memcmp(left.begin, right, length);
 }
 
-int unicode_view_equals(unicode_view left, unicode_view right)
+bool unicode_view_equals(unicode_view left, unicode_view right)
 {
     if (left.length != right.length)
     {

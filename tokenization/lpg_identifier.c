@@ -1,6 +1,6 @@
 #include "lpg_identifier.h"
 
-int is_identifier_begin(char const c)
+bool is_identifier_begin(char const c)
 {
     if ((c >= 'a') && (c <= 'z'))
     {
@@ -13,7 +13,7 @@ int is_identifier_begin(char const c)
     return (c == '_');
 }
 
-int is_identifier_middle(char const c)
+bool is_identifier_middle(char const c)
 {
     if (is_identifier_begin(c))
     {
@@ -26,7 +26,7 @@ int is_identifier_middle(char const c)
     return 0;
 }
 
-int is_identifier(char const *data, size_t size)
+bool is_identifier(char const *data, size_t size)
 {
     if (size < 1)
     {

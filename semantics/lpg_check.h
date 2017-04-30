@@ -13,8 +13,8 @@ typedef struct instruction_sequence
 instruction_sequence instruction_sequence_create(instruction *elements,
                                                  size_t length);
 void instruction_sequence_free(instruction_sequence const *value);
-int instruction_sequence_equals(instruction_sequence const *left,
-                                instruction_sequence const *right);
+bool instruction_sequence_equals(instruction_sequence const *left,
+                                 instruction_sequence const *right);
 
 typedef enum instruction_type
 {
@@ -30,7 +30,7 @@ typedef uint32_t register_id;
 
 typedef struct optional_register_id
 {
-    int is_set;
+    bool is_set;
     register_id value;
 } optional_register_id;
 
@@ -62,8 +62,8 @@ typedef struct read_struct_instruction
 read_struct_instruction read_struct_instruction_create(register_id from_object,
                                                        struct_member_id member,
                                                        register_id into);
-int read_struct_instruction_equals(read_struct_instruction const left,
-                                   read_struct_instruction const right);
+bool read_struct_instruction_equals(read_struct_instruction const left,
+                                    read_struct_instruction const right);
 
 typedef struct string_literal_instruction
 {
@@ -74,8 +74,8 @@ typedef struct string_literal_instruction
 string_literal_instruction
 string_literal_instruction_create(unicode_string value, register_id into);
 void string_literal_instruction_free(string_literal_instruction const *value);
-int string_literal_instruction_equals(string_literal_instruction const left,
-                                      string_literal_instruction const right);
+bool string_literal_instruction_equals(string_literal_instruction const left,
+                                       string_literal_instruction const right);
 
 struct instruction
 {
@@ -98,7 +98,7 @@ instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_unit(register_id into);
 instruction instruction_create_string_literal(string_literal_instruction value);
 void instruction_free(instruction const *value);
-int instruction_equals(instruction const left, instruction const right);
+bool instruction_equals(instruction const left, instruction const right);
 
 typedef struct checked_function
 {
