@@ -34,27 +34,38 @@ static value print(value const *arguments, void *environment)
     return value_from_unit();
 }
 
-void test_interprete(void)
+static void expect_output(char const *source, char const *output,
+                          structure const global_object)
 {
-    structure_member *globals_type = allocate_array(1, sizeof(*globals_type));
-    globals_type[0] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()),
-                                    type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"));
-    structure const non_empty_global = structure_create(globals_type, 1);
-
-    sequence root = parse("print(\"Hello, \")\nprint(\"world!\")");
-    checked_program checked =
-        check(root, non_empty_global, expect_no_errors, NULL);
-    sequence_free(&root);
-    structure_free(&non_empty_global);
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
     value const globals_values[1] = {value_from_function_pointer(
         function_pointer_value_from_external(print, &print_destination))};
+    sequence root = parse(source);
+    checked_program checked =
+        check(root, global_object, expect_no_errors, NULL);
+    sequence_free(&root);
     interprete(checked, globals_values);
     checked_program_free(&checked);
-    REQUIRE(memory_writer_equals(print_buffer, "Hello, world!"));
+    REQUIRE(memory_writer_equals(print_buffer, output));
     memory_writer_free(&print_buffer);
+}
+
+void test_interprete(void)
+{
+    structure_member *const globals = allocate_array(1, sizeof(*globals));
+    globals[0] = structure_member_create(
+        type_from_function_pointer(
+            function_pointer_create(type_allocate(type_from_unit()),
+                                    type_allocate(type_from_string_ref()), 1)),
+        unicode_string_from_c_str("print"));
+    structure const global_object = structure_create(globals, 1);
+
+    expect_output("", "", global_object);
+    expect_output("print(\"\")", "", global_object);
+    expect_output("print(\"Hello, world!\")", "Hello, world!", global_object);
+    expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!",
+                  global_object);
+
+    structure_free(&global_object);
 }

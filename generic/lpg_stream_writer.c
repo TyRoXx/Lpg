@@ -16,7 +16,10 @@ success_indicator stream_writer_write_bytes(stream_writer writer,
 
 void memory_writer_free(memory_writer *writer)
 {
-    deallocate(writer->data);
+    if (writer->data)
+    {
+        deallocate(writer->data);
+    }
 }
 
 success_indicator memory_writer_write(void *user, char const *data,

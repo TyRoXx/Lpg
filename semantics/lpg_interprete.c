@@ -92,7 +92,8 @@ static void run_sequence(instruction_sequence const sequence,
         }
 
         case instruction_unit:
-            LPG_TO_DO();
+            registers[element.unit] = value_from_unit();
+            break;
 
         case instruction_string_literal:
             registers[element.string_literal.into] = value_from_string_ref(
