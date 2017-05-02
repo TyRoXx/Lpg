@@ -3,6 +3,7 @@
 #include "lpg_arithmetic.h"
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 
 static size_t total_allocations = 0;
 static size_t active_allocations = 0;
@@ -64,4 +65,11 @@ void deallocate(void *memory)
 size_t count_total_allocations(void)
 {
     return total_allocations;
+}
+
+void *copy_array_impl(void const *from, size_t size_in_bytes)
+{
+    void *result = allocate(size_in_bytes);
+    memcpy(result, from, size_in_bytes);
+    return result;
 }
