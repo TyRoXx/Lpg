@@ -193,12 +193,14 @@ int main(int const argc, char **const argv)
         return 1;
     }
 
+#if (SIZE_MAX < UINT64_MAX)
     if (source_size > SIZE_MAX)
     {
         fprintf(stderr, "Source file does not fit into memory\n");
         fclose(source_file);
         return 1;
     }
+#endif
 
     fseek(source_file, 0, SEEK_SET);
     size_t const checked_source_size = (size_t)source_size;
