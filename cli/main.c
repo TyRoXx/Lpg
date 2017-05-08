@@ -1,3 +1,6 @@
+#ifndef _MSC_VER
+#define _FILE_OFFSET_BITS 64
+#endif
 #include <stdio.h>
 #include "lpg_find_next_token.h"
 #include "lpg_stream_writer.h"
@@ -176,11 +179,11 @@ int main(int const argc, char **const argv)
     }
 
     fseek(source_file, 0, SEEK_END);
-    long long const source_size =
+
 #ifdef _WIN32
-        _ftelli64
+    long long const source_size = _ftelli64
 #else
-        ftello64
+    off_t const source_size = ftello
 #endif
         (source_file);
     if (source_size < 0)
