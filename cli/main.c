@@ -78,7 +78,7 @@ static void handle_parse_error(parse_error const error,
                        lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(success ==
            stream_writer_write_bytes(actual_user->diagnostics, line,
-                                     (buffer + sizeof(buffer) - line)));
+                                     (size_t)(buffer + sizeof(buffer) - line)));
     ASSERT(success ==
            stream_writer_write_string(actual_user->diagnostics, "\n"));
 }
@@ -138,9 +138,9 @@ static void handle_semantic_error(semantic_error const error, void *user)
         char const *const line =
             integer_format(integer_create(0, error.where.line + 1),
                            lower_case_digits, 10, buffer, sizeof(buffer));
-        ASSERT(success ==
-               stream_writer_write_bytes(context->diagnostics, line,
-                                         (buffer + sizeof(buffer) - line)));
+        ASSERT(success == stream_writer_write_bytes(
+                              context->diagnostics, line,
+                              (size_t)(buffer + sizeof(buffer) - line)));
         ASSERT(success ==
                stream_writer_write_string(context->diagnostics, "\n"));
         break;
@@ -176,7 +176,13 @@ int main(int const argc, char **const argv)
     }
 
     fseek(source_file, 0, SEEK_END);
-    long long const source_size = _ftelli64(source_file);
+    long long const source_size =
+#ifdef _WIN32
+        _ftelli64
+#else
+        ftello64
+#endif
+        (source_file);
     if (source_size < 0)
     {
         fprintf(stderr, "Could not determine size of source file\n");
