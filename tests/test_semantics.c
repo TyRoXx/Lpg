@@ -1,19 +1,20 @@
-#include "find_next_token.h"
 #include "test_semantics.h"
 #include "test.h"
 #include "lpg_check.h"
 #include "lpg_parse_expression.h"
 #include "lpg_allocate.h"
 #include <string.h>
+#include "handle_parse_error.h"
+#include "lpg_find_next_token.h"
 
 static sequence parse(char const *input)
 {
     test_parser_user user = {
-        input, strlen(input), NULL, 0, source_location_create(0, 0)};
+        {input, strlen(input), source_location_create(0, 0)}, NULL, 0};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
     sequence const result = parse_program(&parser);
-    REQUIRE(user.remaining_size == 0);
+    REQUIRE(user.base.remaining_size == 0);
     return result;
 }
 

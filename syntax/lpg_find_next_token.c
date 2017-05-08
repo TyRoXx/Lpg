@@ -1,9 +1,9 @@
-#include "find_next_token.h"
-#include "test.h"
+#include "lpg_find_next_token.h"
+#include "lpg_assert.h"
 
 rich_token find_next_token(callback_user user)
 {
-    test_parser_user *const parser_user = user;
+    parser_user *const parser_user = user;
     if (parser_user->remaining_size == 0)
     {
         rich_token result = rich_token_create(
@@ -14,8 +14,8 @@ rich_token find_next_token(callback_user user)
     }
     tokenize_result tokenized =
         tokenize(parser_user->remaining_input, parser_user->remaining_size);
-    REQUIRE(tokenized.length >= 1);
-    REQUIRE(tokenized.length <= parser_user->remaining_size);
+    ASSUME(tokenized.length >= 1);
+    ASSUME(tokenized.length <= parser_user->remaining_size);
     rich_token result = rich_token_create(
         tokenized.status, tokenized.token,
         unicode_view_create(parser_user->remaining_input, tokenized.length),
@@ -33,13 +33,4 @@ rich_token find_next_token(callback_user user)
     parser_user->remaining_input += tokenized.length;
     parser_user->remaining_size -= tokenized.length;
     return result;
-}
-
-void handle_error(parse_error const error, callback_user user)
-{
-    test_parser_user *const parser_user = user;
-    REQUIRE(parser_user->expected_count >= 1);
-    REQUIRE(parse_error_equals(parser_user->expected_errors[0], error));
-    --parser_user->expected_count;
-    ++parser_user->expected_errors;
 }

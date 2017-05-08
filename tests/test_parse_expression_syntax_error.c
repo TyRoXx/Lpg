@@ -1,16 +1,19 @@
-#include "find_next_token.h"
 #include "test_parse_expression_syntax_error.h"
 #include "test.h"
 #include "lpg_parse_expression.h"
 #include "lpg_array_size.h"
 #include "lpg_allocate.h"
+#include "handle_parse_error.h"
+#include "lpg_find_next_token.h"
 
 static void test_syntax_error(parse_error const *expected_errors,
                               size_t const expected_count,
                               expression *const expected, unicode_string input)
 {
-    test_parser_user user = {input.data, input.length, expected_errors,
-                             expected_count, source_location_create(0, 0)};
+    test_parser_user user = {
+        {input.data, input.length, source_location_create(0, 0)},
+        expected_errors,
+        expected_count};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
     expression_parser_result result = parse_expression(&parser, 0, 1);
@@ -20,7 +23,7 @@ static void test_syntax_error(parse_error const *expected_errors,
         REQUIRE(expression_equals(expected, &result.success));
         expression_free(expected);
         expression_free(&result.success);
-        REQUIRE(user.remaining_size == 0);
+        REQUIRE(user.base.remaining_size == 0);
     }
     else
     {
