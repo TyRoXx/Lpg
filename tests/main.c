@@ -14,6 +14,7 @@
 #include "test_expression.h"
 #include "test_semantics.h"
 #include "test_interprete.h"
+#include "test_cli.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
@@ -34,7 +35,8 @@ int main(void)
                                     test_parse_expression_success,
                                     test_parse_expression_syntax_error,
                                     test_semantics,
-                                    test_interprete};
+                                    test_interprete,
+                                    test_cli};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();

@@ -112,6 +112,7 @@ static optional_sequence parse(unicode_view const input,
     sequence const result = parse_program(&parser);
     if (user.has_error)
     {
+        sequence_free(&result);
         return optional_sequence_none;
     }
     ASSUME(user.base.remaining_size == 0);

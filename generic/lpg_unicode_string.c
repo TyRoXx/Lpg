@@ -31,3 +31,10 @@ bool unicode_string_equals(unicode_string const left,
     return (left.length == right.length) &&
            !memcmp(left.data, right.data, left.length);
 }
+
+char *unicode_string_c_str(unicode_string *value)
+{
+    value->data = reallocate(value->data, value->length + 1);
+    value->data[value->length] = '\0';
+    return value->data;
+}
