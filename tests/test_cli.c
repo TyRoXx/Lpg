@@ -59,6 +59,18 @@ static void expect_output(int argc, char **argv, bool const expected_exit_code,
     memory_writer_free(&diagnostics);
 }
 
+static void expect_output_with_source(char const *const source,
+                                      bool const expected_exit_code,
+                                      char const *const expected_diagnostics,
+                                      char const *const expected_print_output)
+{
+    unicode_string name = write_file(source);
+    char *arguments[] = {"lpg", unicode_string_c_str(&name)};
+    expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code,
+                  expected_diagnostics, expected_print_output);
+    unicode_string_free(&name);
+}
+
 void test_cli(void)
 {
     {
@@ -71,27 +83,12 @@ void test_cli(void)
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
                       "Could not open source file\n", "");
     }
-    {
-        unicode_string name = write_file("print(\"Hello, world!\")");
-        char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        expect_output(
-            LPG_ARRAY_SIZE(arguments), arguments, false, "", "Hello, world!");
-        unicode_string_free(&name);
-    }
-    {
-        unicode_string name = write_file("syntax error here");
-        char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
-                      "Expected declaration or assignment in line 1\n"
-                      "Expected expression in line 1\n",
-                      "");
-        unicode_string_free(&name);
-    }
-    {
-        unicode_string name = write_file("unknown_identifier()");
-        char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
-                      "Unknown identifier in line 1\n", "");
-        unicode_string_free(&name);
-    }
+    expect_output_with_source(
+        "print(\"Hello, world!\")", false, "", "Hello, world!");
+    expect_output_with_source("syntax error here", true,
+                              "Expected declaration or assignment in line 1\n"
+                              "Expected expression in line 1\n",
+                              "");
+    expect_output_with_source(
+        "unknown_identifier()", true, "Unknown identifier in line 1\n", "");
 }
