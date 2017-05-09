@@ -33,32 +33,54 @@ static unicode_string write_file(char const *const content)
     return result;
 }
 
+static void expect_output(int argc, char **argv, bool const expected_exit_code,
+                          char const *const expected_diagnostics,
+                          char const *const expected_print_output)
+{
+    memory_writer diagnostics = {NULL, 0};
+    memory_writer print_output = {NULL, 0};
+    REQUIRE(expected_exit_code == run_cli(argc, argv,
+                                          memory_writer_erase(&diagnostics),
+                                          memory_writer_erase(&print_output)));
+    REQUIRE(memory_writer_equals(diagnostics, expected_diagnostics));
+    REQUIRE(memory_writer_equals(print_output, expected_print_output));
+    memory_writer_free(&print_output);
+    memory_writer_free(&diagnostics);
+}
+
 void test_cli(void)
 {
     {
         char *arguments[] = {"lpg"};
-        REQUIRE(1 == run_cli(LPG_ARRAY_SIZE(arguments), arguments));
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Arguments: filename\n", "");
     }
     {
         char *arguments[] = {"lpg", "not-found"};
-        REQUIRE(1 == run_cli(LPG_ARRAY_SIZE(arguments), arguments));
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Could not open source file\n", "");
     }
     {
         unicode_string name = write_file("print(\"Hello, world!\")");
         char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        REQUIRE(0 == run_cli(LPG_ARRAY_SIZE(arguments), arguments));
+        expect_output(
+            LPG_ARRAY_SIZE(arguments), arguments, false, "", "Hello, world!");
         unicode_string_free(&name);
     }
     {
         unicode_string name = write_file("syntax error here");
         char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        REQUIRE(1 == run_cli(LPG_ARRAY_SIZE(arguments), arguments));
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Expected declaration or assignment in line 1\n"
+                      "Expected expression in line 1\n",
+                      "");
         unicode_string_free(&name);
     }
     {
         unicode_string name = write_file("unknown_identifier()");
         char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-        REQUIRE(1 == run_cli(LPG_ARRAY_SIZE(arguments), arguments));
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Unknown identifier in line 1\n", "");
         unicode_string_free(&name);
     }
 }

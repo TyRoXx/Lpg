@@ -12,22 +12,6 @@
 #include "lpg_interprete.h"
 #include "lpg_allocate.h"
 
-static success_indicator write_file(void *const user, char const *const data,
-                                    size_t const length)
-{
-    if (fwrite(data, 1, length, user) == length)
-    {
-        return success;
-    }
-    return failure;
-}
-
-static stream_writer make_file_writer(FILE *const file)
-{
-    stream_writer const result = {write_file, file};
-    return result;
-}
-
 typedef struct cli_parser_user
 {
     parser_user base;
@@ -158,11 +142,13 @@ static value print(value const *arguments, void *environment)
     return value_from_unit();
 }
 
-bool run_cli(int const argc, char **const argv)
+bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
+             stream_writer print_destination)
 {
     if (argc < 2)
     {
-        fprintf(stderr, "Arguments: filename\n");
+        ASSERT(success == stream_writer_write_string(
+                              diagnostics, "Arguments: filename\n"));
         return true;
     }
 
@@ -174,7 +160,8 @@ bool run_cli(int const argc, char **const argv)
 #endif
     if (!source_file)
     {
-        fprintf(stderr, "Could not open source file\n");
+        ASSERT(success == stream_writer_write_string(
+                              diagnostics, "Could not open source file\n"));
         return true;
     }
 
@@ -188,7 +175,9 @@ bool run_cli(int const argc, char **const argv)
         (source_file);
     if (source_size < 0)
     {
-        fprintf(stderr, "Could not determine size of source file\n");
+        ASSERT(success ==
+               stream_writer_write_string(
+                   diagnostics, "Could not determine size of source file\n"));
         fclose(source_file);
         return true;
     }
@@ -196,7 +185,9 @@ bool run_cli(int const argc, char **const argv)
 #if (SIZE_MAX < UINT64_MAX)
     if (source_size > SIZE_MAX)
     {
-        fprintf(stderr, "Source file does not fit into memory\n");
+        ASSERT(success ==
+               stream_writer_write_string(
+                   diagnostics, "Source file does not fit into memory\n"));
         fclose(source_file);
         return true;
     }
@@ -210,7 +201,9 @@ bool run_cli(int const argc, char **const argv)
         fread(source.data, 1, source.length, source_file);
     if (read_result != source.length)
     {
-        fprintf(stderr, "Could not read from source file\n");
+        ASSERT(success ==
+               stream_writer_write_string(
+                   diagnostics, "Could not read from source file\n"));
         fclose(source_file);
         unicode_string_free(&source);
         return true;
@@ -226,10 +219,8 @@ bool run_cli(int const argc, char **const argv)
         unicode_string_from_c_str("print"));
     structure const global_object = structure_create(globals, 1);
 
-    stream_writer print_destination = make_file_writer(stdout);
     value const globals_values[1] = {value_from_function_pointer(
         function_pointer_value_from_external(print, &print_destination))};
-    stream_writer const diagnostics = make_file_writer(stderr);
     optional_sequence const root =
         parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)

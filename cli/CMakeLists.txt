@@ -1,4 +1,5 @@
 include_directories(../cli_impl)
+include_directories(../generic)
 file(GLOB sources "*.c" "*.h")
 add_executable(lpg ${sources})
 target_link_libraries(lpg cli_impl)
