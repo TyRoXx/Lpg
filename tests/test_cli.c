@@ -9,6 +9,7 @@
 
 static unicode_string write_file(char const *const content)
 {
+#ifdef _WIN32
     char *const name =
 #ifdef _MSC_VER
         _tempnam
@@ -20,17 +21,24 @@ static unicode_string write_file(char const *const content)
     size_t const name_length = strlen(name);
     unicode_string const result = {allocate(name_length), name_length};
     memcpy(result.data, name, name_length);
-#ifdef _WIN32
     FILE *file = NULL;
     fopen_s(&file, name, "wb");
-#else
-    FILE *const file = fopen(name, "wb");
-#endif
     REQUIRE(file);
     REQUIRE(strlen(content) == fwrite(content, 1, strlen(content), file));
     fclose(file);
     free(name);
     return result;
+#else
+    char name[] = "/tmp/XXXXXX";
+    int const file = mkstemp(name);
+    REQUIRE(file >= 0);
+    REQUIRE(write(file, content, strlen(content)) == strlen(content));
+    close(file);
+    size_t const name_length = strlen(name);
+    unicode_string const result = {allocate(name_length), name_length};
+    memcpy(result.data, name, name_length);
+    return result;
+#endif
 }
 
 static void expect_output(int argc, char **argv, bool const expected_exit_code,
