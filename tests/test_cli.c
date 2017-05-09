@@ -35,7 +35,7 @@ static unicode_string write_file(char const *const content)
     char name[] = "/tmp/XXXXXX";
     int const file = mkstemp(name);
     REQUIRE(file >= 0);
-    REQUIRE(write(file, content, strlen(content)) == strlen(content));
+    REQUIRE(write(file, content, strlen(content)) == (ssize_t)strlen(content));
     close(file);
     size_t const name_length = strlen(name);
     unicode_string const result = {allocate(name_length), name_length};
@@ -48,8 +48,8 @@ static void expect_output(int argc, char **argv, bool const expected_exit_code,
                           char const *const expected_diagnostics,
                           char const *const expected_print_output)
 {
-    memory_writer diagnostics = {NULL, 0};
-    memory_writer print_output = {NULL, 0};
+    memory_writer diagnostics = {NULL, 0, 0};
+    memory_writer print_output = {NULL, 0, 0};
     REQUIRE(expected_exit_code == run_cli(argc, argv,
                                           memory_writer_erase(&diagnostics),
                                           memory_writer_erase(&print_output)));
