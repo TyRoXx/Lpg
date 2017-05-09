@@ -62,6 +62,7 @@ static void handle_parse_error(parse_error const error,
     char const *const line =
         integer_format(integer_create(0, error.where.line + 1),
                        lower_case_digits, 10, buffer, sizeof(buffer));
+    ASSERT(line);
     ASSERT(success ==
            stream_writer_write_bytes(actual_user->diagnostics, line,
                                      (size_t)(buffer + sizeof(buffer) - line)));
@@ -125,6 +126,7 @@ static void handle_semantic_error(semantic_error const error, void *user)
         char const *const line =
             integer_format(integer_create(0, error.where.line + 1),
                            lower_case_digits, 10, buffer, sizeof(buffer));
+        ASSERT(line);
         ASSERT(success == stream_writer_write_bytes(
                               context->diagnostics, line,
                               (size_t)(buffer + sizeof(buffer) - line)));
