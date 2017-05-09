@@ -68,6 +68,7 @@ static void expect_output_with_source(char const *const source,
     char *arguments[] = {"lpg", unicode_string_c_str(&name)};
     expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code,
                   expected_diagnostics, expected_print_output);
+    REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
 }
 
