@@ -6,6 +6,9 @@
 #include "lpg_allocate.h"
 #include <stdio.h>
 #include <string.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
 
 static unicode_string write_file(char const *const content)
 {
