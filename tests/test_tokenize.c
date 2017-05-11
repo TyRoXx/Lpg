@@ -25,6 +25,7 @@ static void test_invalid(char const *input)
 void test_tokenize(void)
 {
     test_single_token(token_newline, 1, "\n");
+    test_single_token(token_newline, 2, "\r\n");
     test_single_token(token_newline, 1, "\n\n");
     test_single_token(token_newline, 1, "\n ");
     test_single_token(token_newline, 1, "\naaaa");

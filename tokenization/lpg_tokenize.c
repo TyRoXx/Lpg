@@ -105,6 +105,13 @@ tokenize_result tokenize(char const *input, size_t length)
     case '\n':
         return make_success(token_newline, 1);
 
+    case '\r':
+        if ((length >= 2) && (input[1] == '\n'))
+        {
+            return make_success(token_newline, 2);
+        }
+        return make_success(token_newline, 1);
+
     case '(':
         return make_success(token_left_parenthesis, 1);
 
