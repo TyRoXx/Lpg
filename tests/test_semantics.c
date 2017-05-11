@@ -6,6 +6,7 @@
 #include <string.h>
 #include "handle_parse_error.h"
 #include "lpg_find_next_token.h"
+#include "lpg_for.h"
 
 static sequence parse(char const *input)
 {
@@ -123,22 +124,28 @@ void test_semantics(void)
     structure const non_empty_global = structure_create(globals, 3);
 
     {
-        sequence root = parse("f()");
-        checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
+        char const *const sources[] = {"f()\n", "f()"};
+        LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
+        {
+            sequence root = parse(sources[i]);
+            checked_program checked =
+                check(root, non_empty_global, expect_no_errors, NULL);
+            sequence_free(&root);
+            REQUIRE(checked.function_count == 1);
+            instruction const expected_body_elements[] = {
+                instruction_create_global(0),
+                instruction_create_read_struct(
+                    read_struct_instruction_create(0, 0, 1)),
+                instruction_create_call(
+                    call_instruction_create(1, NULL, 0, 2))};
+            instruction_sequence const expected_body =
+                instruction_sequence_create(
+                    LPG_COPY_ARRAY(expected_body_elements));
+            REQUIRE(instruction_sequence_equals(
+                &expected_body, &checked.functions[0].body));
+            checked_program_free(&checked);
+            instruction_sequence_free(&expected_body);
+        }
     }
     {
         sequence root = parse("f()\n"
