@@ -37,4 +37,4 @@
 #define UNREACHABLE() ASSERT(0)
 #endif
 
-#define LPG_TO_DO() UNREACHABLE()
+#define LPG_TO_DO() ASSERT(!"LPG_TO_DO - not implemented yet")
