@@ -37,4 +37,4 @@
 #define UNREACHABLE() ASSERT(0)
 #endif
 
-#define LPG_TO_DO() ASSERT(!"LPG_TO_DO - not implemented yet")
+#define LPG_TO_DO() ASSERT(!(char const *)"LPG_TO_DO - not implemented yet")
