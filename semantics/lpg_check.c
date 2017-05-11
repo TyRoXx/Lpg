@@ -262,7 +262,7 @@ evaluate_expression(function_checking_state *state,
             instruction_create_string_literal(string_literal_instruction_create(
                 decode_string_literal(unicode_view_from_string(element.string)),
                 result)));
-        static type const string_type = {type_kind_string_ref, {NULL, 0}};
+        static type const string_type = {type_kind_string_ref, {{NULL, 0}}};
         return evaluate_expression_result_create(result, &string_type);
     }
 
@@ -307,7 +307,7 @@ static evaluate_expression_result check_sequence(function_checking_state *state,
 {
     if (input.length == 0)
     {
-        static type const unit_type = {type_kind_unit, {NULL, 0}};
+        static type const unit_type = {type_kind_unit, {{NULL, 0}}};
         evaluate_expression_result const final_result =
             evaluate_expression_result_create(
                 allocate_register(state), &unit_type);
