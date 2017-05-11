@@ -41,6 +41,23 @@ static void expect_errors(semantic_error const error, void *user)
     --expected->count;
 }
 
+static void check_single_wellformed_function(
+    char const *const source, structure const non_empty_global,
+    instruction *const expected_body_elements, size_t const expected_body_size)
+{
+    sequence root = parse(source);
+    checked_program checked =
+        check(root, non_empty_global, expect_no_errors, NULL);
+    sequence_free(&root);
+    REQUIRE(checked.function_count == 1);
+    instruction_sequence const expected_body =
+        instruction_sequence_create(expected_body_elements, expected_body_size);
+    REQUIRE(instruction_sequence_equals(
+        &expected_body, &checked.functions[0].body));
+    checked_program_free(&checked);
+    instruction_sequence_free(&expected_body);
+}
+
 void test_semantics(void)
 {
     REQUIRE(!instruction_equals(
@@ -127,25 +144,75 @@ void test_semantics(void)
         char const *const sources[] = {"f()\n", "f()"};
         LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
         {
-            sequence root = parse(sources[i]);
-            checked_program checked =
-                check(root, non_empty_global, expect_no_errors, NULL);
-            sequence_free(&root);
-            REQUIRE(checked.function_count == 1);
             instruction const expected_body_elements[] = {
                 instruction_create_global(0),
                 instruction_create_read_struct(
                     read_struct_instruction_create(0, 0, 1)),
                 instruction_create_call(
                     call_instruction_create(1, NULL, 0, 2))};
-            instruction_sequence const expected_body =
-                instruction_sequence_create(
-                    LPG_COPY_ARRAY(expected_body_elements));
-            REQUIRE(instruction_sequence_equals(
-                &expected_body, &checked.functions[0].body));
-            checked_program_free(&checked);
-            instruction_sequence_free(&expected_body);
+            check_single_wellformed_function(
+                sources[i], non_empty_global,
+                LPG_COPY_ARRAY(expected_body_elements));
         }
+    }
+    {
+        instruction const loop_body[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 0, 1)),
+            instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_loop(
+            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
+        check_single_wellformed_function("loop\n"
+                                         "    f()",
+                                         non_empty_global,
+                                         expected_body_elements, 1);
+    }
+    {
+        instruction const loop_body[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 0, 1)),
+            instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
+            instruction_create_global(3),
+            instruction_create_read_struct(
+                read_struct_instruction_create(3, 1, 4)),
+            instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
+        instruction const expected_body_elements[] = {instruction_create_loop(
+            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))};
+        check_single_wellformed_function(
+            "loop\n"
+            "    f()\n"
+            "    g()",
+            non_empty_global, LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        instruction const loop_body[] = {instruction_create_break()};
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_loop(
+            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
+        check_single_wellformed_function("loop\n"
+                                         "    break",
+                                         non_empty_global,
+                                         expected_body_elements, 1);
+    }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 2;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 2, 1)),
+            instruction_create_string_literal(string_literal_instruction_create(
+                unicode_string_from_c_str("hello, world!"), 2)),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3))};
+        check_single_wellformed_function(
+            "print(\"hello, world!\")", non_empty_global,
+            LPG_COPY_ARRAY(expected_body_elements));
     }
     {
         sequence root = parse("f()\n"
@@ -163,97 +230,6 @@ void test_semantics(void)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 0, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
-    }
-    {
-        sequence root = parse("loop\n"
-                              "    f()");
-        checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        instruction const loop_body[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
-        instruction *const expected_body_elements =
-            allocate_array(1, sizeof(*expected_body_elements));
-        expected_body_elements[0] = instruction_create_loop(
-            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
-        instruction_sequence const expected_body =
-            instruction_sequence_create(expected_body_elements, 1);
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
-    }
-    {
-        sequence root = parse("loop\n"
-                              "    f()\n"
-                              "    g()");
-        checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        instruction const loop_body[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_global(3),
-            instruction_create_read_struct(
-                read_struct_instruction_create(3, 1, 4)),
-            instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
-        instruction const expected_body_elements[] = {instruction_create_loop(
-            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
-    }
-    {
-        sequence root = parse("loop\n"
-                              "    break");
-        checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        instruction const loop_body[] = {instruction_create_break()};
-        instruction *const expected_body_elements =
-            allocate_array(1, sizeof(*expected_body_elements));
-        expected_body_elements[0] = instruction_create_loop(
-            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
-        instruction_sequence const expected_body =
-            instruction_sequence_create(expected_body_elements, 1);
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
-    }
-    {
-        sequence root = parse("print(\"hello, world!\")");
-        checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        register_id *const arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = 2;
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 2, 1)),
-            instruction_create_string_literal(string_literal_instruction_create(
-                unicode_string_from_c_str("hello, world!"), 2)),
-            instruction_create_call(
-                call_instruction_create(1, arguments, 1, 3))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
