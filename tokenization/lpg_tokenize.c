@@ -30,6 +30,7 @@ static int can_follow_integer(char c)
     case '=':
     case ':':
     case ',':
+    case '.':
         return 1;
 
     default:
@@ -123,6 +124,9 @@ tokenize_result tokenize(char const *input, size_t length)
 
     case ',':
         return make_success(token_comma, 1);
+
+    case '.':
+        return make_success(token_dot, 1);
 
     case '=':
         if ((length >= 2) && (input[1] == '>'))

@@ -351,6 +351,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_fat_arrow:
         case token_return:
         case token_case:
+        case token_dot:
             pop(parser);
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),
@@ -626,6 +627,29 @@ static expression_parser_result parse_returnable(expression_parser *parser,
                     parse_error_create(
                         parse_error_expected_declaration_or_assignment,
                         next_operator.where),
+                    parser->user);
+                return result;
+            }
+            if (maybe_operator.token == token_dot)
+            {
+                pop(parser);
+                rich_token const element_name = peek(parser);
+                pop(parser);
+                if (element_name.token == token_identifier)
+                {
+                    expression access = expression_from_access_structure(
+                        access_structure_create(
+                            expression_allocate(result.success),
+                            expression_allocate(expression_from_identifier(
+                                identifier_expression_create(
+                                    unicode_view_copy(element_name.content),
+                                    element_name.where)))));
+                    result.success = access;
+                    continue;
+                }
+                parser->on_error(
+                    parse_error_create(
+                        parse_error_expected_element_name, element_name.where),
                     parser->user);
                 return result;
             }

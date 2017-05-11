@@ -13,6 +13,7 @@ typedef enum token_type
     token_left_parenthesis,
     token_right_parenthesis,
     token_comma,
+    token_dot,
     token_colon,
     token_assign,
     token_fat_arrow,

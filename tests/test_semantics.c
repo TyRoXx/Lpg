@@ -124,21 +124,42 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
 
-    structure_member *globals = allocate_array(3, sizeof(*globals));
+    structure_member *globals = allocate_array(5, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
         unicode_string_from_c_str("f"));
+
     globals[1] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
         unicode_string_from_c_str("g"));
+
     globals[2] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()),
                                     type_allocate(type_from_string_ref()), 1)),
         unicode_string_from_c_str("print"));
-    structure const non_empty_global = structure_create(globals, 3);
+
+    enumeration_element *const boolean_elements =
+        allocate_array(2, sizeof(*boolean_elements));
+    boolean_elements[0] =
+        enumeration_element_create(unicode_string_from_c_str("false"));
+    boolean_elements[1] =
+        enumeration_element_create(unicode_string_from_c_str("true"));
+    type const boolean =
+        type_from_enumeration(enumeration_create(boolean_elements, 2));
+
+    globals[3] = structure_member_create(
+        type_from_reference(&boolean), unicode_string_from_c_str("boolean"));
+
+    globals[4] = structure_member_create(
+        type_from_function_pointer(function_pointer_create(
+            type_allocate(type_from_unit()),
+            type_allocate(type_from_reference(&boolean)), 1)),
+        unicode_string_from_c_str("assert"));
+
+    structure const non_empty_global = structure_create(globals, 5);
 
     {
         char const *const sources[] = {"f()\n", "f()"};
@@ -215,6 +236,42 @@ void test_semantics(void)
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 4;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_global(2),
+            instruction_create_read_struct(
+                read_struct_instruction_create(2, 3, 3)),
+            instruction_create_read_struct(
+                read_struct_instruction_create(3, 1, 4)),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 5))};
+        check_single_wellformed_function(
+            "assert(boolean.true)", non_empty_global,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 4;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_global(2),
+            instruction_create_read_struct(
+                read_struct_instruction_create(2, 3, 3)),
+            instruction_create_read_struct(
+                read_struct_instruction_create(3, 0, 4)),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 5))};
+        check_single_wellformed_function(
+            "assert(boolean.false)", non_empty_global,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
         sequence root = parse("f()\n"
                               "h()");
         semantic_error const errors[] = {semantic_error_create(
@@ -238,4 +295,5 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
     structure_free(&non_empty_global);
+    type_free(&boolean);
 }

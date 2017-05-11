@@ -44,6 +44,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected colon";
     case parse_error_expected_case:
         return "Expected case";
+    case parse_error_expected_element_name:
+        return "Expected element name";
     }
     UNREACHABLE();
 }

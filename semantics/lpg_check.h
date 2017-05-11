@@ -29,16 +29,6 @@ typedef enum instruction_type
 
 typedef uint32_t register_id;
 
-typedef struct optional_register_id
-{
-    bool is_set;
-    register_id value;
-} optional_register_id;
-
-optional_register_id optional_register_id_create(register_id value);
-
-static optional_register_id const optional_register_id_empty = {0, 0};
-
 typedef struct call_instruction
 {
     register_id callee;
@@ -120,7 +110,8 @@ typedef struct checked_program
 
 typedef enum semantic_error_type
 {
-    semantic_error_unknown_identifier
+    semantic_error_unknown_identifier,
+    semantic_error_unknown_element
 } semantic_error_type;
 
 typedef struct semantic_error

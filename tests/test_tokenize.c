@@ -52,6 +52,8 @@ void test_tokenize(void)
     test_single_token(token_assign, 1, "==");
     test_single_token(token_fat_arrow, 2, "=>");
     test_single_token(token_comma, 1, ",");
+    test_single_token(token_dot, 1, ".");
+    test_single_token(token_dot, 1, "..");
     test_single_token(token_integer, 1, "1");
     test_single_token(token_integer, 1, "1)");
     test_single_token(token_integer, 1, "1 a");
