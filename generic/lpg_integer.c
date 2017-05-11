@@ -51,7 +51,7 @@ bool integer_shift_left(integer *value, uint32_t bits)
     return 1;
 }
 
-unsigned integer_bit(integer value, uint32_t bit)
+bool integer_bit(integer value, uint32_t bit)
 {
     if (bit < 64u)
     {
@@ -60,7 +60,7 @@ unsigned integer_bit(integer value, uint32_t bit)
     return (value.high >> (bit - 64u)) & 1u;
 }
 
-void integer_set_bit(integer *target, uint32_t bit, unsigned value)
+void integer_set_bit(integer *target, uint32_t bit, bool value)
 {
     if (bit < 64u)
     {
