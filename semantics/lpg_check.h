@@ -23,7 +23,8 @@ typedef enum instruction_type
     instruction_global,
     instruction_read_struct,
     instruction_unit,
-    instruction_string_literal
+    instruction_string_literal,
+    instruction_break
 } instruction_type;
 
 typedef uint32_t register_id;
@@ -51,6 +52,8 @@ call_instruction call_instruction_create(register_id callee,
                                          size_t argument_count,
                                          register_id result);
 void call_instruction_free(call_instruction const *value);
+bool call_instruction_equals(call_instruction const left,
+                             call_instruction const right);
 
 typedef struct read_struct_instruction
 {
@@ -97,6 +100,7 @@ instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_unit(register_id into);
 instruction instruction_create_string_literal(string_literal_instruction value);
+instruction instruction_create_break(void);
 void instruction_free(instruction const *value);
 bool instruction_equals(instruction const left, instruction const right);
 

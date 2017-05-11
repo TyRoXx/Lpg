@@ -45,6 +45,26 @@ void test_semantics(void)
     REQUIRE(!instruction_equals(
         instruction_create_loop(instruction_sequence_create(NULL, 0)),
         instruction_create_call(call_instruction_create(0, NULL, 0, 0))));
+    REQUIRE(!instruction_equals(
+        instruction_create_call(call_instruction_create(0, NULL, 0, 0)),
+        instruction_create_call(call_instruction_create(1, NULL, 0, 0))));
+    REQUIRE(!instruction_equals(
+        instruction_create_call(call_instruction_create(0, NULL, 0, 0)),
+        instruction_create_call(call_instruction_create(0, NULL, 0, 1))));
+    {
+        register_id arguments = 0;
+        REQUIRE(!instruction_equals(
+            instruction_create_call(call_instruction_create(0, NULL, 0, 0)),
+            instruction_create_call(
+                call_instruction_create(0, &arguments, 1, 0))));
+    }
+    {
+        register_id left = 0;
+        register_id right = 1;
+        REQUIRE(!instruction_equals(
+            instruction_create_call(call_instruction_create(0, &left, 1, 0)),
+            instruction_create_call(call_instruction_create(0, &right, 1, 0))));
+    }
     {
         instruction_sequence const left = instruction_sequence_create(NULL, 0);
         instruction_sequence const right = instruction_sequence_create(
@@ -187,6 +207,25 @@ void test_semantics(void)
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
+    {
+        sequence root = parse("loop\n"
+                              "    break");
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction const loop_body[] = {instruction_create_break()};
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_loop(
+            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
+        instruction_sequence const expected_body =
+            instruction_sequence_create(expected_body_elements, 1);
         REQUIRE(instruction_sequence_equals(
             &expected_body, &checked.functions[0].body));
         checked_program_free(&checked);

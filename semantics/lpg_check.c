@@ -129,6 +129,9 @@ static optional_register_id evaluate_expression(function_checking_state *state,
     }
 
     case expression_type_break:
+        add_instruction(function, instruction_create_break());
+        return optional_register_id_empty;
+
     case expression_type_sequence:
     case expression_type_declare:
     case expression_type_tuple:
@@ -215,6 +218,31 @@ void call_instruction_free(call_instruction const *value)
     }
 }
 
+bool call_instruction_equals(call_instruction const left,
+                             call_instruction const right)
+{
+    if (left.callee != right.callee)
+    {
+        return false;
+    }
+    if (left.result != right.result)
+    {
+        return false;
+    }
+    if (left.argument_count != right.argument_count)
+    {
+        return false;
+    }
+    LPG_FOR(size_t, i, left.argument_count)
+    {
+        if (left.arguments[i] != right.arguments[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 read_struct_instruction read_struct_instruction_create(register_id from_object,
                                                        struct_member_id member,
                                                        register_id into)
@@ -297,6 +325,13 @@ instruction instruction_create_string_literal(string_literal_instruction value)
     return result;
 }
 
+instruction instruction_create_break()
+{
+    instruction result;
+    result.type = instruction_break;
+    return result;
+}
+
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -321,6 +356,9 @@ void instruction_free(instruction const *value)
     case instruction_string_literal:
         string_literal_instruction_free(&value->string_literal);
         break;
+
+    case instruction_break:
+        break;
     }
 }
 
@@ -328,12 +366,12 @@ bool instruction_equals(instruction const left, instruction const right)
 {
     if (left.type != right.type)
     {
-        return 0;
+        return false;
     }
     switch (left.type)
     {
     case instruction_call:
-        return 1;
+        return call_instruction_equals(left.call, right.call);
 
     case instruction_loop:
         return instruction_sequence_equals(&left.loop, &right.loop);
@@ -351,6 +389,9 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_string_literal:
         return string_literal_instruction_equals(
             left.string_literal, right.string_literal);
+
+    case instruction_break:
+        return true;
     }
     UNREACHABLE();
 }

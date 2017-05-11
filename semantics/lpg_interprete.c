@@ -42,8 +42,14 @@ value value_from_unit(void)
 
 static value call_function(checked_function const callee, value const *globals);
 
-static void run_sequence(instruction_sequence const sequence,
-                         value const *globals, value *registers)
+typedef enum run_sequence_result
+{
+    run_sequence_result_break,
+    run_sequence_result_continue
+} run_sequence_result;
+
+static run_sequence_result run_sequence(instruction_sequence const sequence,
+                                        value const *globals, value *registers)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
@@ -75,8 +81,22 @@ static void run_sequence(instruction_sequence const sequence,
         }
 
         case instruction_loop:
-            run_sequence(element.loop, globals, registers);
+        {
+            bool is_running = true;
+            while (is_running)
+            {
+                switch (run_sequence(element.loop, globals, registers))
+                {
+                case run_sequence_result_break:
+                    is_running = false;
+                    break;
+
+                case run_sequence_result_continue:
+                    break;
+                }
+            }
             break;
+        }
 
         case instruction_global:
             registers[element.global_into] = value_from_flat_object(globals);
@@ -99,15 +119,20 @@ static void run_sequence(instruction_sequence const sequence,
             registers[element.string_literal.into] = value_from_string_ref(
                 unicode_view_from_string(element.string_literal.value));
             break;
+
+        case instruction_break:
+            return run_sequence_result_break;
         }
     }
+    return run_sequence_result_continue;
 }
 
 static value call_function(checked_function const callee, value const *globals)
 {
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
-    run_sequence(callee.body, globals, registers);
+    ASSERT(run_sequence_result_continue ==
+           run_sequence(callee.body, globals, registers));
     deallocate(registers);
     return value_from_unit();
 }

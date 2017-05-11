@@ -67,6 +67,10 @@ void test_interprete(void)
     expect_output("print(\"Hello, world!\")", "Hello, world!", global_object);
     expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!",
                   global_object);
+    expect_output("loop\n"
+                  "    print(\"Hello, world!\")\n"
+                  "    break",
+                  "Hello, world!", global_object);
 
     structure_free(&global_object);
 }
