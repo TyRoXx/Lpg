@@ -113,29 +113,36 @@ typedef struct semantic_error_context
     bool has_error;
 } semantic_error_context;
 
+static char const *semantic_error_text(semantic_error_type const type)
+{
+    switch (type)
+    {
+    case semantic_error_unknown_identifier:
+        return "Unknown identifier";
+    case semantic_error_unknown_element:
+        return "Unknown structure element";
+    }
+    UNREACHABLE();
+}
+
 static void handle_semantic_error(semantic_error const error, void *user)
 {
     semantic_error_context *const context = user;
     context->has_error = true;
-    switch (error.type)
-    {
-    case semantic_error_unknown_identifier:
-        ASSERT(success == stream_writer_write_string(
-                              context->diagnostics, "Unknown identifier"));
-        ASSERT(success ==
-               stream_writer_write_string(context->diagnostics, " in line "));
-        char buffer[64];
-        char const *const line =
-            integer_format(integer_create(0, error.where.line + 1),
-                           lower_case_digits, 10, buffer, sizeof(buffer));
-        ASSERT(line);
-        ASSERT(success == stream_writer_write_bytes(
-                              context->diagnostics, line,
-                              (size_t)(buffer + sizeof(buffer) - line)));
-        ASSERT(success ==
-               stream_writer_write_string(context->diagnostics, "\n"));
-        break;
-    }
+    ASSERT(success ==
+           stream_writer_write_string(
+               context->diagnostics, semantic_error_text(error.type)));
+    ASSERT(success ==
+           stream_writer_write_string(context->diagnostics, " in line "));
+    char buffer[64];
+    char const *const line =
+        integer_format(integer_create(0, error.where.line + 1),
+                       lower_case_digits, 10, buffer, sizeof(buffer));
+    ASSERT(line);
+    ASSERT(success ==
+           stream_writer_write_bytes(context->diagnostics, line,
+                                     (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(success == stream_writer_write_string(context->diagnostics, "\n"));
 }
 
 static value print(value const *arguments, void *environment)
