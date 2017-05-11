@@ -68,6 +68,9 @@ void type_free(type const *value)
     case type_kind_enumeration:
         enumeration_free(&value->enum_);
         break;
+
+    case type_kind_referenced:
+        break;
     }
 }
 
