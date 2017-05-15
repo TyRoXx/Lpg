@@ -21,7 +21,8 @@ typedef struct evaluate_expression_result
 } evaluate_expression_result;
 
 static evaluate_expression_result
-evaluate_expression_result_create(register_id where, type const *type_)
+evaluate_expression_result_create(register_id const where,
+                                  type const *const type_)
 {
     evaluate_expression_result result = {true, where, type_};
     return result;
@@ -119,18 +120,33 @@ static type const *get_return_type(type const *const callee)
     UNREACHABLE();
 }
 
+static evaluate_expression_result
+evaluate_expression(function_checking_state *state,
+                    instruction_sequence *function, expression const element);
+
 static type const *read_element(function_checking_state *state,
                                 instruction_sequence *function,
-                                register_id const object,
-                                const type *const object_type,
+                                expression const object_tree,
                                 const identifier_expression *const element,
                                 register_id const result)
 {
-    switch (object_type->kind)
+    size_t const previous_function_size = function->length;
+    register_id const previous_used_registers = state->used_registers;
+    evaluate_expression_result const object =
+        evaluate_expression(state, function, object_tree);
+    if (!object.has_value)
+    {
+        LPG_TO_DO();
+    }
+
+    type const *const actual_type = (object.type_->kind == type_kind_referenced)
+                                        ? object.type_->referenced
+                                        : object.type_;
+    switch (actual_type->kind)
     {
     case type_kind_structure:
     {
-        structure const *const structure_ = &object_type->structure_;
+        structure const *const structure_ = &actual_type->structure_;
         LPG_FOR(struct_member_id, i, structure_->count)
         {
             if (unicode_view_equals(
@@ -139,7 +155,7 @@ static type const *read_element(function_checking_state *state,
             {
                 add_instruction(function, instruction_create_read_struct(
                                               read_struct_instruction_create(
-                                                  object, i, result)));
+                                                  object.where, i, result)));
                 return &structure_->members[i].what;
             }
         }
@@ -156,7 +172,9 @@ static type const *read_element(function_checking_state *state,
 
     case type_kind_enumeration:
     {
-        enumeration const *const enum_ = &object_type->enum_;
+        function->length = previous_function_size;
+        state->used_registers = previous_used_registers;
+        enumeration const *const enum_ = &actual_type->enum_;
         LPG_FOR(enum_element_id, i, enum_->size)
         {
             if (unicode_view_equals(
@@ -167,7 +185,7 @@ static type const *read_element(function_checking_state *state,
                     function,
                     instruction_create_instantiate_enum(
                         instantiate_enum_instruction_create(result, i)));
-                return object_type;
+                return object.type_;
             }
         }
         state->on_error(semantic_error_create(
@@ -177,8 +195,7 @@ static type const *read_element(function_checking_state *state,
     }
 
     case type_kind_referenced:
-        return read_element(
-            state, function, object, object_type->referenced, element, result);
+        UNREACHABLE();
     }
     UNREACHABLE();
 }
@@ -230,12 +247,6 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_access_structure:
     {
-        evaluate_expression_result const object = evaluate_expression(
-            state, function, *element.access_structure.object);
-        if (!object.has_value)
-        {
-            LPG_TO_DO();
-        }
         identifier_expression const *const member =
             evaluate_compile_time_expression(element.access_structure.member);
         if (!member)
@@ -244,7 +255,7 @@ evaluate_expression(function_checking_state *state,
         }
         register_id const result = allocate_register(state);
         type const *const element_type = read_element(
-            state, function, object.where, object.type_, member, result);
+            state, function, *element.access_structure.object, member, result);
         if (!element_type)
         {
             LPG_TO_DO();

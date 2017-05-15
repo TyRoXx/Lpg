@@ -237,36 +237,30 @@ void test_semantics(void)
     }
     {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = 4;
+        arguments[0] = 2;
         instruction const expected_body_elements[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_global(2),
-            instruction_create_read_struct(
-                read_struct_instruction_create(2, 3, 3)),
             instruction_create_instantiate_enum(
-                instantiate_enum_instruction_create(4, 1)),
+                instantiate_enum_instruction_create(2, 1)),
             instruction_create_call(
-                call_instruction_create(1, arguments, 1, 5))};
+                call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
             "assert(boolean.true)", non_empty_global,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = 4;
+        arguments[0] = 2;
         instruction const expected_body_elements[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_global(2),
-            instruction_create_read_struct(
-                read_struct_instruction_create(2, 3, 3)),
             instruction_create_instantiate_enum(
-                instantiate_enum_instruction_create(4, 0)),
+                instantiate_enum_instruction_create(2, 0)),
             instruction_create_call(
-                call_instruction_create(1, arguments, 1, 5))};
+                call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
             "assert(boolean.false)", non_empty_global,
             LPG_COPY_ARRAY(expected_body_elements));
