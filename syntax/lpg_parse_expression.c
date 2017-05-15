@@ -640,10 +640,9 @@ static expression_parser_result parse_returnable(expression_parser *parser,
                     expression access = expression_from_access_structure(
                         access_structure_create(
                             expression_allocate(result.success),
-                            expression_allocate(expression_from_identifier(
-                                identifier_expression_create(
-                                    unicode_view_copy(element_name.content),
-                                    element_name.where)))));
+                            identifier_expression_create(
+                                unicode_view_copy(element_name.content),
+                                element_name.where)));
                     result.success = access;
                     continue;
                 }

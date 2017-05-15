@@ -71,35 +71,6 @@ static unicode_string decode_string_literal(unicode_view const literal)
     return unicode_string_from_range(literal.begin + 1, literal.length - 2);
 }
 
-static identifier_expression const *
-evaluate_compile_time_expression(expression const *evaluated)
-{
-    switch (evaluated->type)
-    {
-    case expression_type_lambda:
-    case expression_type_call:
-    case expression_type_integer_literal:
-    case expression_type_access_structure:
-    case expression_type_match:
-    case expression_type_string:
-        LPG_TO_DO();
-
-    case expression_type_identifier:
-        return &evaluated->identifier;
-
-    case expression_type_make_identifier:
-    case expression_type_assign:
-    case expression_type_return:
-    case expression_type_loop:
-    case expression_type_break:
-    case expression_type_sequence:
-    case expression_type_declare:
-    case expression_type_tuple:
-        LPG_TO_DO();
-    }
-    UNREACHABLE();
-}
-
 static type const *get_return_type(type const callee)
 {
     switch (callee.kind)
@@ -257,15 +228,10 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_access_structure:
     {
-        identifier_expression const *const member =
-            evaluate_compile_time_expression(element.access_structure.member);
-        if (!member)
-        {
-            LPG_TO_DO();
-        }
         register_id const result = allocate_register(state);
-        type const *const element_type = read_element(
-            state, function, *element.access_structure.object, member, result);
+        type const *const element_type =
+            read_element(state, function, *element.access_structure.object,
+                         &element.access_structure.member, result);
         if (!element_type)
         {
             return evaluate_expression_result_empty;
@@ -297,7 +263,6 @@ evaluate_expression(function_checking_state *state,
         return address;
     }
 
-    case expression_type_make_identifier:
     case expression_type_assign:
     case expression_type_return:
         LPG_TO_DO();

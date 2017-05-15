@@ -37,7 +37,6 @@ typedef enum expression_type
     expression_type_match,
     expression_type_string,
     expression_type_identifier,
-    expression_type_make_identifier,
     expression_type_assign,
     expression_type_return,
     expression_type_loop,
@@ -61,14 +60,20 @@ typedef struct call
 
 call call_create(expression *callee, tuple arguments);
 
+typedef struct identifier_expression
+{
+    unicode_string value;
+    source_location source;
+} identifier_expression;
+
 typedef struct access_structure
 {
     expression *object;
-    expression *member;
+    identifier_expression member;
 } access_structure;
 
 access_structure access_structure_create(expression *object,
-                                         expression *member);
+                                         identifier_expression member);
 
 typedef struct match_case
 {
@@ -127,12 +132,6 @@ expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
 expression expression_from_match(match value);
 
-typedef struct identifier_expression
-{
-    unicode_string value;
-    source_location source;
-} identifier_expression;
-
 identifier_expression identifier_expression_create(unicode_string value,
                                                    source_location source);
 void identifier_expression_free(identifier_expression const *value);
@@ -149,7 +148,6 @@ struct expression
         match match;
         unicode_string string;
         identifier_expression identifier;
-        expression *make_identifier;
         assign assign;
         expression *return_;
         sequence loop_body;
@@ -167,7 +165,6 @@ expression expression_from_lambda(lambda lambda);
 expression expression_from_unicode_string(unicode_string value);
 expression expression_from_call(call value);
 expression expression_from_identifier(identifier_expression identifier);
-expression expression_from_make_identifier(expression *value);
 expression expression_from_tuple(tuple value);
 expression *expression_allocate(expression value);
 void expression_free(expression const *this);
