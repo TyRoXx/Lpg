@@ -163,9 +163,10 @@ static type const *read_element(function_checking_state *state,
                     unicode_view_from_string(element->value),
                     unicode_view_from_string(enum_->elements[i].name)))
             {
-                add_instruction(function, instruction_create_read_struct(
-                                              read_struct_instruction_create(
-                                                  object, i, result)));
+                add_instruction(
+                    function,
+                    instruction_create_instantiate_enum(
+                        instantiate_enum_instruction_create(result, i)));
                 return object_type;
             }
         }
@@ -434,6 +435,20 @@ bool string_literal_instruction_equals(string_literal_instruction const left,
            (left.into == right.into);
 }
 
+instantiate_enum_instruction
+instantiate_enum_instruction_create(register_id into, enum_element_id element)
+{
+    instantiate_enum_instruction result = {into, element};
+    return result;
+}
+
+bool instantiate_enum_instruction_equals(
+    instantiate_enum_instruction const left,
+    instantiate_enum_instruction const right)
+{
+    return (left.into == right.into) && (left.element == right.element);
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -489,6 +504,15 @@ instruction instruction_create_break()
     return result;
 }
 
+instruction
+instruction_create_instantiate_enum(instantiate_enum_instruction value)
+{
+    instruction result;
+    result.type = instruction_instantiate_enum;
+    result.instantiate_enum = value;
+    return result;
+}
+
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -515,6 +539,9 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_break:
+        break;
+
+    case instruction_instantiate_enum:
         break;
     }
 }
@@ -549,6 +576,10 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_break:
         return true;
+
+    case instruction_instantiate_enum:
+        return instantiate_enum_instruction_equals(
+            left.instantiate_enum, right.instantiate_enum);
     }
     UNREACHABLE();
 }

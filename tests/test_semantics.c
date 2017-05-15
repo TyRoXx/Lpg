@@ -245,8 +245,8 @@ void test_semantics(void)
             instruction_create_global(2),
             instruction_create_read_struct(
                 read_struct_instruction_create(2, 3, 3)),
-            instruction_create_read_struct(
-                read_struct_instruction_create(3, 1, 4)),
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(4, 1)),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 5))};
         check_single_wellformed_function(
@@ -263,8 +263,8 @@ void test_semantics(void)
             instruction_create_global(2),
             instruction_create_read_struct(
                 read_struct_instruction_create(2, 3, 3)),
-            instruction_create_read_struct(
-                read_struct_instruction_create(3, 0, 4)),
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(4, 0)),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 5))};
         check_single_wellformed_function(
