@@ -117,10 +117,8 @@ static char const *semantic_error_text(semantic_error_type const type)
 {
     switch (type)
     {
-    case semantic_error_unknown_identifier:
-        return "Unknown identifier";
     case semantic_error_unknown_element:
-        return "Unknown structure element";
+        return "Unknown structure element or global identifier";
     }
     UNREACHABLE();
 }

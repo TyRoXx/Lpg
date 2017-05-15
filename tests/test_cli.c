@@ -91,5 +91,6 @@ void test_cli(void)
                               "Expected expression in line 1\n",
                               "");
     expect_output_with_source(
-        "unknown_identifier()", true, "Unknown identifier in line 1\n", "");
+        "unknown_identifier()", true,
+        "Unknown structure element or global identifier in line 1\n", "");
 }

@@ -126,7 +126,6 @@ typedef struct checked_program
 
 typedef enum semantic_error_type
 {
-    semantic_error_unknown_identifier,
     semantic_error_unknown_element
 } semantic_error_type;
 

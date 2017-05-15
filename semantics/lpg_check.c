@@ -24,6 +24,7 @@ static evaluate_expression_result
 evaluate_expression_result_create(register_id const where,
                                   type const *const type_)
 {
+    ASSUME(type_);
     evaluate_expression_result result = {true, where, type_};
     return result;
 }
@@ -99,15 +100,15 @@ evaluate_compile_time_expression(expression const *evaluated)
     UNREACHABLE();
 }
 
-static type const *get_return_type(type const *const callee)
+static type const *get_return_type(type const callee)
 {
-    switch (callee->kind)
+    switch (callee.kind)
     {
     case type_kind_structure:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        return callee->function_pointer_.result;
+        return callee.function_pointer_.result;
 
     case type_kind_unit:
     case type_kind_string_ref:
@@ -115,9 +116,32 @@ static type const *get_return_type(type const *const callee)
         LPG_TO_DO();
 
     case type_kind_referenced:
-        return get_return_type(callee->referenced);
+        return get_return_type(*callee.referenced);
     }
     UNREACHABLE();
+}
+
+static type const *read_structure_element(
+    function_checking_state *state, instruction_sequence *function,
+    structure const *const type, register_id const where,
+    unicode_view const element_name,
+    source_location const element_name_location, register_id const result)
+{
+    LPG_FOR(struct_member_id, i, type->count)
+    {
+        if (unicode_view_equals(
+                element_name, unicode_view_from_string(type->members[i].name)))
+        {
+            add_instruction(function, instruction_create_read_struct(
+                                          read_struct_instruction_create(
+                                              where, i, result)));
+            return &type->members[i].what;
+        }
+    }
+    state->on_error(semantic_error_create(
+                        semantic_error_unknown_element, element_name_location),
+                    state->user);
+    return NULL;
 }
 
 static evaluate_expression_result
@@ -145,25 +169,9 @@ static type const *read_element(function_checking_state *state,
     switch (actual_type->kind)
     {
     case type_kind_structure:
-    {
-        structure const *const structure_ = &actual_type->structure_;
-        LPG_FOR(struct_member_id, i, structure_->count)
-        {
-            if (unicode_view_equals(
-                    unicode_view_from_string(element->value),
-                    unicode_view_from_string(structure_->members[i].name)))
-            {
-                add_instruction(function, instruction_create_read_struct(
-                                              read_struct_instruction_create(
-                                                  object.where, i, result)));
-                return &structure_->members[i].what;
-            }
-        }
-        state->on_error(semantic_error_create(
-                            semantic_error_unknown_element, element->source),
-                        state->user);
-        return NULL;
-    }
+        return read_structure_element(
+            state, function, &actual_type->structure_, object.where,
+            unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_function_pointer:
     case type_kind_unit:
@@ -234,7 +242,8 @@ evaluate_expression(function_checking_state *state,
             function, instruction_create_call(call_instruction_create(
                           callee.where, arguments,
                           element.call.arguments.length, result)));
-        type const *const return_type = get_return_type(callee.type_);
+        ASSUME(callee.type_);
+        type const *const return_type = get_return_type(*callee.type_);
         if (!return_type)
         {
             LPG_TO_DO();
@@ -632,25 +641,20 @@ static evaluate_expression_result read_variable(function_checking_state *state,
                                                 source_location where)
 {
     structure const globals = *state->global;
-    LPG_FOR(struct_member_id, i, globals.count)
+    size_t const previous_function_size = to->length;
+    register_id const previous_used_registers = state->used_registers;
+    register_id const global = allocate_register(state);
+    add_instruction(to, instruction_create_global(global));
+    register_id const result = allocate_register(state);
+    type const *const element_type = read_structure_element(
+        state, to, &globals, global, name, where, result);
+    if (!element_type)
     {
-        if (unicode_view_equals(
-                name, unicode_view_from_string(globals.members[i].name)))
-        {
-            register_id const global = allocate_register(state);
-            add_instruction(to, instruction_create_global(global));
-            register_id const result = allocate_register(state);
-            add_instruction(
-                to, instruction_create_read_struct(
-                        read_struct_instruction_create(global, i, result)));
-            return evaluate_expression_result_create(
-                result, &globals.members[i].what);
-        }
+        to->length = previous_function_size;
+        state->used_registers = previous_used_registers;
+        return evaluate_expression_result_empty;
     }
-    state->on_error(
-        semantic_error_create(semantic_error_unknown_identifier, where),
-        state->user);
-    return evaluate_expression_result_empty;
+    return evaluate_expression_result_create(result, element_type);
 }
 
 checked_program check(sequence const root, structure const global,

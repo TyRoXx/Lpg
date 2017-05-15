@@ -269,7 +269,7 @@ void test_semantics(void)
         sequence root = parse("f()\n"
                               "h()");
         semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_identifier, source_location_create(1, 0))};
+            semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = {errors, 1};
         checked_program checked =
             check(root, non_empty_global, expect_errors, &expected);
