@@ -288,6 +288,27 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+    {
+        sequence root = parse("assert(boolean.something)");
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_unknown_element, source_location_create(0, 15))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, non_empty_global, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1))};
+        instruction_sequence const expected_body =
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
     structure_free(&non_empty_global);
     type_free(&boolean);
 }

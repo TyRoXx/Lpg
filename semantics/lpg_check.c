@@ -233,6 +233,7 @@ evaluate_expression(function_checking_state *state,
                 state, function, element.call.arguments.elements[i]);
             if (!argument.has_value)
             {
+                deallocate(arguments);
                 return evaluate_expression_result_empty;
             }
             arguments[i] = argument.where;
@@ -267,7 +268,7 @@ evaluate_expression(function_checking_state *state,
             state, function, *element.access_structure.object, member, result);
         if (!element_type)
         {
-            LPG_TO_DO();
+            return evaluate_expression_result_empty;
         }
         return evaluate_expression_result_create(result, element_type);
     }
