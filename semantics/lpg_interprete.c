@@ -122,6 +122,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
 
         case instruction_break:
             return run_sequence_result_break;
+
+        case instruction_instantiate_enum:
+            LPG_TO_DO();
         }
     }
     return run_sequence_result_continue;
