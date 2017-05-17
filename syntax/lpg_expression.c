@@ -202,6 +202,44 @@ expression expression_from_match(match value)
     return result;
 }
 
+source_location expression_source_begin(expression const value)
+{
+    switch (value.type)
+    {
+    case expression_type_lambda:
+        LPG_TO_DO();
+    case expression_type_call:
+        LPG_TO_DO();
+    case expression_type_integer_literal:
+        LPG_TO_DO();
+    case expression_type_access_structure:
+        LPG_TO_DO();
+    case expression_type_match:
+        LPG_TO_DO();
+
+    case expression_type_string:
+        return value.string.source;
+
+    case expression_type_identifier:
+        LPG_TO_DO();
+    case expression_type_assign:
+        LPG_TO_DO();
+    case expression_type_return:
+        LPG_TO_DO();
+    case expression_type_loop:
+        LPG_TO_DO();
+    case expression_type_break:
+        LPG_TO_DO();
+    case expression_type_sequence:
+        LPG_TO_DO();
+    case expression_type_declare:
+        LPG_TO_DO();
+    case expression_type_tuple:
+        LPG_TO_DO();
+    }
+    UNREACHABLE();
+}
+
 identifier_expression identifier_expression_create(unicode_string value,
                                                    source_location source)
 {
@@ -210,6 +248,18 @@ identifier_expression identifier_expression_create(unicode_string value,
 }
 
 void identifier_expression_free(identifier_expression const *value)
+{
+    unicode_string_free(&value->value);
+}
+
+string_expression string_expression_create(unicode_string value,
+                                           source_location source)
+{
+    string_expression result = {value, source};
+    return result;
+}
+
+void string_expression_free(string_expression const *value)
 {
     unicode_string_free(&value->value);
 }
@@ -255,7 +305,7 @@ expression expression_from_lambda(lambda lambda)
     return result;
 }
 
-expression expression_from_unicode_string(unicode_string value)
+expression expression_from_string(string_expression value)
 {
     expression result;
     result.type = expression_type_string;
@@ -318,7 +368,7 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_string:
-        unicode_string_free(&this->string);
+        string_expression_free(&this->string);
         break;
 
     case expression_type_identifier:

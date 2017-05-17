@@ -114,9 +114,9 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_string:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "\""));
-        LPG_FOR(size_t, i, value->string.length)
+        LPG_FOR(size_t, i, value->string.value.length)
         {
-            switch (value->string.data[i])
+            switch (value->string.value.data[i])
             {
             case '\"':
             case '\'':
@@ -124,7 +124,8 @@ success_indicator save_expression(stream_writer const to,
                 LPG_TRY(stream_writer_write_string(to, "\\"));
                 break;
             }
-            LPG_TRY(stream_writer_write_bytes(to, (value->string.data + i), 1));
+            LPG_TRY(stream_writer_write_bytes(
+                to, (value->string.value.data + i), 1));
         }
         return stream_writer_write_string(to, "\"");
 

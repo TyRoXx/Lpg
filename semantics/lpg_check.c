@@ -101,6 +101,88 @@ static type const *get_return_type(type const callee)
     UNREACHABLE();
 }
 
+static type flatten(type const possibly_referenced)
+{
+    switch (possibly_referenced.kind)
+    {
+    case type_kind_structure:
+    case type_kind_function_pointer:
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+    case type_kind_type:
+        return possibly_referenced;
+
+    case type_kind_referenced:
+        return *possibly_referenced.referenced;
+    }
+    UNREACHABLE();
+}
+
+static bool is_implicitly_convertible(type const from, type const into)
+{
+    type const flat_from = flatten(from);
+    type const flat_into = flatten(into);
+    if (flat_from.kind != flat_into.kind)
+    {
+        return false;
+    }
+    switch (flat_from.kind)
+    {
+    case type_kind_structure:
+        LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        LPG_TO_DO();
+
+    case type_kind_unit:
+        return true;
+
+    case type_kind_string_ref:
+        return true;
+
+    case type_kind_enumeration:
+        /*TODO check properly*/
+        return true;
+
+    case type_kind_referenced:
+        UNREACHABLE();
+
+    case type_kind_type:
+        return true;
+    }
+    UNREACHABLE();
+}
+
+static bool function_parameter_accepts_type(type const function,
+                                            size_t const parameter,
+                                            type const argument)
+{
+    switch (function.kind)
+    {
+    case type_kind_structure:
+        LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        return (parameter < function.function_pointer_.arity) &&
+               is_implicitly_convertible(
+                   argument, function.function_pointer_.arguments[parameter]);
+
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+        LPG_TO_DO();
+
+    case type_kind_referenced:
+        return function_parameter_accepts_type(
+            *function.referenced, parameter, argument);
+
+    case type_kind_type:
+        LPG_TO_DO();
+    }
+    UNREACHABLE();
+}
+
 typedef struct read_structure_element_result
 {
     type const *type_;
@@ -143,14 +225,41 @@ static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element);
 
+typedef struct instruction_checkpoint
+{
+    function_checking_state *state;
+    instruction_sequence *sequence;
+    size_t size_of_sequence;
+    register_id used_registers;
+} instruction_checkpoint;
+
+static instruction_checkpoint make_checkpoint(function_checking_state *state,
+                                              instruction_sequence *sequence)
+{
+    instruction_checkpoint result = {
+        state, sequence, sequence->length, state->used_registers};
+    return result;
+}
+
+static void restore(instruction_checkpoint const previous_code)
+{
+    previous_code.state->used_registers = previous_code.used_registers;
+    for (size_t i = previous_code.size_of_sequence;
+         i < previous_code.sequence->length; ++i)
+    {
+        instruction_free(previous_code.sequence->elements + i);
+    }
+    previous_code.sequence->length = previous_code.size_of_sequence;
+}
+
 static read_structure_element_result
 read_element(function_checking_state *state, instruction_sequence *function,
              expression const object_tree,
              const identifier_expression *const element,
              register_id const result)
 {
-    size_t const previous_function_size = function->length;
-    register_id const previous_used_registers = state->used_registers;
+    instruction_checkpoint const previous_code =
+        make_checkpoint(state, function);
     evaluate_expression_result const object =
         evaluate_expression(state, function, object_tree);
     if (!object.has_value)
@@ -184,8 +293,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
     {
         if (!object.compile_time_value.is_set)
         {
-            function->length = previous_function_size;
-            state->used_registers = previous_used_registers;
+            restore(previous_code);
             state->on_error(
                 semantic_error_create(
                     semantic_error_expected_compile_time_type, element->source),
@@ -206,8 +314,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_enumeration:
         {
             enumeration const *const enum_ = &left_side_type->enum_;
-            function->length = previous_function_size;
-            state->used_registers = previous_used_registers;
+            restore(previous_code);
             LPG_FOR(enum_element_id, i, enum_->size)
             {
                 if (unicode_view_equals(
@@ -254,6 +361,8 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_call:
     {
+        instruction_checkpoint const previous_code =
+            make_checkpoint(state, function);
         evaluate_expression_result const callee =
             evaluate_expression(state, function, *element.call.callee);
         if (!callee.has_value)
@@ -264,10 +373,23 @@ evaluate_expression(function_checking_state *state,
             allocate_array(element.call.arguments.length, sizeof(*arguments));
         LPG_FOR(size_t, i, element.call.arguments.length)
         {
-            evaluate_expression_result argument = evaluate_expression(
-                state, function, element.call.arguments.elements[i]);
+            expression const argument_tree = element.call.arguments.elements[i];
+            evaluate_expression_result argument =
+                evaluate_expression(state, function, argument_tree);
             if (!argument.has_value)
             {
+                restore(previous_code);
+                deallocate(arguments);
+                return evaluate_expression_result_empty;
+            }
+            if (!function_parameter_accepts_type(
+                    *callee.type_, i, *argument.type_))
+            {
+                restore(previous_code);
+                state->on_error(semantic_error_create(
+                                    semantic_error_type_mismatch,
+                                    expression_source_begin(argument_tree)),
+                                state->user);
                 deallocate(arguments);
                 return evaluate_expression_result_empty;
             }
@@ -294,16 +416,15 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_access_structure:
     {
-        size_t const previous_function_size = function->length;
-        register_id const previous_used_registers = state->used_registers;
+        instruction_checkpoint const previous_code =
+            make_checkpoint(state, function);
         register_id const result = allocate_register(state);
         read_structure_element_result const element_read =
             read_element(state, function, *element.access_structure.object,
                          &element.access_structure.member, result);
         if (!element_read.type_)
         {
-            function->length = previous_function_size;
-            state->used_registers = previous_used_registers;
+            restore(previous_code);
             return evaluate_expression_result_empty;
         }
         return evaluate_expression_result_create(
@@ -316,7 +437,8 @@ evaluate_expression(function_checking_state *state,
     case expression_type_string:
     {
         register_id const result = allocate_register(state);
-        unicode_view const value = unicode_view_from_string(element.string);
+        unicode_view const value =
+            unicode_view_from_string(element.string.value);
         add_instruction(
             function,
             instruction_create_string_literal(string_literal_instruction_create(
@@ -403,8 +525,7 @@ static evaluate_expression_result read_variable(function_checking_state *state,
                                                 source_location where)
 {
     structure const globals = *state->global;
-    size_t const previous_function_size = to->length;
-    register_id const previous_used_registers = state->used_registers;
+    instruction_checkpoint const previous_code = make_checkpoint(state, to);
     register_id const global = allocate_register(state);
     add_instruction(to, instruction_create_global(global));
     register_id const result = allocate_register(state);
@@ -412,8 +533,7 @@ static evaluate_expression_result read_variable(function_checking_state *state,
         state, to, &globals, global, name, where, result);
     if (!element_read.type_)
     {
-        to->length = previous_function_size;
-        state->used_registers = previous_used_registers;
+        restore(previous_code);
         return evaluate_expression_result_empty;
     }
     return evaluate_expression_result_create(

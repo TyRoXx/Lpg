@@ -131,10 +131,21 @@ expression expression_from_sequence(sequence value);
 expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
 expression expression_from_match(match value);
+source_location expression_source_begin(expression const value);
 
 identifier_expression identifier_expression_create(unicode_string value,
                                                    source_location source);
 void identifier_expression_free(identifier_expression const *value);
+
+typedef struct string_expression
+{
+    unicode_string value;
+    source_location source;
+} string_expression;
+
+string_expression string_expression_create(unicode_string value,
+                                           source_location source);
+void string_expression_free(string_expression const *value);
 
 struct expression
 {
@@ -146,7 +157,7 @@ struct expression
         integer integer_literal;
         access_structure access_structure;
         match match;
-        unicode_string string;
+        string_expression string;
         identifier_expression identifier;
         assign assign;
         expression *return_;
@@ -162,7 +173,7 @@ void call_free(call const *this);
 void access_structure_free(access_structure const *this);
 void match_free(match const *this);
 expression expression_from_lambda(lambda lambda);
-expression expression_from_unicode_string(unicode_string value);
+expression expression_from_string(string_expression value);
 expression expression_from_call(call value);
 expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_tuple(tuple value);

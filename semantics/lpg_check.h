@@ -7,7 +7,8 @@ typedef enum semantic_error_type
 {
     semantic_error_unknown_element,
     semantic_error_expected_compile_time_type,
-    semantic_error_no_members_on_enum_elements
+    semantic_error_no_members_on_enum_elements,
+    semantic_error_type_mismatch
 } semantic_error_type;
 
 typedef struct semantic_error

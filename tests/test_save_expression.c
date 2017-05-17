@@ -31,12 +31,16 @@ static void check_expression_rendering(expression tree, char const *expected)
 void test_save_expression(void)
 {
     check_expression_rendering(
-        expression_from_unicode_string(unicode_string_from_c_str("")), "\"\"");
+        expression_from_string(string_expression_create(
+            unicode_string_from_c_str(""), source_location_create(0, 0))),
+        "\"\"");
     check_expression_rendering(
-        expression_from_unicode_string(unicode_string_from_c_str("abc")),
+        expression_from_string(string_expression_create(
+            unicode_string_from_c_str("abc"), source_location_create(0, 0))),
         "\"abc\"");
     check_expression_rendering(
-        expression_from_unicode_string(unicode_string_from_c_str("\"\'\\")),
+        expression_from_string(string_expression_create(
+            unicode_string_from_c_str("\"\'\\"), source_location_create(0, 0))),
         "\"\\\"\\\'\\\\\"");
     check_expression_rendering(
         expression_from_integer_literal(integer_create(0, 0)), "0");
@@ -58,8 +62,8 @@ void test_save_expression(void)
                                "340282366920938463463374607431768211455");
     {
         expression *const arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] =
-            expression_from_unicode_string(unicode_string_from_c_str("test"));
+        arguments[0] = expression_from_string(string_expression_create(
+            unicode_string_from_c_str("test"), source_location_create(0, 0)));
         arguments[1] = expression_from_identifier(identifier_expression_create(
             unicode_string_from_c_str("a"), source_location_create(0, 0)));
         check_expression_rendering(
