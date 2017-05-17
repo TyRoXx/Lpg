@@ -7,6 +7,8 @@
 #include "lpg_assert.h"
 #include "handle_parse_error.h"
 #include "lpg_find_next_token.h"
+#include "lpg_check.h"
+#include "lpg_structure_member.h"
 
 static sequence parse(char const *input)
 {
@@ -59,7 +61,7 @@ void test_interprete(void)
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()),
                                     type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"));
+        unicode_string_from_c_str("print"), optional_value_empty);
     structure const global_object = structure_create(globals, 1);
 
     expect_output("", "", global_object);

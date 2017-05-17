@@ -11,6 +11,7 @@
 #include "lpg_assert.h"
 #include "lpg_interprete.h"
 #include "lpg_allocate.h"
+#include "lpg_structure_member.h"
 
 typedef struct cli_parser_user
 {
@@ -119,6 +120,12 @@ static char const *semantic_error_text(semantic_error_type const type)
     {
     case semantic_error_unknown_element:
         return "Unknown structure element or global identifier";
+
+    case semantic_error_expected_compile_time_type:
+        return "Expected compile time type";
+
+    case semantic_error_no_members_on_enum_elements:
+        return "Instances of enums do not have members";
     }
     UNREACHABLE();
 }
@@ -225,7 +232,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()),
                                     type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"));
+        unicode_string_from_c_str("print"), optional_value_empty);
     structure const global_object = structure_create(globals, 1);
 
     value const globals_values[1] = {value_from_function_pointer(

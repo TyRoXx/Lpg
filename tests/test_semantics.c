@@ -7,6 +7,8 @@
 #include "handle_parse_error.h"
 #include "lpg_find_next_token.h"
 #include "lpg_for.h"
+#include "lpg_instruction.h"
+#include "lpg_structure_member.h"
 
 static sequence parse(char const *input)
 {
@@ -128,18 +130,18 @@ void test_semantics(void)
     globals[0] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
-        unicode_string_from_c_str("f"));
+        unicode_string_from_c_str("f"), optional_value_empty);
 
     globals[1] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
-        unicode_string_from_c_str("g"));
+        unicode_string_from_c_str("g"), optional_value_empty);
 
     globals[2] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()),
                                     type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"));
+        unicode_string_from_c_str("print"), optional_value_empty);
 
     enumeration_element *const boolean_elements =
         allocate_array(2, sizeof(*boolean_elements));
@@ -147,17 +149,18 @@ void test_semantics(void)
         enumeration_element_create(unicode_string_from_c_str("false"));
     boolean_elements[1] =
         enumeration_element_create(unicode_string_from_c_str("true"));
-    type const boolean =
+    type const boolean_type =
         type_from_enumeration(enumeration_create(boolean_elements, 2));
 
     globals[3] = structure_member_create(
-        type_from_reference(&boolean), unicode_string_from_c_str("boolean"));
+        type_from_type(), unicode_string_from_c_str("boolean"),
+        optional_value_create(value_from_type(&boolean_type)));
 
     globals[4] = structure_member_create(
         type_from_function_pointer(function_pointer_create(
             type_allocate(type_from_unit()),
-            type_allocate(type_from_reference(&boolean)), 1)),
-        unicode_string_from_c_str("assert"));
+            type_allocate(type_from_reference(&boolean_type)), 1)),
+        unicode_string_from_c_str("assert"), optional_value_empty);
 
     structure const non_empty_global = structure_create(globals, 5);
 
@@ -309,6 +312,28 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+    {
+        sequence root = parse("assert(boolean.true.true)");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_no_members_on_enum_elements,
+                                  source_location_create(0, 20))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, non_empty_global, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1))};
+        instruction_sequence const expected_body =
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
     structure_free(&non_empty_global);
-    type_free(&boolean);
+    type_free(&boolean_type);
 }

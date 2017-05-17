@@ -2,43 +2,7 @@
 #include "lpg_for.h"
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
-
-function_pointer_value
-function_pointer_value_from_external(external_function *external,
-                                     void *environment)
-{
-    function_pointer_value result = {NULL, external, environment};
-    return result;
-}
-
-value value_from_flat_object(value const *flat_object)
-{
-    value result;
-    result.flat_object = flat_object;
-    return result;
-}
-
-value value_from_function_pointer(function_pointer_value function_pointer)
-{
-    value result;
-    result.function_pointer = function_pointer;
-    return result;
-}
-
-value value_from_string_ref(unicode_view const string_ref)
-{
-    value result;
-    result.string_ref = string_ref;
-    return result;
-}
-
-value value_from_unit(void)
-{
-    value result;
-    /*dummy value to avoid compiler warning*/
-    result.integer_ = integer_create(0, 0);
-    return result;
-}
+#include "lpg_instruction.h"
 
 static value call_function(checked_function const callee, value const *globals);
 

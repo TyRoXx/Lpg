@@ -1,6 +1,7 @@
 #include "lpg_type.h"
 #include "lpg_for.h"
 #include "lpg_allocate.h"
+#include "lpg_structure_member.h"
 
 structure structure_create(structure_member *members, struct_member_id count)
 {
@@ -71,6 +72,9 @@ void type_free(type const *value)
 
     case type_kind_referenced:
         break;
+
+    case type_kind_type:
+        break;
     }
 }
 
@@ -118,6 +122,13 @@ type type_from_reference(type const *const referenced)
     return result;
 }
 
+type type_from_type(void)
+{
+    type result;
+    result.kind = type_kind_type;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -143,16 +154,4 @@ void function_pointer_free(function_pointer const *value)
     {
         deallocate(value->arguments);
     }
-}
-
-structure_member structure_member_create(type what, unicode_string name)
-{
-    structure_member result = {what, name};
-    return result;
-}
-
-void struct_member_free(structure_member const *value)
-{
-    unicode_string_free(&value->name);
-    type_free(&value->what);
 }

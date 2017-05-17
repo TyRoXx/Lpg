@@ -1,7 +1,7 @@
 #pragma once
 #include "lpg_unicode_string.h"
-
-typedef uint32_t struct_member_id;
+#include "lpg_struct_member_id.h"
+#include "lpg_enum_element_id.h"
 
 typedef struct structure_member structure_member;
 
@@ -31,8 +31,6 @@ typedef struct enumeration_element
 enumeration_element enumeration_element_create(unicode_string name);
 void enumeration_element_free(enumeration_element const *value);
 
-typedef struct_member_id enum_element_id;
-
 typedef struct enumeration
 {
     enumeration_element *elements;
@@ -50,7 +48,8 @@ typedef enum type_kind
     type_kind_unit,
     type_kind_string_ref,
     type_kind_enumeration,
-    type_kind_referenced
+    type_kind_referenced,
+    type_kind_type
 } type_kind;
 
 struct type
@@ -72,17 +71,9 @@ type type_from_unit(void);
 type type_from_string_ref(void);
 type type_from_enumeration(enumeration const value);
 type type_from_reference(type const *const referenced);
+type type_from_type(void);
 type *type_allocate(type const value);
 
 function_pointer function_pointer_create(type *result, type *arguments,
                                          size_t arity);
 void function_pointer_free(function_pointer const *value);
-
-struct structure_member
-{
-    type what;
-    unicode_string name;
-};
-
-structure_member structure_member_create(type what, unicode_string name);
-void struct_member_free(structure_member const *value);
