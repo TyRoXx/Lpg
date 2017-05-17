@@ -56,9 +56,11 @@ typedef struct call
 {
     expression *callee;
     tuple arguments;
+    source_location closing_parenthesis;
 } call;
 
-call call_create(expression *callee, tuple arguments);
+call call_create(expression *callee, tuple arguments,
+                 source_location closing_parenthesis);
 
 typedef struct identifier_expression
 {

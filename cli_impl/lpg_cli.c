@@ -126,6 +126,13 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_no_members_on_enum_elements:
         return "Instances of enums do not have members";
+
+    case semantic_error_type_mismatch:
+        return "Type mismatch";
+
+    case semantic_error_missing_argument:
+        return "Missing call argument";
+    default:;
     }
     UNREACHABLE();
 }

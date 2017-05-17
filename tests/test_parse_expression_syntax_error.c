@@ -214,7 +214,7 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("f"),
                                              source_location_create(0, 0)))),
-            tuple_create(arguments, 1)));
+            tuple_create(arguments, 1), source_location_create(0, 4)));
         test_syntax_error(
             &expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
     }
@@ -227,7 +227,7 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("f"),
                                              source_location_create(0, 0)))),
-            tuple_create(arguments, 1)));
+            tuple_create(arguments, 1), source_location_create(0, 4)));
         test_syntax_error(
             &expected_error, 1, &expected, unicode_string_from_c_str("f(1,)"));
     }

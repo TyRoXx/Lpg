@@ -350,6 +350,30 @@ read_element(function_checking_state *state, instruction_sequence *function,
     UNREACHABLE();
 }
 
+static bool enough_arguments(const type callee, const size_t argument_count)
+{
+    switch (callee.kind)
+    {
+    case type_kind_structure:
+        LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        return (argument_count == callee.function_pointer_.arity);
+
+    case type_kind_unit:
+        LPG_TO_DO();
+    case type_kind_string_ref:
+        LPG_TO_DO();
+    case type_kind_enumeration:
+        LPG_TO_DO();
+    case type_kind_referenced:
+        LPG_TO_DO();
+    case type_kind_type:
+        LPG_TO_DO();
+    }
+    UNREACHABLE();
+}
+
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
@@ -394,6 +418,16 @@ evaluate_expression(function_checking_state *state,
                 return evaluate_expression_result_empty;
             }
             arguments[i] = argument.where;
+        }
+        if (!enough_arguments(*callee.type_, element.call.arguments.length))
+        {
+            restore(previous_code);
+            deallocate(arguments);
+            state->on_error(
+                semantic_error_create(semantic_error_missing_argument,
+                                      element.call.closing_parenthesis),
+                state->user);
+            return evaluate_expression_result_empty;
         }
         register_id const result = allocate_register(state);
         add_instruction(

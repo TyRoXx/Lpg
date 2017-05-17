@@ -37,7 +37,7 @@ void test_parse_expression_success(void)
                             identifier_expression_create(
                                 unicode_string_from_c_str("f"),
                                 source_location_create(0, 7)))),
-                        tuple_create(NULL, 0))))),
+                        tuple_create(NULL, 0), source_location_create(0, 9))))),
         unicode_string_from_c_str("return f()"));
 
     test_successful_parse(
@@ -57,7 +57,7 @@ void test_parse_expression_success(void)
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
-                arguments)),
+                arguments, source_location_create(0, 2))),
             unicode_string_from_c_str("f()"));
     }
     {
@@ -69,8 +69,8 @@ void test_parse_expression_success(void)
                         expression_from_identifier(identifier_expression_create(
                             unicode_string_from_c_str("f"),
                             source_location_create(0, 0)))),
-                    arguments))),
-                arguments)),
+                    arguments, source_location_create(0, 2)))),
+                arguments, source_location_create(0, 4))),
             unicode_string_from_c_str("f()()"));
     }
     {
@@ -83,7 +83,7 @@ void test_parse_expression_success(void)
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
-                arguments_tuple)),
+                arguments_tuple, source_location_create(0, 3))),
             unicode_string_from_c_str("f(1)"));
     }
     {
@@ -97,7 +97,7 @@ void test_parse_expression_success(void)
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
-                arguments_tuple)),
+                arguments_tuple, source_location_create(0, 5))),
             unicode_string_from_c_str("f(1,2)"));
     }
     {

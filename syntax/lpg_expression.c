@@ -43,9 +43,10 @@ void lambda_free(lambda const *this)
     expression_deallocate(this->result);
 }
 
-call call_create(expression *callee, tuple arguments)
+call call_create(expression *callee, tuple arguments,
+                 source_location closing_parenthesis)
 {
-    call result = {callee, arguments};
+    call result = {callee, arguments, closing_parenthesis};
     return result;
 }
 
@@ -481,7 +482,8 @@ bool expression_equals(expression const *left, expression const *right)
                 return 0;
             }
         }
-        return 1;
+        return source_location_equals(
+            left->call.closing_parenthesis, right->call.closing_parenthesis);
 
     case expression_type_integer_literal:
         return integer_equal(left->integer_literal, right->integer_literal);

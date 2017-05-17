@@ -72,7 +72,7 @@ void test_save_expression(void)
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
-                tuple_create(arguments, 2))),
+                tuple_create(arguments, 2), source_location_create(0, 0))),
             "f(\"test\", a)");
     }
     {
@@ -108,7 +108,7 @@ void test_save_expression(void)
                         expression_from_identifier(identifier_expression_create(
                             unicode_string_from_c_str("integer"),
                             source_location_create(0, 0)))),
-                    tuple_create(arguments, 2)))),
+                    tuple_create(arguments, 2), source_location_create(0, 0)))),
                 expression_allocate(
                     expression_from_integer_literal(integer_create(0, 6))))),
             "a: integer(0, 10) = 6");

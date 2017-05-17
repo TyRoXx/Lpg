@@ -422,7 +422,8 @@ static int parse_call(expression_parser *parser, size_t indentation,
                 }
                 *result = expression_from_call(
                     call_create(expression_allocate(*result),
-                                tuple_create(arguments, argument_count)));
+                                tuple_create(arguments, argument_count),
+                                maybe_close.where));
                 return 1;
             }
         }
