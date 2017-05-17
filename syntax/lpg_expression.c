@@ -213,8 +213,10 @@ source_location expression_source_begin(expression const value)
         LPG_TO_DO();
     case expression_type_integer_literal:
         LPG_TO_DO();
+
     case expression_type_access_structure:
-        LPG_TO_DO();
+        return expression_source_begin(*value.access_structure.object);
+
     case expression_type_match:
         LPG_TO_DO();
 
@@ -222,7 +224,8 @@ source_location expression_source_begin(expression const value)
         return value.string.source;
 
     case expression_type_identifier:
-        LPG_TO_DO();
+        return value.identifier.source;
+
     case expression_type_assign:
         LPG_TO_DO();
     case expression_type_return:

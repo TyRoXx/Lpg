@@ -164,9 +164,9 @@ static bool function_parameter_accepts_type(type const function,
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        return (parameter < function.function_pointer_.arity) &&
-               is_implicitly_convertible(
-                   argument, function.function_pointer_.arguments[parameter]);
+        ASSUME(parameter < function.function_pointer_.arity);
+        return is_implicitly_convertible(
+            argument, function.function_pointer_.arguments[parameter]);
 
     case type_kind_unit:
     case type_kind_string_ref:
@@ -350,7 +350,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
     UNREACHABLE();
 }
 
-static bool enough_arguments(const type callee, const size_t argument_count)
+static size_t expected_call_argument_count(const type callee)
 {
     switch (callee.kind)
     {
@@ -358,7 +358,7 @@ static bool enough_arguments(const type callee, const size_t argument_count)
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        return (argument_count == callee.function_pointer_.arity);
+        return callee.function_pointer_.arity;
 
     case type_kind_unit:
         LPG_TO_DO();
@@ -393,11 +393,21 @@ evaluate_expression(function_checking_state *state,
         {
             return evaluate_expression_result_empty;
         }
+        size_t const expected_arguments =
+            expected_call_argument_count(*callee.type_);
         register_id *const arguments =
-            allocate_array(element.call.arguments.length, sizeof(*arguments));
+            allocate_array(expected_arguments, sizeof(*arguments));
         LPG_FOR(size_t, i, element.call.arguments.length)
         {
             expression const argument_tree = element.call.arguments.elements[i];
+            if (i >= expected_arguments)
+            {
+                state->on_error(semantic_error_create(
+                                    semantic_error_extraneous_argument,
+                                    expression_source_begin(argument_tree)),
+                                state->user);
+                break;
+            }
             evaluate_expression_result argument =
                 evaluate_expression(state, function, argument_tree);
             if (!argument.has_value)
@@ -419,7 +429,7 @@ evaluate_expression(function_checking_state *state,
             }
             arguments[i] = argument.where;
         }
-        if (!enough_arguments(*callee.type_, element.call.arguments.length))
+        if (element.call.arguments.length < expected_arguments)
         {
             restore(previous_code);
             deallocate(arguments);
@@ -431,9 +441,9 @@ evaluate_expression(function_checking_state *state,
         }
         register_id const result = allocate_register(state);
         add_instruction(
-            function, instruction_create_call(call_instruction_create(
-                          callee.where, arguments,
-                          element.call.arguments.length, result)));
+            function,
+            instruction_create_call(call_instruction_create(
+                callee.where, arguments, expected_arguments, result)));
         ASSUME(callee.type_);
         type const *const return_type = get_return_type(*callee.type_);
         if (!return_type)
