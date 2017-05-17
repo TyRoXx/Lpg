@@ -49,7 +49,8 @@ call call_create(expression *callee, tuple arguments)
     return result;
 }
 
-access_structure access_structure_create(expression *object, expression *member)
+access_structure access_structure_create(expression *object,
+                                         identifier_expression member)
 {
     access_structure result = {object, member};
     return result;
@@ -230,7 +231,7 @@ void call_free(call const *this)
 void access_structure_free(access_structure const *this)
 {
     expression_deallocate(this->object);
-    expression_deallocate(this->member);
+    identifier_expression_free(&this->member);
 }
 
 void match_free(match const *this)
@@ -278,14 +279,6 @@ expression expression_from_identifier(identifier_expression identifier)
     return result;
 }
 
-expression expression_from_make_identifier(expression *value)
-{
-    expression result;
-    result.type = expression_type_make_identifier;
-    result.make_identifier = value;
-    return result;
-}
-
 expression expression_from_tuple(tuple value)
 {
     expression result;
@@ -330,10 +323,6 @@ void expression_free(expression const *this)
 
     case expression_type_identifier:
         identifier_expression_free(&this->identifier);
-        break;
-
-    case expression_type_make_identifier:
-        expression_deallocate(this->make_identifier);
         break;
 
     case expression_type_assign:
@@ -462,9 +451,6 @@ bool expression_equals(expression const *left, expression const *right)
                    unicode_view_from_string(right->identifier.value)) &&
                source_location_equals(
                    left->identifier.source, right->identifier.source);
-
-    case expression_type_make_identifier:
-        LPG_TO_DO();
 
     case expression_type_assign:
         return assign_equals(left->assign, right->assign);

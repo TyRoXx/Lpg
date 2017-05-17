@@ -82,10 +82,14 @@ success_indicator save_expression(stream_writer const to,
     }
 
     case expression_type_access_structure:
+    {
         LPG_TRY(
             save_expression(to, value->access_structure.object, whitespace));
         LPG_TRY(stream_writer_write_string(to, "."));
-        return save_expression(to, value->access_structure.member, whitespace);
+        expression const member =
+            expression_from_identifier(value->access_structure.member);
+        return save_expression(to, &member, whitespace);
+    }
 
     case expression_type_match:
         LPG_TRY(space_here(to, &whitespace));
@@ -128,11 +132,6 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(space_here(to, &whitespace));
         return stream_writer_write_bytes(
             to, value->identifier.value.data, value->identifier.value.length);
-
-    case expression_type_make_identifier:
-        LPG_TRY(space_here(to, &whitespace));
-        LPG_TRY(stream_writer_write_string(to, "*"));
-        return save_expression(to, value->make_identifier, whitespace);
 
     case expression_type_assign:
         LPG_TRY(save_expression(to, value->assign.left, whitespace));

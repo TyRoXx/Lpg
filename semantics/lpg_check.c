@@ -2,6 +2,7 @@
 #include "lpg_for.h"
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_string_literal.h"
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -64,41 +65,6 @@ static register_id allocate_register(function_checking_state *state)
 static evaluate_expression_result check_sequence(function_checking_state *state,
                                                  instruction_sequence *output,
                                                  sequence const input);
-
-static unicode_string decode_string_literal(unicode_view const literal)
-{
-    ASSUME(literal.length >= 2);
-    return unicode_string_from_range(literal.begin + 1, literal.length - 2);
-}
-
-static identifier_expression const *
-evaluate_compile_time_expression(expression const *evaluated)
-{
-    switch (evaluated->type)
-    {
-    case expression_type_lambda:
-    case expression_type_call:
-    case expression_type_integer_literal:
-    case expression_type_access_structure:
-    case expression_type_match:
-    case expression_type_string:
-        LPG_TO_DO();
-
-    case expression_type_identifier:
-        return &evaluated->identifier;
-
-    case expression_type_make_identifier:
-    case expression_type_assign:
-    case expression_type_return:
-    case expression_type_loop:
-    case expression_type_break:
-    case expression_type_sequence:
-    case expression_type_declare:
-    case expression_type_tuple:
-        LPG_TO_DO();
-    }
-    UNREACHABLE();
-}
 
 static type const *get_return_type(type const callee)
 {
@@ -257,15 +223,10 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_access_structure:
     {
-        identifier_expression const *const member =
-            evaluate_compile_time_expression(element.access_structure.member);
-        if (!member)
-        {
-            LPG_TO_DO();
-        }
         register_id const result = allocate_register(state);
-        type const *const element_type = read_element(
-            state, function, *element.access_structure.object, member, result);
+        type const *const element_type =
+            read_element(state, function, *element.access_structure.object,
+                         &element.access_structure.member, result);
         if (!element_type)
         {
             return evaluate_expression_result_empty;
@@ -279,11 +240,14 @@ evaluate_expression(function_checking_state *state,
     case expression_type_string:
     {
         register_id const result = allocate_register(state);
+        memory_writer decoded = {NULL, 0, 0};
+        stream_writer decoded_writer = memory_writer_erase(&decoded);
+        decode_string_literal(
+            unicode_view_from_string(element.string), decoded_writer);
+        unicode_string string = {decoded.data, decoded.used};
         add_instruction(
-            function,
-            instruction_create_string_literal(string_literal_instruction_create(
-                decode_string_literal(unicode_view_from_string(element.string)),
-                result)));
+            function, instruction_create_string_literal(
+                          string_literal_instruction_create(string, result)));
         static type const string_type = {type_kind_string_ref, {{NULL, 0}}};
         return evaluate_expression_result_create(result, &string_type);
     }
@@ -297,7 +261,6 @@ evaluate_expression(function_checking_state *state,
         return address;
     }
 
-    case expression_type_make_identifier:
     case expression_type_assign:
     case expression_type_return:
         LPG_TO_DO();
