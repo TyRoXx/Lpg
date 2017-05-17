@@ -67,10 +67,13 @@ void test_tokenize(void)
     test_single_token(token_string, 2, "\"\"");
     test_single_token(token_string, 3, "\"a\"");
     test_single_token(token_string, 5, "\"abc\"");
+    test_single_token(token_string, 6, "\"a\\nc\"");
     test_invalid("?");
     test_invalid("\t");
     test_invalid("'aaa");
     test_invalid("1a");
     test_invalid("\"");
     test_invalid("\"a");
+    test_invalid("\"a\nc\"");
+    test_invalid("\"\\\"");
 }

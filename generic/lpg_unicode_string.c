@@ -1,6 +1,9 @@
 #include "lpg_unicode_string.h"
 #include <string.h>
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
+#include "lpg_unicode_view.h"
+#include <assert.h>
 
 unicode_string unicode_string_from_range(char const *data, size_t length)
 {
@@ -20,7 +23,10 @@ unicode_string unicode_string_from_c_str(const char *c_str)
 
 void unicode_string_free(unicode_string const *s)
 {
-    deallocate(s->data);
+    if (s->data)
+    {
+        deallocate(s->data);
+    }
 }
 
 bool unicode_string_equals(unicode_string const left,

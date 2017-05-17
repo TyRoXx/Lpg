@@ -2,6 +2,8 @@
 #include "lpg_assert.h"
 #include "lpg_identifier.h"
 #include "lpg_unicode_view.h"
+#include "lpg_stream_writer.h"
+#include "lpg_string_literal.h"
 
 static tokenize_result make_success(enum token_type token, size_t length)
 {
@@ -137,21 +139,17 @@ tokenize_result tokenize(char const *input, size_t length)
 
     case '"':
     {
-        size_t i;
-        for (i = 1;; ++i)
+        memory_writer decoded = {NULL, 0, 0};
+        decode_string_literal_result decoding_result = decode_string_literal(
+            unicode_view_create(input, length), memory_writer_erase(&decoded));
+        memory_writer_free(&decoded);
+        if (decoding_result.is_valid)
         {
-            if (i == length)
-            {
-                tokenize_result result = {tokenize_invalid, token_space, i};
-                return result;
-            }
-            if (input[i] == '"')
-            {
-                ++i;
-                break;
-            }
+            return make_success(token_string, decoding_result.length);
         }
-        return make_success(token_string, i);
+        tokenize_result result = {
+            tokenize_invalid, token_string, decoding_result.length};
+        return result;
     }
     }
     tokenize_result result = {tokenize_invalid, token_space, 1};
