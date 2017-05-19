@@ -46,12 +46,28 @@ static value assert_impl(value const *arguments, void *environment)
     return value_from_unit();
 }
 
+static value and_impl(value const *arguments, void *environment)
+{
+    (void)environment;
+    enum_element_id const left = arguments[0].enum_element;
+    enum_element_id const right = arguments[1].enum_element;
+    return value_from_enum_element(left && right);
+}
+
+static value or_impl(value const *arguments, void *environment)
+{
+    (void)environment;
+    enum_element_id const left = arguments[0].enum_element;
+    enum_element_id const right = arguments[1].enum_element;
+    return value_from_enum_element(left || right);
+}
+
 static void expect_output(char const *source, char const *output,
                           structure const global_object)
 {
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
-    value const globals_values[6] = {
+    value const globals_values[7] = {
         /*f*/ value_from_unit(),
         /*g*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
@@ -59,7 +75,10 @@ static void expect_output(char const *source, char const *output,
         /*boolean*/ value_from_unit(),
         /*assert*/ value_from_function_pointer(
             function_pointer_value_from_external(assert_impl, NULL)),
-        /*and*/ value_from_unit()};
+        /*and*/ value_from_function_pointer(
+            function_pointer_value_from_external(and_impl, NULL)),
+        /*or*/ value_from_function_pointer(
+            function_pointer_value_from_external(or_impl, NULL))};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -90,6 +109,14 @@ void test_interprete(void)
                   "    break",
                   "Hello, world!", std_library.globals);
     expect_output("assert(boolean.true)", "", std_library.globals);
+    expect_output(
+        "assert(and(boolean.true, boolean.true))", "", std_library.globals);
+    expect_output(
+        "assert(or(boolean.true, boolean.true))", "", std_library.globals);
+    expect_output(
+        "assert(or(boolean.false, boolean.true))", "", std_library.globals);
+    expect_output(
+        "assert(or(boolean.true, boolean.false))", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
