@@ -448,10 +448,7 @@ evaluate_expression(function_checking_state *state,
                 callee.where, arguments, expected_arguments, result)));
         ASSUME(callee.type_);
         type const *const return_type = get_return_type(*callee.type_);
-        if (!return_type)
-        {
-            LPG_TO_DO();
-        }
+        ASSUME(return_type);
         return evaluate_expression_result_create(
             result, return_type,
             /*TODO: compile-time function calls*/ optional_value_empty);
