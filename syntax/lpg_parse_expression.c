@@ -112,7 +112,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 }
 
 static expression_parser_result const expression_parser_result_failure = {
-    0, {expression_type_lambda, {NULL, 0, NULL}}};
+    0, {expression_type_lambda, {{NULL, 0, NULL}}}};
 
 static expression_parser_result parse_loop(expression_parser *parser,
                                            size_t indentation)
