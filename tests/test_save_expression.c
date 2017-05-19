@@ -182,7 +182,7 @@ void test_save_expression(void)
                                              source_location_create(0, 0)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 123)))));
-        body[1] = expression_from_break();
+        body[1] = expression_from_break(source_location_create(0, 0));
         check_expression_rendering(
             expression_from_loop(sequence_create(body, 2)), "loop\n"
                                                             "    a = 123\n"
@@ -190,7 +190,7 @@ void test_save_expression(void)
     }
     {
         expression *inner_loop = allocate_array(2, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break();
+        inner_loop[0] = expression_from_break(source_location_create(0, 0));
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_assign(assign_create(
             expression_allocate(expression_from_identifier(
@@ -207,11 +207,12 @@ void test_save_expression(void)
             "        break");
     }
 
-    check_expression_rendering(expression_from_break(), "break");
+    check_expression_rendering(
+        expression_from_break(source_location_create(0, 0)), "break");
 
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break();
+        inner_loop[0] = expression_from_break(source_location_create(0, 0));
 
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_assign(assign_create(
@@ -334,8 +335,8 @@ void test_save_expression(void)
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 456))));
         expression *const sequence = allocate_array(2, sizeof(*sequence));
-        sequence[0] = expression_from_break();
-        sequence[1] = expression_from_break();
+        sequence[0] = expression_from_break(source_location_create(0, 0));
+        sequence[1] = expression_from_break(source_location_create(0, 0));
         cases[1] = match_case_create(
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 124))),

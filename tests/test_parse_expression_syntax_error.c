@@ -58,7 +58,8 @@ void test_parse_expression_syntax_error(void)
     {
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_invalid_token, source_location_create(0, 0))};
-        expression expected = expression_from_break();
+        expression expected =
+            expression_from_break(source_location_create(0, 1));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("?break"));
     }

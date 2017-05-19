@@ -46,6 +46,7 @@ typedef struct function_checking_state
 {
     register_id used_registers;
     read_variable_function *read_variable;
+    bool is_in_loop;
     structure const *global;
     check_error_handler *on_error;
     void *user;
@@ -56,7 +57,8 @@ function_checking_state_create(read_variable_function *read_variable,
                                structure const *global,
                                check_error_handler *on_error, void *user)
 {
-    function_checking_state result = {0, read_variable, global, on_error, user};
+    function_checking_state result = {
+        0, read_variable, false, global, on_error, user};
     return result;
 }
 
@@ -509,14 +511,28 @@ evaluate_expression(function_checking_state *state,
     case expression_type_loop:
     {
         instruction_sequence body = {NULL, 0};
+        bool const previous_is_in_loop = state->is_in_loop;
+        state->is_in_loop = true;
         evaluate_expression_result const result =
             check_sequence(state, &body, element.loop_body);
+        ASSUME(state->is_in_loop);
+        state->is_in_loop = previous_is_in_loop;
         add_instruction(function, instruction_create_loop(body));
         return result;
     }
 
     case expression_type_break:
-        add_instruction(function, instruction_create_break());
+        if (state->is_in_loop)
+        {
+            add_instruction(function, instruction_create_break());
+        }
+        else
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_break_outside_of_loop,
+                                      expression_source_begin(element)),
+                state->user);
+        }
         return evaluate_expression_result_empty;
 
     case expression_type_sequence:

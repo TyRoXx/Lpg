@@ -128,7 +128,6 @@ void tuple_free(tuple const *value);
 expression expression_from_assign(assign value);
 expression expression_from_return(expression *value);
 expression expression_from_loop(sequence body);
-expression expression_from_break(void);
 expression expression_from_sequence(sequence value);
 expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
@@ -167,6 +166,9 @@ struct expression
         sequence sequence;
         declare declare;
         tuple tuple;
+
+        /*for monostate expressions like break:*/
+        source_location source;
     };
 };
 
@@ -179,6 +181,7 @@ expression expression_from_string(string_expression value);
 expression expression_from_call(call value);
 expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_tuple(tuple value);
+expression expression_from_break(source_location source);
 expression *expression_allocate(expression value);
 void expression_free(expression const *this);
 bool sequence_equals(sequence const left, sequence const right);

@@ -111,6 +111,9 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
     return sequence_create(elements, element_count);
 }
 
+static expression_parser_result const expression_parser_result_failure = {
+    0, {expression_type_lambda, {NULL, 0, NULL}}};
+
 static expression_parser_result parse_loop(expression_parser *parser,
                                            size_t indentation)
 {
@@ -121,8 +124,7 @@ static expression_parser_result parse_loop(expression_parser *parser,
         parser->on_error(parse_error_create(
                              parse_error_expected_newline, maybe_newline.where),
                          parser->user);
-        expression_parser_result const result = {0, expression_from_break()};
-        return result;
+        return expression_parser_result_failure;
     }
     expression_parser_result const result = {
         1, expression_from_loop(parse_sequence(parser, (indentation + 1)))};
@@ -251,9 +253,7 @@ static expression_parser_result parse_match(expression_parser *parser,
             parser->on_error(
                 parse_error_create(parse_error_expected_space, space.where),
                 parser->user);
-            expression_parser_result const result = {
-                0, expression_from_break()};
-            return result;
+            return expression_parser_result_failure;
         }
     }
     expression_parser_result const input =
@@ -270,10 +270,8 @@ static expression_parser_result parse_match(expression_parser *parser,
             parser->on_error(
                 parse_error_create(parse_error_expected_newline, newline.where),
                 parser->user);
-            expression_parser_result const result = {
-                0, expression_from_break()};
             expression_free(&input.success);
-            return result;
+            return expression_parser_result_failure;
         }
     }
     match_case *cases = NULL;
@@ -294,8 +292,7 @@ static expression_parser_result parse_match(expression_parser *parser,
     {
         deallocate(cases);
     }
-    expression_parser_result const result = {0, expression_from_break()};
-    return result;
+    return expression_parser_result_failure;
 }
 
 static expression_parser_result parse_callable(expression_parser *parser,
@@ -310,9 +307,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),
                 parser->user);
-            expression_parser_result const result = {
-                0, expression_from_break()};
-            return result;
+            return expression_parser_result_failure;
         }
         switch (head.token)
         {
@@ -328,7 +323,8 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_break:
         {
             pop(parser);
-            expression_parser_result result = {1, expression_from_break()};
+            expression_parser_result result = {
+                1, expression_from_break(head.where)};
             return result;
         }
 
@@ -684,8 +680,7 @@ expression_parser_result parse_expression(expression_parser *parser,
             parser->on_error(
                 parse_error_create(parse_error_expected_space, space.where),
                 parser->user);
-            expression_parser_result result = {0, expression_from_break()};
-            return result;
+            return expression_parser_result_failure;
         }
     }
     return parse_returnable(parser, indentation, may_be_statement);

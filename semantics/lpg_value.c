@@ -1,7 +1,5 @@
 #include "lpg_value.h"
-#include "lpg_for.h"
 #include "lpg_assert.h"
-#include "lpg_allocate.h"
 
 function_pointer_value
 function_pointer_value_from_external(external_function *external,

@@ -135,6 +135,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_extraneous_argument:
         return "Extraneous call argument";
+
+    case semantic_error_break_outside_of_loop:
+        return "Found break outside of a loop";
     }
     UNREACHABLE();
 }

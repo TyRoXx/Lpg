@@ -164,13 +164,6 @@ expression expression_from_loop(sequence body)
     return result;
 }
 
-expression expression_from_break(void)
-{
-    expression result;
-    result.type = expression_type_break;
-    return result;
-}
-
 expression expression_from_sequence(sequence value)
 {
     expression result;
@@ -232,8 +225,10 @@ source_location expression_source_begin(expression const value)
         LPG_TO_DO();
     case expression_type_loop:
         LPG_TO_DO();
+
     case expression_type_break:
-        LPG_TO_DO();
+        return value.source;
+
     case expression_type_sequence:
         LPG_TO_DO();
     case expression_type_declare:
@@ -338,6 +333,14 @@ expression expression_from_tuple(tuple value)
     expression result;
     result.type = expression_type_tuple;
     result.tuple = value;
+    return result;
+}
+
+expression expression_from_break(source_location source)
+{
+    expression result;
+    result.type = expression_type_break;
+    result.source = source;
     return result;
 }
 
@@ -517,7 +520,7 @@ bool expression_equals(expression const *left, expression const *right)
         return sequence_equals(left->loop_body, right->loop_body);
 
     case expression_type_break:
-        return 1;
+        return source_location_equals(left->source, right->source);
 
     case expression_type_sequence:
         return sequence_equals(left->sequence, right->sequence);

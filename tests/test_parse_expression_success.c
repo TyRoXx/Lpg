@@ -23,8 +23,8 @@ static void test_successful_parse(expression expected, unicode_string input)
 
 void test_parse_expression_success(void)
 {
-    test_successful_parse(
-        expression_from_break(), unicode_string_from_c_str("break"));
+    test_successful_parse(expression_from_break(source_location_create(0, 0)),
+                          unicode_string_from_c_str("break"));
 
     test_successful_parse(
         expression_from_return(expression_allocate(
@@ -102,7 +102,7 @@ void test_parse_expression_success(void)
     }
     {
         expression *elements = allocate_array(1, sizeof(*elements));
-        elements[0] = expression_from_break();
+        elements[0] = expression_from_break(source_location_create(1, 4));
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 1)),
             unicode_string_from_c_str("loop\n"
@@ -112,7 +112,7 @@ void test_parse_expression_success(void)
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_identifier(identifier_expression_create(
             unicode_string_from_c_str("f"), source_location_create(1, 4)));
-        elements[1] = expression_from_break();
+        elements[1] = expression_from_break(source_location_create(2, 4));
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
             unicode_string_from_c_str("loop\n"
@@ -123,7 +123,7 @@ void test_parse_expression_success(void)
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_identifier(identifier_expression_create(
             unicode_string_from_c_str("f"), source_location_create(1, 4)));
-        elements[1] = expression_from_break();
+        elements[1] = expression_from_break(source_location_create(2, 4));
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 2)),
             unicode_string_from_c_str("loop\n"
@@ -132,7 +132,7 @@ void test_parse_expression_success(void)
     }
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break();
+        inner_loop[0] = expression_from_break(source_location_create(2, 8));
         expression *outer_loop = allocate_array(1, sizeof(*outer_loop));
         outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
         test_successful_parse(
@@ -143,10 +143,10 @@ void test_parse_expression_success(void)
     }
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break();
+        inner_loop[0] = expression_from_break(source_location_create(2, 8));
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
-        outer_loop[1] = expression_from_break();
+        outer_loop[1] = expression_from_break(source_location_create(3, 4));
         test_successful_parse(
             expression_from_loop(sequence_create(outer_loop, 2)),
             unicode_string_from_c_str("loop\n"
