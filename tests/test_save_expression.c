@@ -2,8 +2,6 @@
 #include "lpg_expression.h"
 #include "test.h"
 #include "lpg_allocate.h"
-#include "lpg_assert.h"
-#include "lpg_for.h"
 #include "lpg_stream_writer.h"
 #include "lpg_save_expression.h"
 #include <stdio.h>

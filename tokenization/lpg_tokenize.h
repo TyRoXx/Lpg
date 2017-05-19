@@ -1,5 +1,4 @@
 #pragma once
-#include <stddef.h>
 #include "lpg_unicode_string.h"
 
 static size_t const spaces_for_indentation = 4;
