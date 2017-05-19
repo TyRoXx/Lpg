@@ -88,7 +88,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             return run_sequence_result_break;
 
         case instruction_instantiate_enum:
-            LPG_TO_DO();
+            registers[element.instantiate_enum.into] =
+                value_from_enum_element(element.instantiate_enum.element);
+            break;
         }
     }
     return run_sequence_result_continue;

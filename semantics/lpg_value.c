@@ -45,6 +45,13 @@ value value_from_type(type const *type_)
     return result;
 }
 
+value value_from_enum_element(enum_element_id const element)
+{
+    value result;
+    result.enum_element = element;
+    return result;
+}
+
 optional_value optional_value_create(value v)
 {
     optional_value result = {true, v};

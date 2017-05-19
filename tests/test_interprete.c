@@ -9,6 +9,7 @@
 #include "lpg_find_next_token.h"
 #include "lpg_check.h"
 #include "lpg_structure_member.h"
+#include "standard_library.h"
 
 static sequence parse(char const *input)
 {
@@ -37,13 +38,28 @@ static value print(value const *arguments, void *environment)
     return value_from_unit();
 }
 
+static value assert_impl(value const *arguments, void *environment)
+{
+    (void)environment;
+    enum_element_id const argument = arguments[0].enum_element;
+    REQUIRE(argument == 1);
+    return value_from_unit();
+}
+
 static void expect_output(char const *source, char const *output,
                           structure const global_object)
 {
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
-    value const globals_values[1] = {value_from_function_pointer(
-        function_pointer_value_from_external(print, &print_destination))};
+    value const globals_values[6] = {
+        /*f*/ value_from_unit(),
+        /*g*/ value_from_unit(),
+        /*print*/ value_from_function_pointer(
+            function_pointer_value_from_external(print, &print_destination)),
+        /*boolean*/ value_from_unit(),
+        /*assert*/ value_from_function_pointer(
+            function_pointer_value_from_external(assert_impl, NULL)),
+        /*and*/ value_from_unit()};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -56,26 +72,24 @@ static void expect_output(char const *source, char const *output,
 
 void test_interprete(void)
 {
-    structure_member *const globals = allocate_array(1, sizeof(*globals));
-    globals[0] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()),
-                                    type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"), optional_value_empty);
-    structure const global_object = structure_create(globals, 1);
+    standard_library_description const std_library =
+        describe_standard_library();
 
-    expect_output("", "", global_object);
-    expect_output("print(\"\")", "", global_object);
-    expect_output("print(\"Hello, world!\")", "Hello, world!", global_object);
-    expect_output("print(\"Hello, world!\")\n", "Hello, world!", global_object);
+    expect_output("", "", std_library.globals);
+    expect_output("print(\"\")", "", std_library.globals);
     expect_output(
-        "print(\"Hello, world!\")\r\n", "Hello, world!", global_object);
+        "print(\"Hello, world!\")", "Hello, world!", std_library.globals);
+    expect_output(
+        "print(\"Hello, world!\")\n", "Hello, world!", std_library.globals);
+    expect_output(
+        "print(\"Hello, world!\")\r\n", "Hello, world!", std_library.globals);
     expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!",
-                  global_object);
+                  std_library.globals);
     expect_output("loop\n"
                   "    print(\"Hello, world!\")\n"
                   "    break",
-                  "Hello, world!", global_object);
+                  "Hello, world!", std_library.globals);
+    expect_output("assert(boolean.true)", "", std_library.globals);
 
-    structure_free(&global_object);
+    standard_library_description_free(&std_library);
 }

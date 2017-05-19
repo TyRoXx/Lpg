@@ -9,6 +9,7 @@
 #include "lpg_for.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
+#include "standard_library.h"
 
 static sequence parse(char const *input)
 {
@@ -126,54 +127,8 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
 
-    structure_member *globals = allocate_array(6, sizeof(*globals));
-    globals[0] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
-        unicode_string_from_c_str("f"), optional_value_empty);
-
-    globals[1] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
-        unicode_string_from_c_str("g"), optional_value_empty);
-
-    globals[2] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()),
-                                    type_allocate(type_from_string_ref()), 1)),
-        unicode_string_from_c_str("print"), optional_value_empty);
-
-    enumeration_element *const boolean_elements =
-        allocate_array(2, sizeof(*boolean_elements));
-    boolean_elements[0] =
-        enumeration_element_create(unicode_string_from_c_str("false"));
-    boolean_elements[1] =
-        enumeration_element_create(unicode_string_from_c_str("true"));
-    type const boolean_type =
-        type_from_enumeration(enumeration_create(boolean_elements, 2));
-
-    globals[3] = structure_member_create(
-        type_from_type(), unicode_string_from_c_str("boolean"),
-        optional_value_create(value_from_type(&boolean_type)));
-
-    globals[4] = structure_member_create(
-        type_from_function_pointer(function_pointer_create(
-            type_allocate(type_from_unit()),
-            type_allocate(type_from_reference(&boolean_type)), 1)),
-        unicode_string_from_c_str("assert"), optional_value_empty);
-
-    {
-        type *const and_parameters = allocate_array(2, sizeof(*and_parameters));
-        and_parameters[0] = type_from_reference(&boolean_type);
-        and_parameters[1] = type_from_reference(&boolean_type);
-        globals[5] = structure_member_create(
-            type_from_function_pointer(function_pointer_create(
-                type_allocate(type_from_reference(&boolean_type)),
-                and_parameters, 2)),
-            unicode_string_from_c_str("and"), optional_value_empty);
-    }
-
-    structure const non_empty_global = structure_create(globals, 6);
+    standard_library_description const std_library =
+        describe_standard_library();
 
     {
         char const *const sources[] = {"f()\n", "f()"};
@@ -186,7 +141,7 @@ void test_semantics(void)
                 instruction_create_call(
                     call_instruction_create(1, NULL, 0, 2))};
             check_single_wellformed_function(
-                sources[i], non_empty_global,
+                sources[i], std_library.globals,
                 LPG_COPY_ARRAY(expected_body_elements));
         }
     }
@@ -202,7 +157,7 @@ void test_semantics(void)
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         check_single_wellformed_function("loop\n"
                                          "    f()",
-                                         non_empty_global,
+                                         std_library.globals,
                                          expected_body_elements, 1);
     }
     {
@@ -221,7 +176,7 @@ void test_semantics(void)
             "loop\n"
             "    f()\n"
             "    g()",
-            non_empty_global, LPG_COPY_ARRAY(expected_body_elements));
+            std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {
         instruction const loop_body[] = {instruction_create_break()};
@@ -231,7 +186,7 @@ void test_semantics(void)
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         check_single_wellformed_function("loop\n"
                                          "    break",
-                                         non_empty_global,
+                                         std_library.globals,
                                          expected_body_elements, 1);
     }
     {
@@ -246,7 +201,7 @@ void test_semantics(void)
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
-            "print(\"hello, world!\")", non_empty_global,
+            "print(\"hello, world!\")", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
@@ -261,7 +216,7 @@ void test_semantics(void)
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
-            "assert(boolean.true)", non_empty_global,
+            "assert(boolean.true)", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
@@ -276,7 +231,7 @@ void test_semantics(void)
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
-            "assert(boolean.false)", non_empty_global,
+            "assert(boolean.false)", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
@@ -286,7 +241,7 @@ void test_semantics(void)
             semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -308,7 +263,7 @@ void test_semantics(void)
             semantic_error_unknown_element, source_location_create(0, 15))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -322,7 +277,7 @@ void test_semantics(void)
                                   source_location_create(0, 20))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -335,7 +290,7 @@ void test_semantics(void)
             semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -348,7 +303,7 @@ void test_semantics(void)
             semantic_error_missing_argument, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -361,7 +316,7 @@ void test_semantics(void)
             semantic_error_extraneous_argument, source_location_create(0, 21))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -385,7 +340,7 @@ void test_semantics(void)
     {
         sequence const root = parse("and(boolean.true, boolean.false)");
         checked_program checked =
-            check(root, non_empty_global, expect_no_errors, NULL);
+            check(root, std_library.globals, expect_no_errors, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         register_id *const arguments = allocate_array(2, sizeof(*arguments));
@@ -415,13 +370,12 @@ void test_semantics(void)
                                   source_location_create(0, 0))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-            check(root, non_empty_global, expect_errors, &expected);
+            check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
-    structure_free(&non_empty_global);
-    type_free(&boolean_type);
+    standard_library_description_free(&std_library);
 }
