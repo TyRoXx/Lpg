@@ -4,7 +4,7 @@
 
 standard_library_description describe_standard_library(void)
 {
-    structure_member *globals = allocate_array(7, sizeof(*globals));
+    structure_member *globals = allocate_array(8, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
@@ -62,8 +62,18 @@ standard_library_description describe_standard_library(void)
             unicode_string_from_c_str("or"), optional_value_empty);
     }
 
+    {
+        type *const and_parameters = allocate_array(1, sizeof(*and_parameters));
+        and_parameters[0] = type_from_reference(boolean_type);
+        globals[7] = structure_member_create(
+            type_from_function_pointer(function_pointer_create(
+                type_allocate(type_from_reference(boolean_type)),
+                and_parameters, 1)),
+            unicode_string_from_c_str("not"), optional_value_empty);
+    }
+
     standard_library_description result = {
-        structure_create(globals, 7), boolean_type};
+        structure_create(globals, 8), boolean_type};
     return result;
 }
 
