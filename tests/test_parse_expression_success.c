@@ -97,8 +97,8 @@ void test_parse_expression_success(void)
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
-                arguments_tuple, source_location_create(0, 5))),
-            unicode_string_from_c_str("f(1,2)"));
+                arguments_tuple, source_location_create(0, 6))),
+            unicode_string_from_c_str("f(1, 2)"));
     }
     {
         expression *elements = allocate_array(1, sizeof(*elements));

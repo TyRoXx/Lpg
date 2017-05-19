@@ -450,6 +450,17 @@ static int parse_call(expression_parser *parser, size_t indentation,
         {
             expect_another_argument = 1;
             pop(parser);
+            rich_token const expected_space = peek(parser);
+            if (expected_space.token == token_space)
+            {
+                pop(parser);
+            }
+            else
+            {
+                parser->on_error(parse_error_create(parse_error_expected_space,
+                                                    expected_space.where),
+                                 parser->user);
+            }
         }
         else
         {

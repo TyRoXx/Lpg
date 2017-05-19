@@ -220,8 +220,11 @@ void test_parse_expression_syntax_error(void)
             &expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
     }
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 4));
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_space, source_location_create(0, 4)),
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 4))};
         expression *arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = expression_from_integer_literal(integer_create(0, 1));
         expression expected = expression_from_call(call_create(
@@ -229,8 +232,8 @@ void test_parse_expression_syntax_error(void)
                 identifier_expression_create(unicode_string_from_c_str("f"),
                                              source_location_create(0, 0)))),
             tuple_create(arguments, 1), source_location_create(0, 4)));
-        test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("f(1,)"));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          &expected, unicode_string_from_c_str("f(1,)"));
     }
     {
         parse_error const expected_error = parse_error_create(
@@ -251,6 +254,20 @@ void test_parse_expression_syntax_error(void)
             &expected_error, 1, &expected, unicode_string_from_c_str("f(1,"));
     }
     {
+        parse_error const expected_error = parse_error_create(
+            parse_error_expected_space, source_location_create(0, 4));
+        expression *const arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
+        arguments[1] = expression_from_integer_literal(integer_create(0, 2));
+        expression expected = expression_from_call(call_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("f"),
+                                             source_location_create(0, 0)))),
+            tuple_create(arguments, 2), source_location_create(0, 5)));
+        test_syntax_error(
+            &expected_error, 1, &expected, unicode_string_from_c_str("f(1,2)"));
+    }
+    {
         parse_error const expected_errors[] = {
             parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 2)),
@@ -266,6 +283,8 @@ void test_parse_expression_syntax_error(void)
     }
     {
         parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_space, source_location_create(0, 4)),
             parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 4)),
             parse_error_create(

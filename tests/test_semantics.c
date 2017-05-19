@@ -126,7 +126,7 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
 
-    structure_member *globals = allocate_array(5, sizeof(*globals));
+    structure_member *globals = allocate_array(6, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_function_pointer(
             function_pointer_create(type_allocate(type_from_unit()), NULL, 0)),
@@ -162,7 +162,18 @@ void test_semantics(void)
             type_allocate(type_from_reference(&boolean_type)), 1)),
         unicode_string_from_c_str("assert"), optional_value_empty);
 
-    structure const non_empty_global = structure_create(globals, 5);
+    {
+        type *const and_parameters = allocate_array(2, sizeof(*and_parameters));
+        and_parameters[0] = type_from_reference(&boolean_type);
+        and_parameters[1] = type_from_reference(&boolean_type);
+        globals[5] = structure_member_create(
+            type_from_function_pointer(function_pointer_create(
+                type_allocate(type_from_reference(&boolean_type)),
+                and_parameters, 2)),
+            unicode_string_from_c_str("and"), optional_value_empty);
+    }
+
+    structure const non_empty_global = structure_create(globals, 6);
 
     {
         char const *const sources[] = {"f()\n", "f()"};
@@ -345,11 +356,9 @@ void test_semantics(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse(
-            /*TODO support spaces between arguments*/ "assert(boolean.true,"
-                                                      "boolean.false)");
+        sequence const root = parse("assert(boolean.true, boolean.false)");
         semantic_error const errors[] = {semantic_error_create(
-            semantic_error_extraneous_argument, source_location_create(0, 20))};
+            semantic_error_extraneous_argument, source_location_create(0, 21))};
         expected_errors expected = {errors, 1};
         checked_program checked =
             check(root, non_empty_global, expect_errors, &expected);
@@ -366,6 +375,32 @@ void test_semantics(void)
                 instantiate_enum_instruction_create(2, 1)),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
+        instruction_sequence const expected_body =
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
+    {
+        sequence const root = parse("and(boolean.true, boolean.false)");
+        checked_program checked =
+            check(root, non_empty_global, expect_no_errors, NULL);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        register_id *const arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] = 2;
+        arguments[1] = 3;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 5, 1)),
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(2, 1)),
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(3, 0)),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 2, 4))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
