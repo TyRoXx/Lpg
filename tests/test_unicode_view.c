@@ -20,11 +20,16 @@ void test_unicode_view(void)
         unicode_string_free(&copy);
     }
     {
-        unicode_view first = unicode_view_create(NULL, 0);
+        unicode_view const first = unicode_view_create(NULL, 0);
         char const a = 'a';
-        unicode_view second = unicode_view_create(&a, 1);
+        unicode_view const second = unicode_view_create(&a, 1);
         REQUIRE(!unicode_view_equals(first, second));
         REQUIRE(unicode_view_equals(first, first));
         REQUIRE(unicode_view_equals(second, second));
+    }
+    {
+        unicode_view const view = unicode_view_from_c_str("abc");
+        REQUIRE(view.length == 3);
+        REQUIRE(unicode_view_equals_c_str(view, "abc"));
     }
 }
