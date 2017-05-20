@@ -2,6 +2,8 @@
 #include "test.h"
 #include "lpg_unicode_string.h"
 #include <string.h>
+#include <stdio.h>
+#include <lpg_string_literal.h>
 
 void test_unicode_string(void)
 {

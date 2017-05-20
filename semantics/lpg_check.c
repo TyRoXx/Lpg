@@ -5,6 +5,7 @@
 #include "lpg_value.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
+#include "lpg_string_literal.h"
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -72,12 +73,6 @@ static register_id allocate_register(function_checking_state *state)
 static evaluate_expression_result check_sequence(function_checking_state *state,
                                                  instruction_sequence *output,
                                                  sequence const input);
-
-static unicode_string decode_string_literal(unicode_view const literal)
-{
-    ASSUME(literal.length >= 2);
-    return unicode_string_from_range(literal.begin + 1, literal.length - 2);
-}
 
 static type const *get_return_type(type const callee)
 {
@@ -480,16 +475,18 @@ evaluate_expression(function_checking_state *state,
     case expression_type_string:
     {
         register_id const result = allocate_register(state);
-        unicode_view const value =
-            unicode_view_from_string(element.string.value);
+        memory_writer decoded = {NULL, 0, 0};
+        stream_writer decoded_writer = memory_writer_erase(&decoded);
+        decode_string_literal(
+            unicode_view_from_string(element.string.value), decoded_writer);
+        unicode_string string = {decoded.data, decoded.used};
         add_instruction(
-            function,
-            instruction_create_string_literal(string_literal_instruction_create(
-                decode_string_literal(value), result)));
+            function, instruction_create_string_literal(
+                          string_literal_instruction_create(string, result)));
         static type const string_type = {type_kind_string_ref, {{NULL, 0}}};
         return evaluate_expression_result_create(
             result, &string_type, optional_value_create(value_from_string_ref(
-                                      /*TODO: decode string literal*/ value)));
+                                      unicode_view_from_string(string))));
     }
 
     case expression_type_identifier:

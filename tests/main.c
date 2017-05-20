@@ -2,6 +2,7 @@
 #include "test_save_expression.h"
 #include "test.h"
 #include "test_integer.h"
+#include "test_decode_string_literal.h"
 #include "test_unicode_string.h"
 #include "test_allocator.h"
 #include "test_arithmetic.h"
@@ -26,6 +27,7 @@ int main(void)
                                     test_allocator,
                                     test_unicode_string,
                                     test_unicode_view,
+                                    test_decode_string_literal,
                                     test_arithmetic,
                                     test_stream_writer,
                                     test_identifier,

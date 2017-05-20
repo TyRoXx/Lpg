@@ -85,7 +85,7 @@ void test_cli(void)
                       "Could not open source file\n", "");
     }
     expect_output_with_source(
-        "print(\"Hello, world!\")", false, "", "Hello, world!");
+        "print(\"Hello, world!\\n\")", false, "", "Hello, world!\n");
     expect_output_with_source("syntax error here", true,
                               "Expected declaration or assignment in line 1\n"
                               "Expected expression in line 1\n",
