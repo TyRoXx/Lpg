@@ -27,6 +27,13 @@ Install `clang-format` like this on Ubuntu:
 
     sudo apt-get install clang-format-3.7
 
+On Windows, you can get clang-format by installing Clang for Windows:
+
+* http://releases.llvm.org/3.7.1/LLVM-3.7.1-win64.exe
+* http://releases.llvm.org/download.html#3.7.1
+
+You have to use clang-format 3.7 or otherwise the formatting will be inconsistent.
+
 Re-run `cmake` in the build directory to make it will look for `clang-format`:
 
     cmake .
