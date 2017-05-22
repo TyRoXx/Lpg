@@ -28,7 +28,8 @@ typedef enum parse_error_type
     parse_error_expected_space,
     parse_error_expected_colon,
     parse_error_expected_case,
-    parse_error_expected_element_name
+    parse_error_expected_element_name,
+    parse_error_expected_identifier
 } parse_error_type;
 
 typedef struct parse_error
@@ -64,8 +65,8 @@ typedef struct expression_parser_result
     expression success;
 } expression_parser_result;
 
-expression_parser_result parse_expression(expression_parser *parser,
-                                          size_t indentation,
-                                          bool may_be_statement);
+expression_parser_result parse_expression(expression_parser *const parser,
+                                          size_t const indentation,
+                                          bool const may_be_statement);
 
 sequence parse_program(expression_parser *parser);

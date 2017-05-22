@@ -114,13 +114,13 @@ typedef struct sequence
 typedef struct declare
 {
     expression *name;
-    expression *type;
+    expression *optional_type;
     expression *initializer;
 } declare;
 
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(sequence const *value);
-declare declare_create(expression *name, expression *type,
+declare declare_create(expression *name, expression *optional_type,
                        expression *initializer);
 void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);

@@ -105,20 +105,22 @@ void sequence_free(sequence const *value)
     }
 }
 
-declare declare_create(expression *name, expression *type,
+declare declare_create(expression *name, expression *optional_type,
                        expression *initializer)
 {
     ASSUME(name);
-    ASSUME(type);
     ASSUME(initializer);
-    declare result = {name, type, initializer};
+    declare result = {name, optional_type, initializer};
     return result;
 }
 
 void declare_free(declare const *value)
 {
     expression_deallocate(value->name);
-    expression_deallocate(value->type);
+    if (value->optional_type)
+    {
+        expression_deallocate(value->optional_type);
+    }
     expression_deallocate(value->initializer);
 }
 
@@ -430,8 +432,15 @@ bool sequence_equals(sequence const left, sequence const right)
 
 bool declare_equals(declare const left, declare const right)
 {
-    return expression_equals(left.name, right.name) &&
-           expression_equals(left.type, right.type);
+    if (!expression_equals(left.name, right.name))
+    {
+        return false;
+    }
+    if (left.optional_type && right.optional_type)
+    {
+        return expression_equals(left.optional_type, right.optional_type);
+    }
+    return !left.optional_type && !right.optional_type;
 }
 
 bool assign_equals(assign const left, assign const right)

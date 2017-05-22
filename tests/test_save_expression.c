@@ -109,8 +109,17 @@ void test_save_expression(void)
                     tuple_create(arguments, 2), source_location_create(0, 0)))),
                 expression_allocate(
                     expression_from_integer_literal(integer_create(0, 6))))),
-            "a: integer(0, 10) = 6");
+            "let a : integer(0, 10) = 6");
     }
+
+    check_expression_rendering(
+        expression_from_declare(declare_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"),
+                                             source_location_create(0, 0)))),
+            NULL, expression_allocate(
+                      expression_from_integer_literal(integer_create(0, 6))))),
+        "let a = 6");
 
     check_expression_rendering(
         expression_from_assign(assign_create(

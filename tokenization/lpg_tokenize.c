@@ -88,6 +88,10 @@ tokenize_result tokenize(char const *input, size_t length)
         {
             return make_success(token_return, content.length);
         }
+        if (unicode_view_equals_c_str(content, "let"))
+        {
+            return make_success(token_let, content.length);
+        }
         return make_success(token_identifier, i);
     }
     if (is_digit(*input))

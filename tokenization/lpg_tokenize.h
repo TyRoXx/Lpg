@@ -22,6 +22,7 @@ typedef enum token_type
     token_case,
     token_loop,
     token_break,
+    token_let,
     token_string
 } token_type;
 
