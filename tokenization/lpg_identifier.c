@@ -23,7 +23,7 @@ bool is_identifier_middle(char const c)
     {
         return 1;
     }
-    return 0;
+    return (c == '-');
 }
 
 bool is_identifier(char const *data, size_t size)
