@@ -26,6 +26,8 @@ void test_tokenize(void)
 {
     test_single_token(token_newline, 1, "\n");
     test_single_token(token_newline, 2, "\r\n");
+    test_single_token(token_newline, 2, "\r\nabc");
+    test_single_token(token_newline, 1, "\rabc");
     test_single_token(token_newline, 1, "\n\n");
     test_single_token(token_newline, 1, "\n ");
     test_single_token(token_newline, 1, "\naaaa");
