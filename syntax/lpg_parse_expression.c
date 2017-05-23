@@ -362,7 +362,9 @@ static expression_parser_result parse_callable(expression_parser *parser,
             if (integer_parse(&value, head.content))
             {
                 expression_parser_result result = {
-                    1, expression_from_integer_literal(value)};
+                    1,
+                    expression_from_integer_literal(
+                        integer_literal_expression_create(value, head.where))};
                 return result;
             }
             parser->on_error(

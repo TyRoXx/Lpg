@@ -75,7 +75,7 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(space_here(to, &whitespace));
         char buffer[39];
         char *const formatted =
-            integer_format(value->integer_literal, lower_case_digits, 10,
+            integer_format(value->integer_literal.value, lower_case_digits, 10,
                            buffer, sizeof(buffer));
         return stream_writer_write_bytes(
             to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));

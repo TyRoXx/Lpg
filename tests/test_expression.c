@@ -23,10 +23,15 @@ void test_expression(void)
                expression_from_break(source_location_create(0, 0)));
     test_not_equal(expression_from_break(source_location_create(0, 0)),
                    expression_from_break(source_location_create(0, 1)));
-    test_not_equal(expression_from_break(source_location_create(0, 0)),
-                   expression_from_integer_literal(integer_create(0, 0)));
-    test_not_equal(expression_from_integer_literal(integer_create(0, 1)),
-                   expression_from_integer_literal(integer_create(0, 0)));
+    test_not_equal(
+        expression_from_break(source_location_create(0, 0)),
+        expression_from_integer_literal(integer_literal_expression_create(
+            integer_create(0, 0), source_location_create(0, 0))));
+    test_not_equal(
+        expression_from_integer_literal(integer_literal_expression_create(
+            integer_create(0, 1), source_location_create(0, 0))),
+        expression_from_integer_literal(integer_literal_expression_create(
+            integer_create(0, 0), source_location_create(0, 0))));
     test_not_equal(
         expression_from_call(call_create(
             expression_allocate(expression_from_identifier(
@@ -61,7 +66,8 @@ void test_expression(void)
         expression *arguments_right =
             allocate_array(1, sizeof(*arguments_right));
         arguments_right[0] =
-            expression_from_integer_literal(integer_create(0, 1));
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 0)));
         test_not_equal(
             expression_from_call(call_create(
                 expression_allocate(
@@ -89,7 +95,8 @@ void test_expression(void)
         elements_left[0] = expression_from_break(source_location_create(0, 0));
         expression *elements_right = allocate_array(1, sizeof(*elements_right));
         elements_right[0] =
-            expression_from_integer_literal(integer_create(0, 1));
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 0)));
         test_not_equal(
             expression_from_sequence(sequence_create(elements_left, 1)),
             expression_from_sequence(sequence_create(elements_right, 1)));
@@ -119,8 +126,9 @@ void test_expression(void)
         right[0] = match_case_create(
             expression_allocate(
                 expression_from_break(source_location_create(0, 0))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 0)))));
         test_not_equal(expression_from_match(match_create(
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
@@ -141,13 +149,15 @@ void test_expression(void)
                                          source_location_create(0, 0))),
                                      expression_allocate(expression_from_break(
                                          source_location_create(0, 0))));
-        test_not_equal(expression_from_match(match_create(
-                           expression_allocate(expression_from_integer_literal(
-                               integer_create(1, 2))),
-                           left, 1)),
-                       expression_from_match(match_create(
-                           expression_allocate(expression_from_break(
-                               source_location_create(0, 0))),
-                           right, 1)));
+        test_not_equal(
+            expression_from_match(match_create(
+                expression_allocate(expression_from_integer_literal(
+                    integer_literal_expression_create(
+                        integer_create(1, 2), source_location_create(0, 0)))),
+                left, 1)),
+            expression_from_match(match_create(
+                expression_allocate(
+                    expression_from_break(source_location_create(0, 0))),
+                right, 1)));
     }
 }

@@ -208,7 +208,7 @@ source_location expression_source_begin(expression const value)
         return expression_source_begin(*value.call.callee);
 
     case expression_type_integer_literal:
-        LPG_TO_DO();
+        return value.integer_literal.source;
 
     case expression_type_access_structure:
         return expression_source_begin(*value.access_structure.object);
@@ -273,7 +273,21 @@ void string_expression_free(string_expression const *value)
     unicode_string_free(&value->value);
 }
 
-expression expression_from_integer_literal(integer value)
+integer_literal_expression
+integer_literal_expression_create(integer value, source_location source)
+{
+    integer_literal_expression result = {value, source};
+    return result;
+}
+
+bool integer_literal_expression_equals(integer_literal_expression const left,
+                                       integer_literal_expression const right)
+{
+    return integer_equal(left.value, right.value) &&
+           source_location_equals(left.source, right.source);
+}
+
+expression expression_from_integer_literal(integer_literal_expression value)
 {
     expression result;
     result.type = expression_type_integer_literal;
@@ -509,7 +523,8 @@ bool expression_equals(expression const *left, expression const *right)
             left->call.closing_parenthesis, right->call.closing_parenthesis);
 
     case expression_type_integer_literal:
-        return integer_equal(left->integer_literal, right->integer_literal);
+        return integer_literal_expression_equals(
+            left->integer_literal, right->integer_literal);
 
     case expression_type_access_structure:
         LPG_TO_DO();

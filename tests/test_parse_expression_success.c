@@ -31,7 +31,8 @@ void test_parse_expression_success(void)
 
     test_successful_parse(
         expression_from_return(expression_allocate(
-            expression_from_integer_literal(integer_create(0, 123)))),
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 123), source_location_create(0, 7))))),
         unicode_string_from_c_str("return 123"), true);
 
     test_successful_parse(
@@ -49,7 +50,8 @@ void test_parse_expression_success(void)
         unicode_string_from_c_str("a"), false);
 
     test_successful_parse(
-        expression_from_integer_literal(integer_create(0, 123)),
+        expression_from_integer_literal(integer_literal_expression_create(
+            integer_create(0, 123), source_location_create(0, 0))),
         unicode_string_from_c_str("123"), false);
 
     {
@@ -78,7 +80,9 @@ void test_parse_expression_success(void)
     }
     {
         expression *arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
+        arguments[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 2)));
         tuple arguments_tuple = tuple_create(arguments, 1);
         test_successful_parse(
             expression_from_call(call_create(
@@ -91,8 +95,12 @@ void test_parse_expression_success(void)
     }
     {
         expression *arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
-        arguments[1] = expression_from_integer_literal(integer_create(0, 2));
+        arguments[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 2)));
+        arguments[1] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 5)));
         tuple arguments_tuple = tuple_create(arguments, 2);
         test_successful_parse(
             expression_from_call(call_create(
@@ -168,16 +176,19 @@ void test_parse_expression_success(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 0)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 4)))))),
         unicode_string_from_c_str("a = 1"), true);
 
     test_successful_parse(
         expression_from_declare(declare_create(
             identifier_expression_create(
                 unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            NULL, expression_allocate(
-                      expression_from_integer_literal(integer_create(0, 1))))),
+            NULL,
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 8)))))),
         unicode_string_from_c_str("let a = 1"), true);
 
     test_successful_parse(
@@ -187,8 +198,9 @@ void test_parse_expression_success(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 14)))))),
         unicode_string_from_c_str("let a : int = 1"), true);
 
     test_successful_parse(
@@ -202,10 +214,12 @@ void test_parse_expression_success(void)
     {
         match_case *const cases = allocate_array(1, sizeof(*cases));
         cases[0] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 2))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(1, 9)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 2), source_location_create(1, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(
@@ -221,15 +235,19 @@ void test_parse_expression_success(void)
     {
         match_case *const cases = allocate_array(2, sizeof(*cases));
         cases[0] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 2))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(1, 9)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 2), source_location_create(1, 12)))));
         cases[1] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 3))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 4))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 3), source_location_create(2, 9)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 4), source_location_create(2, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(
@@ -246,17 +264,22 @@ void test_parse_expression_success(void)
     {
         match_case *const cases = allocate_array(2, sizeof(*cases));
         expression *sequence = allocate_array(1, sizeof(*sequence));
-        sequence[0] = expression_from_integer_literal(integer_create(0, 2));
+        sequence[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(2, 8)));
         cases[0] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(1, 9)))),
             expression_allocate(
                 expression_from_sequence(sequence_create(sequence, 1))));
         cases[1] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 3))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 4))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 3), source_location_create(3, 9)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 4), source_location_create(3, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
                 expression_allocate(

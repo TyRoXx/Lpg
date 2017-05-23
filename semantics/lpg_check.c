@@ -557,13 +557,16 @@ evaluate_expression(function_checking_state *state,
     case expression_type_integer_literal:
     {
         register_id const where = allocate_register(state);
-        add_instruction(function, instruction_create_integer_literal(
-                                      integer_literal_instruction_create(
-                                          where, element.integer_literal)));
+        add_instruction(
+            function, instruction_create_integer_literal(
+                          integer_literal_instruction_create(
+                              where, element.integer_literal.value)));
         return evaluate_expression_result_create(
-            where, type_from_integer_range(integer_range_create(
-                       element.integer_literal, element.integer_literal)),
-            optional_value_create(value_from_integer(element.integer_literal)));
+            where,
+            type_from_integer_range(integer_range_create(
+                element.integer_literal.value, element.integer_literal.value)),
+            optional_value_create(
+                value_from_integer(element.integer_literal.value)));
     }
 
     case expression_type_access_structure:

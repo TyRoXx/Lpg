@@ -210,7 +210,9 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_error = parse_error_create(
             parse_error_expected_expression, source_location_create(0, 2));
         expression *arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
+        arguments[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 3)));
         expression expected = expression_from_call(call_create(
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("f"),
@@ -226,7 +228,9 @@ void test_parse_expression_syntax_error(void)
             parse_error_create(
                 parse_error_expected_expression, source_location_create(0, 4))};
         expression *arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
+        arguments[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 2)));
         expression expected = expression_from_call(call_create(
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("f"),
@@ -257,8 +261,12 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_error = parse_error_create(
             parse_error_expected_space, source_location_create(0, 4));
         expression *const arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(integer_create(0, 1));
-        arguments[1] = expression_from_integer_literal(integer_create(0, 2));
+        arguments[0] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 1), source_location_create(0, 2)));
+        arguments[1] =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 4)));
         expression expected = expression_from_call(call_create(
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("f"),
@@ -310,8 +318,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 0)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 3))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("a =1"));
     }
@@ -325,8 +334,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 0)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 2))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("a=1"));
     }
@@ -337,8 +347,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 0)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 3))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected, unicode_string_from_c_str("a= 1"));
     }
@@ -373,8 +384,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 7)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 13))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected,
                           unicode_string_from_c_str("let a: int = 1"));
@@ -388,8 +400,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 7)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 13))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected,
                           unicode_string_from_c_str("let a :int = 1"));
@@ -403,8 +416,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 13))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected,
                           unicode_string_from_c_str("let a : int= 1"));
@@ -418,8 +432,9 @@ void test_parse_expression_syntax_error(void)
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1)))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 13))))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected,
                           unicode_string_from_c_str("let a : int =1"));
@@ -571,10 +586,12 @@ void test_parse_expression_syntax_error(void)
             parse_error_expected_space, source_location_create(1, 11))};
         match_case *const cases = allocate_array(1, sizeof(*cases));
         cases[0] = match_case_create(
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 1))),
-            expression_allocate(
-                expression_from_integer_literal(integer_create(0, 2))));
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(1, 9)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 2), source_location_create(1, 11)))));
         expression expected = expression_from_match(match_create(
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
@@ -607,7 +624,8 @@ void test_parse_expression_syntax_error(void)
             parse_error_create(parse_error_expected_expression,
                                source_location_create(0, 13))};
         expression expected = expression_from_return(expression_allocate(
-            expression_from_integer_literal(integer_create(0, 123))));
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 123), source_location_create(0, 14)))));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           &expected,
                           unicode_string_from_c_str("return return 123"));

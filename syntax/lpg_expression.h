@@ -150,6 +150,17 @@ string_expression string_expression_create(unicode_string value,
                                            source_location source);
 void string_expression_free(string_expression const *value);
 
+typedef struct integer_literal_expression
+{
+    integer value;
+    source_location source;
+} integer_literal_expression;
+
+integer_literal_expression
+integer_literal_expression_create(integer value, source_location source);
+bool integer_literal_expression_equals(integer_literal_expression const left,
+                                       integer_literal_expression const right);
+
 struct expression
 {
     expression_type type;
@@ -157,7 +168,7 @@ struct expression
     {
         lambda lambda;
         call call;
-        integer integer_literal;
+        integer_literal_expression integer_literal;
         access_structure access_structure;
         match match;
         string_expression string;
@@ -174,7 +185,7 @@ struct expression
     };
 };
 
-expression expression_from_integer_literal(integer value);
+expression expression_from_integer_literal(integer_literal_expression value);
 void call_free(call const *this);
 void access_structure_free(access_structure const *this);
 void match_free(match const *this);
