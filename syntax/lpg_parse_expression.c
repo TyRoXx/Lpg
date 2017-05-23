@@ -722,9 +722,8 @@ expression_parser_result parse_expression(expression_parser *const parser,
             expression_parser_result const result = {
                 true,
                 expression_from_declare(declare_create(
-                    expression_allocate(
-                        expression_from_identifier(identifier_expression_create(
-                            unicode_view_copy(name.content), name.where))),
+                    identifier_expression_create(
+                        unicode_view_copy(name.content), name.where),
                     (declared_variable_type.is_success
                          ? expression_allocate(declared_variable_type.success)
                          : NULL),

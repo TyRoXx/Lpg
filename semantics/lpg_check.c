@@ -39,27 +39,59 @@ evaluate_expression_result_create(register_id const where,
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, NULL, {false, {{0, 0}}}};
 
-typedef evaluate_expression_result
-read_variable_function(struct function_checking_state *, instruction_sequence *,
-                       unicode_view, source_location);
+typedef struct local_variable
+{
+    unicode_string name;
+    type const *type_;
+    optional_value compile_time_value;
+    register_id where;
+} local_variable;
+
+static local_variable local_variable_create(unicode_string name,
+                                            type const *type_,
+                                            optional_value compile_time_value,
+                                            register_id where)
+{
+    local_variable result = {name, type_, compile_time_value, where};
+    return result;
+}
+
+static void local_variable_free(local_variable const *const value)
+{
+    unicode_string_free(&value->name);
+}
+
+typedef struct local_variable_container
+{
+    local_variable *elements;
+    size_t count;
+} local_variable_container;
+
+static void add_local_variable(local_variable_container *to,
+                               local_variable variable)
+{
+    to->elements =
+        reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));
+    to->elements[to->count] = variable;
+    ++to->count;
+}
 
 typedef struct function_checking_state
 {
     register_id used_registers;
-    read_variable_function *read_variable;
     bool is_in_loop;
     structure const *global;
     check_error_handler *on_error;
+    local_variable_container local_variables;
     void *user;
 } function_checking_state;
 
 static function_checking_state
-function_checking_state_create(read_variable_function *read_variable,
-                               structure const *global,
+function_checking_state_create(structure const *global,
                                check_error_handler *on_error, void *user)
 {
     function_checking_state result = {
-        0, read_variable, false, global, on_error, user};
+        0, false, global, on_error, {NULL, 0}, user};
     return result;
 }
 
@@ -70,9 +102,9 @@ static register_id allocate_register(function_checking_state *state)
     return id;
 }
 
-static evaluate_expression_result check_sequence(function_checking_state *state,
-                                                 instruction_sequence *output,
-                                                 sequence const input);
+static evaluate_expression_result
+check_sequence(function_checking_state *const state,
+               instruction_sequence *const output, sequence const input);
 
 static type const *get_return_type(type const callee)
 {
@@ -372,6 +404,50 @@ static size_t expected_call_argument_count(const type callee)
 }
 
 static evaluate_expression_result
+read_variable(function_checking_state *const state,
+              instruction_sequence *const to, unicode_view const name,
+              source_location const where)
+{
+    instruction_checkpoint const previous_code = make_checkpoint(state, to);
+
+    LPG_FOR(size_t, i, state->local_variables.count)
+    {
+        local_variable const *const variable =
+            state->local_variables.elements + i;
+        if (unicode_view_equals(unicode_view_from_string(variable->name), name))
+        {
+            return evaluate_expression_result_create(
+                variable->where, variable->type_, variable->compile_time_value);
+        }
+    }
+
+    register_id const global = allocate_register(state);
+    add_instruction(to, instruction_create_global(global));
+    register_id const result = allocate_register(state);
+    read_structure_element_result const element_read = read_structure_element(
+        state, to, state->global, global, name, where, result);
+    if (!element_read.type_)
+    {
+        restore(previous_code);
+        return evaluate_expression_result_empty;
+    }
+    return evaluate_expression_result_create(
+        result, element_read.type_, element_read.compile_time_value);
+}
+
+static evaluate_expression_result make_unit(function_checking_state *state,
+                                            instruction_sequence *output)
+{
+    static type const unit_type = {type_kind_unit, {{NULL, 0}}};
+    evaluate_expression_result const final_result =
+        evaluate_expression_result_create(
+            allocate_register(state), &unit_type,
+            optional_value_create(value_from_unit()));
+    add_instruction(output, instruction_create_unit(final_result.where));
+    return final_result;
+}
+
+static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
 {
@@ -493,8 +569,8 @@ evaluate_expression(function_checking_state *state,
     {
         unicode_view const name =
             unicode_view_from_string(element.identifier.value);
-        evaluate_expression_result address = state->read_variable(
-            state, function, name, element.identifier.source);
+        evaluate_expression_result address =
+            read_variable(state, function, name, element.identifier.source);
         return address;
     }
 
@@ -530,31 +606,53 @@ evaluate_expression(function_checking_state *state,
         return evaluate_expression_result_empty;
 
     case expression_type_sequence:
+        LPG_TO_DO();
+
     case expression_type_declare:
+    {
+        /*TODO: check redefinition*/
+        /*TODO: check if declared type matches initializer*/
+        evaluate_expression_result const initializer =
+            evaluate_expression(state, function, *element.declare.initializer);
+        if (!initializer.has_value)
+        {
+            return evaluate_expression_result_empty;
+        }
+        add_local_variable(
+            &state->local_variables,
+            local_variable_create(
+                unicode_view_copy(
+                    unicode_view_from_string(element.declare.name.value)),
+                initializer.type_, initializer.compile_time_value,
+                initializer.where));
+        return make_unit(state, function);
+    }
+
     case expression_type_tuple:
         LPG_TO_DO();
     }
     UNREACHABLE();
 }
 
-static evaluate_expression_result check_sequence(function_checking_state *state,
-                                                 instruction_sequence *output,
-                                                 sequence const input)
+static evaluate_expression_result
+check_sequence(function_checking_state *const state,
+               instruction_sequence *const output, sequence const input)
 {
     if (input.length == 0)
     {
-        static type const unit_type = {type_kind_unit, {{NULL, 0}}};
-        evaluate_expression_result const final_result =
-            evaluate_expression_result_create(
-                allocate_register(state), &unit_type,
-                optional_value_create(value_from_unit()));
-        add_instruction(output, instruction_create_unit(final_result.where));
-        return final_result;
+        return make_unit(state, output);
     }
+    size_t const previous_number_of_variables = state->local_variables.count;
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     LPG_FOR(size_t, i, input.length)
     {
         final_result = evaluate_expression(state, output, input.elements[i]);
+    }
+    for (size_t i = previous_number_of_variables,
+                c = state->local_variables.count;
+         i != c; ++i)
+    {
+        local_variable_free(state->local_variables.elements + i);
     }
     return final_result;
 }
@@ -573,27 +671,6 @@ bool semantic_error_equals(semantic_error const left,
            source_location_equals(left.where, right.where);
 }
 
-static evaluate_expression_result read_variable(function_checking_state *state,
-                                                instruction_sequence *to,
-                                                unicode_view name,
-                                                source_location where)
-{
-    structure const globals = *state->global;
-    instruction_checkpoint const previous_code = make_checkpoint(state, to);
-    register_id const global = allocate_register(state);
-    add_instruction(to, instruction_create_global(global));
-    register_id const result = allocate_register(state);
-    read_structure_element_result const element_read = read_structure_element(
-        state, to, &globals, global, name, where, result);
-    if (!element_read.type_)
-    {
-        restore(previous_code);
-        return evaluate_expression_result_empty;
-    }
-    return evaluate_expression_result_create(
-        result, element_read.type_, element_read.compile_time_value);
-}
-
 checked_program check(sequence const root, structure const global,
                       check_error_handler *on_error, void *user)
 {
@@ -601,8 +678,12 @@ checked_program check(sequence const root, structure const global,
         allocate_array(1, sizeof(struct checked_function)), 1};
     program.functions[0].body = instruction_sequence_create(NULL, 0);
     function_checking_state state =
-        function_checking_state_create(read_variable, &global, on_error, user);
+        function_checking_state_create(&global, on_error, user);
     check_sequence(&state, &program.functions[0].body, root);
     program.functions[0].number_of_registers = state.used_registers;
+    if (state.local_variables.elements)
+    {
+        deallocate(state.local_variables.elements);
+    }
     return program;
 }

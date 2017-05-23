@@ -172,7 +172,8 @@ success_indicator save_expression(stream_writer const to,
 
     case expression_type_declare:
         LPG_TRY(stream_writer_write_string(to, "let "));
-        LPG_TRY(save_expression(to, value->declare.name, whitespace));
+        LPG_TRY(stream_writer_write_bytes(to, value->declare.name.value.data,
+                                          value->declare.name.value.length));
         if (value->declare.optional_type)
         {
             LPG_TRY(stream_writer_write_string(to, " : "));

@@ -174,18 +174,16 @@ void test_parse_expression_success(void)
 
     test_successful_parse(
         expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             NULL, expression_allocate(
                       expression_from_integer_literal(integer_create(0, 1))))),
         unicode_string_from_c_str("let a = 1"), true);
 
     test_successful_parse(
         expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),

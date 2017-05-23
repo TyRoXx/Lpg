@@ -377,5 +377,21 @@ void test_semantics(void)
         REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 0;
+        instruction const expected_body_elements[] = {
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(0, 1)),
+            instruction_create_unit(1), instruction_create_global(2),
+            instruction_create_read_struct(
+                read_struct_instruction_create(2, 4, 3)),
+            instruction_create_call(
+                call_instruction_create(3, arguments, 1, 4))};
+        check_single_wellformed_function(
+            "let v = boolean.true\n"
+            "assert(v)\n",
+            std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
+    }
     standard_library_description_free(&std_library);
 }

@@ -368,9 +368,8 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_expected_space, source_location_create(0, 5))};
         expression expected = expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 7)))),
@@ -384,9 +383,8 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_expected_space, source_location_create(0, 7))};
         expression expected = expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 7)))),
@@ -400,9 +398,8 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_expected_space, source_location_create(0, 11))};
         expression expected = expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),
@@ -416,9 +413,8 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_expected_space, source_location_create(0, 13))};
         expression expected = expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 4)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("int"),
                                              source_location_create(0, 8)))),

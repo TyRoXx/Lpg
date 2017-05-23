@@ -113,14 +113,14 @@ typedef struct sequence
 
 typedef struct declare
 {
-    expression *name;
+    identifier_expression name;
     expression *optional_type;
     expression *initializer;
 } declare;
 
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(sequence const *value);
-declare declare_create(expression *name, expression *optional_type,
+declare declare_create(identifier_expression name, expression *optional_type,
                        expression *initializer);
 void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);
@@ -137,6 +137,8 @@ source_location expression_source_begin(expression const value);
 identifier_expression identifier_expression_create(unicode_string value,
                                                    source_location source);
 void identifier_expression_free(identifier_expression const *value);
+bool identifier_expression_equals(identifier_expression const left,
+                                  identifier_expression const right);
 
 typedef struct string_expression
 {

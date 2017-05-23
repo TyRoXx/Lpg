@@ -97,10 +97,8 @@ void test_save_expression(void)
         arguments[1] = expression_from_integer_literal(integer_create(0, 10));
         check_expression_rendering(
             expression_from_declare(declare_create(
-                expression_allocate(
-                    expression_from_identifier(identifier_expression_create(
-                        unicode_string_from_c_str("a"),
-                        source_location_create(0, 0)))),
+                identifier_expression_create(unicode_string_from_c_str("a"),
+                                             source_location_create(0, 0)),
                 expression_allocate(expression_from_call(call_create(
                     expression_allocate(
                         expression_from_identifier(identifier_expression_create(
@@ -114,9 +112,8 @@ void test_save_expression(void)
 
     check_expression_rendering(
         expression_from_declare(declare_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 0)),
             NULL, expression_allocate(
                       expression_from_integer_literal(integer_create(0, 6))))),
         "let a = 6");

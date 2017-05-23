@@ -105,10 +105,9 @@ void sequence_free(sequence const *value)
     }
 }
 
-declare declare_create(expression *name, expression *optional_type,
+declare declare_create(identifier_expression name, expression *optional_type,
                        expression *initializer)
 {
-    ASSUME(name);
     ASSUME(initializer);
     declare result = {name, optional_type, initializer};
     return result;
@@ -116,7 +115,7 @@ declare declare_create(expression *name, expression *optional_type,
 
 void declare_free(declare const *value)
 {
-    expression_deallocate(value->name);
+    identifier_expression_free(&value->name);
     if (value->optional_type)
     {
         expression_deallocate(value->optional_type);
@@ -251,6 +250,13 @@ identifier_expression identifier_expression_create(unicode_string value,
 void identifier_expression_free(identifier_expression const *value)
 {
     unicode_string_free(&value->value);
+}
+
+bool identifier_expression_equals(identifier_expression const left,
+                                  identifier_expression const right)
+{
+    return unicode_string_equals(left.value, right.value) &&
+           source_location_equals(left.source, right.source);
 }
 
 string_expression string_expression_create(unicode_string value,
@@ -432,7 +438,7 @@ bool sequence_equals(sequence const left, sequence const right)
 
 bool declare_equals(declare const left, declare const right)
 {
-    if (!expression_equals(left.name, right.name))
+    if (!identifier_expression_equals(left.name, right.name))
     {
         return false;
     }
