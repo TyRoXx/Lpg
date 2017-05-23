@@ -11,7 +11,8 @@ typedef enum semantic_error_type
     semantic_error_type_mismatch,
     semantic_error_missing_argument,
     semantic_error_extraneous_argument,
-    semantic_error_break_outside_of_loop
+    semantic_error_break_outside_of_loop,
+    semantic_error_declaration_with_existing_name
 } semantic_error_type;
 
 typedef struct semantic_error

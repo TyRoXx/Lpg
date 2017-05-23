@@ -140,6 +140,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_break_outside_of_loop:
         return "Found break outside of a loop";
+
+    case semantic_error_declaration_with_existing_name:
+        return "Cannot reuse a name of a local variable in scope";
     }
     UNREACHABLE();
 }

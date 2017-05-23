@@ -76,6 +76,20 @@ static void add_local_variable(local_variable_container *to,
     ++to->count;
 }
 
+static bool local_variable_name_exists(local_variable_container const variables,
+                                       unicode_view const name)
+{
+    LPG_FOR(size_t, i, variables.count)
+    {
+        if (unicode_view_equals(
+                unicode_view_from_string(variables.elements[i].name), name))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 typedef struct function_checking_state
 {
     register_id used_registers;
@@ -610,8 +624,6 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_declare:
     {
-        /*TODO: check redefinition*/
-
         evaluate_expression_result const initializer =
             evaluate_expression(state, function, *element.declare.initializer);
         if (!initializer.has_value)
@@ -661,13 +673,25 @@ evaluate_expression(function_checking_state *state,
             }
         }
 
-        add_local_variable(
-            &state->local_variables,
-            local_variable_create(
-                unicode_view_copy(
-                    unicode_view_from_string(element.declare.name.value)),
-                initializer.type_, initializer.compile_time_value,
-                initializer.where));
+        if (local_variable_name_exists(
+                state->local_variables,
+                unicode_view_from_string(element.declare.name.value)))
+        {
+            state->on_error(semantic_error_create(
+                                semantic_error_declaration_with_existing_name,
+                                element.declare.name.source),
+                            state->user);
+        }
+        else
+        {
+            add_local_variable(
+                &state->local_variables,
+                local_variable_create(
+                    unicode_view_copy(
+                        unicode_view_from_string(element.declare.name.value)),
+                    initializer.type_, initializer.compile_time_value,
+                    initializer.where));
+        }
         return evaluate_expression_result_empty;
     }
 

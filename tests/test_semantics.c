@@ -195,14 +195,17 @@ void test_semantics(void)
                 instantiate_enum_instruction_create(0, 1)),
             instruction_create_break()};
         instruction *const expected_body_elements =
-            allocate_array(1, sizeof(*expected_body_elements));
+            allocate_array(2, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
+        expected_body_elements[1] = instruction_create_instantiate_enum(
+            instantiate_enum_instruction_create(1, 0));
         check_single_wellformed_function("loop\n"
                                          "    let v = boolean.true\n"
-                                         "    break",
+                                         "    break\n"
+                                         "let v = boolean.false\n",
                                          std_library.globals,
-                                         expected_body_elements, 1);
+                                         expected_body_elements, 2);
     }
     {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
@@ -494,6 +497,30 @@ void test_semantics(void)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 0, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
+        instruction_sequence const expected_body =
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body));
+        checked_program_free(&checked);
+        instruction_sequence_free(&expected_body);
+    }
+    {
+        sequence root = parse("let v : boolean = boolean.true\n"
+                              "let v : boolean = boolean.true\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_declaration_with_existing_name,
+                                  source_location_create(1, 4))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        instruction const expected_body_elements[] = {
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(0, 1)),
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(1, 1))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
