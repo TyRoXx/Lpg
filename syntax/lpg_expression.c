@@ -203,8 +203,10 @@ source_location expression_source_begin(expression const value)
     {
     case expression_type_lambda:
         LPG_TO_DO();
+
     case expression_type_call:
-        LPG_TO_DO();
+        return expression_source_begin(*value.call.callee);
+
     case expression_type_integer_literal:
         LPG_TO_DO();
 

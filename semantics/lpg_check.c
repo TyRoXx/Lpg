@@ -611,13 +611,56 @@ evaluate_expression(function_checking_state *state,
     case expression_type_declare:
     {
         /*TODO: check redefinition*/
-        /*TODO: check if declared type matches initializer*/
+
         evaluate_expression_result const initializer =
             evaluate_expression(state, function, *element.declare.initializer);
         if (!initializer.has_value)
         {
             return evaluate_expression_result_empty;
         }
+
+        if (element.declare.optional_type)
+        {
+            instruction_checkpoint const previous_code =
+                make_checkpoint(state, function);
+            evaluate_expression_result const declared_type =
+                evaluate_expression(
+                    state, function, *element.declare.optional_type);
+            restore(previous_code);
+            if (declared_type.has_value)
+            {
+                if (!declared_type.compile_time_value.is_set)
+                {
+                    state->on_error(
+                        semantic_error_create(
+                            semantic_error_expected_compile_time_type,
+                            expression_source_begin(
+                                *element.declare.optional_type)),
+                        state->user);
+                }
+                else if (declared_type.type_->kind != type_kind_type)
+                {
+                    state->on_error(
+                        semantic_error_create(
+                            semantic_error_expected_compile_time_type,
+                            expression_source_begin(
+                                *element.declare.optional_type)),
+                        state->user);
+                }
+                else if (!is_implicitly_convertible(
+                             *initializer.type_,
+                             *declared_type.compile_time_value.value_.type_))
+                {
+                    state->on_error(semantic_error_create(
+                                        semantic_error_type_mismatch,
+                                        expression_source_begin(
+                                            *element.declare.initializer)),
+                                    state->user);
+                    return evaluate_expression_result_empty;
+                }
+            }
+        }
+
         add_local_variable(
             &state->local_variables,
             local_variable_create(
