@@ -193,7 +193,7 @@ void test_semantics(void)
         instruction const loop_body[] = {
             instruction_create_instantiate_enum(
                 instantiate_enum_instruction_create(0, 1)),
-            instruction_create_unit(1), instruction_create_break()};
+            instruction_create_break()};
         instruction *const expected_body_elements =
             allocate_array(1, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(
@@ -398,11 +398,11 @@ void test_semantics(void)
         instruction const expected_body_elements[] = {
             instruction_create_instantiate_enum(
                 instantiate_enum_instruction_create(0, 1)),
-            instruction_create_unit(1), instruction_create_global(2),
+            instruction_create_global(1),
             instruction_create_read_struct(
-                read_struct_instruction_create(2, 4, 3)),
+                read_struct_instruction_create(1, 4, 2)),
             instruction_create_call(
-                call_instruction_create(3, arguments, 1, 4))};
+                call_instruction_create(2, arguments, 1, 3))};
         check_single_wellformed_function(
             "let v = boolean.true\n"
             "assert(v)\n",
@@ -414,11 +414,11 @@ void test_semantics(void)
         instruction const expected_body_elements[] = {
             instruction_create_instantiate_enum(
                 instantiate_enum_instruction_create(0, 1)),
-            instruction_create_unit(1), instruction_create_global(2),
+            instruction_create_global(1),
             instruction_create_read_struct(
-                read_struct_instruction_create(2, 4, 3)),
+                read_struct_instruction_create(1, 4, 2)),
             instruction_create_call(
-                call_instruction_create(3, arguments, 1, 4))};
+                call_instruction_create(2, arguments, 1, 3))};
         check_single_wellformed_function(
             "let v : boolean = boolean.true\n"
             "assert(v)\n",
@@ -437,8 +437,7 @@ void test_semantics(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_instantiate_enum(
-                instantiate_enum_instruction_create(0, 1)),
-            instruction_create_unit(1)};
+                instantiate_enum_instruction_create(0, 1))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
@@ -459,8 +458,7 @@ void test_semantics(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_instantiate_enum(
-                instantiate_enum_instruction_create(0, 1)),
-            instruction_create_unit(1)};
+                instantiate_enum_instruction_create(0, 1))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(

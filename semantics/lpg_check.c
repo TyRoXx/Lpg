@@ -668,7 +668,7 @@ evaluate_expression(function_checking_state *state,
                     unicode_view_from_string(element.declare.name.value)),
                 initializer.type_, initializer.compile_time_value,
                 initializer.where));
-        return make_unit(state, function);
+        return evaluate_expression_result_empty;
     }
 
     case expression_type_tuple:
