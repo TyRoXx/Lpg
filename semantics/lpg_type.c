@@ -48,43 +48,13 @@ void enumeration_free(enumeration const *value)
     }
 }
 
-void type_free(type const *value)
+integer_range integer_range_create(integer minimum, integer maximum)
 {
-    switch (value->kind)
-    {
-    case type_kind_structure:
-        structure_free(&value->structure_);
-        break;
-
-    case type_kind_function_pointer:
-        function_pointer_free(&value->function_pointer_);
-        break;
-
-    case type_kind_unit:
-        break;
-
-    case type_kind_string_ref:
-        break;
-
-    case type_kind_enumeration:
-        enumeration_free(&value->enum_);
-        break;
-
-    case type_kind_referenced:
-        break;
-
-    case type_kind_type:
-        break;
-    }
+    integer_range result = {minimum, maximum};
+    return result;
 }
 
-void type_deallocate(type *value)
-{
-    type_free(value);
-    deallocate(value);
-}
-
-type type_from_function_pointer(function_pointer value)
+type type_from_function_pointer(function_pointer const *value)
 {
     type result;
     result.kind = type_kind_function_pointer;
@@ -106,7 +76,7 @@ type type_from_string_ref(void)
     return result;
 }
 
-type type_from_enumeration(enumeration const value)
+type type_from_enumeration(enumeration const *value)
 {
     type result;
     result.kind = type_kind_enumeration;
@@ -129,6 +99,14 @@ type type_from_type(void)
     return result;
 }
 
+type type_from_integer_range(integer_range value)
+{
+    type result;
+    result.kind = type_kind_integer_range;
+    result.integer_range_ = value;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -136,7 +114,7 @@ type *type_allocate(type const value)
     return result;
 }
 
-function_pointer function_pointer_create(type *result, type *arguments,
+function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity)
 {
     function_pointer returned = {result, arguments, arity};
@@ -145,11 +123,6 @@ function_pointer function_pointer_create(type *result, type *arguments,
 
 void function_pointer_free(function_pointer const *value)
 {
-    type_deallocate(value->result);
-    LPG_FOR(size_t, i, value->arity)
-    {
-        type_free(value->arguments + i);
-    }
     if (value->arguments)
     {
         deallocate(value->arguments);

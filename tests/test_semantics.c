@@ -528,5 +528,13 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+    {
+        instruction const expected_body_elements[] = {
+            instruction_create_integer_literal(
+                integer_literal_instruction_create(0, integer_create(0, 1)))};
+        check_single_wellformed_function(
+            "let v = 1\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
     standard_library_description_free(&std_library);
 }

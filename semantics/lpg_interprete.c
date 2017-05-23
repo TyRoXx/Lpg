@@ -91,6 +91,11 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             registers[element.instantiate_enum.into] =
                 value_from_enum_element(element.instantiate_enum.element);
             break;
+
+        case instruction_integer_literal:
+            registers[element.integer.into] =
+                value_from_integer(element.integer.value);
+            break;
         }
     }
     return run_sequence_result_continue;

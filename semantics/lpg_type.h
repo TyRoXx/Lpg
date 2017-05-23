@@ -2,6 +2,7 @@
 #include "lpg_unicode_string.h"
 #include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
+#include "lpg_integer.h"
 
 typedef struct structure_member structure_member;
 
@@ -15,13 +16,6 @@ structure structure_create(structure_member *members, struct_member_id count);
 void structure_free(structure const *value);
 
 typedef struct type type;
-
-typedef struct function_pointer
-{
-    type *result;
-    type *arguments;
-    size_t arity;
-} function_pointer;
 
 typedef struct enumeration_element
 {
@@ -41,6 +35,14 @@ enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size);
 void enumeration_free(enumeration const *value);
 
+typedef struct integer_range
+{
+    integer minimum;
+    integer maximum;
+} integer_range;
+
+integer_range integer_range_create(integer minimum, integer maximum);
+
 typedef enum type_kind
 {
     type_kind_structure,
@@ -49,31 +51,41 @@ typedef enum type_kind
     type_kind_string_ref,
     type_kind_enumeration,
     type_kind_referenced,
-    type_kind_type
+    type_kind_type,
+    type_kind_integer_range
 } type_kind;
+
+typedef struct function_pointer function_pointer;
 
 struct type
 {
     type_kind kind;
     union
     {
-        structure structure_;
-        function_pointer function_pointer_;
-        enumeration enum_;
+        structure const *structure_;
+        function_pointer const *function_pointer_;
+        enumeration const *enum_;
         type const *referenced;
+        integer_range integer_range_;
     };
 };
 
-void type_free(type const *value);
-void type_deallocate(type *value);
-type type_from_function_pointer(function_pointer value);
+struct function_pointer
+{
+    type result;
+    type *arguments;
+    size_t arity;
+};
+
+type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
-type type_from_enumeration(enumeration const value);
+type type_from_enumeration(enumeration const *value);
 type type_from_reference(type const *const referenced);
 type type_from_type(void);
+type type_from_integer_range(integer_range value);
 type *type_allocate(type const value);
 
-function_pointer function_pointer_create(type *result, type *arguments,
+function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity);
 void function_pointer_free(function_pointer const *value);

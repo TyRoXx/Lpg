@@ -245,10 +245,12 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     fclose(source_file);
 
     structure_member *const globals = allocate_array(1, sizeof(*globals));
+
+    function_pointer const print_signature = function_pointer_create(
+        type_from_unit(), type_allocate(type_from_string_ref()), 1);
+
     globals[0] = structure_member_create(
-        type_from_function_pointer(
-            function_pointer_create(type_allocate(type_from_unit()),
-                                    type_allocate(type_from_string_ref()), 1)),
+        type_from_function_pointer(&print_signature),
         unicode_string_from_c_str("print"), optional_value_empty);
     structure const global_object = structure_create(globals, 1);
 
@@ -259,6 +261,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     if (!root.has_value)
     {
         sequence_free(&root.value);
+        function_pointer_free(&print_signature);
         structure_free(&global_object);
         unicode_string_free(&source);
         return true;
@@ -268,6 +271,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     checked_program checked =
         check(root.value, global_object, handle_semantic_error, &context);
     sequence_free(&root.value);
+    function_pointer_free(&print_signature);
     interprete(checked, globals_values);
     checked_program_free(&checked);
     structure_free(&global_object);

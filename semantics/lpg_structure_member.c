@@ -10,5 +10,4 @@ structure_member structure_member_create(type what, unicode_string name,
 void struct_member_free(structure_member const *value)
 {
     unicode_string_free(&value->name);
-    type_free(&value->what);
 }

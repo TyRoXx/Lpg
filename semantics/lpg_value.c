@@ -38,7 +38,7 @@ value value_from_unit(void)
     return result;
 }
 
-value value_from_type(type const *type_)
+value value_from_type(type const type_)
 {
     value result;
     result.type_ = type_;
@@ -49,6 +49,13 @@ value value_from_enum_element(enum_element_id const element)
 {
     value result;
     result.enum_element = element;
+    return result;
+}
+
+value value_from_integer(integer const content)
+{
+    value result;
+    result.integer_ = content;
     return result;
 }
 

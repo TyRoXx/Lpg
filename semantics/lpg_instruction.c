@@ -93,6 +93,19 @@ bool instantiate_enum_instruction_equals(
     return (left.into == right.into) && (left.element == right.element);
 }
 
+integer_literal_instruction integer_literal_instruction_create(register_id into,
+                                                               integer value)
+{
+    integer_literal_instruction result = {into, value};
+    return result;
+}
+
+bool integer_literal_instruction_equals(integer_literal_instruction const left,
+                                        integer_literal_instruction const right)
+{
+    return (left.into == right.into) && integer_equal(left.value, right.value);
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -157,6 +170,15 @@ instruction_create_instantiate_enum(instantiate_enum_instruction value)
     return result;
 }
 
+instruction
+instruction_create_integer_literal(integer_literal_instruction const value)
+{
+    instruction result;
+    result.type = instruction_integer_literal;
+    result.integer = value;
+    return result;
+}
+
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -186,6 +208,9 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_instantiate_enum:
+        break;
+
+    case instruction_integer_literal:
         break;
     }
 }
@@ -224,6 +249,9 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_instantiate_enum:
         return instantiate_enum_instruction_equals(
             left.instantiate_enum, right.instantiate_enum);
+
+    case instruction_integer_literal:
+        return integer_literal_instruction_equals(left.integer, right.integer);
     }
     UNREACHABLE();
 }

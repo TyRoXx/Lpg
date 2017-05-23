@@ -135,6 +135,7 @@ void test_interprete(void)
         "let v = boolean.false\nassert(not(v))", "", std_library.globals);
     expect_output(
         "let v = not(boolean.false)\nassert(v)", "", std_library.globals);
+    expect_output("let v = 123\n", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }

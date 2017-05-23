@@ -24,7 +24,7 @@ typedef union value
     unicode_view string_ref;
     function_pointer_value function_pointer;
     union value const *flat_object;
-    type const *type_;
+    type type_;
     enum_element_id enum_element;
 } value;
 
@@ -32,8 +32,9 @@ value value_from_flat_object(value const *flat_object);
 value value_from_function_pointer(function_pointer_value function_pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
-value value_from_type(type const *type_);
+value value_from_type(type const type_);
 value value_from_enum_element(enum_element_id const element);
+value value_from_integer(integer const content);
 
 typedef struct optional_value
 {
