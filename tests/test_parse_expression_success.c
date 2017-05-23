@@ -6,13 +6,16 @@
 #include "handle_parse_error.h"
 #include "lpg_find_next_token.h"
 
-static void test_successful_parse(expression expected, unicode_string input)
+static void test_successful_parse(expression const expected,
+                                  unicode_string const input,
+                                  bool const is_statement)
 {
     test_parser_user user = {
         {input.data, input.length, source_location_create(0, 0)}, NULL, 0};
     expression_parser parser =
         expression_parser_create(find_next_token, handle_error, &user);
-    expression_parser_result result = parse_expression(&parser, 0, 1);
+    expression_parser_result result =
+        parse_expression(&parser, 0, is_statement);
     REQUIRE(result.is_success);
     REQUIRE(user.base.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
@@ -24,12 +27,12 @@ static void test_successful_parse(expression expected, unicode_string input)
 void test_parse_expression_success(void)
 {
     test_successful_parse(expression_from_break(source_location_create(0, 0)),
-                          unicode_string_from_c_str("break"));
+                          unicode_string_from_c_str("break"), true);
 
     test_successful_parse(
         expression_from_return(expression_allocate(
             expression_from_integer_literal(integer_create(0, 123)))),
-        unicode_string_from_c_str("return 123"));
+        unicode_string_from_c_str("return 123"), true);
 
     test_successful_parse(
         expression_from_return(expression_allocate(expression_from_call(
@@ -38,16 +41,16 @@ void test_parse_expression_success(void)
                                 unicode_string_from_c_str("f"),
                                 source_location_create(0, 7)))),
                         tuple_create(NULL, 0), source_location_create(0, 9))))),
-        unicode_string_from_c_str("return f()"));
+        unicode_string_from_c_str("return f()"), true);
 
     test_successful_parse(
         expression_from_identifier(identifier_expression_create(
             unicode_string_from_c_str("a"), source_location_create(0, 0))),
-        unicode_string_from_c_str("a"));
+        unicode_string_from_c_str("a"), false);
 
     test_successful_parse(
         expression_from_integer_literal(integer_create(0, 123)),
-        unicode_string_from_c_str("123"));
+        unicode_string_from_c_str("123"), false);
 
     {
         tuple arguments = tuple_create(NULL, 0);
@@ -58,7 +61,7 @@ void test_parse_expression_success(void)
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
                 arguments, source_location_create(0, 2))),
-            unicode_string_from_c_str("f()"));
+            unicode_string_from_c_str("f()"), false);
     }
     {
         tuple arguments = tuple_create(NULL, 0);
@@ -71,7 +74,7 @@ void test_parse_expression_success(void)
                             source_location_create(0, 0)))),
                     arguments, source_location_create(0, 2)))),
                 arguments, source_location_create(0, 4))),
-            unicode_string_from_c_str("f()()"));
+            unicode_string_from_c_str("f()()"), false);
     }
     {
         expression *arguments = allocate_array(1, sizeof(*arguments));
@@ -84,7 +87,7 @@ void test_parse_expression_success(void)
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
                 arguments_tuple, source_location_create(0, 3))),
-            unicode_string_from_c_str("f(1)"));
+            unicode_string_from_c_str("f(1)"), false);
     }
     {
         expression *arguments = allocate_array(2, sizeof(*arguments));
@@ -98,7 +101,7 @@ void test_parse_expression_success(void)
                         unicode_string_from_c_str("f"),
                         source_location_create(0, 0)))),
                 arguments_tuple, source_location_create(0, 6))),
-            unicode_string_from_c_str("f(1, 2)"));
+            unicode_string_from_c_str("f(1, 2)"), false);
     }
     {
         expression *elements = allocate_array(1, sizeof(*elements));
@@ -106,7 +109,8 @@ void test_parse_expression_success(void)
         test_successful_parse(
             expression_from_loop(sequence_create(elements, 1)),
             unicode_string_from_c_str("loop\n"
-                                      "    break"));
+                                      "    break"),
+            false);
     }
     {
         expression *elements = allocate_array(2, sizeof(*elements));
@@ -117,7 +121,8 @@ void test_parse_expression_success(void)
             expression_from_loop(sequence_create(elements, 2)),
             unicode_string_from_c_str("loop\n"
                                       "    f\n"
-                                      "    break"));
+                                      "    break"),
+            false);
     }
     {
         expression *elements = allocate_array(2, sizeof(*elements));
@@ -128,7 +133,8 @@ void test_parse_expression_success(void)
             expression_from_loop(sequence_create(elements, 2)),
             unicode_string_from_c_str("loop\n"
                                       "    f\n"
-                                      "    break\n"));
+                                      "    break\n"),
+            false);
     }
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
@@ -139,7 +145,8 @@ void test_parse_expression_success(void)
             expression_from_loop(sequence_create(outer_loop, 1)),
             unicode_string_from_c_str("loop\n"
                                       "    loop\n"
-                                      "        break\n"));
+                                      "        break\n"),
+            false);
     }
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
@@ -152,7 +159,8 @@ void test_parse_expression_success(void)
             unicode_string_from_c_str("loop\n"
                                       "    loop\n"
                                       "        break\n"
-                                      "    break\n"));
+                                      "    break\n"),
+            false);
     }
 
     test_successful_parse(
@@ -162,7 +170,7 @@ void test_parse_expression_success(void)
                                              source_location_create(0, 0)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
-        unicode_string_from_c_str("a = 1"));
+        unicode_string_from_c_str("a = 1"), true);
 
     test_successful_parse(
         expression_from_declare(declare_create(
@@ -171,7 +179,7 @@ void test_parse_expression_success(void)
                                              source_location_create(0, 4)))),
             NULL, expression_allocate(
                       expression_from_integer_literal(integer_create(0, 1))))),
-        unicode_string_from_c_str("let a = 1"));
+        unicode_string_from_c_str("let a = 1"), true);
 
     test_successful_parse(
         expression_from_declare(declare_create(
@@ -183,7 +191,7 @@ void test_parse_expression_success(void)
                                              source_location_create(0, 8)))),
             expression_allocate(
                 expression_from_integer_literal(integer_create(0, 1))))),
-        unicode_string_from_c_str("let a : int = 1"));
+        unicode_string_from_c_str("let a : int = 1"), true);
 
     test_successful_parse(
         expression_from_match(match_create(
@@ -191,7 +199,7 @@ void test_parse_expression_success(void)
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 6)))),
             NULL, 0)),
-        unicode_string_from_c_str("match a\n"));
+        unicode_string_from_c_str("match a\n"), false);
 
     {
         match_case *const cases = allocate_array(1, sizeof(*cases));
@@ -208,7 +216,8 @@ void test_parse_expression_success(void)
                         source_location_create(0, 6)))),
                 cases, 1)),
             unicode_string_from_c_str("match a\n"
-                                      "    case 1: 2\n"));
+                                      "    case 1: 2\n"),
+            false);
     }
 
     {
@@ -232,7 +241,8 @@ void test_parse_expression_success(void)
                 cases, 2)),
             unicode_string_from_c_str("match a\n"
                                       "    case 1: 2\n"
-                                      "    case 3: 4\n"));
+                                      "    case 3: 4\n"),
+            false);
     }
 
     {
@@ -259,6 +269,7 @@ void test_parse_expression_success(void)
             unicode_string_from_c_str("match a\n"
                                       "    case 1:\n"
                                       "        2\n"
-                                      "    case 3: 4\n"));
+                                      "    case 3: 4\n"),
+            false);
     }
 }

@@ -548,30 +548,30 @@ parse_returnable(expression_parser *const parser, size_t const indentation,
                     parser->user);
                 return result;
             }
-            if (maybe_operator.token == token_dot)
+        }
+        if (maybe_operator.token == token_dot)
+        {
+            pop(parser);
+            rich_token const element_name = peek(parser);
+            pop(parser);
+            if (element_name.token == token_identifier)
             {
-                pop(parser);
-                rich_token const element_name = peek(parser);
-                pop(parser);
-                if (element_name.token == token_identifier)
-                {
-                    expression access = expression_from_access_structure(
-                        access_structure_create(
-                            expression_allocate(result.success),
-                            identifier_expression_create(
-                                unicode_view_copy(element_name.content),
-                                element_name.where)));
-                    result.success = access;
-                    continue;
-                }
-                parser->on_error(
-                    parse_error_create(
-                        parse_error_expected_element_name, element_name.where),
-                    parser->user);
-                ASSUME(result.is_success);
-                expression_free(&result.success);
-                return expression_parser_result_failure;
+                expression access =
+                    expression_from_access_structure(access_structure_create(
+                        expression_allocate(result.success),
+                        identifier_expression_create(
+                            unicode_view_copy(element_name.content),
+                            element_name.where)));
+                result.success = access;
+                continue;
             }
+            parser->on_error(
+                parse_error_create(
+                    parse_error_expected_element_name, element_name.where),
+                parser->user);
+            ASSUME(result.is_success);
+            expression_free(&result.success);
+            return expression_parser_result_failure;
         }
         return result;
     }
