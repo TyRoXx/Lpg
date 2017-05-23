@@ -190,6 +190,21 @@ void test_semantics(void)
                                          expected_body_elements, 1);
     }
     {
+        instruction const loop_body[] = {
+            instruction_create_instantiate_enum(
+                instantiate_enum_instruction_create(0, 1)),
+            instruction_create_unit(1), instruction_create_break()};
+        instruction *const expected_body_elements =
+            allocate_array(1, sizeof(*expected_body_elements));
+        expected_body_elements[0] = instruction_create_loop(
+            instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
+        check_single_wellformed_function("loop\n"
+                                         "    let v = boolean.true\n"
+                                         "    break",
+                                         std_library.globals,
+                                         expected_body_elements, 1);
+    }
+    {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_body_elements[] = {

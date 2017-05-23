@@ -697,6 +697,7 @@ check_sequence(function_checking_state *const state,
     {
         local_variable_free(state->local_variables.elements + i);
     }
+    state->local_variables.count = previous_number_of_variables;
     return final_result;
 }
 

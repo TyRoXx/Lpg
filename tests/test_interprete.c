@@ -114,7 +114,8 @@ void test_interprete(void)
     expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!",
                   std_library.globals);
     expect_output("loop\n"
-                  "    print(\"Hello, world!\")\n"
+                  "    let v = \"Hello, world!\"\n"
+                  "    print(v)\n"
                   "    break",
                   "Hello, world!", std_library.globals);
     expect_output("assert(boolean.true)", "", std_library.globals);
