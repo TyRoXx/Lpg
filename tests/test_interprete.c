@@ -109,6 +109,8 @@ void test_interprete(void)
         "print(\"Hello, world!\")", "Hello, world!", std_library.globals);
     expect_output(
         "print(\"Hello, world!\")\n", "Hello, world!", std_library.globals);
+    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "Hello, world!",
+                  std_library.globals);
     expect_output(
         "print(\"Hello, world!\")\r\n", "Hello, world!", std_library.globals);
     expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!",
@@ -128,6 +130,11 @@ void test_interprete(void)
         "assert(or(boolean.false, boolean.true))", "", std_library.globals);
     expect_output(
         "assert(or(boolean.true, boolean.false))", "", std_library.globals);
+    expect_output("let v = boolean.true\nassert(v)", "", std_library.globals);
+    expect_output(
+        "let v = boolean.false\nassert(not(v))", "", std_library.globals);
+    expect_output(
+        "let v = not(boolean.false)\nassert(v)", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
