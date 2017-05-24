@@ -3,13 +3,13 @@ f()
 
 let g = () =>
     f()
-	f()
+    f()
 
 assert(type-of("") == string-ref)
 
 let print-twice = (message: string-ref) =>
     print(message)
-	print(message)
+    print(message)
 
 print-twice("woo")
 
