@@ -61,3 +61,16 @@ assert(x != y)
 
 //unsolved problem: Implicit conversion from option(T) to option(U) if T converts to U?
 let z : option(int(0, 999)) = option.some(123)
+
+let make-counter = () =>
+    mutable count : int(0, 9999) = 0
+    return () =>
+        match count.add(1)
+            case next: type-of(count)
+                count = next
+                return boolean.true
+            case 10000: boolean.false
+
+let c = make-counter()
+assert(c())
+assert(c())
