@@ -74,3 +74,20 @@ let make-counter = () =>
 let c = make-counter()
 assert(c())
 assert(c())
+
+let counter = interface(number: type)
+    mutable increment(): boolean
+    count(): number
+
+let make-counter-2 = () =>
+    mutable state: int(0, 100000) = 0
+    new counter(type-of(state))
+        increment()
+            match state.add(1)
+                case next: type-of(state)
+                    state = next
+                    return true
+                case 100001:
+                    return false
+        count()
+            return state
