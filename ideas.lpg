@@ -36,6 +36,8 @@ let instance = new stream-writer
 
 let other-interface = interface
     write(written: string-ref): unit
+
+//unsolved problem: Every declared type should be a new type
 assert(stream-writer != other-interface)
 
 let boolean = enum
@@ -56,3 +58,6 @@ let y = option.some(123)
 
 //enums are comparable if their contents are
 assert(x != y)
+
+//unsolved problem: Implicit conversion from option(T) to option(U) if T converts to U?
+let z : option(int(0, 999)) = option.some(123)
