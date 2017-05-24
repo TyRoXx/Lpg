@@ -71,7 +71,7 @@ let make-counter = () =>
                 return boolean.true
             case 10000: boolean.false
 
-let c = make-counter()
+mutable c = make-counter()
 assert(c())
 assert(c())
 
@@ -91,3 +91,17 @@ let make-counter-2 = () =>
                     return false
         count()
             return state
+
+mutable d = make-counter-2()
+let result = thread.spawn(() =>
+    d.increment()
+    return d.count()
+)
+
+//would not compile because d is mutated by the thread:
+//d.count()
+
+assert(1 == result.wait())
+
+//problem to solve: Waiting on the future should make d usable again
+assert(1 == d.count())
