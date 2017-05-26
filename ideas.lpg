@@ -132,29 +132,6 @@ struct pair<First: type, Second: type>
 
 let p = pair{1, 2}
 
-let make-pair = (first: let First, second: let Second)
-    return new struct
-        first
-        second
-        to-tuple = ()
-            return (first, second)
-
-let make-pair = <First: type, Second: type>(first: First, second: Second)
-    return new struct
-        first
-        second
-        to-tuple = ()
-            return (first, second)
-
-let make-pair = (first, second)
-    return new struct
-        first
-        second
-        to-tuple = ()
-            return (first, second)
-
-let p : ? = make-pair(1, 2)
-
 struct binary-tree<Payload: type>
     payload: Payload
     left: option<binary-tree<Payload>>
