@@ -76,6 +76,7 @@ standard_library_description describe_standard_library(void)
     globals[5] = structure_member_create(
         type_from_function_pointer(&stable->and_),
         unicode_string_from_c_str("and"), optional_value_empty);
+
     globals[6] = structure_member_create(
         type_from_function_pointer(&stable->or_),
         unicode_string_from_c_str("or"), optional_value_empty);
