@@ -84,13 +84,92 @@ void test_cli(void)
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
                       "Could not open source file\n", "");
     }
+    expect_output_with_source("print(\"\")\n"
+                              "print(a)\n"
+                              "let v = ?",
+                              true, "Invalid token in line 3:\n"
+                                    "let v = ?\n"
+                                    "        ^\n"
+                                    "Expected expression in line 3:\n"
+                                    "let v = ?\n"
+                                    "         ^\n",
+                              "");
+    expect_output_with_source("\n"
+                              "print(\"\")\n"
+                              "print(a)\n"
+                              "let v = ?",
+                              true, "Expected expression in line 1:\n"
+                                    "\n"
+                                    "^\n"
+                                    "Invalid token in line 4:\n"
+                                    "let v = ?\n"
+                                    "        ^\n"
+                                    "Expected expression in line 4:\n"
+                                    "let v = ?\n"
+                                    "         ^\n",
+                              "");
+    expect_output_with_source("\r\n"
+                              "print(\"\")\r\n"
+                              "print(a)\r\n"
+                              "let v = ?",
+                              true, "Expected expression in line 1:\n"
+                                    "\n"
+                                    "^\n"
+                                    "Invalid token in line 4:\n"
+                                    "let v = ?\n"
+                                    "        ^\n"
+                                    "Expected expression in line 4:\n"
+                                    "let v = ?\n"
+                                    "         ^\n",
+                              "");
+    expect_output_with_source("\r"
+                              "print(\"\")\r"
+                              "print(a)\r"
+                              "let v = ?",
+                              true, "Expected expression in line 1:\n"
+                                    "\n"
+                                    "^\n"
+                                    "Invalid token in line 4:\n"
+                                    "let v = ?\n"
+                                    "        ^\n"
+                                    "Expected expression in line 4:\n"
+                                    "let v = ?\n"
+                                    "         ^\n",
+                              "");
+    expect_output_with_source(
+        "print(a)\n"
+        "print(b)\n"
+        "print(c)\n",
+        true, "Unknown structure element or global identifier in line 1:\n"
+              "print(a)\n"
+              "      ^\n"
+              "Unknown structure element or global identifier in line 2:\n"
+              "print(b)\n"
+              "      ^\n"
+              "Unknown structure element or global identifier in line 3:\n"
+              "print(c)\n"
+              "      ^\n",
+        "");
     expect_output_with_source(
         "print(\"Hello, world!\\n\")", false, "", "Hello, world!\n");
     expect_output_with_source("syntax error here", true,
-                              "Expected declaration or assignment in line 1\n"
-                              "Expected expression in line 1\n",
+                              "Expected declaration or assignment in line 1:\n"
+                              "syntax error here\n"
+                              "       ^\n"
+                              "Expected expression in line 1:\n"
+                              "syntax error here\n"
+                              "            ^\n",
                               "");
     expect_output_with_source(
         "unknown_identifier()", true,
-        "Unknown structure element or global identifier in line 1\n", "");
+        "Unknown structure element or global identifier in line 1:\n"
+        "unknown_identifier()\n"
+        "^\n",
+        "");
+    expect_output_with_source(
+        "print(\"\")\nprint(a)", true,
+        "Unknown structure element or global identifier in line 2:\n"
+        "print(a)\n"
+        "      ^\n",
+        "");
 }

@@ -21,6 +21,78 @@ typedef struct cli_parser_user
     bool has_error;
 } cli_parser_user;
 
+static unicode_view find_whole_line(unicode_view const source,
+                                    line_number const found_line)
+{
+    char const *begin_of_line = source.begin;
+    char const *const end_of_file = source.begin + source.length;
+    if (found_line > 0)
+    {
+        line_number current_line = 0;
+        char const *i = begin_of_line;
+        for (;;)
+        {
+            /*the location cannot be beyond the end of the file*/
+            ASSUME(i != end_of_file);
+
+            if (*i == '\n')
+            {
+                ++i;
+                ++current_line;
+                if (current_line == found_line)
+                {
+                    begin_of_line = i;
+                    break;
+                }
+            }
+            if (*i == '\r')
+            {
+                {
+                    char const *const newline = i + 1;
+                    if ((newline != end_of_file) && (*newline == '\n'))
+                    {
+                        ++i;
+                    }
+                }
+                ++i;
+                ++current_line;
+                if (current_line == found_line)
+                {
+                    begin_of_line = i;
+                    break;
+                }
+            }
+            else
+            {
+                ++i;
+            }
+        }
+    }
+    size_t line_length = 0;
+    for (char const *i = begin_of_line;
+         (i != end_of_file) && (*i != '\n') && (*i != '\r'); ++i)
+    {
+        ++line_length;
+    }
+    return unicode_view_create(begin_of_line, line_length);
+}
+
+static void print_source_location_hint(unicode_view const source,
+                                       stream_writer const diagnostics,
+                                       source_location const where)
+{
+    unicode_view const affected_line = find_whole_line(source, where.line);
+    ASSERT(success == stream_writer_write_bytes(diagnostics,
+                                                affected_line.begin,
+                                                affected_line.length));
+    ASSERT(success == stream_writer_write_string(diagnostics, "\n"));
+    for (column_number i = 0; i < where.approximate_column; ++i)
+    {
+        ASSERT(success == stream_writer_write_string(diagnostics, " "));
+    }
+    ASSERT(success == stream_writer_write_string(diagnostics, "^\n"));
+}
+
 static char const *describe_parse_error(parse_error_type const error)
 {
     switch (error)
@@ -72,7 +144,9 @@ static void handle_parse_error(parse_error const error,
            stream_writer_write_bytes(actual_user->diagnostics, line,
                                      (size_t)(buffer + sizeof(buffer) - line)));
     ASSERT(success ==
-           stream_writer_write_string(actual_user->diagnostics, "\n"));
+           stream_writer_write_string(actual_user->diagnostics, ":\n"));
+    print_source_location_hint(
+        actual_user->source, actual_user->diagnostics, error.where);
 }
 
 typedef struct optional_sequence
@@ -164,7 +238,9 @@ static void handle_semantic_error(semantic_error const error, void *user)
     ASSERT(success ==
            stream_writer_write_bytes(context->diagnostics, line,
                                      (size_t)(buffer + sizeof(buffer) - line)));
-    ASSERT(success == stream_writer_write_string(context->diagnostics, "\n"));
+    ASSERT(success == stream_writer_write_string(context->diagnostics, ":\n"));
+    print_source_location_hint(
+        context->source, context->diagnostics, error.where);
 }
 
 static value print(value const *arguments, void *environment)
