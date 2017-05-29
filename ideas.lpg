@@ -177,3 +177,14 @@ let insert-mutable = (into: reference mutable binary-tree<let Payload>, element:
                     insert-mutable(right-side, element, compare)
                 case option.none
                     into.right = option.some({element, option.none, option.none})
+
+let hello : string-view = "Hello"
+let world : string-view = "world"
+let message : string-view = concat(concat(hello, ", "), world)
+print(message)
+
+let message : string-buffer = make-string-buffer()
+message.append(hello)
+message.append(", ")
+message.append(world)
+print(message.read())
