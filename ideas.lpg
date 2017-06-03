@@ -192,6 +192,15 @@ print(message.read())
 interface AsyncOperation
     [destructive] cancel() -> unit
 
+let g = () -> option<AsyncOperation>
+    let a : AsyncOperation = f()
+    match ..
+        case
+            a.cancel()
+            return none
+        case
+            return some(a)
+
 interface Continuation<result: type>
     [destructive] continue(result) -> unit
 
