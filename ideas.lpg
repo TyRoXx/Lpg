@@ -188,3 +188,28 @@ message.append(hello)
 message.append(", ")
 message.append(world)
 print(message.read())
+
+interface AsyncOperation
+    [destructive] cancel() -> unit
+
+interface Continuation<result: type>
+    [destructive] continue(result) -> unit
+
+interface AsyncPlan<parameter: type, result: type>
+    [destructive] start(Continuation<result>, parameter) -> AsyncOperation
+
+interface Context
+    yield<parameter: type, result: type>(AsyncPlan<parameter, result>, parameter) -> result
+
+this_thread.yield(clock.wait(seconds(1))
+
+interface Clock
+    wait(duration) -> AsyncPlan<unit, unit>
+
+interface Writer<error: type>
+    write-some(slice<byte>) -> AsyncPlan<unit, outcome<size, error>>
+
+let then = (input: AsyncPlan<let parameter, let result>, transform: (result) -> let final)
+    return new AsyncPlan<parameter, final>
+         start = (handler: Continuation<final>, argument: parameter)
+              input.start( ... 
