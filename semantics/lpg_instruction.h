@@ -1,6 +1,5 @@
 #pragma once
 #include "lpg_register_id.h"
-#include "lpg_type.h"
 #include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
 #include "lpg_instruction_sequence.h"
