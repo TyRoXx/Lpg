@@ -69,12 +69,61 @@ static value not_impl(value const *arguments, void *environment)
     return value_from_enum_element(!argument);
 }
 
+typedef struct memory_allocation
+{
+    struct memory_allocation *next;
+    char payload[
+#ifdef _MSC_VER
+        1
+#endif
+    ];
+} memory_allocation;
+
+typedef struct garbage_collector
+{
+    memory_allocation *allocations;
+} garbage_collector;
+
+static void *garbage_collector_allocate(garbage_collector *const gc,
+                                        size_t const bytes)
+{
+    memory_allocation *const allocation = allocate(sizeof(*allocation) + bytes);
+    allocation->next = gc->allocations;
+    gc->allocations = allocation;
+    return &allocation->payload;
+}
+
+static void garbage_collector_free(garbage_collector const gc)
+{
+    memory_allocation *i = gc.allocations;
+    while (i)
+    {
+        memory_allocation *const next = i->next;
+        deallocate(i);
+        i = next;
+    }
+}
+
+static value concat_impl(value const *arguments, void *environment)
+{
+    (void)environment;
+    unicode_view const left = arguments[0].string_ref;
+    unicode_view const right = arguments[1].string_ref;
+    size_t const result_length = left.length + right.length;
+    garbage_collector *const gc = environment;
+    char *const result = garbage_collector_allocate(gc, result_length);
+    memcpy(result, left.begin, left.length);
+    memcpy(result + left.length, right.begin, right.length);
+    return value_from_string_ref(unicode_view_create(result, result_length));
+}
+
 static void expect_output(char const *source, char const *output,
                           structure const global_object)
 {
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
-    value const globals_values[8] = {
+    garbage_collector gc = {NULL};
+    value const globals_values[9] = {
         /*f*/ value_from_unit(),
         /*g*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
@@ -87,7 +136,9 @@ static void expect_output(char const *source, char const *output,
         /*or*/ value_from_function_pointer(
             function_pointer_value_from_external(or_impl, NULL)),
         /*not*/ value_from_function_pointer(
-            function_pointer_value_from_external(not_impl, NULL))};
+            function_pointer_value_from_external(not_impl, NULL)),
+        /*concat*/ value_from_function_pointer(
+            function_pointer_value_from_external(concat_impl, &gc))};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -96,6 +147,7 @@ static void expect_output(char const *source, char const *output,
     checked_program_free(&checked);
     REQUIRE(memory_writer_equals(print_buffer, output));
     memory_writer_free(&print_buffer);
+    garbage_collector_free(gc);
 }
 
 void test_interprete(void)
@@ -136,6 +188,8 @@ void test_interprete(void)
     expect_output(
         "let v = not(boolean.false)\nassert(v)", "", std_library.globals);
     expect_output("let v = 123\n", "", std_library.globals);
+    expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "123456",
+                  std_library.globals);
 
     standard_library_description_free(&std_library);
 }

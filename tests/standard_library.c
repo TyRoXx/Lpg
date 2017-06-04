@@ -12,6 +12,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->and_);
     function_pointer_free(&stable->or_);
     function_pointer_free(&stable->not_);
+    function_pointer_free(&stable->concat);
 }
 
 standard_library_description describe_standard_library(void)
@@ -50,8 +51,15 @@ standard_library_description describe_standard_library(void)
         not_parameters[0] = boolean;
         stable->not_ = function_pointer_create(boolean, not_parameters, 1);
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_string_ref();
+        parameters[1] = type_from_string_ref();
+        stable->concat =
+            function_pointer_create(type_from_string_ref(), parameters, 2);
+    }
 
-    structure_member *globals = allocate_array(8, sizeof(*globals));
+    structure_member *globals = allocate_array(9, sizeof(*globals));
     globals[0] = structure_member_create(type_from_function_pointer(&stable->f),
                                          unicode_string_from_c_str("f"),
                                          optional_value_empty);
@@ -85,8 +93,12 @@ standard_library_description describe_standard_library(void)
         type_from_function_pointer(&stable->not_),
         unicode_string_from_c_str("not"), optional_value_empty);
 
+    globals[8] = structure_member_create(
+        type_from_function_pointer(&stable->concat),
+        unicode_string_from_c_str("concat"), optional_value_empty);
+
     standard_library_description result = {
-        structure_create(globals, 8), stable};
+        structure_create(globals, 9), stable};
     return result;
 }
 
