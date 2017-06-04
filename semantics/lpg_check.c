@@ -450,6 +450,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
 
     case type_kind_integer_range:
         LPG_TO_DO();
+
+    case type_kind_inferred:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
