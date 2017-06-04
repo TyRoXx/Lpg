@@ -6,6 +6,7 @@
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 #include "lpg_string_literal.h"
+#include "lpg_interprete.h"
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -141,6 +142,9 @@ static type get_return_type(type const callee)
 
     case type_kind_integer_range:
         LPG_TO_DO();
+
+    case type_kind_inferred:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -156,6 +160,7 @@ static type flatten(type const possibly_referenced)
     case type_kind_enumeration:
     case type_kind_type:
     case type_kind_integer_range:
+    case type_kind_inferred:
         return possibly_referenced;
 
     case type_kind_referenced:
@@ -164,10 +169,20 @@ static type flatten(type const possibly_referenced)
     UNREACHABLE();
 }
 
-static bool is_implicitly_convertible(type const from, type const into)
+typedef struct type_inference
 {
-    type const flat_from = flatten(from);
-    type const flat_into = flatten(into);
+    optional_value *values;
+    size_t count;
+} type_inference;
+
+static void type_inference_free(type_inference const value)
+{
+    deallocate(value.values);
+}
+
+static bool is_implicitly_convertible(type const flat_from,
+                                      type const flat_into)
+{
     if (flat_from.kind != flat_into.kind)
     {
         return false;
@@ -198,13 +213,39 @@ static bool is_implicitly_convertible(type const from, type const into)
 
     case type_kind_integer_range:
         LPG_TO_DO();
+
+    case type_kind_inferred:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
 
+static bool check_parameter_type(type const from, type const into,
+                                 type_inference const inferring)
+{
+    type const flat_from = flatten(from);
+    type const flat_into = flatten(into);
+    if (flat_into.kind == type_kind_inferred)
+    {
+        ASSUME(flat_into.inferred < inferring.count);
+        optional_value *const inferred_parameter_type =
+            &inferring.values[flat_into.inferred];
+        if (inferred_parameter_type->is_set)
+        {
+            /*TODO: find conflicts*/
+            LPG_TO_DO();
+        }
+        *inferred_parameter_type =
+            optional_value_create(value_from_type(flat_from));
+        return true;
+    }
+    return is_implicitly_convertible(flat_from, flat_into);
+}
+
 static bool function_parameter_accepts_type(type const function,
                                             size_t const parameter,
-                                            type const argument)
+                                            type const argument,
+                                            type_inference const inferring)
 {
     switch (function.kind)
     {
@@ -213,8 +254,9 @@ static bool function_parameter_accepts_type(type const function,
 
     case type_kind_function_pointer:
         ASSUME(parameter < function.function_pointer_->arity);
-        return is_implicitly_convertible(
-            argument, function.function_pointer_->arguments[parameter]);
+        return check_parameter_type(
+            argument, function.function_pointer_->arguments[parameter],
+            inferring);
 
     case type_kind_unit:
     case type_kind_string_ref:
@@ -223,12 +265,15 @@ static bool function_parameter_accepts_type(type const function,
 
     case type_kind_referenced:
         return function_parameter_accepts_type(
-            *function.referenced, parameter, argument);
+            *function.referenced, parameter, argument, inferring);
 
     case type_kind_type:
         LPG_TO_DO();
 
     case type_kind_integer_range:
+        LPG_TO_DO();
+
+    case type_kind_inferred:
         LPG_TO_DO();
     }
     UNREACHABLE();
@@ -394,6 +439,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_referenced:
         case type_kind_type:
         case type_kind_integer_range:
+        case type_kind_inferred:
             LPG_TO_DO();
         }
         break;
@@ -429,6 +475,8 @@ static size_t expected_call_argument_count(const type callee)
     case type_kind_type:
         LPG_TO_DO();
     case type_kind_integer_range:
+        LPG_TO_DO();
+    case type_kind_inferred:
         LPG_TO_DO();
     }
     UNREACHABLE();
@@ -478,6 +526,51 @@ static evaluate_expression_result make_unit(function_checking_state *state,
     return final_result;
 }
 
+static size_t find_lower_bound_for_inferred_values(type const root)
+{
+    switch (root.kind)
+    {
+    case type_kind_structure:
+    case type_kind_function_pointer:
+        LPG_TO_DO();
+
+    case type_kind_unit:
+        return 0;
+
+    case type_kind_string_ref:
+        return 0;
+
+    case type_kind_enumeration:
+        return 0;
+
+    case type_kind_referenced:
+        return find_lower_bound_for_inferred_values(*root.referenced);
+
+    case type_kind_type:
+    case type_kind_integer_range:
+        LPG_TO_DO();
+
+    case type_kind_inferred:
+        return (root.inferred + 1);
+    }
+    UNREACHABLE();
+}
+
+static size_t count_inferred_values(function_pointer const signature)
+{
+    size_t count = 0;
+    for (size_t i = 0; i < signature.arity; ++i)
+    {
+        size_t const new_count =
+            find_lower_bound_for_inferred_values(signature.arguments[i]);
+        if (new_count > count)
+        {
+            count = new_count;
+        }
+    }
+    return count;
+}
+
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
@@ -501,6 +594,18 @@ evaluate_expression(function_checking_state *state,
             expected_call_argument_count(callee.type_);
         register_id *const arguments =
             allocate_array(expected_arguments, sizeof(*arguments));
+        value *const compile_time_arguments =
+            allocate_array(expected_arguments, sizeof(*compile_time_arguments));
+        bool all_compile_time_arguments = true;
+        size_t const inferred_value_count =
+            count_inferred_values(*callee.type_.function_pointer_);
+        type_inference inferring = {
+            allocate_array(inferred_value_count, sizeof(*inferring.values)),
+            inferred_value_count};
+        for (size_t i = 0; i < inferred_value_count; ++i)
+        {
+            inferring.values[i].is_set = false;
+        }
         LPG_FOR(size_t, i, element.call.arguments.length)
         {
             expression const argument_tree = element.call.arguments.elements[i];
@@ -517,26 +622,40 @@ evaluate_expression(function_checking_state *state,
             if (!argument.has_value)
             {
                 restore(previous_code);
+                deallocate(compile_time_arguments);
                 deallocate(arguments);
+                type_inference_free(inferring);
                 return evaluate_expression_result_empty;
             }
             if (!function_parameter_accepts_type(
-                    callee.type_, i, argument.type_))
+                    callee.type_, i, argument.type_, inferring))
             {
                 restore(previous_code);
                 state->on_error(semantic_error_create(
                                     semantic_error_type_mismatch,
                                     expression_source_begin(argument_tree)),
                                 state->user);
+                deallocate(compile_time_arguments);
                 deallocate(arguments);
+                type_inference_free(inferring);
                 return evaluate_expression_result_empty;
+            }
+            if (argument.compile_time_value.is_set)
+            {
+                compile_time_arguments[i] = argument.compile_time_value.value_;
+            }
+            else
+            {
+                all_compile_time_arguments = false;
             }
             arguments[i] = argument.where;
         }
         if (element.call.arguments.length < expected_arguments)
         {
+            deallocate(compile_time_arguments);
             restore(previous_code);
             deallocate(arguments);
+            type_inference_free(inferring);
             state->on_error(
                 semantic_error_create(semantic_error_missing_argument,
                                       element.call.closing_parenthesis),
@@ -544,14 +663,43 @@ evaluate_expression(function_checking_state *state,
             return evaluate_expression_result_empty;
         }
         register_id const result = allocate_register(state);
-        add_instruction(
-            function,
-            instruction_create_call(call_instruction_create(
-                callee.where, arguments, expected_arguments, result)));
+        optional_value compile_time_result = {false, value_from_unit()};
+        if (callee.compile_time_value.is_set && all_compile_time_arguments)
+        {
+            value *const complete_inferred_values = allocate_array(
+                inferred_value_count, sizeof(*complete_inferred_values));
+            for (size_t i = 0; i < inferred_value_count; ++i)
+            {
+                if (!inferring.values[i].is_set)
+                {
+                    LPG_TO_DO();
+                }
+                complete_inferred_values[i] = inferring.values[i].value_;
+            }
+            value *const globals = /*TODO*/ NULL;
+            compile_time_result.value_ = call_function(
+                callee.compile_time_value.value_, complete_inferred_values,
+                compile_time_arguments, globals);
+            compile_time_result.is_set = true;
+            deallocate(complete_inferred_values);
+            deallocate(arguments);
+        }
+        else
+        {
+            /*TODO: type inference for runtime-evaluated functions
+             * ("templates")*/
+            ASSERT(inferred_value_count == 0);
+
+            add_instruction(
+                function,
+                instruction_create_call(call_instruction_create(
+                    callee.where, arguments, expected_arguments, result)));
+        }
+        type_inference_free(inferring);
+        deallocate(compile_time_arguments);
         type const return_type = get_return_type(callee.type_);
         return evaluate_expression_result_create(
-            result, return_type,
-            /*TODO: compile-time function calls*/ optional_value_empty);
+            result, return_type, compile_time_result);
     }
 
     case expression_type_integer_literal:

@@ -12,6 +12,7 @@ typedef struct standard_library_stable
     function_pointer or_;
     function_pointer not_;
     function_pointer concat;
+    function_pointer type_of;
 } standard_library_stable;
 
 typedef struct standard_library_description

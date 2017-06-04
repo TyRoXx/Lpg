@@ -52,7 +52,8 @@ typedef enum type_kind
     type_kind_enumeration,
     type_kind_referenced,
     type_kind_type,
-    type_kind_integer_range
+    type_kind_integer_range,
+    type_kind_inferred
 } type_kind;
 
 typedef struct function_pointer function_pointer;
@@ -67,6 +68,7 @@ struct type
         enumeration const *enum_;
         type const *referenced;
         integer_range integer_range_;
+        size_t inferred;
     };
 };
 
@@ -84,6 +86,7 @@ type type_from_enumeration(enumeration const *value);
 type type_from_reference(type const *const referenced);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
+type type_from_inferred(size_t const inferred);
 type *type_allocate(type const value);
 
 function_pointer function_pointer_create(type result, type *arguments,

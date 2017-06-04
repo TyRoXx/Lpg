@@ -29,8 +29,10 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
-static value print(value const *arguments, void *environment)
+static value print(value const *const inferred, value const *const arguments,
+                   void *environment)
 {
+    (void)inferred;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *destination = environment;
     REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) ==
@@ -38,33 +40,41 @@ static value print(value const *arguments, void *environment)
     return value_from_unit();
 }
 
-static value assert_impl(value const *arguments, void *environment)
+static value assert_impl(value const *const inferred, value const *arguments,
+                         void *environment)
 {
     (void)environment;
+    (void)inferred;
     enum_element_id const argument = arguments[0].enum_element;
     REQUIRE(argument == 1);
     return value_from_unit();
 }
 
-static value and_impl(value const *arguments, void *environment)
+static value and_impl(value const *const inferred, value const *arguments,
+                      void *environment)
 {
     (void)environment;
+    (void)inferred;
     enum_element_id const left = arguments[0].enum_element;
     enum_element_id const right = arguments[1].enum_element;
     return value_from_enum_element(left && right);
 }
 
-static value or_impl(value const *arguments, void *environment)
+static value or_impl(value const *const inferred, value const *arguments,
+                     void *environment)
 {
     (void)environment;
+    (void)inferred;
     enum_element_id const left = arguments[0].enum_element;
     enum_element_id const right = arguments[1].enum_element;
     return value_from_enum_element(left || right);
 }
 
-static value not_impl(value const *arguments, void *environment)
+static value not_impl(value const *const inferred, value const *arguments,
+                      void *environment)
 {
     (void)environment;
+    (void)inferred;
     enum_element_id const argument = arguments[0].enum_element;
     return value_from_enum_element(!argument);
 }
@@ -104,8 +114,10 @@ static void garbage_collector_free(garbage_collector const gc)
     }
 }
 
-static value concat_impl(value const *arguments, void *environment)
+static value concat_impl(value const *const inferred, value const *arguments,
+                         void *environment)
 {
+    (void)inferred;
     (void)environment;
     unicode_view const left = arguments[0].string_ref;
     unicode_view const right = arguments[1].string_ref;
@@ -123,7 +135,7 @@ static void expect_output(char const *source, char const *output,
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
     garbage_collector gc = {NULL};
-    value const globals_values[9] = {
+    value const globals_values[10] = {
         /*f*/ value_from_unit(),
         /*g*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
@@ -138,7 +150,8 @@ static void expect_output(char const *source, char const *output,
         /*not*/ value_from_function_pointer(
             function_pointer_value_from_external(not_impl, NULL)),
         /*concat*/ value_from_function_pointer(
-            function_pointer_value_from_external(concat_impl, &gc))};
+            function_pointer_value_from_external(concat_impl, &gc)),
+        /*type-of*/ value_from_unit()};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -189,6 +202,10 @@ void test_interprete(void)
         "let v = not(boolean.false)\nassert(v)", "", std_library.globals);
     expect_output("let v = 123\n", "", std_library.globals);
     expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "123456",
+                  std_library.globals);
+    expect_output("let b : type-of(boolean.true) = boolean.true\nassert(b)\n",
+                  "", std_library.globals);
+    expect_output("let s : type-of(\"\") = \"hello\"\nprint(s)\n", "hello",
                   std_library.globals);
 
     standard_library_description_free(&std_library);

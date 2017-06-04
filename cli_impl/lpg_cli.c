@@ -243,8 +243,10 @@ static void handle_semantic_error(semantic_error const error, void *user)
         context->source, context->diagnostics, error.where);
 }
 
-static value print(value const *arguments, void *environment)
+static value print(value const *const inferred, value const *const arguments,
+                   void *environment)
 {
+    (void)inferred;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *const destination = environment;
     stream_writer_write_bytes(*destination, text.begin, text.length);

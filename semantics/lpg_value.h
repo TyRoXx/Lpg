@@ -5,7 +5,8 @@
 
 typedef struct enumeration enumeration;
 
-typedef union value external_function(union value const *, void *);
+typedef union value external_function(union value const *, union value const *,
+                                      void *);
 
 typedef struct function_pointer_value
 {

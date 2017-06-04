@@ -4,13 +4,26 @@
 #include "lpg_allocate.h"
 #include "lpg_instruction.h"
 
-static value call_function(checked_function const callee, value const *globals);
+static value call_interpreted_function(checked_function const callee,
+                                       value const *globals);
 
 typedef enum run_sequence_result
 {
     run_sequence_result_break,
     run_sequence_result_continue
 } run_sequence_result;
+
+value call_function(value const callee, value const *const inferred,
+                    value *const arguments, value const *globals)
+{
+    if (callee.function_pointer.code)
+    {
+        return call_interpreted_function(
+            *callee.function_pointer.code, globals);
+    }
+    return callee.function_pointer.external(
+        inferred, arguments, callee.function_pointer.external_environment);
+}
 
 static run_sequence_result run_sequence(instruction_sequence const sequence,
                                         value const *globals, value *registers)
@@ -29,16 +42,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             {
                 arguments[j] = registers[element.call.arguments[j]];
             }
-            value result;
-            if (callee.function_pointer.code)
-            {
-                result = call_function(*callee.function_pointer.code, globals);
-            }
-            else
-            {
-                result = callee.function_pointer.external(
-                    arguments, callee.function_pointer.external_environment);
-            }
+            value const result =
+                call_function(callee, NULL, arguments, globals);
             deallocate(arguments);
             registers[element.call.result] = result;
             break;
@@ -101,7 +106,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
     return run_sequence_result_continue;
 }
 
-static value call_function(checked_function const callee, value const *globals)
+static value call_interpreted_function(checked_function const callee,
+                                       value const *globals)
 {
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
@@ -114,5 +120,5 @@ static value call_function(checked_function const callee, value const *globals)
 void interprete(checked_program const program, value const *globals)
 {
     checked_function const entry_point = program.functions[0];
-    call_function(entry_point, globals);
+    call_interpreted_function(entry_point, globals);
 }

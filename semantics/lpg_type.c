@@ -107,6 +107,14 @@ type type_from_integer_range(integer_range value)
     return result;
 }
 
+type type_from_inferred(size_t const inferred)
+{
+    type result;
+    result.kind = type_kind_inferred;
+    result.inferred = inferred;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
