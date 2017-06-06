@@ -211,3 +211,25 @@ let then = (input: AsyncPlan<let parameter, let result>, transform: (result) -> 
     return new AsyncPlan<parameter, final>
          start = (handler: Continuation<final>, argument: parameter)
               input.start( ... 
+
+interface Reader<error: type>
+    read-some(buffer<byte>) -> AsyncPlan<unit, outcome<size, error>>
+
+struct Pipe<error: type>
+    read: Reader<error>
+    write: Writer<error>
+
+let make-pipe = () -> outcome<Pipe<system-error>>
+    let fd = match linux.pipe()
+        case outcome.success(fd)
+            fd
+        case outcome.error(error)
+            return outcome.error(error)
+    let pipe = new Pipe<system-error>
+        read = new Reader<system-error>
+            read-some = (into: buffer<byte>) -> AsyncPlan<unit, outcome<size, error>>
+                ...
+        write = new Writer<system-error>
+            write-some = (from: slice<byte>) -> AsyncPlan<unit, outcome<size, error>>
+                ...
+    return add-destructor(pipe, () => linux.close(fd))
