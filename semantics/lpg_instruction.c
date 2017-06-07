@@ -106,6 +106,18 @@ bool integer_literal_instruction_equals(integer_literal_instruction const left,
     return (left.into == right.into) && integer_equal(left.value, right.value);
 }
 
+literal_instruction literal_instruction_create(register_id into, value value_)
+{
+    literal_instruction result = {into, value_};
+    return result;
+}
+
+bool literal_instruction_equals(literal_instruction const left,
+                                literal_instruction const right)
+{
+    return (left.into == right.into); /*TODO: compare values*/
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -179,6 +191,14 @@ instruction_create_integer_literal(integer_literal_instruction const value)
     return result;
 }
 
+instruction instruction_create_literal(literal_instruction const value)
+{
+    instruction result;
+    result.type = instruction_literal;
+    result.literal = value;
+    return result;
+}
+
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -211,6 +231,9 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_integer_literal:
+        break;
+
+    case instruction_literal:
         break;
     }
 }
@@ -252,6 +275,9 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_integer_literal:
         return integer_literal_instruction_equals(left.integer, right.integer);
+
+    case instruction_literal:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }

@@ -1,6 +1,7 @@
 #include "standard_library.h"
 #include "test.h"
 #include "lpg_allocate.h"
+#include <string.h>
 
 static void standard_library_stable_free(standard_library_stable *stable)
 {
@@ -17,13 +18,30 @@ static void standard_library_stable_free(standard_library_stable *stable)
 }
 
 static value type_of_impl(value const *const inferred,
-                          value const *const parameters, void *environment)
+                          value const *const arguments,
+                          garbage_collector *const gc, void *environment)
 {
     (void)environment;
+    (void)gc;
     value const type_of_argument = inferred[0];
     /*ignoring actual arguments*/
-    (void)parameters;
+    (void)arguments;
     return type_of_argument;
+}
+
+static value concat_impl(value const *const inferred,
+                         value const *const arguments,
+                         garbage_collector *const gc, void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    unicode_view const left = arguments[0].string_ref;
+    unicode_view const right = arguments[1].string_ref;
+    size_t const result_length = left.length + right.length;
+    char *const result = garbage_collector_allocate(gc, result_length);
+    memcpy(result, left.begin, left.length);
+    memcpy(result + left.length, right.begin, right.length);
+    return value_from_string_ref(unicode_view_create(result, result_length));
 }
 
 standard_library_description describe_standard_library(void)
@@ -112,7 +130,9 @@ standard_library_description describe_standard_library(void)
 
     globals[8] = structure_member_create(
         type_from_function_pointer(&stable->concat),
-        unicode_string_from_c_str("concat"), optional_value_empty);
+        unicode_string_from_c_str("concat"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(concat_impl, NULL))));
 
     globals[9] = structure_member_create(
         type_from_function_pointer(&stable->type_of),

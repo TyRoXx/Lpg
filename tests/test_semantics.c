@@ -10,6 +10,8 @@
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 #include "standard_library.h"
+#include <stdio.h>
+#include "lpg_assert.h"
 
 static sequence parse(char const *input)
 {
@@ -44,6 +46,63 @@ static void expect_errors(semantic_error const error, void *user)
     --expected->count;
 }
 
+static void print_instruction(instruction const printed)
+{
+    switch (printed.type)
+    {
+    case instruction_call:
+        printf("call callee %u result %u arguments", printed.call.callee,
+               printed.call.result);
+        for (size_t i = 0; i < printed.call.argument_count; ++i)
+        {
+            printf(" %u", printed.call.arguments[i]);
+        }
+        printf("\n");
+        return;
+
+    case instruction_loop:
+        LPG_TO_DO();
+
+    case instruction_global:
+        printf("global\n");
+        return;
+
+    case instruction_read_struct:
+        printf("read_struct from %u member %u into %u\n",
+               printed.read_struct.from_object, printed.read_struct.member,
+               printed.read_struct.into);
+        return;
+
+    case instruction_unit:
+        LPG_TO_DO();
+
+    case instruction_string_literal:
+        printf("string_literal %u ", printed.string_literal.into);
+        fwrite(printed.string_literal.value.data, 1,
+               printed.string_literal.value.length, stdout);
+        printf("\n");
+        return;
+
+    case instruction_break:
+    case instruction_instantiate_enum:
+    case instruction_integer_literal:
+        LPG_TO_DO();
+
+    case instruction_literal:
+        printf("literal ?\n");
+        return;
+    }
+    UNREACHABLE();
+}
+
+static void print_instruction_sequence(instruction_sequence const sequence)
+{
+    for (size_t i = 0; i < sequence.length; ++i)
+    {
+        print_instruction(sequence.elements[i]);
+    }
+}
+
 static void check_single_wellformed_function(
     char const *const source, structure const non_empty_global,
     instruction *const expected_body_elements, size_t const expected_body_size)
@@ -55,8 +114,15 @@ static void check_single_wellformed_function(
     REQUIRE(checked.function_count == 1);
     instruction_sequence const expected_body =
         instruction_sequence_create(expected_body_elements, expected_body_size);
-    REQUIRE(instruction_sequence_equals(
-        &expected_body, &checked.functions[0].body));
+    if (!instruction_sequence_equals(
+            &expected_body, &checked.functions[0].body))
+    {
+        printf("Expected instruction sequence:\n");
+        print_instruction_sequence(expected_body);
+        printf("Got instruction sequence:\n");
+        print_instruction_sequence(checked.functions[0].body);
+        FAIL();
+    }
     checked_program_free(&checked);
     instruction_sequence_free(&expected_body);
 }
@@ -220,6 +286,21 @@ void test_semantics(void)
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
             "print(\"hello, world!\")", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 2;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 2, 1)),
+            instruction_create_string_literal(string_literal_instruction_create(
+                unicode_string_from_c_str("hello, world!"), 2)),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3))};
+        check_single_wellformed_function(
+            "print(concat(\"hello, \", \"world!\"))", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {

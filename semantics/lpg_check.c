@@ -97,14 +97,16 @@ typedef struct function_checking_state
     check_error_handler *on_error;
     local_variable_container local_variables;
     void *user;
+    garbage_collector *gc;
 } function_checking_state;
 
 static function_checking_state
 function_checking_state_create(structure const *global,
-                               check_error_handler *on_error, void *user)
+                               check_error_handler *on_error, void *user,
+                               garbage_collector *const gc)
 {
     function_checking_state result = {
-        0, false, global, on_error, {NULL, 0}, user};
+        0, false, global, on_error, {NULL, 0}, user, gc};
     return result;
 }
 
@@ -574,6 +576,14 @@ static size_t count_inferred_values(function_pointer const signature)
     return count;
 }
 
+static void set_compile_time_constant(instruction_sequence *const function,
+                                      register_id const into,
+                                      value const value_)
+{
+    add_instruction(function, instruction_create_literal(
+                                  literal_instruction_create(into, value_)));
+}
+
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
@@ -665,7 +675,8 @@ evaluate_expression(function_checking_state *state,
                 state->user);
             return evaluate_expression_result_empty;
         }
-        register_id const result = allocate_register(state);
+        type const return_type = get_return_type(callee.type_);
+        register_id result;
         optional_value compile_time_result = {false, value_from_unit()};
         if (callee.compile_time_value.is_set && all_compile_time_arguments)
         {
@@ -682,10 +693,27 @@ evaluate_expression(function_checking_state *state,
             value *const globals = /*TODO*/ NULL;
             compile_time_result.value_ = call_function(
                 callee.compile_time_value.value_, complete_inferred_values,
-                compile_time_arguments, globals);
+                compile_time_arguments, globals, state->gc);
             compile_time_result.is_set = true;
             deallocate(complete_inferred_values);
             deallocate(arguments);
+            restore(previous_code);
+            result = allocate_register(state);
+            if (return_type.kind == type_kind_string_ref)
+            {
+                add_instruction(
+                    function,
+                    instruction_create_string_literal(
+                        string_literal_instruction_create(
+                            unicode_view_copy(
+                                compile_time_result.value_.string_ref),
+                            result)));
+            }
+            else
+            {
+                set_compile_time_constant(
+                    function, result, compile_time_result.value_);
+            }
         }
         else
         {
@@ -693,6 +721,7 @@ evaluate_expression(function_checking_state *state,
              * ("templates")*/
             ASSERT(inferred_value_count == 0);
 
+            result = allocate_register(state);
             add_instruction(
                 function,
                 instruction_create_call(call_instruction_create(
@@ -700,7 +729,6 @@ evaluate_expression(function_checking_state *state,
         }
         type_inference_free(inferring);
         deallocate(compile_time_arguments);
-        type const return_type = get_return_type(callee.type_);
         return evaluate_expression_result_create(
             result, return_type, compile_time_result);
     }
@@ -921,10 +949,10 @@ checked_program check(sequence const root, structure const global,
                       check_error_handler *on_error, void *user)
 {
     checked_program program = {
-        allocate_array(1, sizeof(struct checked_function)), 1};
+        {NULL}, allocate_array(1, sizeof(struct checked_function)), 1};
     program.functions[0].body = instruction_sequence_create(NULL, 0);
-    function_checking_state state =
-        function_checking_state_create(&global, on_error, user);
+    function_checking_state state = function_checking_state_create(
+        &global, on_error, user, &program.memory);
     check_sequence(&state, &program.functions[0].body, root);
     program.functions[0].number_of_registers = state.used_registers;
     if (state.local_variables.elements)

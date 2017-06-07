@@ -1,8 +1,6 @@
 #include "test_interprete.h"
 #include "test.h"
 #include "lpg_interprete.h"
-#include <string.h>
-#include "lpg_allocate.h"
 #include "lpg_stream_writer.h"
 #include "lpg_assert.h"
 #include "handle_parse_error.h"
@@ -10,6 +8,7 @@
 #include "lpg_check.h"
 #include "lpg_structure_member.h"
 #include "standard_library.h"
+#include <string.h>
 
 static sequence parse(char const *input)
 {
@@ -30,9 +29,10 @@ static void expect_no_errors(semantic_error const error, void *user)
 }
 
 static value print(value const *const inferred, value const *const arguments,
-                   void *environment)
+                   garbage_collector *const gc, void *environment)
 {
     (void)inferred;
+    (void)gc;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *destination = environment;
     REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) ==
@@ -41,92 +41,46 @@ static value print(value const *const inferred, value const *const arguments,
 }
 
 static value assert_impl(value const *const inferred, value const *arguments,
-                         void *environment)
+                         garbage_collector *const gc, void *environment)
 {
     (void)environment;
     (void)inferred;
+    (void)gc;
     enum_element_id const argument = arguments[0].enum_element;
     REQUIRE(argument == 1);
     return value_from_unit();
 }
 
 static value and_impl(value const *const inferred, value const *arguments,
-                      void *environment)
+                      garbage_collector *const gc, void *environment)
 {
     (void)environment;
     (void)inferred;
+    (void)gc;
     enum_element_id const left = arguments[0].enum_element;
     enum_element_id const right = arguments[1].enum_element;
     return value_from_enum_element(left && right);
 }
 
 static value or_impl(value const *const inferred, value const *arguments,
-                     void *environment)
+                     garbage_collector *const gc, void *environment)
 {
     (void)environment;
     (void)inferred;
+    (void)gc;
     enum_element_id const left = arguments[0].enum_element;
     enum_element_id const right = arguments[1].enum_element;
     return value_from_enum_element(left || right);
 }
 
 static value not_impl(value const *const inferred, value const *arguments,
-                      void *environment)
+                      garbage_collector *const gc, void *environment)
 {
     (void)environment;
     (void)inferred;
+    (void)gc;
     enum_element_id const argument = arguments[0].enum_element;
     return value_from_enum_element(!argument);
-}
-
-typedef struct memory_allocation
-{
-    struct memory_allocation *next;
-    char payload[
-#ifdef _MSC_VER
-        1
-#endif
-    ];
-} memory_allocation;
-
-typedef struct garbage_collector
-{
-    memory_allocation *allocations;
-} garbage_collector;
-
-static void *garbage_collector_allocate(garbage_collector *const gc,
-                                        size_t const bytes)
-{
-    memory_allocation *const allocation = allocate(sizeof(*allocation) + bytes);
-    allocation->next = gc->allocations;
-    gc->allocations = allocation;
-    return &allocation->payload;
-}
-
-static void garbage_collector_free(garbage_collector const gc)
-{
-    memory_allocation *i = gc.allocations;
-    while (i)
-    {
-        memory_allocation *const next = i->next;
-        deallocate(i);
-        i = next;
-    }
-}
-
-static value concat_impl(value const *const inferred, value const *arguments,
-                         void *environment)
-{
-    (void)inferred;
-    (void)environment;
-    unicode_view const left = arguments[0].string_ref;
-    unicode_view const right = arguments[1].string_ref;
-    size_t const result_length = left.length + right.length;
-    garbage_collector *const gc = environment;
-    char *const result = garbage_collector_allocate(gc, result_length);
-    memcpy(result, left.begin, left.length);
-    memcpy(result + left.length, right.begin, right.length);
-    return value_from_string_ref(unicode_view_create(result, result_length));
 }
 
 static void expect_output(char const *source, char const *output,
@@ -149,17 +103,16 @@ static void expect_output(char const *source, char const *output,
             function_pointer_value_from_external(or_impl, NULL)),
         /*not*/ value_from_function_pointer(
             function_pointer_value_from_external(not_impl, NULL)),
-        /*concat*/ value_from_function_pointer(
-            function_pointer_value_from_external(concat_impl, &gc)),
+        /*concat*/ value_from_unit(),
         /*type-of*/ value_from_unit()};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
     sequence_free(&root);
-    interprete(checked, globals_values);
-    checked_program_free(&checked);
+    interprete(checked, globals_values, &gc);
     REQUIRE(memory_writer_equals(print_buffer, output));
     memory_writer_free(&print_buffer);
+    checked_program_free(&checked);
     garbage_collector_free(gc);
 }
 

@@ -5,7 +5,8 @@
 #include "lpg_instruction.h"
 
 static value call_interpreted_function(checked_function const callee,
-                                       value const *globals);
+                                       value const *globals,
+                                       garbage_collector *const gc);
 
 typedef enum run_sequence_result
 {
@@ -14,19 +15,21 @@ typedef enum run_sequence_result
 } run_sequence_result;
 
 value call_function(value const callee, value const *const inferred,
-                    value *const arguments, value const *globals)
+                    value *const arguments, value const *globals,
+                    garbage_collector *const gc)
 {
     if (callee.function_pointer.code)
     {
         return call_interpreted_function(
-            *callee.function_pointer.code, globals);
+            *callee.function_pointer.code, globals, gc);
     }
     return callee.function_pointer.external(
-        inferred, arguments, callee.function_pointer.external_environment);
+        inferred, arguments, gc, callee.function_pointer.external_environment);
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence,
-                                        value const *globals, value *registers)
+                                        value const *globals, value *registers,
+                                        garbage_collector *const gc)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
@@ -43,7 +46,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
                 arguments[j] = registers[element.call.arguments[j]];
             }
             value const result =
-                call_function(callee, NULL, arguments, globals);
+                call_function(callee, NULL, arguments, globals, gc);
             deallocate(arguments);
             registers[element.call.result] = result;
             break;
@@ -54,7 +57,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             bool is_running = true;
             while (is_running)
             {
-                switch (run_sequence(element.loop, globals, registers))
+                switch (run_sequence(element.loop, globals, registers, gc))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -101,24 +104,29 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             registers[element.integer.into] =
                 value_from_integer(element.integer.value);
             break;
+
+        case instruction_literal:
+            LPG_TO_DO();
         }
     }
     return run_sequence_result_continue;
 }
 
 static value call_interpreted_function(checked_function const callee,
-                                       value const *globals)
+                                       value const *globals,
+                                       garbage_collector *const gc)
 {
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
     ASSERT(run_sequence_result_continue ==
-           run_sequence(callee.body, globals, registers));
+           run_sequence(callee.body, globals, registers, gc));
     deallocate(registers);
     return value_from_unit();
 }
 
-void interprete(checked_program const program, value const *globals)
+void interprete(checked_program const program, value const *globals,
+                garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
-    call_interpreted_function(entry_point, globals);
+    call_interpreted_function(entry_point, globals, gc);
 }

@@ -2,11 +2,12 @@
 #include "lpg_checked_function.h"
 #include "lpg_integer.h"
 #include "lpg_type.h"
+#include "lpg_garbage_collector.h"
 
 typedef struct enumeration enumeration;
 
 typedef union value external_function(union value const *, union value const *,
-                                      void *);
+                                      garbage_collector *, void *);
 
 typedef struct function_pointer_value
 {

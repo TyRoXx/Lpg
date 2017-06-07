@@ -244,9 +244,10 @@ static void handle_semantic_error(semantic_error const error, void *user)
 }
 
 static value print(value const *const inferred, value const *const arguments,
-                   void *environment)
+                   garbage_collector *const gc, void *environment)
 {
     (void)inferred;
+    (void)gc;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *const destination = environment;
     stream_writer_write_bytes(*destination, text.begin, text.length);
@@ -350,7 +351,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         check(root.value, global_object, handle_semantic_error, &context);
     sequence_free(&root.value);
     function_pointer_free(&print_signature);
-    interprete(checked, globals_values);
+    garbage_collector gc = {NULL};
+    interprete(checked, globals_values, &gc);
+    garbage_collector_free(gc);
     checked_program_free(&checked);
     structure_free(&global_object);
     unicode_string_free(&source);

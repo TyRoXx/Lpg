@@ -282,6 +282,9 @@ static success_indicator generate_instruction(c_backend_state *state,
     case instruction_instantiate_enum:
     case instruction_integer_literal:
         LPG_TO_DO();
+
+    case instruction_literal:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }

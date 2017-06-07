@@ -4,6 +4,7 @@
 #include "lpg_enum_element_id.h"
 #include "lpg_instruction_sequence.h"
 #include "lpg_integer.h"
+#include "lpg_value.h"
 
 typedef struct instruction instruction;
 
@@ -17,7 +18,8 @@ typedef enum instruction_type
     instruction_string_literal,
     instruction_break,
     instruction_instantiate_enum,
-    instruction_integer_literal
+    instruction_integer_literal,
+    instruction_literal
 } instruction_type;
 
 typedef struct call_instruction
@@ -85,6 +87,16 @@ bool integer_literal_instruction_equals(
     integer_literal_instruction const left,
     integer_literal_instruction const right);
 
+typedef struct literal_instruction
+{
+    register_id into;
+    value value_;
+} literal_instruction;
+
+literal_instruction literal_instruction_create(register_id into, value value_);
+bool literal_instruction_equals(literal_instruction const left,
+                                literal_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -98,6 +110,7 @@ struct instruction
         string_literal_instruction string_literal;
         instantiate_enum_instruction instantiate_enum;
         integer_literal_instruction integer;
+        literal_instruction literal;
     };
 };
 
@@ -112,5 +125,7 @@ instruction
 instruction_create_instantiate_enum(instantiate_enum_instruction value);
 instruction
 instruction_create_integer_literal(integer_literal_instruction const value);
+instruction instruction_create_literal(literal_instruction const value);
+
 void instruction_free(instruction const *value);
 bool instruction_equals(instruction const left, instruction const right);

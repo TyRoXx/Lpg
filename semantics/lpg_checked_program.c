@@ -12,4 +12,5 @@ void checked_program_free(checked_program const *program)
     {
         deallocate(program->functions);
     }
+    garbage_collector_free(program->memory);
 }
