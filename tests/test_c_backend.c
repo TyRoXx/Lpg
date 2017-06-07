@@ -24,21 +24,6 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
-typedef struct expected_errors
-{
-    semantic_error const *errors;
-    size_t count;
-} expected_errors;
-
-static void expect_errors(semantic_error const error, void *user)
-{
-    expected_errors *expected = user;
-    REQUIRE(expected->count >= 1);
-    REQUIRE(semantic_error_equals(error, expected->errors[0]));
-    ++expected->errors;
-    --expected->count;
-}
-
 static void check_generated_c_code(char const *const source,
                                    structure const non_empty_global,
                                    char const *const expected_c)
@@ -65,6 +50,14 @@ void test_c_backend(void)
                                                     "{\n"
                                                     "    return 0;\n"
                                                     "}\n");
+
+    check_generated_c_code("print(\"Hello, world!\")\n", std_library.globals,
+                           "#include <stdio.h>\n"
+                           "int main(void)\n"
+                           "{\n"
+                           "    fwrite(\"Hello, world!\", 1, 13, stdout);\n"
+                           "    return 0;\n"
+                           "}\n");
 
     standard_library_description_free(&std_library);
 }
