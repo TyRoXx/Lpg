@@ -1,0 +1,8 @@
+include_directories(../generic)
+include_directories(../semantics)
+file(GLOB sources "*.c" "*.h")
+add_library(c_backend ${sources})
+target_link_libraries(c_backend semantics generic)
+if(LPG_WITH_CLANG_FORMAT_AUTO)
+	add_dependencies(c_backend clang-format)
+endif()
