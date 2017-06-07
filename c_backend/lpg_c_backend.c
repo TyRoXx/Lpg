@@ -151,6 +151,21 @@ static register_state make_string_literal(unicode_view const value)
     return result;
 }
 
+static success_indicator generate_sequence(c_backend_state *state,
+                                           instruction_sequence const sequence,
+                                           size_t const indentation,
+                                           stream_writer const c_output);
+
+static success_indicator indent(size_t const indentation,
+                                stream_writer const c_output)
+{
+    for (size_t i = 0; i < indentation; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(c_output, "    "));
+    }
+    return success;
+}
+
 static success_indicator generate_instruction(c_backend_state *state,
                                               instruction const input,
                                               size_t const indentation,
@@ -159,10 +174,7 @@ static success_indicator generate_instruction(c_backend_state *state,
     switch (input.type)
     {
     case instruction_call:
-        for (size_t i = 0; i < indentation; ++i)
-        {
-            LPG_TRY(stream_writer_write_string(c_output, "    "));
-        }
+        LPG_TRY(indent(indentation, c_output));
         switch (state->registers[input.call.callee].meaning)
         {
         case register_meaning_nothing:
@@ -205,7 +217,15 @@ static success_indicator generate_instruction(c_backend_state *state,
         return success;
 
     case instruction_loop:
-        LPG_TO_DO();
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+        LPG_TRY(
+            generate_sequence(state, input.loop, indentation + 1, c_output));
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+        return success;
 
     case instruction_global:
         set_register_meaning(state, input.global_into, register_meaning_global);
@@ -255,6 +275,10 @@ static success_indicator generate_instruction(c_backend_state *state,
         return success;
 
     case instruction_break:
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
+        return success;
+
     case instruction_instantiate_enum:
     case instruction_integer_literal:
         LPG_TO_DO();

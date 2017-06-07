@@ -69,5 +69,20 @@ void test_c_backend(void)
                            "    return 0;\n"
                            "}\n");
 
+    check_generated_c_code("loop\n"
+                           "    print(\"Hello, world!\")\n"
+                           "    break\n",
+                           std_library.globals,
+                           "#include <stdio.h>\n"
+                           "int main(void)\n"
+                           "{\n"
+                           "    for (;;)\n"
+                           "    {\n"
+                           "        fwrite(\"Hello, world!\", 1, 13, stdout);\n"
+                           "        break;\n"
+                           "    }\n"
+                           "    return 0;\n"
+                           "}\n");
+
     standard_library_description_free(&std_library);
 }
