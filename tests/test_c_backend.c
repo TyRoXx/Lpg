@@ -59,5 +59,15 @@ void test_c_backend(void)
                            "    return 0;\n"
                            "}\n");
 
+    check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n",
+                           std_library.globals,
+                           "#include <stdio.h>\n"
+                           "int main(void)\n"
+                           "{\n"
+                           "    fwrite(\"Hello, \", 1, 7, stdout);\n"
+                           "    fwrite(\"world!\\n\", 1, 7, stdout);\n"
+                           "    return 0;\n"
+                           "}\n");
+
     standard_library_description_free(&std_library);
 }

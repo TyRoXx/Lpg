@@ -38,8 +38,18 @@ static success_indicator encode_string_literal(unicode_view const content,
                                                stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "\""));
-    /*TODO: proper string encoding*/
-    LPG_TRY(stream_writer_write_bytes(c_output, content.begin, content.length));
+    for (size_t i = 0; i < content.length; ++i)
+    {
+        switch (content.begin[i])
+        {
+        case '\n':
+            LPG_TRY(stream_writer_write_string(c_output, "\\n"));
+            break;
+
+        default:
+            LPG_TRY(stream_writer_write_bytes(c_output, content.begin + i, 1));
+        }
+    }
     LPG_TRY(stream_writer_write_string(c_output, "\""));
     return success;
 }
