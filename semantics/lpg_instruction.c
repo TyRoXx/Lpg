@@ -277,7 +277,8 @@ bool instruction_equals(instruction const left, instruction const right)
         return integer_literal_instruction_equals(left.integer, right.integer);
 
     case instruction_literal:
-        LPG_TO_DO();
+        /*TODO: compare values*/
+        return true;
     }
     UNREACHABLE();
 }

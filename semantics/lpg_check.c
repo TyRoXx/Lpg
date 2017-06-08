@@ -427,7 +427,8 @@ read_element(function_checking_state *state, instruction_sequence *function,
                         instruction_create_instantiate_enum(
                             instantiate_enum_instruction_create(result, i)));
                     return read_structure_element_result_create(
-                        true, left_side_type, object.compile_time_value);
+                        true, left_side_type,
+                        optional_value_create(value_from_enum_element(i)));
                 }
             }
             state->on_error(

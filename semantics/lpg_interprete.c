@@ -106,7 +106,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             break;
 
         case instruction_literal:
-            LPG_TO_DO();
+            registers[element.literal.into] = element.literal.value_;
+            break;
         }
     }
     return run_sequence_result_continue;

@@ -84,7 +84,13 @@ static void print_instruction(instruction const printed)
         return;
 
     case instruction_break:
+        LPG_TO_DO();
+
     case instruction_instantiate_enum:
+        printf("instantiate_enum %u into %u\n",
+               printed.instantiate_enum.element, printed.instantiate_enum.into);
+        return;
+
     case instruction_integer_literal:
         LPG_TO_DO();
 
@@ -331,6 +337,21 @@ void test_semantics(void)
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
             "assert(boolean.false)", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 2;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_enum_element(0))),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3))};
+        check_single_wellformed_function(
+            "assert(not(boolean.true))", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {

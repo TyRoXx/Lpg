@@ -73,16 +73,6 @@ static value or_impl(value const *const inferred, value const *arguments,
     return value_from_enum_element(left || right);
 }
 
-static value not_impl(value const *const inferred, value const *arguments,
-                      garbage_collector *const gc, void *environment)
-{
-    (void)environment;
-    (void)inferred;
-    (void)gc;
-    enum_element_id const argument = arguments[0].enum_element;
-    return value_from_enum_element(!argument);
-}
-
 static void expect_output(char const *source, char const *output,
                           structure const global_object)
 {
@@ -101,8 +91,7 @@ static void expect_output(char const *source, char const *output,
             function_pointer_value_from_external(and_impl, NULL)),
         /*or*/ value_from_function_pointer(
             function_pointer_value_from_external(or_impl, NULL)),
-        /*not*/ value_from_function_pointer(
-            function_pointer_value_from_external(not_impl, NULL)),
+        /*not*/ value_from_unit(),
         /*concat*/ value_from_unit(),
         /*type-of*/ value_from_unit()};
     sequence root = parse(source);

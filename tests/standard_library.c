@@ -17,6 +17,16 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->type_of);
 }
 
+static value not_impl(value const *const inferred, value const *arguments,
+                      garbage_collector *const gc, void *environment)
+{
+    (void)environment;
+    (void)inferred;
+    (void)gc;
+    enum_element_id const argument = arguments[0].enum_element;
+    return value_from_enum_element(!argument);
+}
+
 static value type_of_impl(value const *const inferred,
                           value const *const arguments,
                           garbage_collector *const gc, void *environment)
@@ -126,7 +136,9 @@ standard_library_description describe_standard_library(void)
 
     globals[7] = structure_member_create(
         type_from_function_pointer(&stable->not_),
-        unicode_string_from_c_str("not"), optional_value_empty);
+        unicode_string_from_c_str("not"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(not_impl, NULL))));
 
     globals[8] = structure_member_create(
         type_from_function_pointer(&stable->concat),
