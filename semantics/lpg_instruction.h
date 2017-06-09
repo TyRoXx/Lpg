@@ -17,7 +17,6 @@ typedef enum instruction_type
     instruction_unit,
     instruction_string_literal,
     instruction_break,
-    instruction_instantiate_enum,
     instruction_integer_literal,
     instruction_literal
 } instruction_type;
@@ -63,18 +62,6 @@ void string_literal_instruction_free(string_literal_instruction const *value);
 bool string_literal_instruction_equals(string_literal_instruction const left,
                                        string_literal_instruction const right);
 
-typedef struct instantiate_enum_instruction
-{
-    register_id into;
-    enum_element_id element;
-} instantiate_enum_instruction;
-
-instantiate_enum_instruction
-instantiate_enum_instruction_create(register_id into, enum_element_id element);
-bool instantiate_enum_instruction_equals(
-    instantiate_enum_instruction const left,
-    instantiate_enum_instruction const right);
-
 typedef struct integer_literal_instruction
 {
     register_id into;
@@ -108,7 +95,6 @@ struct instruction
         read_struct_instruction read_struct;
         register_id unit;
         string_literal_instruction string_literal;
-        instantiate_enum_instruction instantiate_enum;
         integer_literal_instruction integer;
         literal_instruction literal;
     };
@@ -121,8 +107,6 @@ instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_unit(register_id into);
 instruction instruction_create_string_literal(string_literal_instruction value);
 instruction instruction_create_break(void);
-instruction
-instruction_create_instantiate_enum(instantiate_enum_instruction value);
 instruction
 instruction_create_integer_literal(integer_literal_instruction const value);
 instruction instruction_create_literal(literal_instruction const value);

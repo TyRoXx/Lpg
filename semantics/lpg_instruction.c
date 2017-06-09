@@ -79,20 +79,6 @@ bool string_literal_instruction_equals(string_literal_instruction const left,
            (left.into == right.into);
 }
 
-instantiate_enum_instruction
-instantiate_enum_instruction_create(register_id into, enum_element_id element)
-{
-    instantiate_enum_instruction result = {into, element};
-    return result;
-}
-
-bool instantiate_enum_instruction_equals(
-    instantiate_enum_instruction const left,
-    instantiate_enum_instruction const right)
-{
-    return (left.into == right.into) && (left.element == right.element);
-}
-
 integer_literal_instruction integer_literal_instruction_create(register_id into,
                                                                integer value)
 {
@@ -174,15 +160,6 @@ instruction instruction_create_break()
 }
 
 instruction
-instruction_create_instantiate_enum(instantiate_enum_instruction value)
-{
-    instruction result;
-    result.type = instruction_instantiate_enum;
-    result.instantiate_enum = value;
-    return result;
-}
-
-instruction
 instruction_create_integer_literal(integer_literal_instruction const value)
 {
     instruction result;
@@ -227,9 +204,6 @@ void instruction_free(instruction const *value)
     case instruction_break:
         break;
 
-    case instruction_instantiate_enum:
-        break;
-
     case instruction_integer_literal:
         break;
 
@@ -268,10 +242,6 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_break:
         return true;
-
-    case instruction_instantiate_enum:
-        return instantiate_enum_instruction_equals(
-            left.instantiate_enum, right.instantiate_enum);
 
     case instruction_integer_literal:
         return integer_literal_instruction_equals(left.integer, right.integer);

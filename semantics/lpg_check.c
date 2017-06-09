@@ -427,8 +427,8 @@ read_element(function_checking_state *state, instruction_sequence *function,
                 {
                     add_instruction(
                         function,
-                        instruction_create_instantiate_enum(
-                            instantiate_enum_instruction_create(result, i)));
+                        instruction_create_literal(literal_instruction_create(
+                            result, value_from_enum_element(i))));
                     return read_structure_element_result_create(
                         true, left_side_type,
                         optional_value_create(value_from_enum_element(i)));
