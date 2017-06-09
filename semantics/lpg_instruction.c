@@ -60,25 +60,6 @@ bool read_struct_instruction_equals(read_struct_instruction const left,
            (left.member == right.member) && (left.into == right.into);
 }
 
-string_literal_instruction
-string_literal_instruction_create(unicode_string value, register_id into)
-{
-    string_literal_instruction result = {value, into};
-    return result;
-}
-
-void string_literal_instruction_free(string_literal_instruction const *value)
-{
-    unicode_string_free(&value->value);
-}
-
-bool string_literal_instruction_equals(string_literal_instruction const left,
-                                       string_literal_instruction const right)
-{
-    return unicode_string_equals(left.value, right.value) &&
-           (left.into == right.into);
-}
-
 literal_instruction literal_instruction_create(register_id into, value value_)
 {
     literal_instruction result = {into, value_};
@@ -131,14 +112,6 @@ instruction instruction_create_unit(register_id into)
     return result;
 }
 
-instruction instruction_create_string_literal(string_literal_instruction value)
-{
-    instruction result;
-    result.type = instruction_string_literal;
-    result.string_literal = value;
-    return result;
-}
-
 instruction instruction_create_break()
 {
     instruction result;
@@ -175,10 +148,6 @@ void instruction_free(instruction const *value)
     case instruction_unit:
         break;
 
-    case instruction_string_literal:
-        string_literal_instruction_free(&value->string_literal);
-        break;
-
     case instruction_break:
         break;
 
@@ -210,10 +179,6 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_unit:
         return (left.unit == right.unit);
-
-    case instruction_string_literal:
-        return string_literal_instruction_equals(
-            left.string_literal, right.string_literal);
 
     case instruction_break:
         return true;

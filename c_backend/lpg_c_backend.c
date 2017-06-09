@@ -267,20 +267,37 @@ static success_indicator generate_instruction(c_backend_state *state,
         set_register_meaning(state, input.unit, register_meaning_unit);
         return success;
 
-    case instruction_string_literal:
-        ASSERT(state->registers[input.string_literal.into].meaning ==
-               register_meaning_nothing);
-        state->registers[input.string_literal.into] = make_string_literal(
-            unicode_view_from_string(input.string_literal.value));
-        return success;
-
     case instruction_break:
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
         return success;
 
     case instruction_literal:
-        LPG_TO_DO();
+        ASSERT(state->registers[input.literal.into].meaning ==
+               register_meaning_nothing);
+        switch (input.literal.value_.kind)
+        {
+        case value_kind_integer:
+            LPG_TO_DO();
+
+        case value_kind_string:
+            state->registers[input.literal.into] =
+                make_string_literal(input.literal.value_.string_ref);
+            return success;
+
+        case value_kind_function_pointer:
+            LPG_TO_DO();
+
+        case value_kind_flat_object:
+            LPG_TO_DO();
+
+        case value_kind_type:
+            LPG_TO_DO();
+
+        case value_kind_enum_element:
+            LPG_TO_DO();
+        }
+        UNREACHABLE();
     }
     UNREACHABLE();
 }

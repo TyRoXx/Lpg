@@ -7,6 +7,7 @@
 #include "lpg_structure_member.h"
 #include "lpg_string_literal.h"
 #include "lpg_interprete.h"
+#include <string.h>
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -705,13 +706,17 @@ evaluate_expression(function_checking_state *state,
             result = allocate_register(state);
             if (return_type.kind == type_kind_string_ref)
             {
+                size_t const length =
+                    compile_time_result.value_.string_ref.length;
+                char *const copy =
+                    garbage_collector_allocate(state->gc, length);
+                memcpy(
+                    copy, compile_time_result.value_.string_ref.begin, length);
                 add_instruction(
                     function,
-                    instruction_create_string_literal(
-                        string_literal_instruction_create(
-                            unicode_view_copy(
-                                compile_time_result.value_.string_ref),
-                            result)));
+                    instruction_create_literal(literal_instruction_create(
+                        result, value_from_string_ref(
+                                    unicode_view_create(copy, length)))));
             }
             else
             {
@@ -779,14 +784,17 @@ evaluate_expression(function_checking_state *state,
         stream_writer decoded_writer = memory_writer_erase(&decoded);
         decode_string_literal(
             unicode_view_from_string(element.string.value), decoded_writer);
-        unicode_string string = {decoded.data, decoded.used};
+        char *const copy = garbage_collector_allocate(state->gc, decoded.used);
+        memcpy(copy, decoded.data, decoded.used);
+        unicode_view const literal = unicode_view_create(copy, decoded.used);
+        memory_writer_free(&decoded);
         add_instruction(
-            function, instruction_create_string_literal(
-                          string_literal_instruction_create(string, result)));
+            function, instruction_create_literal(literal_instruction_create(
+                          result, value_from_string_ref(literal))));
         type const string_type = {type_kind_string_ref, {NULL}};
         return evaluate_expression_result_create(
-            result, string_type, optional_value_create(value_from_string_ref(
-                                     unicode_view_from_string(string))));
+            result, string_type,
+            optional_value_create(value_from_string_ref(literal)));
     }
 
     case expression_type_identifier:

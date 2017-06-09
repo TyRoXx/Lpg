@@ -76,13 +76,6 @@ static void print_instruction(instruction const printed)
     case instruction_unit:
         LPG_TO_DO();
 
-    case instruction_string_literal:
-        printf("string_literal %u ", printed.string_literal.into);
-        fwrite(printed.string_literal.value.data, 1,
-               printed.string_literal.value.length, stdout);
-        printf("\n");
-        return;
-
     case instruction_break:
         LPG_TO_DO();
 
@@ -278,8 +271,9 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 2, 1)),
-            instruction_create_string_literal(string_literal_instruction_create(
-                unicode_string_from_c_str("hello, world!"), 2)),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_string_ref(
+                       unicode_view_from_c_str("hello, world!")))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -293,8 +287,9 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 2, 1)),
-            instruction_create_string_literal(string_literal_instruction_create(
-                unicode_string_from_c_str("hello, world!"), 2)),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_string_ref(
+                       unicode_view_from_c_str("hello, world!")))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(

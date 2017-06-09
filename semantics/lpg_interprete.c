@@ -87,11 +87,6 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             registers[element.unit] = value_from_unit();
             break;
 
-        case instruction_string_literal:
-            registers[element.string_literal.into] = value_from_string_ref(
-                unicode_view_from_string(element.string_literal.value));
-            break;
-
         case instruction_break:
             return run_sequence_result_break;
 
