@@ -277,8 +277,8 @@ bool instruction_equals(instruction const left, instruction const right)
         return integer_literal_instruction_equals(left.integer, right.integer);
 
     case instruction_literal:
-        /*TODO: compare values*/
-        return true;
+        return (left.integer.into == right.integer.into) &&
+               value_equals(left.literal.value_, right.literal.value_);
     }
     UNREACHABLE();
 }

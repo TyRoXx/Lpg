@@ -36,7 +36,10 @@ evaluate_expression_result_create(register_id const where, type const type_,
 }
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
-    false, 0, {type_kind_type, {NULL}}, {false, {{0, 0}}}};
+    false,
+    0,
+    {type_kind_type, {NULL}},
+    {false, {value_kind_integer, {{0, 0}}}}};
 
 typedef struct local_variable
 {
