@@ -279,9 +279,6 @@ static success_indicator generate_instruction(c_backend_state *state,
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
         return success;
 
-    case instruction_integer_literal:
-        LPG_TO_DO();
-
     case instruction_literal:
         LPG_TO_DO();
     }

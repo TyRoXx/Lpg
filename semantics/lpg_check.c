@@ -741,9 +741,9 @@ evaluate_expression(function_checking_state *state,
     {
         register_id const where = allocate_register(state);
         add_instruction(
-            function, instruction_create_integer_literal(
-                          integer_literal_instruction_create(
-                              where, element.integer_literal.value)));
+            function,
+            instruction_create_literal(literal_instruction_create(
+                where, value_from_integer(element.integer_literal.value))));
         return evaluate_expression_result_create(
             where,
             type_from_integer_range(integer_range_create(

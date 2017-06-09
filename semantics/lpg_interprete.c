@@ -95,11 +95,6 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
         case instruction_break:
             return run_sequence_result_break;
 
-        case instruction_integer_literal:
-            registers[element.integer.into] =
-                value_from_integer(element.integer.value);
-            break;
-
         case instruction_literal:
             registers[element.literal.into] = element.literal.value_;
             break;

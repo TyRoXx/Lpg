@@ -86,9 +86,6 @@ static void print_instruction(instruction const printed)
     case instruction_break:
         LPG_TO_DO();
 
-    case instruction_integer_literal:
-        LPG_TO_DO();
-
     case instruction_literal:
         printf("literal ?\n");
         return;
@@ -679,8 +676,8 @@ void test_semantics(void)
     }
     {
         instruction const expected_body_elements[] = {
-            instruction_create_integer_literal(
-                integer_literal_instruction_create(0, integer_create(0, 1)))};
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_integer(integer_create(0, 1))))};
         check_single_wellformed_function(
             "let v = 1\n", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));

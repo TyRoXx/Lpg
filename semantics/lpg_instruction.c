@@ -79,19 +79,6 @@ bool string_literal_instruction_equals(string_literal_instruction const left,
            (left.into == right.into);
 }
 
-integer_literal_instruction integer_literal_instruction_create(register_id into,
-                                                               integer value)
-{
-    integer_literal_instruction result = {into, value};
-    return result;
-}
-
-bool integer_literal_instruction_equals(integer_literal_instruction const left,
-                                        integer_literal_instruction const right)
-{
-    return (left.into == right.into) && integer_equal(left.value, right.value);
-}
-
 literal_instruction literal_instruction_create(register_id into, value value_)
 {
     literal_instruction result = {into, value_};
@@ -159,15 +146,6 @@ instruction instruction_create_break()
     return result;
 }
 
-instruction
-instruction_create_integer_literal(integer_literal_instruction const value)
-{
-    instruction result;
-    result.type = instruction_integer_literal;
-    result.integer = value;
-    return result;
-}
-
 instruction instruction_create_literal(literal_instruction const value)
 {
     instruction result;
@@ -202,9 +180,6 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_break:
-        break;
-
-    case instruction_integer_literal:
         break;
 
     case instruction_literal:
@@ -243,11 +218,8 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_break:
         return true;
 
-    case instruction_integer_literal:
-        return integer_literal_instruction_equals(left.integer, right.integer);
-
     case instruction_literal:
-        return (left.integer.into == right.integer.into) &&
+        return (left.literal.into == right.literal.into) &&
                value_equals(left.literal.value_, right.literal.value_);
     }
     UNREACHABLE();
