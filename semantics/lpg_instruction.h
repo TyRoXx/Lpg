@@ -14,7 +14,6 @@ typedef enum instruction_type
     instruction_loop,
     instruction_global,
     instruction_read_struct,
-    instruction_unit,
     instruction_break,
     instruction_literal
 } instruction_type;
@@ -67,7 +66,6 @@ struct instruction
         call_instruction call;
         register_id global_into;
         read_struct_instruction read_struct;
-        register_id unit;
         literal_instruction literal;
     };
 };
@@ -76,7 +74,6 @@ instruction instruction_create_call(call_instruction argument);
 instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
-instruction instruction_create_unit(register_id into);
 instruction instruction_create_break(void);
 instruction instruction_create_literal(literal_instruction const value);
 

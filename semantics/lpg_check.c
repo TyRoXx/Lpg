@@ -532,7 +532,9 @@ static evaluate_expression_result make_unit(function_checking_state *state,
         evaluate_expression_result_create(
             allocate_register(state), unit_type,
             optional_value_create(value_from_unit()));
-    add_instruction(output, instruction_create_unit(final_result.where));
+    add_instruction(
+        output, instruction_create_literal(literal_instruction_create(
+                    final_result.where, value_from_unit())));
     return final_result;
 }
 

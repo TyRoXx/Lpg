@@ -73,9 +73,6 @@ static void print_instruction(instruction const printed)
                printed.read_struct.into);
         return;
 
-    case instruction_unit:
-        LPG_TO_DO();
-
     case instruction_break:
         LPG_TO_DO();
 
@@ -175,7 +172,8 @@ void test_semantics(void)
         REQUIRE(checked.function_count == 1);
         instruction *const expected_body_elements =
             allocate_array(1, sizeof(*expected_body_elements));
-        expected_body_elements[0] = instruction_create_unit(0);
+        expected_body_elements[0] = instruction_create_literal(
+            literal_instruction_create(0, value_from_unit()));
         instruction_sequence const expected_body =
             instruction_sequence_create(expected_body_elements, 1);
         REQUIRE(instruction_sequence_equals(

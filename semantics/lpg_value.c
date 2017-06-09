@@ -36,7 +36,7 @@ value value_from_string_ref(unicode_view const string_ref)
 value value_from_unit(void)
 {
     value result;
-    result.kind = value_kind_integer;
+    result.kind = value_kind_unit;
     /*dummy value to avoid compiler warning*/
     result.integer_ = integer_create(0, 0);
     return result;
@@ -91,6 +91,9 @@ bool value_equals(value const left, value const right)
 
     case value_kind_enum_element:
         return (left.enum_element == right.enum_element);
+
+    case value_kind_unit:
+        return true;
     }
     UNREACHABLE();
 }

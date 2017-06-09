@@ -104,14 +104,6 @@ instruction instruction_create_loop(instruction_sequence body)
     return result;
 }
 
-instruction instruction_create_unit(register_id into)
-{
-    instruction result;
-    result.type = instruction_unit;
-    result.unit = into;
-    return result;
-}
-
 instruction instruction_create_break()
 {
     instruction result;
@@ -145,9 +137,6 @@ void instruction_free(instruction const *value)
     case instruction_read_struct:
         break;
 
-    case instruction_unit:
-        break;
-
     case instruction_break:
         break;
 
@@ -176,9 +165,6 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_read_struct:
         return read_struct_instruction_equals(
             left.read_struct, right.read_struct);
-
-    case instruction_unit:
-        return (left.unit == right.unit);
 
     case instruction_break:
         return true;

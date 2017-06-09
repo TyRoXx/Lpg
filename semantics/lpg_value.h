@@ -28,7 +28,8 @@ typedef enum value_kind
     value_kind_function_pointer,
     value_kind_flat_object,
     value_kind_type,
-    value_kind_enum_element
+    value_kind_enum_element,
+    value_kind_unit
 } value_kind;
 
 typedef struct value

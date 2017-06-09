@@ -263,10 +263,6 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
         }
 
-    case instruction_unit:
-        set_register_meaning(state, input.unit, register_meaning_unit);
-        return success;
-
     case instruction_break:
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
@@ -296,6 +292,11 @@ static success_indicator generate_instruction(c_backend_state *state,
 
         case value_kind_enum_element:
             LPG_TO_DO();
+
+        case value_kind_unit:
+            state->registers[input.literal.into].meaning =
+                register_meaning_unit;
+            return success;
         }
         UNREACHABLE();
     }
