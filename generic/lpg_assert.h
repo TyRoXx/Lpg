@@ -34,7 +34,7 @@
 #define UNREACHABLE() __builtin_unreachable()
 #endif
 #else
-#define UNREACHABLE() ASSERT(0)
+#define UNREACHABLE() abort()
 #endif
 
-#define LPG_TO_DO() ASSERT(!(char const *)"LPG_TO_DO - not implemented yet")
+#define LPG_TO_DO() abort()
