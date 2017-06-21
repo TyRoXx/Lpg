@@ -14,7 +14,6 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->or_);
     function_pointer_free(&stable->not_);
     function_pointer_free(&stable->concat);
-    function_pointer_free(&stable->type_of);
 }
 
 static value not_impl(value const *const inferred, value const *arguments,
@@ -25,18 +24,6 @@ static value not_impl(value const *const inferred, value const *arguments,
     (void)gc;
     enum_element_id const argument = arguments[0].enum_element;
     return value_from_enum_element(!argument);
-}
-
-static value type_of_impl(value const *const inferred,
-                          value const *const arguments,
-                          garbage_collector *const gc, void *environment)
-{
-    (void)environment;
-    (void)gc;
-    value const type_of_argument = inferred[0];
-    /*ignoring actual arguments*/
-    (void)arguments;
-    return type_of_argument;
 }
 
 static value concat_impl(value const *const inferred,
@@ -97,14 +84,8 @@ standard_library_description describe_standard_library(void)
         stable->concat =
             function_pointer_create(type_from_string_ref(), parameters, 2);
     }
-    {
-        type *const parameters = allocate_array(1, sizeof(*parameters));
-        parameters[0] = type_from_inferred(0);
-        stable->type_of =
-            function_pointer_create(type_from_type(), parameters, 1);
-    }
 
-    structure_member *globals = allocate_array(10, sizeof(*globals));
+    structure_member *globals = allocate_array(9, sizeof(*globals));
     globals[0] = structure_member_create(type_from_function_pointer(&stable->f),
                                          unicode_string_from_c_str("f"),
                                          optional_value_empty);
@@ -146,14 +127,8 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(concat_impl, NULL))));
 
-    globals[9] = structure_member_create(
-        type_from_function_pointer(&stable->type_of),
-        unicode_string_from_c_str("type-of"),
-        optional_value_create(value_from_function_pointer(
-            function_pointer_value_from_external(type_of_impl, NULL))));
-
     standard_library_description result = {
-        structure_create(globals, 10), stable};
+        structure_create(globals, 9), stable};
     return result;
 }
 

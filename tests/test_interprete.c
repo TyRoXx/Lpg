@@ -145,10 +145,6 @@ void test_interprete(void)
     expect_output("let v = 123\n", "", std_library.globals);
     expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "123456",
                   std_library.globals);
-    expect_output("let b : type-of(boolean.true) = boolean.true\nassert(b)\n",
-                  "", std_library.globals);
-    expect_output("let s : type-of(\"\") = \"hello\"\nprint(s)\n", "hello",
-                  std_library.globals);
 
     standard_library_description_free(&std_library);
 }
