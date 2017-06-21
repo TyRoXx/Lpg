@@ -248,7 +248,6 @@ static success_indicator generate_instruction(c_backend_state *state,
             default:
                 LPG_TO_DO();
             }
-            return success;
 
         case register_meaning_variable:
             LPG_TO_DO();
