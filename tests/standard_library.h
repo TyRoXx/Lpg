@@ -1,6 +1,10 @@
 #pragma once
 #include "lpg_structure_member.h"
 
+value string_equals_impl(value const *const inferred,
+                         value const *const arguments,
+                         garbage_collector *const gc, void *environment);
+
 typedef struct standard_library_stable
 {
     enumeration boolean;

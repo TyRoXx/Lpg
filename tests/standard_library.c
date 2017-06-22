@@ -43,9 +43,9 @@ static value concat_impl(value const *const inferred,
     return value_from_string_ref(unicode_view_create(result, result_length));
 }
 
-static value string_equals_impl(value const *const inferred,
-                                value const *const arguments,
-                                garbage_collector *const gc, void *environment)
+value string_equals_impl(value const *const inferred,
+                         value const *const arguments,
+                         garbage_collector *const gc, void *environment)
 {
     (void)inferred;
     (void)environment;
