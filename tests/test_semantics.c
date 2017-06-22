@@ -495,32 +495,6 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
     {
-        sequence const root = parse("and(boolean.true, boolean.false)");
-        checked_program checked =
-            check(root, std_library.globals, expect_no_errors, NULL);
-        sequence_free(&root);
-        REQUIRE(checked.function_count == 1);
-        register_id *const arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] = 2;
-        arguments[1] = 3;
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 5, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1))),
-            instruction_create_literal(
-                literal_instruction_create(3, value_from_enum_element(0))),
-            instruction_create_call(
-                call_instruction_create(1, arguments, 2, 4))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
-        checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
-    }
-    {
         sequence root = parse("break\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_break_outside_of_loop,

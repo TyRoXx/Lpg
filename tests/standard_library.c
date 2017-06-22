@@ -18,8 +18,8 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->read);
 }
 
-static value not_impl(value const *const inferred, value const *arguments,
-                      garbage_collector *const gc, void *environment)
+value not_impl(value const *const inferred, value const *arguments,
+               garbage_collector *const gc, void *environment)
 {
     (void)environment;
     (void)inferred;
@@ -28,9 +28,8 @@ static value not_impl(value const *const inferred, value const *arguments,
     return value_from_enum_element(!argument);
 }
 
-static value concat_impl(value const *const inferred,
-                         value const *const arguments,
-                         garbage_collector *const gc, void *environment)
+value concat_impl(value const *const inferred, value const *const arguments,
+                  garbage_collector *const gc, void *environment)
 {
     (void)inferred;
     (void)environment;
@@ -41,6 +40,28 @@ static value concat_impl(value const *const inferred,
     memcpy(result, left.begin, left.length);
     memcpy(result + left.length, right.begin, right.length);
     return value_from_string_ref(unicode_view_create(result, result_length));
+}
+
+value and_impl(value const *const inferred, value const *arguments,
+               garbage_collector *const gc, void *environment)
+{
+    (void)environment;
+    (void)inferred;
+    (void)gc;
+    enum_element_id const left = arguments[0].enum_element;
+    enum_element_id const right = arguments[1].enum_element;
+    return value_from_enum_element(left && right);
+}
+
+value or_impl(value const *const inferred, value const *arguments,
+              garbage_collector *const gc, void *environment)
+{
+    (void)environment;
+    (void)inferred;
+    (void)gc;
+    enum_element_id const left = arguments[0].enum_element;
+    enum_element_id const right = arguments[1].enum_element;
+    return value_from_enum_element(left || right);
 }
 
 value string_equals_impl(value const *const inferred,
@@ -130,11 +151,15 @@ standard_library_description describe_standard_library(void)
 
     globals[5] = structure_member_create(
         type_from_function_pointer(&stable->and_),
-        unicode_string_from_c_str("and"), optional_value_empty);
+        unicode_string_from_c_str("and"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(and_impl, NULL))));
 
     globals[6] = structure_member_create(
         type_from_function_pointer(&stable->or_),
-        unicode_string_from_c_str("or"), optional_value_empty);
+        unicode_string_from_c_str("or"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(or_impl, NULL))));
 
     globals[7] = structure_member_create(
         type_from_function_pointer(&stable->not_),

@@ -1,6 +1,18 @@
 #pragma once
 #include "lpg_structure_member.h"
 
+value not_impl(value const *const inferred, value const *arguments,
+               garbage_collector *const gc, void *environment);
+
+value concat_impl(value const *const inferred, value const *const arguments,
+                  garbage_collector *const gc, void *environment);
+
+value and_impl(value const *const inferred, value const *arguments,
+               garbage_collector *const gc, void *environment);
+
+value or_impl(value const *const inferred, value const *arguments,
+              garbage_collector *const gc, void *environment);
+
 value string_equals_impl(value const *const inferred,
                          value const *const arguments,
                          garbage_collector *const gc, void *environment);

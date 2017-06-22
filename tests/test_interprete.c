@@ -58,28 +58,6 @@ static value assert_impl(value const *const inferred, value const *arguments,
     return value_from_unit();
 }
 
-static value and_impl(value const *const inferred, value const *arguments,
-                      garbage_collector *const gc, void *environment)
-{
-    (void)environment;
-    (void)inferred;
-    (void)gc;
-    enum_element_id const left = arguments[0].enum_element;
-    enum_element_id const right = arguments[1].enum_element;
-    return value_from_enum_element(left && right);
-}
-
-static value or_impl(value const *const inferred, value const *arguments,
-                     garbage_collector *const gc, void *environment)
-{
-    (void)environment;
-    (void)inferred;
-    (void)gc;
-    enum_element_id const left = arguments[0].enum_element;
-    enum_element_id const right = arguments[1].enum_element;
-    return value_from_enum_element(left || right);
-}
-
 static value read_impl(value const *const inferred, value const *arguments,
                        garbage_collector *const gc, void *environment)
 {
@@ -111,8 +89,10 @@ static void expect_output(char const *source, char const *input,
             function_pointer_value_from_external(and_impl, NULL)),
         /*or*/ value_from_function_pointer(
             function_pointer_value_from_external(or_impl, NULL)),
-        /*not*/ value_from_unit(),
-        /*concat*/ value_from_unit(),
+        /*not*/ value_from_function_pointer(
+            function_pointer_value_from_external(not_impl, NULL)),
+        /*concat*/ value_from_function_pointer(
+            function_pointer_value_from_external(concat_impl, NULL)),
         /*string-equals*/ value_from_function_pointer(
             function_pointer_value_from_external(string_equals_impl, NULL)),
         /*read*/ value_from_function_pointer(
