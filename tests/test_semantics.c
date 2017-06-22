@@ -186,13 +186,13 @@ void test_semantics(void)
         describe_standard_library();
 
     {
-        char const *const sources[] = {"f()\n", "f()"};
+        char const *const sources[] = {"read()\n", "read()"};
         LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
         {
             instruction const expected_body_elements[] = {
                 instruction_create_global(0),
                 instruction_create_read_struct(
-                    read_struct_instruction_create(0, 0, 1)),
+                    read_struct_instruction_create(0, 10, 1)),
                 instruction_create_call(
                     call_instruction_create(1, NULL, 0, 2))};
             check_single_wellformed_function(
@@ -204,14 +204,14 @@ void test_semantics(void)
         instruction const loop_body[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
+                read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction *const expected_body_elements =
             allocate_array(1, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         check_single_wellformed_function("loop\n"
-                                         "    f()",
+                                         "    read()",
                                          std_library.globals,
                                          expected_body_elements, 1);
     }
@@ -219,18 +219,18 @@ void test_semantics(void)
         instruction const loop_body[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
+                read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_global(3),
             instruction_create_read_struct(
-                read_struct_instruction_create(3, 1, 4)),
+                read_struct_instruction_create(3, 10, 4)),
             instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
         instruction const expected_body_elements[] = {instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))};
         check_single_wellformed_function(
             "loop\n"
-            "    f()\n"
-            "    g()",
+            "    read()\n"
+            "    read()",
             std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {
@@ -340,7 +340,7 @@ void test_semantics(void)
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
-        sequence root = parse("f()\n"
+        sequence root = parse("read()\n"
                               "h()");
         semantic_error const errors[] = {semantic_error_create(
             semantic_error_unknown_element, source_location_create(1, 0))};
@@ -353,7 +353,7 @@ void test_semantics(void)
         instruction const expected_body_elements[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
+                read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
@@ -442,7 +442,7 @@ void test_semantics(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("assert(f())");
+        sequence root = parse("assert(read())");
         semantic_error const errors[] = {semantic_error_create(
             semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
@@ -562,7 +562,7 @@ void test_semantics(void)
         instruction_sequence_free(&expected_body);
     }
     {
-        sequence root = parse("let v : f() = boolean.true\n");
+        sequence root = parse("let v : read() = boolean.true\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_expected_compile_time_type,
                                   source_location_create(0, 8))};
@@ -596,7 +596,7 @@ void test_semantics(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("let v : boolean = f()\n");
+        sequence root = parse("let v : boolean = read()\n");
         semantic_error const errors[] = {semantic_error_create(
             semantic_error_type_mismatch, source_location_create(0, 18))};
         expected_errors expected = {errors, 1};
@@ -608,7 +608,7 @@ void test_semantics(void)
         instruction const expected_body_elements[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
-                read_struct_instruction_create(0, 0, 1)),
+                read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));

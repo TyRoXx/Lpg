@@ -6,8 +6,6 @@
 static void standard_library_stable_free(standard_library_stable *stable)
 {
     enumeration_free(&stable->boolean);
-    function_pointer_free(&stable->f);
-    function_pointer_free(&stable->g);
     function_pointer_free(&stable->print);
     function_pointer_free(&stable->assert_);
     function_pointer_free(&stable->and_);
@@ -89,8 +87,6 @@ standard_library_description describe_standard_library(void)
         stable->boolean = enumeration_create(boolean_elements, 2);
     }
     type const boolean = type_from_enumeration(&stable->boolean);
-    stable->f = function_pointer_create(type_from_unit(), NULL, 0);
-    stable->g = function_pointer_create(type_from_unit(), NULL, 0);
     stable->print = function_pointer_create(
         type_from_unit(), type_allocate(type_from_string_ref()), 1);
     stable->assert_ =
@@ -128,13 +124,11 @@ standard_library_description describe_standard_library(void)
     stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
     structure_member *globals = allocate_array(11, sizeof(*globals));
-    globals[0] = structure_member_create(type_from_function_pointer(&stable->f),
-                                         unicode_string_from_c_str("f"),
-                                         optional_value_empty);
+    globals[0] = structure_member_create(
+        type_from_unit(), unicode_string_from_c_str("f"), optional_value_empty);
 
-    globals[1] = structure_member_create(type_from_function_pointer(&stable->g),
-                                         unicode_string_from_c_str("g"),
-                                         optional_value_empty);
+    globals[1] = structure_member_create(
+        type_from_unit(), unicode_string_from_c_str("g"), optional_value_empty);
 
     globals[2] = structure_member_create(
         type_from_function_pointer(&stable->print),
