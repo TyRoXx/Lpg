@@ -14,6 +14,8 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->or_);
     function_pointer_free(&stable->not_);
     function_pointer_free(&stable->concat);
+    function_pointer_free(&stable->string_equals);
+    function_pointer_free(&stable->read);
 }
 
 static value not_impl(value const *const inferred, value const *arguments,
@@ -39,6 +41,18 @@ static value concat_impl(value const *const inferred,
     memcpy(result, left.begin, left.length);
     memcpy(result + left.length, right.begin, right.length);
     return value_from_string_ref(unicode_view_create(result, result_length));
+}
+
+static value string_equals_impl(value const *const inferred,
+                                value const *const arguments,
+                                garbage_collector *const gc, void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    (void)gc;
+    unicode_view const left = arguments[0].string_ref;
+    unicode_view const right = arguments[1].string_ref;
+    return value_from_enum_element(unicode_view_equals(left, right));
 }
 
 standard_library_description describe_standard_library(void)
@@ -84,8 +98,15 @@ standard_library_description describe_standard_library(void)
         stable->concat =
             function_pointer_create(type_from_string_ref(), parameters, 2);
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_string_ref();
+        parameters[1] = type_from_string_ref();
+        stable->string_equals = function_pointer_create(boolean, parameters, 2);
+    }
+    stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
-    structure_member *globals = allocate_array(9, sizeof(*globals));
+    structure_member *globals = allocate_array(11, sizeof(*globals));
     globals[0] = structure_member_create(type_from_function_pointer(&stable->f),
                                          unicode_string_from_c_str("f"),
                                          optional_value_empty);
@@ -127,8 +148,18 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(concat_impl, NULL))));
 
+    globals[9] = structure_member_create(
+        type_from_function_pointer(&stable->string_equals),
+        unicode_string_from_c_str("string-equals"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(string_equals_impl, NULL))));
+
+    globals[10] = structure_member_create(
+        type_from_function_pointer(&stable->read),
+        unicode_string_from_c_str("read"), optional_value_empty);
+
     standard_library_description result = {
-        structure_create(globals, 9), stable};
+        structure_create(globals, 11), stable};
     return result;
 }
 

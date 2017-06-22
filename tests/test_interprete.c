@@ -73,13 +73,23 @@ static value or_impl(value const *const inferred, value const *arguments,
     return value_from_enum_element(left || right);
 }
 
+static value read_impl(value const *const inferred, value const *arguments,
+                       garbage_collector *const gc, void *environment)
+{
+    (void)environment;
+    (void)inferred;
+    (void)gc;
+    (void)arguments;
+    LPG_TO_DO();
+}
+
 static void expect_output(char const *source, char const *output,
                           structure const global_object)
 {
     memory_writer print_buffer = {NULL, 0, 0};
     stream_writer print_destination = memory_writer_erase(&print_buffer);
     garbage_collector gc = {NULL};
-    value const globals_values[10] = {
+    value const globals_values[11] = {
         /*f*/ value_from_unit(),
         /*g*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
@@ -93,7 +103,9 @@ static void expect_output(char const *source, char const *output,
             function_pointer_value_from_external(or_impl, NULL)),
         /*not*/ value_from_unit(),
         /*concat*/ value_from_unit(),
-        /*type-of*/ value_from_unit()};
+        /*string-equals*/ value_from_unit(),
+        /*read*/ value_from_function_pointer(
+            function_pointer_value_from_external(read_impl, NULL))};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -145,6 +157,16 @@ void test_interprete(void)
     expect_output("let v = 123\n", "", std_library.globals);
     expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "123456",
                   std_library.globals);
+    expect_output(
+        "assert(string-equals(\"\", \"\"))\n", "", std_library.globals);
+    expect_output(
+        "assert(string-equals(\"aaa\", \"aaa\"))\n", "", std_library.globals);
+    expect_output("assert(string-equals(concat(\"aa\", \"a\"), \"aaa\"))\n", "",
+                  std_library.globals);
+    expect_output(
+        "assert(not(string-equals(\"a\", \"\")))\n", "", std_library.globals);
+    expect_output(
+        "assert(not(string-equals(\"a\", \"b\")))\n", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
