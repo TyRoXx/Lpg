@@ -17,7 +17,6 @@ typedef enum register_meaning
     register_meaning_nothing,
     register_meaning_global,
     register_meaning_variable,
-    register_meaning_string_literal,
     register_meaning_print,
     register_meaning_assert,
     register_meaning_read,
@@ -35,11 +34,7 @@ typedef struct register_state
 {
     register_meaning meaning;
     register_resource_ownership ownership;
-    union
-    {
-        unicode_view string_literal;
-        value literal;
-    };
+    value literal;
 } register_state;
 
 typedef struct c_backend_state
@@ -55,7 +50,6 @@ static void set_register_meaning(c_backend_state *const state,
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     ASSERT(meaning != register_meaning_nothing);
-    ASSERT(meaning != register_meaning_string_literal);
     ASSERT(meaning != register_meaning_variable);
     ASSERT(meaning != register_meaning_literal);
     state->registers[id].meaning = meaning;
@@ -137,15 +131,16 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_unit:
         LPG_TO_DO();
 
-    case register_meaning_string_literal:
-        return encode_string_literal(
-            state->registers[from].string_literal, c_output);
-
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
+            LPG_TO_DO();
+
         case value_kind_string:
+            return encode_string_literal(
+                state->registers[from].literal.string_ref, c_output);
+
         case value_kind_function_pointer:
         case value_kind_flat_object:
         case value_kind_type:
@@ -209,12 +204,23 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_unit:
         LPG_TO_DO();
 
-    case register_meaning_string_literal:
-        return encode_string_literal(
-            state->registers[from].string_literal, c_output);
-
     case register_meaning_literal:
-        LPG_TO_DO();
+        switch (state->registers[from].literal.kind)
+        {
+        case value_kind_integer:
+            LPG_TO_DO();
+
+        case value_kind_string:
+            return encode_string_literal(
+                state->registers[from].literal.string_ref, c_output);
+
+        case value_kind_function_pointer:
+        case value_kind_flat_object:
+        case value_kind_type:
+        case value_kind_enum_element:
+        case value_kind_unit:
+            LPG_TO_DO();
+        }
     }
     UNREACHABLE();
 }
@@ -247,18 +253,31 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_unit:
         LPG_TO_DO();
 
-    case register_meaning_string_literal:
-    {
-        char buffer[40];
-        char *formatted = integer_format(
-            integer_create(0, state->registers[from].string_literal.length),
-            lower_case_digits, 10, buffer, sizeof(buffer));
-        return stream_writer_write_bytes(
-            c_output, formatted,
-            (size_t)((buffer + sizeof(buffer)) - formatted));
-    }
-
     case register_meaning_literal:
+        switch (state->registers[from].literal.kind)
+        {
+        case value_kind_integer:
+            LPG_TO_DO();
+
+        case value_kind_string:
+        {
+            char buffer[40];
+            char *formatted = integer_format(
+                integer_create(
+                    0, state->registers[from].literal.string_ref.length),
+                lower_case_digits, 10, buffer, sizeof(buffer));
+            return stream_writer_write_bytes(
+                c_output, formatted,
+                (size_t)((buffer + sizeof(buffer)) - formatted));
+        }
+
+        case value_kind_function_pointer:
+        case value_kind_flat_object:
+        case value_kind_type:
+        case value_kind_enum_element:
+        case value_kind_unit:
+            LPG_TO_DO();
+        }
         LPG_TO_DO();
     }
     UNREACHABLE();
@@ -266,9 +285,9 @@ static success_indicator generate_string_length(c_backend_state *state,
 
 static register_state make_string_literal(unicode_view const value)
 {
-    register_state result = {register_meaning_string_literal,
+    register_state result = {register_meaning_literal,
                              register_resource_ownership_none,
-                             {value}};
+                             value_from_string_ref(value)};
     return result;
 }
 
@@ -342,9 +361,6 @@ static success_indicator generate_instruction(c_backend_state *state,
         case register_meaning_unit:
             LPG_TO_DO();
 
-        case register_meaning_string_literal:
-            LPG_TO_DO();
-
         case register_meaning_literal:
             LPG_TO_DO();
         }
@@ -415,9 +431,6 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case register_meaning_unit:
-            LPG_TO_DO();
-
-        case register_meaning_string_literal:
             LPG_TO_DO();
 
         case register_meaning_assert:
