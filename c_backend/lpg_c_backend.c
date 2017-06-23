@@ -307,14 +307,6 @@ static success_indicator generate_string_length(c_backend_state *state,
     UNREACHABLE();
 }
 
-static register_state make_string_literal(unicode_view const value)
-{
-    register_state result = {register_meaning_literal,
-                             register_resource_ownership_none,
-                             value_from_string_ref(value)};
-    return result;
-}
-
 static success_indicator generate_sequence(c_backend_state *state,
                                            instruction_sequence const sequence,
                                            size_t const indentation,
