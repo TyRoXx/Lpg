@@ -5,8 +5,9 @@
 success_indicator generate_c(checked_program const program,
                              stream_writer const c_output);
 
+#define LPG_C_STDLIB "#include <stdlib.h>\n"
+
 #define LPG_C_STRING_REF                                                       \
-    "#include <stdlib.h>\n"                                                    \
     "typedef struct string_ref\n"                                              \
     "{\n"                                                                      \
     "    char *data;\n"                                                        \
@@ -24,3 +25,13 @@ success_indicator generate_c(checked_program const program,
     "}\n"
 
 #define LPG_C_STDIO "#include <stdio.h>\n"
+
+#define LPG_C_ASSERT                                                           \
+    "#include <stdbool.h>\n"                                                   \
+    "static void assert_impl(bool const condition)\n"                          \
+    "{\n"                                                                      \
+    "    if (!condition)\n"                                                    \
+    "    {\n"                                                                  \
+    "        abort();\n"                                                       \
+    "    }\n"                                                                  \
+    "}\n"

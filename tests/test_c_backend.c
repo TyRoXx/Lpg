@@ -51,7 +51,7 @@ void test_c_backend(void)
                                                     "}\n");
 
     check_generated_c_code("print(\"Hello, world!\")\n", std_library.globals,
-                           "#include <stdio.h>\n"
+                           LPG_C_STDIO
                            "int main(void)\n"
                            "{\n"
                            "    fwrite(\"Hello, world!\", 1, 13, stdout);\n"
@@ -59,8 +59,7 @@ void test_c_backend(void)
                            "}\n");
 
     check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n",
-                           std_library.globals,
-                           "#include <stdio.h>\n"
+                           std_library.globals, LPG_C_STDIO
                            "int main(void)\n"
                            "{\n"
                            "    fwrite(\"Hello, \", 1, 7, stdout);\n"
@@ -71,8 +70,7 @@ void test_c_backend(void)
     check_generated_c_code("loop\n"
                            "    print(\"Hello, world!\")\n"
                            "    break\n",
-                           std_library.globals,
-                           "#include <stdio.h>\n"
+                           std_library.globals, LPG_C_STDIO
                            "int main(void)\n"
                            "{\n"
                            "    for (;;)\n"
@@ -86,12 +84,11 @@ void test_c_backend(void)
     check_generated_c_code("let s = concat(\"123\", \"456\")\n"
                            "print(s)\n",
                            std_library.globals,
-                           "#include <stdio.h>\n"
-                           "int main(void)\n"
-                           "{\n"
-                           "    fwrite(\"123456\", 1, 6, stdout);\n"
-                           "    return 0;\n"
-                           "}\n");
+                           LPG_C_STDIO "int main(void)\n"
+                                       "{\n"
+                                       "    fwrite(\"123456\", 1, 6, stdout);\n"
+                                       "    return 0;\n"
+                                       "}\n");
 
     check_generated_c_code("print(read())\n", std_library.globals,
                            LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
@@ -117,6 +114,20 @@ void test_c_backend(void)
                            "    }\n"
                            "    return 0;\n"
                            "}\n");
+
+    check_generated_c_code("assert(boolean.false)\n", std_library.globals,
+                           LPG_C_ASSERT "int main(void)\n"
+                                        "{\n"
+                                        "    assert_impl(0);\n"
+                                        "    return 0;\n"
+                                        "}\n");
+
+    check_generated_c_code("assert(boolean.true)\n", std_library.globals,
+                           LPG_C_ASSERT "int main(void)\n"
+                                        "{\n"
+                                        "    assert_impl(1);\n"
+                                        "    return 0;\n"
+                                        "}\n");
 
     standard_library_description_free(&std_library);
 }

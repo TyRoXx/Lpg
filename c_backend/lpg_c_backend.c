@@ -8,6 +8,8 @@ typedef struct standard_library_usage
     bool using_string_ref;
     bool using_read;
     bool using_stdio;
+    bool using_assert;
+    bool using_stdlib;
 } standard_library_usage;
 
 typedef enum register_meaning
@@ -17,8 +19,10 @@ typedef enum register_meaning
     register_meaning_variable,
     register_meaning_string_literal,
     register_meaning_print,
+    register_meaning_assert,
     register_meaning_read,
-    register_meaning_unit
+    register_meaning_unit,
+    register_meaning_literal
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -32,6 +36,7 @@ typedef struct register_state
     register_meaning meaning;
     unicode_view string_literal;
     register_resource_ownership ownership;
+    value literal;
 } register_state;
 
 typedef struct c_backend_state
@@ -49,6 +54,7 @@ static void set_register_meaning(c_backend_state *const state,
     ASSERT(meaning != register_meaning_nothing);
     ASSERT(meaning != register_meaning_string_literal);
     ASSERT(meaning != register_meaning_variable);
+    ASSERT(meaning != register_meaning_literal);
     state->registers[id].meaning = meaning;
     if (id >= state->registers_active)
     {
@@ -63,6 +69,18 @@ static void set_register_variable(c_backend_state *const state,
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
+    if (id >= state->registers_active)
+    {
+        state->registers_active = (id + 1);
+    }
+}
+
+static void set_register_literal(c_backend_state *const state,
+                                 register_id const id, value const literal)
+{
+    ASSERT(state->registers[id].meaning == register_meaning_nothing);
+    state->registers[id].meaning = register_meaning_literal;
+    state->registers[id].literal = literal;
     if (id >= state->registers_active)
     {
         state->registers_active = (id + 1);
@@ -110,12 +128,40 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_read:
         LPG_TO_DO();
 
+    case register_meaning_assert:
+        LPG_TO_DO();
+
     case register_meaning_unit:
         LPG_TO_DO();
 
     case register_meaning_string_literal:
         return encode_string_literal(
             state->registers[from].string_literal, c_output);
+
+    case register_meaning_literal:
+        switch (state->registers[from].literal.kind)
+        {
+        case value_kind_integer:
+        case value_kind_string:
+        case value_kind_function_pointer:
+        case value_kind_flat_object:
+        case value_kind_type:
+            LPG_TO_DO();
+
+        case value_kind_enum_element:
+        {
+            char buffer[64];
+            char const *const formatted = integer_format(
+                integer_create(0, state->registers[from].literal.enum_element),
+                lower_case_digits, 10, buffer, sizeof(buffer));
+            return stream_writer_write_bytes(
+                c_output, formatted,
+                (size_t)((buffer + sizeof(buffer)) - formatted));
+        }
+
+        case value_kind_unit:
+            LPG_TO_DO();
+        }
     }
     UNREACHABLE();
 }
@@ -154,12 +200,18 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_read:
         LPG_TO_DO();
 
+    case register_meaning_assert:
+        LPG_TO_DO();
+
     case register_meaning_unit:
         LPG_TO_DO();
 
     case register_meaning_string_literal:
         return encode_string_literal(
             state->registers[from].string_literal, c_output);
+
+    case register_meaning_literal:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -186,6 +238,9 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_read:
         LPG_TO_DO();
 
+    case register_meaning_assert:
+        LPG_TO_DO();
+
     case register_meaning_unit:
         LPG_TO_DO();
 
@@ -199,6 +254,9 @@ static success_indicator generate_string_length(c_backend_state *state,
             c_output, formatted,
             (size_t)((buffer + sizeof(buffer)) - formatted));
     }
+
+    case register_meaning_literal:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -267,10 +325,22 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TRY(stream_writer_write_string(c_output, " = read_impl();\n"));
             return success;
 
+        case register_meaning_assert:
+            state->standard_library.using_assert = true;
+            LPG_TRY(stream_writer_write_string(c_output, "assert_impl("));
+            ASSERT(input.call.argument_count == 1);
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success;
+
         case register_meaning_unit:
             LPG_TO_DO();
 
         case register_meaning_string_literal:
+            LPG_TO_DO();
+
+        case register_meaning_literal:
             LPG_TO_DO();
         }
         LPG_TRY(generate_c_read_access(state, input.call.callee, c_output));
@@ -316,6 +386,11 @@ static success_indicator generate_instruction(c_backend_state *state,
                     state, input.read_struct.into, register_meaning_print);
                 return success;
 
+            case 4:
+                set_register_meaning(
+                    state, input.read_struct.into, register_meaning_assert);
+                return success;
+
             case 10:
                 set_register_meaning(
                     state, input.read_struct.into, register_meaning_read);
@@ -338,6 +413,12 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case register_meaning_string_literal:
+            LPG_TO_DO();
+
+        case register_meaning_assert:
+            LPG_TO_DO();
+
+        case register_meaning_literal:
             LPG_TO_DO();
         }
 
@@ -369,7 +450,9 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case value_kind_enum_element:
-            LPG_TO_DO();
+            set_register_literal(
+                state, input.literal.into, input.literal.value_);
+            return success;
 
         case value_kind_unit:
             state->registers[input.literal.into].meaning =
@@ -433,7 +516,7 @@ success_indicator generate_c(checked_program const program,
         allocate_array(
             program.functions[0].number_of_registers, sizeof(*state.registers)),
         0,
-        {false, false, false}};
+        {false, false, false, false, false}};
     for (size_t i = 0; i < program.functions[0].number_of_registers; ++i)
     {
         state.registers[i].meaning = register_meaning_nothing;
@@ -448,6 +531,16 @@ success_indicator generate_c(checked_program const program,
     LPG_TRY_GOTO(
         stream_writer_write_string(program_defined_writer, "}\n"), fail_2);
 
+    if (state.standard_library.using_stdlib)
+    {
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, LPG_C_STDLIB), fail_2);
+    }
+    if (state.standard_library.using_assert)
+    {
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, LPG_C_ASSERT), fail_2);
+    }
     if (state.standard_library.using_string_ref)
     {
         LPG_TRY_GOTO(
