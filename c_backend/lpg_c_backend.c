@@ -34,9 +34,12 @@ typedef enum register_resource_ownership
 typedef struct register_state
 {
     register_meaning meaning;
-    unicode_view string_literal;
     register_resource_ownership ownership;
-    value literal;
+    union
+    {
+        unicode_view string_literal;
+        value literal;
+    };
 } register_state;
 
 typedef struct c_backend_state
@@ -263,7 +266,9 @@ static success_indicator generate_string_length(c_backend_state *state,
 
 static register_state make_string_literal(unicode_view const value)
 {
-    register_state result = {register_meaning_string_literal, value};
+    register_state result = {register_meaning_string_literal,
+                             register_resource_ownership_none,
+                             {value}};
     return result;
 }
 
