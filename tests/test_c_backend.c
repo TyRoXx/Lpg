@@ -91,7 +91,8 @@ void test_c_backend(void)
                                        "}\n");
 
     check_generated_c_code("print(read())\n", std_library.globals,
-                           LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
+                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
                            "int main(void)\n"
                            "{\n"
                            "    string_ref const r_4 = read_impl();\n"
@@ -103,7 +104,8 @@ void test_c_backend(void)
     check_generated_c_code("loop\n"
                            "    print(read())\n",
                            std_library.globals,
-                           LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
+                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
                            "int main(void)\n"
                            "{\n"
                            "    for (;;)\n"
@@ -116,18 +118,34 @@ void test_c_backend(void)
                            "}\n");
 
     check_generated_c_code("assert(boolean.false)\n", std_library.globals,
-                           LPG_C_ASSERT "int main(void)\n"
-                                        "{\n"
-                                        "    assert_impl(0);\n"
-                                        "    return 0;\n"
-                                        "}\n");
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT
+                           "int main(void)\n"
+                           "{\n"
+                           "    assert_impl(0);\n"
+                           "    return 0;\n"
+                           "}\n");
 
     check_generated_c_code("assert(boolean.true)\n", std_library.globals,
-                           LPG_C_ASSERT "int main(void)\n"
-                                        "{\n"
-                                        "    assert_impl(1);\n"
-                                        "    return 0;\n"
-                                        "}\n");
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT
+                           "int main(void)\n"
+                           "{\n"
+                           "    assert_impl(1);\n"
+                           "    return 0;\n"
+                           "}\n");
+
+    check_generated_c_code("assert(string-equals(read(), \"\"))\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT LPG_C_STRING
+                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
+                           "int main(void)\n"
+                           "{\n"
+                           "    string_ref const r_6 = read_impl();\n"
+                           "    bool const r_8 = string_ref_equals(r_6, "
+                           "string_ref_create(\"\", 0));\n"
+                           "    assert_impl(r_8);\n"
+                           "    string_ref_free(&r_6);\n"
+                           "    return 0;\n"
+                           "}\n");
 
     standard_library_description_free(&std_library);
 }

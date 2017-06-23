@@ -10,7 +10,17 @@ typedef struct standard_library_usage
     bool using_stdio;
     bool using_assert;
     bool using_stdlib;
+    bool using_stdbool;
+    bool using_string;
 } standard_library_usage;
+
+static void standard_library_usage_use_string_ref(standard_library_usage *usage)
+{
+    usage->using_string_ref = true;
+    usage->using_stdbool = true;
+    usage->using_string = true;
+    usage->using_stdlib = true;
+}
 
 typedef enum register_meaning
 {
@@ -19,6 +29,7 @@ typedef enum register_meaning
     register_meaning_variable,
     register_meaning_print,
     register_meaning_assert,
+    register_meaning_string_equals,
     register_meaning_read,
     register_meaning_literal
 } register_meaning;
@@ -103,6 +114,18 @@ static success_indicator encode_string_literal(unicode_view const content,
     return success;
 }
 
+static success_indicator generate_register_name(register_id const id,
+                                                stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "r_"));
+    char buffer[64];
+    char const *const formatted = integer_format(
+        integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
+    LPG_TRY(stream_writer_write_bytes(
+        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+    return success;
+}
+
 static success_indicator generate_c_read_access(c_backend_state *state,
                                                 register_id const from,
                                                 stream_writer const c_output)
@@ -116,7 +139,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_variable:
-        LPG_TO_DO();
+        return generate_register_name(from, c_output);
 
     case register_meaning_print:
         LPG_TO_DO();
@@ -127,6 +150,9 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_assert:
         LPG_TO_DO();
 
+    case register_meaning_string_equals:
+        LPG_TO_DO();
+
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -134,8 +160,22 @@ static success_indicator generate_c_read_access(c_backend_state *state,
             LPG_TO_DO();
 
         case value_kind_string:
-            return encode_string_literal(
-                state->registers[from].literal.string_ref, c_output);
+            LPG_TRY(stream_writer_write_string(c_output, "string_ref_create("));
+            LPG_TRY(encode_string_literal(
+                state->registers[from].literal.string_ref, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ", "));
+            {
+                char buffer[40];
+                char *formatted = integer_format(
+                    integer_create(
+                        0, state->registers[from].literal.string_ref.length),
+                    lower_case_digits, 10, buffer, sizeof(buffer));
+                LPG_TRY(stream_writer_write_bytes(
+                    c_output, formatted,
+                    (size_t)((buffer + sizeof(buffer)) - formatted)));
+            }
+            LPG_TRY(stream_writer_write_string(c_output, ")"));
+            return success;
 
         case value_kind_function_pointer:
         case value_kind_flat_object:
@@ -158,18 +198,6 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         }
     }
     UNREACHABLE();
-}
-
-static success_indicator generate_register_name(register_id const id,
-                                                stream_writer const c_output)
-{
-    LPG_TRY(stream_writer_write_string(c_output, "r_"));
-    char buffer[64];
-    char const *const formatted = integer_format(
-        integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
-    LPG_TRY(stream_writer_write_bytes(
-        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-    return success;
 }
 
 static success_indicator generate_c_str(c_backend_state *state,
@@ -195,6 +223,9 @@ static success_indicator generate_c_str(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_assert:
+        LPG_TO_DO();
+
+    case register_meaning_string_equals:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -241,6 +272,9 @@ static success_indicator generate_string_length(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_assert:
+        LPG_TO_DO();
+
+    case register_meaning_string_equals:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -329,7 +363,7 @@ static success_indicator generate_instruction(c_backend_state *state,
 
         case register_meaning_read:
             state->standard_library.using_stdio = true;
-            state->standard_library.using_string_ref = true;
+            standard_library_usage_use_string_ref(&state->standard_library);
             state->standard_library.using_read = true;
             ASSERT(input.call.argument_count == 0);
             set_register_variable(state, input.call.result,
@@ -341,10 +375,29 @@ static success_indicator generate_instruction(c_backend_state *state,
 
         case register_meaning_assert:
             state->standard_library.using_assert = true;
+            state->standard_library.using_stdlib = true;
+            state->standard_library.using_stdbool = true;
             LPG_TRY(stream_writer_write_string(c_output, "assert_impl("));
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_read_access(
                 state, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success;
+
+        case register_meaning_string_equals:
+            standard_library_usage_use_string_ref(&state->standard_library);
+            set_register_variable(
+                state, input.call.result, register_resource_ownership_none);
+            LPG_TRY(stream_writer_write_string(c_output, "bool const "));
+            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(
+                stream_writer_write_string(c_output, " = string_ref_equals("));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ", "));
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -399,6 +452,11 @@ static success_indicator generate_instruction(c_backend_state *state,
                     state, input.read_struct.into, register_meaning_assert);
                 return success;
 
+            case 9:
+                set_register_meaning(state, input.read_struct.into,
+                                     register_meaning_string_equals);
+                return success;
+
             case 10:
                 set_register_meaning(
                     state, input.read_struct.into, register_meaning_read);
@@ -418,6 +476,9 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case register_meaning_assert:
+            LPG_TO_DO();
+
+        case register_meaning_string_equals:
             LPG_TO_DO();
 
         case register_meaning_literal:
@@ -490,7 +551,7 @@ success_indicator generate_c(checked_program const program,
         allocate_array(
             program.functions[0].number_of_registers, sizeof(*state.registers)),
         0,
-        {false, false, false, false, false}};
+        {false, false, false, false, false, false, false}};
     for (size_t i = 0; i < program.functions[0].number_of_registers; ++i)
     {
         state.registers[i].meaning = register_meaning_nothing;
@@ -510,10 +571,20 @@ success_indicator generate_c(checked_program const program,
         LPG_TRY_GOTO(
             stream_writer_write_string(c_output, LPG_C_STDLIB), fail_2);
     }
+    if (state.standard_library.using_stdbool)
+    {
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, LPG_C_STDBOOL), fail_2);
+    }
     if (state.standard_library.using_assert)
     {
         LPG_TRY_GOTO(
             stream_writer_write_string(c_output, LPG_C_ASSERT), fail_2);
+    }
+    if (state.standard_library.using_string)
+    {
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, LPG_C_STRING), fail_2);
     }
     if (state.standard_library.using_string_ref)
     {
