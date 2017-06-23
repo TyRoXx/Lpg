@@ -20,7 +20,6 @@ typedef enum register_meaning
     register_meaning_print,
     register_meaning_assert,
     register_meaning_read,
-    register_meaning_unit,
     register_meaning_literal
 } register_meaning;
 
@@ -128,9 +127,6 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_assert:
         LPG_TO_DO();
 
-    case register_meaning_unit:
-        LPG_TO_DO();
-
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -201,9 +197,6 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_assert:
         LPG_TO_DO();
 
-    case register_meaning_unit:
-        LPG_TO_DO();
-
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -248,9 +241,6 @@ static success_indicator generate_string_length(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_assert:
-        LPG_TO_DO();
-
-    case register_meaning_unit:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -358,9 +348,6 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
-        case register_meaning_unit:
-            LPG_TO_DO();
-
         case register_meaning_literal:
             LPG_TO_DO();
         }
@@ -430,9 +417,6 @@ static success_indicator generate_instruction(c_backend_state *state,
         case register_meaning_read:
             LPG_TO_DO();
 
-        case register_meaning_unit:
-            LPG_TO_DO();
-
         case register_meaning_assert:
             LPG_TO_DO();
 
@@ -448,36 +432,8 @@ static success_indicator generate_instruction(c_backend_state *state,
     case instruction_literal:
         ASSERT(state->registers[input.literal.into].meaning ==
                register_meaning_nothing);
-        switch (input.literal.value_.kind)
-        {
-        case value_kind_integer:
-            LPG_TO_DO();
-
-        case value_kind_string:
-            state->registers[input.literal.into] =
-                make_string_literal(input.literal.value_.string_ref);
-            return success;
-
-        case value_kind_function_pointer:
-            LPG_TO_DO();
-
-        case value_kind_flat_object:
-            LPG_TO_DO();
-
-        case value_kind_type:
-            LPG_TO_DO();
-
-        case value_kind_enum_element:
-            set_register_literal(
-                state, input.literal.into, input.literal.value_);
-            return success;
-
-        case value_kind_unit:
-            state->registers[input.literal.into].meaning =
-                register_meaning_unit;
-            return success;
-        }
-        UNREACHABLE();
+        set_register_literal(state, input.literal.into, input.literal.value_);
+        return success;
     }
     UNREACHABLE();
 }
