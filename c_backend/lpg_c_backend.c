@@ -31,6 +31,7 @@ typedef enum register_meaning
     register_meaning_assert,
     register_meaning_string_equals,
     register_meaning_read,
+    register_meaning_concat,
     register_meaning_literal
 } register_meaning;
 
@@ -153,6 +154,9 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_string_equals:
         LPG_TO_DO();
 
+    case register_meaning_concat:
+        LPG_TO_DO();
+
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -228,6 +232,9 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_string_equals:
         LPG_TO_DO();
 
+    case register_meaning_concat:
+        LPG_TO_DO();
+
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -275,6 +282,9 @@ static success_indicator generate_string_length(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_string_equals:
+        LPG_TO_DO();
+
+    case register_meaning_concat:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -393,6 +403,23 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
+        case register_meaning_concat:
+            standard_library_usage_use_string_ref(&state->standard_library);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_string_ref);
+            LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
+            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(
+                stream_writer_write_string(c_output, " = string_ref_concat("));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ", "));
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[1], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success;
+
         case register_meaning_literal:
             LPG_TO_DO();
         }
@@ -444,6 +471,11 @@ static success_indicator generate_instruction(c_backend_state *state,
                     state, input.read_struct.into, register_meaning_assert);
                 return success;
 
+            case 8:
+                set_register_meaning(
+                    state, input.read_struct.into, register_meaning_concat);
+                return success;
+
             case 9:
                 set_register_meaning(state, input.read_struct.into,
                                      register_meaning_string_equals);
@@ -471,6 +503,9 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case register_meaning_string_equals:
+            LPG_TO_DO();
+
+        case register_meaning_concat:
             LPG_TO_DO();
 
         case register_meaning_literal:

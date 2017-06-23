@@ -147,5 +147,19 @@ void test_c_backend(void)
                            "    return 0;\n"
                            "}\n");
 
+    check_generated_c_code(
+        "print(concat(\"a\", read()))\n", std_library.globals,
+        LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING LPG_C_STRING_REF LPG_C_STDIO
+            LPG_C_READ "int main(void)\n"
+                       "{\n"
+                       "    string_ref const r_7 = read_impl();\n"
+                       "    string_ref const r_8 = "
+                       "string_ref_concat(string_ref_create(\"a\", 1), r_7);\n"
+                       "    fwrite(r_8.data, 1, r_8.length, stdout);\n"
+                       "    string_ref_free(&r_7);\n"
+                       "    string_ref_free(&r_8);\n"
+                       "    return 0;\n"
+                       "}\n");
+
     standard_library_description_free(&std_library);
 }

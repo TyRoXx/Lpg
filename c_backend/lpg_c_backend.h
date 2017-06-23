@@ -34,6 +34,15 @@ success_indicator generate_c(checked_program const program,
     "        return false;\n"                                                  \
     "    }\n"                                                                  \
     "    return !memcmp(left.data, right.data, left.length);\n"                \
+    "}\n"                                                                      \
+    "static string_ref string_ref_concat(string_ref const left, string_ref "   \
+    "const right)\n"                                                           \
+    "{\n"                                                                      \
+    "    size_t const result_length = (left.length + right.length);\n"         \
+    "    string_ref const result = {malloc(result_length), result_length};\n"  \
+    "    memcpy(result.data, left.data, left.length);\n"                       \
+    "    memcpy(result.data + left.length, right.data, right.length);\n"       \
+    "    return result;\n"                                                     \
     "}\n"
 
 #define LPG_C_READ                                                             \
