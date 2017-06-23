@@ -40,8 +40,14 @@ success_indicator generate_c(checked_program const program,
     "{\n"                                                                      \
     "    size_t const result_length = (left.length + right.length);\n"         \
     "    string_ref const result = {malloc(result_length), result_length};\n"  \
-    "    memcpy(result.data, left.data, left.length);\n"                       \
-    "    memcpy(result.data + left.length, right.data, right.length);\n"       \
+    "    if (left.data)\n"                                                     \
+    "    {\n"                                                                  \
+    "        memcpy(result.data, left.data, left.length);\n"                   \
+    "    }\n"                                                                  \
+    "    if (right.data)\n"                                                    \
+    "    {\n"                                                                  \
+    "        memcpy(result.data + left.length, right.data, right.length);\n"   \
+    "    }\n"                                                                  \
     "    return result;\n"                                                     \
     "}\n"
 
