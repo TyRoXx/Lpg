@@ -45,8 +45,7 @@ void test_c_backend(void)
     standard_library_description const std_library =
         describe_standard_library();
 
-    check_generated_c_code("", std_library.globals, "#include <stdio.h>\n"
-                                                    "int main(void)\n"
+    check_generated_c_code("", std_library.globals, "int main(void)\n"
                                                     "{\n"
                                                     "    return 0;\n"
                                                     "}\n");
@@ -91,6 +90,16 @@ void test_c_backend(void)
                            "int main(void)\n"
                            "{\n"
                            "    fwrite(\"123456\", 1, 6, stdout);\n"
+                           "    return 0;\n"
+                           "}\n");
+
+    check_generated_c_code("print(read())\n", std_library.globals,
+                           LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
+                           "int main(void)\n"
+                           "{\n"
+                           "    string_ref const r_4 = read_impl();\n"
+                           "    fwrite(r_4.data, 1, r_4.length, stdout);\n"
+                           "    string_ref_free(&r_4);\n"
                            "    return 0;\n"
                            "}\n");
 

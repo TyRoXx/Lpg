@@ -14,3 +14,12 @@ typedef enum success_indicator
     case success:                                                              \
         break;                                                                 \
     }
+
+#define LPG_TRY_GOTO(expression, on_failure)                                   \
+    switch (expression)                                                        \
+    {                                                                          \
+    case failure:                                                              \
+        goto on_failure;                                                       \
+    case success:                                                              \
+        break;                                                                 \
+    }
