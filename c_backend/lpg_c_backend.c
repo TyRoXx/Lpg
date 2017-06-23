@@ -37,27 +37,36 @@ typedef struct register_state
 typedef struct c_backend_state
 {
     register_state *registers;
+    register_id registers_active;
     standard_library_usage standard_library;
 } c_backend_state;
 
 static void set_register_meaning(c_backend_state *const state,
-                                 size_t const register_id,
+                                 register_id const id,
                                  register_meaning const meaning)
 {
-    ASSERT(state->registers[register_id].meaning == register_meaning_nothing);
+    ASSERT(state->registers[id].meaning == register_meaning_nothing);
     ASSERT(meaning != register_meaning_nothing);
     ASSERT(meaning != register_meaning_string_literal);
     ASSERT(meaning != register_meaning_variable);
-    state->registers[register_id].meaning = meaning;
+    state->registers[id].meaning = meaning;
+    if (id >= state->registers_active)
+    {
+        state->registers_active = (id + 1);
+    }
 }
 
 static void set_register_variable(c_backend_state *const state,
-                                  size_t const register_id,
+                                  register_id const id,
                                   register_resource_ownership ownership)
 {
-    ASSERT(state->registers[register_id].meaning == register_meaning_nothing);
-    state->registers[register_id].meaning = register_meaning_variable;
-    state->registers[register_id].ownership = ownership;
+    ASSERT(state->registers[id].meaning == register_meaning_nothing);
+    state->registers[id].meaning = register_meaning_variable;
+    state->registers[id].ownership = ownership;
+    if (id >= state->registers_active)
+    {
+        state->registers_active = (id + 1);
+    }
 }
 
 static success_indicator encode_string_literal(unicode_view const content,
@@ -377,11 +386,30 @@ static success_indicator generate_sequence(c_backend_state *state,
                                            size_t const indentation,
                                            stream_writer const c_output)
 {
+    register_id const previously_active_registers = state->registers_active;
     for (size_t i = 0; i < sequence.length; ++i)
     {
         LPG_TRY(generate_instruction(
             state, sequence.elements[i], indentation, c_output));
     }
+    for (register_id i = previously_active_registers;
+         i < state->registers_active; ++i)
+    {
+        switch (state->registers[i].ownership)
+        {
+        case register_resource_ownership_none:
+            break;
+
+        case register_resource_ownership_string_ref:
+            ASSERT(state->standard_library.using_string_ref);
+            LPG_TRY(indent(indentation, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
+            LPG_TRY(generate_register_name(i, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            break;
+        }
+    }
+    state->registers_active = previously_active_registers;
     return success;
 }
 
@@ -404,6 +432,7 @@ success_indicator generate_c(checked_program const program,
     c_backend_state state = {
         allocate_array(
             program.functions[0].number_of_registers, sizeof(*state.registers)),
+        0,
         {false, false, false}};
     for (size_t i = 0; i < program.functions[0].number_of_registers; ++i)
     {
@@ -413,28 +442,6 @@ success_indicator generate_c(checked_program const program,
     LPG_TRY_GOTO(generate_sequence(&state, program.functions[0].body, 1,
                                    program_defined_writer),
                  fail_2);
-
-    for (register_id i = 0; i < program.functions[0].number_of_registers; ++i)
-    {
-        switch (state.registers[i].ownership)
-        {
-        case register_resource_ownership_none:
-            break;
-
-        case register_resource_ownership_string_ref:
-            ASSERT(state.standard_library.using_string_ref);
-            LPG_TRY_GOTO(stream_writer_write_string(
-                             program_defined_writer, "    string_ref_free(&"),
-                         fail_2);
-            LPG_TRY_GOTO(
-                generate_register_name(i, program_defined_writer), fail_2);
-            LPG_TRY_GOTO(
-                stream_writer_write_string(program_defined_writer, ");\n"),
-                fail_2);
-            break;
-        }
-    }
-
     LPG_TRY_GOTO(
         stream_writer_write_string(program_defined_writer, "    return 0;\n"),
         fail_2);

@@ -103,5 +103,20 @@ void test_c_backend(void)
                            "    return 0;\n"
                            "}\n");
 
+    check_generated_c_code("loop\n"
+                           "    print(read())\n",
+                           std_library.globals,
+                           LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ
+                           "int main(void)\n"
+                           "{\n"
+                           "    for (;;)\n"
+                           "    {\n"
+                           "        string_ref const r_4 = read_impl();\n"
+                           "        fwrite(r_4.data, 1, r_4.length, stdout);\n"
+                           "        string_ref_free(&r_4);\n"
+                           "    }\n"
+                           "    return 0;\n"
+                           "}\n");
+
     standard_library_description_free(&std_library);
 }
