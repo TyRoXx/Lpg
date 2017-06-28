@@ -3,6 +3,7 @@
 #include "lpg_try.h"
 #include "lpg_unicode_string.h"
 #include <stdbool.h>
+#include "lpg_unicode_view.h"
 
 typedef struct stream_writer
 {
@@ -27,3 +28,4 @@ success_indicator memory_writer_write(void *user, char const *data,
                                       size_t length);
 bool memory_writer_equals(memory_writer const writer, char const *c_str);
 stream_writer memory_writer_erase(memory_writer *writer);
+unicode_view memory_writer_content(memory_writer const writer);

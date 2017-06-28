@@ -1,5 +1,6 @@
 #include "lpg_unicode_view.h"
 #include <string.h>
+#include "lpg_assert.h"
 
 unicode_view unicode_view_create(char const *begin, size_t length)
 {
@@ -40,4 +41,12 @@ bool unicode_view_equals(unicode_view left, unicode_view right)
 unicode_string unicode_view_copy(unicode_view value)
 {
     return unicode_string_from_range(value.begin, value.length);
+}
+
+unicode_view unicode_view_cut(unicode_view const whole, size_t const begin,
+                              size_t const end)
+{
+    ASSUME(begin <= end);
+    ASSUME(end <= whole.length);
+    return unicode_view_create(whole.begin + begin, (end - begin));
 }

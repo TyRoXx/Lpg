@@ -57,3 +57,8 @@ stream_writer memory_writer_erase(memory_writer *writer)
     stream_writer result = {memory_writer_write, writer};
     return result;
 }
+
+unicode_view memory_writer_content(memory_writer const writer)
+{
+    return unicode_view_create(writer.data, writer.used);
+}

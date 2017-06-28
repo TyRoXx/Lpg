@@ -20,7 +20,7 @@ unicode_string_or_error read_file(char const *const name)
     FILE *source_file = NULL;
     fopen_s(&source_file, name, "rb");
 #else
-    FILE *const source_file = fopen(argv[1], "rb");
+    FILE *const source_file = fopen(name, "rb");
 #endif
     if (!source_file)
     {
