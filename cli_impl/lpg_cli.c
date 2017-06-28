@@ -12,6 +12,7 @@
 #include "lpg_interprete.h"
 #include "lpg_allocate.h"
 #include "lpg_structure_member.h"
+#include "lpg_read_file.h"
 
 typedef struct cli_parser_user
 {
@@ -264,64 +265,13 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
-#ifdef _WIN32
-    FILE *source_file = NULL;
-    fopen_s(&source_file, argv[1], "rb");
-#else
-    FILE *const source_file = fopen(argv[1], "rb");
-#endif
-    if (!source_file)
-    {
-        ASSERT(success == stream_writer_write_string(
-                              diagnostics, "Could not open source file\n"));
-        return true;
-    }
-
-    fseek(source_file, 0, SEEK_END);
-
-#ifdef _WIN32
-    long long const source_size = _ftelli64
-#else
-    off_t const source_size = ftello
-#endif
-        (source_file);
-    if (source_size < 0)
+    unicode_string_or_error const source_or_error = read_file(argv[1]);
+    if (source_or_error.error)
     {
         ASSERT(success ==
-               stream_writer_write_string(
-                   diagnostics, "Could not determine size of source file\n"));
-        fclose(source_file);
+               stream_writer_write_string(diagnostics, source_or_error.error));
         return true;
     }
-
-#if (SIZE_MAX < UINT64_MAX)
-    if (source_size > SIZE_MAX)
-    {
-        ASSERT(success ==
-               stream_writer_write_string(
-                   diagnostics, "Source file does not fit into memory\n"));
-        fclose(source_file);
-        return true;
-    }
-#endif
-
-    fseek(source_file, 0, SEEK_SET);
-    size_t const checked_source_size = (size_t)source_size;
-    unicode_string const source = {
-        allocate(checked_source_size), checked_source_size};
-    size_t const read_result =
-        fread(source.data, 1, source.length, source_file);
-    if (read_result != source.length)
-    {
-        ASSERT(success ==
-               stream_writer_write_string(
-                   diagnostics, "Could not read from source file\n"));
-        fclose(source_file);
-        unicode_string_free(&source);
-        return true;
-    }
-
-    fclose(source_file);
 
     structure_member *const globals = allocate_array(1, sizeof(*globals));
 
@@ -336,17 +286,17 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     value const globals_values[1] = {value_from_function_pointer(
         function_pointer_value_from_external(print, &print_destination))};
     optional_sequence const root =
-        parse(unicode_view_from_string(source), diagnostics);
+        parse(unicode_view_from_string(source_or_error.success), diagnostics);
     if (!root.has_value)
     {
         sequence_free(&root.value);
         function_pointer_free(&print_signature);
         structure_free(&global_object);
-        unicode_string_free(&source);
+        unicode_string_free(&source_or_error.success);
         return true;
     }
     semantic_error_context context = {
-        unicode_view_from_string(source), diagnostics, false};
+        unicode_view_from_string(source_or_error.success), diagnostics, false};
     checked_program checked =
         check(root.value, global_object, handle_semantic_error, &context);
     sequence_free(&root.value);
@@ -356,10 +306,6 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     garbage_collector_free(gc);
     checked_program_free(&checked);
     structure_free(&global_object);
-    unicode_string_free(&source);
-    if (context.has_error)
-    {
-        return true;
-    }
-    return false;
+    unicode_string_free(&source_or_error.success);
+    return context.has_error;
 }
