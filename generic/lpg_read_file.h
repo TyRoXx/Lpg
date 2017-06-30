@@ -1,14 +1,14 @@
 #pragma once
-#include "lpg_unicode_string.h"
+#include "lpg_blob.h"
 
-typedef struct unicode_string_or_error
+typedef struct blob_or_error
 {
     char const *error;
-    unicode_string success;
-} unicode_string_or_error;
+    blob success;
+} blob_or_error;
 
-unicode_string_or_error make_unicode_string_success(unicode_string success);
+blob_or_error make_blob_success(blob success);
 
-unicode_string_or_error make_unicode_string_error(char const *const error);
+blob_or_error make_blob_error(char const *const error);
 
-unicode_string_or_error read_file(char const *const name);
+blob_or_error read_file(char const *const name);

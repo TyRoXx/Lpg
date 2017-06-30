@@ -265,11 +265,22 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
-    unicode_string_or_error const source_or_error = read_file(argv[1]);
+    blob_or_error const source_or_error = read_file(argv[1]);
     if (source_or_error.error)
     {
         ASSERT(success ==
                stream_writer_write_string(diagnostics, source_or_error.error));
+        return true;
+    }
+
+    unicode_string const source =
+        unicode_string_validate(source_or_error.success);
+    if (source.length != source_or_error.success.length)
+    {
+        ASSERT(
+            success ==
+            stream_writer_write_string(
+                diagnostics, "Source code must in in ASCII (UTF-8 is TODO)\n"));
         return true;
     }
 
@@ -286,17 +297,17 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     value const globals_values[1] = {value_from_function_pointer(
         function_pointer_value_from_external(print, &print_destination))};
     optional_sequence const root =
-        parse(unicode_view_from_string(source_or_error.success), diagnostics);
+        parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)
     {
         sequence_free(&root.value);
         function_pointer_free(&print_signature);
         structure_free(&global_object);
-        unicode_string_free(&source_or_error.success);
+        unicode_string_free(&source);
         return true;
     }
     semantic_error_context context = {
-        unicode_view_from_string(source_or_error.success), diagnostics, false};
+        unicode_view_from_string(source), diagnostics, false};
     checked_program checked =
         check(root.value, global_object, handle_semantic_error, &context);
     sequence_free(&root.value);
@@ -306,6 +317,6 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     garbage_collector_free(gc);
     checked_program_free(&checked);
     structure_free(&global_object);
-    unicode_string_free(&source_or_error.success);
+    unicode_string_free(&source);
     return context.has_error;
 }

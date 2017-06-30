@@ -3,19 +3,19 @@
 #include "lpg_allocate.h"
 #include <stdint.h>
 
-unicode_string_or_error make_unicode_string_success(unicode_string success)
+blob_or_error make_blob_success(blob success)
 {
-    unicode_string_or_error result = {NULL, success};
+    blob_or_error result = {NULL, success};
     return result;
 }
 
-unicode_string_or_error make_unicode_string_error(char const *const error)
+blob_or_error make_blob_error(char const *const error)
 {
-    unicode_string_or_error result = {error, {NULL, 0}};
+    blob_or_error result = {error, {NULL, 0}};
     return result;
 }
 
-unicode_string_or_error read_file(char const *const name)
+blob_or_error read_file(char const *const name)
 {
 #ifdef _WIN32
     FILE *source_file = NULL;
@@ -25,7 +25,7 @@ unicode_string_or_error read_file(char const *const name)
 #endif
     if (!source_file)
     {
-        return make_unicode_string_error("Could not open source file\n");
+        return make_blob_error("Could not open source file\n");
     }
 
     fseek(source_file, 0, SEEK_END);
@@ -39,32 +39,29 @@ unicode_string_or_error read_file(char const *const name)
     if (source_size < 0)
     {
         fclose(source_file);
-        return make_unicode_string_error(
-            "Could not determine size of source file\n");
+        return make_blob_error("Could not determine size of source file\n");
     }
 
 #if (SIZE_MAX < UINT64_MAX)
     if (source_size > SIZE_MAX)
     {
         fclose(source_file);
-        return make_unicode_string_error(
-            "Source file does not fit into memory\n");
+        return make_blob_error("Source file does not fit into memory\n");
     }
 #endif
 
     fseek(source_file, 0, SEEK_SET);
     size_t const checked_source_size = (size_t)source_size;
-    unicode_string const source = {
-        allocate(checked_source_size), checked_source_size};
+    blob const source = {allocate(checked_source_size), checked_source_size};
     size_t const read_result =
         fread(source.data, 1, source.length, source_file);
     if (read_result != source.length)
     {
         fclose(source_file);
-        unicode_string_free(&source);
-        return make_unicode_string_error("Could not read from source file\n");
+        blob_free(&source);
+        return make_blob_error("Could not read from source file\n");
     }
 
     fclose(source_file);
-    return make_unicode_string_success(source);
+    return make_blob_success(source);
 }

@@ -95,12 +95,13 @@ static void check_generated_c_code(char const *const source,
         unicode_view_from_c_str(expected_c_file_name)};
     unicode_string const full_expected_file_path =
         path_combine(pieces, LPG_ARRAY_SIZE(pieces));
-    unicode_string_or_error expected_or_error =
-        read_file(full_expected_file_path.data);
-    fix_line_endings(&expected_or_error.success);
+    blob_or_error expected_or_error = read_file(full_expected_file_path.data);
     REQUIRE(!expected_or_error.error);
-    REQUIRE(generated.used ==
-            (strlen(expected_boilerplate) + expected_or_error.success.length));
+    unicode_string expected =
+        unicode_string_validate(expected_or_error.success);
+    REQUIRE(expected.length == expected_or_error.success.length);
+    fix_line_endings(&expected);
+    REQUIRE(generated.used == (strlen(expected_boilerplate) + expected.length));
     REQUIRE(
         unicode_view_equals(unicode_view_cut(memory_writer_content(generated),
                                              0, strlen(expected_boilerplate)),
@@ -108,11 +109,11 @@ static void check_generated_c_code(char const *const source,
     REQUIRE(unicode_view_equals(
         unicode_view_cut(memory_writer_content(generated),
                          strlen(expected_boilerplate), generated.used),
-        unicode_view_from_string(expected_or_error.success)));
+        unicode_view_from_string(expected)));
     unicode_string_free(&full_expected_file_path);
     checked_program_free(&checked);
     memory_writer_free(&generated);
-    unicode_string_free(&expected_or_error.success);
+    unicode_string_free(&expected);
 }
 
 void test_c_backend(void)

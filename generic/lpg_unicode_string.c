@@ -39,3 +39,16 @@ char *unicode_string_c_str(unicode_string *value)
     value->data[value->length] = '\0';
     return value->data;
 }
+
+unicode_string unicode_string_validate(blob const raw)
+{
+    unicode_string result = {raw.data, 0};
+    for (; result.length < raw.length; ++result.length)
+    {
+        if ((unsigned char)(raw.data[result.length]) >= 127)
+        {
+            break;
+        }
+    }
+    return result;
+}
