@@ -1,9 +1,6 @@
 #pragma once
-#include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
-
-typedef uint32_t unicode_code_point;
 
 typedef struct unicode_string
 {

@@ -1,6 +1,7 @@
 #include "lpg_read_file.h"
 #include <stdio.h>
 #include "lpg_allocate.h"
+#include <stdint.h>
 
 unicode_string_or_error make_unicode_string_success(unicode_string success)
 {
