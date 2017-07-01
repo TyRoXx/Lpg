@@ -649,5 +649,20 @@ void test_semantics(void)
             "let v = 1\n", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
+    {
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 2;
+        instruction const expected_body_elements[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3))};
+        check_single_wellformed_function(
+            "assert(string-equals(\"\", \"\"))", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
     standard_library_description_free(&std_library);
 }
