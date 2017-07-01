@@ -295,6 +295,71 @@ static expression_parser_result parse_match(expression_parser *parser,
     return expression_parser_result_failure;
 }
 
+static expression_parser_result parse_lambda(expression_parser *const parser,
+                                             size_t const indentation)
+{
+    for (;;)
+    {
+        rich_token const head = peek(parser);
+        if (head.token == token_right_parenthesis)
+        {
+            pop(parser);
+            rich_token const whitespace = peek(parser);
+            if (whitespace.token == token_space)
+            {
+                pop(parser);
+                expression_parser_result const body =
+                    parse_expression(parser, indentation, false);
+                if (!body.is_success)
+                {
+                    return expression_parser_result_failure;
+                }
+                expression_parser_result const result = {
+                    1, expression_from_lambda(lambda_create(
+                           NULL, 0, expression_allocate(body.success)))};
+                return result;
+            }
+            else if (whitespace.token == token_newline)
+            {
+                LPG_TO_DO();
+            }
+            else
+            {
+                pop(parser);
+                parser->on_error(
+                    parse_error_create(
+                        parse_error_expected_lambda_body, whitespace.where),
+                    parser->user);
+                return expression_parser_result_failure;
+            }
+        }
+        else if (head.token == token_comma)
+        {
+            pop(parser);
+            rich_token const space = peek(parser);
+            if (space.token == token_space)
+            {
+                pop(parser);
+            }
+            else
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, space.where),
+                    parser->user);
+            }
+            LPG_TO_DO();
+        }
+        else
+        {
+            pop(parser);
+            parser->on_error(
+                parse_error_create(parse_error_expected_comma, head.where),
+                parser->user);
+            return expression_parser_result_failure;
+        }
+    }
+}
+
 static expression_parser_result parse_callable(expression_parser *parser,
                                                size_t indentation)
 {
@@ -336,10 +401,13 @@ static expression_parser_result parse_callable(expression_parser *parser,
             pop(parser);
             return parse_match(parser, indentation);
 
+        case token_left_parenthesis:
+            pop(parser);
+            return parse_lambda(parser, indentation);
+
         case token_newline:
         case token_space:
         case token_indentation:
-        case token_left_parenthesis:
         case token_right_parenthesis:
         case token_colon:
         case token_comma:

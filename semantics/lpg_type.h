@@ -42,6 +42,7 @@ typedef struct integer_range
 } integer_range;
 
 integer_range integer_range_create(integer minimum, integer maximum);
+bool integer_range_equals(integer_range const left, integer_range const right);
 
 typedef enum type_kind
 {
@@ -79,6 +80,9 @@ struct function_pointer
     size_t arity;
 };
 
+bool function_pointer_equals(function_pointer const left,
+                             function_pointer const right);
+
 type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
@@ -88,6 +92,7 @@ type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
 type *type_allocate(type const value);
+bool type_equals(type const left, type const right);
 
 function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity);

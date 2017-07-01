@@ -122,6 +122,10 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected element name";
     case parse_error_expected_identifier:
         return "Expected identifier";
+    case parse_error_expected_comma:
+        return "Expected comma";
+    case parse_error_expected_lambda_body:
+        return "Expected lambda body";
     }
     UNREACHABLE();
 }

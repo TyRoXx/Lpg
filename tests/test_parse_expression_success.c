@@ -293,4 +293,20 @@ void test_parse_expression_success(void)
                                       "    case 3: 4\n"),
             false);
     }
+    test_successful_parse(
+        expression_from_lambda(lambda_create(
+            NULL, 0,
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(
+                    integer_create(0, 1), source_location_create(0, 3)))))),
+        unicode_string_from_c_str("() 1"), false);
+    test_successful_parse(
+        expression_from_lambda(lambda_create(
+            NULL, 0,
+            expression_allocate(expression_from_lambda(lambda_create(
+                NULL, 0, expression_allocate(expression_from_integer_literal(
+                             integer_literal_expression_create(
+                                 integer_create(0, 1),
+                                 source_location_create(0, 6))))))))),
+        unicode_string_from_c_str("() () 1"), false);
 }

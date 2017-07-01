@@ -16,6 +16,7 @@ typedef struct parameter
 
 parameter parameter_create(expression *name, expression *type);
 void parameter_free(parameter *value);
+bool parameter_equals(parameter const left, parameter const right);
 
 typedef struct lambda
 {
@@ -27,6 +28,7 @@ typedef struct lambda
 lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result);
 void lambda_free(lambda const *this);
+bool lambda_equals(lambda const left, lambda const right);
 
 typedef enum expression_type
 {

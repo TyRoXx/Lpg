@@ -4,9 +4,10 @@
 #include "lpg_allocate.h"
 #include "lpg_instruction.h"
 
-static value call_interpreted_function(checked_function const callee,
-                                       value const *globals,
-                                       garbage_collector *const gc);
+static value
+call_interpreted_function(checked_function const callee, value const *globals,
+                          garbage_collector *const gc,
+                          checked_function const *const all_functions);
 
 typedef enum run_sequence_result
 {
@@ -16,20 +17,22 @@ typedef enum run_sequence_result
 
 value call_function(value const callee, value const *const inferred,
                     value *const arguments, value const *globals,
-                    garbage_collector *const gc)
+                    garbage_collector *const gc,
+                    checked_function const *const all_functions)
 {
     if (callee.function_pointer.code)
     {
         return call_interpreted_function(
-            *callee.function_pointer.code, globals, gc);
+            *callee.function_pointer.code, globals, gc, all_functions);
     }
     return callee.function_pointer.external(
         inferred, arguments, gc, callee.function_pointer.external_environment);
 }
 
-static run_sequence_result run_sequence(instruction_sequence const sequence,
-                                        value const *globals, value *registers,
-                                        garbage_collector *const gc)
+static run_sequence_result
+run_sequence(instruction_sequence const sequence, value const *globals,
+             value *registers, garbage_collector *const gc,
+             checked_function const *const all_functions)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
@@ -45,8 +48,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             {
                 arguments[j] = registers[element.call.arguments[j]];
             }
-            value const result =
-                call_function(callee, NULL, arguments, globals, gc);
+            value const result = call_function(
+                callee, NULL, arguments, globals, gc, all_functions);
             deallocate(arguments);
             registers[element.call.result] = result;
             break;
@@ -57,7 +60,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
             bool is_running = true;
             while (is_running)
             {
-                switch (run_sequence(element.loop, globals, registers, gc))
+                switch (run_sequence(
+                    element.loop, globals, registers, gc, all_functions))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -89,26 +93,34 @@ static run_sequence_result run_sequence(instruction_sequence const sequence,
         case instruction_literal:
             registers[element.literal.into] = element.literal.value_;
             break;
+
+        case instruction_lambda:
+            registers[element.lambda.into] = value_from_function_pointer(
+                function_pointer_value_from_internal(all_functions +
+                                                     element.lambda.id));
+            break;
         }
     }
     return run_sequence_result_continue;
 }
 
-static value call_interpreted_function(checked_function const callee,
-                                       value const *globals,
-                                       garbage_collector *const gc)
+static value
+call_interpreted_function(checked_function const callee, value const *globals,
+                          garbage_collector *const gc,
+                          checked_function const *const all_functions)
 {
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
     ASSERT(run_sequence_result_continue ==
-           run_sequence(callee.body, globals, registers, gc));
+           run_sequence(callee.body, globals, registers, gc, all_functions));
+    value const return_value = registers[callee.return_value];
     deallocate(registers);
-    return value_from_unit();
+    return return_value;
 }
 
 void interprete(checked_program const program, value const *globals,
                 garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
-    call_interpreted_function(entry_point, globals, gc);
+    call_interpreted_function(entry_point, globals, gc, program.functions);
 }

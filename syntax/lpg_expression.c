@@ -23,6 +23,12 @@ void parameter_free(parameter *value)
     expression_deallocate(value->type);
 }
 
+bool parameter_equals(parameter const left, parameter const right)
+{
+    return expression_equals(left.name, right.name) &&
+           expression_equals(left.type, right.type);
+}
+
 lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result)
 {
@@ -41,6 +47,22 @@ void lambda_free(lambda const *this)
         deallocate(this->parameters);
     }
     expression_deallocate(this->result);
+}
+
+bool lambda_equals(lambda const left, lambda const right)
+{
+    if (left.parameter_count != right.parameter_count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.parameter_count; ++i)
+    {
+        if (!parameter_equals(left.parameters[i], right.parameters[i]))
+        {
+            return false;
+        }
+    }
+    return expression_equals(left.result, right.result);
 }
 
 call call_create(expression *callee, tuple arguments,
@@ -500,7 +522,7 @@ bool expression_equals(expression const *left, expression const *right)
     switch (left->type)
     {
     case expression_type_lambda:
-        LPG_TO_DO();
+        return lambda_equals(left->lambda, right->lambda);
 
     case expression_type_call:
         if (!expression_equals(left->call.callee, right->call.callee))

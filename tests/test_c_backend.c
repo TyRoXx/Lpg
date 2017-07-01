@@ -101,7 +101,11 @@ static void check_generated_c_code(char const *const source,
         unicode_string_validate(expected_or_error.success);
     REQUIRE(expected.length == expected_or_error.success.length);
     fix_line_endings(&expected);
-    REQUIRE(generated.used == (strlen(expected_boilerplate) + expected.length));
+    {
+        size_t const expected_total_length =
+            (strlen(expected_boilerplate) + expected.length);
+        REQUIRE(generated.used == expected_total_length);
+    }
     REQUIRE(
         unicode_view_equals(unicode_view_cut(memory_writer_content(generated),
                                              0, strlen(expected_boilerplate)),

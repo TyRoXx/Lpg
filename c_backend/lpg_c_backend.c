@@ -51,9 +51,23 @@ typedef struct register_state
 typedef struct c_backend_state
 {
     register_state *registers;
-    register_id registers_active;
     standard_library_usage standard_library;
+    register_id *active_registers;
+    size_t active_register_count;
 } c_backend_state;
+
+static void active_register(c_backend_state *const state, register_id const id)
+{
+    for (size_t i = 0; i < state->active_register_count; ++i)
+    {
+        ASSERT(state->active_registers[i] != id);
+    }
+    state->active_registers = reallocate_array(
+        state->active_registers, (state->active_register_count + 1),
+        sizeof(*state->active_registers));
+    state->active_registers[state->active_register_count] = id;
+    ++(state->active_register_count);
+}
 
 static void set_register_meaning(c_backend_state *const state,
                                  register_id const id,
@@ -64,10 +78,7 @@ static void set_register_meaning(c_backend_state *const state,
     ASSERT(meaning != register_meaning_variable);
     ASSERT(meaning != register_meaning_literal);
     state->registers[id].meaning = meaning;
-    if (id >= state->registers_active)
-    {
-        state->registers_active = (id + 1);
-    }
+    active_register(state, id);
 }
 
 static void set_register_variable(c_backend_state *const state,
@@ -77,10 +88,7 @@ static void set_register_variable(c_backend_state *const state,
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
-    if (id >= state->registers_active)
-    {
-        state->registers_active = (id + 1);
-    }
+    active_register(state, id);
 }
 
 static void set_register_literal(c_backend_state *const state,
@@ -89,10 +97,7 @@ static void set_register_literal(c_backend_state *const state,
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_literal;
     state->registers[id].literal = literal;
-    if (id >= state->registers_active)
-    {
-        state->registers_active = (id + 1);
-    }
+    active_register(state, id);
 }
 
 static success_indicator encode_string_literal(unicode_view const content,
@@ -522,6 +527,9 @@ static success_indicator generate_instruction(c_backend_state *state,
                register_meaning_nothing);
         set_register_literal(state, input.literal.into, input.literal.value_);
         return success;
+
+    case instruction_lambda:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -531,16 +539,17 @@ static success_indicator generate_sequence(c_backend_state *state,
                                            size_t const indentation,
                                            stream_writer const c_output)
 {
-    register_id const previously_active_registers = state->registers_active;
+    size_t const previously_active_registers = state->active_register_count;
     for (size_t i = 0; i < sequence.length; ++i)
     {
         LPG_TRY(generate_instruction(
             state, sequence.elements[i], indentation, c_output));
     }
-    for (register_id i = previously_active_registers;
-         i < state->registers_active; ++i)
+    for (size_t i = previously_active_registers;
+         i < state->active_register_count; ++i)
     {
-        switch (state->registers[i].ownership)
+        register_id const which = state->active_registers[i];
+        switch (state->registers[which].ownership)
         {
         case register_resource_ownership_none:
             break;
@@ -549,12 +558,12 @@ static success_indicator generate_sequence(c_backend_state *state,
             ASSERT(state->standard_library.using_string_ref);
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
-            LPG_TRY(generate_register_name(i, c_output));
+            LPG_TRY(generate_register_name(which, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             break;
         }
     }
-    state->registers_active = previously_active_registers;
+    state->active_register_count = previously_active_registers;
     return success;
 }
 
@@ -577,8 +586,9 @@ success_indicator generate_c(checked_program const program,
     c_backend_state state = {
         allocate_array(
             program.functions[0].number_of_registers, sizeof(*state.registers)),
-        0,
-        {false, false, false, false, false, false, false}};
+        {false, false, false, false, false, false, false},
+        NULL,
+        0};
     for (size_t i = 0; i < program.functions[0].number_of_registers; ++i)
     {
         state.registers[i].meaning = register_meaning_nothing;
@@ -632,6 +642,10 @@ success_indicator generate_c(checked_program const program,
                  fail_2);
     memory_writer_free(&program_defined);
     deallocate(state.registers);
+    if (state.active_registers)
+    {
+        deallocate(state.active_registers);
+    }
     return success;
 
 fail_2:

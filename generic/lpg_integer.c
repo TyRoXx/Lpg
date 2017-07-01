@@ -92,7 +92,15 @@ bool integer_less(integer left, integer right)
 
 integer integer_subtract(integer minuend, integer subtrahend)
 {
-    integer result = {0, 0};
+    integer result
+#ifndef _MSC_VER
+        =
+    {
+        0,
+        0
+    }
+#endif
+    ;
     result.low = (minuend.low - subtrahend.low);
     if (result.low > minuend.low)
     {

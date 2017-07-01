@@ -20,6 +20,8 @@ typedef struct function_pointer_value
 function_pointer_value
 function_pointer_value_from_external(external_function *external,
                                      void *environment);
+function_pointer_value
+function_pointer_value_from_internal(checked_function const *code);
 
 typedef enum value_kind
 {

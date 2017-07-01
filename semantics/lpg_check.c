@@ -101,16 +101,16 @@ typedef struct function_checking_state
     check_error_handler *on_error;
     local_variable_container local_variables;
     void *user;
-    garbage_collector *gc;
+    checked_program *program;
 } function_checking_state;
 
 static function_checking_state
 function_checking_state_create(structure const *global,
                                check_error_handler *on_error, void *user,
-                               garbage_collector *const gc)
+                               checked_program *const program)
 {
     function_checking_state result = {
-        0, false, global, on_error, {NULL, 0}, user, gc};
+        0, false, global, on_error, {NULL, 0}, user, program};
     return result;
 }
 
@@ -591,6 +591,111 @@ static void set_compile_time_constant(instruction_sequence *const function,
                                   literal_instruction_create(into, value_)));
 }
 
+typedef struct optional_checked_function
+{
+    bool is_set;
+    checked_function value;
+} optional_checked_function;
+
+static optional_checked_function
+optional_checked_function_create(checked_function const value)
+{
+    optional_checked_function result = {true, value};
+    return result;
+}
+
+static optional_checked_function const optional_checked_function_empty = {
+    false, {0, NULL, {NULL, 0}, 0}};
+
+static optional_checked_function check_function(expression const body_in,
+                                                structure const global,
+                                                check_error_handler *on_error,
+                                                void *user,
+                                                checked_program *const program)
+{
+    function_checking_state state =
+        function_checking_state_create(&global, on_error, user, program);
+    instruction_sequence body_out = instruction_sequence_create(NULL, 0);
+    evaluate_expression_result const body_evaluated =
+        evaluate_expression(&state, &body_out, body_in);
+    register_id return_value;
+    if (body_evaluated.has_value)
+    {
+        return_value = body_evaluated.where;
+    }
+    else if (body_evaluated.compile_time_value.is_set)
+    {
+        return_value = allocate_register(&state);
+        add_instruction(
+            &body_out,
+            instruction_create_literal(literal_instruction_create(
+                return_value, body_evaluated.compile_time_value.value_)));
+    }
+    else
+    {
+        return optional_checked_function_empty;
+    }
+    if (state.local_variables.elements)
+    {
+        deallocate(state.local_variables.elements);
+    }
+    function_pointer *const signature = allocate(sizeof(*signature));
+    signature->result = body_evaluated.type_;
+    signature->arity = 0;
+    signature->arguments = NULL;
+    checked_function const result = {
+        return_value, signature, body_out, state.used_registers};
+    return optional_checked_function_create(result);
+}
+
+static evaluate_expression_result make_compile_time_unit(void)
+{
+    evaluate_expression_result const result = {
+        false, 0, type_from_unit(), optional_value_create(value_from_unit())};
+    return result;
+}
+
+static evaluate_expression_result
+evaluate_lambda(function_checking_state *state, instruction_sequence *function,
+                lambda const evaluated)
+{
+    if (evaluated.parameter_count > 0)
+    {
+        LPG_TO_DO();
+    }
+    function_id const this_lambda_id = state->program->function_count;
+    ++(state->program->function_count);
+    state->program->functions = reallocate_array(
+        state->program->functions, state->program->function_count,
+        sizeof(*state->program->functions));
+    {
+        function_pointer *const dummy_signature =
+            allocate(sizeof(*dummy_signature));
+        dummy_signature->result = type_from_unit();
+        dummy_signature->arguments = NULL;
+        dummy_signature->arity = 0;
+        state->program->functions[this_lambda_id] = checked_function_create(
+            0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
+    }
+    optional_checked_function const checked =
+        check_function(*evaluated.result, *state->global, state->on_error,
+                       state->user, state->program);
+    if (!checked.is_set)
+    {
+        return evaluate_expression_result_empty;
+    }
+    checked_function_free(&state->program->functions[this_lambda_id]);
+    state->program->functions[this_lambda_id] = checked.value;
+    register_id const destination = allocate_register(state);
+    add_instruction(
+        function, instruction_create_lambda(
+                      lambda_instruction_create(destination, this_lambda_id)));
+    return evaluate_expression_result_create(
+        destination, type_from_function_pointer(
+                         state->program->functions[this_lambda_id].signature),
+        optional_value_empty);
+}
+
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
@@ -598,7 +703,7 @@ evaluate_expression(function_checking_state *state,
     switch (element.type)
     {
     case expression_type_lambda:
-        LPG_TO_DO();
+        return evaluate_lambda(state, function, element.lambda);
 
     case expression_type_call:
     {
@@ -608,7 +713,7 @@ evaluate_expression(function_checking_state *state,
             evaluate_expression(state, function, *element.call.callee);
         if (!callee.has_value)
         {
-            return evaluate_expression_result_empty;
+            return make_compile_time_unit();
         }
         size_t const expected_arguments =
             expected_call_argument_count(callee.type_);
@@ -700,7 +805,8 @@ evaluate_expression(function_checking_state *state,
             value *const globals = /*TODO*/ NULL;
             compile_time_result.value_ = call_function(
                 callee.compile_time_value.value_, complete_inferred_values,
-                compile_time_arguments, globals, state->gc);
+                compile_time_arguments, globals, &state->program->memory,
+                state->program->functions);
             compile_time_result.is_set = true;
             deallocate(complete_inferred_values);
             deallocate(arguments);
@@ -711,7 +817,7 @@ evaluate_expression(function_checking_state *state,
                 size_t const length =
                     compile_time_result.value_.string_ref.length;
                 char *const copy =
-                    garbage_collector_allocate(state->gc, length);
+                    garbage_collector_allocate(&state->program->memory, length);
                 memcpy(
                     copy, compile_time_result.value_.string_ref.begin, length);
                 add_instruction(
@@ -786,7 +892,8 @@ evaluate_expression(function_checking_state *state,
         stream_writer decoded_writer = memory_writer_erase(&decoded);
         decode_string_literal(
             unicode_view_from_string(element.string.value), decoded_writer);
-        char *const copy = garbage_collector_allocate(state->gc, decoded.used);
+        char *const copy =
+            garbage_collector_allocate(&state->program->memory, decoded.used);
         memcpy(copy, decoded.data, decoded.used);
         unicode_view const literal = unicode_view_create(copy, decoded.used);
         memory_writer_free(&decoded);
@@ -817,12 +924,13 @@ evaluate_expression(function_checking_state *state,
         instruction_sequence body = {NULL, 0};
         bool const previous_is_in_loop = state->is_in_loop;
         state->is_in_loop = true;
-        evaluate_expression_result const result =
-            check_sequence(state, &body, element.loop_body);
+        /*ignoring body result*/
+        check_sequence(state, &body, element.loop_body);
         ASSUME(state->is_in_loop);
         state->is_in_loop = previous_is_in_loop;
         add_instruction(function, instruction_create_loop(body));
-        return result;
+        evaluate_expression_result const loop_result = make_compile_time_unit();
+        return loop_result;
     }
 
     case expression_type_break:
@@ -840,7 +948,7 @@ evaluate_expression(function_checking_state *state,
         return evaluate_expression_result_empty;
 
     case expression_type_sequence:
-        LPG_TO_DO();
+        return check_sequence(state, function, element.sequence);
 
     case expression_type_declare:
     {
@@ -888,7 +996,7 @@ evaluate_expression(function_checking_state *state,
                                         expression_source_begin(
                                             *element.declare.initializer)),
                                     state->user);
-                    return evaluate_expression_result_empty;
+                    return make_compile_time_unit();
                 }
             }
         }
@@ -912,7 +1020,10 @@ evaluate_expression(function_checking_state *state,
                     initializer.type_, initializer.compile_time_value,
                     initializer.where));
         }
-        return evaluate_expression_result_empty;
+        evaluate_expression_result const result = {
+            false, 0, type_from_unit(),
+            optional_value_create(value_from_unit())};
+        return result;
     }
 
     case expression_type_tuple:
@@ -929,8 +1040,8 @@ check_sequence(function_checking_state *const state,
     {
         return make_unit(state, output);
     }
-    size_t const previous_number_of_variables = state->local_variables.count;
     evaluate_expression_result final_result = evaluate_expression_result_empty;
+    size_t const previous_number_of_variables = state->local_variables.count;
     LPG_FOR(size_t, i, input.length)
     {
         final_result = evaluate_expression(state, output, input.elements[i]);
@@ -964,14 +1075,21 @@ checked_program check(sequence const root, structure const global,
 {
     checked_program program = {
         {NULL}, allocate_array(1, sizeof(struct checked_function)), 1};
-    program.functions[0].body = instruction_sequence_create(NULL, 0);
-    function_checking_state state = function_checking_state_create(
-        &global, on_error, user, &program.memory);
-    check_sequence(&state, &program.functions[0].body, root);
-    program.functions[0].number_of_registers = state.used_registers;
-    if (state.local_variables.elements)
+    optional_checked_function const checked = check_function(
+        expression_from_sequence(root), global, on_error, user, &program);
+    if (checked.is_set)
     {
-        deallocate(state.local_variables.elements);
+        program.functions[0] = checked.value;
+    }
+    else
+    {
+        function_pointer *const dummy_signature =
+            allocate(sizeof(*dummy_signature));
+        dummy_signature->result = type_from_unit();
+        dummy_signature->arguments = NULL;
+        dummy_signature->arity = 0;
+        program.functions[0] = checked_function_create(
+            0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }
     return program;
 }

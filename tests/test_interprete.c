@@ -165,6 +165,9 @@ void test_interprete(void)
         "assert(string-equals(read(), \"\"))\n", "", "", std_library.globals);
     expect_output("assert(string-equals(read(), \"aaa\"))\n", "aaa", "",
                   std_library.globals);
+    expect_output("let f = () boolean.true\n"
+                  "assert(f())\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }

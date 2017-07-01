@@ -9,6 +9,13 @@ function_pointer_value_from_external(external_function *external,
     return result;
 }
 
+function_pointer_value
+function_pointer_value_from_internal(checked_function const *code)
+{
+    function_pointer_value result = {code, NULL, NULL};
+    return result;
+}
+
 value value_from_flat_object(value const *flat_object)
 {
     value result;
