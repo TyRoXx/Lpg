@@ -155,6 +155,8 @@ void test_interprete(void)
                   std_library.globals);
     expect_output("assert(string-equals(concat(\"aa\", \"a\"), \"aaa\"))\n", "",
                   "", std_library.globals);
+    expect_output("assert(string-equals(concat(\"aa\", read()), \"aaa\"))\n",
+                  "a", "", std_library.globals);
     expect_output("assert(not(string-equals(\"a\", \"\")))\n", "", "",
                   std_library.globals);
     expect_output("assert(not(string-equals(\"a\", \"b\")))\n", "", "",
