@@ -3,6 +3,7 @@
 #include "lpg_integer.h"
 #include "lpg_type.h"
 #include "lpg_garbage_collector.h"
+#include "lpg_function_id.h"
 
 typedef struct enumeration enumeration;
 
@@ -12,7 +13,7 @@ typedef struct value external_function(struct value const *,
 
 typedef struct function_pointer_value
 {
-    checked_function const *code;
+    function_id code;
     external_function *external;
     void *external_environment;
 } function_pointer_value;
@@ -21,7 +22,7 @@ function_pointer_value
 function_pointer_value_from_external(external_function *external,
                                      void *environment);
 function_pointer_value
-function_pointer_value_from_internal(checked_function const *code);
+function_pointer_value_from_internal(function_id const code);
 
 typedef enum value_kind
 {

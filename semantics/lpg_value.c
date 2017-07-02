@@ -5,12 +5,12 @@ function_pointer_value
 function_pointer_value_from_external(external_function *external,
                                      void *environment)
 {
-    function_pointer_value result = {NULL, external, environment};
+    function_pointer_value result = {0, external, environment};
     return result;
 }
 
 function_pointer_value
-function_pointer_value_from_internal(checked_function const *code)
+function_pointer_value_from_internal(function_id const code)
 {
     function_pointer_value result = {code, NULL, NULL};
     return result;

@@ -20,10 +20,14 @@ value call_function(value const callee, value const *const inferred,
                     garbage_collector *const gc,
                     checked_function const *const all_functions)
 {
+    ASSUME(globals);
+    ASSUME(gc);
+    ASSUME(all_functions);
     if (callee.function_pointer.code)
     {
         return call_interpreted_function(
-            *callee.function_pointer.code, globals, gc, all_functions);
+            all_functions[callee.function_pointer.code], globals, gc,
+            all_functions);
     }
     return callee.function_pointer.external(
         inferred, arguments, gc, callee.function_pointer.external_environment);
@@ -96,8 +100,7 @@ run_sequence(instruction_sequence const sequence, value const *globals,
 
         case instruction_lambda:
             registers[element.lambda.into] = value_from_function_pointer(
-                function_pointer_value_from_internal(all_functions +
-                                                     element.lambda.id));
+                function_pointer_value_from_internal(element.lambda.id));
             break;
         }
     }
@@ -109,6 +112,9 @@ call_interpreted_function(checked_function const callee, value const *globals,
                           garbage_collector *const gc,
                           checked_function const *const all_functions)
 {
+    ASSUME(globals);
+    ASSUME(gc);
+    ASSUME(all_functions);
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
     ASSERT(run_sequence_result_continue ==

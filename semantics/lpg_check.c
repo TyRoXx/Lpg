@@ -694,7 +694,8 @@ evaluate_lambda(function_checking_state *state, instruction_sequence *function,
     return evaluate_expression_result_create(
         destination, type_from_function_pointer(
                          state->program->functions[this_lambda_id].signature),
-        optional_value_empty);
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_internal(this_lambda_id))));
 }
 
 static evaluate_expression_result
@@ -803,11 +804,30 @@ evaluate_expression(function_checking_state *state,
                 }
                 complete_inferred_values[i] = inferring.values[i].value_;
             }
-            value *const globals = /*TODO*/ NULL;
-            compile_time_result.value_ = call_function(
-                callee.compile_time_value.value_, complete_inferred_values,
-                compile_time_arguments, globals, &state->program->memory,
-                state->program->functions);
+            {
+                size_t const globals_count = state->global->count;
+                value *const globals =
+                    allocate_array(globals_count, sizeof(*globals));
+                for (size_t i = 0; i < globals_count; ++i)
+                {
+                    optional_value const compile_time_global =
+                        state->global->members[i].compile_time_value;
+                    if (compile_time_global.is_set)
+                    {
+                        globals[i] = compile_time_global.value_;
+                    }
+                    else
+                    {
+                        /*TODO: solve properly*/
+                        globals[i] = value_from_unit();
+                    }
+                }
+                compile_time_result.value_ = call_function(
+                    callee.compile_time_value.value_, complete_inferred_values,
+                    compile_time_arguments, globals, &state->program->memory,
+                    state->program->functions);
+                deallocate(globals);
+            }
             compile_time_result.is_set = true;
             deallocate(complete_inferred_values);
             deallocate(arguments);
