@@ -316,9 +316,12 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     checked_program checked = check(
         root.value, standard_library.globals, handle_semantic_error, &context);
     sequence_free(&root.value);
-    garbage_collector gc = {NULL};
-    interprete(checked, globals_values, &gc);
-    garbage_collector_free(gc);
+    if (!context.has_error)
+    {
+        garbage_collector gc = {NULL};
+        interprete(checked, globals_values, &gc);
+        garbage_collector_free(gc);
+    }
     checked_program_free(&checked);
     standard_library_description_free(&standard_library);
     unicode_string_free(&source);

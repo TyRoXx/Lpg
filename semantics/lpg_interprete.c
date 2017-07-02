@@ -112,6 +112,9 @@ call_interpreted_function(checked_function const callee, value const *globals,
                           garbage_collector *const gc,
                           checked_function const *const all_functions)
 {
+    /*there has to be at least one register for the return value, even if it is
+     * unit*/
+    ASSUME(callee.number_of_registers >= 1);
     ASSUME(globals);
     ASSUME(gc);
     ASSUME(all_functions);
@@ -119,6 +122,7 @@ call_interpreted_function(checked_function const callee, value const *globals,
         allocate_array(callee.number_of_registers, sizeof(*registers));
     ASSERT(run_sequence_result_continue ==
            run_sequence(callee.body, globals, registers, gc, all_functions));
+    ASSUME(callee.return_value < callee.number_of_registers);
     value const return_value = registers[callee.return_value];
     deallocate(registers);
     return return_value;
