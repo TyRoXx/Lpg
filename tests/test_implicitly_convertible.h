@@ -1,3 +1,3 @@
 #pragma once
 
-void test_implicitly_convertible();
+void test_implicitly_convertible(void);
