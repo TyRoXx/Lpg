@@ -633,6 +633,7 @@ static optional_checked_function check_function(expression const body_in,
     }
     else
     {
+        instruction_sequence_free(&body_out);
         return optional_checked_function_empty;
     }
     if (state.local_variables.elements)
