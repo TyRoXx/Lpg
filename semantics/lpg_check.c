@@ -878,7 +878,10 @@ evaluate_expression(function_checking_state *state,
             unicode_view_from_string(element.string.value), decoded_writer);
         char *const copy =
             garbage_collector_allocate(&state->program->memory, decoded.used);
-        memcpy(copy, decoded.data, decoded.used);
+        if (decoded.used > 0)
+        {
+            memcpy(copy, decoded.data, decoded.used);
+        }
         unicode_view const literal = unicode_view_create(copy, decoded.used);
         memory_writer_free(&decoded);
         add_instruction(

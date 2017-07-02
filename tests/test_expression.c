@@ -102,19 +102,28 @@ void test_expression(void)
             expression_from_sequence(sequence_create(elements_right, 1)));
     }
     {
-        match_case *cases = allocate_array(1, sizeof(*cases));
-        cases[0] = match_case_create(expression_allocate(expression_from_break(
+        match_case *left = allocate_array(1, sizeof(*left));
+        left[0] = match_case_create(expression_allocate(expression_from_break(
+                                        source_location_create(0, 0))),
+                                    expression_allocate(expression_from_break(
+                                        source_location_create(0, 0))));
+        match_case *right = allocate_array(2, sizeof(*right));
+        right[0] = match_case_create(expression_allocate(expression_from_break(
+                                         source_location_create(0, 0))),
+                                     expression_allocate(expression_from_break(
+                                         source_location_create(0, 0))));
+        right[1] = match_case_create(expression_allocate(expression_from_break(
                                          source_location_create(0, 0))),
                                      expression_allocate(expression_from_break(
                                          source_location_create(0, 0))));
         test_not_equal(expression_from_match(match_create(
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
-                           cases, 1)),
+                           left, 1)),
                        expression_from_match(match_create(
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
-                           NULL, 0)));
+                           right, 2)));
     }
     {
         match_case *left = allocate_array(1, sizeof(*left));

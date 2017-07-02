@@ -15,7 +15,7 @@ static success_indicator write_file(void *const user, char const *const data,
     return failure;
 }
 
-static stream_writer make_file_writer(FILE *const file)
+static stream_writer make_file_writer(LPG_NON_NULL(FILE *const file))
 {
     stream_writer const result = {write_file, file};
     return result;

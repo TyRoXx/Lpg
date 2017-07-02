@@ -9,5 +9,5 @@ typedef struct whitespace_state
 } whitespace_state;
 
 success_indicator save_expression(stream_writer const to,
-                                  expression const *value,
+                                  LPG_NON_NULL(expression const *value),
                                   whitespace_state whitespace);

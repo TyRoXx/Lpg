@@ -1,5 +1,6 @@
 #pragma once
 #include <stddef.h>
+#include <lpg_non_null.h>
 
 typedef struct memory_allocation
 {
@@ -16,7 +17,7 @@ typedef struct garbage_collector
     memory_allocation *allocations;
 } garbage_collector;
 
-void *garbage_collector_allocate(garbage_collector *const gc,
+void *garbage_collector_allocate(LPG_NON_NULL(garbage_collector *const gc),
                                  size_t const bytes);
 
 void garbage_collector_free(garbage_collector const gc);

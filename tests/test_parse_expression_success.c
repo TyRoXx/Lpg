@@ -203,14 +203,6 @@ void test_parse_expression_success(void)
                     integer_create(0, 1), source_location_create(0, 14)))))),
         unicode_string_from_c_str("let a : int = 1"), true);
 
-    test_successful_parse(
-        expression_from_match(match_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 6)))),
-            NULL, 0)),
-        unicode_string_from_c_str("match a\n"), false);
-
     {
         match_case *const cases = allocate_array(1, sizeof(*cases));
         cases[0] = match_case_create(

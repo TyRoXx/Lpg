@@ -9,7 +9,8 @@ typedef struct enumeration enumeration;
 
 typedef struct value external_function(struct value const *,
                                        struct value const *,
-                                       garbage_collector *, void *);
+                                       LPG_NON_NULL(garbage_collector *),
+                                       void *);
 
 typedef struct function_pointer_value
 {
@@ -19,7 +20,7 @@ typedef struct function_pointer_value
 } function_pointer_value;
 
 function_pointer_value
-function_pointer_value_from_external(external_function *external,
+function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
                                      void *environment);
 function_pointer_value
 function_pointer_value_from_internal(function_id const code);
@@ -49,7 +50,7 @@ typedef struct value
     };
 } value;
 
-value value_from_flat_object(value const *flat_object);
+value value_from_flat_object(LPG_NON_NULL(value const *flat_object));
 value value_from_function_pointer(function_pointer_value function_pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);

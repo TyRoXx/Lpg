@@ -31,7 +31,7 @@ call_instruction call_instruction_create(register_id callee,
                                          register_id *arguments,
                                          size_t argument_count,
                                          register_id result);
-void call_instruction_free(call_instruction const *value);
+void call_instruction_free(LPG_NON_NULL(call_instruction const *value));
 bool call_instruction_equals(call_instruction const left,
                              call_instruction const right);
 
@@ -90,5 +90,5 @@ instruction instruction_create_break(void);
 instruction instruction_create_literal(literal_instruction const value);
 instruction instruction_create_lambda(lambda_instruction const value);
 
-void instruction_free(instruction const *value);
+void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

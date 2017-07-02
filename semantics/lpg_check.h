@@ -29,4 +29,4 @@ bool semantic_error_equals(semantic_error const left,
 typedef void check_error_handler(semantic_error, void *);
 
 checked_program check(sequence const root, structure const global,
-                      check_error_handler *on_error, void *user);
+                      LPG_NON_NULL(check_error_handler *on_error), void *user);

@@ -35,6 +35,11 @@ bool unicode_view_equals(unicode_view left, unicode_view right)
     {
         return 0;
     }
+    if (left.length == 0)
+    {
+        // memcmp must not be called with NULL
+        return true;
+    }
     return !memcmp(left.begin, right.begin, left.length * sizeof(*left.begin));
 }
 

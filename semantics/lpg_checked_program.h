@@ -10,4 +10,4 @@ typedef struct checked_program
     function_id function_count;
 } checked_program;
 
-void checked_program_free(checked_program const *program);
+void checked_program_free(LPG_NON_NULL(checked_program const *program));

@@ -37,17 +37,25 @@ success_indicator memory_writer_write(void *user, char const *data,
         writer->data = reallocate(writer->data, new_reserved);
         writer->reserved = new_reserved;
     }
-    memmove(writer->data + writer->used, data, length);
+    if (length > 0)
+    {
+        memmove(writer->data + writer->used, data, length);
+    }
     writer->used = new_used;
     return success;
 }
 
 bool memory_writer_equals(memory_writer const writer, char const *c_str)
 {
-    size_t length = strlen(c_str);
+    size_t const length = strlen(c_str);
     if (length != writer.used)
     {
         return 0;
+    }
+    if (length == 0)
+    {
+        /*must not call memcmp with NULL*/
+        return true;
     }
     return !memcmp(c_str, writer.data, length);
 }

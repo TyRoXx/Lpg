@@ -23,7 +23,7 @@ typedef struct enumeration_element
 } enumeration_element;
 
 enumeration_element enumeration_element_create(unicode_string name);
-void enumeration_element_free(enumeration_element const *value);
+void enumeration_element_free(LPG_NON_NULL(enumeration_element const *value));
 
 typedef struct enumeration
 {
@@ -33,7 +33,7 @@ typedef struct enumeration
 
 enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size);
-void enumeration_free(enumeration const *value);
+void enumeration_free(LPG_NON_NULL(enumeration const *value));
 
 typedef struct integer_range
 {
@@ -84,7 +84,7 @@ bool function_pointer_equals(function_pointer const left,
 type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
-type type_from_enumeration(enumeration const *value);
+type type_from_enumeration(LPG_NON_NULL(enumeration const *value));
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
@@ -93,4 +93,4 @@ bool type_equals(type const left, type const right);
 
 function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity);
-void function_pointer_free(function_pointer const *value);
+void function_pointer_free(LPG_NON_NULL(function_pointer const *value));
