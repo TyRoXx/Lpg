@@ -16,6 +16,11 @@ static int is_digit(char c)
     return (c >= '0') && (c <= '9');
 }
 
+static bool is_new_line(char c)
+{
+    return c == '\n' || c == '\r';
+}
+
 static int can_follow_integer(char c)
 {
     ASSUME(!is_digit(c));
@@ -60,6 +65,45 @@ tokenize_result tokenize(char const *input, size_t length)
                 token_indentation, (i - (i % spaces_for_indentation)));
         }
         return make_success(token_space, 1);
+    }
+    if (*input == '/')
+    {
+        if (length > 1)
+        {
+            ++input;
+            // Single line comment
+            if (*input == '/')
+            {
+                size_t comment_length = 1;
+                for (; comment_length < length; ++comment_length)
+                {
+                    if (is_new_line(input[comment_length]) ||
+                        input[comment_length] == 0)
+                    {
+                        break;
+                    }
+                }
+                return make_success(token_comment, comment_length);
+            }
+            if (*input == '*')
+            {
+                size_t comment_length = 1;
+                bool asterisk = false;
+                while (comment_length < length)
+                {
+                    ++input;
+                    if (asterisk && *input == '/')
+                    {
+                        return make_success(token_comment, comment_length + 1);
+                    }
+                    asterisk = (*input == '*');
+                    ++comment_length;
+                }
+                tokenize_result result = {
+                    tokenize_invalid, token_comment, comment_length};
+                return result;
+            }
+        }
     }
     if (is_identifier_begin(*input))
     {

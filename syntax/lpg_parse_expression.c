@@ -442,6 +442,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
             break;
         }
 
+        case token_comment:
         case token_string:
         {
             pop(parser);
