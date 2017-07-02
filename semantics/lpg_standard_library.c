@@ -1,5 +1,4 @@
-#include "standard_library.h"
-#include "test.h"
+#include "lpg_standard_library.h"
 #include "lpg_allocate.h"
 #include <string.h>
 

@@ -3,7 +3,7 @@
 #include "lpg_check.h"
 #include "handle_parse_error.h"
 #include <string.h>
-#include "standard_library.h"
+#include "lpg_standard_library.h"
 #include "lpg_c_backend.h"
 #include "lpg_read_file.h"
 #include "lpg_allocate.h"

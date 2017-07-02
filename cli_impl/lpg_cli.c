@@ -13,6 +13,7 @@
 #include "lpg_allocate.h"
 #include "lpg_structure_member.h"
 #include "lpg_read_file.h"
+#include "lpg_standard_library.h"
 
 typedef struct cli_parser_user
 {
@@ -288,39 +289,38 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
-    structure_member *const globals = allocate_array(1, sizeof(*globals));
+    standard_library_description const standard_library =
+        describe_standard_library();
 
-    function_pointer const print_signature = function_pointer_create(
-        type_from_unit(), type_allocate(type_from_string_ref()), 1);
+    value globals_values[11];
+    ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
 
-    globals[0] = structure_member_create(
-        type_from_function_pointer(&print_signature),
-        unicode_string_from_c_str("print"), optional_value_empty);
-    structure const global_object = structure_create(globals, 1);
+    for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
+    {
+        globals_values[i] = value_from_unit();
+    }
+    globals_values[2] = value_from_function_pointer(
+        function_pointer_value_from_external(print, &print_destination));
 
-    value const globals_values[1] = {value_from_function_pointer(
-        function_pointer_value_from_external(print, &print_destination))};
     optional_sequence const root =
         parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)
     {
         sequence_free(&root.value);
-        function_pointer_free(&print_signature);
-        structure_free(&global_object);
+        standard_library_description_free(&standard_library);
         unicode_string_free(&source);
         return true;
     }
     semantic_error_context context = {
         unicode_view_from_string(source), diagnostics, false};
-    checked_program checked =
-        check(root.value, global_object, handle_semantic_error, &context);
+    checked_program checked = check(
+        root.value, standard_library.globals, handle_semantic_error, &context);
     sequence_free(&root.value);
-    function_pointer_free(&print_signature);
     garbage_collector gc = {NULL};
     interprete(checked, globals_values, &gc);
     garbage_collector_free(gc);
     checked_program_free(&checked);
-    structure_free(&global_object);
+    standard_library_description_free(&standard_library);
     unicode_string_free(&source);
     return context.has_error;
 }

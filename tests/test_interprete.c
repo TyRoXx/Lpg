@@ -7,7 +7,7 @@
 #include "lpg_find_next_token.h"
 #include "lpg_check.h"
 #include "lpg_structure_member.h"
-#include "standard_library.h"
+#include "lpg_standard_library.h"
 #include <string.h>
 
 static sequence parse(char const *input)

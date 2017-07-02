@@ -9,7 +9,7 @@
 #include "lpg_for.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
-#include "standard_library.h"
+#include "lpg_standard_library.h"
 #include <stdio.h>
 #include "lpg_assert.h"
 
