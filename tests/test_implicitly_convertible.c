@@ -2,7 +2,7 @@
 #include "lpg_check.h"
 #include "test.h"
 
-void test_integer_convertible()
+void test_integer_convertible(void)
 {
     type small_range = type_from_integer_range(
         integer_range_create(integer_create(20, 10), integer_create(30, 7)));
@@ -12,7 +12,7 @@ void test_integer_convertible()
     REQUIRE(!is_implicitly_convertible(big_range, small_range));
 }
 
-void test_function_pointer_convertible()
+void test_function_pointer_convertible(void)
 {
     type small_range = type_from_integer_range(
         integer_range_create(integer_create(20, 10), integer_create(30, 7)));
