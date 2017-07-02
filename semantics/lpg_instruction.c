@@ -69,7 +69,7 @@ literal_instruction literal_instruction_create(register_id into, value value_)
 bool literal_instruction_equals(literal_instruction const left,
                                 literal_instruction const right)
 {
-    return (left.into == right.into) || value_equals(left.value_, right.value_);
+    return (left.into == right.into) && value_equals(left.value_, right.value_);
 }
 
 lambda_instruction lambda_instruction_create(register_id into, function_id id)
