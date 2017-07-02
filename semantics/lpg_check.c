@@ -783,10 +783,12 @@ evaluate_expression(function_checking_state *state,
                         globals[i] = value_from_unit();
                     }
                 }
+                ASSUME(callee.compile_time_value.value_.kind ==
+                       value_kind_function_pointer);
                 compile_time_result.value_ = call_function(
-                    callee.compile_time_value.value_, complete_inferred_values,
-                    compile_time_arguments, globals, &state->program->memory,
-                    state->program->functions);
+                    callee.compile_time_value.value_.function_pointer,
+                    complete_inferred_values, compile_time_arguments, globals,
+                    &state->program->memory, state->program->functions);
                 deallocate(globals);
             }
             compile_time_result.is_set = true;

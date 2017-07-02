@@ -15,22 +15,21 @@ typedef enum run_sequence_result
     run_sequence_result_continue
 } run_sequence_result;
 
-value call_function(value const callee, value const *const inferred,
-                    value *const arguments, value const *globals,
-                    garbage_collector *const gc,
+value call_function(function_pointer_value const callee,
+                    value const *const inferred, value *const arguments,
+                    value const *globals, garbage_collector *const gc,
                     checked_function const *const all_functions)
 {
     ASSUME(globals);
     ASSUME(gc);
     ASSUME(all_functions);
-    if (callee.function_pointer.code)
+    if (callee.external)
     {
-        return call_interpreted_function(
-            all_functions[callee.function_pointer.code], globals, gc,
-            all_functions);
+        return callee.external(
+            inferred, arguments, gc, callee.external_environment);
     }
-    return callee.function_pointer.external(
-        inferred, arguments, gc, callee.function_pointer.external_environment);
+    return call_interpreted_function(
+        all_functions[callee.code], globals, gc, all_functions);
 }
 
 static run_sequence_result
@@ -52,8 +51,10 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             {
                 arguments[j] = registers[element.call.arguments[j]];
             }
-            value const result = call_function(
-                callee, NULL, arguments, globals, gc, all_functions);
+            ASSUME(callee.kind == value_kind_function_pointer);
+            value const result =
+                call_function(callee.function_pointer, NULL, arguments, globals,
+                              gc, all_functions);
             deallocate(arguments);
             registers[element.call.result] = result;
             break;

@@ -86,7 +86,7 @@ static void check_generated_c_code(char const *const source,
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, NULL);
     sequence_free(&root);
-    REQUIRE(checked.function_count == 1);
+    REQUIRE(checked.function_count >= 1);
     memory_writer generated = {NULL, 0, 0};
     REQUIRE(success == generate_c(checked, memory_writer_erase(&generated)));
     unicode_view const pieces[] = {
@@ -174,6 +174,12 @@ void test_c_backend(void)
                            LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
                                LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
                            "10_concat.c");
+
+    check_generated_c_code("let f = () boolean.true\n"
+                           "assert(f())\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
+                           "11_lambda.c");
 
     standard_library_description_free(&std_library);
 }
