@@ -181,7 +181,16 @@ bool is_implicitly_convertible(type const flat_from,
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        LPG_TO_DO(); // todo: Is not easy
+        if(flat_from.function_pointer_->arity != flat_into.function_pointer_->arity)
+            return false;
+
+        for (size_t i = 0; i < flat_from.function_pointer_->arity; ++i) {
+            if(!type_equals(flat_from.function_pointer_->arguments[i], flat_into.function_pointer_->arguments[i])){
+                return false;
+            }
+        }
+        return flat_from.function_pointer_->result.kind ==
+                   flat_into.function_pointer_->result.kind;
 
     case type_kind_enumeration:
         return flat_from.enum_ == flat_into.enum_;
