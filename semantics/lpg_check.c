@@ -152,23 +152,6 @@ static type get_return_type(type const callee)
     UNREACHABLE();
 }
 
-static type flatten(type const possibly_referenced)
-{
-    switch (possibly_referenced.kind)
-    {
-    case type_kind_structure:
-    case type_kind_function_pointer:
-    case type_kind_unit:
-    case type_kind_string_ref:
-    case type_kind_enumeration:
-    case type_kind_type:
-    case type_kind_integer_range:
-    case type_kind_inferred:
-        return possibly_referenced;
-    }
-    UNREACHABLE();
-}
-
 typedef struct type_inference
 {
     optional_value *values;
