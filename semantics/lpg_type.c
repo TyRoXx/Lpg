@@ -161,12 +161,17 @@ bool type_equals(type const left, type const right)
     case type_kind_structure:
     case type_kind_function_pointer:
         LPG_TO_DO();
+
     case type_kind_unit:
         return true;
+
     case type_kind_string_ref:
     case type_kind_enumeration:
     case type_kind_referenced:
+        LPG_TO_DO();
+
     case type_kind_type:
+        return true;
 
     case type_kind_integer_range:
         return integer_range_equals(left.integer_range_, right.integer_range_);
