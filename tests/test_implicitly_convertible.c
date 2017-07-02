@@ -49,7 +49,7 @@ void test_function_pointer_convertible()
     }
 }
 
-void test_implicitly_convertible()
+void test_implicitly_convertible(void)
 {
     test_integer_convertible();
     test_function_pointer_convertible();
