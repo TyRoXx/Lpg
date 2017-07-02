@@ -15,8 +15,11 @@ integer integer_shift_left_truncate(integer value, uint32_t bits)
     }
     if (bits == 64)
     {
-        integer result = {value.low, 0};
-        return result;
+        return integer_create(value.low, 0);
+    }
+    if (bits == 128)
+    {
+        return integer_create(0, 0);
     }
     if (bits > 64)
     {
