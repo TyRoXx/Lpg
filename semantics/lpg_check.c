@@ -172,10 +172,10 @@ static bool is_implicitly_convertible(type const flat_from,
     }
     switch (flat_from.kind)
     {
-        case type_kind_type:
-        case type_kind_unit:
-        case type_kind_string_ref:
-            return true;
+    case type_kind_type:
+    case type_kind_unit:
+    case type_kind_string_ref:
+        return true;
 
     case type_kind_structure:
         LPG_TO_DO();
@@ -188,7 +188,7 @@ static bool is_implicitly_convertible(type const flat_from,
 
     case type_kind_integer_range:
         return integer_less_or_equals(flat_into.integer_range_.minimum, flat_from.integer_range_.minimum) &&
-               integer_less_or_equals(flat_from.integer_range_.minimum, flat_into.integer_range_.minimum);
+               integer_less_or_equals(flat_from.integer_range_.maximum, flat_into.integer_range_.maximum);
 
     case type_kind_inferred:
         LPG_TO_DO();
