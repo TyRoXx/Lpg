@@ -112,14 +112,6 @@ type type_from_enumeration(enumeration const *value)
     return result;
 }
 
-type type_from_reference(type const *const referenced)
-{
-    type result;
-    result.kind = type_kind_referenced;
-    result.referenced = referenced;
-    return result;
-}
-
 type type_from_type(void)
 {
     type result;
@@ -167,7 +159,6 @@ bool type_equals(type const left, type const right)
 
     case type_kind_string_ref:
     case type_kind_enumeration:
-    case type_kind_referenced:
         LPG_TO_DO();
 
     case type_kind_type:

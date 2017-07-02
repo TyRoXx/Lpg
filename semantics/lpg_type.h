@@ -51,7 +51,6 @@ typedef enum type_kind
     type_kind_unit,
     type_kind_string_ref,
     type_kind_enumeration,
-    type_kind_referenced,
     type_kind_type,
     type_kind_integer_range,
     type_kind_inferred
@@ -67,7 +66,6 @@ struct type
         structure const *structure_;
         function_pointer const *function_pointer_;
         enumeration const *enum_;
-        type const *referenced;
         integer_range integer_range_;
         size_t inferred;
     };
@@ -87,7 +85,6 @@ type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
 type type_from_enumeration(enumeration const *value);
-type type_from_reference(type const *const referenced);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);

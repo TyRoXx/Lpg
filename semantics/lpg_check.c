@@ -140,9 +140,6 @@ static type get_return_type(type const callee)
     case type_kind_enumeration:
         LPG_TO_DO();
 
-    case type_kind_referenced:
-        return get_return_type(*callee.referenced);
-
     case type_kind_type:
         LPG_TO_DO();
 
@@ -168,9 +165,6 @@ static type flatten(type const possibly_referenced)
     case type_kind_integer_range:
     case type_kind_inferred:
         return possibly_referenced;
-
-    case type_kind_referenced:
-        return *possibly_referenced.referenced;
     }
     UNREACHABLE();
 }
@@ -211,9 +205,6 @@ static bool is_implicitly_convertible(type const flat_from,
         /*TODO check properly*/
         return true;
 
-    case type_kind_referenced:
-        UNREACHABLE();
-
     case type_kind_type:
         return true;
 
@@ -229,23 +220,20 @@ static bool is_implicitly_convertible(type const flat_from,
 static bool check_parameter_type(type const from, type const into,
                                  type_inference const inferring)
 {
-    type const flat_from = flatten(from);
-    type const flat_into = flatten(into);
-    if (flat_into.kind == type_kind_inferred)
+    if (into.kind == type_kind_inferred)
     {
-        ASSUME(flat_into.inferred < inferring.count);
+        ASSUME(into.inferred < inferring.count);
         optional_value *const inferred_parameter_type =
-            &inferring.values[flat_into.inferred];
+            &inferring.values[into.inferred];
         if (inferred_parameter_type->is_set)
         {
             /*TODO: find conflicts*/
             LPG_TO_DO();
         }
-        *inferred_parameter_type =
-            optional_value_create(value_from_type(flat_from));
+        *inferred_parameter_type = optional_value_create(value_from_type(from));
         return true;
     }
-    return is_implicitly_convertible(flat_from, flat_into);
+    return is_implicitly_convertible(from, into);
 }
 
 static bool function_parameter_accepts_type(type const function,
@@ -268,10 +256,6 @@ static bool function_parameter_accepts_type(type const function,
     case type_kind_string_ref:
     case type_kind_enumeration:
         LPG_TO_DO();
-
-    case type_kind_referenced:
-        return function_parameter_accepts_type(
-            *function.referenced, parameter, argument, inferring);
 
     case type_kind_type:
         LPG_TO_DO();
@@ -372,9 +356,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
         LPG_TO_DO();
     }
 
-    type const *const actual_type = (object.type_.kind == type_kind_referenced)
-                                        ? object.type_.referenced
-                                        : &object.type_;
+    type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
     case type_kind_structure:
@@ -443,7 +425,6 @@ read_element(function_checking_state *state, instruction_sequence *function,
                 false, type_from_unit(), optional_value_empty);
         }
 
-        case type_kind_referenced:
         case type_kind_type:
         case type_kind_integer_range:
         case type_kind_inferred:
@@ -451,9 +432,6 @@ read_element(function_checking_state *state, instruction_sequence *function,
         }
         break;
     }
-
-    case type_kind_referenced:
-        UNREACHABLE();
 
     case type_kind_integer_range:
         LPG_TO_DO();
@@ -476,16 +454,19 @@ static size_t expected_call_argument_count(const type callee)
 
     case type_kind_unit:
         LPG_TO_DO();
+
     case type_kind_string_ref:
         LPG_TO_DO();
+
     case type_kind_enumeration:
         LPG_TO_DO();
-    case type_kind_referenced:
-        LPG_TO_DO();
+
     case type_kind_type:
         LPG_TO_DO();
+
     case type_kind_integer_range:
         LPG_TO_DO();
+
     case type_kind_inferred:
         LPG_TO_DO();
     }
@@ -554,9 +535,6 @@ static size_t find_lower_bound_for_inferred_values(type const root)
 
     case type_kind_enumeration:
         return 0;
-
-    case type_kind_referenced:
-        return find_lower_bound_for_inferred_values(*root.referenced);
 
     case type_kind_type:
     case type_kind_integer_range:
