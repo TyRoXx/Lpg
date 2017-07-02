@@ -163,8 +163,7 @@ static void type_inference_free(type_inference const value)
     deallocate(value.values);
 }
 
-static bool is_implicitly_convertible(type const flat_from,
-                                      type const flat_into)
+bool is_implicitly_convertible(type const flat_from, type const flat_into)
 {
     if (flat_from.kind != flat_into.kind)
     {
@@ -172,27 +171,40 @@ static bool is_implicitly_convertible(type const flat_from,
     }
     switch (flat_from.kind)
     {
+    case type_kind_type:
+    case type_kind_unit:
+    case type_kind_string_ref:
+        return true;
+
     case type_kind_structure:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        LPG_TO_DO();
+        if (flat_from.function_pointer_->arity !=
+            flat_into.function_pointer_->arity)
+        {
+            return false;
+        }
 
-    case type_kind_unit:
-        return true;
-
-    case type_kind_string_ref:
-        return true;
+        for (size_t i = 0; i < flat_from.function_pointer_->arity; ++i)
+        {
+            if (!type_equals(flat_from.function_pointer_->arguments[i],
+                             flat_into.function_pointer_->arguments[i]))
+            {
+                return false;
+            }
+        }
+        return type_equals(flat_from.function_pointer_->result,
+                           flat_into.function_pointer_->result);
 
     case type_kind_enumeration:
-        /*TODO check properly*/
-        return true;
-
-    case type_kind_type:
-        return true;
+        return flat_from.enum_ == flat_into.enum_;
 
     case type_kind_integer_range:
-        LPG_TO_DO();
+        return integer_less_or_equals(flat_into.integer_range_.minimum,
+                                      flat_from.integer_range_.minimum) &&
+               integer_less_or_equals(flat_from.integer_range_.maximum,
+                                      flat_into.integer_range_.maximum);
 
     case type_kind_inferred:
         LPG_TO_DO();

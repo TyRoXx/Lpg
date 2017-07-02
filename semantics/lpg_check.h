@@ -26,6 +26,9 @@ semantic_error semantic_error_create(semantic_error_type type,
 bool semantic_error_equals(semantic_error const left,
                            semantic_error const right);
 
+bool is_implicitly_convertible(type const flat_from,
+                                      type const flat_into);
+
 typedef void check_error_handler(semantic_error, void *);
 
 checked_program check(sequence const root, structure const global,

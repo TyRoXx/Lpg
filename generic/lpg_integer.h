@@ -17,6 +17,7 @@ bool integer_bit(integer value, uint32_t bit);
 void integer_set_bit(LPG_NON_NULL(integer *target), uint32_t bit, bool value);
 bool integer_equal(integer left, integer right);
 bool integer_less(integer left, integer right);
+bool integer_less_or_equals(integer left, integer right);
 integer integer_subtract(integer minuend, integer subtrahend);
 bool integer_multiply(LPG_NON_NULL(integer *left), integer right);
 bool integer_add(LPG_NON_NULL(integer *left), integer right);

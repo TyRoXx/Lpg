@@ -93,6 +93,10 @@ bool integer_less(integer left, integer right)
     return (left.low < right.low);
 }
 
+bool integer_less_or_equals(integer left, integer right){
+    return !integer_less(right, left);
+}
+
 integer integer_subtract(integer minuend, integer subtrahend)
 {
     integer result
