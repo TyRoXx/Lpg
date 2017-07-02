@@ -16,6 +16,11 @@ if(UNIX)
         add_definitions(-coverage)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage")
     endif()
+
+	option(LPG_WITH_UB_SANITIZER "compile clang undefined behaviour sanitizer" OFF)
+    if(LPG_WITH_UB_SANITIZER)
+        add_definitions(-fsanitize=undefined -fno-omit-frame-pointer)
+    endif()
 endif()
 
 file(GLOB_RECURSE formatted "*.c" "*.h")

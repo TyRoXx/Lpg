@@ -43,7 +43,7 @@ bool integer_shift_left(integer *value, uint32_t bits)
             return 0;
         }
     }
-    if ((bits > 0) && (value->high & (UINT64_MAX << (64u - bits))))
+    else if ((bits > 0) && (value->high & (UINT64_MAX << (64u - bits))))
     {
         return 0;
     }

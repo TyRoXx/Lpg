@@ -18,27 +18,32 @@ addons:
     - valgrind
 
 env:
- - MYCC=gcc-5 BUILD_TYPE=Release COVERAGE=NO
- - MYCC=gcc-5 BUILD_TYPE=Debug   COVERAGE=YES
- - MYCC=clang BUILD_TYPE=Release COVERAGE=NO
+ - MYCC=gcc-5 BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=OFF
+ - MYCC=gcc-5 BUILD_TYPE=Debug          COVERAGE=YES UB_SANITIZER=OFF
+ - MYCC=clang BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=ON
+ - MYCC=clang BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=OFF
 
 matrix:
   exclude:
     - os: osx
-      env: MYCC=gcc-5 BUILD_TYPE=Release COVERAGE=NO
+      env: MYCC=gcc-5 BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=OFF
     - os: osx
-      env: MYCC=gcc-5 BUILD_TYPE=Debug   COVERAGE=YES
+      env: MYCC=gcc-5 BUILD_TYPE=Debug          COVERAGE=YES UB_SANITIZER=OFF
+    - os: osx
+      env: MYCC=clang BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=ON
+    - os: linux
+      env: MYCC=clang BUILD_TYPE=RelWithDebInfo COVERAGE=NO  UB_SANITIZER=OFF
 
 script:
  - mkdir build
  - cd build
- - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_GCOV=$COVERAGE || exit 1
+ - CC=$MYCC cmake .. -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_GCOV=$COVERAGE -DLPG_WITH_UB_SANITIZER=$UB_SANITIZER || exit 1
  - cmake --build . -- -j2 || exit 1
  - cd tests
  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-     ./tests || exit 1;
+     UBSAN_OPTIONS=print_stacktrace=1 ./tests || exit 1;
    else
-     valgrind --error-exitcode=42 --leak-check=full ./tests || exit 1;
+     UBSAN_OPTIONS=print_stacktrace=1 valgrind --error-exitcode=42 --leak-check=full ./tests || exit 1;
    fi
  - if [ $COVERAGE == "YES" ]; then
      curl -s https://codecov.io/bash > codecov.sh || exit 1;
