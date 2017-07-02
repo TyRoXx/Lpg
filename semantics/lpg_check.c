@@ -1061,7 +1061,7 @@ checked_program check(sequence const root, structure const global,
                       check_error_handler *on_error, void *user)
 {
     checked_program program = {
-        {NULL}, allocate_array(1, sizeof(struct checked_function)), 1};
+        {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
     optional_checked_function const checked = check_function(
         expression_from_sequence(root), global, on_error, user, &program);
     if (checked.is_set)
