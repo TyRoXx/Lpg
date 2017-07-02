@@ -163,7 +163,7 @@ static void type_inference_free(type_inference const value)
     deallocate(value.values);
 }
 
-static bool is_implicitly_convertible(type const flat_from,
+bool is_implicitly_convertible(type const flat_from,
                                       type const flat_into)
 {
     if (flat_from.kind != flat_into.kind)

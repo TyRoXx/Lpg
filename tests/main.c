@@ -17,6 +17,7 @@
 #include "test_interprete.h"
 #include "test_cli.h"
 #include "test_c_backend.h"
+#include "test_implicitly_convertible.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
@@ -39,6 +40,7 @@ int main(void)
                                     test_parse_expression_syntax_error,
                                     test_semantics,
                                     test_interprete,
+                                    test_implicitly_convertible,
                                     test_cli,
                                     test_c_backend};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
