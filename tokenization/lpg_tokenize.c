@@ -68,42 +68,43 @@ tokenize_result tokenize(char const *input, size_t length)
     }
     if (*input == '/')
     {
-        if (length > 1)
-        {
-            ++input;
-            // Single line comment
-            if (*input == '/')
-            {
-                size_t comment_length = 1;
-                for (; comment_length < length; ++comment_length)
-                {
-                    if (is_new_line(input[comment_length]) ||
-                        input[comment_length] == 0)
-                    {
-                        break;
-                    }
-                }
-                return make_success(token_comment, comment_length);
-            }
-            if (*input == '*')
-            {
-                size_t comment_length = 1;
-                bool asterisk = false;
-                while (comment_length < length)
-                {
-                    ++input;
-                    if (asterisk && *input == '/')
-                    {
-                        return make_success(token_comment, comment_length + 1);
-                    }
-                    asterisk = (*input == '*');
-                    ++comment_length;
-                }
-                tokenize_result result = {
-                    tokenize_invalid, token_comment, comment_length};
-                return result;
-            }
+        if (length == 1) {
+            tokenize_result result = {
+                    tokenize_invalid, token_comment, 1};
+            return result;
         }
+
+        size_t comment_length = 1;
+
+        // Single line comment
+        if (input[comment_length] == '/')
+        {
+            while (comment_length < length)
+            {
+                if (is_new_line(input[comment_length]))
+                {
+                    return make_success(token_comment, comment_length);
+                }
+                ++comment_length;
+            }
+            return make_success(token_comment, comment_length);
+        }
+        if (input[comment_length] == '*')
+        {
+            bool asterisk = false;
+            while (comment_length < length)
+            {
+                if (asterisk && input[comment_length] == '/')
+                {
+                    return make_success(token_comment, comment_length + 1);
+                }
+                asterisk = (input[comment_length] == '*');
+                ++comment_length;
+            }
+            tokenize_result result = {
+                tokenize_invalid, token_comment, comment_length};
+        }
+        return result;
     }
     if (is_identifier_begin(*input))
     {
