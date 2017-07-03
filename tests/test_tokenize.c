@@ -73,6 +73,10 @@ void test_tokenize(void)
     test_single_token(token_string, 3, "\"a\"");
     test_single_token(token_string, 5, "\"abc\"");
     test_single_token(token_string, 6, "\"a\\nc\"");
+    test_single_token(token_comment, 13, "//Hello World");
+    test_single_token(token_comment, 13, "//Hello World\nTest");
+    test_single_token(token_comment, 15, "/*Hello World*/");
+    test_single_token(token_comment, 15, "/*Hello World*/testings");
     test_invalid("?");
     test_invalid("\t");
     test_invalid("'aaa");
@@ -82,4 +86,7 @@ void test_tokenize(void)
     test_invalid("\"a");
     test_invalid("\"a\nc\"");
     test_invalid("\"\\\"");
+    test_invalid("/*Hello World");
+    test_invalid("/*Hello World*");
+    test_invalid("/**");
 }
