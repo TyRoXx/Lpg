@@ -103,8 +103,8 @@ tokenize_result tokenize(char const *input, size_t length)
             }
             tokenize_result result = {
                 tokenize_invalid, token_comment, comment_length};
+            return result;
         }
-        return result;
     }
     if (is_identifier_begin(*input))
     {
