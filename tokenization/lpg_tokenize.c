@@ -68,9 +68,9 @@ tokenize_result tokenize(char const *input, size_t length)
     }
     if (*input == '/')
     {
-        if (length == 1) {
-            tokenize_result result = {
-                    tokenize_invalid, token_comment, 1};
+        if (length == 1)
+        {
+            tokenize_result result = {tokenize_invalid, token_comment, 1};
             return result;
         }
 
