@@ -181,5 +181,11 @@ void test_c_backend(void)
                            LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
                            "11_lambda.c");
 
+    check_generated_c_code("let f = () assert(boolean.true)\n"
+                           "f()\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
+                           "12_lambda_call.c");
+
     standard_library_description_free(&std_library);
 }

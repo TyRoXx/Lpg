@@ -147,6 +147,18 @@ static success_indicator generate_register_name(register_id const id,
     return success;
 }
 
+static success_indicator generate_function_name(function_id const id,
+                                                stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "lambda_"));
+    char buffer[64];
+    char const *const formatted = integer_format(
+        integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
+    LPG_TRY(stream_writer_write_bytes(
+        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+    return success;
+}
+
 static success_indicator generate_c_read_access(c_backend_state *state,
                                                 register_id const from,
                                                 stream_writer const c_output)
@@ -178,7 +190,8 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_function:
-        LPG_TO_DO();
+        return generate_function_name(
+            state->registers[from].function, c_output);
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
@@ -361,18 +374,6 @@ static success_indicator indent(size_t const indentation,
     return success;
 }
 
-static success_indicator generate_function_name(function_id const id,
-                                                stream_writer const c_output)
-{
-    LPG_TRY(stream_writer_write_string(c_output, "lambda_"));
-    char buffer[64];
-    char const *const formatted = integer_format(
-        integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
-    LPG_TRY(stream_writer_write_bytes(
-        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-    return success;
-}
-
 static success_indicator generate_instruction(c_backend_state *state,
                                               instruction const input,
                                               size_t const indentation,
@@ -465,7 +466,7 @@ static success_indicator generate_instruction(c_backend_state *state,
             LPG_TO_DO();
 
         case register_meaning_function:
-            LPG_TO_DO();
+            break;
         }
         LPG_TRY(generate_c_read_access(state, input.call.callee, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "("));

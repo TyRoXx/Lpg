@@ -763,7 +763,7 @@ evaluate_expression(function_checking_state *state,
             return evaluate_expression_result_empty;
         }
         type const return_type = get_return_type(callee.type_);
-        register_id result;
+        register_id result = ~(register_id)0;
         optional_value compile_time_result = {false, value_from_unit()};
         if (callee.compile_time_value.is_set && all_compile_time_arguments)
         {
@@ -797,38 +797,41 @@ evaluate_expression(function_checking_state *state,
                 }
                 ASSUME(callee.compile_time_value.value_.kind ==
                        value_kind_function_pointer);
-                compile_time_result.value_ = call_function(
+                compile_time_result = call_function(
                     callee.compile_time_value.value_.function_pointer,
                     complete_inferred_values, compile_time_arguments, globals,
                     &state->program->memory, state->program->functions);
                 deallocate(globals);
             }
-            compile_time_result.is_set = true;
             deallocate(complete_inferred_values);
-            deallocate(arguments);
-            restore(previous_code);
-            result = allocate_register(state);
-            if (return_type.kind == type_kind_string_ref)
+            if (compile_time_result.is_set)
             {
-                size_t const length =
-                    compile_time_result.value_.string_ref.length;
-                char *const copy =
-                    garbage_collector_allocate(&state->program->memory, length);
-                memcpy(
-                    copy, compile_time_result.value_.string_ref.begin, length);
-                add_instruction(
-                    function,
-                    instruction_create_literal(literal_instruction_create(
-                        result, value_from_string_ref(
-                                    unicode_view_create(copy, length)))));
-            }
-            else
-            {
-                set_compile_time_constant(
-                    function, result, compile_time_result.value_);
+                deallocate(arguments);
+                restore(previous_code);
+                result = allocate_register(state);
+                if (return_type.kind == type_kind_string_ref)
+                {
+                    size_t const length =
+                        compile_time_result.value_.string_ref.length;
+                    char *const copy = garbage_collector_allocate(
+                        &state->program->memory, length);
+                    memcpy(copy, compile_time_result.value_.string_ref.begin,
+                           length);
+                    add_instruction(
+                        function,
+                        instruction_create_literal(literal_instruction_create(
+                            result, value_from_string_ref(
+                                        unicode_view_create(copy, length)))));
+                }
+                else
+                {
+                    set_compile_time_constant(
+                        function, result, compile_time_result.value_);
+                }
             }
         }
-        else
+
+        if (!compile_time_result.is_set)
         {
             /*TODO: type inference for runtime-evaluated functions
              * ("templates")*/
@@ -840,6 +843,7 @@ evaluate_expression(function_checking_state *state,
                 instruction_create_call(call_instruction_create(
                     callee.where, arguments, expected_arguments, result)));
         }
+
         type_inference_free(inferring);
         deallocate(compile_time_arguments);
         return evaluate_expression_result_create(
