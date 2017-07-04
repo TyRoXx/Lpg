@@ -168,6 +168,9 @@ void test_interprete(void)
     expect_output("let f = () boolean.true\n"
                   "assert(f())\n",
                   "", "", std_library.globals);
+    expect_output("let f = () print(\"hello\")\n"
+                  "f()\n",
+                  "", "hello", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
