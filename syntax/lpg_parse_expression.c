@@ -443,6 +443,8 @@ static expression_parser_result parse_callable(expression_parser *parser,
         }
 
         case token_comment:
+            LPG_TO_DO();
+
         case token_string:
         {
             pop(parser);
