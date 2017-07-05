@@ -319,19 +319,22 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
                            NULL, 0, expression_allocate(body.success)))};
                 return result;
             }
-            else if (whitespace.token == token_newline)
-            {
-                LPG_TO_DO();
-            }
-            else
+            if (whitespace.token == token_newline)
             {
                 pop(parser);
-                parser->on_error(
-                    parse_error_create(
-                        parse_error_expected_lambda_body, whitespace.where),
-                    parser->user);
-                return expression_parser_result_failure;
+                sequence body = parse_sequence(parser, (indentation + 1));
+                expression_parser_result const result = {
+                    1, expression_from_lambda(lambda_create(
+                           NULL, 0, expression_allocate(
+                                        expression_from_sequence(body))))};
+                return result;
             }
+            pop(parser);
+            parser->on_error(
+                parse_error_create(
+                    parse_error_expected_lambda_body, whitespace.where),
+                parser->user);
+            return expression_parser_result_failure;
         }
         else if (head.token == token_comma)
         {
