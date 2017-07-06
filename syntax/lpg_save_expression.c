@@ -54,7 +54,8 @@ success_indicator save_expression(stream_writer const to,
                 LPG_TRY(stream_writer_write_string(to, ", "));
             }
             parameter const *param = value->lambda.parameters + i;
-            LPG_TRY(save_expression(to, param->name, whitespace));
+            LPG_TRY(stream_writer_write_bytes(
+                to, param->name.value.data, param->name.value.length));
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, param->type, whitespace));
         }

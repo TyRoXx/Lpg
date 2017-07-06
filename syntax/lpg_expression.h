@@ -5,19 +5,9 @@
 #include <stdbool.h>
 
 typedef struct expression expression;
+typedef struct parameter parameter;
 
 void expression_deallocate(expression *this);
-
-typedef struct parameter
-{
-    expression *name;
-    expression *type;
-} parameter;
-
-parameter parameter_create(LPG_NON_NULL(expression *name),
-                           LPG_NON_NULL(expression *type));
-void parameter_free(LPG_NON_NULL(parameter *value));
-bool parameter_equals(parameter const left, parameter const right);
 
 typedef struct lambda
 {
@@ -70,6 +60,17 @@ typedef struct identifier_expression
     unicode_string value;
     source_location source;
 } identifier_expression;
+
+struct parameter
+{
+    identifier_expression name;
+    expression *type;
+};
+
+parameter parameter_create(identifier_expression name,
+                           LPG_NON_NULL(expression *type));
+void parameter_free(LPG_NON_NULL(parameter *value));
+bool parameter_equals(parameter const left, parameter const right);
 
 typedef struct access_structure
 {

@@ -383,10 +383,13 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
             }
         }
 
-        expression_parser_result const parsed_name =
-            parse_expression(parser, indentation, false);
-        if (!parsed_name.is_success)
+        rich_token const name = peek(parser);
+        pop(parser);
+        if (name.token != token_identifier)
         {
+            parser->on_error(
+                parse_error_create(parse_error_expected_identifier, name.where),
+                parser->user);
             clean_up_parameters(parameters, parameter_count);
             return expression_parser_result_failure;
         }
@@ -428,7 +431,8 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
         parameters = reallocate_array(
             parameters, (parameter_count + 1), sizeof(*parameters));
         parameters[parameter_count] =
-            parameter_create(expression_allocate(parsed_name.success),
+            parameter_create(identifier_expression_create(
+                                 unicode_view_copy(name.content), name.where),
                              expression_allocate(parsed_type.success));
         ++parameter_count;
     }

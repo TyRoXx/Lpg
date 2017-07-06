@@ -158,8 +158,10 @@ bool type_equals(type const left, type const right)
         return true;
 
     case type_kind_string_ref:
-    case type_kind_enumeration:
         LPG_TO_DO();
+
+    case type_kind_enumeration:
+        return (left.enum_ == right.enum_);
 
     case type_kind_type:
         return true;

@@ -325,9 +325,8 @@ void test_parse_expression_success(void)
                 integer_create(0, 1), source_location_create(1, 4)));
         parameter *const parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 1)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 1)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("type"),
                                              source_location_create(0, 4)))));
@@ -347,16 +346,14 @@ void test_parse_expression_success(void)
                 integer_create(0, 1), source_location_create(1, 4)));
         parameter *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 1)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 1)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("b"),
                                              source_location_create(0, 4)))));
         parameters[1] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("c"),
-                                             source_location_create(0, 7)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("c"), source_location_create(0, 7)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("d"),
                                              source_location_create(0, 10)))));

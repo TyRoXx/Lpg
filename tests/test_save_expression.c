@@ -91,9 +91,8 @@ void test_save_expression(void)
     {
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 0)),
             expression_allocate(
                 expression_from_identifier(identifier_expression_create(
                     unicode_string_from_c_str("uint32"),
@@ -260,9 +259,8 @@ void test_save_expression(void)
 
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 0)),
             expression_allocate(
                 expression_from_identifier(identifier_expression_create(
                     unicode_string_from_c_str("uint32"),
@@ -281,16 +279,14 @@ void test_save_expression(void)
     {
         parameter *parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("a"), source_location_create(0, 0)),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("float"),
                                              source_location_create(0, 0)))));
         parameters[1] = parameter_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("b"),
-                                             source_location_create(0, 0)))),
+            identifier_expression_create(
+                unicode_string_from_c_str("b"), source_location_create(0, 0)),
             expression_allocate(
                 expression_from_identifier(identifier_expression_create(
                     unicode_string_from_c_str("string"),

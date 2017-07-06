@@ -630,12 +630,27 @@ static evaluate_expression_result make_compile_time_unit(void)
 }
 
 static evaluate_expression_result
-evaluate_lambda(function_checking_state *state, instruction_sequence *function,
-                lambda const evaluated)
+evaluate_lambda(function_checking_state *const state,
+                instruction_sequence *const function, lambda const evaluated)
 {
-    if (evaluated.parameter_count > 0)
+    type *const parameters =
+        allocate_array(evaluated.parameter_count, sizeof(*parameters));
+    for (size_t i = 0; i < evaluated.parameter_count; ++i)
     {
-        LPG_TO_DO();
+        instruction_checkpoint const before = make_checkpoint(state, function);
+        parameter const this_parameter = evaluated.parameters[i];
+        evaluate_expression_result const parameter_type =
+            evaluate_expression(state, function, *this_parameter.type);
+        if (!parameter_type.compile_time_value.is_set)
+        {
+            LPG_TO_DO();
+        }
+        if (parameter_type.compile_time_value.value_.kind != value_kind_type)
+        {
+            LPG_TO_DO();
+        }
+        parameters[i] = parameter_type.compile_time_value.value_.type_;
+        restore(before);
     }
     function_id const this_lambda_id = state->program->function_count;
     ++(state->program->function_count);
@@ -656,8 +671,14 @@ evaluate_lambda(function_checking_state *state, instruction_sequence *function,
                        state->user, state->program);
     if (!checked.is_set)
     {
+        deallocate(parameters);
         return evaluate_expression_result_empty;
     }
+
+    ASSUME(checked.value.signature->arity == 0);
+    checked.value.signature->arguments = parameters;
+    checked.value.signature->arity = evaluated.parameter_count;
+
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.value;
     register_id const destination = allocate_register(state);

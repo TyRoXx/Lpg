@@ -11,24 +11,6 @@ void expression_deallocate(expression *this)
     deallocate(this);
 }
 
-parameter parameter_create(expression *name, expression *type)
-{
-    parameter result = {name, type};
-    return result;
-}
-
-void parameter_free(parameter *value)
-{
-    expression_deallocate(value->name);
-    expression_deallocate(value->type);
-}
-
-bool parameter_equals(parameter const left, parameter const right)
-{
-    return expression_equals(left.name, right.name) &&
-           expression_equals(left.type, right.type);
-}
-
 lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result)
 {
@@ -70,6 +52,24 @@ call call_create(expression *callee, tuple arguments,
 {
     call result = {callee, arguments, closing_parenthesis};
     return result;
+}
+
+parameter parameter_create(identifier_expression name, expression *type)
+{
+    parameter result = {name, type};
+    return result;
+}
+
+void parameter_free(parameter *value)
+{
+    identifier_expression_free(&value->name);
+    expression_deallocate(value->type);
+}
+
+bool parameter_equals(parameter const left, parameter const right)
+{
+    return identifier_expression_equals(left.name, right.name) &&
+           expression_equals(left.type, right.type);
 }
 
 access_structure access_structure_create(expression *object,
