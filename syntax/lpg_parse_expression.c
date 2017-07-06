@@ -295,9 +295,24 @@ static expression_parser_result parse_match(expression_parser *parser,
     return expression_parser_result_failure;
 }
 
+static void clean_up_parameters(parameter *const parameters,
+                                size_t parameter_count)
+{
+    if (parameters)
+    {
+        for (size_t i = 0; i < parameter_count; ++i)
+        {
+            parameter_free(parameters + i);
+        }
+        deallocate(parameters);
+    }
+}
+
 static expression_parser_result parse_lambda(expression_parser *const parser,
                                              size_t const indentation)
 {
+    parameter *parameters = NULL;
+    size_t parameter_count = 0;
     for (;;)
     {
         rich_token const head = peek(parser);
@@ -315,8 +330,9 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
                     return expression_parser_result_failure;
                 }
                 expression_parser_result const result = {
-                    1, expression_from_lambda(lambda_create(
-                           NULL, 0, expression_allocate(body.success)))};
+                    1, expression_from_lambda(
+                           lambda_create(parameters, parameter_count,
+                                         expression_allocate(body.success)))};
                 return result;
             }
             if (whitespace.token == token_newline)
@@ -324,9 +340,10 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
                 pop(parser);
                 sequence body = parse_sequence(parser, (indentation + 1));
                 expression_parser_result const result = {
-                    1, expression_from_lambda(lambda_create(
-                           NULL, 0, expression_allocate(
-                                        expression_from_sequence(body))))};
+                    1,
+                    expression_from_lambda(lambda_create(
+                        parameters, parameter_count,
+                        expression_allocate(expression_from_sequence(body))))};
                 return result;
             }
             pop(parser);
@@ -334,32 +351,86 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
                 parse_error_create(
                     parse_error_expected_lambda_body, whitespace.where),
                 parser->user);
+            clean_up_parameters(parameters, parameter_count);
             return expression_parser_result_failure;
         }
-        else if (head.token == token_comma)
+        if (parameter_count >= 1)
         {
-            pop(parser);
-            rich_token const space = peek(parser);
-            if (space.token == token_space)
+            if (head.token == token_comma)
             {
                 pop(parser);
+                rich_token const space = peek(parser);
+                if (space.token == token_space)
+                {
+                    pop(parser);
+                }
+                else
+                {
+                    parser->on_error(
+                        parse_error_create(
+                            parse_error_expected_space, space.where),
+                        parser->user);
+                }
             }
             else
+            {
+                pop(parser);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_comma, head.where),
+                    parser->user);
+                clean_up_parameters(parameters, parameter_count);
+                return expression_parser_result_failure;
+            }
+        }
+
+        expression_parser_result const parsed_name =
+            parse_expression(parser, indentation, false);
+        if (!parsed_name.is_success)
+        {
+            clean_up_parameters(parameters, parameter_count);
+            return expression_parser_result_failure;
+        }
+
+        {
+            rich_token const colon = peek(parser);
+            pop(parser);
+            if (colon.token != token_colon)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_colon, colon.where),
+                    parser->user);
+                clean_up_parameters(parameters, parameter_count);
+                return expression_parser_result_failure;
+            }
+        }
+
+        {
+            rich_token const space = peek(parser);
+            pop(parser);
+            if (space.token != token_space)
             {
                 parser->on_error(
                     parse_error_create(parse_error_expected_space, space.where),
                     parser->user);
+                clean_up_parameters(parameters, parameter_count);
+                return expression_parser_result_failure;
             }
-            LPG_TO_DO();
         }
-        else
+
+        expression_parser_result const parsed_type =
+            parse_expression(parser, indentation, false);
+        if (!parsed_type.is_success)
         {
-            pop(parser);
-            parser->on_error(
-                parse_error_create(parse_error_expected_comma, head.where),
-                parser->user);
+            clean_up_parameters(parameters, parameter_count);
             return expression_parser_result_failure;
         }
+
+        parameters = reallocate_array(
+            parameters, (parameter_count + 1), sizeof(*parameters));
+        parameters[parameter_count] =
+            parameter_create(expression_allocate(parsed_name.success),
+                             expression_allocate(parsed_type.success));
+        ++parameter_count;
     }
 }
 
