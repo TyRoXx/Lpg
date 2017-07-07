@@ -171,6 +171,13 @@ void test_interprete(void)
     expect_output("let f = () print(\"hello\")\n"
                   "f()\n",
                   "", "hello", std_library.globals);
+    expect_output("let xor = (a: boolean, b: boolean)\n"
+                  "    or(and(a, not(b)), and(not(a), b))\n"
+                  "assert(xor(boolean.true, boolean.false))\n"
+                  "assert(xor(boolean.false, boolean.true))\n"
+                  "assert(not(xor(boolean.true, boolean.true)))\n"
+                  "assert(not(xor(boolean.false, boolean.false)))\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
