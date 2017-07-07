@@ -78,7 +78,7 @@ static void expect_output(char const *source, char const *input,
         memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
     garbage_collector gc = {NULL};
     value const globals_values[11] = {
-        /*f*/ value_from_unit(),
+        /*type*/ value_from_unit(),
         /*g*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
             function_pointer_value_from_external(print, &environment)),
