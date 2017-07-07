@@ -76,7 +76,7 @@ static void add_local_variable(local_variable_container *to,
     to->elements =
         reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));
     to->elements[to->count] = variable;
-    ++to->count;
+    ++(to->count);
 }
 
 static bool local_variable_name_exists(local_variable_container const variables,
@@ -532,6 +532,8 @@ static size_t find_lower_bound_for_inferred_values(type const root)
         return 0;
 
     case type_kind_type:
+        return 0;
+
     case type_kind_integer_range:
         LPG_TO_DO();
 
@@ -580,17 +582,38 @@ optional_checked_function_create(checked_function const value)
 static optional_checked_function const optional_checked_function_empty = {
     false, {0, NULL, {NULL, 0}, 0}};
 
-static optional_checked_function check_function(expression const body_in,
-                                                structure const global,
-                                                check_error_handler *on_error,
-                                                void *user,
-                                                checked_program *const program)
+static optional_checked_function check_function(
+    expression const body_in, structure const global,
+    check_error_handler *on_error, void *user, checked_program *const program,
+    type const *const parameter_types, unicode_string *const parameter_names,
+    size_t const parameter_count)
 {
     function_checking_state state =
         function_checking_state_create(&global, on_error, user, program);
+
+    for (size_t i = 0; i < parameter_count; ++i)
+    {
+        add_local_variable(
+            &state.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(parameter_names[i])),
+                parameter_types[i], optional_value_empty,
+                allocate_register(&state)));
+    }
+
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     evaluate_expression_result const body_evaluated =
         evaluate_expression(&state, &body_out, body_in);
+
+    for (size_t i = 0; i < parameter_count; ++i)
+    {
+        local_variable_free(state.local_variables.elements + i);
+    }
+    if (state.local_variables.elements)
+    {
+        deallocate(state.local_variables.elements);
+    }
+
     register_id return_value;
     if (body_evaluated.has_value)
     {
@@ -608,10 +631,6 @@ static optional_checked_function check_function(expression const body_in,
     {
         instruction_sequence_free(&body_out);
         return optional_checked_function_empty;
-    }
-    if (state.local_variables.elements)
-    {
-        deallocate(state.local_variables.elements);
     }
     function_pointer *const signature = allocate(sizeof(*signature));
     signature->result = body_evaluated.type_;
@@ -633,8 +652,10 @@ static evaluate_expression_result
 evaluate_lambda(function_checking_state *const state,
                 instruction_sequence *const function, lambda const evaluated)
 {
-    type *const parameters =
-        allocate_array(evaluated.parameter_count, sizeof(*parameters));
+    type *const parameter_types =
+        allocate_array(evaluated.parameter_count, sizeof(*parameter_types));
+    unicode_string *const parameter_names =
+        allocate_array(evaluated.parameter_count, sizeof(*parameter_names));
     for (size_t i = 0; i < evaluated.parameter_count; ++i)
     {
         instruction_checkpoint const before = make_checkpoint(state, function);
@@ -649,7 +670,9 @@ evaluate_lambda(function_checking_state *const state,
         {
             LPG_TO_DO();
         }
-        parameters[i] = parameter_type.compile_time_value.value_.type_;
+        parameter_types[i] = parameter_type.compile_time_value.value_.type_;
+        parameter_names[i] = unicode_view_copy(
+            unicode_view_from_string(this_parameter.name.value));
         restore(before);
     }
     function_id const this_lambda_id = state->program->function_count;
@@ -668,15 +691,21 @@ evaluate_lambda(function_checking_state *const state,
     }
     optional_checked_function const checked =
         check_function(*evaluated.result, *state->global, state->on_error,
-                       state->user, state->program);
+                       state->user, state->program, parameter_types,
+                       parameter_names, evaluated.parameter_count);
+    for (size_t i = 0; i < evaluated.parameter_count; ++i)
+    {
+        unicode_string_free(parameter_names + i);
+    }
+    deallocate(parameter_names);
     if (!checked.is_set)
     {
-        deallocate(parameters);
+        deallocate(parameter_types);
         return evaluate_expression_result_empty;
     }
 
     ASSUME(checked.value.signature->arity == 0);
-    checked.value.signature->arguments = parameters;
+    checked.value.signature->arguments = parameter_types;
     checked.value.signature->arity = evaluated.parameter_count;
 
     checked_function_free(&state->program->functions[this_lambda_id]);
@@ -1099,8 +1128,9 @@ checked_program check(sequence const root, structure const global,
 {
     checked_program program = {
         {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
-    optional_checked_function const checked = check_function(
-        expression_from_sequence(root), global, on_error, user, &program);
+    optional_checked_function const checked =
+        check_function(expression_from_sequence(root), global, on_error, user,
+                       &program, NULL, NULL, 0);
     if (checked.is_set)
     {
         program.functions[0] = checked.value;

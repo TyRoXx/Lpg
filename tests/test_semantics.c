@@ -514,7 +514,7 @@ void test_semantics(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("assert(f)");
+        sequence root = parse("assert(assert)");
         semantic_error const errors[] = {semantic_error_create(
             semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
@@ -810,7 +810,7 @@ void test_semantics(void)
                 literal_instruction_create(1, value_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_integer(integer_create(0, 123))))};
+                1, value_from_integer(integer_create(0, 123))))};
         checked_program const expected = {
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
@@ -829,9 +829,9 @@ void test_semantics(void)
                     integer_create(0, 123), integer_create(0, 123))),
                 parameters, 1);
             expected.functions[1] = checked_function_create(
-                0, signature,
+                1, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                1);
+                2);
         }
         check_wellformed_program(
             "let f = (a: boolean) 123\n", std_library.globals, expected);
@@ -866,6 +866,35 @@ void test_semantics(void)
         }
         check_wellformed_program("let f = () boolean\n"
                                  "let v : f() = boolean.true",
+                                 std_library.globals, expected);
+    }
+    {
+        instruction const expected_main[] = {
+            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_enum_element(1))),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_unit()))};
+        checked_program const expected = {
+            {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        {
+            function_pointer *const signature = allocate(sizeof(*signature));
+            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            expected.functions[0] = checked_function_create(
+                2, signature,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 3);
+        }
+        {
+            function_pointer *const signature = allocate(sizeof(*signature));
+            type *const parameters = allocate_array(1, sizeof(*parameters));
+            parameters[0] = type_from_type();
+            *signature =
+                function_pointer_create(type_from_type(), parameters, 1);
+            expected.functions[1] = checked_function_create(
+                0, signature, instruction_sequence_create(NULL, 0), 1);
+        }
+        check_wellformed_program("let f = (a: type) a\n"
+                                 "let v : f(boolean) = boolean.true",
                                  std_library.globals, expected);
     }
     standard_library_description_free(&std_library);

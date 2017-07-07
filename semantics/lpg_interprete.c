@@ -5,8 +5,8 @@
 #include "lpg_instruction.h"
 
 static optional_value
-call_interpreted_function(checked_function const callee, value const *globals,
-                          garbage_collector *const gc,
+call_interpreted_function(checked_function const callee, value *const arguments,
+                          value const *globals, garbage_collector *const gc,
                           checked_function const *const all_functions);
 
 typedef enum run_sequence_result
@@ -31,7 +31,7 @@ optional_value call_function(function_pointer_value const callee,
             inferred, arguments, gc, callee.external_environment));
     }
     return call_interpreted_function(
-        all_functions[callee.code], globals, gc, all_functions);
+        all_functions[callee.code], arguments, globals, gc, all_functions);
 }
 
 static run_sequence_result
@@ -122,8 +122,8 @@ run_sequence(instruction_sequence const sequence, value const *globals,
 }
 
 static optional_value
-call_interpreted_function(checked_function const callee, value const *globals,
-                          garbage_collector *const gc,
+call_interpreted_function(checked_function const callee, value *const arguments,
+                          value const *globals, garbage_collector *const gc,
                           checked_function const *const all_functions)
 {
     /*there has to be at least one register for the return value, even if it is
@@ -134,6 +134,10 @@ call_interpreted_function(checked_function const callee, value const *globals,
     ASSUME(all_functions);
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
+    for (size_t i = 0; i < callee.signature->arity; ++i)
+    {
+        registers[i] = arguments[i];
+    }
     switch (run_sequence(callee.body, globals, registers, gc, all_functions))
     {
     case run_sequence_result_break:
@@ -156,5 +160,6 @@ void interprete(checked_program const program, value const *globals,
                 garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
-    call_interpreted_function(entry_point, globals, gc, program.functions);
+    call_interpreted_function(
+        entry_point, NULL, globals, gc, program.functions);
 }

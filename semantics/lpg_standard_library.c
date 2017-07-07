@@ -124,7 +124,8 @@ standard_library_description describe_standard_library(void)
 
     structure_member *globals = allocate_array(11, sizeof(*globals));
     globals[0] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("f"), optional_value_empty);
+        type_from_type(), unicode_string_from_c_str("type"),
+        optional_value_create(value_from_type(type_from_type())));
 
     globals[1] = structure_member_create(
         type_from_unit(), unicode_string_from_c_str("g"), optional_value_empty);
