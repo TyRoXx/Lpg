@@ -808,6 +808,42 @@ void test_semantics(void)
             instruction_create_lambda(lambda_instruction_create(0, 1)),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
+        register_id *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = 2;
+        instruction const expected_lambda[] = {
+            instruction_create_global(0),
+            instruction_create_read_struct(
+                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_call(
+                call_instruction_create(1, arguments, 1, 3))};
+        checked_program const expected = {
+            {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        {
+            function_pointer *const signature = allocate(sizeof(*signature));
+            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            expected.functions[0] = checked_function_create(
+                1, signature,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
+        }
+        {
+            function_pointer *const signature = allocate(sizeof(*signature));
+            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            expected.functions[1] = checked_function_create(
+                3, signature,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
+                4);
+        }
+        check_wellformed_program("let f = ()\n"
+                                 "    assert(boolean.true)\n",
+                                 std_library.globals, expected);
+    }
+    {
+        instruction const expected_main[] = {
+            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_literal(literal_instruction_create(
                 1, value_from_integer(integer_create(0, 123))))};

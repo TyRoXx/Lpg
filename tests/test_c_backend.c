@@ -187,5 +187,21 @@ void test_c_backend(void)
                            LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
                            "12_lambda_call.c");
 
+    check_generated_c_code("let id = (a: boolean) a\n"
+                           "assert(id(boolean.true))\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
+                           "13_lambda_parameter.c");
+
+    check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
+                           "    or(and(a, not(b)), and(not(a), b))\n"
+                           "assert(xor(boolean.true, boolean.false))\n"
+                           "assert(xor(boolean.false, boolean.true))\n"
+                           "assert(not(xor(boolean.true, boolean.true)))\n"
+                           "assert(not(xor(boolean.false, boolean.false)))\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
+                           "14_lambda_parameters.c");
+
     standard_library_description_free(&std_library);
 }

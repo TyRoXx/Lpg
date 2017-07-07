@@ -1,5 +1,5 @@
 int main(void)
 {
-    assert_impl(0);
+    unit const r_3 = assert_impl(0);
     return 0;
 }

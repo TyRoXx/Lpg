@@ -1,6 +1,6 @@
-static size_t lambda_1(void)
+static size_t lambda_1(size_t arg0)
 {
-    return 1;
+    return arg0;
 }
 int main(void)
 {

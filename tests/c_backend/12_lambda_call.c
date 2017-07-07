@@ -1,10 +1,10 @@
-static void lambda_1(void)
+static unit lambda_1(void)
 {
-    assert_impl(1);
-    return 0;
+    unit const r_3 = assert_impl(1);
+    return r_3;
 }
 int main(void)
 {
-    lambda_1();
+    unit const r_1 = lambda_1();
     return 0;
 }
