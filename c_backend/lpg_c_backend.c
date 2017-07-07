@@ -293,6 +293,11 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_argument:
         return generate_parameter_name(
             state->registers[from].argument, c_output);
+
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -348,6 +353,14 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_unit:
             LPG_TO_DO();
         }
+
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
+        LPG_TO_DO();
+
+    case register_meaning_argument:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -359,6 +372,9 @@ static success_indicator generate_string_length(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
+        LPG_TO_DO();
+
+    case register_meaning_argument:
         LPG_TO_DO();
 
     case register_meaning_global:
@@ -384,6 +400,11 @@ static success_indicator generate_string_length(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_function:
+        LPG_TO_DO();
+
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -570,6 +591,9 @@ static success_indicator generate_instruction(c_backend_state *state,
                 state, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
+
+        case register_meaning_argument:
+            LPG_TO_DO();
         }
         set_register_variable(
             state, input.call.result, register_resource_ownership_none);
@@ -609,6 +633,14 @@ static success_indicator generate_instruction(c_backend_state *state,
         switch (state->registers[input.read_struct.from_object].meaning)
         {
         case register_meaning_nothing:
+            LPG_TO_DO();
+
+        case register_meaning_and:
+        case register_meaning_not:
+        case register_meaning_or:
+            LPG_TO_DO();
+
+        case register_meaning_argument:
             LPG_TO_DO();
 
         case register_meaning_global:
