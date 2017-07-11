@@ -219,5 +219,10 @@ void test_c_backend(void)
                                LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
                            "15_return_string.c");
 
+    check_generated_c_code("let s = (a: string-ref) print(a)\n"
+                           "s(\"a\")\n",
+                           std_library.globals, LPG_C_STDIO,
+                           "16_pass_string.c");
+
     standard_library_description_free(&std_library);
 }

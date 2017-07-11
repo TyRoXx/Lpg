@@ -128,7 +128,8 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_type(type_from_type())));
 
     globals[1] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("g"), optional_value_empty);
+        type_from_type(), unicode_string_from_c_str("string-ref"),
+        optional_value_create(value_from_type(type_from_string_ref())));
 
     globals[2] = structure_member_create(
         type_from_function_pointer(&stable->print),

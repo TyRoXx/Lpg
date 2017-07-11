@@ -344,7 +344,8 @@ static success_indicator generate_c_str(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_variable:
-        LPG_TRY(generate_register_name(from, c_output));
+    case register_meaning_argument:
+        LPG_TRY(generate_c_read_access(state, from, c_output));
         return stream_writer_write_string(c_output, ".data");
 
     case register_meaning_print:
@@ -387,9 +388,6 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_not:
     case register_meaning_or:
         LPG_TO_DO();
-
-    case register_meaning_argument:
-        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -403,14 +401,12 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_nothing:
         LPG_TO_DO();
 
-    case register_meaning_argument:
-        LPG_TO_DO();
-
     case register_meaning_global:
         LPG_TO_DO();
 
+    case register_meaning_argument:
     case register_meaning_variable:
-        LPG_TRY(generate_register_name(from, c_output));
+        LPG_TRY(generate_c_read_access(state, from, c_output));
         return stream_writer_write_string(c_output, ".length");
 
     case register_meaning_print:
@@ -505,6 +501,12 @@ static success_indicator generate_instruction(
 
         case register_meaning_print:
             state->standard_library.using_stdio = true;
+            set_register_variable(
+                state, input.call.result, register_resource_ownership_none);
+            LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = {};\n"));
+            LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "fwrite("));
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_str(state, input.call.arguments[0], c_output));
