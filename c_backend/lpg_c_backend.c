@@ -898,7 +898,8 @@ success_indicator generate_c(checked_program const program,
                                        program_defined_writer),
                          fail);
             LPG_TRY_GOTO(
-                stream_writer_write_string(program_defined_writer, " "), fail);
+                stream_writer_write_string(program_defined_writer, " const "),
+                fail);
             LPG_TRY_GOTO(
                 generate_parameter_name(j, program_defined_writer), fail);
         }

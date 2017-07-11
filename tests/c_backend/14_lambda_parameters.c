@@ -1,4 +1,4 @@
-static size_t lambda_1(size_t arg0, size_t arg1)
+static size_t lambda_1(size_t const arg0, size_t const arg1)
 {
     size_t const r_8 = !arg1;
     size_t const r_9 = (arg0 & r_8);

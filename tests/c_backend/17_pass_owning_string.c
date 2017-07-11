@@ -1,4 +1,4 @@
-static unit lambda_1(string_ref arg0)
+static unit lambda_1(string_ref const arg0)
 {
     unit const r_3 = {};
     fwrite(arg0.data, 1, arg0.length, stdout);
