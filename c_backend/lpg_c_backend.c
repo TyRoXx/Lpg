@@ -46,6 +46,12 @@ typedef enum register_resource_ownership
     register_resource_ownership_string_ref
 } register_resource_ownership;
 
+typedef struct register_function
+{
+    function_id id;
+    type result;
+} register_function;
+
 typedef struct register_state
 {
     register_meaning meaning;
@@ -53,7 +59,7 @@ typedef struct register_state
     union
     {
         value literal;
-        function_id function;
+        register_function function;
         register_id argument;
     };
 } register_state;
@@ -91,6 +97,28 @@ static void set_register_meaning(c_backend_state *const state,
     active_register(state, id);
 }
 
+static register_resource_ownership
+find_register_resource_ownership(type const variable)
+{
+    switch (variable.kind)
+    {
+    case type_kind_enumeration:
+    case type_kind_function_pointer:
+    case type_kind_inferred:
+    case type_kind_integer_range:
+    case type_kind_structure:
+    case type_kind_type:
+        LPG_TO_DO();
+
+    case type_kind_string_ref:
+        return register_resource_ownership_string_ref;
+
+    case type_kind_unit:
+        return register_resource_ownership_none;
+    }
+    UNREACHABLE();
+}
+
 static void set_register_variable(c_backend_state *const state,
                                   register_id const id,
                                   register_resource_ownership ownership)
@@ -112,11 +140,12 @@ static void set_register_literal(c_backend_state *const state,
 
 static void set_register_lambda(c_backend_state *const state,
                                 register_id const id,
-                                function_id const function)
+                                function_id const function, type const result)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_function;
-    state->registers[id].function = function;
+    state->registers[id].function.id = function;
+    state->registers[id].function.result = result;
     active_register(state, id);
 }
 
@@ -187,7 +216,7 @@ static success_indicator generate_type(type const generated,
         return stream_writer_write_string(c_output, "unit");
 
     case type_kind_string_ref:
-        LPG_TO_DO();
+        return stream_writer_write_string(c_output, "string_ref");
 
     case type_kind_enumeration:
         return stream_writer_write_string(c_output, "size_t");
@@ -244,7 +273,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
 
     case register_meaning_function:
         return generate_function_name(
-            state->registers[from].function, c_output);
+            state->registers[from].function.id, c_output);
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
@@ -437,10 +466,12 @@ static success_indicator generate_string_length(c_backend_state *state,
     UNREACHABLE();
 }
 
-static success_indicator generate_sequence(c_backend_state *state,
-                                           instruction_sequence const sequence,
-                                           size_t const indentation,
-                                           stream_writer const c_output);
+static success_indicator
+generate_sequence(c_backend_state *state,
+                  checked_function const *const all_functions,
+                  register_id const current_function_result,
+                  instruction_sequence const sequence, size_t const indentation,
+                  stream_writer const c_output);
 
 static success_indicator indent(size_t const indentation,
                                 stream_writer const c_output)
@@ -452,10 +483,10 @@ static success_indicator indent(size_t const indentation,
     return success;
 }
 
-static success_indicator generate_instruction(c_backend_state *state,
-                                              instruction const input,
-                                              size_t const indentation,
-                                              stream_writer const c_output)
+static success_indicator generate_instruction(
+    c_backend_state *state, checked_function const *const all_functions,
+    register_id const current_function_result, instruction const input,
+    size_t const indentation, stream_writer const c_output)
 {
     switch (input.type)
     {
@@ -595,9 +626,15 @@ static success_indicator generate_instruction(c_backend_state *state,
         case register_meaning_argument:
             LPG_TO_DO();
         }
-        set_register_variable(
-            state, input.call.result, register_resource_ownership_none);
-        LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+        {
+            type const result_type =
+                state->registers[input.call.callee].function.result;
+            set_register_variable(
+                state, input.call.result,
+                find_register_resource_ownership(result_type));
+            LPG_TRY(generate_type(result_type, c_output));
+        }
+        LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.call.result, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_c_read_access(state, input.call.callee, c_output));
@@ -619,8 +656,8 @@ static success_indicator generate_instruction(c_backend_state *state,
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-        LPG_TRY(
-            generate_sequence(state, input.loop, indentation + 1, c_output));
+        LPG_TRY(generate_sequence(state, all_functions, current_function_result,
+                                  input.loop, indentation + 1, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         return success;
@@ -727,27 +764,35 @@ static success_indicator generate_instruction(c_backend_state *state,
         return success;
 
     case instruction_lambda:
-        set_register_lambda(state, input.lambda.into, input.lambda.id);
+        set_register_lambda(state, input.lambda.into, input.lambda.id,
+                            all_functions[input.lambda.id].signature->result);
         return success;
     }
     UNREACHABLE();
 }
 
-static success_indicator generate_sequence(c_backend_state *state,
-                                           instruction_sequence const sequence,
-                                           size_t const indentation,
-                                           stream_writer const c_output)
+static success_indicator
+generate_sequence(c_backend_state *state,
+                  checked_function const *const all_functions,
+                  register_id const current_function_result,
+                  instruction_sequence const sequence, size_t const indentation,
+                  stream_writer const c_output)
 {
     size_t const previously_active_registers = state->active_register_count;
     for (size_t i = 0; i < sequence.length; ++i)
     {
-        LPG_TRY(generate_instruction(
-            state, sequence.elements[i], indentation, c_output));
+        LPG_TRY(
+            generate_instruction(state, all_functions, current_function_result,
+                                 sequence.elements[i], indentation, c_output));
     }
     for (size_t i = previously_active_registers;
          i < state->active_register_count; ++i)
     {
         register_id const which = state->active_registers[i];
+        if (which == current_function_result)
+        {
+            continue;
+        }
         switch (state->registers[which].ownership)
         {
         case register_resource_ownership_none:
@@ -767,7 +812,8 @@ static success_indicator generate_sequence(c_backend_state *state,
 }
 
 static success_indicator generate_function_body(
-    checked_function const current_function, stream_writer const c_output,
+    checked_function const current_function,
+    checked_function const *const all_functions, stream_writer const c_output,
     standard_library_usage *standard_library, bool const return_0)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
@@ -785,7 +831,9 @@ static success_indicator generate_function_body(
     {
         set_register_argument(&state, i, i);
     }
-    LPG_TRY(generate_sequence(&state, current_function.body, 1, c_output));
+    LPG_TRY(generate_sequence(&state, all_functions,
+                              current_function.return_value,
+                              current_function.body, 1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "    return "));
     if (return_0)
     {
@@ -854,18 +902,18 @@ success_indicator generate_c(checked_program const program,
         }
         LPG_TRY_GOTO(
             stream_writer_write_string(program_defined_writer, ")\n"), fail);
-        LPG_TRY_GOTO(
-            generate_function_body(current_function, program_defined_writer,
-                                   &standard_library, false),
-            fail);
+        LPG_TRY_GOTO(generate_function_body(current_function, program.functions,
+                                            program_defined_writer,
+                                            &standard_library, false),
+                     fail);
     }
 
     LPG_TRY_GOTO(
         stream_writer_write_string(program_defined_writer, "int main(void)\n"),
         fail);
     LPG_TRY_GOTO(
-        generate_function_body(program.functions[0], program_defined_writer,
-                               &standard_library, true),
+        generate_function_body(program.functions[0], program.functions,
+                               program_defined_writer, &standard_library, true),
         fail);
 
     if (standard_library.using_stdlib)

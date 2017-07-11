@@ -7,6 +7,7 @@
 #include "lpg_c_backend.h"
 #include "lpg_read_file.h"
 #include "lpg_allocate.h"
+#include <stdio.h>
 
 static sequence parse(unicode_view const input)
 {
@@ -104,16 +105,24 @@ static void check_generated_c_code(char const *const source,
     {
         size_t const expected_total_length =
             (strlen(expected_boilerplate) + expected.length);
-        REQUIRE(generated.used == expected_total_length);
+        if (generated.used != expected_total_length)
+        {
+            fwrite(generated.data, 1, generated.used, stdout);
+            FAIL();
+        }
     }
     REQUIRE(
         unicode_view_equals(unicode_view_cut(memory_writer_content(generated),
                                              0, strlen(expected_boilerplate)),
                             unicode_view_from_c_str(expected_boilerplate)));
-    REQUIRE(unicode_view_equals(
-        unicode_view_cut(memory_writer_content(generated),
-                         strlen(expected_boilerplate), generated.used),
-        unicode_view_from_string(expected)));
+    if (!unicode_view_equals(
+            unicode_view_cut(memory_writer_content(generated),
+                             strlen(expected_boilerplate), generated.used),
+            unicode_view_from_string(expected)))
+    {
+        fwrite(generated.data, 1, generated.used, stdout);
+        FAIL();
+    }
     unicode_string_free(&full_expected_file_path);
     checked_program_free(&checked);
     memory_writer_free(&generated);
@@ -202,6 +211,13 @@ void test_c_backend(void)
                            std_library.globals,
                            LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
                            "14_lambda_parameters.c");
+
+    check_generated_c_code("let s = () read()\n"
+                           "print(s())\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
+                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
+                           "15_return_string.c");
 
     standard_library_description_free(&std_library);
 }
