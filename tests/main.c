@@ -14,7 +14,7 @@
 #include "test_parse_expression_syntax_error.h"
 #include "test_expression.h"
 #include "test_semantics.h"
-#include "test_interprete.h"
+#include "test_interpreter.h"
 #include "test_cli.h"
 #include "test_c_backend.h"
 #include "test_implicitly_convertible.h"
@@ -39,7 +39,7 @@ int main(void)
                                     test_parse_expression_success,
                                     test_parse_expression_syntax_error,
                                     test_semantics,
-                                    test_interprete,
+                                    test_interpreter,
                                     test_implicitly_convertible,
                                     test_cli,
                                     test_c_backend};

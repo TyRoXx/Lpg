@@ -1,4 +1,4 @@
-#include "test_interprete.h"
+#include "test_interpreter.h"
 #include "test.h"
 #include "lpg_interprete.h"
 #include "lpg_stream_writer.h"
@@ -108,7 +108,7 @@ static void expect_output(char const *source, char const *input,
     garbage_collector_free(gc);
 }
 
-void test_interprete(void)
+void test_interpreter(void)
 {
     standard_library_description const std_library =
         describe_standard_library();
