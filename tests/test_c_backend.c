@@ -224,5 +224,12 @@ void test_c_backend(void)
                            std_library.globals, LPG_C_STDIO,
                            "16_pass_string.c");
 
+    check_generated_c_code("let s = (a: string-ref) print(a)\n"
+                           "s(read())\n",
+                           std_library.globals,
+                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
+                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
+                           "17_pass_owning_string.c");
+
     standard_library_description_free(&std_library);
 }
