@@ -28,7 +28,7 @@ if(UNIX)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=memory -pie")
     endif()
    
-    option(LPG_WITH_ADDRESS_SANITIZER "compile with clang memory sanitizer" OFF)
+    option(LPG_WITH_ADDRESS_SANITIZER "compile with clang address sanitizer" OFF)
     if(LPG_WITH_ADDRESS_SANITIZER)
         add_definitions(-fsanitize=address -fno-omit-frame-pointer -shared-libasan)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -shared-libasan")
