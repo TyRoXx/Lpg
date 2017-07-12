@@ -9,17 +9,12 @@ typedef struct standard_library_usage
     bool using_read;
     bool using_stdio;
     bool using_assert;
-    bool using_stdlib;
-    bool using_stdbool;
-    bool using_string;
+    bool using_unit;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
 {
     usage->using_string_ref = true;
-    usage->using_stdbool = true;
-    usage->using_string = true;
-    usage->using_stdlib = true;
 }
 
 typedef enum register_meaning
@@ -282,6 +277,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
             LPG_TO_DO();
 
         case value_kind_string:
+            state->standard_library.using_string_ref = true;
             LPG_TRY(stream_writer_write_string(c_output, "string_ref_create("));
             LPG_TRY(encode_string_literal(
                 state->registers[from].literal.string_ref, c_output));
@@ -501,11 +497,12 @@ static success_indicator generate_instruction(
 
         case register_meaning_print:
             state->standard_library.using_stdio = true;
+            state->standard_library.using_unit = true;
             set_register_variable(
                 state, input.call.result, register_resource_ownership_none);
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = {};\n"));
+            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "fwrite("));
             ASSERT(input.call.argument_count == 1);
@@ -530,8 +527,6 @@ static success_indicator generate_instruction(
 
         case register_meaning_assert:
             state->standard_library.using_assert = true;
-            state->standard_library.using_stdlib = true;
-            state->standard_library.using_stdbool = true;
             set_register_variable(
                 state, input.call.result, register_resource_ownership_none);
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
@@ -865,7 +860,7 @@ success_indicator generate_c(checked_program const program,
         memory_writer_erase(&program_defined);
 
     standard_library_usage standard_library = {
-        false, false, false, false, false, false, false};
+        false, false, false, false, false};
     for (function_id i = 1; i < program.function_count; ++i)
     {
         checked_function const current_function = program.functions[i];
@@ -919,38 +914,35 @@ success_indicator generate_c(checked_program const program,
                                program_defined_writer, &standard_library, true),
         fail);
 
-    if (standard_library.using_stdlib)
+    if (standard_library.using_unit)
     {
         LPG_TRY_GOTO(
-            stream_writer_write_string(c_output, LPG_C_STDLIB), fail_2);
-    }
-    if (standard_library.using_stdbool)
-    {
-        LPG_TRY_GOTO(
-            stream_writer_write_string(c_output, LPG_C_STDBOOL), fail_2);
+            stream_writer_write_string(c_output, "#include <lpg_std_unit.h>\n"),
+            fail_2);
     }
     if (standard_library.using_assert)
     {
-        LPG_TRY_GOTO(
-            stream_writer_write_string(c_output, LPG_C_ASSERT), fail_2);
-    }
-    if (standard_library.using_string)
-    {
-        LPG_TRY_GOTO(
-            stream_writer_write_string(c_output, LPG_C_STRING), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(
+                         c_output, "#include <lpg_std_assert.h>\n"),
+                     fail_2);
     }
     if (standard_library.using_string_ref)
     {
-        LPG_TRY_GOTO(
-            stream_writer_write_string(c_output, LPG_C_STRING_REF), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(
+                         c_output, "#include <lpg_std_string.h>\n"),
+                     fail_2);
     }
     if (standard_library.using_stdio)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, LPG_C_STDIO), fail_2);
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, "#include <stdio.h>\n"),
+            fail_2);
     }
     if (standard_library.using_read)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, LPG_C_READ), fail_2);
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, "#include <lpg_std_read.h>\n"),
+            fail_2);
     }
 
     LPG_TRY_GOTO(stream_writer_write_bytes(

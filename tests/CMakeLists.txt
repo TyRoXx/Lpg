@@ -1,3 +1,4 @@
+add_subdirectory(c_backend)
 include_directories(../syntax)
 include_directories(../generic)
 include_directories(../tokenization)

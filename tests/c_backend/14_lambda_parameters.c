@@ -1,3 +1,4 @@
+#include <lpg_std_assert.h>
 static size_t lambda_1(size_t const arg0, size_t const arg1)
 {
     size_t const r_8 = !arg1;

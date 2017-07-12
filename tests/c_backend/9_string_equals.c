@@ -1,3 +1,7 @@
+#include <lpg_std_assert.h>
+#include <lpg_std_string.h>
+#include <stdio.h>
+#include <lpg_std_read.h>
 int main(void)
 {
     string_ref const r_6 = read_impl();

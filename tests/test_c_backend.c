@@ -80,7 +80,6 @@ static void fix_line_endings(unicode_string *s)
 
 static void check_generated_c_code(char const *const source,
                                    structure const non_empty_global,
-                                   char const *const expected_boilerplate,
                                    char const *const expected_c_file_name)
 {
     sequence root = parse(unicode_view_from_c_str(source));
@@ -103,22 +102,15 @@ static void check_generated_c_code(char const *const source,
     REQUIRE(expected.length == expected_or_error.success.length);
     fix_line_endings(&expected);
     {
-        size_t const expected_total_length =
-            (strlen(expected_boilerplate) + expected.length);
+        size_t const expected_total_length = expected.length;
         if (generated.used != expected_total_length)
         {
             fwrite(generated.data, 1, generated.used, stdout);
             FAIL();
         }
     }
-    REQUIRE(
-        unicode_view_equals(unicode_view_cut(memory_writer_content(generated),
-                                             0, strlen(expected_boilerplate)),
-                            unicode_view_from_c_str(expected_boilerplate)));
-    if (!unicode_view_equals(
-            unicode_view_cut(memory_writer_content(generated),
-                             strlen(expected_boilerplate), generated.used),
-            unicode_view_from_string(expected)))
+    if (!unicode_view_equals(memory_writer_content(generated),
+                             unicode_view_from_string(expected)))
     {
         fwrite(generated.data, 1, generated.used, stdout);
         FAIL();
@@ -134,73 +126,52 @@ void test_c_backend(void)
     standard_library_description const std_library =
         describe_standard_library();
 
-    check_generated_c_code("", std_library.globals, "", "0_empty.c");
+    check_generated_c_code("", std_library.globals, "0_empty.c");
 
-    check_generated_c_code("print(\"Hello, world!\")\n", std_library.globals,
-                           LPG_C_STDIO, "1_hello_world.c");
+    check_generated_c_code(
+        "print(\"Hello, world!\")\n", std_library.globals, "1_hello_world.c");
 
     check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n",
-                           std_library.globals, LPG_C_STDIO, "2_print_twice.c");
+                           std_library.globals, "2_print_twice.c");
 
     check_generated_c_code("loop\n"
                            "    print(\"Hello, world!\")\n"
                            "    break\n",
-                           std_library.globals, LPG_C_STDIO, "3_loop_break.c");
+                           std_library.globals, "3_loop_break.c");
 
     check_generated_c_code("let s = concat(\"123\", \"456\")\n"
                            "print(s)\n",
-                           std_library.globals, LPG_C_STDIO,
-                           "4_concat_compile_time.c");
+                           std_library.globals, "4_concat_compile_time.c");
 
-    check_generated_c_code("print(read())\n", std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "5_read.c");
+    check_generated_c_code("print(read())\n", std_library.globals, "5_read.c");
 
     check_generated_c_code("loop\n"
                            "    print(read())\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "6_loop_read.c");
+                           std_library.globals, "6_loop_read.c");
 
-    check_generated_c_code("assert(boolean.false)\n", std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "7_assert_false.c");
+    check_generated_c_code(
+        "assert(boolean.false)\n", std_library.globals, "7_assert_false.c");
 
-    check_generated_c_code("assert(boolean.true)\n", std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "8_assert_true.c");
+    check_generated_c_code(
+        "assert(boolean.true)\n", std_library.globals, "8_assert_true.c");
 
     check_generated_c_code("assert(string-equals(read(), \"\"))\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "9_string_equals.c");
+                           std_library.globals, "9_string_equals.c");
 
-    check_generated_c_code("print(concat(\"a\", read()))\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "10_concat.c");
+    check_generated_c_code(
+        "print(concat(\"a\", read()))\n", std_library.globals, "10_concat.c");
 
     check_generated_c_code("let f = () boolean.true\n"
                            "assert(f())\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "11_lambda.c");
+                           std_library.globals, "11_lambda.c");
 
     check_generated_c_code("let f = () assert(boolean.true)\n"
                            "f()\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "12_lambda_call.c");
+                           std_library.globals, "12_lambda_call.c");
 
     check_generated_c_code("let id = (a: boolean) a\n"
                            "assert(id(boolean.true))\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "13_lambda_parameter.c");
+                           std_library.globals, "13_lambda_parameter.c");
 
     check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
                            "    or(and(a, not(b)), and(not(a), b))\n"
@@ -208,28 +179,19 @@ void test_c_backend(void)
                            "assert(xor(boolean.false, boolean.true))\n"
                            "assert(not(xor(boolean.true, boolean.true)))\n"
                            "assert(not(xor(boolean.false, boolean.false)))\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_ASSERT,
-                           "14_lambda_parameters.c");
+                           std_library.globals, "14_lambda_parameters.c");
 
     check_generated_c_code("let s = () read()\n"
                            "print(s())\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "15_return_string.c");
+                           std_library.globals, "15_return_string.c");
 
     check_generated_c_code("let s = (a: string-ref) print(a)\n"
                            "s(\"a\")\n",
-                           std_library.globals, LPG_C_STDIO,
-                           "16_pass_string.c");
+                           std_library.globals, "16_pass_string.c");
 
     check_generated_c_code("let s = (a: string-ref) print(a)\n"
                            "s(read())\n",
-                           std_library.globals,
-                           LPG_C_STDLIB LPG_C_STDBOOL LPG_C_STRING
-                               LPG_C_STRING_REF LPG_C_STDIO LPG_C_READ,
-                           "17_pass_owning_string.c");
+                           std_library.globals, "17_pass_owning_string.c");
 
     standard_library_description_free(&std_library);
 }
