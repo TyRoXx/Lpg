@@ -1,6 +1,8 @@
 if(MSVC)
     add_definitions(/wd4101)
     add_definitions(/wd4702)
+else()
+    add_definitions(-Wno-unused-variable)
 endif()
 file(GLOB sources "*.c")
 foreach(source IN ITEMS ${sources})
