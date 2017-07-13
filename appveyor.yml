@@ -31,7 +31,7 @@ test_script:
   - cd build\tests
   - .\%BUILD_TYPE%\tests.exe
   - cd ..
-  - ctest
+  - ctest -C %BUILD_TYPE%
 
 after_test:
 
