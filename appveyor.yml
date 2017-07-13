@@ -30,6 +30,8 @@ before_test:
 test_script:
   - cd build\tests
   - .\%BUILD_TYPE%\tests.exe
+  - cd ..
+  - ctest
 
 after_test:
 
