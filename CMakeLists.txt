@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8)
 project(Lpg C)
 
+enable_testing()
+
 if(MSVC)
 	option(LPG_WITH_VLD "use Visual Leak Detector" OFF)
 endif()

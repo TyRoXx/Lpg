@@ -146,11 +146,14 @@ void test_c_backend(void)
     check_generated_c_code("print(read())\n", std_library.globals, "5_read.c");
 
     check_generated_c_code("loop\n"
+                           "    break\n"
                            "    print(read())\n",
                            std_library.globals, "6_loop_read.c");
 
-    check_generated_c_code(
-        "assert(boolean.false)\n", std_library.globals, "7_assert_false.c");
+    check_generated_c_code("loop\n"
+                           "    break\n"
+                           "    assert(boolean.false)\n",
+                           std_library.globals, "7_assert_false.c");
 
     check_generated_c_code(
         "assert(boolean.true)\n", std_library.globals, "8_assert_true.c");

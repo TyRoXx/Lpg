@@ -6,6 +6,7 @@ int main(void)
 {
     for (;;)
     {
+        break;
         string_ref const r_4 = read_impl();
         unit const r_5 = unit_impl;
         fwrite(r_4.data, 1, r_4.length, stdout);
