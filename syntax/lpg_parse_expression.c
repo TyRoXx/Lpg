@@ -521,7 +521,11 @@ static expression_parser_result parse_callable(expression_parser *parser,
         }
 
         case token_comment:
-            LPG_TO_DO();
+            pop(parser);
+            expression expr = expression_from_comment(comment_expression_create(
+                unicode_view_copy(head.content), head.where));
+            expression_parser_result result = {1, expr};
+            return result;
 
         case token_string:
         {

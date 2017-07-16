@@ -36,7 +36,8 @@ typedef enum expression_type
     expression_type_break,
     expression_type_sequence,
     expression_type_declare,
-    expression_type_tuple
+    expression_type_tuple,
+    expression_type_comment
 } expression_type;
 
 typedef struct tuple
@@ -54,6 +55,11 @@ typedef struct call
 
 call call_create(LPG_NON_NULL(expression *callee), tuple arguments,
                  source_location closing_parenthesis);
+typedef struct comment_expression
+{
+    unicode_string value;
+    source_location source;
+} comment_expression;
 
 typedef struct identifier_expression
 {
@@ -168,6 +174,13 @@ integer_literal_expression_create(integer value, source_location source);
 bool integer_literal_expression_equals(integer_literal_expression const left,
                                        integer_literal_expression const right);
 
+comment_expression comment_expression_create(unicode_string value,
+                                             source_location source);
+typedef struct comment
+{
+    unicode_string content;
+} comment;
+
 struct expression
 {
     expression_type type;
@@ -186,6 +199,7 @@ struct expression
         sequence sequence;
         declare declare;
         tuple tuple;
+        comment_expression comment;
 
         /*for monostate expressions like break:*/
         source_location source;
@@ -198,6 +212,7 @@ void access_structure_free(access_structure const *this);
 void match_free(LPG_NON_NULL(match const *this));
 expression expression_from_lambda(lambda lambda);
 expression expression_from_string(string_expression value);
+expression expression_from_comment(comment_expression value);
 expression expression_from_call(call value);
 expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_tuple(tuple value);

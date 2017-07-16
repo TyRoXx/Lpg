@@ -112,6 +112,26 @@ void test_parse_expression_success(void)
             unicode_string_from_c_str("f(1, 2)"), false);
     }
     {
+        expression expr = expression_from_comment(comment_expression_create(
+            unicode_string_from_c_str("//Testing the comments"),
+            source_location_create(0, 0)));
+        test_successful_parse(
+            expr, unicode_string_from_c_str("//Testing the comments"), false);
+    }
+    {
+        expression *elements = allocate_array(2, sizeof(*elements));
+        elements[0] = expression_from_comment(comment_expression_create(
+            unicode_string_from_c_str("//Testing the comments"),
+            source_location_create(1, 4)));
+        elements[1] = expression_from_break(source_location_create(2, 4));
+        test_successful_parse(
+            expression_from_loop(sequence_create(elements, 2)),
+            unicode_string_from_c_str("loop\n"
+                                      "    //Testing the comments\n"
+                                      "    break"),
+            false);
+    }
+    {
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_break(source_location_create(1, 4));
         test_successful_parse(

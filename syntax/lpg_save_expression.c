@@ -197,6 +197,8 @@ success_indicator save_expression(stream_writer const to,
             LPG_TRY(save_expression(to, value->tuple.elements + i, whitespace));
         }
         return stream_writer_write_string(to, ")");
+    case expression_type_comment:
+        return stream_writer_write_string(to, "//");
     }
     UNREACHABLE();
 }
