@@ -260,8 +260,17 @@ source_location expression_source_begin(expression const value)
         LPG_TO_DO();
     case expression_type_tuple:
         LPG_TO_DO();
+    case expression_type_comment:
+        LPG_TO_DO();
     }
     UNREACHABLE();
+}
+
+comment_expression comment_expression_create(unicode_string value,
+                                             source_location source)
+{
+    comment_expression result = {value, source};
+    return result;
 }
 
 identifier_expression identifier_expression_create(unicode_string value,
@@ -291,6 +300,11 @@ string_expression string_expression_create(unicode_string value,
 }
 
 void string_expression_free(string_expression const *value)
+{
+    unicode_string_free(&value->value);
+}
+
+void comment_expression_free(comment_expression const *value)
 {
     unicode_string_free(&value->value);
 }
@@ -347,6 +361,14 @@ expression expression_from_lambda(lambda lambda)
     expression result;
     result.type = expression_type_lambda;
     result.lambda = lambda;
+    return result;
+}
+
+expression expression_from_comment(comment_expression value)
+{
+    expression result;
+    result.type = expression_type_comment;
+    result.comment = value;
     return result;
 }
 
@@ -455,6 +477,9 @@ void expression_free(expression const *this)
     case expression_type_tuple:
         tuple_free(&this->tuple);
         break;
+    case expression_type_comment:
+        comment_expression_free(&this->comment);
+        break;
     }
 }
 
@@ -511,6 +536,12 @@ bool match_equals(match const left, match const right)
         }
     }
     return true;
+}
+
+bool comment_equals(comment_expression left, comment_expression right)
+{
+    bool source_equals = source_location_equals(left.source, right.source);
+    return unicode_string_equals(left.value, right.value) && source_equals;
 }
 
 bool expression_equals(expression const *left, expression const *right)
@@ -584,6 +615,9 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_tuple:
         LPG_TO_DO();
+
+    case expression_type_comment:
+        return comment_equals(left->comment, right->comment);
     }
     UNREACHABLE();
 }

@@ -43,7 +43,7 @@ blob_or_error read_file(char const *const name)
     }
 
 #if (SIZE_MAX < UINT64_MAX)
-    if (source_size > SIZE_MAX)
+    if ((uint64_t)source_size > SIZE_MAX)
     {
         fclose(source_file);
         return make_blob_error("Source file does not fit into memory\n");

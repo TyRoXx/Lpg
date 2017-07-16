@@ -931,7 +931,7 @@ evaluate_expression(function_checking_state *state,
         return evaluate_expression_result_create(
             result, element_read.type_, element_read.compile_time_value);
     }
-
+    case expression_type_comment:
     case expression_type_match:
         LPG_TO_DO();
 
