@@ -1,4 +1,5 @@
 #include "lpg_save_expression.h"
+#include "lpg_unicode_view.h"
 #include "lpg_assert.h"
 #include "lpg_for.h"
 #include "lpg_identifier.h"
@@ -132,8 +133,8 @@ success_indicator save_expression(stream_writer const to,
 
     case expression_type_identifier:
         LPG_TRY(space_here(to, &whitespace));
-        return stream_writer_write_bytes(
-            to, value->identifier.value.data, value->identifier.value.length);
+        return stream_writer_write_unicode_view(
+            to, unicode_view_from_string(value->identifier.value));
 
     case expression_type_assign:
         LPG_TRY(save_expression(to, value->assign.left, whitespace));
@@ -173,8 +174,8 @@ success_indicator save_expression(stream_writer const to,
 
     case expression_type_declare:
         LPG_TRY(stream_writer_write_string(to, "let "));
-        LPG_TRY(stream_writer_write_bytes(to, value->declare.name.value.data,
-                                          value->declare.name.value.length));
+        LPG_TRY(stream_writer_write_unicode_view(
+            to, unicode_view_from_string(value->declare.name.value)));
         if (value->declare.optional_type)
         {
             LPG_TRY(stream_writer_write_string(to, " : "));
@@ -198,7 +199,19 @@ success_indicator save_expression(stream_writer const to,
         }
         return stream_writer_write_string(to, ")");
     case expression_type_comment:
-        return stream_writer_write_string(to, "//");
+    {
+        unicode_string comment_content = value->comment.value;
+        if (unicode_string_find(comment_content, '\n').state == optional_set)
+        {
+            LPG_TRY(stream_writer_write_string(to, "/*"));
+            LPG_TRY(stream_writer_write_unicode_view(
+                to, unicode_view_from_string(comment_content)));
+            return stream_writer_write_string(to, "*/");
+        }
+        LPG_TRY(stream_writer_write_string(to, "//"));
+        return stream_writer_write_unicode_view(
+            to, unicode_view_from_string(comment_content));
+    }
     }
     UNREACHABLE();
 }

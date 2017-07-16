@@ -176,10 +176,6 @@ bool integer_literal_expression_equals(integer_literal_expression const left,
 
 comment_expression comment_expression_create(unicode_string value,
                                              source_location source);
-typedef struct comment
-{
-    unicode_string content;
-} comment;
 
 struct expression
 {
