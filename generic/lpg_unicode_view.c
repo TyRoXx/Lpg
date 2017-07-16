@@ -55,3 +55,15 @@ unicode_view unicode_view_cut(unicode_view const whole, size_t const begin,
     ASSUME(end <= whole.length);
     return unicode_view_create(whole.begin + begin, (end - begin));
 }
+
+optional_size unicode_string_find(unicode_string haystack, const char needle)
+{
+    for (size_t i = 0; i < haystack.length; ++i)
+    {
+        if (haystack.data[i] == needle)
+        {
+            return make_optional_size(i);
+        }
+    }
+    return optional_size_empty;
+}

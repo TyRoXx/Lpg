@@ -12,6 +12,9 @@ typedef struct stream_writer
     void *user;
 } stream_writer;
 
+success_indicator stream_writer_write_unicode_view(stream_writer writer,
+                                                   unicode_view string);
+
 success_indicator stream_writer_write_string(stream_writer writer,
                                              LPG_NON_NULL(char const *c_str));
 success_indicator stream_writer_write_bytes(stream_writer writer,

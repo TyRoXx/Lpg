@@ -2,6 +2,12 @@
 #include "lpg_allocate.h"
 #include <string.h>
 
+success_indicator stream_writer_write_unicode_view(stream_writer writer,
+                                                   unicode_view string)
+{
+    return stream_writer_write_bytes(writer, string.begin, string.length);
+}
+
 success_indicator stream_writer_write_string(stream_writer writer,
                                              char const *c_str)
 {
