@@ -17,4 +17,8 @@ void test_unicode_string(void)
         REQUIRE(!memcmp(s.data, &expected, sizeof(expected)));
         unicode_string_free(&s);
     }
+    {
+        unicode_string s = unicode_string_from_c_str("abc");
+        unicode_string_free(&s);
+    }
 }

@@ -200,17 +200,15 @@ success_indicator save_expression(stream_writer const to,
         return stream_writer_write_string(to, ")");
     case expression_type_comment:
     {
-        unicode_string comment_content = value->comment.value;
-        if (unicode_string_find(comment_content, '\n').state == optional_set)
+        unicode_view view = unicode_view_from_string(value->comment.value);
+        if (unicode_view_find(view, '\n').state == optional_set)
         {
             LPG_TRY(stream_writer_write_string(to, "/*"));
-            LPG_TRY(stream_writer_write_unicode_view(
-                to, unicode_view_from_string(comment_content)));
+            LPG_TRY(stream_writer_write_unicode_view(to, view));
             return stream_writer_write_string(to, "*/");
         }
         LPG_TRY(stream_writer_write_string(to, "//"));
-        return stream_writer_write_unicode_view(
-            to, unicode_view_from_string(comment_content));
+        return stream_writer_write_unicode_view(to, view);
     }
     }
     UNREACHABLE();

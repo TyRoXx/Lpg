@@ -17,4 +17,4 @@ bool unicode_view_equals(unicode_view left, unicode_view right);
 unicode_string unicode_view_copy(unicode_view value);
 unicode_view unicode_view_cut(unicode_view const whole, size_t const begin,
                               size_t const end);
-optional_size unicode_string_find(unicode_string haystack, const char needle);
+optional_size unicode_view_find(unicode_view haystack, const char needle);

@@ -1,8 +1,28 @@
 #include "test_unicode_view.h"
-#include "test.h"
 #include "lpg_unicode_view.h"
+#include "test.h"
+#include "lpg_arithmetic.h"
 #include <string.h>
 #include <lpg_string_literal.h>
+
+void test_unicode_view_finder()
+{
+    unicode_view const view = unicode_view_from_c_str("abc");
+    {
+        optional_size position = unicode_view_find(view, 'a');
+        REQUIRE(position.state == optional_set);
+        REQUIRE(position.value_if_set == 0);
+    }
+    {
+        optional_size position = unicode_view_find(view, 'c');
+        REQUIRE(position.state == optional_set);
+        REQUIRE(position.value_if_set == 2);
+    }
+    {
+        optional_size position = unicode_view_find(view, '0');
+        REQUIRE(position.state == optional_empty);
+    }
+}
 
 void test_unicode_view(void)
 {
@@ -33,4 +53,5 @@ void test_unicode_view(void)
         REQUIRE(view.length == 3);
         REQUIRE(unicode_view_equals_c_str(view, "abc"));
     }
+    test_unicode_view_finder();
 }
