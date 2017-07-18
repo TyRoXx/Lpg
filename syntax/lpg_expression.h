@@ -55,6 +55,7 @@ typedef struct call
 
 call call_create(LPG_NON_NULL(expression *callee), tuple arguments,
                  source_location closing_parenthesis);
+
 typedef struct comment_expression
 {
     unicode_string value;
