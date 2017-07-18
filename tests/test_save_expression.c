@@ -8,7 +8,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-void testing_comment_expressions();
+static void testing_comment_expressions();
 
 static void check_expression_rendering(expression tree, char const *expected)
 {
@@ -406,7 +406,7 @@ void test_save_expression(void)
     testing_comment_expressions();
 }
 
-void testing_comment_expressions() {
+static void testing_comment_expressions() {
     {
         unicode_string content = unicode_string_from_c_str("//Test");
         expression comment = expression_from_comment(

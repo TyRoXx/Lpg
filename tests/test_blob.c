@@ -17,4 +17,11 @@ void test_blob(void)
         REQUIRE(!memcmp(s.data, &expected, sizeof(expected)));
         blob_free(&s);
     }
+
+    {
+        blob blob_range = blob_from_range("hello", 5);
+        REQUIRE(blob_range.length == 5);
+        blob blob_string = blob_from_c_str("hello");
+        REQUIRE(blob_equals(blob_range, blob_string));
+    }
 }
