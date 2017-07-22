@@ -271,11 +271,14 @@ comment_expression comment_expression_create(unicode_string value,
 {
     unicode_view view = unicode_view_from_string(value);
     size_t end = value.length;
-    if(value.data[1] == '*'){
+    if (value.data[1] == '*')
+    {
         end -= 2;
     }
     view = unicode_view_cut(view, 2, end);
-    comment_expression result = {unicode_string_from_range(view.begin, view.length), source};
+    comment_expression result = {
+        unicode_string_from_range(view.begin, view.length), source};
+    unicode_string_free(&value);
     return result;
 }
 
@@ -483,6 +486,7 @@ void expression_free(expression const *this)
     case expression_type_tuple:
         tuple_free(&this->tuple);
         break;
+
     case expression_type_comment:
         comment_expression_free(&this->comment);
         break;

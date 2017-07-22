@@ -23,5 +23,7 @@ void test_blob(void)
         REQUIRE(blob_range.length == 5);
         blob blob_string = blob_from_c_str("hello");
         REQUIRE(blob_equals(blob_range, blob_string));
+        blob_free(&blob_range);
+        blob_free(&blob_string);
     }
 }
