@@ -269,16 +269,7 @@ source_location expression_source_begin(expression const value)
 comment_expression comment_expression_create(unicode_string value,
                                              source_location source)
 {
-    unicode_view view = unicode_view_from_string(value);
-    size_t end = value.length;
-    if (value.data[1] == '*')
-    {
-        end -= 2;
-    }
-    view = unicode_view_cut(view, 2, end);
-    comment_expression result = {
-        unicode_string_from_range(view.begin, view.length), source};
-    unicode_string_free(&value);
+    comment_expression result = {value, source};
     return result;
 }
 
