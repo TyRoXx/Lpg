@@ -523,9 +523,17 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_comment:
         {
             pop(parser);
-            expression expr = expression_from_comment(comment_expression_create(
-                unicode_view_copy(head.content), head.where));
-            expression_parser_result result = {1, expr};
+            size_t end = head.content.length;
+            if (head.content.begin[1] == '*')
+            {
+                end -= 2;
+            }
+            unicode_view view = unicode_view_cut(head.content, 2, end);
+
+            comment_expression comment = comment_expression_create(
+                    unicode_view_copy(view), head.where);
+
+            expression_parser_result result = {1, expression_from_comment(comment)};
             return result;
         }
         case token_string:

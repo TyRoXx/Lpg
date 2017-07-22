@@ -8,6 +8,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+static void testing_comment_expressions();
+
 static void check_expression_rendering(expression tree, char const *expected)
 {
     memory_writer buffer = {NULL, 0, 0};
@@ -401,6 +403,11 @@ void test_save_expression(void)
             "        break\n");
     }
 
+    testing_comment_expressions();
+}
+
+static void testing_comment_expressions()
+{
     {
         unicode_string content = unicode_string_from_c_str("Test");
         expression comment = expression_from_comment(

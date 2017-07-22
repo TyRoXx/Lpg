@@ -7,6 +7,7 @@
 #include "test_unicode_string.h"
 #include "test_allocator.h"
 #include "test_arithmetic.h"
+#include "test_blob.h"
 #include "test_stream_writer.h"
 #include "test_identifier.h"
 #include "test_tokenize.h"
@@ -44,6 +45,7 @@ int main(void)
                                     test_interpreter,
                                     test_implicitly_convertible,
                                     test_cli,
+                                    test_blob,
                                     test_c_backend};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {

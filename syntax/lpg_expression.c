@@ -261,7 +261,7 @@ source_location expression_source_begin(expression const value)
     case expression_type_tuple:
         LPG_TO_DO();
     case expression_type_comment:
-        LPG_TO_DO();
+        return value.comment.source;
     }
     UNREACHABLE();
 }
@@ -477,6 +477,7 @@ void expression_free(expression const *this)
     case expression_type_tuple:
         tuple_free(&this->tuple);
         break;
+
     case expression_type_comment:
         comment_expression_free(&this->comment);
         break;

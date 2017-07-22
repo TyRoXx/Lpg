@@ -113,7 +113,7 @@ void test_parse_expression_success(void)
     }
     {
         expression expr = expression_from_comment(comment_expression_create(
-            unicode_string_from_c_str("//Testing the comments"),
+            unicode_string_from_c_str("Testing the comments"),
             source_location_create(0, 0)));
         test_successful_parse(
             expr, unicode_string_from_c_str("//Testing the comments"), false);
@@ -121,7 +121,7 @@ void test_parse_expression_success(void)
     {
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_comment(comment_expression_create(
-            unicode_string_from_c_str("//Testing the comments"),
+            unicode_string_from_c_str("Testing the comments"),
             source_location_create(1, 4)));
         elements[1] = expression_from_break(source_location_create(2, 4));
         test_successful_parse(
