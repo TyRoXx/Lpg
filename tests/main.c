@@ -1,6 +1,7 @@
 #include "lpg_allocate.h"
 #include "test_save_expression.h"
 #include "test.h"
+#include "test_blob.h"
 #include "test_integer.h"
 #include "test_decode_string_literal.h"
 #include "test_unicode_string.h"
@@ -25,7 +26,8 @@
 
 int main(void)
 {
-    static void (*tests[])(void) = {test_integer,
+    static void (*tests[])(void) = {test_blob,
+                                    test_integer,
                                     test_allocator,
                                     test_unicode_string,
                                     test_unicode_view,
