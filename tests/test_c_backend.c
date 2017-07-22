@@ -197,7 +197,8 @@ void test_c_backend(void)
                            std_library.globals, "17_pass_owning_string.c");
 
     check_generated_c_code("let s = (a: string-ref) a\n"
-                           "print(s(read()))\n",
+                           "let t = s(concat(read(), \"\"))\n"
+                           "assert(string-equals(\"\", t))\n",
                            std_library.globals, "18_move_string.c");
 
     standard_library_description_free(&std_library);

@@ -9,6 +9,6 @@ static unit lambda_1(string_ref const arg0)
 }
 int main(void)
 {
-    unit const r_2 = lambda_1(string_ref_create("a", 1));
+    unit const r_2 = lambda_1(string_literal("a", 1));
     return 0;
 }

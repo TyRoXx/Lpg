@@ -38,7 +38,8 @@ typedef enum register_meaning
 typedef enum register_resource_ownership
 {
     register_resource_ownership_none,
-    register_resource_ownership_string_ref
+    register_resource_ownership_owns_string,
+    register_resource_ownership_borrows_string
 } register_resource_ownership;
 
 typedef struct register_function
@@ -106,7 +107,7 @@ find_register_resource_ownership(type const variable)
         LPG_TO_DO();
 
     case type_kind_string_ref:
-        return register_resource_ownership_string_ref;
+        return register_resource_ownership_owns_string;
 
     case type_kind_unit:
         return register_resource_ownership_none;
@@ -146,11 +147,13 @@ static void set_register_lambda(c_backend_state *const state,
 
 static void set_register_argument(c_backend_state *const state,
                                   register_id const id,
-                                  register_id const argument)
+                                  register_id const argument,
+                                  register_resource_ownership const ownership)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_argument;
     state->registers[id].argument = argument;
+    state->registers[id].ownership = ownership;
     active_register(state, id);
 }
 
@@ -278,7 +281,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
 
         case value_kind_string:
             state->standard_library.using_string_ref = true;
-            LPG_TRY(stream_writer_write_string(c_output, "string_ref_create("));
+            LPG_TRY(stream_writer_write_string(c_output, "string_literal("));
             LPG_TRY(encode_string_literal(
                 state->registers[from].literal.string_ref, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
@@ -318,6 +321,65 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_argument:
         return generate_parameter_name(
             state->registers[from].argument, c_output);
+
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
+        LPG_TO_DO();
+    }
+    UNREACHABLE();
+}
+
+static success_indicator
+generate_add_reference_for_return_value(c_backend_state *state,
+                                        register_id const from,
+                                        stream_writer const c_output)
+{
+    switch (state->registers[from].meaning)
+    {
+    case register_meaning_nothing:
+        LPG_TO_DO();
+
+    case register_meaning_global:
+        LPG_TO_DO();
+
+    case register_meaning_variable:
+    case register_meaning_argument:
+        switch (state->registers[from].ownership)
+        {
+        case register_resource_ownership_none:
+            return success;
+
+        case register_resource_ownership_borrows_string:
+            LPG_TRY(stream_writer_write_string(
+                c_output, "    string_ref_add_reference(&"));
+            LPG_TRY(generate_c_read_access(state, from, c_output));
+            return stream_writer_write_string(c_output, ");\n");
+
+        case register_resource_ownership_owns_string:
+            return success;
+        }
+
+    case register_meaning_print:
+        LPG_TO_DO();
+
+    case register_meaning_read:
+        LPG_TO_DO();
+
+    case register_meaning_assert:
+        LPG_TO_DO();
+
+    case register_meaning_string_equals:
+        LPG_TO_DO();
+
+    case register_meaning_concat:
+        LPG_TO_DO();
+
+    case register_meaning_function:
+        LPG_TO_DO();
+
+    case register_meaning_literal:
+        return success;
 
     case register_meaning_and:
     case register_meaning_not:
@@ -519,7 +581,7 @@ static success_indicator generate_instruction(
             state->standard_library.using_read = true;
             ASSERT(input.call.argument_count == 0);
             set_register_variable(state, input.call.result,
-                                  register_resource_ownership_string_ref);
+                                  register_resource_ownership_owns_string);
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = read_impl();\n"));
@@ -558,7 +620,7 @@ static success_indicator generate_instruction(
         case register_meaning_concat:
             standard_library_usage_use_string_ref(&state->standard_library);
             set_register_variable(state, input.call.result,
-                                  register_resource_ownership_string_ref);
+                                  register_resource_ownership_owns_string);
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(
@@ -795,12 +857,15 @@ generate_sequence(c_backend_state *state,
         case register_resource_ownership_none:
             break;
 
-        case register_resource_ownership_string_ref:
+        case register_resource_ownership_owns_string:
             ASSERT(state->standard_library.using_string_ref);
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
             LPG_TRY(generate_register_name(which, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            break;
+
+        case register_resource_ownership_borrows_string:
             break;
         }
     }
@@ -826,11 +891,22 @@ static success_indicator generate_function_body(
     }
     for (register_id i = 0; i < current_function.signature->arity; ++i)
     {
-        set_register_argument(&state, i, i);
+        set_register_argument(
+            &state, i, i, (current_function.signature->arguments[i].kind ==
+                           type_kind_string_ref)
+                              ? register_resource_ownership_borrows_string
+                              : register_resource_ownership_none);
     }
     LPG_TRY(generate_sequence(&state, all_functions,
                               current_function.return_value,
                               current_function.body, 1, c_output));
+
+    if (!return_0)
+    {
+        LPG_TRY(generate_add_reference_for_return_value(
+            &state, current_function.return_value, c_output));
+    }
+
     LPG_TRY(stream_writer_write_string(c_output, "    return "));
     if (return_0)
     {
