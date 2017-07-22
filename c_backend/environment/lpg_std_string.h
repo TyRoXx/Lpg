@@ -47,7 +47,6 @@ static void string_ref_free(string_ref const *const s)
     {
         return;
     }
-    free((char *)s->data);
     free(s->references);
 }
 
@@ -65,10 +64,11 @@ static string_ref string_ref_concat(string_ref const left,
                                     string_ref const right)
 {
     size_t const result_length = (left.length + right.length);
-    size_t *const references = malloc(sizeof(*references));
+    char *const allocation = malloc(sizeof(size_t) + result_length);
+    size_t *const references = (size_t *)allocation;
     *references = 1;
     string_ref const result = {
-        malloc(result_length), 0, result_length, references};
+        allocation + sizeof(*references), 0, result_length, references};
     if (left.data)
     {
         memcpy((char *)result.data, left.data + left.begin, left.length);
