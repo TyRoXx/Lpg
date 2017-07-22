@@ -530,10 +530,11 @@ static expression_parser_result parse_callable(expression_parser *parser,
             }
             unicode_view view = unicode_view_cut(head.content, 2, end);
 
-            comment_expression comment = comment_expression_create(
-                    unicode_view_copy(view), head.where);
+            comment_expression comment =
+                comment_expression_create(unicode_view_copy(view), head.where);
 
-            expression_parser_result result = {1, expression_from_comment(comment)};
+            expression_parser_result result = {
+                1, expression_from_comment(comment)};
             return result;
         }
         case token_string:
