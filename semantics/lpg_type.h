@@ -1,7 +1,6 @@
 #pragma once
 
 #include "lpg_unicode_string.h"
-#include "../syntax/lpg_expression.h"
 #include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
 #include "lpg_integer.h"

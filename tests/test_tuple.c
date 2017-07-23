@@ -19,5 +19,5 @@ void test_tuple(void) {
         type t2 = type_from_tuple_type(&tuple2);
         ASSERT(type_equals(t1, t2));
     }
-
+    free(elements);
 }
