@@ -67,6 +67,11 @@ size_t count_total_allocations(void)
     return total_allocations;
 }
 
+size_t count_active_allocations(void)
+{
+    return active_allocations;
+}
+
 void *copy_array_impl(void const *from, size_t size_in_bytes)
 {
     void *result = allocate(size_in_bytes);
