@@ -140,6 +140,9 @@ static type get_return_type(type const callee)
     case type_kind_enumeration:
         LPG_TO_DO();
 
+    case type_kind_tuple:
+        return callee;
+
     case type_kind_type:
         LPG_TO_DO();
 
@@ -200,6 +203,9 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_enumeration:
         return flat_from.enum_ == flat_into.enum_;
 
+    case type_kind_tuple:
+        return type_equals(flat_from, flat_into);
+
     case type_kind_integer_range:
         return integer_less_or_equals(flat_into.integer_range_.minimum,
                                       flat_from.integer_range_.minimum) &&
@@ -250,6 +256,7 @@ static bool function_parameter_accepts_type(type const function,
     case type_kind_unit:
     case type_kind_string_ref:
     case type_kind_enumeration:
+    case type_kind_tuple:
         LPG_TO_DO();
 
     case type_kind_type:
@@ -377,6 +384,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
         return read_structure_element_result_create(
             false, type_from_unit(), optional_value_empty);
 
+    case type_kind_tuple:
+        LPG_TO_DO();
+
     case type_kind_type:
     {
         if (!object.compile_time_value.is_set)
@@ -396,6 +406,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_function_pointer:
         case type_kind_unit:
         case type_kind_string_ref:
+        case type_kind_tuple:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -459,6 +470,7 @@ static size_t expected_call_argument_count(const type callee)
         LPG_TO_DO();
 
     case type_kind_enumeration:
+    case type_kind_tuple:
         LPG_TO_DO();
 
     case type_kind_type:
@@ -541,6 +553,9 @@ static size_t find_lower_bound_for_inferred_values(type const root)
 
     case type_kind_integer_range:
         return 0;
+
+    case type_kind_tuple:
+        LPG_TO_DO();
 
     case type_kind_inferred:
         return (root.inferred + 1);

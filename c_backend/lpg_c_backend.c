@@ -102,7 +102,7 @@ find_register_resource_ownership(type const variable)
     {
     case type_kind_enumeration:
         LPG_TO_DO();
-
+    case type_kind_tuple:
     case type_kind_function_pointer:
         return register_resource_ownership_none;
 
@@ -242,6 +242,7 @@ generate_type(type const generated,
     case type_kind_enumeration:
         return stream_writer_write_string(c_output, "size_t");
 
+    case type_kind_tuple:
     case type_kind_type:
         LPG_TO_DO();
 
