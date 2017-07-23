@@ -151,12 +151,16 @@ tuple tuple_create(expression *elements, size_t length)
     return result;
 }
 
-bool tuple_equals(tuple const* left, tuple const* right){
-    if(left->length != right->length){
+bool tuple_equals(tuple const *left, tuple const *right)
+{
+    if (left->length != right->length)
+    {
         return false;
     }
-    for(size_t i = 0; i < left->length; ++i){
-        if(!expression_equals(left->elements+i, right->elements+i)){
+    for (size_t i = 0; i < left->length; ++i)
+    {
+        if (!expression_equals(left->elements + i, right->elements + i))
+        {
             return false;
         }
     }

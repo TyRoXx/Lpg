@@ -36,8 +36,9 @@ enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size);
 void enumeration_free(LPG_NON_NULL(enumeration const *value));
 
-typedef struct tuple_type{
-    type* elements;
+typedef struct tuple_type
+{
+    type *elements;
     size_t length;
 } tuple_type;
 
