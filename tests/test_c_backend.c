@@ -201,5 +201,10 @@ void test_c_backend(void)
                            "assert(string-equals(\"\", t))\n",
                            std_library.globals, "18_move_string.c");
 
+    check_generated_c_code("let s = (a: int(0, 3)) a\n"
+                           "let i = s(2)\n"
+                           "assert(integer-equals(i, 2))\n",
+                           std_library.globals, "19_integer.c");
+
     standard_library_description_free(&std_library);
 }

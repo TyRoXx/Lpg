@@ -10,6 +10,7 @@ typedef struct standard_library_usage
     bool using_stdio;
     bool using_assert;
     bool using_unit;
+    bool using_stdint;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -201,8 +202,10 @@ static success_indicator generate_function_name(function_id const id,
     return success;
 }
 
-static success_indicator generate_type(type const generated,
-                                       stream_writer const c_output)
+static success_indicator
+generate_type(type const generated,
+              standard_library_usage *const standard_library,
+              stream_writer const c_output)
 {
     switch (generated.kind)
     {
@@ -220,7 +223,17 @@ static success_indicator generate_type(type const generated,
         return stream_writer_write_string(c_output, "size_t");
 
     case type_kind_type:
+        LPG_TO_DO();
+
     case type_kind_integer_range:
+        if (integer_less(
+                generated.integer_range_.maximum, integer_create(1, 0)))
+        {
+            standard_library->using_stdint = true;
+            return stream_writer_write_string(c_output, "uint64_t");
+        }
+        LPG_TO_DO();
+
     case type_kind_inferred:
         LPG_TO_DO();
     }
@@ -691,7 +704,8 @@ static success_indicator generate_instruction(
             set_register_variable(
                 state, input.call.result,
                 find_register_resource_ownership(result_type));
-            LPG_TRY(generate_type(result_type, c_output));
+            LPG_TRY(
+                generate_type(result_type, &state->standard_library, c_output));
         }
         LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.call.result, c_output));
@@ -936,7 +950,7 @@ success_indicator generate_c(checked_program const program,
         memory_writer_erase(&program_defined);
 
     standard_library_usage standard_library = {
-        false, false, false, false, false};
+        false, false, false, false, false, false};
     for (function_id i = 1; i < program.function_count; ++i)
     {
         checked_function const current_function = program.functions[i];
@@ -944,7 +958,7 @@ success_indicator generate_c(checked_program const program,
             stream_writer_write_string(program_defined_writer, "static "),
             fail);
         LPG_TRY_GOTO(generate_type(current_function.signature->result,
-                                   program_defined_writer),
+                                   &standard_library, program_defined_writer),
                      fail);
         LPG_TRY_GOTO(
             stream_writer_write_string(program_defined_writer, " "), fail);
@@ -965,9 +979,10 @@ success_indicator generate_c(checked_program const program,
                     stream_writer_write_string(program_defined_writer, ", "),
                     fail);
             }
-            LPG_TRY_GOTO(generate_type(current_function.signature->arguments[j],
-                                       program_defined_writer),
-                         fail);
+            LPG_TRY_GOTO(
+                generate_type(current_function.signature->arguments[j],
+                              &standard_library, program_defined_writer),
+                fail);
             LPG_TRY_GOTO(
                 stream_writer_write_string(program_defined_writer, " const "),
                 fail);
@@ -1018,6 +1033,12 @@ success_indicator generate_c(checked_program const program,
     {
         LPG_TRY_GOTO(
             stream_writer_write_string(c_output, "#include <lpg_std_read.h>\n"),
+            fail_2);
+    }
+    if (standard_library.using_stdint)
+    {
+        LPG_TRY_GOTO(
+            stream_writer_write_string(c_output, "#include <stdint.h>\n"),
             fail_2);
     }
 

@@ -14,6 +14,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->string_equals);
     function_pointer_free(&stable->read);
     function_pointer_free(&stable->int_);
+    function_pointer_free(&stable->integer_equals);
 }
 
 value not_impl(value const *const inferred, value const *arguments,
@@ -91,6 +92,18 @@ value int_impl(value const *const inferred, value const *arguments,
         type_from_integer_range(integer_range_create(second, first)));
 }
 
+value integer_equals_impl(value const *const inferred,
+                          value const *const arguments,
+                          garbage_collector *const gc, void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    (void)gc;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
+    return value_from_enum_element(integer_equal(left, right));
+}
+
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
@@ -145,9 +158,17 @@ standard_library_description describe_standard_library(void)
         parameters[1] = parameters[0];
         stable->int_ = function_pointer_create(type_from_type(), parameters, 2);
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_integer_range(
+            integer_range_create(integer_create(0, 0), integer_max()));
+        parameters[1] = parameters[0];
+        stable->integer_equals =
+            function_pointer_create(boolean, parameters, 2);
+    }
     stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
-    structure_member *globals = allocate_array(12, sizeof(*globals));
+    structure_member *globals = allocate_array(13, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"),
         optional_value_create(value_from_type(type_from_type())));
@@ -209,8 +230,14 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(int_impl, NULL))));
 
+    globals[12] = structure_member_create(
+        type_from_function_pointer(&stable->integer_equals),
+        unicode_string_from_c_str("integer-equals"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_equals_impl, NULL))));
+
     standard_library_description result = {
-        structure_create(globals, 12), stable};
+        structure_create(globals, 13), stable};
     return result;
 }
 
