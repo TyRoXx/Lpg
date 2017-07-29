@@ -535,7 +535,7 @@ static size_t find_lower_bound_for_inferred_values(type const root)
         return 0;
 
     case type_kind_integer_range:
-        LPG_TO_DO();
+        return 0;
 
     case type_kind_inferred:
         return (root.inferred + 1);

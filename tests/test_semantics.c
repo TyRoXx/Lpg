@@ -758,6 +758,39 @@ void test_semantics(void)
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_integer(integer_create(0, 1)))),
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_unit()))};
+        check_single_wellformed_function(
+            "let v : int(1, 10) = 1\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_integer(integer_create(0, 1)))),
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_unit()))};
+        check_single_wellformed_function(
+            "let v : int(10, 1) = 1\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        sequence root = parse("let v : int(1, 10) = 11\n");
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_type_mismatch, source_location_create(0, 21))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 2);
+        checked_program_free(&checked);
+    }
+    {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_body_elements[] = {

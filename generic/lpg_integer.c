@@ -7,6 +7,11 @@ integer integer_create(uint64_t high, uint64_t low)
     return result;
 }
 
+integer integer_max(void)
+{
+    return integer_create(~(uint64_t)0, ~(uint64_t)0);
+}
+
 integer integer_shift_left_truncate(integer value, uint32_t bits)
 {
     if (bits == 0)

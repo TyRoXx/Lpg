@@ -11,6 +11,7 @@ typedef struct integer
 } integer;
 
 integer integer_create(uint64_t high, uint64_t low);
+integer integer_max(void);
 integer integer_shift_left_truncate(integer value, uint32_t bits);
 bool integer_shift_left(LPG_NON_NULL(integer *value), uint32_t bits);
 bool integer_bit(integer value, uint32_t bit);

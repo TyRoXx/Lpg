@@ -28,6 +28,7 @@ typedef struct standard_library_stable
     function_pointer concat;
     function_pointer string_equals;
     function_pointer read;
+    function_pointer int_;
 } standard_library_stable;
 
 typedef struct standard_library_description
