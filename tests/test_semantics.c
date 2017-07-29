@@ -791,6 +791,16 @@ void test_semantics(void)
         checked_program_free(&checked);
     }
     {
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_unit())),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_unit()))};
+        check_single_wellformed_function(
+            "let v : unit = unit_value\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_body_elements[] = {
@@ -807,7 +817,9 @@ void test_semantics(void)
     }
     {
         instruction const expected_main[] = {
-            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1)))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
         instruction const expected_lambda[] = {
@@ -838,7 +850,9 @@ void test_semantics(void)
     }
     {
         instruction const expected_main[] = {
-            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1)))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
@@ -874,7 +888,9 @@ void test_semantics(void)
     }
     {
         instruction const expected_main[] = {
-            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1)))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
         instruction const expected_lambda[] = {
@@ -907,7 +923,9 @@ void test_semantics(void)
     }
     {
         instruction const expected_main[] = {
-            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1)))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_enum_element(1))),
             instruction_create_literal(
@@ -939,7 +957,9 @@ void test_semantics(void)
     }
     {
         instruction const expected_main[] = {
-            instruction_create_lambda(lambda_instruction_create(0, 1)),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1)))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_enum_element(1))),
             instruction_create_literal(

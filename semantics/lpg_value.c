@@ -16,6 +16,25 @@ function_pointer_value_from_internal(function_id const code)
     return result;
 }
 
+bool function_pointer_value_equals(function_pointer_value const left,
+                                   function_pointer_value const right)
+{
+    if (left.external)
+    {
+        if (right.external)
+        {
+            return (left.external == right.external) &&
+                   (left.external_environment == right.external_environment);
+        }
+        return false;
+    }
+    if (right.external)
+    {
+        return false;
+    }
+    return (left.code == right.code);
+}
+
 value value_from_flat_object(value const *flat_object)
 {
     value result;
@@ -88,7 +107,8 @@ bool value_equals(value const left, value const right)
         return unicode_view_equals(left.string_ref, right.string_ref);
 
     case value_kind_function_pointer:
-        LPG_TO_DO();
+        return function_pointer_value_equals(
+            left.function_pointer, right.function_pointer);
 
     case value_kind_flat_object:
         LPG_TO_DO();

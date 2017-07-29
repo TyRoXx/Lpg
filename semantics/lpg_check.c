@@ -325,15 +325,20 @@ static instruction_checkpoint make_checkpoint(function_checking_state *state,
     return result;
 }
 
-static void restore(instruction_checkpoint const previous_code)
+static void restore_instructions(instruction_checkpoint const previous_code)
 {
-    previous_code.state->used_registers = previous_code.used_registers;
     for (size_t i = previous_code.size_of_sequence;
          i < previous_code.sequence->length; ++i)
     {
         instruction_free(previous_code.sequence->elements + i);
     }
     previous_code.sequence->length = previous_code.size_of_sequence;
+}
+
+static void restore(instruction_checkpoint const previous_code)
+{
+    previous_code.state->used_registers = previous_code.used_registers;
+    restore_instructions(previous_code);
 }
 
 static read_structure_element_result
@@ -1005,11 +1010,22 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_declare:
     {
+        instruction_checkpoint const before_initialization =
+            make_checkpoint(state, function);
         evaluate_expression_result const initializer =
             evaluate_expression(state, function, *element.declare.initializer);
         if (!initializer.has_value)
         {
             return evaluate_expression_result_empty;
+        }
+
+        if (initializer.compile_time_value.is_set)
+        {
+            restore_instructions(before_initialization);
+            add_instruction(
+                function,
+                instruction_create_literal(literal_instruction_create(
+                    initializer.where, initializer.compile_time_value.value_)));
         }
 
         if (element.declare.optional_type)

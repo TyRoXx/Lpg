@@ -168,7 +168,7 @@ standard_library_description describe_standard_library(void)
     }
     stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
-    structure_member *globals = allocate_array(13, sizeof(*globals));
+    structure_member *globals = allocate_array(15, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"),
         optional_value_create(value_from_type(type_from_type())));
@@ -236,8 +236,16 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_equals_impl, NULL))));
 
+    globals[13] = structure_member_create(
+        type_from_type(), unicode_string_from_c_str("unit"),
+        optional_value_create(value_from_type(type_from_unit())));
+
+    globals[14] = structure_member_create(
+        type_from_unit(), unicode_string_from_c_str("unit_value"),
+        optional_value_create(value_from_unit()));
+
     standard_library_description result = {
-        structure_create(globals, 13), stable};
+        structure_create(globals, 15), stable};
     return result;
 }
 

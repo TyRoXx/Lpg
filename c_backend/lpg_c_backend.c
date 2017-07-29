@@ -67,6 +67,7 @@ typedef struct c_backend_state
     standard_library_usage standard_library;
     register_id *active_registers;
     size_t active_register_count;
+    checked_function const *all_functions;
 } c_backend_state;
 
 static void active_register(c_backend_state *const state, register_id const id)
@@ -100,7 +101,11 @@ find_register_resource_ownership(type const variable)
     switch (variable.kind)
     {
     case type_kind_enumeration:
+        LPG_TO_DO();
+
     case type_kind_function_pointer:
+        return register_resource_ownership_none;
+
     case type_kind_inferred:
     case type_kind_integer_range:
     case type_kind_structure:
@@ -210,8 +215,23 @@ generate_type(type const generated,
     switch (generated.kind)
     {
     case type_kind_structure:
-    case type_kind_function_pointer:
         LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        LPG_TRY(generate_type(
+            generated.function_pointer_->result, standard_library, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "(*)("));
+        for (size_t i = 0; i < generated.function_pointer_->arity; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", "));
+            }
+            LPG_TRY(generate_type(generated.function_pointer_->arguments[i],
+                                  standard_library, c_output));
+        }
+        LPG_TRY(stream_writer_write_string(c_output, ")"));
+        return success;
 
     case type_kind_unit:
         return stream_writer_write_string(c_output, "unit");
@@ -312,6 +332,13 @@ static success_indicator generate_c_read_access(c_backend_state *state,
             return success;
 
         case value_kind_function_pointer:
+            if (state->registers[from].literal.function_pointer.external)
+            {
+                LPG_TO_DO();
+            }
+            return generate_function_name(
+                state->registers[from].literal.function_pointer.code, c_output);
+
         case value_kind_flat_object:
         case value_kind_type:
             LPG_TO_DO();
@@ -550,6 +577,16 @@ static success_indicator indent(size_t const indentation,
     return success;
 }
 
+static function_pointer signature_of(LPG_NON_NULL(c_backend_state *const state),
+                                     function_pointer_value const pointer)
+{
+    if (pointer.external)
+    {
+        LPG_TO_DO();
+    }
+    return *state->all_functions[pointer.code].signature;
+}
+
 static success_indicator generate_instruction(
     c_backend_state *state, checked_function const *const all_functions,
     register_id const current_function_result, instruction const input,
@@ -648,10 +685,30 @@ static success_indicator generate_instruction(
             return success;
 
         case register_meaning_literal:
-            LPG_TO_DO();
+        {
+            type const result_type =
+                signature_of(state, state->registers[input.call.callee]
+                                        .literal.function_pointer)
+                    .result;
+            set_register_variable(
+                state, input.call.result,
+                find_register_resource_ownership(result_type));
+            LPG_TRY(
+                generate_type(result_type, &state->standard_library, c_output));
+            break;
+        }
 
         case register_meaning_function:
+        {
+            type const result_type =
+                state->registers[input.call.callee].function.result;
+            set_register_variable(
+                state, input.call.result,
+                find_register_resource_ownership(result_type));
+            LPG_TRY(
+                generate_type(result_type, &state->standard_library, c_output));
             break;
+        }
 
         case register_meaning_and:
             ASSUME(input.call.argument_count == 2);
@@ -697,15 +754,6 @@ static success_indicator generate_instruction(
 
         case register_meaning_argument:
             LPG_TO_DO();
-        }
-        {
-            type const result_type =
-                state->registers[input.call.callee].function.result;
-            set_register_variable(
-                state, input.call.result,
-                find_register_resource_ownership(result_type));
-            LPG_TRY(
-                generate_type(result_type, &state->standard_library, c_output));
         }
         LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.call.result, c_output));
@@ -897,7 +945,7 @@ static success_indicator generate_function_body(
     c_backend_state state = {
         allocate_array(
             current_function.number_of_registers, sizeof(*state.registers)),
-        *standard_library, NULL, 0};
+        *standard_library, NULL, 0, all_functions};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;

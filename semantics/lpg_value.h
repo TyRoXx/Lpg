@@ -24,6 +24,8 @@ function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
                                      void *environment);
 function_pointer_value
 function_pointer_value_from_internal(function_id const code);
+bool function_pointer_value_equals(function_pointer_value const left,
+                                   function_pointer_value const right);
 
 typedef enum value_kind
 {
