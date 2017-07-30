@@ -446,4 +446,7 @@ static void test_tuples(void)
     test_successful_parse(
         assign, unicode_string_from_c_str("let t : {string-ref} = {\"Test\"}"),
         true);
+    expression_free(tuple_elements);
+    expression_free(tuple_expression);
+    expression_free(tuple_type_expression);
 }
