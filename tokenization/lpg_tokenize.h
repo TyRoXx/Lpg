@@ -12,6 +12,8 @@ typedef enum token_type
     token_identifier,
     token_left_parenthesis,
     token_right_parenthesis,
+    token_left_curly_brace,
+    token_right_curly_brace,
     token_comma,
     token_dot,
     token_colon,

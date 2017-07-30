@@ -628,7 +628,7 @@ bool expression_equals(expression const *left, expression const *right)
         return declare_equals(left->declare, right->declare);
 
     case expression_type_tuple:
-        LPG_TO_DO();
+        return tuple_equals(&left->tuple, &right->tuple);
 
     case expression_type_comment:
         return comment_equals(left->comment, right->comment);
