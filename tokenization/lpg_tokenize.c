@@ -34,6 +34,8 @@ static int can_follow_integer(char c)
     case '\n':
     case '(':
     case ')':
+    case '{':
+    case '}':
     case '=':
     case ':':
     case ',':
