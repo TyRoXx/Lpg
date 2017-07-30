@@ -111,11 +111,6 @@ run_sequence(instruction_sequence const sequence, value const *globals,
         case instruction_literal:
             registers[element.literal.into] = element.literal.value_;
             break;
-
-        case instruction_lambda:
-            registers[element.lambda.into] = value_from_function_pointer(
-                function_pointer_value_from_internal(element.lambda.id));
-            break;
         }
     }
     return run_sequence_result_continue;

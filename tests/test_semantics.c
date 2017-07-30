@@ -129,10 +129,6 @@ static void print_instruction(instruction const printed)
         print_value(printed.literal.value_);
         printf("\n");
         return;
-
-    case instruction_lambda:
-        printf("lambda %u %u\n", printed.lambda.into, printed.lambda.id);
-        return;
     }
     UNREACHABLE();
 }

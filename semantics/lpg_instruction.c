@@ -72,18 +72,6 @@ bool literal_instruction_equals(literal_instruction const left,
     return (left.into == right.into) && value_equals(left.value_, right.value_);
 }
 
-lambda_instruction lambda_instruction_create(register_id into, function_id id)
-{
-    lambda_instruction result = {into, id};
-    return result;
-}
-
-bool lambda_instruction_equals(lambda_instruction const left,
-                               lambda_instruction const right)
-{
-    return (left.into == right.into) && (left.id == right.id);
-}
-
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -131,14 +119,6 @@ instruction instruction_create_literal(literal_instruction const value)
     return result;
 }
 
-instruction instruction_create_lambda(lambda_instruction const value)
-{
-    instruction result;
-    result.type = instruction_lambda;
-    result.lambda = value;
-    return result;
-}
-
 void instruction_free(instruction const *value)
 {
     switch (value->type)
@@ -161,9 +141,6 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_literal:
-        break;
-
-    case instruction_lambda:
         break;
     }
 }
@@ -195,9 +172,6 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_literal:
         return (left.literal.into == right.literal.into) &&
                value_equals(left.literal.value_, right.literal.value_);
-
-    case instruction_lambda:
-        return lambda_instruction_equals(left.lambda, right.lambda);
     }
     UNREACHABLE();
 }

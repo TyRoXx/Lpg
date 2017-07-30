@@ -732,8 +732,11 @@ evaluate_lambda(function_checking_state *const state,
     state->program->functions[this_lambda_id] = checked.value;
     register_id const destination = allocate_register(state);
     add_instruction(
-        function, instruction_create_lambda(
-                      lambda_instruction_create(destination, this_lambda_id)));
+        function,
+        instruction_create_literal(literal_instruction_create(
+            destination,
+            value_from_function_pointer(
+                function_pointer_value_from_internal(this_lambda_id)))));
     return evaluate_expression_result_create(
         destination, type_from_function_pointer(
                          state->program->functions[this_lambda_id].signature),

@@ -32,7 +32,6 @@ typedef enum register_meaning
     register_meaning_not,
     register_meaning_concat,
     register_meaning_literal,
-    register_meaning_function,
     register_meaning_argument
 } register_meaning;
 
@@ -137,17 +136,6 @@ static void set_register_literal(c_backend_state *const state,
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_literal;
     state->registers[id].literal = literal;
-    active_register(state, id);
-}
-
-static void set_register_lambda(c_backend_state *const state,
-                                register_id const id,
-                                function_id const function, type const result)
-{
-    ASSERT(state->registers[id].meaning == register_meaning_nothing);
-    state->registers[id].meaning = register_meaning_function;
-    state->registers[id].function.id = function;
-    state->registers[id].function.result = result;
     active_register(state, id);
 }
 
@@ -303,10 +291,6 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_concat:
         LPG_TO_DO();
 
-    case register_meaning_function:
-        return generate_function_name(
-            state->registers[from].function.id, c_output);
-
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
@@ -416,9 +400,6 @@ generate_add_reference_for_return_value(c_backend_state *state,
     case register_meaning_concat:
         LPG_TO_DO();
 
-    case register_meaning_function:
-        LPG_TO_DO();
-
     case register_meaning_literal:
         return success;
 
@@ -460,9 +441,6 @@ static success_indicator generate_c_str(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_concat:
-        LPG_TO_DO();
-
-    case register_meaning_function:
         LPG_TO_DO();
 
     case register_meaning_literal:
@@ -521,9 +499,6 @@ static success_indicator generate_string_length(c_backend_state *state,
         LPG_TO_DO();
 
     case register_meaning_concat:
-        LPG_TO_DO();
-
-    case register_meaning_function:
         LPG_TO_DO();
 
     case register_meaning_and:
@@ -699,18 +674,6 @@ static success_indicator generate_instruction(
             break;
         }
 
-        case register_meaning_function:
-        {
-            type const result_type =
-                state->registers[input.call.callee].function.result;
-            set_register_variable(
-                state, input.call.result,
-                find_register_resource_ownership(result_type));
-            LPG_TRY(
-                generate_type(result_type, &state->standard_library, c_output));
-            break;
-        }
-
         case register_meaning_and:
             ASSUME(input.call.argument_count == 2);
             set_register_variable(
@@ -869,9 +832,6 @@ static success_indicator generate_instruction(
 
         case register_meaning_literal:
             LPG_TO_DO();
-
-        case register_meaning_function:
-            LPG_TO_DO();
         }
 
     case instruction_break:
@@ -883,11 +843,6 @@ static success_indicator generate_instruction(
         ASSERT(state->registers[input.literal.into].meaning ==
                register_meaning_nothing);
         set_register_literal(state, input.literal.into, input.literal.value_);
-        return success;
-
-    case instruction_lambda:
-        set_register_lambda(state, input.lambda.into, input.lambda.id,
-                            all_functions[input.lambda.id].signature->result);
         return success;
     }
     UNREACHABLE();
