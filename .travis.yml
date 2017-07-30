@@ -57,12 +57,12 @@ script:
  - export MSAN_OPTIONS=poison_in_dtor=1
  - export ASAN_OPTIONS=check_initialization_order=1
  - if [ "$TRAVIS_OS_NAME" == "osx" ] || [ "$UB_SANITIZER" == "ON" ] || [ "$MEMORY_SANITIZER" == "ON" ] || [ "$ADDRESS_SANITIZER" == "ON" ] || [ "$THREAD_SANITIZER" == "ON" ]; then
-     LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.1/lib/linux/ ./tests || exit 1;
+     LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ ./tests || exit 1;
    else
      valgrind --error-exitcode=42 --leak-check=full ./tests || exit 1;
    fi
  - cd ..
- - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.1/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
+ - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
  - if [ $COVERAGE == "YES" ]; then
      curl -s https://codecov.io/bash > codecov.sh || exit 1;
      chmod +x codecov.sh || exit 1;
