@@ -137,6 +137,7 @@ declare declare_create(identifier_expression name, expression *optional_type,
                        LPG_NON_NULL(expression *initializer));
 void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);
+bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
 expression expression_from_assign(assign value);
 expression expression_from_return(LPG_NON_NULL(expression *value));

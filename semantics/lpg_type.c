@@ -49,6 +49,22 @@ void enumeration_free(enumeration const *value)
     }
 }
 
+bool tuple_type_equals(tuple_type const left, tuple_type const right)
+{
+    if (left.length != right.length)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.length; ++i)
+    {
+        if (!type_equals(left.elements[i], right.elements[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 integer_range integer_range_create(integer minimum, integer maximum)
 {
     integer_range result = {minimum, maximum};
@@ -112,6 +128,14 @@ type type_from_enumeration(enumeration const *value)
     return result;
 }
 
+type type_from_tuple_type(tuple_type const *value)
+{
+    type result;
+    result.kind = type_kind_tuple;
+    result.tuple_ = value;
+    return result;
+}
+
 type type_from_type(void)
 {
     type result;
@@ -162,6 +186,9 @@ bool type_equals(type const left, type const right)
 
     case type_kind_enumeration:
         return (left.enum_ == right.enum_);
+
+    case type_kind_tuple:
+        return tuple_type_equals(*left.tuple_, *right.tuple_);
 
     case type_kind_type:
         return true;

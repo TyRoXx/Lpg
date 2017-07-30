@@ -1,3 +1,4 @@
+#include <lpg_type.h>
 #include "test_expression.h"
 #include "lpg_expression.h"
 #include "test.h"

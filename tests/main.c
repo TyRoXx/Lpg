@@ -20,6 +20,7 @@
 #include "test_cli.h"
 #include "test_c_backend.h"
 #include "test_implicitly_convertible.h"
+#include "test_tuple.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
@@ -42,6 +43,7 @@ int main(void)
                                     test_parse_expression_success,
                                     test_parse_expression_syntax_error,
                                     test_semantics,
+                                    test_tuple,
                                     test_interpreter,
                                     test_implicitly_convertible,
                                     test_cli,

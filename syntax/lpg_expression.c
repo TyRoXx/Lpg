@@ -151,6 +151,22 @@ tuple tuple_create(expression *elements, size_t length)
     return result;
 }
 
+bool tuple_equals(tuple const *left, tuple const *right)
+{
+    if (left->length != right->length)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left->length; ++i)
+    {
+        if (!expression_equals(left->elements + i, right->elements + i))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 void tuple_free(tuple const *value)
 {
     LPG_FOR(size_t, i, value->length)
@@ -245,9 +261,7 @@ source_location expression_source_begin(expression const value)
         return value.identifier.source;
 
     case expression_type_assign:
-        LPG_TO_DO();
     case expression_type_return:
-        LPG_TO_DO();
     case expression_type_loop:
         LPG_TO_DO();
 
@@ -255,11 +269,10 @@ source_location expression_source_begin(expression const value)
         return value.source;
 
     case expression_type_sequence:
-        LPG_TO_DO();
     case expression_type_declare:
-        LPG_TO_DO();
     case expression_type_tuple:
         LPG_TO_DO();
+
     case expression_type_comment:
         return value.comment.source;
     }
@@ -615,7 +628,7 @@ bool expression_equals(expression const *left, expression const *right)
         return declare_equals(left->declare, right->declare);
 
     case expression_type_tuple:
-        LPG_TO_DO();
+        return tuple_equals(&left->tuple, &right->tuple);
 
     case expression_type_comment:
         return comment_equals(left->comment, right->comment);

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "lpg_unicode_string.h"
 #include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
@@ -35,6 +36,13 @@ enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size);
 void enumeration_free(LPG_NON_NULL(enumeration const *value));
 
+typedef struct tuple_type
+{
+    type *elements;
+    size_t length;
+} tuple_type;
+
+bool tuple_type_equals(tuple_type const left, tuple_type const right);
 typedef struct integer_range
 {
     integer minimum;
@@ -51,6 +59,7 @@ typedef enum type_kind
     type_kind_unit,
     type_kind_string_ref,
     type_kind_enumeration,
+    type_kind_tuple,
     type_kind_type,
     type_kind_integer_range,
     type_kind_inferred
@@ -66,6 +75,7 @@ struct type
         structure const *structure_;
         function_pointer const *function_pointer_;
         enumeration const *enum_;
+        tuple_type const *tuple_;
         integer_range integer_range_;
         size_t inferred;
     };
@@ -85,6 +95,7 @@ type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
 type type_from_enumeration(LPG_NON_NULL(enumeration const *value));
+type type_from_tuple_type(tuple_type const *value);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
