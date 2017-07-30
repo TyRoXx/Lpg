@@ -428,7 +428,7 @@ static void test_tuples(void)
             unicode_string_from_c_str("Test"), source_location_create(0, 0))));
 
     expression *const tuple_expression = expression_allocate(
-        expression_from_tuple(tuple_create(tuple_elements, 2)));
+        expression_from_tuple(tuple_create(tuple_elements, 1)));
 
     expression *const tuple_type_expression =
         expression_allocate(expression_from_tuple(tuple_create(
@@ -446,7 +446,4 @@ static void test_tuples(void)
     test_successful_parse(
         assign, unicode_string_from_c_str("let t : {string-ref} = {\"Test\"}"),
         true);
-    expression_free(tuple_elements);
-    expression_free(tuple_expression);
-    expression_free(tuple_type_expression);
 }
