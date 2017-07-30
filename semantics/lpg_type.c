@@ -175,14 +175,33 @@ bool type_equals(type const left, type const right)
     switch (left.kind)
     {
     case type_kind_structure:
-    case type_kind_function_pointer:
         LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        if (!type_equals(left.function_pointer_->result,
+                         right.function_pointer_->result))
+        {
+            return false;
+        }
+        if (left.function_pointer_->arity != right.function_pointer_->arity)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < left.function_pointer_->arity; ++i)
+        {
+            if (!type_equals(left.function_pointer_->arguments[i],
+                             right.function_pointer_->arguments[i]))
+            {
+                return false;
+            }
+        }
+        return true;
 
     case type_kind_unit:
         return true;
 
     case type_kind_string_ref:
-        LPG_TO_DO();
+        return true;
 
     case type_kind_enumeration:
         return (left.enum_ == right.enum_);

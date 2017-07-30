@@ -2,6 +2,7 @@
 #include "lpg_assert.h"
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
+#include <string.h>
 
 typedef struct standard_library_usage
 {
@@ -60,6 +61,38 @@ typedef struct register_state
     };
 } register_state;
 
+typedef struct type_definition
+{
+    type what;
+    unicode_string name;
+    unicode_string definition;
+} type_definition;
+
+static void type_definition_free(type_definition const definition)
+{
+
+    unicode_string_free(&definition.definition);
+    unicode_string_free(&definition.name);
+}
+
+typedef struct type_definitions
+{
+    type_definition *elements;
+    size_t count;
+} type_definitions;
+
+static void type_definitions_free(type_definitions const definitions)
+{
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        type_definition_free(definitions.elements[i]);
+    }
+    if (definitions.elements)
+    {
+        deallocate(definitions.elements);
+    }
+}
+
 typedef struct c_backend_state
 {
     register_state *registers;
@@ -67,6 +100,7 @@ typedef struct c_backend_state
     register_id *active_registers;
     size_t active_register_count;
     checked_function const *all_functions;
+    type_definitions *definitions;
 } c_backend_state;
 
 static void active_register(c_backend_state *const state, register_id const id)
@@ -195,10 +229,38 @@ static success_indicator generate_function_name(function_id const id,
     return success;
 }
 
+static unicode_string const *
+find_type_definition(type_definitions const definitions, type const needle)
+{
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        if (type_equals(definitions.elements[i].what, needle))
+        {
+            return &definitions.elements[i].name;
+        }
+    }
+    return NULL;
+}
+
+static unicode_string make_type_definition_name(size_t const index)
+{
+    char buffer[64];
+    char *const formatted =
+        integer_format(integer_create(0, index), lower_case_digits, 10, buffer,
+                       sizeof(buffer));
+    size_t const index_length = (size_t)((buffer + sizeof(buffer)) - formatted);
+    char const *const prefix = "type_definition_";
+    size_t const name_length = strlen(prefix) + index_length;
+    unicode_string name = {allocate(name_length), name_length};
+    memcpy(name.data, prefix, strlen(prefix));
+    memcpy(name.data + strlen(prefix), formatted, index_length);
+    return name;
+}
+
 static success_indicator
 generate_type(type const generated,
               standard_library_usage *const standard_library,
-              stream_writer const c_output)
+              type_definitions *const definitions, stream_writer const c_output)
 {
     switch (generated.kind)
     {
@@ -206,20 +268,59 @@ generate_type(type const generated,
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        LPG_TRY(generate_type(
-            generated.function_pointer_->result, standard_library, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "(*)("));
-        for (size_t i = 0; i < generated.function_pointer_->arity; ++i)
+    {
+        unicode_string const *const existing_definition =
+            find_type_definition(*definitions, generated);
+        if (existing_definition)
         {
-            if (i > 0)
-            {
-                LPG_TRY(stream_writer_write_string(c_output, ", "));
-            }
-            LPG_TRY(generate_type(generated.function_pointer_->arguments[i],
-                                  standard_library, c_output));
+            return stream_writer_write_unicode_view(
+                c_output, unicode_view_from_string(*existing_definition));
         }
-        LPG_TRY(stream_writer_write_string(c_output, ")"));
-        return success;
+        else
+        {
+            memory_writer definition_buffer = {NULL, 0, 0};
+            stream_writer definition_writer =
+                memory_writer_erase(&definition_buffer);
+            size_t const definition_index = definitions->count;
+            ++(definitions->count);
+            unicode_string name = make_type_definition_name(definition_index);
+            definitions->elements = reallocate_array(
+                definitions->elements, (definitions->count + 1),
+                sizeof(*definitions->elements));
+            {
+                type_definition *const new_definition =
+                    definitions->elements + definition_index;
+                new_definition->what = generated;
+                new_definition->name = name;
+            }
+            LPG_TRY(stream_writer_write_string(definition_writer, "typedef "));
+            LPG_TRY(generate_type(generated.function_pointer_->result,
+                                  standard_library, definitions,
+                                  definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, " (*"));
+            LPG_TRY(stream_writer_write_unicode_view(
+                definition_writer, unicode_view_from_string(name)));
+            LPG_TRY(stream_writer_write_string(definition_writer, ")("));
+            for (size_t i = 0; i < generated.function_pointer_->arity; ++i)
+            {
+                if (i > 0)
+                {
+                    LPG_TRY(
+                        stream_writer_write_string(definition_writer, ", "));
+                }
+                LPG_TRY(generate_type(generated.function_pointer_->arguments[i],
+                                      standard_library, definitions,
+                                      definition_writer));
+            }
+            LPG_TRY(stream_writer_write_string(definition_writer, ");\n"));
+            type_definition *const new_definition =
+                definitions->elements + definition_index;
+            new_definition->definition.data = definition_buffer.data;
+            new_definition->definition.length = definition_buffer.used;
+            return stream_writer_write_unicode_view(
+                c_output, unicode_view_from_string(name));
+        }
+    }
 
     case type_kind_unit:
         return stream_writer_write_string(c_output, "unit");
@@ -669,8 +770,8 @@ static success_indicator generate_instruction(
             set_register_variable(
                 state, input.call.result,
                 find_register_resource_ownership(result_type));
-            LPG_TRY(
-                generate_type(result_type, &state->standard_library, c_output));
+            LPG_TRY(generate_type(result_type, &state->standard_library,
+                                  state->definitions, c_output));
             break;
         }
 
@@ -891,17 +992,19 @@ generate_sequence(c_backend_state *state,
     return success;
 }
 
-static success_indicator generate_function_body(
-    checked_function const current_function,
-    checked_function const *const all_functions, stream_writer const c_output,
-    standard_library_usage *standard_library, bool const return_0)
+static success_indicator
+generate_function_body(checked_function const current_function,
+                       checked_function const *const all_functions,
+                       stream_writer const c_output,
+                       standard_library_usage *standard_library,
+                       type_definitions *const definitions, bool const return_0)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
     c_backend_state state = {
         allocate_array(
             current_function.number_of_registers, sizeof(*state.registers)),
-        *standard_library, NULL, 0, all_functions};
+        *standard_library, NULL, 0, all_functions, definitions};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;
@@ -946,6 +1049,38 @@ static success_indicator generate_function_body(
     return success;
 }
 
+static success_indicator
+generate_function_declaration(function_id const id,
+                              function_pointer const signature,
+                              standard_library_usage *const standard_library,
+                              type_definitions *const definitions,
+                              stream_writer const program_defined_writer)
+{
+    LPG_TRY(stream_writer_write_string(program_defined_writer, "static "));
+    LPG_TRY(generate_type(signature.result, standard_library, definitions,
+                          program_defined_writer));
+    LPG_TRY(stream_writer_write_string(program_defined_writer, " "));
+    LPG_TRY(generate_function_name(id, program_defined_writer));
+    LPG_TRY(stream_writer_write_string(program_defined_writer, "("));
+    if (signature.arity == 0)
+    {
+        LPG_TRY(stream_writer_write_string(program_defined_writer, "void"));
+    }
+    for (register_id j = 0; j < signature.arity; ++j)
+    {
+        if (j > 0)
+        {
+            LPG_TRY(stream_writer_write_string(program_defined_writer, ", "));
+        }
+        LPG_TRY(generate_type(signature.arguments[j], standard_library,
+                              definitions, program_defined_writer));
+        LPG_TRY(stream_writer_write_string(program_defined_writer, " const "));
+        LPG_TRY(generate_parameter_name(j, program_defined_writer));
+    }
+    LPG_TRY(stream_writer_write_string(program_defined_writer, ")"));
+    return success;
+}
+
 success_indicator generate_c(checked_program const program,
                              stream_writer const c_output)
 {
@@ -955,59 +1090,43 @@ success_indicator generate_c(checked_program const program,
 
     standard_library_usage standard_library = {
         false, false, false, false, false, false};
+
+    type_definitions definitions = {NULL, 0};
+
     for (function_id i = 1; i < program.function_count; ++i)
     {
         checked_function const current_function = program.functions[i];
+        LPG_TRY_GOTO(generate_function_declaration(
+                         i, *current_function.signature, &standard_library,
+                         &definitions, program_defined_writer),
+                     fail);
         LPG_TRY_GOTO(
-            stream_writer_write_string(program_defined_writer, "static "),
+            stream_writer_write_string(program_defined_writer, ";\n"), fail);
+    }
+
+    for (function_id i = 1; i < program.function_count; ++i)
+    {
+        checked_function const current_function = program.functions[i];
+        LPG_TRY_GOTO(generate_function_declaration(
+                         i, *current_function.signature, &standard_library,
+                         &definitions, program_defined_writer),
+                     fail);
+        LPG_TRY_GOTO(
+            stream_writer_write_string(program_defined_writer, "\n"), fail);
+        LPG_TRY_GOTO(
+            generate_function_body(current_function, program.functions,
+                                   program_defined_writer, &standard_library,
+                                   &definitions, false),
             fail);
-        LPG_TRY_GOTO(generate_type(current_function.signature->result,
-                                   &standard_library, program_defined_writer),
-                     fail);
-        LPG_TRY_GOTO(
-            stream_writer_write_string(program_defined_writer, " "), fail);
-        LPG_TRY_GOTO(generate_function_name(i, program_defined_writer), fail);
-        LPG_TRY_GOTO(
-            stream_writer_write_string(program_defined_writer, "("), fail);
-        if (current_function.signature->arity == 0)
-        {
-            LPG_TRY_GOTO(
-                stream_writer_write_string(program_defined_writer, "void"),
-                fail);
-        }
-        for (register_id j = 0; j < current_function.signature->arity; ++j)
-        {
-            if (j > 0)
-            {
-                LPG_TRY_GOTO(
-                    stream_writer_write_string(program_defined_writer, ", "),
-                    fail);
-            }
-            LPG_TRY_GOTO(
-                generate_type(current_function.signature->arguments[j],
-                              &standard_library, program_defined_writer),
-                fail);
-            LPG_TRY_GOTO(
-                stream_writer_write_string(program_defined_writer, " const "),
-                fail);
-            LPG_TRY_GOTO(
-                generate_parameter_name(j, program_defined_writer), fail);
-        }
-        LPG_TRY_GOTO(
-            stream_writer_write_string(program_defined_writer, ")\n"), fail);
-        LPG_TRY_GOTO(generate_function_body(current_function, program.functions,
-                                            program_defined_writer,
-                                            &standard_library, false),
-                     fail);
     }
 
     LPG_TRY_GOTO(
         stream_writer_write_string(program_defined_writer, "int main(void)\n"),
         fail);
-    LPG_TRY_GOTO(
-        generate_function_body(program.functions[0], program.functions,
-                               program_defined_writer, &standard_library, true),
-        fail);
+    LPG_TRY_GOTO(generate_function_body(program.functions[0], program.functions,
+                                        program_defined_writer,
+                                        &standard_library, &definitions, true),
+                 fail);
 
     if (standard_library.using_unit)
     {
@@ -1046,14 +1165,24 @@ success_indicator generate_c(checked_program const program,
             fail_2);
     }
 
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        LPG_TRY_GOTO(stream_writer_write_unicode_view(
+                         c_output, unicode_view_from_string(
+                                       definitions.elements[i].definition)),
+                     fail_2);
+    }
+
     LPG_TRY_GOTO(stream_writer_write_bytes(
                      c_output, program_defined.data, program_defined.used),
                  fail_2);
+    type_definitions_free(definitions);
     memory_writer_free(&program_defined);
     return success;
 
 fail_2:
 fail:
+    type_definitions_free(definitions);
     memory_writer_free(&program_defined);
     return failure;
 }

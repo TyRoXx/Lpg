@@ -206,5 +206,10 @@ void test_c_backend(void)
                            "assert(integer-equals(i, 2))\n",
                            std_library.globals, "19_integer.c");
 
+    check_generated_c_code("let s = () () \"a\"\n"
+                           "let r = s()\n"
+                           "assert(string-equals(r(), \"a\"))\n",
+                           std_library.globals, "20_return_lambda.c");
+
     standard_library_description_free(&std_library);
 }

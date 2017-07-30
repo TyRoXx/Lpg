@@ -2,6 +2,7 @@
 #include <lpg_std_string.h>
 #include <stdio.h>
 #include <lpg_std_read.h>
+static string_ref lambda_1(void);
 static string_ref lambda_1(void)
 {
     string_ref const r_2 = read_impl();
