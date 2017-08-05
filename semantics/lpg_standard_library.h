@@ -20,6 +20,7 @@ value string_equals_impl(value const *const inferred,
 typedef struct standard_library_stable
 {
     enumeration boolean;
+    enumeration option;
     function_pointer print;
     function_pointer assert_;
     function_pointer and_;

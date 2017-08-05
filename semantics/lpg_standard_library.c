@@ -15,6 +15,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->read);
     function_pointer_free(&stable->int_);
     function_pointer_free(&stable->integer_equals);
+    enumeration_free(&stable->option);
 }
 
 value not_impl(value const *const inferred, value const *arguments,
@@ -117,6 +118,17 @@ standard_library_description describe_standard_library(void)
         stable->boolean = enumeration_create(boolean_elements, 2);
     }
     type const boolean = type_from_enumeration(&stable->boolean);
+
+    {
+        enumeration_element *const elements =
+            allocate_array(2, sizeof(*elements));
+        elements[0] =
+            enumeration_element_create(unicode_string_from_c_str("none"));
+        elements[1] =
+            enumeration_element_create(unicode_string_from_c_str("some"));
+        stable->option = enumeration_create(elements, 2);
+    }
+
     stable->print = function_pointer_create(
         type_from_unit(), type_allocate(type_from_string_ref()), 1);
     stable->assert_ =
@@ -168,7 +180,7 @@ standard_library_description describe_standard_library(void)
     }
     stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
-    structure_member *globals = allocate_array(15, sizeof(*globals));
+    structure_member *globals = allocate_array(16, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"),
         optional_value_create(value_from_type(type_from_type())));
@@ -244,8 +256,13 @@ standard_library_description describe_standard_library(void)
         type_from_unit(), unicode_string_from_c_str("unit_value"),
         optional_value_create(value_from_unit()));
 
+    globals[15] = structure_member_create(
+        type_from_type(), unicode_string_from_c_str("option"),
+        optional_value_create(
+            value_from_type(type_from_enumeration(&stable->option))));
+
     standard_library_description result = {
-        structure_create(globals, 15), stable};
+        structure_create(globals, 16), stable};
     return result;
 }
 
