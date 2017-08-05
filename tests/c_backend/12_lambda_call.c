@@ -1,4 +1,5 @@
 #include <lpg_std_assert.h>
+static unit lambda_1(void);
 static unit lambda_1(void)
 {
     unit const r_3 = assert_impl(1);

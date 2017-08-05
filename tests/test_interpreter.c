@@ -79,7 +79,7 @@ static void expect_output(char const *source, char const *input,
     garbage_collector gc = {NULL};
     value const globals_values[11] = {
         /*type*/ value_from_unit(),
-        /*g*/ value_from_unit(),
+        /*string-ref*/ value_from_unit(),
         /*print*/ value_from_function_pointer(
             function_pointer_value_from_external(print, &environment)),
         /*boolean*/ value_from_unit(),

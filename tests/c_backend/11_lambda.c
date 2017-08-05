@@ -1,4 +1,5 @@
 #include <lpg_std_assert.h>
+static size_t lambda_1(void);
 static size_t lambda_1(void)
 {
     return 1;

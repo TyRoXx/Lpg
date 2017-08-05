@@ -1,6 +1,7 @@
 #include <lpg_std_unit.h>
 #include <lpg_std_string.h>
 #include <stdio.h>
+static unit lambda_1(string_ref const arg0);
 static unit lambda_1(string_ref const arg0)
 {
     unit const r_3 = unit_impl;
