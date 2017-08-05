@@ -1,8 +1,6 @@
 #include "lpg_save_expression.h"
-#include "lpg_unicode_view.h"
 #include "lpg_assert.h"
 #include "lpg_for.h"
-#include "lpg_identifier.h"
 
 static success_indicator indent(const stream_writer to,
                                 whitespace_state const whitespace)

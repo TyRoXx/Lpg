@@ -2,8 +2,6 @@
 #include "lpg_for.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
-#include "lpg_unicode_view.h"
-#include <stdbool.h>
 
 void expression_deallocate(expression *this)
 {
