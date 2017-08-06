@@ -121,6 +121,19 @@ bool value_equals(value const left, value const right)
 
     case value_kind_unit:
         return true;
+    case value_kind_tuple:
+        if (sizeof(left.tuple_) != sizeof(right.tuple_))
+        {
+            return false;
+        }
+        for (size_t i = 0; i < sizeof(left.tuple_); ++i)
+        {
+            if (!value_equals(left.tuple_[i], right.tuple_[i]))
+            {
+                return false;
+            }
+        }
+        return true;
     }
     UNREACHABLE();
 }
