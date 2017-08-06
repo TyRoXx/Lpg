@@ -1118,7 +1118,33 @@ evaluate_expression(function_checking_state *state,
     }
 
     case expression_type_tuple:
-        LPG_TO_DO();
+    {
+        register_id *registers =
+            allocate_array(element.tuple.length, sizeof(*registers));
+        /* todo: Fix overflowing multiplication */
+        tuple_type tt = {
+            garbage_collector_allocate(
+                &state->program->memory, element.tuple.length * sizeof(type)),
+            element.tuple.length};
+        for (size_t i = 0; i < element.tuple.length; ++i)
+        {
+            evaluate_expression_result result =
+                evaluate_expression(state, function, element.tuple.elements[i]);
+            if (!result.has_value)
+            {
+                break;
+            }
+            registers[i] = result.where;
+            tt.elements[i] = result.type_;
+        }
+        register_id result_register = allocate_register(state);
+        add_instruction(
+            function, instruction_create_tuple(tuple_instruction_create(
+                          registers, element.tuple.length, result_register)));
+
+        return evaluate_expression_result_create(
+            result_register, type_from_tuple_type(tt), optional_value_empty);
+    }
     }
     UNREACHABLE();
 }

@@ -988,5 +988,22 @@ void test_semantics(void)
                                  "let v : f(boolean) = boolean.true",
                                  std_library.globals, expected);
     }
+    {
+        register_id *values = allocate_array(2, sizeof(*values));
+        values[0] = 0;
+        values[1] = 1;
+        instruction const expected_main_function[] = {
+            instruction_create_literal(literal_instruction_create(
+                values[0], value_from_enum_element(0))),
+            instruction_create_literal(literal_instruction_create(
+                values[1], value_from_enum_element(1))),
+            instruction_create_tuple(tuple_instruction_create(values, 2, 3)),
+            instruction_create_literal(
+                literal_instruction_create(3, value_from_unit()))};
+
+        check_single_wellformed_function(
+            "let t = {boolean.false,boolean.true}\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_main_function));
+    }
     standard_library_description_free(&std_library);
 }
