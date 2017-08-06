@@ -128,7 +128,7 @@ type type_from_enumeration(enumeration const *value)
     return result;
 }
 
-type type_from_tuple_type(tuple_type const *value)
+type type_from_tuple_type(tuple_type const value)
 {
     type result;
     result.kind = type_kind_tuple;
@@ -207,7 +207,7 @@ bool type_equals(type const left, type const right)
         return (left.enum_ == right.enum_);
 
     case type_kind_tuple:
-        return tuple_type_equals(*left.tuple_, *right.tuple_);
+        return tuple_type_equals(left.tuple_, right.tuple_);
 
     case type_kind_type:
         return true;
