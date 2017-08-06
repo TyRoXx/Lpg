@@ -319,7 +319,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     if (!context.has_error)
     {
         garbage_collector gc = {NULL};
-        interprete(checked, globals_values, &gc);
+        interpret(checked, globals_values, &gc);
         garbage_collector_free(gc);
     }
     checked_program_free(&checked);

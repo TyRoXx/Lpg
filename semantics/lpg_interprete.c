@@ -165,8 +165,8 @@ call_interpreted_function(checked_function const callee, value *const arguments,
     UNREACHABLE();
 }
 
-void interprete(checked_program const program, value const *globals,
-                garbage_collector *const gc)
+void interpret(checked_program const program, value const *globals,
+               garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
     call_interpreted_function(
