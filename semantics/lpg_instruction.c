@@ -151,7 +151,9 @@ void instruction_free(instruction const *value)
     case instruction_read_struct:
     case instruction_break:
     case instruction_literal:
+        break;
     case instruction_tuple:
+        deallocate(value->tuple_.elements);
         break;
     }
 }

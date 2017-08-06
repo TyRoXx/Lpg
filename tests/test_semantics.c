@@ -78,11 +78,14 @@ static void print_value(value const printed)
         break;
 
     case value_kind_enum_element:
-        printf("enum element ?");
+        printf("enum element at %u", printed.enum_element);
         break;
 
     case value_kind_unit:
         printf("unit");
+        break;
+    case value_kind_tuple:
+        printf("tuple ");
         break;
     }
 }
@@ -128,6 +131,9 @@ static void print_instruction(instruction const printed)
         printf("literal %u ", printed.literal.into);
         print_value(printed.literal.value_);
         printf("\n");
+        return;
+    case instruction_tuple:
+        printf("tuple with length %zu\n", printed.tuple_.element_count);
         return;
     }
     UNREACHABLE();
