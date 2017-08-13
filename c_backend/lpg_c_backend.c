@@ -938,15 +938,7 @@ static success_indicator generate_instruction(
         set_register_literal(state, input.literal.into, input.literal.value_);
         return success;
     case instruction_tuple:
-        for (size_t j = 0; j < input.tuple_.element_count; ++j)
-        {
-            set_register_literal(
-                state, input.tuple_.elements[j],
-                state->registers[input.tuple_.elements[j]].literal);
-        }
-        set_register_literal(state, input.tuple_.result,
-                             state->registers[input.tuple_.result].literal);
-        return success;
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
