@@ -122,8 +122,9 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             {
                 values[j] = registers[*(element.tuple_.elements + j)];
             }
-            value_tuple.tuple_ = values;
+            value_tuple.tuple_.elements = values;
             registers[element.tuple_.result] = value_tuple;
+            break;
         }
         }
     }
