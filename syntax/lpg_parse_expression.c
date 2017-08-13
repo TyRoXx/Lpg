@@ -506,6 +506,10 @@ static expression_parser_result parse_callable(expression_parser *parser,
                     next = peek(parser);
                     if (next.token == token_comma)
                     {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_comma, next.where),
+                            parser->user);
                         return expression_parser_result_failure;
                     }
                     if (next.token == token_space)
@@ -515,6 +519,10 @@ static expression_parser_result parse_callable(expression_parser *parser,
                     }
                     else
                     {
+                        parser->on_error(
+                            parse_error_create(
+                                parse_error_expected_space, next.where),
+                            parser->user);
                         return expression_parser_result_failure;
                     }
                 }
