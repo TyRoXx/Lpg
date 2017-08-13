@@ -186,18 +186,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return (left.literal.into == right.literal.into) &&
                value_equals(left.literal.value_, right.literal.value_);
     case instruction_tuple:
-        if (left.tuple_.element_count != right.tuple_.element_count)
-        {
-            return false;
-        }
-        for (size_t i = 0; i < left.tuple_.element_count; ++i)
-        {
-            if (left.tuple_.elements[i] != right.tuple_.elements[i])
-            {
-                return false;
-            }
-        }
-        return true;
+        return left.tuple_.result == right.tuple_.result;
     }
     UNREACHABLE();
 }

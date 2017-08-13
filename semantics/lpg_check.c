@@ -1122,10 +1122,10 @@ evaluate_expression(function_checking_state *state,
         register_id *registers =
             allocate_array(element.tuple.length, sizeof(*registers));
         /* todo: Fix overflowing multiplication */
-        tuple_type tt = {
-            garbage_collector_allocate(
-                &state->program->memory, element.tuple.length * sizeof(type)),
-            element.tuple.length};
+        tuple_type tt = {garbage_collector_allocate(
+                             &state->program->memory,
+                             element.tuple.length * sizeof(*tt.elements)),
+                         element.tuple.length};
         for (size_t i = 0; i < element.tuple.length; ++i)
         {
             evaluate_expression_result result =
