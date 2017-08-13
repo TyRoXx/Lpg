@@ -19,7 +19,7 @@ typedef enum instruction_type
     instruction_tuple,
 } instruction_type;
 
-typedef struct
+typedef struct tuple_instruction
 {
     register_id *elements;
     size_t element_count;
