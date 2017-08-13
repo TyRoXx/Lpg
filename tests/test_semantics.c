@@ -1002,7 +1002,7 @@ void test_semantics(void)
                 literal_instruction_create(3, value_from_unit()))};
 
         check_single_wellformed_function(
-            "let t = {boolean.false,boolean.true}\n", std_library.globals,
+            "let t = {boolean.false, boolean.true}\n", std_library.globals,
             LPG_COPY_ARRAY(expected_main_function));
     }
     standard_library_description_free(&std_library);

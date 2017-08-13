@@ -508,11 +508,15 @@ static expression_parser_result parse_callable(expression_parser *parser,
                     {
                         return expression_parser_result_failure;
                     }
-                }
-                if (next.token == token_space)
-                {
-                    pop(parser);
-                    next = peek(parser);
+                    if (next.token == token_space)
+                    {
+                        pop(parser);
+                        next = peek(parser);
+                    }
+                    else
+                    {
+                        return expression_parser_result_failure;
+                    }
                 }
                 expression_parser_result parser_result =
                     parse_expression(parser, indentation, false);
