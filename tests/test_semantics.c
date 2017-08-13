@@ -997,7 +997,7 @@ void test_semantics(void)
                 values[0], value_from_enum_element(0))),
             instruction_create_literal(literal_instruction_create(
                 values[1], value_from_enum_element(1))),
-            instruction_create_tuple(tuple_instruction_create(values, 2, 3)),
+            instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
             instruction_create_literal(
                 literal_instruction_create(3, value_from_unit()))};
 
