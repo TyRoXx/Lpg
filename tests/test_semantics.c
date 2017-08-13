@@ -78,11 +78,14 @@ static void print_value(value const printed)
         break;
 
     case value_kind_enum_element:
-        printf("enum element ?");
+        printf("enum element at %u", printed.enum_element);
         break;
 
     case value_kind_unit:
         printf("unit");
+        break;
+    case value_kind_tuple:
+        printf("tuple ");
         break;
     }
 }
@@ -128,6 +131,9 @@ static void print_instruction(instruction const printed)
         printf("literal %u ", printed.literal.into);
         print_value(printed.literal.value_);
         printf("\n");
+        return;
+    case instruction_tuple:
+        printf("tuple with length %zu\n", printed.tuple_.element_count);
         return;
     }
     UNREACHABLE();
@@ -981,6 +987,23 @@ void test_semantics(void)
         check_wellformed_program("let f = (a: type) a\n"
                                  "let v : f(boolean) = boolean.true",
                                  std_library.globals, expected);
+    }
+    {
+        register_id *values = allocate_array(2, sizeof(*values));
+        values[0] = 0;
+        values[1] = 1;
+        instruction const expected_main_function[] = {
+            instruction_create_literal(literal_instruction_create(
+                values[0], value_from_enum_element(0))),
+            instruction_create_literal(literal_instruction_create(
+                values[1], value_from_enum_element(1))),
+            instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
+            instruction_create_literal(
+                literal_instruction_create(3, value_from_unit()))};
+
+        check_single_wellformed_function(
+            "let t = {boolean.false, boolean.true}\n", std_library.globals,
+            LPG_COPY_ARRAY(expected_main_function));
     }
     standard_library_description_free(&std_library);
 }

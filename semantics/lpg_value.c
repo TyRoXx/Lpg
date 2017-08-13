@@ -92,6 +92,14 @@ value value_from_integer(integer const content)
     return result;
 }
 
+value value_from_tuple(value_tuple content)
+{
+    value result;
+    result.kind = value_kind_tuple;
+    result.tuple_ = content;
+    return result;
+}
+
 bool value_equals(value const left, value const right)
 {
     if (left.kind != right.kind)
@@ -120,6 +128,20 @@ bool value_equals(value const left, value const right)
         return (left.enum_element == right.enum_element);
 
     case value_kind_unit:
+        return true;
+    case value_kind_tuple:
+        if (left.tuple_.element_count != right.tuple_.element_count)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < left.tuple_.element_count; ++i)
+        {
+            if (!value_equals(
+                    left.tuple_.elements[i], right.tuple_.elements[i]))
+            {
+                return false;
+            }
+        }
         return true;
     }
     UNREACHABLE();

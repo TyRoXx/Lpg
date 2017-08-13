@@ -15,8 +15,20 @@ typedef enum instruction_type
     instruction_global,
     instruction_read_struct,
     instruction_break,
-    instruction_literal
+    instruction_literal,
+    instruction_tuple,
 } instruction_type;
+
+typedef struct tuple_instruction
+{
+    register_id *elements;
+    size_t element_count;
+    register_id result;
+} tuple_instruction;
+
+tuple_instruction tuple_instruction_create(register_id *elements,
+                                           size_t element_count,
+                                           register_id result);
 
 typedef struct call_instruction
 {
@@ -67,6 +79,7 @@ struct instruction
         register_id global_into;
         read_struct_instruction read_struct;
         literal_instruction literal;
+        tuple_instruction tuple_;
     };
 };
 
@@ -76,6 +89,7 @@ instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_break(void);
 instruction instruction_create_literal(literal_instruction const value);
+instruction instruction_create_tuple(tuple_instruction argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

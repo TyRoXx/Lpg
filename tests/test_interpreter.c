@@ -101,7 +101,7 @@ static void expect_output(char const *source, char const *input,
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
     sequence_free(&root);
-    interprete(checked, globals_values, &gc);
+    interpret(checked, globals_values, &gc);
     REQUIRE(memory_writer_equals(print_buffer, output));
     memory_writer_free(&print_buffer);
     checked_program_free(&checked);

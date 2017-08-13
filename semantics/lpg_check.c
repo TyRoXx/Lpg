@@ -745,6 +745,177 @@ evaluate_lambda(function_checking_state *const state,
 }
 
 static evaluate_expression_result
+evaluate_call_expression(function_checking_state *state,
+                         instruction_sequence *function, call call)
+{
+    instruction_checkpoint const previous_code =
+        make_checkpoint(state, function);
+    evaluate_expression_result const callee =
+        evaluate_expression(state, function, *call.callee);
+    if (!callee.has_value)
+    {
+        return make_compile_time_unit();
+    }
+    size_t const expected_arguments =
+        expected_call_argument_count(callee.type_);
+    register_id *const arguments =
+        allocate_array(expected_arguments, sizeof(*arguments));
+    value *const compile_time_arguments =
+        allocate_array(expected_arguments, sizeof(*compile_time_arguments));
+    bool all_compile_time_arguments = true;
+    size_t const inferred_value_count =
+        count_inferred_values(*callee.type_.function_pointer_);
+    type_inference inferring = {
+        allocate_array(inferred_value_count, sizeof(*inferring.values)),
+        inferred_value_count};
+    for (size_t i = 0; i < inferred_value_count; ++i)
+    {
+        inferring.values[i].is_set = false;
+    }
+    LPG_FOR(size_t, i, call.arguments.length)
+    {
+        expression const argument_tree = call.arguments.elements[i];
+        if (i >= expected_arguments)
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_extraneous_argument,
+                                      expression_source_begin(argument_tree)),
+                state->user);
+            break;
+        }
+        evaluate_expression_result argument =
+            evaluate_expression(state, function, argument_tree);
+        if (!argument.has_value)
+        {
+            restore(previous_code);
+            deallocate(compile_time_arguments);
+            deallocate(arguments);
+            type_inference_free(inferring);
+            return evaluate_expression_result_empty;
+        }
+        if (!function_parameter_accepts_type(
+                callee.type_, i, argument.type_, inferring))
+        {
+            restore(previous_code);
+            state->on_error(
+                semantic_error_create(semantic_error_type_mismatch,
+                                      expression_source_begin(argument_tree)),
+                state->user);
+            deallocate(compile_time_arguments);
+            deallocate(arguments);
+            type_inference_free(inferring);
+            return evaluate_expression_result_empty;
+        }
+        if (argument.compile_time_value.is_set)
+        {
+            compile_time_arguments[i] = argument.compile_time_value.value_;
+        }
+        else
+        {
+            all_compile_time_arguments = false;
+        }
+        arguments[i] = argument.where;
+    }
+    if (call.arguments.length < expected_arguments)
+    {
+        deallocate(compile_time_arguments);
+        restore(previous_code);
+        deallocate(arguments);
+        type_inference_free(inferring);
+        state->on_error(semantic_error_create(semantic_error_missing_argument,
+                                              call.closing_parenthesis),
+                        state->user);
+        return evaluate_expression_result_empty;
+    }
+    type const return_type = get_return_type(callee.type_);
+    register_id result = ~(register_id)0;
+    optional_value compile_time_result = {false, value_from_unit()};
+    if (callee.compile_time_value.is_set && all_compile_time_arguments)
+    {
+        value *const complete_inferred_values = allocate_array(
+            inferred_value_count, sizeof(*complete_inferred_values));
+        for (size_t i = 0; i < inferred_value_count; ++i)
+        {
+            if (!inferring.values[i].is_set)
+            {
+                LPG_TO_DO();
+            }
+            complete_inferred_values[i] = inferring.values[i].value_;
+        }
+        {
+            size_t const globals_count = state->global->count;
+            value *const globals =
+                allocate_array(globals_count, sizeof(*globals));
+            for (size_t i = 0; i < globals_count; ++i)
+            {
+                optional_value const compile_time_global =
+                    state->global->members[i].compile_time_value;
+                if (compile_time_global.is_set)
+                {
+                    globals[i] = compile_time_global.value_;
+                }
+                else
+                {
+                    /*TODO: solve properly*/
+                    globals[i] = value_from_unit();
+                }
+            }
+            ASSUME(callee.compile_time_value.value_.kind ==
+                   value_kind_function_pointer);
+            compile_time_result = call_function(
+                callee.compile_time_value.value_.function_pointer,
+                complete_inferred_values, compile_time_arguments, globals,
+                &state->program->memory, state->program->functions);
+            deallocate(globals);
+        }
+        deallocate(complete_inferred_values);
+        if (compile_time_result.is_set)
+        {
+            deallocate(arguments);
+            restore(previous_code);
+            result = allocate_register(state);
+            if (return_type.kind == type_kind_string_ref)
+            {
+                size_t const length =
+                    compile_time_result.value_.string_ref.length;
+                char *const copy =
+                    garbage_collector_allocate(&state->program->memory, length);
+                memcpy(
+                    copy, compile_time_result.value_.string_ref.begin, length);
+                add_instruction(
+                    function,
+                    instruction_create_literal(literal_instruction_create(
+                        result, value_from_string_ref(
+                                    unicode_view_create(copy, length)))));
+            }
+            else
+            {
+                set_compile_time_constant(
+                    function, result, compile_time_result.value_);
+            }
+        }
+    }
+
+    if (!compile_time_result.is_set)
+    {
+        /*TODO: type inference for runtime-evaluated functions
+         * ("templates")*/
+        ASSERT(inferred_value_count == 0);
+
+        result = allocate_register(state);
+        add_instruction(
+            function,
+            instruction_create_call(call_instruction_create(
+                callee.where, arguments, expected_arguments, result)));
+    }
+
+    type_inference_free(inferring);
+    deallocate(compile_time_arguments);
+    return evaluate_expression_result_create(
+        result, return_type, compile_time_result);
+}
+
+static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element)
 {
@@ -754,174 +925,7 @@ evaluate_expression(function_checking_state *state,
         return evaluate_lambda(state, function, element.lambda);
 
     case expression_type_call:
-    {
-        instruction_checkpoint const previous_code =
-            make_checkpoint(state, function);
-        evaluate_expression_result const callee =
-            evaluate_expression(state, function, *element.call.callee);
-        if (!callee.has_value)
-        {
-            return make_compile_time_unit();
-        }
-        size_t const expected_arguments =
-            expected_call_argument_count(callee.type_);
-        register_id *const arguments =
-            allocate_array(expected_arguments, sizeof(*arguments));
-        value *const compile_time_arguments =
-            allocate_array(expected_arguments, sizeof(*compile_time_arguments));
-        bool all_compile_time_arguments = true;
-        size_t const inferred_value_count =
-            count_inferred_values(*callee.type_.function_pointer_);
-        type_inference inferring = {
-            allocate_array(inferred_value_count, sizeof(*inferring.values)),
-            inferred_value_count};
-        for (size_t i = 0; i < inferred_value_count; ++i)
-        {
-            inferring.values[i].is_set = false;
-        }
-        LPG_FOR(size_t, i, element.call.arguments.length)
-        {
-            expression const argument_tree = element.call.arguments.elements[i];
-            if (i >= expected_arguments)
-            {
-                state->on_error(semantic_error_create(
-                                    semantic_error_extraneous_argument,
-                                    expression_source_begin(argument_tree)),
-                                state->user);
-                break;
-            }
-            evaluate_expression_result argument =
-                evaluate_expression(state, function, argument_tree);
-            if (!argument.has_value)
-            {
-                restore(previous_code);
-                deallocate(compile_time_arguments);
-                deallocate(arguments);
-                type_inference_free(inferring);
-                return evaluate_expression_result_empty;
-            }
-            if (!function_parameter_accepts_type(
-                    callee.type_, i, argument.type_, inferring))
-            {
-                restore(previous_code);
-                state->on_error(semantic_error_create(
-                                    semantic_error_type_mismatch,
-                                    expression_source_begin(argument_tree)),
-                                state->user);
-                deallocate(compile_time_arguments);
-                deallocate(arguments);
-                type_inference_free(inferring);
-                return evaluate_expression_result_empty;
-            }
-            if (argument.compile_time_value.is_set)
-            {
-                compile_time_arguments[i] = argument.compile_time_value.value_;
-            }
-            else
-            {
-                all_compile_time_arguments = false;
-            }
-            arguments[i] = argument.where;
-        }
-        if (element.call.arguments.length < expected_arguments)
-        {
-            deallocate(compile_time_arguments);
-            restore(previous_code);
-            deallocate(arguments);
-            type_inference_free(inferring);
-            state->on_error(
-                semantic_error_create(semantic_error_missing_argument,
-                                      element.call.closing_parenthesis),
-                state->user);
-            return evaluate_expression_result_empty;
-        }
-        type const return_type = get_return_type(callee.type_);
-        register_id result = ~(register_id)0;
-        optional_value compile_time_result = {false, value_from_unit()};
-        if (callee.compile_time_value.is_set && all_compile_time_arguments)
-        {
-            value *const complete_inferred_values = allocate_array(
-                inferred_value_count, sizeof(*complete_inferred_values));
-            for (size_t i = 0; i < inferred_value_count; ++i)
-            {
-                if (!inferring.values[i].is_set)
-                {
-                    LPG_TO_DO();
-                }
-                complete_inferred_values[i] = inferring.values[i].value_;
-            }
-            {
-                size_t const globals_count = state->global->count;
-                value *const globals =
-                    allocate_array(globals_count, sizeof(*globals));
-                for (size_t i = 0; i < globals_count; ++i)
-                {
-                    optional_value const compile_time_global =
-                        state->global->members[i].compile_time_value;
-                    if (compile_time_global.is_set)
-                    {
-                        globals[i] = compile_time_global.value_;
-                    }
-                    else
-                    {
-                        /*TODO: solve properly*/
-                        globals[i] = value_from_unit();
-                    }
-                }
-                ASSUME(callee.compile_time_value.value_.kind ==
-                       value_kind_function_pointer);
-                compile_time_result = call_function(
-                    callee.compile_time_value.value_.function_pointer,
-                    complete_inferred_values, compile_time_arguments, globals,
-                    &state->program->memory, state->program->functions);
-                deallocate(globals);
-            }
-            deallocate(complete_inferred_values);
-            if (compile_time_result.is_set)
-            {
-                deallocate(arguments);
-                restore(previous_code);
-                result = allocate_register(state);
-                if (return_type.kind == type_kind_string_ref)
-                {
-                    size_t const length =
-                        compile_time_result.value_.string_ref.length;
-                    char *const copy = garbage_collector_allocate(
-                        &state->program->memory, length);
-                    memcpy(copy, compile_time_result.value_.string_ref.begin,
-                           length);
-                    add_instruction(
-                        function,
-                        instruction_create_literal(literal_instruction_create(
-                            result, value_from_string_ref(
-                                        unicode_view_create(copy, length)))));
-                }
-                else
-                {
-                    set_compile_time_constant(
-                        function, result, compile_time_result.value_);
-                }
-            }
-        }
-
-        if (!compile_time_result.is_set)
-        {
-            /*TODO: type inference for runtime-evaluated functions
-             * ("templates")*/
-            ASSERT(inferred_value_count == 0);
-
-            result = allocate_register(state);
-            add_instruction(
-                function,
-                instruction_create_call(call_instruction_create(
-                    callee.where, arguments, expected_arguments, result)));
-        }
-
-        type_inference_free(inferring);
-        deallocate(compile_time_arguments);
-        return evaluate_expression_result_create(
-            result, return_type, compile_time_result);
-    }
+        return evaluate_call_expression(state, function, element.call);
 
     case expression_type_integer_literal:
     {
@@ -1114,7 +1118,34 @@ evaluate_expression(function_checking_state *state,
     }
 
     case expression_type_tuple:
-        LPG_TO_DO();
+    {
+        register_id *registers =
+            allocate_array(element.tuple.length, sizeof(*registers));
+        /* todo: Fix overflowing multiplication */
+        tuple_type tt = {garbage_collector_allocate(
+                             &state->program->memory,
+                             element.tuple.length * sizeof(*tt.elements)),
+                         element.tuple.length};
+        for (size_t i = 0; i < element.tuple.length; ++i)
+        {
+            evaluate_expression_result result =
+                evaluate_expression(state, function, element.tuple.elements[i]);
+            if (!result.has_value)
+            {
+                deallocate(registers);
+                return evaluate_expression_result_empty;
+            }
+            registers[i] = result.where;
+            tt.elements[i] = result.type_;
+        }
+        register_id result_register = allocate_register(state);
+        add_instruction(
+            function, instruction_create_tuple(tuple_instruction_create(
+                          registers, element.tuple.length, result_register)));
+
+        return evaluate_expression_result_create(
+            result_register, type_from_tuple_type(tt), optional_value_empty);
+    }
     }
     UNREACHABLE();
 }

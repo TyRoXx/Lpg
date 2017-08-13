@@ -3,6 +3,7 @@
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
 #include <string.h>
+#include <lpg_instruction.h>
 
 typedef struct standard_library_usage
 {
@@ -396,6 +397,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
+        case value_kind_tuple:
             LPG_TO_DO();
 
         case value_kind_string:
@@ -559,6 +561,7 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_type:
         case value_kind_enum_element:
         case value_kind_unit:
+        case value_kind_tuple:
             LPG_TO_DO();
         }
 
@@ -611,6 +614,7 @@ static success_indicator generate_string_length(c_backend_state *state,
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
+        case value_kind_tuple:
             LPG_TO_DO();
 
         case value_kind_string:
@@ -914,23 +918,11 @@ static success_indicator generate_instruction(
             }
 
         case register_meaning_variable:
-            LPG_TO_DO();
-
         case register_meaning_print:
-            LPG_TO_DO();
-
         case register_meaning_read:
-            LPG_TO_DO();
-
         case register_meaning_assert:
-            LPG_TO_DO();
-
         case register_meaning_string_equals:
-            LPG_TO_DO();
-
         case register_meaning_concat:
-            LPG_TO_DO();
-
         case register_meaning_literal:
             LPG_TO_DO();
         }
@@ -945,6 +937,8 @@ static success_indicator generate_instruction(
                register_meaning_nothing);
         set_register_literal(state, input.literal.into, input.literal.value_);
         return success;
+    case instruction_tuple:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }

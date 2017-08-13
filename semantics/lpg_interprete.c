@@ -111,6 +111,21 @@ run_sequence(instruction_sequence const sequence, value const *globals,
         case instruction_literal:
             registers[element.literal.into] = element.literal.value_;
             break;
+        case instruction_tuple:
+        {
+            value value_tuple;
+            value_tuple.kind = value_kind_tuple;
+            value *values = garbage_collector_allocate(
+                gc, element.tuple_.element_count * sizeof(*values));
+            // TODO: check overflow multiplication
+            for (size_t j = 0; j < element.tuple_.element_count; ++j)
+            {
+                values[j] = registers[*(element.tuple_.elements + j)];
+            }
+            value_tuple.tuple_.elements = values;
+            registers[element.tuple_.result] = value_tuple;
+            break;
+        }
         }
     }
     return run_sequence_result_continue;
@@ -151,8 +166,8 @@ call_interpreted_function(checked_function const callee, value *const arguments,
     UNREACHABLE();
 }
 
-void interprete(checked_program const program, value const *globals,
-                garbage_collector *const gc)
+void interpret(checked_program const program, value const *globals,
+               garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
     call_interpreted_function(

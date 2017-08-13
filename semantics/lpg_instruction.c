@@ -3,6 +3,14 @@
 #include "lpg_for.h"
 #include "lpg_assert.h"
 
+tuple_instruction tuple_instruction_create(register_id *elements,
+                                           size_t element_count,
+                                           register_id result)
+{
+    tuple_instruction tuple_instruction1 = {elements, element_count, result};
+    return tuple_instruction1;
+}
+
 call_instruction call_instruction_create(register_id callee,
                                          register_id *arguments,
                                          size_t argument_count,
@@ -72,6 +80,14 @@ bool literal_instruction_equals(literal_instruction const left,
     return (left.into == right.into) && value_equals(left.value_, right.value_);
 }
 
+instruction instruction_create_tuple(tuple_instruction argument)
+{
+    instruction result;
+    result.type = instruction_tuple;
+    result.tuple_ = argument;
+    return result;
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;
@@ -132,15 +148,12 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_global:
-        break;
-
     case instruction_read_struct:
-        break;
-
     case instruction_break:
-        break;
-
     case instruction_literal:
+        break;
+    case instruction_tuple:
+        deallocate(value->tuple_.elements);
         break;
     }
 }
@@ -172,6 +185,8 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_literal:
         return (left.literal.into == right.literal.into) &&
                value_equals(left.literal.value_, right.literal.value_);
+    case instruction_tuple:
+        return left.tuple_.result == right.tuple_.result;
     }
     UNREACHABLE();
 }
