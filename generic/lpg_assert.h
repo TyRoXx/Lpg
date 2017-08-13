@@ -8,7 +8,7 @@
         {                                                                      \
             abort();                                                           \
         }                                                                      \
-    } while (0)
+    } while ((void)0, 0)
 
 #ifdef NDEBUG
 #ifdef _MSC_VER
@@ -21,7 +21,7 @@
         {                                                                      \
             __builtin_unreachable();                                           \
         }                                                                      \
-    } while (0)
+    } while ((void)0, 0)
 #endif
 #else
 #define ASSUME(x) ASSERT(x)

@@ -14,7 +14,7 @@
     {                                                                          \
         __debugbreak();                                                        \
         abort();                                                               \
-    } while (0)
+    } while ((void)0, 0)
 #endif
 
 int lpg_check(int success);
