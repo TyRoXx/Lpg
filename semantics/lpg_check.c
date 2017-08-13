@@ -1132,7 +1132,8 @@ evaluate_expression(function_checking_state *state,
                 evaluate_expression(state, function, element.tuple.elements[i]);
             if (!result.has_value)
             {
-                break;
+                deallocate(registers);
+                return evaluate_expression_result_empty;
             }
             registers[i] = result.where;
             tt.elements[i] = result.type_;
