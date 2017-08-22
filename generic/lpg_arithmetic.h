@@ -9,9 +9,9 @@ typedef struct optional_size
     size_t value_if_set;
 } optional_size;
 
-LPG_USE_RESULT optional_size make_optional_size(size_t const value);
+optional_size make_optional_size(size_t const value) LPG_USE_RESULT;
 
 static optional_size const optional_size_empty = {optional_empty, 0};
 
-LPG_USE_RESULT optional_size size_multiply(size_t const first,
-                                           size_t const second);
+optional_size size_multiply(size_t const first,
+                            size_t const second) LPG_USE_RESULT;
