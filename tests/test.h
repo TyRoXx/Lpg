@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <stdbool.h>
 
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)
@@ -23,7 +24,12 @@ int lpg_print_test_summary(void);
 #define FAIL() LPG_ABORT()
 
 #define REQUIRE(x)                                                             \
-    if (!lpg_check(!!(x)))                                                     \
+    do                                                                         \
     {                                                                          \
-        FAIL();                                                                \
-    }
+        bool const lpg_require_local_variable = !!(x);                         \
+        lpg_check(lpg_require_local_variable);                                 \
+        if (!lpg_require_local_variable)                                       \
+        {                                                                      \
+            FAIL();                                                            \
+        }                                                                      \
+    } while ((void)0, 0)

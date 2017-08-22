@@ -16,15 +16,36 @@ decode_string_literal_result decode_string_literal(unicode_view source,
         {
             if (c == '"' || c == '\'' || c == '\\')
             {
-                stream_writer_write_bytes(decoded, &c, 1);
+                switch (stream_writer_write_bytes(decoded, &c, 1))
+                {
+                case failure:
+                    return decode_string_literal_result_create(false, i);
+
+                case success:
+                    break;
+                }
             }
             else if (c == 'n' || c == 'r')
             {
-                stream_writer_write_string(decoded, "\n");
+                switch (stream_writer_write_string(decoded, "\n"))
+                {
+                case failure:
+                    return decode_string_literal_result_create(false, i);
+
+                case success:
+                    break;
+                }
             }
             else if (c == 't')
             {
-                stream_writer_write_string(decoded, "\t");
+                switch (stream_writer_write_string(decoded, "\t"))
+                {
+                case failure:
+                    return decode_string_literal_result_create(false, i);
+
+                case success:
+                    break;
+                }
             }
             else
             {
@@ -42,7 +63,14 @@ decode_string_literal_result decode_string_literal(unicode_view source,
         }
         else
         {
-            stream_writer_write_bytes(decoded, &c, 1);
+            switch (stream_writer_write_bytes(decoded, &c, 1))
+            {
+            case failure:
+                return decode_string_literal_result_create(false, i);
+
+            case success:
+                break;
+            }
         }
     }
     return decode_string_literal_result_create(false, source.length);

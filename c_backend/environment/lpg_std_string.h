@@ -62,6 +62,10 @@ static string_ref string_ref_concat(string_ref const left,
 {
     size_t const result_length = (left.length + right.length);
     char *const allocation = malloc(sizeof(size_t) + result_length);
+    if (!allocation)
+    {
+        abort();
+    }
     size_t *const references = (size_t *)allocation;
     *references = 1;
     string_ref const result = {

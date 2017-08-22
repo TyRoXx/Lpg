@@ -192,14 +192,14 @@ integer_division integer_divide(integer numerator, integer denominator)
 {
     ASSERT(denominator.low || denominator.high);
     integer_division result = {{0, 0}, {0, 0}};
-    for (unsigned i = 127; i < 128; --i)
+    for (unsigned i = 0; i < 128u; ++i)
     {
         result.remainder = integer_shift_left_truncate(result.remainder, 1);
-        result.remainder.low |= integer_bit(numerator, i);
+        result.remainder.low |= integer_bit(numerator, 127u - i);
         if (!integer_less(result.remainder, denominator))
         {
             result.remainder = integer_subtract(result.remainder, denominator);
-            integer_set_bit(&result.quotient, i, 1);
+            integer_set_bit(&result.quotient, 127u - i, 1);
         }
     }
     return result;

@@ -256,7 +256,8 @@ static value print(value const *const inferred, value const *const arguments,
     (void)gc;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *const destination = environment;
-    stream_writer_write_bytes(*destination, text.begin, text.length);
+    ASSERT(stream_writer_write_bytes(*destination, text.begin, text.length) ==
+           success);
     return value_from_unit();
 }
 
