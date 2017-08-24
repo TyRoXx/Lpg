@@ -564,13 +564,13 @@ read_variable(function_checking_state *const state,
         result, element_read.type_, element_read.compile_time_value);
 }
 
-static evaluate_expression_result make_unit(function_checking_state *state,
+static evaluate_expression_result make_unit(register_id *const used_registers,
                                             instruction_sequence *output)
 {
     type const unit_type = {type_kind_unit, {NULL}};
     evaluate_expression_result const final_result =
         evaluate_expression_result_create(
-            allocate_register(&state->used_registers), unit_type,
+            allocate_register(used_registers), unit_type,
             optional_value_create(value_from_unit()));
     add_instruction(
         output, instruction_create_literal(literal_instruction_create(
@@ -1258,7 +1258,7 @@ check_sequence(function_checking_state *const state,
 {
     if (input.length == 0)
     {
-        return make_unit(state, output);
+        return make_unit(&state->used_registers, output);
     }
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     size_t const previous_number_of_variables = state->local_variables.count;
