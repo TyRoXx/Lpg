@@ -804,11 +804,8 @@ evaluate_call_expression(function_checking_state *state,
     {
         return make_compile_time_unit();
     }
-    size_t inferred_value_count
-#ifdef _MSC_VER
-        = 0
-#endif
-        ;
+    size_t inferred_value_count =
+        /*needs to be initialized to avoid compiler warnings due to the missing default case in the switch statement below*/ 0;
     switch (callee.type_.kind)
     {
     case type_kind_structure:
