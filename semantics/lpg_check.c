@@ -332,17 +332,17 @@ evaluate_expression(function_checking_state *state,
 
 typedef struct instruction_checkpoint
 {
-    function_checking_state *state;
+    register_id *currently_used_registers;
     instruction_sequence *sequence;
     size_t size_of_sequence;
-    register_id used_registers;
+    register_id originally_used_registers;
 } instruction_checkpoint;
 
-static instruction_checkpoint make_checkpoint(function_checking_state *state,
+static instruction_checkpoint make_checkpoint(register_id *const used_registers,
                                               instruction_sequence *sequence)
 {
     instruction_checkpoint result = {
-        state, sequence, sequence->length, state->used_registers};
+        used_registers, sequence, sequence->length, *used_registers};
     return result;
 }
 
@@ -358,7 +358,8 @@ static void restore_instructions(instruction_checkpoint const previous_code)
 
 static void restore(instruction_checkpoint const previous_code)
 {
-    previous_code.state->used_registers = previous_code.used_registers;
+    *previous_code.currently_used_registers =
+        previous_code.originally_used_registers;
     restore_instructions(previous_code);
 }
 
@@ -369,7 +370,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
              register_id const result)
 {
     instruction_checkpoint const previous_code =
-        make_checkpoint(state, function);
+        make_checkpoint(&state->used_registers, function);
     evaluate_expression_result const object =
         evaluate_expression(state, function, object_tree);
     if (!object.has_value)
@@ -535,7 +536,8 @@ read_variable(function_checking_state *const state,
               instruction_sequence *const to, unicode_view const name,
               source_location const where)
 {
-    instruction_checkpoint const previous_code = make_checkpoint(state, to);
+    instruction_checkpoint const previous_code =
+        make_checkpoint(&state->used_registers, to);
 
     LPG_FOR(size_t, i, state->local_variables.count)
     {
@@ -726,7 +728,8 @@ evaluate_lambda(function_checking_state *const state,
         allocate_array(evaluated.parameter_count, sizeof(*parameter_names));
     for (size_t i = 0; i < evaluated.parameter_count; ++i)
     {
-        instruction_checkpoint const before = make_checkpoint(state, function);
+        instruction_checkpoint const before =
+            make_checkpoint(&state->used_registers, function);
         parameter const this_parameter = evaluated.parameters[i];
         evaluate_expression_result const parameter_type =
             evaluate_expression(state, function, *this_parameter.type);
@@ -797,7 +800,7 @@ evaluate_call_expression(function_checking_state *state,
                          instruction_sequence *function, call call)
 {
     instruction_checkpoint const previous_code =
-        make_checkpoint(state, function);
+        make_checkpoint(&state->used_registers, function);
     evaluate_expression_result const callee =
         evaluate_expression(state, function, *call.callee);
     if (!callee.has_value)
@@ -1044,7 +1047,7 @@ evaluate_expression(function_checking_state *state,
     case expression_type_access_structure:
     {
         instruction_checkpoint const previous_code =
-            make_checkpoint(state, function);
+            make_checkpoint(&state->used_registers, function);
         register_id const result = allocate_register(&state->used_registers);
         read_structure_element_result const element_read =
             read_element(state, function, *element.access_structure.object,
@@ -1132,7 +1135,7 @@ evaluate_expression(function_checking_state *state,
     case expression_type_declare:
     {
         instruction_checkpoint const before_initialization =
-            make_checkpoint(state, function);
+            make_checkpoint(&state->used_registers, function);
         evaluate_expression_result const initializer =
             evaluate_expression(state, function, *element.declare.initializer);
         if (!initializer.has_value)
@@ -1152,7 +1155,7 @@ evaluate_expression(function_checking_state *state,
         if (element.declare.optional_type)
         {
             instruction_checkpoint const previous_code =
-                make_checkpoint(state, function);
+                make_checkpoint(&state->used_registers, function);
             evaluate_expression_result const declared_type =
                 evaluate_expression(
                     state, function, *element.declare.optional_type);
