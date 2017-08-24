@@ -957,7 +957,7 @@ evaluate_call_expression(function_checking_state *state,
             case value_kind_enum_constructor:
             {
                 value *const enum_state = garbage_collector_allocate(
-                    &state->program->memory, sizeof(*state));
+                    &state->program->memory, sizeof(*enum_state));
                 ASSUME(expected_arguments == 1);
                 *enum_state = compile_time_arguments[0];
                 compile_time_result =
