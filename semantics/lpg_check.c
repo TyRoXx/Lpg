@@ -114,10 +114,10 @@ function_checking_state_create(structure const *global,
     return result;
 }
 
-static register_id allocate_register(function_checking_state *state)
+static register_id allocate_register(register_id *const used_registers)
 {
-    register_id id = state->used_registers;
-    ++state->used_registers;
+    register_id id = *used_registers;
+    ++(*used_registers);
     return id;
 }
 
@@ -548,9 +548,9 @@ read_variable(function_checking_state *const state,
         }
     }
 
-    register_id const global = allocate_register(state);
+    register_id const global = allocate_register(&state->used_registers);
     add_instruction(to, instruction_create_global(global));
-    register_id const result = allocate_register(state);
+    register_id const result = allocate_register(&state->used_registers);
     read_structure_element_result const element_read = read_structure_element(
         state, to, state->global, global, name, where, result);
     if (!element_read.success)
@@ -568,7 +568,7 @@ static evaluate_expression_result make_unit(function_checking_state *state,
     type const unit_type = {type_kind_unit, {NULL}};
     evaluate_expression_result const final_result =
         evaluate_expression_result_create(
-            allocate_register(state), unit_type,
+            allocate_register(&state->used_registers), unit_type,
             optional_value_create(value_from_unit()));
     add_instruction(
         output, instruction_create_literal(literal_instruction_create(
@@ -666,7 +666,7 @@ static optional_checked_function check_function(
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(parameter_names[i])),
                 parameter_types[i], optional_value_empty,
-                allocate_register(&state)));
+                allocate_register(&state.used_registers)));
     }
 
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
@@ -689,7 +689,7 @@ static optional_checked_function check_function(
     }
     else if (body_evaluated.compile_time_value.is_set)
     {
-        return_value = allocate_register(&state);
+        return_value = allocate_register(&state.used_registers);
         add_instruction(
             &body_out,
             instruction_create_literal(literal_instruction_create(
@@ -778,7 +778,7 @@ evaluate_lambda(function_checking_state *const state,
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.value;
-    register_id const destination = allocate_register(state);
+    register_id const destination = allocate_register(&state->used_registers);
     add_instruction(
         function,
         instruction_create_literal(literal_instruction_create(
@@ -972,7 +972,7 @@ evaluate_call_expression(function_checking_state *state,
         {
             deallocate(arguments);
             restore(previous_code);
-            result = allocate_register(state);
+            result = allocate_register(&state->used_registers);
             if (return_type.kind == type_kind_string_ref)
             {
                 size_t const length =
@@ -1001,7 +1001,7 @@ evaluate_call_expression(function_checking_state *state,
          * ("templates")*/
         ASSERT(inferred_value_count == 0);
 
-        result = allocate_register(state);
+        result = allocate_register(&state->used_registers);
         add_instruction(
             function,
             instruction_create_call(call_instruction_create(
@@ -1028,7 +1028,7 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_integer_literal:
     {
-        register_id const where = allocate_register(state);
+        register_id const where = allocate_register(&state->used_registers);
         add_instruction(
             function,
             instruction_create_literal(literal_instruction_create(
@@ -1045,7 +1045,7 @@ evaluate_expression(function_checking_state *state,
     {
         instruction_checkpoint const previous_code =
             make_checkpoint(state, function);
-        register_id const result = allocate_register(state);
+        register_id const result = allocate_register(&state->used_registers);
         read_structure_element_result const element_read =
             read_element(state, function, *element.access_structure.object,
                          &element.access_structure.member, result);
@@ -1063,7 +1063,7 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_string:
     {
-        register_id const result = allocate_register(state);
+        register_id const result = allocate_register(&state->used_registers);
         memory_writer decoded = {NULL, 0, 0};
         stream_writer decoded_writer = memory_writer_erase(&decoded);
         decode_string_literal(
@@ -1237,7 +1237,7 @@ evaluate_expression(function_checking_state *state,
             registers[i] = result.where;
             tt.elements[i] = result.type_;
         }
-        register_id result_register = allocate_register(state);
+        register_id result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_tuple(tuple_instruction_create(
                           registers, element.tuple.length, result_register)));
