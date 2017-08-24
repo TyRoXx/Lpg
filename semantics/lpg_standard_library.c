@@ -24,8 +24,8 @@ value not_impl(value const *const inferred, value const *arguments,
     (void)environment;
     (void)inferred;
     (void)gc;
-    enum_element_id const argument = arguments[0].enum_element;
-    return value_from_enum_element(!argument);
+    enum_element_id const argument = arguments[0].enum_element.which;
+    return value_from_enum_element(!argument, NULL);
 }
 
 value concat_impl(value const *const inferred, value const *const arguments,
@@ -48,9 +48,9 @@ value and_impl(value const *const inferred, value const *arguments,
     (void)environment;
     (void)inferred;
     (void)gc;
-    enum_element_id const left = arguments[0].enum_element;
-    enum_element_id const right = arguments[1].enum_element;
-    return value_from_enum_element(left && right);
+    enum_element_id const left = arguments[0].enum_element.which;
+    enum_element_id const right = arguments[1].enum_element.which;
+    return value_from_enum_element(left && right, NULL);
 }
 
 value or_impl(value const *const inferred, value const *arguments,
@@ -59,9 +59,9 @@ value or_impl(value const *const inferred, value const *arguments,
     (void)environment;
     (void)inferred;
     (void)gc;
-    enum_element_id const left = arguments[0].enum_element;
-    enum_element_id const right = arguments[1].enum_element;
-    return value_from_enum_element(left || right);
+    enum_element_id const left = arguments[0].enum_element.which;
+    enum_element_id const right = arguments[1].enum_element.which;
+    return value_from_enum_element(left || right, NULL);
 }
 
 value string_equals_impl(value const *const inferred,
@@ -73,7 +73,7 @@ value string_equals_impl(value const *const inferred,
     (void)gc;
     unicode_view const left = arguments[0].string_ref;
     unicode_view const right = arguments[1].string_ref;
-    return value_from_enum_element(unicode_view_equals(left, right));
+    return value_from_enum_element(unicode_view_equals(left, right), NULL);
 }
 
 value int_impl(value const *const inferred, value const *arguments,
@@ -102,7 +102,7 @@ value integer_equals_impl(value const *const inferred,
     (void)gc;
     integer const left = arguments[0].integer_;
     integer const right = arguments[1].integer_;
-    return value_from_enum_element(integer_equal(left, right));
+    return value_from_enum_element(integer_equal(left, right), NULL);
 }
 
 standard_library_description describe_standard_library(void)
@@ -111,10 +111,10 @@ standard_library_description describe_standard_library(void)
     {
         enumeration_element *const boolean_elements =
             allocate_array(2, sizeof(*boolean_elements));
-        boolean_elements[0] =
-            enumeration_element_create(unicode_string_from_c_str("false"));
-        boolean_elements[1] =
-            enumeration_element_create(unicode_string_from_c_str("true"));
+        boolean_elements[0] = enumeration_element_create(
+            unicode_string_from_c_str("false"), type_from_unit());
+        boolean_elements[1] = enumeration_element_create(
+            unicode_string_from_c_str("true"), type_from_unit());
         stable->boolean = enumeration_create(boolean_elements, 2);
     }
     type const boolean = type_from_enumeration(&stable->boolean);
@@ -122,10 +122,12 @@ standard_library_description describe_standard_library(void)
     {
         enumeration_element *const elements =
             allocate_array(2, sizeof(*elements));
-        elements[0] =
-            enumeration_element_create(unicode_string_from_c_str("none"));
-        elements[1] =
-            enumeration_element_create(unicode_string_from_c_str("some"));
+        elements[0] = enumeration_element_create(
+            unicode_string_from_c_str("none"), type_from_unit());
+        elements[1] = enumeration_element_create(
+            unicode_string_from_c_str("some"),
+            type_from_integer_range(
+                integer_range_create(integer_create(0, 0), integer_max())));
         stable->option = enumeration_create(elements, 2);
     }
 

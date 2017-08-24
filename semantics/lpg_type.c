@@ -19,17 +19,6 @@ void structure_free(structure const *value)
     deallocate(value->members);
 }
 
-enumeration_element enumeration_element_create(unicode_string name)
-{
-    enumeration_element result = {name};
-    return result;
-}
-
-void enumeration_element_free(enumeration_element const *value)
-{
-    unicode_string_free(&value->name);
-}
-
 enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size)
 {
@@ -75,6 +64,17 @@ bool integer_range_equals(integer_range const left, integer_range const right)
 {
     return integer_equal(left.minimum, right.minimum) &&
            integer_equal(left.maximum, right.maximum);
+}
+
+enumeration_element enumeration_element_create(unicode_string name, type state)
+{
+    enumeration_element result = {name, state};
+    return result;
+}
+
+void enumeration_element_free(enumeration_element const *value)
+{
+    unicode_string_free(&value->name);
 }
 
 bool function_pointer_equals(function_pointer const left,
@@ -159,6 +159,15 @@ type type_from_inferred(size_t const inferred)
     return result;
 }
 
+type type_from_enum_constructor(
+    LPG_NON_NULL(enum_constructor_type *enum_constructor))
+{
+    type result;
+    result.kind = type_kind_enum_constructor;
+    result.enum_constructor = enum_constructor;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -216,6 +225,9 @@ bool type_equals(type const left, type const right)
         return integer_range_equals(left.integer_range_, right.integer_range_);
 
     case type_kind_inferred:
+        LPG_TO_DO();
+
+    case type_kind_enum_constructor:
         LPG_TO_DO();
     }
     UNREACHABLE();

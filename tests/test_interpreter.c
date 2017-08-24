@@ -53,7 +53,7 @@ static value assert_impl(value const *const inferred, value const *arguments,
     (void)environment;
     (void)inferred;
     (void)gc;
-    enum_element_id const argument = arguments[0].enum_element;
+    enum_element_id const argument = arguments[0].enum_element.which;
     REQUIRE(argument == 1);
     return value_from_unit();
 }

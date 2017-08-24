@@ -151,6 +151,9 @@ static type get_return_type(type const callee)
 
     case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        return type_from_enumeration(callee.enum_constructor->enumeration);
     }
     UNREACHABLE();
 }
@@ -214,6 +217,9 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
 
     case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -267,6 +273,14 @@ static bool function_parameter_accepts_type(type const function,
 
     case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        ASSUME(parameter == 0);
+        return check_parameter_type(
+            argument, function.enum_constructor->enumeration
+                          ->elements[function.enum_constructor->which]
+                          .state,
+            inferring);
     }
     UNREACHABLE();
 }
@@ -419,13 +433,29 @@ read_element(function_checking_state *state, instruction_sequence *function,
                         unicode_view_from_string(element->value),
                         unicode_view_from_string(enum_->elements[i].name)))
                 {
-                    add_instruction(
-                        function,
-                        instruction_create_literal(literal_instruction_create(
-                            result, value_from_enum_element(i))));
+                    if (enum_->elements[i].state.kind == type_kind_unit)
+                    {
+                        value const literal = value_from_enum_element(i, NULL);
+                        add_instruction(
+                            function,
+                            instruction_create_literal(
+                                literal_instruction_create(result, literal)));
+                        return read_structure_element_result_create(
+                            true, left_side_type,
+                            optional_value_create(literal));
+                    }
+                    value const literal = value_from_enum_constructor();
+                    add_instruction(function, instruction_create_literal(
+                                                  literal_instruction_create(
+                                                      result, literal)));
+                    enum_constructor_type *const constructor_type =
+                        garbage_collector_allocate(
+                            &state->program->memory, sizeof(*constructor_type));
+                    constructor_type->enumeration = enum_;
+                    constructor_type->which = i;
                     return read_structure_element_result_create(
-                        true, left_side_type,
-                        optional_value_create(value_from_enum_element(i)));
+                        true, type_from_enum_constructor(constructor_type),
+                        optional_value_create(literal));
                 }
             }
             state->on_error(
@@ -440,6 +470,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_integer_range:
         case type_kind_inferred:
             LPG_TO_DO();
+
+        case type_kind_enum_constructor:
+            LPG_TO_DO();
         }
         break;
     }
@@ -448,6 +481,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
         LPG_TO_DO();
 
     case type_kind_inferred:
+        LPG_TO_DO();
+
+    case type_kind_enum_constructor:
         LPG_TO_DO();
     }
     UNREACHABLE();
@@ -470,6 +506,8 @@ static size_t expected_call_argument_count(const type callee)
         LPG_TO_DO();
 
     case type_kind_enumeration:
+        LPG_TO_DO();
+
     case type_kind_tuple:
         LPG_TO_DO();
 
@@ -481,6 +519,13 @@ static size_t expected_call_argument_count(const type callee)
 
     case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        ASSUME(callee.enum_constructor->which <
+               callee.enum_constructor->enumeration->size);
+        return callee.enum_constructor->enumeration
+                   ->elements[callee.enum_constructor->which]
+                   .state.kind != type_kind_unit;
     }
     UNREACHABLE();
 }
@@ -559,6 +604,9 @@ static size_t find_lower_bound_for_inferred_values(type const root)
 
     case type_kind_inferred:
         return (root.inferred + 1);
+
+    case type_kind_enum_constructor:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -756,6 +804,34 @@ evaluate_call_expression(function_checking_state *state,
     {
         return make_compile_time_unit();
     }
+    size_t inferred_value_count
+#ifdef _MSC_VER
+        = 0
+#endif
+        ;
+    switch (callee.type_.kind)
+    {
+    case type_kind_structure:
+        LPG_TO_DO();
+
+    case type_kind_function_pointer:
+        inferred_value_count =
+            count_inferred_values(*callee.type_.function_pointer_);
+        break;
+
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+    case type_kind_tuple:
+    case type_kind_type:
+    case type_kind_integer_range:
+    case type_kind_inferred:
+        LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        inferred_value_count = 0;
+        break;
+    }
     size_t const expected_arguments =
         expected_call_argument_count(callee.type_);
     register_id *const arguments =
@@ -763,8 +839,6 @@ evaluate_call_expression(function_checking_state *state,
     value *const compile_time_arguments =
         allocate_array(expected_arguments, sizeof(*compile_time_arguments));
     bool all_compile_time_arguments = true;
-    size_t const inferred_value_count =
-        count_inferred_values(*callee.type_.function_pointer_);
     type_inference inferring = {
         allocate_array(inferred_value_count, sizeof(*inferring.values)),
         inferred_value_count};
@@ -843,30 +917,58 @@ evaluate_call_expression(function_checking_state *state,
             complete_inferred_values[i] = inferring.values[i].value_;
         }
         {
-            size_t const globals_count = state->global->count;
-            value *const globals =
-                allocate_array(globals_count, sizeof(*globals));
-            for (size_t i = 0; i < globals_count; ++i)
+            switch (callee.compile_time_value.value_.kind)
             {
-                optional_value const compile_time_global =
-                    state->global->members[i].compile_time_value;
-                if (compile_time_global.is_set)
+            case value_kind_integer:
+            case value_kind_string:
+                UNREACHABLE();
+
+            case value_kind_function_pointer:
+            {
+                size_t const globals_count = state->global->count;
+                value *const globals =
+                    allocate_array(globals_count, sizeof(*globals));
+                for (size_t i = 0; i < globals_count; ++i)
                 {
-                    globals[i] = compile_time_global.value_;
+                    optional_value const compile_time_global =
+                        state->global->members[i].compile_time_value;
+                    if (compile_time_global.is_set)
+                    {
+                        globals[i] = compile_time_global.value_;
+                    }
+                    else
+                    {
+                        /*TODO: solve properly*/
+                        globals[i] = value_from_unit();
+                    }
                 }
-                else
-                {
-                    /*TODO: solve properly*/
-                    globals[i] = value_from_unit();
-                }
+                compile_time_result = call_function(
+                    callee.compile_time_value.value_.function_pointer,
+                    complete_inferred_values, compile_time_arguments, globals,
+                    &state->program->memory, state->program->functions);
+                deallocate(globals);
+                break;
             }
-            ASSUME(callee.compile_time_value.value_.kind ==
-                   value_kind_function_pointer);
-            compile_time_result = call_function(
-                callee.compile_time_value.value_.function_pointer,
-                complete_inferred_values, compile_time_arguments, globals,
-                &state->program->memory, state->program->functions);
-            deallocate(globals);
+
+            case value_kind_flat_object:
+            case value_kind_type:
+            case value_kind_enum_element:
+            case value_kind_unit:
+            case value_kind_tuple:
+                UNREACHABLE();
+
+            case value_kind_enum_constructor:
+            {
+                value *const enum_state = garbage_collector_allocate(
+                    &state->program->memory, sizeof(*state));
+                ASSUME(expected_arguments == 1);
+                *enum_state = compile_time_arguments[0];
+                compile_time_result =
+                    optional_value_create(value_from_enum_element(
+                        callee.type_.enum_constructor->which, enum_state));
+                break;
+            }
+            }
         }
         deallocate(complete_inferred_values);
         if (compile_time_result.is_set)

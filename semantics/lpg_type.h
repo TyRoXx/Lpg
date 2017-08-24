@@ -18,13 +18,7 @@ void structure_free(structure const *value);
 
 typedef struct type type;
 
-typedef struct enumeration_element
-{
-    unicode_string name;
-} enumeration_element;
-
-enumeration_element enumeration_element_create(unicode_string name);
-void enumeration_element_free(LPG_NON_NULL(enumeration_element const *value));
+typedef struct enumeration_element enumeration_element;
 
 typedef struct enumeration
 {
@@ -62,10 +56,13 @@ typedef enum type_kind
     type_kind_tuple,
     type_kind_type,
     type_kind_integer_range,
-    type_kind_inferred
+    type_kind_inferred,
+    type_kind_enum_constructor
 } type_kind;
 
 typedef struct function_pointer function_pointer;
+
+typedef struct enum_constructor_type enum_constructor_type;
 
 struct type
 {
@@ -78,8 +75,24 @@ struct type
         tuple_type tuple_;
         integer_range integer_range_;
         size_t inferred;
+        enum_constructor_type *enum_constructor;
     };
 };
+
+struct enum_constructor_type
+{
+    enumeration const *enumeration;
+    enum_element_id which;
+};
+
+struct enumeration_element
+{
+    unicode_string name;
+    type state;
+};
+
+enumeration_element enumeration_element_create(unicode_string name, type state);
+void enumeration_element_free(LPG_NON_NULL(enumeration_element const *value));
 
 struct function_pointer
 {
@@ -99,6 +112,8 @@ type type_from_tuple_type(tuple_type const value);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
+type type_from_enum_constructor(
+    LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 

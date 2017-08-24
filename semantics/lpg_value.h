@@ -37,6 +37,7 @@ typedef enum value_kind
     value_kind_enum_element,
     value_kind_unit,
     value_kind_tuple,
+    value_kind_enum_constructor
 } value_kind;
 
 typedef struct value_tuple
@@ -44,6 +45,14 @@ typedef struct value_tuple
     size_t element_count;
     struct value *elements;
 } value_tuple;
+
+typedef struct enum_element_value
+{
+    enum_element_id which;
+
+    /*NULL means unit*/
+    struct value *state;
+} enum_element_value;
 
 typedef struct value
 {
@@ -55,7 +64,7 @@ typedef struct value
         function_pointer_value function_pointer;
         struct value const *flat_object;
         type type_;
-        enum_element_id enum_element;
+        enum_element_value enum_element;
         value_tuple tuple_;
     };
 } value;
@@ -65,9 +74,11 @@ value value_from_function_pointer(function_pointer_value function_pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
 value value_from_type(type const type_);
-value value_from_enum_element(enum_element_id const element);
+value value_from_enum_element(enum_element_id const element,
+                              value *const state);
 value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
+value value_from_enum_constructor(void);
 bool value_equals(value const left, value const right);
 
 typedef struct optional_value

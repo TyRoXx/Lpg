@@ -136,6 +136,7 @@ find_register_resource_ownership(type const variable)
     {
     case type_kind_enumeration:
         LPG_TO_DO();
+
     case type_kind_tuple:
     case type_kind_function_pointer:
         return register_resource_ownership_none;
@@ -151,6 +152,9 @@ find_register_resource_ownership(type const variable)
 
     case type_kind_unit:
         return register_resource_ownership_none;
+
+    case type_kind_enum_constructor:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -347,6 +351,9 @@ generate_type(type const generated,
 
     case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
@@ -435,7 +442,8 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         {
             char buffer[64];
             char const *const formatted = integer_format(
-                integer_create(0, state->registers[from].literal.enum_element),
+                integer_create(
+                    0, state->registers[from].literal.enum_element.which),
                 lower_case_digits, 10, buffer, sizeof(buffer));
             return stream_writer_write_bytes(
                 c_output, formatted,
@@ -444,6 +452,9 @@ static success_indicator generate_c_read_access(c_backend_state *state,
 
         case value_kind_unit:
             return stream_writer_write_string(c_output, "unit_value");
+
+        case value_kind_enum_constructor:
+            LPG_TO_DO();
         }
 
     case register_meaning_argument:
@@ -562,6 +573,7 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_enum_element:
         case value_kind_unit:
         case value_kind_tuple:
+        case value_kind_enum_constructor:
             LPG_TO_DO();
         }
 
@@ -634,6 +646,7 @@ static success_indicator generate_string_length(c_backend_state *state,
         case value_kind_type:
         case value_kind_enum_element:
         case value_kind_unit:
+        case value_kind_enum_constructor:
             LPG_TO_DO();
         }
         LPG_TO_DO();

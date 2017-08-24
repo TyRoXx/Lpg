@@ -78,15 +78,22 @@ static void print_value(value const printed)
         break;
 
     case value_kind_enum_element:
-        printf("enum element at %u", printed.enum_element);
+        printf("enum element # %u, state = (", printed.enum_element.which);
+        print_value(printed.enum_element.state ? *printed.enum_element.state
+                                               : value_from_unit());
+        printf(")");
         break;
 
     case value_kind_unit:
         printf("unit");
         break;
+
     case value_kind_tuple:
         printf("tuple ");
         break;
+
+    case value_kind_enum_constructor:
+        LPG_TO_DO();
     }
 }
 
@@ -132,6 +139,7 @@ static void print_instruction(instruction const printed)
         print_value(printed.literal.value_);
         printf("\n");
         return;
+
     case instruction_tuple:
         printf("tuple with length %zu\n", printed.tuple_.element_count);
         return;
@@ -342,15 +350,15 @@ void test_semantics(void)
     }
     {
         instruction const loop_body[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
             instruction_create_break()};
         instruction *const expected_body_elements =
             allocate_array(3, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] = instruction_create_literal(
-            literal_instruction_create(1, value_from_enum_element(0)));
+            literal_instruction_create(1, value_from_enum_element(0, NULL)));
         expected_body_elements[2] = instruction_create_literal(
             literal_instruction_create(2, value_from_unit()));
         check_single_wellformed_function("loop\n"
@@ -399,8 +407,8 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(1, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -414,8 +422,8 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(0))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(0, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -429,12 +437,23 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(0))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(0, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
             "assert(not(boolean.true))", std_library.globals,
+            LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
+        value state = value_from_integer(integer_create(0, 123));
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, &state))),
+            instruction_create_literal(
+                literal_instruction_create(1, value_from_unit()))};
+        check_single_wellformed_function(
+            "let s = option.some(123)", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
@@ -583,8 +602,8 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(1, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         instruction_sequence const expected_body =
@@ -612,8 +631,8 @@ void test_semantics(void)
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
             instruction_create_global(1),
             instruction_create_read_struct(
                 read_struct_instruction_create(1, 4, 2)),
@@ -628,8 +647,8 @@ void test_semantics(void)
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
             instruction_create_global(1),
             instruction_create_read_struct(
                 read_struct_instruction_create(1, 4, 2)),
@@ -652,8 +671,8 @@ void test_semantics(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
         instruction_sequence const expected_body =
@@ -675,8 +694,8 @@ void test_semantics(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
             instruction_create_literal(
                 literal_instruction_create(1, value_from_unit()))};
         instruction_sequence const expected_body =
@@ -736,10 +755,10 @@ void test_semantics(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, NULL))),
             instruction_create_literal(
                 literal_instruction_create(2, value_from_unit()))};
         instruction_sequence const expected_body =
@@ -809,8 +828,8 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(1, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -863,8 +882,8 @@ void test_semantics(void)
             instruction_create_global(0),
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(1, NULL))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         checked_program const expected = {
@@ -928,8 +947,8 @@ void test_semantics(void)
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
                        function_pointer_value_from_internal(1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, NULL))),
             instruction_create_literal(
                 literal_instruction_create(2, value_from_unit()))};
         instruction const expected_lambda[] = {
@@ -962,8 +981,8 @@ void test_semantics(void)
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
                        function_pointer_value_from_internal(1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_enum_element(1))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, NULL))),
             instruction_create_literal(
                 literal_instruction_create(2, value_from_unit()))};
         checked_program const expected = {
@@ -994,9 +1013,9 @@ void test_semantics(void)
         values[1] = 1;
         instruction const expected_main_function[] = {
             instruction_create_literal(literal_instruction_create(
-                values[0], value_from_enum_element(0))),
+                values[0], value_from_enum_element(0, NULL))),
             instruction_create_literal(literal_instruction_create(
-                values[1], value_from_enum_element(1))),
+                values[1], value_from_enum_element(1, NULL))),
             instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
             instruction_create_literal(
                 literal_instruction_create(3, value_from_unit()))};

@@ -76,11 +76,12 @@ value value_from_type(type const type_)
     return result;
 }
 
-value value_from_enum_element(enum_element_id const element)
+value value_from_enum_element(enum_element_id const element, value *const state)
 {
     value result;
     result.kind = value_kind_enum_element;
-    result.enum_element = element;
+    result.enum_element.which = element;
+    result.enum_element.state = state;
     return result;
 }
 
@@ -97,6 +98,13 @@ value value_from_tuple(value_tuple content)
     value result;
     result.kind = value_kind_tuple;
     result.tuple_ = content;
+    return result;
+}
+
+value value_from_enum_constructor(void)
+{
+    value result;
+    result.kind = value_kind_enum_constructor;
     return result;
 }
 
@@ -125,10 +133,23 @@ bool value_equals(value const left, value const right)
         LPG_TO_DO();
 
     case value_kind_enum_element:
-        return (left.enum_element == right.enum_element);
+    {
+        if (left.enum_element.which != right.enum_element.which)
+        {
+            return false;
+        }
+        value const left_state = left.enum_element.state
+                                     ? *left.enum_element.state
+                                     : value_from_unit();
+        value const right_state = right.enum_element.state
+                                      ? *right.enum_element.state
+                                      : value_from_unit();
+        return value_equals(left_state, right_state);
+    }
 
     case value_kind_unit:
         return true;
+
     case value_kind_tuple:
         if (left.tuple_.element_count != right.tuple_.element_count)
         {
@@ -143,6 +164,9 @@ bool value_equals(value const left, value const right)
             }
         }
         return true;
+
+    case value_kind_enum_constructor:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
