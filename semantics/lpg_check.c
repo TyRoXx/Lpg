@@ -8,6 +8,7 @@
 #include "lpg_string_literal.h"
 #include "lpg_interprete.h"
 #include <string.h>
+#include "lpg_local_variable.h"
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -41,57 +42,6 @@ static evaluate_expression_result const evaluate_expression_result_empty = {
     0,
     {type_kind_type, {NULL}},
     {false, {value_kind_integer, {{0, 0}}}}};
-
-typedef struct local_variable
-{
-    unicode_string name;
-    type type_;
-    optional_value compile_time_value;
-    register_id where;
-} local_variable;
-
-static local_variable local_variable_create(unicode_string name,
-                                            type const type_,
-                                            optional_value compile_time_value,
-                                            register_id where)
-{
-    local_variable result = {name, type_, compile_time_value, where};
-    return result;
-}
-
-static void local_variable_free(local_variable const *const value)
-{
-    unicode_string_free(&value->name);
-}
-
-typedef struct local_variable_container
-{
-    local_variable *elements;
-    size_t count;
-} local_variable_container;
-
-static void add_local_variable(local_variable_container *to,
-                               local_variable variable)
-{
-    to->elements =
-        reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));
-    to->elements[to->count] = variable;
-    ++(to->count);
-}
-
-static bool local_variable_name_exists(local_variable_container const variables,
-                                       unicode_view const name)
-{
-    LPG_FOR(size_t, i, variables.count)
-    {
-        if (unicode_view_equals(
-                unicode_view_from_string(variables.elements[i].name), name))
-        {
-            return true;
-        }
-    }
-    return false;
-}
 
 typedef struct function_checking_state
 {
