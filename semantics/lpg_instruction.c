@@ -80,11 +80,35 @@ bool literal_instruction_equals(literal_instruction const left,
     return (left.into == right.into) && value_equals(left.value_, right.value_);
 }
 
+enum_construct_instruction
+enum_construct_instruction_create(register_id into, enum_element_id which,
+                                  register_id state)
+{
+    enum_construct_instruction result = {into, which, state};
+    return result;
+}
+
+bool enum_construct_instruction_equals(enum_construct_instruction const left,
+                                       enum_construct_instruction const right)
+{
+    return (left.into == right.into) && (left.which == right.which) &&
+           (left.state == right.state);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
     result.type = instruction_tuple;
     result.tuple_ = argument;
+    return result;
+}
+
+instruction
+instruction_create_enum_construct(enum_construct_instruction argument)
+{
+    instruction result;
+    result.type = instruction_enum_construct;
+    result.enum_construct = argument;
     return result;
 }
 

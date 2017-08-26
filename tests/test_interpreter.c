@@ -178,6 +178,11 @@ void test_interpreter(void)
                   "assert(not(xor(boolean.true, boolean.true)))\n"
                   "assert(not(xor(boolean.false, boolean.false)))\n",
                   "", "", std_library.globals);
+    expect_output("let f = (arg: int(0, 1000))\n"
+                  "    let force-runtime-evaluation = read()\n"
+                  "    option.some(arg)\n"
+                  "f(123)\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }

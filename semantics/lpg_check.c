@@ -1003,12 +1003,38 @@ evaluate_call_expression(function_checking_state *state,
         /*TODO: type inference for runtime-evaluated functions
          * ("templates")*/
         ASSERT(inferred_value_count == 0);
-
         result = allocate_register(&state->used_registers);
-        add_instruction(
-            function,
-            instruction_create_call(call_instruction_create(
-                callee.where, arguments, expected_arguments, result)));
+        switch (callee.type_.kind)
+        {
+        case type_kind_structure:
+            UNREACHABLE();
+
+        case type_kind_function_pointer:
+            add_instruction(
+                function,
+                instruction_create_call(call_instruction_create(
+                    callee.where, arguments, expected_arguments, result)));
+            break;
+
+        case type_kind_unit:
+        case type_kind_string_ref:
+        case type_kind_enumeration:
+        case type_kind_tuple:
+        case type_kind_type:
+        case type_kind_integer_range:
+        case type_kind_inferred:
+            UNREACHABLE();
+
+        case type_kind_enum_constructor:
+            ASSUME(call.arguments.length == 1);
+            add_instruction(
+                function, instruction_create_enum_construct(
+                              enum_construct_instruction_create(
+                                  result, callee.type_.enum_constructor->which,
+                                  arguments[0])));
+            deallocate(arguments);
+            break;
+        }
     }
 
     type_inference_free(inferring);

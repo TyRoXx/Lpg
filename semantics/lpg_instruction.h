@@ -17,6 +17,7 @@ typedef enum instruction_type
     instruction_break,
     instruction_literal,
     instruction_tuple,
+    instruction_enum_construct
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -69,6 +70,19 @@ literal_instruction literal_instruction_create(register_id into, value value_);
 bool literal_instruction_equals(literal_instruction const left,
                                 literal_instruction const right);
 
+typedef struct enum_construct_instruction
+{
+    register_id into;
+    enum_element_id which;
+    register_id state;
+} enum_construct_instruction;
+
+enum_construct_instruction
+enum_construct_instruction_create(register_id into, enum_element_id which,
+                                  register_id state);
+bool enum_construct_instruction_equals(enum_construct_instruction const left,
+                                       enum_construct_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -80,6 +94,7 @@ struct instruction
         read_struct_instruction read_struct;
         literal_instruction literal;
         tuple_instruction tuple_;
+        enum_construct_instruction enum_construct;
     };
 };
 
@@ -90,6 +105,8 @@ instruction instruction_create_loop(instruction_sequence body);
 instruction instruction_create_break(void);
 instruction instruction_create_literal(literal_instruction const value);
 instruction instruction_create_tuple(tuple_instruction argument);
+instruction
+instruction_create_enum_construct(enum_construct_instruction argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

@@ -57,16 +57,32 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             {
                 arguments[j] = registers[element.call.arguments[j]];
             }
-            ASSUME(callee.kind == value_kind_function_pointer);
-            optional_value const result =
-                call_function(callee.function_pointer, NULL, arguments, globals,
-                              gc, all_functions);
-            deallocate(arguments);
-            if (!result.is_set)
+            switch (callee.kind)
             {
-                return run_sequence_result_unavailable_at_this_time;
+            case value_kind_function_pointer:
+            {
+                optional_value const result =
+                    call_function(callee.function_pointer, NULL, arguments,
+                                  globals, gc, all_functions);
+                deallocate(arguments);
+                if (!result.is_set)
+                {
+                    return run_sequence_result_unavailable_at_this_time;
+                }
+                registers[element.call.result] = result.value_;
+                break;
             }
-            registers[element.call.result] = result.value_;
+
+            case value_kind_integer:
+            case value_kind_string:
+            case value_kind_flat_object:
+            case value_kind_type:
+            case value_kind_enum_element:
+            case value_kind_unit:
+            case value_kind_tuple:
+            case value_kind_enum_constructor:
+                LPG_TO_DO();
+            }
             break;
         }
 
@@ -111,6 +127,7 @@ run_sequence(instruction_sequence const sequence, value const *globals,
         case instruction_literal:
             registers[element.literal.into] = element.literal.value_;
             break;
+
         case instruction_tuple:
         {
             value value_tuple;
@@ -124,6 +141,15 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             }
             value_tuple.tuple_.elements = values;
             registers[element.tuple_.result] = value_tuple;
+            break;
+        }
+
+        case instruction_enum_construct:
+        {
+            value *const state = garbage_collector_allocate(gc, sizeof(*state));
+            *state = registers[element.enum_construct.state];
+            registers[element.enum_construct.into] =
+                value_from_enum_element(element.enum_construct.which, state);
             break;
         }
         }
