@@ -31,7 +31,7 @@ static type_definition_2 lambda_5(void)
 }
 static unit lambda_6(unit const arg0, unit const arg1)
 {
-    return unit_value;
+    return unit_impl;
 }
 int main(void)
 {

@@ -451,7 +451,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         }
 
         case value_kind_unit:
-            return stream_writer_write_string(c_output, "unit_value");
+            return stream_writer_write_string(c_output, "unit_impl");
 
         case value_kind_enum_constructor:
             LPG_TO_DO();
