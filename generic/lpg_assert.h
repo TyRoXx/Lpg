@@ -40,6 +40,9 @@
 #define LPG_TO_DO() abort()
 
 #define LPG_STATIC_ASSERT_IMPL3(X, L)                                          \
-    typedef char lpg_static_assertion_##L[(X) ? 1 : -1]
+    enum                                                                       \
+    {                                                                          \
+        lpg_static_assertion_##L = sizeof(char[1 - (2 * !(X))])                \
+    };
 #define LPG_STATIC_ASSERT_IMPL2(X, L) LPG_STATIC_ASSERT_IMPL3(X, L)
 #define LPG_STATIC_ASSERT(X) LPG_STATIC_ASSERT_IMPL2(X, __LINE__)
