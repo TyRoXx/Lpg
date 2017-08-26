@@ -546,14 +546,6 @@ static size_t count_inferred_values(function_pointer const signature)
     return count;
 }
 
-static void set_compile_time_constant(instruction_sequence *const function,
-                                      register_id const into,
-                                      value const value_)
-{
-    add_instruction(function, instruction_create_literal(
-                                  literal_instruction_create(into, value_)));
-}
-
 typedef struct optional_checked_function
 {
     bool is_set;
@@ -910,8 +902,10 @@ evaluate_call_expression(function_checking_state *state,
             }
             else
             {
-                set_compile_time_constant(
-                    function, result, compile_time_result.value_);
+                add_instruction(
+                    function,
+                    instruction_create_literal(literal_instruction_create(
+                        result, compile_time_result.value_)));
             }
         }
     }
