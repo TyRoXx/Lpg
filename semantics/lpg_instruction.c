@@ -176,8 +176,12 @@ void instruction_free(instruction const *value)
     case instruction_break:
     case instruction_literal:
         break;
+
     case instruction_tuple:
         deallocate(value->tuple_.elements);
+        break;
+
+    case instruction_enum_construct:
         break;
     }
 }
@@ -209,8 +213,12 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_literal:
         return (left.literal.into == right.literal.into) &&
                value_equals(left.literal.value_, right.literal.value_);
+
     case instruction_tuple:
         return left.tuple_.result == right.tuple_.result;
+
+    case instruction_enum_construct:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }

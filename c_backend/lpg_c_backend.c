@@ -950,7 +950,9 @@ static success_indicator generate_instruction(
                register_meaning_nothing);
         set_register_literal(state, input.literal.into, input.literal.value_);
         return success;
+
     case instruction_tuple:
+    case instruction_enum_construct:
         LPG_TO_DO();
     }
     UNREACHABLE();

@@ -143,6 +143,9 @@ static void print_instruction(instruction const printed)
     case instruction_tuple:
         printf("tuple with length %zu\n", printed.tuple_.element_count);
         return;
+
+    case instruction_enum_construct:
+        LPG_TO_DO();
     }
     UNREACHABLE();
 }
