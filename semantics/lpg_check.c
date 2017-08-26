@@ -1302,20 +1302,6 @@ check_sequence(function_checking_state *const state,
     return final_result;
 }
 
-semantic_error semantic_error_create(semantic_error_type type,
-                                     source_location where)
-{
-    semantic_error result = {type, where};
-    return result;
-}
-
-bool semantic_error_equals(semantic_error const left,
-                           semantic_error const right)
-{
-    return (left.type == right.type) &&
-           source_location_equals(left.where, right.where);
-}
-
 checked_program check(sequence const root, structure const global,
                       check_error_handler *on_error, void *user)
 {
