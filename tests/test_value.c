@@ -25,6 +25,6 @@ void test_value(void)
             !value_equals(value_from_tuple(value_tuple_create(&first, 1)),
                           value_from_tuple(value_tuple_create(&second, 1))));
     }
-	REQUIRE(!value_equals(
-		value_from_enum_element(0,NULL), value_from_enum_element(1,NULL)));
+    REQUIRE(!value_equals(
+        value_from_enum_element(0, NULL), value_from_enum_element(1, NULL)));
 }
