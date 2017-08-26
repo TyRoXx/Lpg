@@ -132,9 +132,8 @@ run_sequence(instruction_sequence const sequence, value const *globals,
         {
             value value_tuple;
             value_tuple.kind = value_kind_tuple;
-            value *values = garbage_collector_allocate(
-                gc, element.tuple_.element_count * sizeof(*values));
-            // TODO: check overflow multiplication
+            value *values = garbage_collector_allocate_array(
+                gc, element.tuple_.element_count, sizeof(*values));
             for (size_t j = 0; j < element.tuple_.element_count; ++j)
             {
                 values[j] = registers[*(element.tuple_.elements + j)];
