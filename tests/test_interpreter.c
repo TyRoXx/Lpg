@@ -183,6 +183,11 @@ void test_interpreter(void)
                   "    option.some(arg)\n"
                   "f(123)\n",
                   "", "", std_library.globals);
+    expect_output("let t = {unit}\n"
+                  "let u = {1, 2, 3, 4, 5, 6}\n"
+                  "let v = {123, \"abc\"}\n"
+                  "let w = {{{{123}}}}\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }

@@ -207,6 +207,8 @@ void test_c_backend(void)
                            std_library.globals, "19_integer.c");
 
     check_generated_c_code("let s = () () \"a\"\n"
+                           "let t = () (a: unit) \"a\"\n"
+                           "let u = () (a: unit, b: unit) unit_value\n"
                            "let r = s()\n"
                            "assert(string-equals(r(), \"a\"))\n",
                            std_library.globals, "20_return_lambda.c");

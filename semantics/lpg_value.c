@@ -35,6 +35,12 @@ bool function_pointer_value_equals(function_pointer_value const left,
     return (left.code == right.code);
 }
 
+value_tuple value_tuple_create(struct value *elements, size_t element_count)
+{
+    value_tuple result = {elements, element_count};
+    return result;
+}
+
 value value_from_flat_object(value const *flat_object)
 {
     value result;

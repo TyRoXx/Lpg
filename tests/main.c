@@ -21,6 +21,7 @@
 #include "test_c_backend.h"
 #include "test_implicitly_convertible.h"
 #include <stdio.h>
+#include "test_value.h"
 #if LPG_WITH_VLD
 #include <vld.h>
 #endif
@@ -46,7 +47,8 @@ int main(void)
                                     test_implicitly_convertible,
                                     test_cli,
                                     test_blob,
-                                    test_c_backend};
+                                    test_c_backend,
+                                    test_value};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();

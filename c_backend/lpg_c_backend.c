@@ -926,6 +926,11 @@ static success_indicator generate_instruction(
                     state, input.read_struct.into, register_meaning_read);
                 return success;
 
+            case 14:
+                set_register_literal(
+                    state, input.read_struct.into, value_from_unit());
+                return success;
+
             default:
                 LPG_TO_DO();
             }

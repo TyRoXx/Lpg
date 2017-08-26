@@ -1,6 +1,7 @@
 if(MSVC)
     add_definitions(/wd4101)
     add_definitions(/wd4702)
+    add_definitions(/wd4100)
 else()
     add_definitions(-Wno-unused-variable)
     add_definitions(-Wno-unused-function)

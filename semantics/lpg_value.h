@@ -42,9 +42,11 @@ typedef enum value_kind
 
 typedef struct value_tuple
 {
-    size_t element_count;
     struct value *elements;
+    size_t element_count;
 } value_tuple;
+
+value_tuple value_tuple_create(struct value *elements, size_t element_count);
 
 typedef struct enum_element_value
 {
