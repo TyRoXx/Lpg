@@ -9,6 +9,7 @@
 #include "lpg_interprete.h"
 #include <string.h>
 #include "lpg_local_variable.h"
+#include "lpg_instruction_checkpoint.h"
 
 static void add_instruction(instruction_sequence *to, instruction const added)
 {
@@ -279,39 +280,6 @@ static read_structure_element_result read_structure_element(
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element);
-
-typedef struct instruction_checkpoint
-{
-    register_id *currently_used_registers;
-    instruction_sequence *sequence;
-    size_t size_of_sequence;
-    register_id originally_used_registers;
-} instruction_checkpoint;
-
-static instruction_checkpoint make_checkpoint(register_id *const used_registers,
-                                              instruction_sequence *sequence)
-{
-    instruction_checkpoint result = {
-        used_registers, sequence, sequence->length, *used_registers};
-    return result;
-}
-
-static void restore_instructions(instruction_checkpoint const previous_code)
-{
-    for (size_t i = previous_code.size_of_sequence;
-         i < previous_code.sequence->length; ++i)
-    {
-        instruction_free(previous_code.sequence->elements + i);
-    }
-    previous_code.sequence->length = previous_code.size_of_sequence;
-}
-
-static void restore(instruction_checkpoint const previous_code)
-{
-    *previous_code.currently_used_registers =
-        previous_code.originally_used_registers;
-    restore_instructions(previous_code);
-}
 
 static read_structure_element_result
 read_element(function_checking_state *state, instruction_sequence *function,
