@@ -33,6 +33,11 @@ typedef struct standard_library_stable
     function_pointer integer_equals;
 } standard_library_stable;
 
+enum
+{
+    standard_library_element_count = 16
+};
+
 typedef struct standard_library_description
 {
     structure globals;

@@ -77,7 +77,7 @@ static void expect_output(char const *source, char const *input,
     test_environment environment = {
         memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
     garbage_collector gc = {NULL};
-    value const globals_values[11] = {
+    value const globals_values[standard_library_element_count] = {
         /*type*/ value_from_unit(),
         /*string-ref*/ value_from_unit(),
         /*print*/ value_from_function_pointer(

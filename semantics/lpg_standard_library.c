@@ -1,6 +1,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_allocate.h"
 #include <string.h>
+#include "lpg_assert.h"
 
 static void standard_library_stable_free(standard_library_stable *stable)
 {
@@ -182,7 +183,8 @@ standard_library_description describe_standard_library(void)
     }
     stable->read = function_pointer_create(type_from_string_ref(), NULL, 0);
 
-    structure_member *globals = allocate_array(16, sizeof(*globals));
+    structure_member *globals =
+        allocate_array(standard_library_element_count, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"),
         optional_value_create(value_from_type(type_from_type())));
@@ -263,8 +265,10 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_type(type_from_enumeration(&stable->option))));
 
+    LPG_STATIC_ASSERT(standard_library_element_count == 16);
+
     standard_library_description result = {
-        structure_create(globals, 16), stable};
+        structure_create(globals, standard_library_element_count), stable};
     return result;
 }
 
