@@ -286,7 +286,10 @@ void test_semantics(void)
         describe_standard_library();
 
     {
-        char const *const sources[] = {"read()\n", "read()"};
+        char const *const sources[] = {"read()\n", "read()", "/*comment*/\n"
+                                                             "read()\n",
+                                       "//comment\n"
+                                       "read()\n"};
         LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
         {
             instruction const expected_body_elements[] = {
