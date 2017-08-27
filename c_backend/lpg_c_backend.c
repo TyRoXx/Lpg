@@ -377,7 +377,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_global:
         LPG_TO_DO();
@@ -532,10 +532,8 @@ static success_indicator generate_c_str(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        LPG_TO_DO();
-
     case register_meaning_global:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_variable:
     case register_meaning_argument:
@@ -543,25 +541,17 @@ static success_indicator generate_c_str(c_backend_state *state,
         return stream_writer_write_string(c_output, ".data");
 
     case register_meaning_print:
-        LPG_TO_DO();
-
     case register_meaning_read:
-        LPG_TO_DO();
-
     case register_meaning_assert:
-        LPG_TO_DO();
-
     case register_meaning_string_equals:
-        LPG_TO_DO();
-
     case register_meaning_concat:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
-            LPG_TO_DO();
+            UNREACHABLE();
 
         case value_kind_string:
             return encode_string_literal(
@@ -574,13 +564,13 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_unit:
         case value_kind_tuple:
         case value_kind_enum_constructor:
-            LPG_TO_DO();
+            UNREACHABLE();
         }
 
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
-        LPG_TO_DO();
+        UNREACHABLE();
     }
     UNREACHABLE();
 }
@@ -592,10 +582,8 @@ static success_indicator generate_string_length(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        LPG_TO_DO();
-
     case register_meaning_global:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_argument:
     case register_meaning_variable:
@@ -603,31 +591,23 @@ static success_indicator generate_string_length(c_backend_state *state,
         return stream_writer_write_string(c_output, ".length");
 
     case register_meaning_print:
-        LPG_TO_DO();
-
     case register_meaning_read:
-        LPG_TO_DO();
-
     case register_meaning_assert:
-        LPG_TO_DO();
-
     case register_meaning_string_equals:
-        LPG_TO_DO();
-
     case register_meaning_concat:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
-        LPG_TO_DO();
+        UNREACHABLE();
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
         case value_kind_tuple:
-            LPG_TO_DO();
+            UNREACHABLE();
 
         case value_kind_string:
         {
@@ -647,9 +627,9 @@ static success_indicator generate_string_length(c_backend_state *state,
         case value_kind_enum_element:
         case value_kind_unit:
         case value_kind_enum_constructor:
-            LPG_TO_DO();
+            UNREACHABLE();
         }
-        LPG_TO_DO();
+        UNREACHABLE();
     }
     UNREACHABLE();
 }
@@ -693,10 +673,8 @@ static success_indicator generate_instruction(
         switch (state->registers[input.call.callee].meaning)
         {
         case register_meaning_nothing:
-            LPG_TO_DO();
-
         case register_meaning_global:
-            LPG_TO_DO();
+            UNREACHABLE();
 
         case register_meaning_variable:
             LPG_TO_DO();
@@ -873,12 +851,10 @@ static success_indicator generate_instruction(
         switch (state->registers[input.read_struct.from_object].meaning)
         {
         case register_meaning_nothing:
-            LPG_TO_DO();
-
         case register_meaning_and:
         case register_meaning_not:
         case register_meaning_or:
-            LPG_TO_DO();
+            UNREACHABLE();
 
         case register_meaning_argument:
             LPG_TO_DO();
@@ -936,11 +912,15 @@ static success_indicator generate_instruction(
             }
 
         case register_meaning_variable:
+            LPG_TO_DO();
+
         case register_meaning_print:
         case register_meaning_read:
         case register_meaning_assert:
         case register_meaning_string_equals:
         case register_meaning_concat:
+            UNREACHABLE();
+
         case register_meaning_literal:
             LPG_TO_DO();
         }
