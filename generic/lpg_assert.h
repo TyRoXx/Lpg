@@ -29,12 +29,12 @@
 
 #ifdef NDEBUG
 #ifdef _MSC_VER
-#define UNREACHABLE() ASSUME(0)
+#define LPG_UNREACHABLE() ASSUME(0)
 #else
-#define UNREACHABLE() __builtin_unreachable()
+#define LPG_UNREACHABLE() __builtin_unreachable()
 #endif
 #else
-#define UNREACHABLE() abort()
+#define LPG_UNREACHABLE() abort()
 #endif
 
 #define LPG_TO_DO() abort()

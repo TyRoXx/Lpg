@@ -147,7 +147,7 @@ static void print_instruction(instruction const printed)
     case instruction_enum_construct:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static void print_instruction_sequence(instruction_sequence const sequence)

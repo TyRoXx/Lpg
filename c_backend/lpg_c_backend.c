@@ -156,7 +156,7 @@ find_register_resource_ownership(type const variable)
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static void set_register_variable(c_backend_state *const state,
@@ -355,7 +355,7 @@ generate_type(type const generated,
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator generate_parameter_name(register_id const argument,
@@ -377,7 +377,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_global:
         LPG_TO_DO();
@@ -466,7 +466,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_or:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator
@@ -522,7 +522,7 @@ generate_add_reference_for_return_value(c_backend_state *state,
     case register_meaning_or:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator generate_c_str(c_backend_state *state,
@@ -533,7 +533,7 @@ static success_indicator generate_c_str(c_backend_state *state,
     {
     case register_meaning_nothing:
     case register_meaning_global:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_variable:
     case register_meaning_argument:
@@ -545,13 +545,13 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_concat:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case value_kind_string:
             return encode_string_literal(
@@ -564,15 +564,15 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_unit:
         case value_kind_tuple:
         case value_kind_enum_constructor:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
         }
 
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator generate_string_length(c_backend_state *state,
@@ -583,7 +583,7 @@ static success_indicator generate_string_length(c_backend_state *state,
     {
     case register_meaning_nothing:
     case register_meaning_global:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_argument:
     case register_meaning_variable:
@@ -595,19 +595,19 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_concat:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
         case value_kind_tuple:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case value_kind_string:
         {
@@ -627,11 +627,11 @@ static success_indicator generate_string_length(c_backend_state *state,
         case value_kind_enum_element:
         case value_kind_unit:
         case value_kind_enum_constructor:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
         }
-        UNREACHABLE();
+        LPG_UNREACHABLE();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator
@@ -674,7 +674,7 @@ static success_indicator generate_instruction(
         {
         case register_meaning_nothing:
         case register_meaning_global:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case register_meaning_variable:
             LPG_TO_DO();
@@ -854,7 +854,7 @@ static success_indicator generate_instruction(
         case register_meaning_and:
         case register_meaning_not:
         case register_meaning_or:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case register_meaning_argument:
             LPG_TO_DO();
@@ -919,7 +919,7 @@ static success_indicator generate_instruction(
         case register_meaning_assert:
         case register_meaning_string_equals:
         case register_meaning_concat:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case register_meaning_literal:
             LPG_TO_DO();
@@ -940,7 +940,7 @@ static success_indicator generate_instruction(
     case instruction_enum_construct:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static success_indicator

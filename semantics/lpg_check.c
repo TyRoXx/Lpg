@@ -106,7 +106,7 @@ static type get_return_type(type const callee)
     case type_kind_enum_constructor:
         return type_from_enumeration(callee.enum_constructor->enumeration);
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 typedef struct type_inference
@@ -172,7 +172,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static bool check_parameter_type(type const from, type const into,
@@ -233,7 +233,7 @@ static bool function_parameter_accepts_type(type const function,
                           .state,
             inferring);
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 typedef struct read_structure_element_result
@@ -405,7 +405,7 @@ read_element(function_checking_state *state, instruction_sequence *function,
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static size_t expected_call_argument_count(const type callee)
@@ -446,7 +446,7 @@ static size_t expected_call_argument_count(const type callee)
                    ->elements[callee.enum_constructor->which]
                    .state.kind != type_kind_unit;
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static evaluate_expression_result
@@ -528,7 +528,7 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static size_t count_inferred_values(function_pointer const signature)
@@ -831,7 +831,7 @@ evaluate_call_expression(function_checking_state *state,
             {
             case value_kind_integer:
             case value_kind_string:
-                UNREACHABLE();
+                LPG_UNREACHABLE();
 
             case value_kind_function_pointer:
             {
@@ -865,7 +865,7 @@ evaluate_call_expression(function_checking_state *state,
             case value_kind_enum_element:
             case value_kind_unit:
             case value_kind_tuple:
-                UNREACHABLE();
+                LPG_UNREACHABLE();
 
             case value_kind_enum_constructor:
             {
@@ -919,7 +919,7 @@ evaluate_call_expression(function_checking_state *state,
         switch (callee.type_.kind)
         {
         case type_kind_structure:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case type_kind_function_pointer:
             add_instruction(
@@ -935,7 +935,7 @@ evaluate_call_expression(function_checking_state *state,
         case type_kind_type:
         case type_kind_integer_range:
         case type_kind_inferred:
-            UNREACHABLE();
+            LPG_UNREACHABLE();
 
         case type_kind_enum_constructor:
             ASSUME(call.arguments.length == 1);
@@ -1189,7 +1189,7 @@ evaluate_expression(function_checking_state *state,
             result_register, type_from_tuple_type(tt), optional_value_empty);
     }
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static evaluate_expression_result

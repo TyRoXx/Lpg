@@ -220,5 +220,5 @@ bool instruction_equals(instruction const left, instruction const right)
     case instruction_enum_construct:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }

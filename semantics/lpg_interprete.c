@@ -176,7 +176,7 @@ call_interpreted_function(checked_function const callee, value *const arguments,
     switch (run_sequence(callee.body, globals, registers, gc, all_functions))
     {
     case run_sequence_result_break:
-        UNREACHABLE();
+        LPG_UNREACHABLE();
 
     case run_sequence_result_continue:
         ASSUME(callee.return_value < callee.number_of_registers);
@@ -188,7 +188,7 @@ call_interpreted_function(checked_function const callee, value *const arguments,
         deallocate(registers);
         return optional_value_empty;
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 void interpret(checked_program const program, value const *globals,

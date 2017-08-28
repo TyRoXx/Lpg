@@ -274,7 +274,7 @@ source_location expression_source_begin(expression const value)
     case expression_type_comment:
         return value.comment.source;
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 comment_expression comment_expression_create(unicode_string value,
@@ -631,5 +631,5 @@ bool expression_equals(expression const *left, expression const *right)
     case expression_type_comment:
         return comment_equals(left->comment, right->comment);
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }

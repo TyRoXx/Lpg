@@ -230,7 +230,7 @@ bool type_equals(type const left, type const right)
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 function_pointer function_pointer_create(type result, type *arguments,

@@ -128,7 +128,7 @@ static char const *describe_parse_error(parse_error_type const error)
     case parse_error_expected_lambda_body:
         return "Expected lambda body";
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static void handle_parse_error(parse_error const error,
@@ -224,7 +224,7 @@ static char const *semantic_error_text(semantic_error_type const type)
     case semantic_error_declaration_with_existing_name:
         return "Cannot reuse a name of a local variable in scope";
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 static void handle_semantic_error(semantic_error const error, void *user)

@@ -209,5 +209,5 @@ success_indicator save_expression(stream_writer const to,
         return stream_writer_write_unicode_view(to, view);
     }
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }

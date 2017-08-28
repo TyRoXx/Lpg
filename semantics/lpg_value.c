@@ -174,7 +174,7 @@ bool value_equals(value const left, value const right)
     case value_kind_enum_constructor:
         LPG_TO_DO();
     }
-    UNREACHABLE();
+    LPG_UNREACHABLE();
 }
 
 optional_value optional_value_create(value v)
