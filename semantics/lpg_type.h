@@ -37,6 +37,7 @@ typedef struct tuple_type
 } tuple_type;
 
 bool tuple_type_equals(tuple_type const left, tuple_type const right);
+
 typedef struct integer_range
 {
     integer minimum;

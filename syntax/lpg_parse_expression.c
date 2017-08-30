@@ -788,7 +788,8 @@ parse_returnable(expression_parser *const parser, size_t const indentation,
             pop(parser);
             rich_token const element_name = peek(parser);
             pop(parser);
-            if (element_name.token == token_identifier)
+            if ((element_name.token == token_identifier) ||
+                (element_name.token == token_integer))
             {
                 expression access =
                     expression_from_access_structure(access_structure_create(

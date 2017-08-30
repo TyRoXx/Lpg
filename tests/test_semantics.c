@@ -1023,12 +1023,14 @@ void test_semantics(void)
             instruction_create_literal(literal_instruction_create(
                 values[1], value_from_enum_element(1, NULL))),
             instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
+            instruction_create_read_struct(
+                read_struct_instruction_create(2, 1, 3)),
             instruction_create_literal(
-                literal_instruction_create(3, value_from_unit()))};
-
+                literal_instruction_create(4, value_from_unit()))};
         check_single_wellformed_function(
-            "let t = {boolean.false, boolean.true}\n", std_library.globals,
-            LPG_COPY_ARRAY(expected_main_function));
+            "let t = {boolean.false, boolean.true}\n"
+            "let u = t.1\n",
+            std_library.globals, LPG_COPY_ARRAY(expected_main_function));
     }
     standard_library_description_free(&std_library);
 }

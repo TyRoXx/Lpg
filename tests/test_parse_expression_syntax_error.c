@@ -635,6 +635,6 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {parse_error_create(
             parse_error_expected_element_name, source_location_create(0, 2))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("a.1"));
+                          NULL, unicode_string_from_c_str("a.."));
     }
 }

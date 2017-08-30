@@ -277,6 +277,39 @@ static read_structure_element_result read_structure_element(
         false, type_from_unit(), optional_value_empty);
 }
 
+static read_structure_element_result
+read_tuple_element(function_checking_state *state,
+                   instruction_sequence *function, tuple_type const type,
+                   register_id const where, unicode_view const element_name,
+                   source_location const element_name_location,
+                   register_id const result)
+{
+    integer element_index;
+    if (!integer_parse(&element_index, element_name))
+    {
+        state->on_error(semantic_error_create(semantic_error_unknown_element,
+                                              element_name_location),
+                        state->user);
+        return read_structure_element_result_create(
+            false, type_from_unit(), optional_value_empty);
+    }
+    if (!integer_less(element_index, integer_create(0, type.length)))
+    {
+        state->on_error(semantic_error_create(semantic_error_unknown_element,
+                                              element_name_location),
+                        state->user);
+        return read_structure_element_result_create(
+            false, type_from_unit(), optional_value_empty);
+    }
+    ASSERT(
+        integer_less(element_index, integer_create(0, ~(struct_member_id)0)));
+    add_instruction(
+        function, instruction_create_read_struct(read_struct_instruction_create(
+                      where, (struct_member_id)element_index.low, result)));
+    return read_structure_element_result_create(
+        true, type.elements[element_index.low], optional_value_empty);
+}
+
 static evaluate_expression_result
 evaluate_expression(function_checking_state *state,
                     instruction_sequence *function, expression const element);
@@ -318,7 +351,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
             false, type_from_unit(), optional_value_empty);
 
     case type_kind_tuple:
-        LPG_TO_DO();
+        return read_tuple_element(
+            state, function, actual_type->tuple_, object.where,
+            unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_type:
     {
