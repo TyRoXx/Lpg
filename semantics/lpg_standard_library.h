@@ -17,6 +17,13 @@ value string_equals_impl(value const *const inferred,
                          value const *const arguments,
                          garbage_collector *const gc, void *environment);
 
+value int_impl(value const *const inferred, value const *arguments,
+               garbage_collector *const gc, void *environment);
+
+value integer_equals_impl(value const *const inferred,
+                          value const *const arguments,
+                          garbage_collector *const gc, void *environment);
+
 typedef struct standard_library_stable
 {
     enumeration boolean;

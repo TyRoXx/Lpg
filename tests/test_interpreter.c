@@ -96,7 +96,12 @@ static void expect_output(char const *source, char const *input,
         /*string-equals*/ value_from_function_pointer(
             function_pointer_value_from_external(string_equals_impl, NULL)),
         /*read*/ value_from_function_pointer(
-            function_pointer_value_from_external(read_impl, &environment))};
+            function_pointer_value_from_external(read_impl, &environment)),
+        /*int*/ value_from_function_pointer(
+            function_pointer_value_from_external(int_impl, &environment)),
+        /*integer-equals*/ value_from_function_pointer(
+            function_pointer_value_from_external(
+                integer_equals_impl, &environment))};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -186,7 +191,10 @@ void test_interpreter(void)
     expect_output("let t = {unit}\n"
                   "let u = {1, 2, 3, 4, 5, 6}\n"
                   "let v = {123, \"abc\"}\n"
-                  "let w = {{{{123}}}}\n",
+                  "assert(integer-equals(123, v.0))\n"
+                  "assert(string-equals(\"abc\", v.1))\n"
+                  "let w = {{{{123}}}}\n"
+                  "assert(integer-equals(123, w.0.0.0.0))\n",
                   "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
