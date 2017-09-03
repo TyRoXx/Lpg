@@ -233,6 +233,36 @@ bool type_equals(type const left, type const right)
     LPG_UNREACHABLE();
 }
 
+type type_clone(type const original, garbage_collector *const clone_gc)
+{
+    (void)clone_gc;
+    switch (original.kind)
+    {
+    case type_kind_structure:
+    case type_kind_function_pointer:
+        LPG_TO_DO();
+
+    case type_kind_unit:
+        return original;
+
+    case type_kind_string_ref:
+        return original;
+
+    case type_kind_enumeration:
+    case type_kind_tuple:
+    case type_kind_type:
+    case type_kind_integer_range:
+        LPG_TO_DO();
+
+    case type_kind_inferred:
+        return original;
+
+    case type_kind_enum_constructor:
+        LPG_TO_DO();
+    }
+    LPG_UNREACHABLE();
+}
+
 function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity)
 {

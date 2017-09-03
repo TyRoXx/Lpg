@@ -4,6 +4,7 @@
 #include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
 #include "lpg_integer.h"
+#include "lpg_garbage_collector.h"
 
 typedef struct structure_member structure_member;
 
@@ -117,6 +118,7 @@ type type_from_enum_constructor(
     LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
+type type_clone(type const original, garbage_collector *const clone_gc);
 
 function_pointer function_pointer_create(type result, type *arguments,
                                          size_t arity);
