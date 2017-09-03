@@ -1,0 +1,8 @@
+include_directories(../generic)
+include_directories(../semantics)
+file(GLOB sources "*.c" "*.h")
+add_library(optimization ${sources})
+target_link_libraries(optimization semantics)
+if(LPG_WITH_CLANG_FORMAT_AUTO)
+	add_dependencies(optimization clang-format)
+endif()
