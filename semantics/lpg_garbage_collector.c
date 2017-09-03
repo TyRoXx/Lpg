@@ -17,7 +17,7 @@ void *garbage_collector_allocate_array(garbage_collector *const gc,
                                        size_t const element)
 {
     optional_size const bytes = size_multiply(length, element);
-    ASSERT(bytes.value_if_set);
+    ASSERT(bytes.state == optional_set);
     return garbage_collector_allocate(gc, bytes.value_if_set);
 }
 
