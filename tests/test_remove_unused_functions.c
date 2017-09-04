@@ -4,13 +4,17 @@
 #include "lpg_standard_library.h"
 #include "lpg_remove_unused_functions.h"
 #include "lpg_allocate.h"
+#include "lpg_instruction.h"
 
 void test_remove_unused_functions(void)
 {
     standard_library_description const std_library =
         describe_standard_library();
+    function_id const original_function_count = 3;
     checked_program original = {
-        {NULL}, allocate_array(2, sizeof(*original.functions)), 2};
+        {NULL},
+        allocate_array(original_function_count, sizeof(*original.functions)),
+        original_function_count};
 
     for (function_id i = 0; i < original.function_count; ++i)
     {
@@ -23,9 +27,35 @@ void test_remove_unused_functions(void)
         original.functions[i].return_value = 0;
     }
 
-    REQUIRE(original.function_count == 2);
+    {
+        size_t const body_size = 1;
+        instruction *const body = allocate_array(body_size, sizeof(*body));
+        body[0] = instruction_create_literal(literal_instruction_create(
+            0, value_from_function_pointer(
+                   function_pointer_value_from_internal(2))));
+        original.functions[0].body =
+            instruction_sequence_create(body, body_size);
+    }
+
+    REQUIRE(original.function_count == original_function_count);
     checked_program optimized = remove_unused_functions(original);
-    REQUIRE(optimized.function_count == 1);
+    REQUIRE(optimized.function_count == 2);
+    {
+        instruction_sequence expected_main;
+        {
+            size_t const body_size = 1;
+            instruction *const body = allocate_array(body_size, sizeof(*body));
+            body[0] = instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(
+                       function_pointer_value_from_internal(1))));
+            expected_main = instruction_sequence_create(body, body_size);
+        }
+        REQUIRE(instruction_sequence_equals(
+            &expected_main, &optimized.functions[0].body));
+        instruction_sequence_free(&expected_main);
+    }
+    REQUIRE(instruction_sequence_equals(
+        &original.functions[2].body, &optimized.functions[1].body));
     checked_program_free(&optimized);
     checked_program_free(&original);
     standard_library_description_free(&std_library);

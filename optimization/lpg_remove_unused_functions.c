@@ -96,8 +96,39 @@ clone_function_pointer(function_pointer const original,
     return result;
 }
 
+static value adapt_value(value const from,
+                         function_id const *const new_function_ids)
+{
+    switch (from.kind)
+    {
+    case value_kind_integer:
+        return from;
+
+    case value_kind_string:
+        LPG_TO_DO();
+
+    case value_kind_function_pointer:
+        return value_from_function_pointer(function_pointer_value_from_internal(
+            new_function_ids[from.function_pointer.code]));
+
+    case value_kind_flat_object:
+    case value_kind_type:
+    case value_kind_enum_element:
+        LPG_TO_DO();
+
+    case value_kind_unit:
+        return from;
+
+    case value_kind_tuple:
+    case value_kind_enum_constructor:
+        LPG_TO_DO();
+    }
+    LPG_UNREACHABLE();
+}
+
 static instruction clone_instruction(instruction const original,
-                                     garbage_collector *const clone_gc)
+                                     garbage_collector *const clone_gc,
+                                     function_id const *const new_function_ids)
 {
     switch (original.type)
     {
@@ -125,7 +156,9 @@ static instruction clone_instruction(instruction const original,
         return original;
 
     case instruction_literal:
-        LPG_TO_DO();
+        return instruction_create_literal(literal_instruction_create(
+            original.literal.into,
+            adapt_value(original.literal.value_, new_function_ids)));
 
     case instruction_tuple:
         LPG_TO_DO();
@@ -136,26 +169,31 @@ static instruction clone_instruction(instruction const original,
     LPG_UNREACHABLE();
 }
 
-static instruction_sequence clone_sequence(instruction_sequence const original,
-                                           garbage_collector *const clone_gc)
+static instruction_sequence
+clone_sequence(instruction_sequence const original,
+               garbage_collector *const clone_gc,
+               function_id const *const new_function_ids)
 {
     instruction_sequence result = {
         allocate_array(original.length, sizeof(*result.elements)),
         original.length};
     for (size_t i = 0; i < result.length; ++i)
     {
-        result.elements[i] = clone_instruction(original.elements[i], clone_gc);
+        result.elements[i] =
+            clone_instruction(original.elements[i], clone_gc, new_function_ids);
     }
     return result;
 }
 
 static checked_function keep_function(checked_function const original,
-                                      garbage_collector *const new_gc)
+                                      garbage_collector *const new_gc,
+                                      function_id const *const new_function_ids)
 {
     checked_function result = {
         original.return_value,
         clone_function_pointer(*original.signature, new_gc),
-        clone_sequence(original.body, new_gc), original.number_of_registers};
+        clone_sequence(original.body, new_gc, new_function_ids),
+        original.number_of_registers};
     return result;
 }
 
@@ -193,7 +231,8 @@ checked_program remove_unused_functions(checked_program const from)
         }
         checked_function *const new_function =
             result.functions + new_function_ids[i];
-        *new_function = keep_function(from.functions[i], &result.memory);
+        *new_function =
+            keep_function(from.functions[i], &result.memory, new_function_ids);
     }
     deallocate(used_functions);
     deallocate(new_function_ids);
