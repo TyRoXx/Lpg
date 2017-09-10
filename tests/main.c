@@ -21,6 +21,7 @@
 #include "test_c_backend.h"
 #include "test_implicitly_convertible.h"
 #include "test_remove_unused_functions.h"
+#include "test_remove_dead_code.h"
 #include <stdio.h>
 #include "test_value.h"
 #if LPG_WITH_VLD
@@ -50,7 +51,8 @@ int main(void)
                                     test_blob,
                                     test_c_backend,
                                     test_value,
-                                    test_remove_unused_functions};
+                                    test_remove_unused_functions,
+                                    test_remove_dead_code};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();
