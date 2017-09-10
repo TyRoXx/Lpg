@@ -89,15 +89,9 @@ static void check_generated_c_code(char const *const source,
         check(root, non_empty_global, expect_no_errors, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
-
+    remove_dead_code(&checked);
     checked_program optimized = remove_unused_functions(checked);
     checked_program_free(&checked);
-    remove_dead_code(&optimized);
-    {
-        checked_program const second_pass = remove_unused_functions(optimized);
-        checked_program_free(&optimized);
-        optimized = second_pass;
-    }
 
     memory_writer generated = {NULL, 0, 0};
     REQUIRE(success == generate_c(optimized, memory_writer_erase(&generated)));
