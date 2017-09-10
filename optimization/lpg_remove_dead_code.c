@@ -4,18 +4,27 @@
 #include "lpg_allocate.h"
 #include <string.h>
 
-static void remove_dead_code_from_sequence(instruction_sequence *const from,
-                                           bool *const registers_read_from)
+static void find_used_registers(instruction_sequence const from,
+                                bool *const registers_read_from)
 {
-    for (size_t i = 0; i < from->length; ++i)
+    for (size_t i = 0; i < from.length; ++i)
     {
         instruction const current_instruction =
-            from->elements[from->length - i - 1u];
+            from.elements[from.length - i - 1u];
         switch (current_instruction.type)
         {
         case instruction_call:
+            registers_read_from[current_instruction.call.callee] = true;
+            for (size_t j = 0; j < current_instruction.call.argument_count; ++j)
+            {
+                registers_read_from[current_instruction.call.arguments[j]] =
+                    true;
+            }
+            break;
+
         case instruction_loop:
-            LPG_TO_DO();
+            find_used_registers(current_instruction.loop, registers_read_from);
+            break;
 
         case instruction_global:
             break;
@@ -39,32 +48,53 @@ static void remove_dead_code_from_sequence(instruction_sequence *const from,
             break;
 
         case instruction_enum_construct:
-            LPG_TO_DO();
+            registers_read_from[current_instruction.enum_construct.state] =
+                true;
+            break;
         }
     }
 }
 
 static register_id const no_register = ~(register_id)0;
 
-static bool
-update_register_id(register_id *const updated,
-                   register_id const *const new_register_ids) LPG_USE_RESULT
+static bool update_register_id(register_id *const updated,
+                               register_id const *const new_register_ids)
 {
     *updated = new_register_ids[*updated];
     return (*updated != no_register);
 }
 
-static bool
-change_register_ids(instruction *const where,
-                    register_id const *const new_register_ids) LPG_USE_RESULT
+static void
+change_register_ids_in_sequence(instruction_sequence *const sequence,
+                                register_id const *const new_register_ids);
+
+static bool change_register_ids(instruction *const where,
+                                register_id const *const new_register_ids)
 {
     switch (where->type)
     {
     case instruction_call:
+        ASSERT(update_register_id(&where->call.callee, new_register_ids));
+        for (size_t j = 0; j < where->call.argument_count; ++j)
+        {
+            ASSERT(update_register_id(
+                where->call.arguments + j, new_register_ids));
+        }
+        (void)update_register_id(&where->call.result, new_register_ids);
+        /*never remove function calls because they might have side effects*/
+        return true;
+
     case instruction_loop:
+        change_register_ids_in_sequence(&where->loop, new_register_ids);
+        return (where->loop.length >= 1);
+
     case instruction_global:
+        return update_register_id(&where->global_into, new_register_ids);
+
     case instruction_read_struct:
-        LPG_TO_DO();
+        ASSERT(update_register_id(
+            &where->read_struct.from_object, new_register_ids));
+        return update_register_id(&where->read_struct.into, new_register_ids);
 
     case instruction_break:
         return true;
@@ -81,7 +111,10 @@ change_register_ids(instruction *const where,
         return update_register_id(&where->tuple_.result, new_register_ids);
 
     case instruction_enum_construct:
-        LPG_TO_DO();
+        ASSERT(
+            update_register_id(&where->enum_construct.state, new_register_ids));
+        return update_register_id(
+            &where->enum_construct.into, new_register_ids);
     }
     LPG_UNREACHABLE();
 }
@@ -112,8 +145,8 @@ typedef enum removed_something
     removed_something_no
 } removed_something;
 
-static removed_something remove_one_layer_of_dead_code_from_function(
-    checked_function *const from) LPG_USE_RESULT
+static removed_something
+remove_one_layer_of_dead_code_from_function(checked_function *const from)
 {
     bool *const registers_read_from =
         allocate_array(from->number_of_registers, sizeof(*registers_read_from));
@@ -124,7 +157,7 @@ static removed_something remove_one_layer_of_dead_code_from_function(
     {
         registers_read_from[i] = true;
     }
-    remove_dead_code_from_sequence(&from->body, registers_read_from);
+    find_used_registers(from->body, registers_read_from);
     register_id *const new_register_ids =
         allocate_array(from->number_of_registers, sizeof(*new_register_ids));
     removed_something result = removed_something_no;
