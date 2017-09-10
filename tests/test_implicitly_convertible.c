@@ -52,10 +52,10 @@ static void test_function_pointer_convertible(void)
 static void test_tuple_implicitly_convertible(void)
 {
     {
-        type *type_list =
-            type_allocate(type_from_integer_range(integer_range_create(
-                integer_create(10, 100), integer_create(100, 30))));
-        tuple_type tuple_type1 = {type_list, 1};
+        // Checks if a tuple is implicitly castable to itself.
+        type type_list = type_from_integer_range(integer_range_create(
+            integer_create(10, 100), integer_create(100, 30)));
+        tuple_type tuple_type1 = {&type_list, 1};
 
         type left = type_from_tuple_type(tuple_type1);
         type right = type_from_tuple_type(tuple_type1);
