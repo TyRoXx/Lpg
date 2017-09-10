@@ -226,13 +226,14 @@ void test_c_backend(void)
                            std_library.globals, "19_integer.c");
 
     check_generated_c_code("let s = ()\n"
-                           "    ()\n"
+                           "    print(\"\")\n"
+                           "    (a: string-ref)\n"
                            "        print(\"\")\n"
-                           "        \"a\"\n"
+                           "        a\n"
                            "let t = () (a: unit) \"a\"\n"
                            "let u = () (a: unit, b: unit) unit_value\n"
                            "let r = s()\n"
-                           "assert(string-equals(r(), \"a\"))\n",
+                           "assert(string-equals(r(\"a\"), \"a\"))\n",
                            std_library.globals, "20_return_lambda.c");
 
     standard_library_description_free(&std_library);

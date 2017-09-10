@@ -46,12 +46,6 @@ typedef enum register_resource_ownership
     register_resource_ownership_borrows_string
 } register_resource_ownership;
 
-typedef struct register_function
-{
-    function_id id;
-    type result;
-} register_function;
-
 typedef struct register_state
 {
     register_meaning meaning;
@@ -59,7 +53,7 @@ typedef struct register_state
     union
     {
         value literal;
-        register_function function;
+        type type_of;
         register_id argument;
     };
 } register_state;
@@ -173,6 +167,17 @@ static void set_register_variable(c_backend_state *const state,
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
+    active_register(state, id);
+}
+
+static void set_register_function_variable(
+    c_backend_state *const state, register_id const id,
+    register_resource_ownership ownership, type const type_of)
+{
+    ASSERT(state->registers[id].meaning == register_meaning_nothing);
+    state->registers[id].meaning = register_meaning_variable;
+    state->registers[id].ownership = ownership;
+    state->registers[id].type_of = type_of;
     active_register(state, id);
 }
 
@@ -695,9 +700,6 @@ static success_indicator generate_instruction(
         case register_meaning_global:
             LPG_UNREACHABLE();
 
-        case register_meaning_variable:
-            LPG_TO_DO();
-
         case register_meaning_print:
             state->standard_library.using_stdio = true;
             state->standard_library.using_unit = true;
@@ -791,15 +793,29 @@ static success_indicator generate_instruction(
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
+        case register_meaning_variable:
+        {
+            ASSUME(state->registers[input.call.callee].type_of.kind ==
+                   type_kind_function_pointer);
+            type const result_type = state->registers[input.call.callee]
+                                         .type_of.function_pointer_->result;
+            set_register_function_variable(
+                state, input.call.result,
+                find_register_resource_ownership(result_type), result_type);
+            LPG_TRY(generate_type(result_type, &state->standard_library,
+                                  state->definitions, c_output));
+            break;
+        }
+
         case register_meaning_literal:
         {
             type const result_type =
                 signature_of(state, state->registers[input.call.callee]
                                         .literal.function_pointer)
                     .result;
-            set_register_variable(
+            set_register_function_variable(
                 state, input.call.result,
-                find_register_resource_ownership(result_type));
+                find_register_resource_ownership(result_type), result_type);
             LPG_TRY(generate_type(result_type, &state->standard_library,
                                   state->definitions, c_output));
             break;
