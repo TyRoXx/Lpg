@@ -239,8 +239,24 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     switch (original.kind)
     {
     case type_kind_structure:
-    case type_kind_function_pointer:
         LPG_TO_DO();
+
+    case type_kind_function_pointer:
+    {
+        function_pointer *const copy =
+            garbage_collector_allocate(clone_gc, sizeof(*copy));
+        type *const arguments = garbage_collector_allocate_array(
+            clone_gc, original.function_pointer_->arity, sizeof(*arguments));
+        for (size_t i = 0; i < original.function_pointer_->arity; ++i)
+        {
+            arguments[i] =
+                type_clone(original.function_pointer_->arguments[i], clone_gc);
+        }
+        *copy = function_pointer_create(
+            type_clone(original.function_pointer_->result, clone_gc), arguments,
+            original.function_pointer_->arity);
+        return type_from_function_pointer(copy);
+    }
 
     case type_kind_unit:
         return original;
@@ -249,10 +265,14 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         return original;
 
     case type_kind_enumeration:
+        return original;
+
     case type_kind_tuple:
     case type_kind_type:
-    case type_kind_integer_range:
         LPG_TO_DO();
+
+    case type_kind_integer_range:
+        return original;
 
     case type_kind_inferred:
         return original;

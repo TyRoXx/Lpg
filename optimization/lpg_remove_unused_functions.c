@@ -96,7 +96,7 @@ clone_function_pointer(function_pointer const original,
     return result;
 }
 
-static value adapt_value(value const from,
+static value adapt_value(value const from, garbage_collector *const clone_gc,
                          function_id const *const new_function_ids)
 {
     switch (from.kind)
@@ -105,7 +105,13 @@ static value adapt_value(value const from,
         return from;
 
     case value_kind_string:
-        LPG_TO_DO();
+    {
+        char *const copy =
+            garbage_collector_allocate(clone_gc, from.string_ref.length);
+        memcpy(copy, from.string_ref.begin, from.string_ref.length);
+        return value_from_string_ref(
+            unicode_view_create(copy, from.string_ref.length));
+    }
 
     case value_kind_function_pointer:
         return value_from_function_pointer(function_pointer_value_from_internal(
@@ -113,8 +119,19 @@ static value adapt_value(value const from,
 
     case value_kind_flat_object:
     case value_kind_type:
-    case value_kind_enum_element:
         LPG_TO_DO();
+
+    case value_kind_enum_element:
+    {
+        value *const state =
+            from.enum_element.state ? allocate(sizeof(*state)) : NULL;
+        if (state)
+        {
+            *state = adapt_value(
+                *from.enum_element.state, clone_gc, new_function_ids);
+        }
+        return value_from_enum_element(from.enum_element.which, state);
+    }
 
     case value_kind_unit:
         return from;
@@ -134,8 +151,8 @@ static instruction clone_instruction(instruction const original,
     {
     case instruction_call:
     {
-        register_id *const arguments = garbage_collector_allocate_array(
-            clone_gc, original.call.argument_count, sizeof(*arguments));
+        register_id *const arguments =
+            allocate_array(original.call.argument_count, sizeof(*arguments));
         memcpy(arguments, original.call.arguments,
                sizeof(*arguments) * original.call.argument_count);
         return instruction_create_call(call_instruction_create(
@@ -144,7 +161,17 @@ static instruction clone_instruction(instruction const original,
     }
 
     case instruction_loop:
-        LPG_TO_DO();
+    {
+        instruction *const body =
+            allocate_array(original.loop.length, sizeof(*body));
+        for (size_t i = 0; i < original.loop.length; ++i)
+        {
+            body[i] = clone_instruction(
+                original.loop.elements[i], clone_gc, new_function_ids);
+        }
+        return instruction_create_loop(
+            instruction_sequence_create(body, original.loop.length));
+    }
 
     case instruction_global:
         return original;
@@ -158,7 +185,7 @@ static instruction clone_instruction(instruction const original,
     case instruction_literal:
         return instruction_create_literal(literal_instruction_create(
             original.literal.into,
-            adapt_value(original.literal.value_, new_function_ids)));
+            adapt_value(original.literal.value_, clone_gc, new_function_ids)));
 
     case instruction_tuple:
         LPG_TO_DO();

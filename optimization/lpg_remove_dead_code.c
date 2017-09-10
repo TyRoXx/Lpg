@@ -20,6 +20,8 @@ static void find_used_registers(instruction_sequence const from,
                 registers_read_from[current_instruction.call.arguments[j]] =
                     true;
             }
+            /*never remove function calls because they might have side effects*/
+            registers_read_from[current_instruction.call.result] = true;
             break;
 
         case instruction_loop:
@@ -60,6 +62,7 @@ static register_id const no_register = ~(register_id)0;
 static bool update_register_id(register_id *const updated,
                                register_id const *const new_register_ids)
 {
+    ASSUME(*updated != no_register);
     *updated = new_register_ids[*updated];
     return (*updated != no_register);
 }
@@ -80,7 +83,7 @@ static bool change_register_ids(instruction *const where,
             ASSERT(update_register_id(
                 where->call.arguments + j, new_register_ids));
         }
-        (void)update_register_id(&where->call.result, new_register_ids);
+        ASSERT(update_register_id(&where->call.result, new_register_ids));
         /*never remove function calls because they might have side effects*/
         return true;
 

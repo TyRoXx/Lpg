@@ -8,6 +8,8 @@
 #include "lpg_read_file.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
+#include "lpg_remove_unused_functions.h"
+#include "lpg_remove_dead_code.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -87,8 +89,18 @@ static void check_generated_c_code(char const *const source,
         check(root, non_empty_global, expect_no_errors, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
+
+    checked_program optimized = remove_unused_functions(checked);
+    checked_program_free(&checked);
+    remove_dead_code(&optimized);
+    {
+        checked_program const second_pass = remove_unused_functions(optimized);
+        checked_program_free(&optimized);
+        optimized = second_pass;
+    }
+
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success == generate_c(checked, memory_writer_erase(&generated)));
+    REQUIRE(success == generate_c(optimized, memory_writer_erase(&generated)));
     unicode_view const pieces[] = {
         path_remove_leaf(unicode_view_from_c_str(__FILE__)),
         unicode_view_from_c_str("c_backend"),
@@ -116,7 +128,7 @@ static void check_generated_c_code(char const *const source,
         FAIL();
     }
     unicode_string_free(&full_expected_file_path);
-    checked_program_free(&checked);
+    checked_program_free(&optimized);
     memory_writer_free(&generated);
     unicode_string_free(&expected);
 }
