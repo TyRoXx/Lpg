@@ -13,6 +13,7 @@ typedef struct standard_library_usage
     bool using_assert;
     bool using_unit;
     bool using_stdint;
+    bool using_integer;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -28,6 +29,7 @@ typedef enum register_meaning
     register_meaning_print,
     register_meaning_assert,
     register_meaning_string_equals,
+    register_meaning_integer_equals,
     register_meaning_read,
     register_meaning_or,
     register_meaning_and,
@@ -135,14 +137,19 @@ find_register_resource_ownership(type const variable)
     switch (variable.kind)
     {
     case type_kind_enumeration:
-        LPG_TO_DO();
+        /*TODO: support owning, stateful enums*/
+        return register_resource_ownership_none;
 
     case type_kind_tuple:
     case type_kind_function_pointer:
         return register_resource_ownership_none;
 
     case type_kind_inferred:
+        LPG_TO_DO();
+
     case type_kind_integer_range:
+        return register_resource_ownership_none;
+
     case type_kind_structure:
     case type_kind_type:
         LPG_TO_DO();
@@ -397,6 +404,10 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_string_equals:
         LPG_TO_DO();
 
+    case register_meaning_integer_equals:
+        state->standard_library.using_integer = true;
+        return stream_writer_write_string(c_output, "integer_equals");
+
     case register_meaning_concat:
         LPG_TO_DO();
 
@@ -404,6 +415,23 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         switch (state->registers[from].literal.kind)
         {
         case value_kind_integer:
+        {
+            integer const value = state->registers[from].literal.integer_;
+            if (integer_less(value, integer_create(1, 0)))
+            {
+                char buffer[40];
+                char *formatted = integer_format(
+                    value, lower_case_digits, 10, buffer, sizeof(buffer));
+                return stream_writer_write_bytes(
+                    c_output, formatted,
+                    (size_t)((buffer + sizeof(buffer)) - formatted));
+            }
+            else
+            {
+                LPG_TO_DO();
+            }
+        }
+
         case value_kind_tuple:
             LPG_TO_DO();
 
@@ -477,8 +505,6 @@ generate_add_reference_for_return_value(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        LPG_TO_DO();
-
     case register_meaning_global:
         LPG_TO_DO();
 
@@ -500,20 +526,11 @@ generate_add_reference_for_return_value(c_backend_state *state,
         }
 
     case register_meaning_print:
-        LPG_TO_DO();
-
     case register_meaning_read:
-        LPG_TO_DO();
-
     case register_meaning_assert:
-        LPG_TO_DO();
-
     case register_meaning_string_equals:
-        LPG_TO_DO();
-
+    case register_meaning_integer_equals:
     case register_meaning_concat:
-        LPG_TO_DO();
-
     case register_meaning_literal:
         return success;
 
@@ -544,6 +561,7 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
+    case register_meaning_integer_equals:
     case register_meaning_concat:
         LPG_UNREACHABLE();
 
@@ -594,6 +612,7 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
+    case register_meaning_integer_equals:
     case register_meaning_concat:
         LPG_UNREACHABLE();
 
@@ -730,6 +749,22 @@ static success_indicator generate_instruction(
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(
                 stream_writer_write_string(c_output, " = string_ref_equals("));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ", "));
+            LPG_TRY(generate_c_read_access(
+                state, input.call.arguments[1], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success;
+
+        case register_meaning_integer_equals:
+            state->standard_library.using_integer = true;
+            set_register_variable(
+                state, input.call.result, register_resource_ownership_none);
+            LPG_TRY(stream_writer_write_string(c_output, "bool const "));
+            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = integer_equals("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(
                 state, input.call.arguments[0], c_output));
@@ -902,6 +937,11 @@ static success_indicator generate_instruction(
                     state, input.read_struct.into, register_meaning_read);
                 return success;
 
+            case 12:
+                set_register_meaning(state, input.read_struct.into,
+                                     register_meaning_integer_equals);
+                return success;
+
             case 14:
                 set_register_literal(
                     state, input.read_struct.into, value_from_unit());
@@ -918,6 +958,7 @@ static success_indicator generate_instruction(
         case register_meaning_read:
         case register_meaning_assert:
         case register_meaning_string_equals:
+        case register_meaning_integer_equals:
         case register_meaning_concat:
             LPG_UNREACHABLE();
 
@@ -1083,7 +1124,7 @@ success_indicator generate_c(checked_program const program,
         memory_writer_erase(&program_defined);
 
     standard_library_usage standard_library = {
-        false, false, false, false, false, false};
+        false, false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0};
 
@@ -1157,6 +1198,12 @@ success_indicator generate_c(checked_program const program,
         LPG_TRY_GOTO(
             stream_writer_write_string(c_output, "#include <stdint.h>\n"),
             fail_2);
+    }
+    if (standard_library.using_integer)
+    {
+        LPG_TRY_GOTO(stream_writer_write_string(
+                         c_output, "#include <lpg_std_integer.h>\n"),
+                     fail_2);
     }
 
     for (size_t i = 0; i < definitions.count; ++i)

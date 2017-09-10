@@ -8,6 +8,8 @@
 #include "lpg_read_file.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
+#include "lpg_remove_unused_functions.h"
+#include "lpg_remove_dead_code.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -87,8 +89,18 @@ static void check_generated_c_code(char const *const source,
         check(root, non_empty_global, expect_no_errors, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
+
+    checked_program optimized = remove_unused_functions(checked);
+    checked_program_free(&checked);
+    remove_dead_code(&optimized);
+    {
+        checked_program const second_pass = remove_unused_functions(optimized);
+        checked_program_free(&optimized);
+        optimized = second_pass;
+    }
+
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success == generate_c(checked, memory_writer_erase(&generated)));
+    REQUIRE(success == generate_c(optimized, memory_writer_erase(&generated)));
     unicode_view const pieces[] = {
         path_remove_leaf(unicode_view_from_c_str(__FILE__)),
         unicode_view_from_c_str("c_backend"),
@@ -116,7 +128,7 @@ static void check_generated_c_code(char const *const source,
         FAIL();
     }
     unicode_string_free(&full_expected_file_path);
-    checked_program_free(&checked);
+    checked_program_free(&optimized);
     memory_writer_free(&generated);
     unicode_string_free(&expected);
 }
@@ -164,7 +176,9 @@ void test_c_backend(void)
     check_generated_c_code(
         "print(concat(\"a\", read()))\n", std_library.globals, "10_concat.c");
 
-    check_generated_c_code("let f = () boolean.true\n"
+    check_generated_c_code("let f = ()\n"
+                           "    print(\"\")\n"
+                           "    boolean.true\n"
                            "assert(f())\n",
                            std_library.globals, "11_lambda.c");
 
@@ -172,11 +186,14 @@ void test_c_backend(void)
                            "f()\n",
                            std_library.globals, "12_lambda_call.c");
 
-    check_generated_c_code("let id = (a: boolean) a\n"
+    check_generated_c_code("let id = (a: boolean)\n"
+                           "    print(\"\")\n"
+                           "    a\n"
                            "assert(id(boolean.true))\n",
                            std_library.globals, "13_lambda_parameter.c");
 
     check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
+                           "    print(\"\")\n"
                            "    or(and(a, not(b)), and(not(a), b))\n"
                            "assert(xor(boolean.true, boolean.false))\n"
                            "assert(xor(boolean.false, boolean.true))\n"
@@ -201,12 +218,17 @@ void test_c_backend(void)
                            "assert(string-equals(\"\", t))\n",
                            std_library.globals, "18_move_string.c");
 
-    check_generated_c_code("let s = (a: int(0, 3)) a\n"
+    check_generated_c_code("let s = (a: int(0, 3))\n"
+                           "    print(\"\")\n"
+                           "    a\n"
                            "let i = s(2)\n"
                            "assert(integer-equals(i, 2))\n",
                            std_library.globals, "19_integer.c");
 
-    check_generated_c_code("let s = () () \"a\"\n"
+    check_generated_c_code("let s = ()\n"
+                           "    ()\n"
+                           "        print(\"\")\n"
+                           "        \"a\"\n"
                            "let t = () (a: unit) \"a\"\n"
                            "let u = () (a: unit, b: unit) unit_value\n"
                            "let r = s()\n"
