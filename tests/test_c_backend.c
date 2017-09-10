@@ -176,7 +176,9 @@ void test_c_backend(void)
     check_generated_c_code(
         "print(concat(\"a\", read()))\n", std_library.globals, "10_concat.c");
 
-    check_generated_c_code("let f = () boolean.true\n"
+    check_generated_c_code("let f = ()\n"
+                           "    print(\"\")\n"
+                           "    boolean.true\n"
                            "assert(f())\n",
                            std_library.globals, "11_lambda.c");
 
@@ -184,11 +186,14 @@ void test_c_backend(void)
                            "f()\n",
                            std_library.globals, "12_lambda_call.c");
 
-    check_generated_c_code("let id = (a: boolean) a\n"
+    check_generated_c_code("let id = (a: boolean)\n"
+                           "    print(\"\")\n"
+                           "    a\n"
                            "assert(id(boolean.true))\n",
                            std_library.globals, "13_lambda_parameter.c");
 
     check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
+                           "    print(\"\")\n"
                            "    or(and(a, not(b)), and(not(a), b))\n"
                            "assert(xor(boolean.true, boolean.false))\n"
                            "assert(xor(boolean.false, boolean.true))\n"
@@ -213,12 +218,17 @@ void test_c_backend(void)
                            "assert(string-equals(\"\", t))\n",
                            std_library.globals, "18_move_string.c");
 
-    check_generated_c_code("let s = (a: int(0, 3)) a\n"
+    check_generated_c_code("let s = (a: int(0, 3))\n"
+                           "    print(\"\")\n"
+                           "    a\n"
                            "let i = s(2)\n"
                            "assert(integer-equals(i, 2))\n",
                            std_library.globals, "19_integer.c");
 
-    check_generated_c_code("let s = () () \"a\"\n"
+    check_generated_c_code("let s = ()\n"
+                           "    ()\n"
+                           "        print(\"\")\n"
+                           "        \"a\"\n"
                            "let t = () (a: unit) \"a\"\n"
                            "let u = () (a: unit, b: unit) unit_value\n"
                            "let r = s()\n"
