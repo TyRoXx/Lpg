@@ -28,21 +28,6 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
-typedef struct expected_errors
-{
-    semantic_error const *errors;
-    size_t count;
-} expected_errors;
-
-static void expect_errors(semantic_error const error, void *user)
-{
-    expected_errors *expected = user;
-    REQUIRE(expected->count >= 1);
-    REQUIRE(semantic_error_equals(error, expected->errors[0]));
-    ++expected->errors;
-    --expected->count;
-}
-
 static void check_single_wellformed_function(
     char const *const source, structure const non_empty_global,
     instruction *const expected_body_elements, size_t const expected_body_size)
