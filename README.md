@@ -24,16 +24,16 @@ Just write a `.lpg` file and run it. If you want to have syntax highlighting, th
 
 | Type           | Explanation                                      | Example values                    |
 |----------------|--------------------------------------------------|-----------------------------------|
-| unit           | A nothing like type "void"                       | `unit`                            |
-| type           | A type                                           | `unit`, `boolean`, `int(0, 0)`    |
+| unit           | A nothing like type "void"                       | `unit_value`                      |
+| type           | A type of a variable / constant                  | `unit`, `boolean`, `int(0, 0)`    |
 | boolean        | A logical value (either true or false)           | `boolean.true` or `boolean.false` |
-| int(low, high) | A whole number within a certain range            | `int(0, 100)` or `int(-100, 33)`  |
+| int(low, high) | A whole number within a certain range            | `int(0, 100)` or `int(33, 100)`   |
 | string-ref     | A reference to a string that is a string literal | `"Hello"` or `"\n"`               |
 
 #### Variables and constants
 * Variables
 
-**Currently there all values are constants.**
+**Currently there all variables are constants.**
 
 * Constants
 
@@ -48,8 +48,9 @@ Functions can be implemented like this
 ```
 This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
-let print_int = (in : int(0, 100))
-    print(in)
+let print_twice = (message : string-ref)
+    print(message)
+    print(message)
 ```
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
