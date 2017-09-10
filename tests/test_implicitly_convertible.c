@@ -61,6 +61,18 @@ static void test_tuple_implicitly_convertible(void)
         type right = type_from_tuple_type(tuple_type1);
         REQUIRE(is_implicitly_convertible(left, right));
     }
+    {
+        type big_int_type = type_from_integer_range(integer_range_create(
+            integer_create(10, 100), integer_create(100, 30)));
+        type small_int_type = type_from_integer_range(integer_range_create(
+            integer_create(1, 100), integer_create(200, 70)));
+        tuple_type left_tuple_type = {&big_int_type, 1};
+        tuple_type right_tuple_type = {&small_int_type, 1};
+
+        type left = type_from_tuple_type(left_tuple_type);
+        type right = type_from_tuple_type(right_tuple_type);
+        REQUIRE(is_implicitly_convertible(left, right));
+    }
 }
 
 void test_implicitly_convertible(void)

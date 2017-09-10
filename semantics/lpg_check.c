@@ -158,8 +158,21 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
         return flat_from.enum_ == flat_into.enum_;
 
     case type_kind_tuple:
-        return type_equals(flat_from, flat_into);
-
+    {
+        if (flat_from.tuple_.length != flat_into.tuple_.length)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < flat_from.tuple_.length; ++i)
+        {
+            if (!is_implicitly_convertible(
+                    flat_from.tuple_.elements[i], flat_into.tuple_.elements[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
     case type_kind_integer_range:
         return integer_less_or_equals(flat_into.integer_range_.minimum,
                                       flat_from.integer_range_.minimum) &&
