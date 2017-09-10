@@ -107,7 +107,8 @@ static void check_wellformed_program(char const *const source,
 static void test_loops(const standard_library_description *std_library);
 static void test_printing(const standard_library_description *std_library);
 static void test_assert(const standard_library_description *std_library);
-static void test_let_assignments(const standard_library_description *std_library);
+static void
+test_let_assignments(const standard_library_description *std_library);
 static void test_functions(const standard_library_description *std_library);
 
 void test_semantics(void)
@@ -848,27 +849,27 @@ test_let_assignments(const standard_library_description *std_library)
 
     {
         sequence root = parse("let v : boolean = boolean.true\n"
-                                      "let v : boolean = boolean.true\n");
+                              "let v : boolean = boolean.true\n");
         semantic_error const errors[] = {
-                semantic_error_create(semantic_error_declaration_with_existing_name,
-                                      source_location_create(1, 4))};
+            semantic_error_create(semantic_error_declaration_with_existing_name,
+                                  source_location_create(1, 4))};
         expected_errors expected = {errors, 1};
         checked_program checked =
-                check(root, std_library->globals, expect_errors, &expected);
+            check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-                instruction_create_literal(literal_instruction_create(
-                        0, value_from_enum_element(1, NULL))),
-                instruction_create_literal(literal_instruction_create(
-                        1, value_from_enum_element(1, NULL))),
-                instruction_create_literal(
-                        literal_instruction_create(2, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, NULL))),
+            instruction_create_literal(
+                literal_instruction_create(2, value_from_unit()))};
         instruction_sequence const expected_body =
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
-                &expected_body, &checked.functions[0].body));
+            &expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
@@ -929,32 +930,32 @@ test_let_assignments(const standard_library_description *std_library)
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
-                instruction_create_literal(literal_instruction_create(
-                        0, value_from_enum_element(1, NULL))),
-                instruction_create_global(1),
-                instruction_create_read_struct(
-                        read_struct_instruction_create(1, 4, 2)),
-                instruction_create_call(
-                        call_instruction_create(2, arguments, 1, 3))};
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
+            instruction_create_global(1),
+            instruction_create_read_struct(
+                read_struct_instruction_create(1, 4, 2)),
+            instruction_create_call(
+                call_instruction_create(2, arguments, 1, 3))};
         check_single_wellformed_function(
-                "let v = boolean.true\n"
-                        "assert(v)\n",
-                std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
+            "let v = boolean.true\n"
+            "assert(v)\n",
+            std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
-                instruction_create_literal(literal_instruction_create(
-                        0, value_from_enum_element(1, NULL))),
-                instruction_create_global(1),
-                instruction_create_read_struct(
-                        read_struct_instruction_create(1, 4, 2)),
-                instruction_create_call(
-                        call_instruction_create(2, arguments, 1, 3))};
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
+            instruction_create_global(1),
+            instruction_create_read_struct(
+                read_struct_instruction_create(1, 4, 2)),
+            instruction_create_call(
+                call_instruction_create(2, arguments, 1, 3))};
         check_single_wellformed_function(
-                "let v : boolean = boolean.true\n"
-                        "assert(v)\n",
-                std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
+            "let v : boolean = boolean.true\n"
+            "assert(v)\n",
+            std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
     }
 }
