@@ -1,6 +1,5 @@
-[![codecov](https://codecov.io/gh/TyRoXx/Lpg/branch/master/graph/badge.svg)](https://codecov.io/gh/TyRoXx/Lpg)
-[![Build Status](https://travis-ci.org/TyRoXx/Lpg.svg?branch=master)](https://travis-ci.org/TyRoXx/Lpg)
-[![Build status](https://ci.appveyor.com/api/projects/status/lq9sc1am1xn5fvgg/branch/master?svg=true)](https://ci.appveyor.com/project/TyRoXx/lpg/branch/master)
+[![codecov](https://codecov.io/gh/mamazu/Lpg/branch/master/graph/badge.svg)](https://codecov.io/gh/mamazu/Lpg)
+[![Build Status](https://travis-ci.org/mamazu/Lpg.svg?branch=master)](https://travis-ci.org/mamazu/Lpg)
 
 # Lpg
 
