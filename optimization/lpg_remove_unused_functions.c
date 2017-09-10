@@ -20,17 +20,9 @@ static void mark_function(bool *used_functions,
         switch (current_instruction.type)
         {
         case instruction_call:
-            break;
-
         case instruction_loop:
-            break;
-
         case instruction_global:
-            break;
-
         case instruction_read_struct:
-            break;
-
         case instruction_break:
             break;
 
@@ -38,8 +30,6 @@ static void mark_function(bool *used_functions,
             switch (current_instruction.literal.value_.kind)
             {
             case value_kind_integer:
-                break;
-
             case value_kind_string:
                 break;
 
@@ -52,28 +42,16 @@ static void mark_function(bool *used_functions,
             }
 
             case value_kind_flat_object:
-                break;
-
             case value_kind_type:
-                break;
-
             case value_kind_enum_element:
-                break;
-
             case value_kind_unit:
-                break;
-
             case value_kind_tuple:
-                break;
-
             case value_kind_enum_constructor:
                 break;
             }
             break;
 
         case instruction_tuple:
-            break;
-
         case instruction_enum_construct:
             break;
         }
