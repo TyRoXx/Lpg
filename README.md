@@ -25,6 +25,7 @@ Just write a `.lpg` file and run it. If you want to have syntax highlighting, th
 | Type           | Explanation                                      | Example values                    |
 |----------------|--------------------------------------------------|-----------------------------------|
 | unit           | A nothing like type "void"                       | `unit`                            |
+| type           | A type                                           | `unit`, `boolean`, `int(0, 0)`    |
 | boolean        | A logical value (either true or false)           | `boolean.true` or `boolean.false` |
 | int(low, high) | A whole number within a certain range            | `int(0, 100)` or `int(-100, 33)`  |
 | string-ref     | A reference to a string that is a string literal | `"Hello"` or `"\n"`               |
@@ -79,7 +80,11 @@ loop
 You can combine this with the `match`-statement in order to break out of a loop in a controlled manner.
 
 #### Tuple
-TODO!
+Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
+```lpg
+let tuple = {10, boolean.true, "Hello", () boolean}
+```
+The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string-ref "Hello"`.
 
 ### Compilation
 In order to compile and run an `.lpg` file you need to build the whole project and run the following command in the terminal:
