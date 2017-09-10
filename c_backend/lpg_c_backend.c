@@ -505,8 +505,6 @@ generate_add_reference_for_return_value(c_backend_state *state,
     switch (state->registers[from].meaning)
     {
     case register_meaning_nothing:
-        LPG_TO_DO();
-
     case register_meaning_global:
         LPG_TO_DO();
 
@@ -528,20 +526,11 @@ generate_add_reference_for_return_value(c_backend_state *state,
         }
 
     case register_meaning_print:
-        LPG_TO_DO();
-
     case register_meaning_read:
-        LPG_TO_DO();
-
     case register_meaning_assert:
-        LPG_TO_DO();
-
     case register_meaning_string_equals:
-        LPG_TO_DO();
-
+    case register_meaning_integer_equals:
     case register_meaning_concat:
-        LPG_TO_DO();
-
     case register_meaning_literal:
         return success;
 
@@ -572,6 +561,7 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
+    case register_meaning_integer_equals:
     case register_meaning_concat:
         LPG_UNREACHABLE();
 
@@ -622,6 +612,7 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
+    case register_meaning_integer_equals:
     case register_meaning_concat:
         LPG_UNREACHABLE();
 
