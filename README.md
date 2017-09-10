@@ -10,7 +10,7 @@
         1. [Match](#Match)
         1. [Loops](#Loops)
         1. [Tuple](#Tuple)
-    1. [Compilation](#Compilation)
+    1. [Running LPG files](#Compilation)
 1. [Development](#Development)
     1. [Build and run on Ubuntu](#Build-and-run-on-Ubuntu)
     1. [Build and run on Windows](#Build-and-run-on-Windows)
