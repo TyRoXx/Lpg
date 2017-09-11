@@ -995,6 +995,7 @@ static success_indicator generate_instruction(
 
     case instruction_tuple:
     case instruction_enum_construct:
+    case instruction_match:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();

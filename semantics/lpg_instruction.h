@@ -17,7 +17,8 @@ typedef enum instruction_type
     instruction_break,
     instruction_literal,
     instruction_tuple,
-    instruction_enum_construct
+    instruction_enum_construct,
+    instruction_match
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -83,6 +84,23 @@ enum_construct_instruction_create(register_id into, enum_element_id which,
 bool enum_construct_instruction_equals(enum_construct_instruction const left,
                                        enum_construct_instruction const right);
 
+typedef struct match_instruction_case match_instruction_case;
+
+typedef struct match_instruction
+{
+    register_id key;
+    match_instruction_case *cases;
+    size_t count;
+    register_id result;
+} match_instruction;
+
+match_instruction match_instruction_create(register_id key,
+                                           match_instruction_case *cases,
+                                           size_t count, register_id result);
+void match_instruction_free(match_instruction const *match);
+bool match_instruction_equals(match_instruction const left,
+                              match_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -95,8 +113,21 @@ struct instruction
         literal_instruction literal;
         tuple_instruction tuple_;
         enum_construct_instruction enum_construct;
+        match_instruction match;
     };
 };
+
+struct match_instruction_case
+{
+    register_id key;
+    instruction_sequence action;
+    register_id value;
+};
+
+match_instruction_case
+match_instruction_case_create(register_id key, instruction_sequence action,
+                              register_id value);
+void match_instruction_case_free(match_instruction_case freed);
 
 instruction instruction_create_call(call_instruction argument);
 instruction instruction_create_global(register_id into);
@@ -107,6 +138,7 @@ instruction instruction_create_literal(literal_instruction const value);
 instruction instruction_create_tuple(tuple_instruction argument);
 instruction
 instruction_create_enum_construct(enum_construct_instruction argument);
+instruction instruction_create_match(match_instruction argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

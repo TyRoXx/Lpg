@@ -214,6 +214,27 @@ void test_semantics(void)
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
+        match_instruction_case *const cases = allocate_array(2, sizeof(*cases));
+        cases[0] = match_instruction_case_create(
+            1, instruction_sequence_create(NULL, 0), 0);
+        cases[1] = match_instruction_case_create(
+            2, instruction_sequence_create(NULL, 0), 0);
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, NULL))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(0, NULL))),
+            instruction_create_match(match_instruction_create(0, cases, 2, 3))};
+        check_single_wellformed_function(
+            "let s = boolean.true\n"
+            "match s\n"
+            "    case boolean.true: s\n"
+            "    case boolean.false: s\n",
+            std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
+    }
+    {
         sequence root = parse("read()\n"
                               "h()");
         semantic_error const errors[] = {semantic_error_create(

@@ -95,6 +95,14 @@ bool enum_construct_instruction_equals(enum_construct_instruction const left,
            (left.state == right.state);
 }
 
+match_instruction match_instruction_create(register_id key,
+                                           match_instruction_case *cases,
+                                           size_t count, register_id result)
+{
+    match_instruction returning = {key, cases, count, result};
+    return returning;
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -110,6 +118,27 @@ instruction_create_enum_construct(enum_construct_instruction argument)
     result.type = instruction_enum_construct;
     result.enum_construct = argument;
     return result;
+}
+
+instruction instruction_create_match(match_instruction argument)
+{
+    instruction result;
+    result.type = instruction_match;
+    result.match = argument;
+    return result;
+}
+
+match_instruction_case
+match_instruction_case_create(register_id key, instruction_sequence action,
+                              register_id value)
+{
+    match_instruction_case result = {key, action, value};
+    return result;
+}
+
+void match_instruction_case_free(match_instruction_case freed)
+{
+    instruction_sequence_free(&freed.action);
 }
 
 instruction instruction_create_call(call_instruction argument)
@@ -183,6 +212,17 @@ void instruction_free(instruction const *value)
 
     case instruction_enum_construct:
         break;
+
+    case instruction_match:
+        for (size_t i = 0; i < value->match.count; ++i)
+        {
+            match_instruction_case_free(value->match.cases[i]);
+        }
+        if (value->match.cases)
+        {
+            deallocate(value->match.cases);
+        }
+        break;
     }
 }
 
@@ -219,6 +259,37 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_enum_construct:
         LPG_TO_DO();
+
+    case instruction_match:
+        if (left.match.key != right.match.key)
+        {
+            return false;
+        }
+        if (left.match.result != right.match.result)
+        {
+            return false;
+        }
+        if (left.match.count != right.match.count)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < left.match.count; ++i)
+        {
+            if (left.match.cases[i].key != right.match.cases[i].key)
+            {
+                return false;
+            }
+            if (!instruction_sequence_equals(
+                    &left.match.cases[i].action, &right.match.cases[i].action))
+            {
+                return false;
+            }
+            if (left.match.cases[i].value != right.match.cases[i].value)
+            {
+                return false;
+            }
+        }
+        return true;
     }
     LPG_UNREACHABLE();
 }

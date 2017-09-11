@@ -53,6 +53,9 @@ static void find_used_registers(instruction_sequence const from,
             registers_read_from[current_instruction.enum_construct.state] =
                 true;
             break;
+
+        case instruction_match:
+            LPG_TO_DO();
         }
     }
 }
@@ -118,6 +121,9 @@ static bool change_register_ids(instruction *const where,
             update_register_id(&where->enum_construct.state, new_register_ids));
         return update_register_id(
             &where->enum_construct.into, new_register_ids);
+
+    case instruction_match:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

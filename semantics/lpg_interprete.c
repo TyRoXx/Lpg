@@ -151,6 +151,9 @@ run_sequence(instruction_sequence const sequence, value const *globals,
                 value_from_enum_element(element.enum_construct.which, state);
             break;
         }
+
+        case instruction_match:
+            LPG_TO_DO();
         }
     }
     return run_sequence_result_continue;

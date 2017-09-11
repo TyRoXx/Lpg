@@ -1051,7 +1051,61 @@ evaluate_expression(function_checking_state *state,
         return make_compile_time_unit();
 
     case expression_type_match:
-        LPG_TO_DO();
+    {
+        evaluate_expression_result const key =
+            evaluate_expression(state, function, *element.match.input);
+        if (!key.has_value)
+        {
+            return key;
+        }
+        match_instruction_case *const cases =
+            allocate_array(element.match.number_of_cases, sizeof(*cases));
+        type result_type = type_from_unit();
+        for (size_t i = 0; i < element.match.number_of_cases; ++i)
+        {
+            match_case const case_tree = element.match.cases[i];
+            evaluate_expression_result const key_evaluated =
+                evaluate_expression(state, function, *case_tree.key);
+            if (!key_evaluated.has_value)
+            {
+                return key_evaluated;
+            }
+
+            /*TODO: support runtime values as keys*/
+            ASSERT(key_evaluated.compile_time_value.is_set);
+
+            /*TODO: check whether key type can be compared*/
+
+            instruction_sequence action = instruction_sequence_create(NULL, 0);
+            evaluate_expression_result const action_evaluated =
+                evaluate_expression(state, &action, *case_tree.action);
+            if (!action_evaluated.has_value)
+            {
+                return action_evaluated;
+            }
+
+            cases[i] = match_instruction_case_create(
+                key_evaluated.where, action, action_evaluated.where);
+            if (i == 0)
+            {
+                result_type = action_evaluated.type_;
+            }
+            else if (!type_equals(result_type, action_evaluated.type_))
+            {
+                /*TODO: support types that are not the same, but still
+                 * comparable*/
+                LPG_TO_DO();
+            }
+        }
+        register_id const result_register =
+            allocate_register(&state->used_registers);
+        add_instruction(
+            function, instruction_create_match(match_instruction_create(
+                          key.where, cases, element.match.number_of_cases,
+                          result_register)));
+        return evaluate_expression_result_create(
+            result_register, result_type, optional_value_empty);
+    }
 
     case expression_type_string:
     {

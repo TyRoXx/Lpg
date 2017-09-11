@@ -103,6 +103,17 @@ void print_instruction(instruction const printed)
 
     case instruction_enum_construct:
         LPG_TO_DO();
+
+    case instruction_match:
+        printf(
+            "match %u, result %u\n", printed.match.key, printed.match.result);
+        for (size_t i = 0; i < printed.match.count; ++i)
+        {
+            printf("case %u {\n", printed.match.cases[i].key);
+            print_instruction_sequence(printed.match.cases[i].action);
+            printf("return %u }\n", printed.match.cases[i].value);
+        }
+        return;
     }
     LPG_UNREACHABLE();
 }

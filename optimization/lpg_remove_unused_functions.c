@@ -54,6 +54,9 @@ static void mark_function(bool *used_functions,
         case instruction_tuple:
         case instruction_enum_construct:
             break;
+
+        case instruction_match:
+            LPG_TO_DO();
         }
     }
 }
@@ -170,6 +173,9 @@ static instruction clone_instruction(instruction const original,
 
     case instruction_enum_construct:
         return original;
+
+    case instruction_match:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
