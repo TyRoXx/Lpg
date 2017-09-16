@@ -153,7 +153,33 @@ run_sequence(instruction_sequence const sequence, value const *globals,
         }
 
         case instruction_match:
-            LPG_TO_DO();
+        {
+            value const key = registers[element.match.key];
+            for (size_t j = 0; j < element.match.count; ++j)
+            {
+                match_instruction_case *const this_case =
+                    element.match.cases + j;
+                if (value_equals(key, registers[this_case->key]))
+                {
+                    switch (run_sequence(this_case->action, globals, registers,
+                                         gc, all_functions))
+                    {
+                    case run_sequence_result_break:
+                        return run_sequence_result_break;
+
+                    case run_sequence_result_continue:
+                        break;
+
+                    case run_sequence_result_unavailable_at_this_time:
+                        return run_sequence_result_unavailable_at_this_time;
+                    }
+                    registers[element.match.result] =
+                        registers[this_case->value];
+                    break;
+                }
+            }
+            break;
+        }
         }
     }
     return run_sequence_result_continue;

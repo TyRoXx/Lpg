@@ -197,5 +197,23 @@ void test_interpreter(void)
                   "assert(integer-equals(123, w.0.0.0.0))\n",
                   "", "", std_library.globals);
 
+    /*first case fits*/
+    expect_output("assert(match boolean.true\n"
+                  "    case boolean.true:\n"
+                  "        print(\"jup\")\n"
+                  "        boolean.true\n"
+                  "    case boolean.false: boolean.false\n"
+                  ")\n",
+                  "", "jup", std_library.globals);
+
+    /*second case fits*/
+    expect_output("assert(match boolean.true\n"
+                  "    case boolean.false: boolean.false\n"
+                  "    case boolean.true:\n"
+                  "        print(\"jup\")\n"
+                  "        boolean.true\n"
+                  ")\n",
+                  "", "jup", std_library.globals);
+
     standard_library_description_free(&std_library);
 }
