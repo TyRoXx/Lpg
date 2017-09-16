@@ -1074,6 +1074,23 @@ evaluate_expression(function_checking_state *state,
             /*TODO: support runtime values as keys*/
             ASSERT(key_evaluated.compile_time_value.is_set);
 
+            if (!type_equals(key.type_, key_evaluated.type_))
+            {
+                for (size_t j = 0; j < i; ++j)
+                {
+                    match_instruction_case_free(cases[j]);
+                }
+                if (cases)
+                {
+                    deallocate(cases);
+                }
+                state->on_error(semantic_error_create(
+                                    semantic_error_type_mismatch,
+                                    expression_source_begin(*case_tree.key)),
+                                state->user);
+                return evaluate_expression_result_empty;
+            }
+
             /*TODO: check whether key type can be compared*/
 
             instruction_sequence action = instruction_sequence_create(NULL, 0);
@@ -1084,8 +1101,6 @@ evaluate_expression(function_checking_state *state,
                 return action_evaluated;
             }
 
-            cases[i] = match_instruction_case_create(
-                key_evaluated.where, action, action_evaluated.where);
             if (i == 0)
             {
                 result_type = action_evaluated.type_;
@@ -1094,8 +1109,24 @@ evaluate_expression(function_checking_state *state,
             {
                 /*TODO: support types that are not the same, but still
                  * comparable*/
-                LPG_TO_DO();
+                for (size_t j = 0; j < i; ++j)
+                {
+                    match_instruction_case_free(cases[j]);
+                }
+                if (cases)
+                {
+                    deallocate(cases);
+                }
+                instruction_sequence_free(&action);
+                state->on_error(semantic_error_create(
+                                    semantic_error_type_mismatch,
+                                    expression_source_begin(*case_tree.action)),
+                                state->user);
+                return evaluate_expression_result_empty;
             }
+
+            cases[i] = match_instruction_case_create(
+                key_evaluated.where, action, action_evaluated.where);
         }
         register_id const result_register =
             allocate_register(&state->used_registers);
