@@ -7,7 +7,6 @@
 #include "test_unicode_string.h"
 #include "test_allocator.h"
 #include "test_arithmetic.h"
-#include "test_blob.h"
 #include "test_stream_writer.h"
 #include "test_identifier.h"
 #include "test_tokenize.h"
@@ -23,8 +22,9 @@
 #include "test_remove_unused_functions.h"
 #include "test_remove_dead_code.h"
 #include "test_semantic_errors.h"
-#include <stdio.h>
 #include "test_value.h"
+#include "test_type.h"
+#include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
 #endif
@@ -54,7 +54,8 @@ int main(void)
                                     test_value,
                                     test_remove_unused_functions,
                                     test_remove_dead_code,
-                                    test_semantic_errors};
+                                    test_semantic_errors,
+                                    test_type};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();

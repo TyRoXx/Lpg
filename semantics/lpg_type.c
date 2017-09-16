@@ -187,24 +187,8 @@ bool type_equals(type const left, type const right)
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        if (!type_equals(left.function_pointer_->result,
-                         right.function_pointer_->result))
-        {
-            return false;
-        }
-        if (left.function_pointer_->arity != right.function_pointer_->arity)
-        {
-            return false;
-        }
-        for (size_t i = 0; i < left.function_pointer_->arity; ++i)
-        {
-            if (!type_equals(left.function_pointer_->arguments[i],
-                             right.function_pointer_->arguments[i]))
-            {
-                return false;
-            }
-        }
-        return true;
+        return function_pointer_equals(
+            *left.function_pointer_, *right.function_pointer_);
 
     case type_kind_unit:
         return true;
