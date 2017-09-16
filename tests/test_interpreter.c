@@ -1,6 +1,6 @@
 #include "test_interpreter.h"
 #include "test.h"
-#include "lpg_interprete.h"
+#include "lpg_interpret.h"
 #include "lpg_stream_writer.h"
 #include "lpg_assert.h"
 #include "handle_parse_error.h"

@@ -9,7 +9,7 @@
 #include "lpg_find_next_token.h"
 #include "lpg_parse_expression.h"
 #include "lpg_assert.h"
-#include "lpg_interprete.h"
+#include "lpg_interpret.h"
 #include "lpg_allocate.h"
 #include "lpg_structure_member.h"
 #include "lpg_read_file.h"

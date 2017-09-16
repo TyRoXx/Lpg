@@ -1,4 +1,4 @@
-#include "lpg_interprete.h"
+#include "lpg_interpret.h"
 #include "lpg_for.h"
 #include "lpg_assert.h"
 #include "lpg_allocate.h"

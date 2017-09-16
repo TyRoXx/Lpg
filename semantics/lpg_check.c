@@ -6,7 +6,7 @@
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 #include "lpg_string_literal.h"
-#include "lpg_interprete.h"
+#include "lpg_interpret.h"
 #include <string.h>
 #include "lpg_local_variable.h"
 #include "lpg_instruction_checkpoint.h"
