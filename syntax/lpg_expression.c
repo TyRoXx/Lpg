@@ -95,9 +95,10 @@ bool match_case_equals(match_case const left, match_case const right)
            expression_equals(left.action, right.action);
 }
 
-match match_create(expression *input, match_case *cases, size_t number_of_cases)
+match match_create(source_location begin, expression *input, match_case *cases,
+                   size_t number_of_cases)
 {
-    match result = {input, cases, number_of_cases};
+    match result = {begin, input, cases, number_of_cases};
     return result;
 }
 
@@ -250,7 +251,7 @@ source_location expression_source_begin(expression const value)
         return expression_source_begin(*value.access_structure.object);
 
     case expression_type_match:
-        LPG_TO_DO();
+        return value.match.begin;
 
     case expression_type_string:
         return value.string.source;

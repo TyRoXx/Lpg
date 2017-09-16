@@ -337,6 +337,7 @@ void test_save_expression(void)
                     integer_create(0, 456), source_location_create(0, 0)))));
         check_expression_rendering(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(expression_from_integer_literal(
                     integer_literal_expression_create(
                         integer_create(0, 123), source_location_create(0, 0)))),
@@ -363,6 +364,7 @@ void test_save_expression(void)
                     integer_create(0, 457), source_location_create(0, 0)))));
         check_expression_rendering(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(expression_from_integer_literal(
                     integer_literal_expression_create(
                         integer_create(0, 123), source_location_create(0, 0)))),
@@ -392,6 +394,7 @@ void test_save_expression(void)
                 expression_from_sequence(sequence_create(sequence, 2))));
         check_expression_rendering(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(expression_from_integer_literal(
                     integer_literal_expression_create(
                         integer_create(0, 123), source_location_create(0, 0)))),

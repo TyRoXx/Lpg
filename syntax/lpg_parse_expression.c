@@ -243,7 +243,8 @@ static int parse_match_cases(expression_parser *parser,
 }
 
 static expression_parser_result parse_match(expression_parser *parser,
-                                            size_t const indentation)
+                                            size_t const indentation,
+                                            source_location const begin)
 {
     {
         rich_token const space = peek(parser);
@@ -279,8 +280,9 @@ static expression_parser_result parse_match(expression_parser *parser,
     if (parse_match_cases(parser, (indentation + 1), &cases, &case_count))
     {
         expression_parser_result const result = {
-            1, expression_from_match(match_create(
-                   expression_allocate(input.success), cases, case_count))};
+            1,
+            expression_from_match(match_create(
+                begin, expression_allocate(input.success), cases, case_count))};
         return result;
     }
     expression_free(&input.success);
@@ -477,7 +479,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
 
         case token_match:
             pop(parser);
-            return parse_match(parser, indentation);
+            return parse_match(parser, indentation, head.where);
 
         case token_left_parenthesis:
             pop(parser);

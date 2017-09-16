@@ -101,12 +101,13 @@ bool match_case_equals(match_case const left, match_case const right);
 
 typedef struct match
 {
+    source_location begin;
     expression *input;
     match_case *cases;
     size_t number_of_cases;
 } match;
 
-match match_create(LPG_NON_NULL(expression *input),
+match match_create(source_location begin, LPG_NON_NULL(expression *input),
                    LPG_NON_NULL(match_case *cases), size_t number_of_cases);
 
 typedef struct assign

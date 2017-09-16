@@ -1058,6 +1058,32 @@ evaluate_expression(function_checking_state *state,
         {
             return key;
         }
+        switch (key.type_.kind)
+        {
+        case type_kind_structure:
+        case type_kind_function_pointer:
+        case type_kind_unit:
+        case type_kind_string_ref:
+            LPG_TO_DO();
+
+        case type_kind_enumeration:
+            if (key.type_.enum_->size != element.match.number_of_cases)
+            {
+                state->on_error(
+                    semantic_error_create(semantic_error_missing_match_case,
+                                          expression_source_begin(element)),
+                    state->user);
+                return evaluate_expression_result_empty;
+            }
+            break;
+
+        case type_kind_tuple:
+        case type_kind_type:
+        case type_kind_integer_range:
+        case type_kind_inferred:
+        case type_kind_enum_constructor:
+            LPG_TO_DO();
+        }
         match_instruction_case *const cases =
             allocate_array(element.match.number_of_cases, sizeof(*cases));
         type result_type = type_from_unit();

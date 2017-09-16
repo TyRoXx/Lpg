@@ -666,6 +666,7 @@ static void test_match_case(void)
                 integer_literal_expression_create(
                     integer_create(0, 2), source_location_create(1, 11)))));
         expression expected = expression_from_match(match_create(
+            source_location_create(0, 0),
             expression_allocate(expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("a"),
                                              source_location_create(0, 6)))),

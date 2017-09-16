@@ -223,6 +223,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_declaration_with_existing_name:
         return "Cannot reuse a name of a local variable in scope";
+
+    case semantic_error_missing_match_case:
+        return "At least one match case is missing";
     }
     LPG_UNREACHABLE();
 }

@@ -118,10 +118,12 @@ void test_expression(void)
                                      expression_allocate(expression_from_break(
                                          source_location_create(0, 0))));
         test_not_equal(expression_from_match(match_create(
+                           source_location_create(0, 0),
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
                            left, 1)),
                        expression_from_match(match_create(
+                           source_location_create(0, 0),
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
                            right, 2)));
@@ -140,10 +142,12 @@ void test_expression(void)
                 integer_literal_expression_create(
                     integer_create(0, 1), source_location_create(0, 0)))));
         test_not_equal(expression_from_match(match_create(
+                           source_location_create(0, 0),
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
                            left, 1)),
                        expression_from_match(match_create(
+                           source_location_create(0, 0),
                            expression_allocate(expression_from_break(
                                source_location_create(0, 0))),
                            right, 1)));
@@ -161,11 +165,13 @@ void test_expression(void)
                                          source_location_create(0, 0))));
         test_not_equal(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(expression_from_integer_literal(
                     integer_literal_expression_create(
                         integer_create(1, 2), source_location_create(0, 0)))),
                 left, 1)),
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(
                     expression_from_break(source_location_create(0, 0))),
                 right, 1)));

@@ -200,6 +200,7 @@ static void test_match_cases(void)
                     integer_create(0, 2), source_location_create(1, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
@@ -228,6 +229,7 @@ static void test_match_cases(void)
                     integer_create(0, 4), source_location_create(2, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
@@ -260,6 +262,7 @@ static void test_match_cases(void)
                     integer_create(0, 4), source_location_create(3, 12)))));
         test_successful_parse(
             expression_from_match(match_create(
+                source_location_create(0, 0),
                 expression_allocate(
                     expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("a"),
