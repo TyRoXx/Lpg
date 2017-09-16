@@ -99,8 +99,7 @@ void enumeration_element_free(LPG_NON_NULL(enumeration_element const *value));
 struct function_pointer
 {
     type result;
-    type *arguments;
-    size_t arity;
+    tuple_type parameters;
 };
 
 bool function_pointer_equals(function_pointer const left,

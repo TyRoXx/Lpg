@@ -198,7 +198,7 @@ call_interpreted_function(checked_function const callee, value *const arguments,
     ASSUME(all_functions);
     value *const registers =
         allocate_array(callee.number_of_registers, sizeof(*registers));
-    for (size_t i = 0; i < callee.signature->arity; ++i)
+    for (size_t i = 0; i < callee.signature->parameters.length; ++i)
     {
         registers[i] = arguments[i];
     }

@@ -318,16 +318,17 @@ generate_type(type const generated,
             LPG_TRY(stream_writer_write_unicode_view(
                 definition_writer, unicode_view_from_string(name)));
             LPG_TRY(stream_writer_write_string(definition_writer, ")("));
-            for (size_t i = 0; i < generated.function_pointer_->arity; ++i)
+            for (size_t i = 0;
+                 i < generated.function_pointer_->parameters.length; ++i)
             {
                 if (i > 0)
                 {
                     LPG_TRY(
                         stream_writer_write_string(definition_writer, ", "));
                 }
-                LPG_TRY(generate_type(generated.function_pointer_->arguments[i],
-                                      standard_library, definitions,
-                                      definition_writer));
+                LPG_TRY(generate_type(
+                    generated.function_pointer_->parameters.elements[i],
+                    standard_library, definitions, definition_writer));
             }
             LPG_TRY(stream_writer_write_string(definition_writer, ");\n"));
             type_definition *const new_definition =
@@ -1062,13 +1063,15 @@ generate_function_body(checked_function const current_function,
         state.registers[j].meaning = register_meaning_nothing;
         state.registers[j].ownership = register_resource_ownership_none;
     }
-    for (register_id i = 0; i < current_function.signature->arity; ++i)
+    for (register_id i = 0; i < current_function.signature->parameters.length;
+         ++i)
     {
         set_register_argument(
-            &state, i, i, (current_function.signature->arguments[i].kind ==
-                           type_kind_string_ref)
-                              ? register_resource_ownership_borrows_string
-                              : register_resource_ownership_none);
+            &state, i, i,
+            (current_function.signature->parameters.elements[i].kind ==
+             type_kind_string_ref)
+                ? register_resource_ownership_borrows_string
+                : register_resource_ownership_none);
     }
     LPG_TRY(generate_sequence(&state, all_functions,
                               current_function.return_value,
@@ -1114,18 +1117,19 @@ generate_function_declaration(function_id const id,
     LPG_TRY(stream_writer_write_string(program_defined_writer, " "));
     LPG_TRY(generate_function_name(id, program_defined_writer));
     LPG_TRY(stream_writer_write_string(program_defined_writer, "("));
-    if (signature.arity == 0)
+    if (signature.parameters.length == 0)
     {
         LPG_TRY(stream_writer_write_string(program_defined_writer, "void"));
     }
-    for (register_id j = 0; j < signature.arity; ++j)
+    for (register_id j = 0; j < signature.parameters.length; ++j)
     {
         if (j > 0)
         {
             LPG_TRY(stream_writer_write_string(program_defined_writer, ", "));
         }
-        LPG_TRY(generate_type(signature.arguments[j], standard_library,
-                              definitions, program_defined_writer));
+        LPG_TRY(generate_type(signature.parameters.elements[j],
+                              standard_library, definitions,
+                              program_defined_writer));
         LPG_TRY(stream_writer_write_string(program_defined_writer, " const "));
         LPG_TRY(generate_parameter_name(j, program_defined_writer));
     }

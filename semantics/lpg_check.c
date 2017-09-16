@@ -137,22 +137,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        if (flat_from.function_pointer_->arity !=
-            flat_into.function_pointer_->arity)
-        {
-            return false;
-        }
-
-        for (size_t i = 0; i < flat_from.function_pointer_->arity; ++i)
-        {
-            if (!type_equals(flat_from.function_pointer_->arguments[i],
-                             flat_into.function_pointer_->arguments[i]))
-            {
-                return false;
-            }
-        }
-        return type_equals(flat_from.function_pointer_->result,
-                           flat_into.function_pointer_->result);
+        return type_equals(flat_from, flat_into);
 
     case type_kind_enumeration:
         return flat_from.enum_ == flat_into.enum_;
@@ -218,9 +203,10 @@ static bool function_parameter_accepts_type(type const function,
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        ASSUME(parameter < function.function_pointer_->arity);
+        ASSUME(parameter < function.function_pointer_->parameters.length);
         return check_parameter_type(
-            argument, function.function_pointer_->arguments[parameter],
+            argument,
+            function.function_pointer_->parameters.elements[parameter],
             inferring);
 
     case type_kind_unit:
@@ -464,7 +450,7 @@ static size_t expected_call_argument_count(const type callee)
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        return callee.function_pointer_->arity;
+        return callee.function_pointer_->parameters.length;
 
     case type_kind_unit:
         LPG_TO_DO();
@@ -582,10 +568,10 @@ static size_t find_lower_bound_for_inferred_values(type const root)
 static size_t count_inferred_values(function_pointer const signature)
 {
     size_t count = 0;
-    for (size_t i = 0; i < signature.arity; ++i)
+    for (size_t i = 0; i < signature.parameters.length; ++i)
     {
-        size_t const new_count =
-            find_lower_bound_for_inferred_values(signature.arguments[i]);
+        size_t const new_count = find_lower_bound_for_inferred_values(
+            signature.parameters.elements[i]);
         if (new_count > count)
         {
             count = new_count;
@@ -662,8 +648,8 @@ static optional_checked_function check_function(
     }
     function_pointer *const signature = allocate(sizeof(*signature));
     signature->result = body_evaluated.type_;
-    signature->arity = 0;
-    signature->arguments = NULL;
+    signature->parameters.length = 0;
+    signature->parameters.elements = NULL;
     checked_function const result = {
         return_value, signature, body_out, state.used_registers};
     return optional_checked_function_create(result);
@@ -713,8 +699,8 @@ evaluate_lambda(function_checking_state *const state,
         function_pointer *const dummy_signature =
             allocate(sizeof(*dummy_signature));
         dummy_signature->result = type_from_unit();
-        dummy_signature->arguments = NULL;
-        dummy_signature->arity = 0;
+        dummy_signature->parameters.elements = NULL;
+        dummy_signature->parameters.length = 0;
         state->program->functions[this_lambda_id] = checked_function_create(
             0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }
@@ -733,9 +719,9 @@ evaluate_lambda(function_checking_state *const state,
         return evaluate_expression_result_empty;
     }
 
-    ASSUME(checked.value.signature->arity == 0);
-    checked.value.signature->arguments = parameter_types;
-    checked.value.signature->arity = evaluated.parameter_count;
+    ASSUME(checked.value.signature->parameters.length == 0);
+    checked.value.signature->parameters.elements = parameter_types;
+    checked.value.signature->parameters.length = evaluated.parameter_count;
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.value;
@@ -1430,8 +1416,8 @@ checked_program check(sequence const root, structure const global,
         function_pointer *const dummy_signature =
             allocate(sizeof(*dummy_signature));
         dummy_signature->result = type_from_unit();
-        dummy_signature->arguments = NULL;
-        dummy_signature->arity = 0;
+        dummy_signature->parameters.elements = NULL;
+        dummy_signature->parameters.length = 0;
         program.functions[0] = checked_function_create(
             0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }

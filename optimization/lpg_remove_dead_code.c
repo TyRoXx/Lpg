@@ -162,7 +162,7 @@ remove_one_layer_of_dead_code_from_function(checked_function *const from)
     memset(registers_read_from, 0,
            from->number_of_registers * sizeof(*registers_read_from));
     registers_read_from[from->return_value] = true;
-    for (size_t i = 0; i < from->signature->arity; ++i)
+    for (size_t i = 0; i < from->signature->parameters.length; ++i)
     {
         registers_read_from[i] = true;
     }

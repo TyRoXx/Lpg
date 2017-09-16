@@ -67,12 +67,13 @@ clone_function_pointer(function_pointer const original,
 {
     function_pointer *const result = allocate(sizeof(*result));
     result->result = type_clone(original.result, clone_gc);
-    result->arity = original.arity;
-    result->arguments =
-        allocate_array(original.arity, sizeof(*result->arguments));
-    for (size_t i = 0; i < original.arity; ++i)
+    result->parameters.length = original.parameters.length;
+    result->parameters.elements = allocate_array(
+        original.parameters.length, sizeof(*result->parameters.elements));
+    for (size_t i = 0; i < original.parameters.length; ++i)
     {
-        result->arguments[i] = type_clone(original.arguments[i], clone_gc);
+        result->parameters.elements[i] =
+            type_clone(original.parameters.elements[i], clone_gc);
     }
     return result;
 }

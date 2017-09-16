@@ -84,18 +84,7 @@ bool function_pointer_equals(function_pointer const left,
     {
         return false;
     }
-    if (left.arity != right.arity)
-    {
-        return false;
-    }
-    for (size_t i = 0; i < left.arity; ++i)
-    {
-        if (!type_equals(left.arguments[i], right.arguments[i]))
-        {
-            return false;
-        }
-    }
-    return true;
+    return tuple_type_equals(left.parameters, right.parameters);
 }
 
 type type_from_function_pointer(function_pointer const *value)
@@ -230,15 +219,17 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         function_pointer *const copy =
             garbage_collector_allocate(clone_gc, sizeof(*copy));
         type *const arguments = garbage_collector_allocate_array(
-            clone_gc, original.function_pointer_->arity, sizeof(*arguments));
-        for (size_t i = 0; i < original.function_pointer_->arity; ++i)
+            clone_gc, original.function_pointer_->parameters.length,
+            sizeof(*arguments));
+        for (size_t i = 0; i < original.function_pointer_->parameters.length;
+             ++i)
         {
-            arguments[i] =
-                type_clone(original.function_pointer_->arguments[i], clone_gc);
+            arguments[i] = type_clone(
+                original.function_pointer_->parameters.elements[i], clone_gc);
         }
         *copy = function_pointer_create(
             type_clone(original.function_pointer_->result, clone_gc), arguments,
-            original.function_pointer_->arity);
+            original.function_pointer_->parameters.length);
         return type_from_function_pointer(copy);
     }
 
@@ -276,8 +267,8 @@ function_pointer function_pointer_create(type result, type *arguments,
 
 void function_pointer_free(function_pointer const *value)
 {
-    if (value->arguments)
+    if (value->parameters.elements)
     {
-        deallocate(value->arguments);
+        deallocate(value->parameters.elements);
     }
 }
