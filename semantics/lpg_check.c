@@ -1086,6 +1086,10 @@ evaluate_expression(function_checking_state *state,
         }
         match_instruction_case *const cases =
             allocate_array(element.match.number_of_cases, sizeof(*cases));
+        bool *const enum_elements_handled = allocate_array(
+            element.match.number_of_cases, sizeof(*enum_elements_handled));
+        memset(enum_elements_handled, 0,
+               element.match.number_of_cases * sizeof(*enum_elements_handled));
         type result_type = type_from_unit();
         for (size_t i = 0; i < element.match.number_of_cases; ++i)
         {
@@ -1094,14 +1098,16 @@ evaluate_expression(function_checking_state *state,
                 evaluate_expression(state, function, *case_tree.key);
             if (!key_evaluated.has_value)
             {
+                deallocate(enum_elements_handled);
                 return key_evaluated;
             }
 
-            /*TODO: support runtime values as keys*/
-            ASSERT(key_evaluated.compile_time_value.is_set);
-
             if (!type_equals(key.type_, key_evaluated.type_))
             {
+                state->on_error(semantic_error_create(
+                                    semantic_error_type_mismatch,
+                                    expression_source_begin(*case_tree.key)),
+                                state->user);
                 for (size_t j = 0; j < i; ++j)
                 {
                     match_instruction_case_free(cases[j]);
@@ -1110,20 +1116,46 @@ evaluate_expression(function_checking_state *state,
                 {
                     deallocate(cases);
                 }
-                state->on_error(semantic_error_create(
-                                    semantic_error_type_mismatch,
-                                    expression_source_begin(*case_tree.key)),
-                                state->user);
+                deallocate(enum_elements_handled);
                 return evaluate_expression_result_empty;
             }
 
-            /*TODO: check whether key type can be compared*/
+            {
+                ASSUME(key_evaluated.compile_time_value.value_.kind ==
+                       value_kind_enum_element);
+                bool *const case_handled = (enum_elements_handled +
+                                            key_evaluated.compile_time_value
+                                                .value_.enum_element.which);
+                if (*case_handled)
+                {
+                    state->on_error(
+                        semantic_error_create(
+                            semantic_error_duplicate_match_case,
+                            expression_source_begin(*case_tree.key)),
+                        state->user);
+                    for (size_t j = 0; j < i; ++j)
+                    {
+                        match_instruction_case_free(cases[j]);
+                    }
+                    if (cases)
+                    {
+                        deallocate(cases);
+                    }
+                    deallocate(enum_elements_handled);
+                    return evaluate_expression_result_empty;
+                }
+                *case_handled = true;
+            }
+
+            /*TODO: support runtime values as keys?*/
+            ASSERT(key_evaluated.compile_time_value.is_set);
 
             instruction_sequence action = instruction_sequence_create(NULL, 0);
             evaluate_expression_result const action_evaluated =
                 evaluate_expression(state, &action, *case_tree.action);
             if (!action_evaluated.has_value)
             {
+                deallocate(enum_elements_handled);
                 return action_evaluated;
             }
 
@@ -1148,11 +1180,16 @@ evaluate_expression(function_checking_state *state,
                                     semantic_error_type_mismatch,
                                     expression_source_begin(*case_tree.action)),
                                 state->user);
+                deallocate(enum_elements_handled);
                 return evaluate_expression_result_empty;
             }
 
             cases[i] = match_instruction_case_create(
                 key_evaluated.where, action, action_evaluated.where);
+        }
+        for (size_t i = 0; i < element.match.number_of_cases; ++i)
+        {
+            ASSUME(enum_elements_handled[i]);
         }
         register_id const result_register =
             allocate_register(&state->used_registers);
@@ -1160,6 +1197,7 @@ evaluate_expression(function_checking_state *state,
             function, instruction_create_match(match_instruction_create(
                           key.where, cases, element.match.number_of_cases,
                           result_register)));
+        deallocate(enum_elements_handled);
         return evaluate_expression_result_create(
             result_register, result_type, optional_value_empty);
     }

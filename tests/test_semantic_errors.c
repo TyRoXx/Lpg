@@ -98,6 +98,22 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let s = boolean.true\n"
+                              "match s\n"
+                              "    case boolean.true: s\n"
+                              "    case boolean.true: 123\n");
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_duplicate_match_case, source_location_create(3, 9))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = boolean.true\n"
                               "match s\n");
         semantic_error const errors[] = {semantic_error_create(
             semantic_error_missing_match_case, source_location_create(1, 0))};

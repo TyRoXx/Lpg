@@ -226,6 +226,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_missing_match_case:
         return "At least one match case is missing";
+
+    case semantic_error_duplicate_match_case:
+        return "Match case already exists";
     }
     LPG_UNREACHABLE();
 }
