@@ -68,16 +68,19 @@ bool read_struct_instruction_equals(read_struct_instruction const left,
            (left.member == right.member) && (left.into == right.into);
 }
 
-literal_instruction literal_instruction_create(register_id into, value value_)
+literal_instruction literal_instruction_create(register_id into, value value_,
+                                               type type_of)
 {
-    literal_instruction result = {into, value_};
+    literal_instruction result = {into, value_, type_of};
     return result;
 }
 
 bool literal_instruction_equals(literal_instruction const left,
                                 literal_instruction const right)
 {
-    return (left.into == right.into) && value_equals(left.value_, right.value_);
+    return (left.into == right.into) &&
+           value_equals(left.value_, right.value_) &&
+           type_equals(left.type_of, right.type_of);
 }
 
 enum_construct_instruction
@@ -97,9 +100,10 @@ bool enum_construct_instruction_equals(enum_construct_instruction const left,
 
 match_instruction match_instruction_create(register_id key,
                                            match_instruction_case *cases,
-                                           size_t count, register_id result)
+                                           size_t count, register_id result,
+                                           type result_type)
 {
-    match_instruction returning = {key, cases, count, result};
+    match_instruction returning = {key, cases, count, result, result_type};
     return returning;
 }
 

@@ -37,6 +37,7 @@ typedef struct tuple_type
     size_t length;
 } tuple_type;
 
+tuple_type tuple_type_create(type *elements, size_t length);
 bool tuple_type_equals(tuple_type const left, tuple_type const right);
 
 typedef struct integer_range
@@ -119,6 +120,5 @@ type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);
 
-function_pointer function_pointer_create(type result, type *arguments,
-                                         size_t arity);
+function_pointer function_pointer_create(type result, tuple_type parameters);
 void function_pointer_free(LPG_NON_NULL(function_pointer const *value));

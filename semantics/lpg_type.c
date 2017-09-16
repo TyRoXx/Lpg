@@ -38,6 +38,12 @@ void enumeration_free(enumeration const *value)
     }
 }
 
+tuple_type tuple_type_create(type *elements, size_t length)
+{
+    tuple_type result = {elements, length};
+    return result;
+}
+
 bool tuple_type_equals(tuple_type const left, tuple_type const right)
 {
     if (left.length != right.length)
@@ -228,8 +234,9 @@ type type_clone(type const original, garbage_collector *const clone_gc)
                 original.function_pointer_->parameters.elements[i], clone_gc);
         }
         *copy = function_pointer_create(
-            type_clone(original.function_pointer_->result, clone_gc), arguments,
-            original.function_pointer_->parameters.length);
+            type_clone(original.function_pointer_->result, clone_gc),
+            tuple_type_create(
+                arguments, original.function_pointer_->parameters.length));
         return type_from_function_pointer(copy);
     }
 
@@ -258,10 +265,9 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     LPG_UNREACHABLE();
 }
 
-function_pointer function_pointer_create(type result, type *arguments,
-                                         size_t arity)
+function_pointer function_pointer_create(type result, tuple_type parameters)
 {
-    function_pointer returned = {result, arguments, arity};
+    function_pointer returned = {result, parameters};
     return returned;
 }
 

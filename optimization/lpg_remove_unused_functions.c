@@ -6,21 +6,26 @@
 
 static void mark_function(bool *used_functions,
                           checked_function const *const all_functions,
-                          function_id const marked_function)
+                          function_id const marked_function);
+
+static void
+mark_used_functions_in_sequence(instruction_sequence const sequence,
+                                bool *used_functions,
+                                checked_function const *const all_functions)
 {
-    if (used_functions[marked_function])
-    {
-        return;
-    }
-    used_functions[marked_function] = true;
-    instruction_sequence const sequence = all_functions[marked_function].body;
     for (size_t j = 0; j < sequence.length; ++j)
     {
         instruction const current_instruction = sequence.elements[j];
         switch (current_instruction.type)
         {
         case instruction_call:
+            break;
+
         case instruction_loop:
+            mark_used_functions_in_sequence(
+                current_instruction.loop, used_functions, all_functions);
+            break;
+
         case instruction_global:
         case instruction_read_struct:
         case instruction_break:
@@ -56,9 +61,28 @@ static void mark_function(bool *used_functions,
             break;
 
         case instruction_match:
-            LPG_TO_DO();
+            for (size_t k = 0; k < current_instruction.match.count; ++k)
+            {
+                mark_used_functions_in_sequence(
+                    current_instruction.match.cases[k].action, used_functions,
+                    all_functions);
+            }
+            break;
         }
     }
+}
+
+static void mark_function(bool *used_functions,
+                          checked_function const *const all_functions,
+                          function_id const marked_function)
+{
+    if (used_functions[marked_function])
+    {
+        return;
+    }
+    used_functions[marked_function] = true;
+    instruction_sequence const sequence = all_functions[marked_function].body;
+    mark_used_functions_in_sequence(sequence, used_functions, all_functions);
 }
 
 static function_pointer *
@@ -125,6 +149,11 @@ static value adapt_value(value const from, garbage_collector *const clone_gc,
     LPG_UNREACHABLE();
 }
 
+static instruction_sequence
+clone_sequence(instruction_sequence const original,
+               garbage_collector *const clone_gc,
+               function_id const *const new_function_ids);
+
 static instruction clone_instruction(instruction const original,
                                      garbage_collector *const clone_gc,
                                      function_id const *const new_function_ids)
@@ -167,7 +196,8 @@ static instruction clone_instruction(instruction const original,
     case instruction_literal:
         return instruction_create_literal(literal_instruction_create(
             original.literal.into,
-            adapt_value(original.literal.value_, clone_gc, new_function_ids)));
+            adapt_value(original.literal.value_, clone_gc, new_function_ids),
+            type_clone(original.literal.type_of, clone_gc)));
 
     case instruction_tuple:
         LPG_TO_DO();
@@ -176,7 +206,22 @@ static instruction clone_instruction(instruction const original,
         return original;
 
     case instruction_match:
-        LPG_TO_DO();
+    {
+        match_instruction_case *const cases =
+            allocate_array(original.match.count, sizeof(*cases));
+        for (size_t i = 0; i < original.match.count; ++i)
+        {
+            cases[i] = match_instruction_case_create(
+                original.match.cases[i].key,
+                clone_sequence(
+                    original.match.cases[i].action, clone_gc, new_function_ids),
+                original.match.cases[i].value);
+        }
+        return instruction_create_match(match_instruction_create(
+            original.match.key, cases, original.match.count,
+            original.match.result,
+            type_clone(original.match.result_type, clone_gc)));
+    }
     }
     LPG_UNREACHABLE();
 }

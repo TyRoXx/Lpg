@@ -20,8 +20,8 @@ void test_remove_unused_functions(void)
     {
         original.functions[i].signature =
             allocate(sizeof(*original.functions[i].signature));
-        *original.functions[i].signature =
-            function_pointer_create(type_from_unit(), NULL, 0);
+        *original.functions[i].signature = function_pointer_create(
+            type_from_unit(), tuple_type_create(NULL, 0));
         original.functions[i].body = instruction_sequence_create(NULL, 0);
         original.functions[i].number_of_registers = 0;
         original.functions[i].return_value = 0;
@@ -32,7 +32,8 @@ void test_remove_unused_functions(void)
         instruction *const body = allocate_array(body_size, sizeof(*body));
         body[0] = instruction_create_literal(literal_instruction_create(
             0, value_from_function_pointer(
-                   function_pointer_value_from_internal(2))));
+                   function_pointer_value_from_internal(2)),
+            type_from_function_pointer(original.functions[2].signature)));
         original.functions[0].body =
             instruction_sequence_create(body, body_size);
     }
@@ -47,7 +48,8 @@ void test_remove_unused_functions(void)
             instruction *const body = allocate_array(body_size, sizeof(*body));
             body[0] = instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1))));
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(optimized.functions[1].signature)));
             expected_main = instruction_sequence_create(body, body_size);
         }
         REQUIRE(instruction_sequence_equals(

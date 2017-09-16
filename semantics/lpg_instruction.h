@@ -65,9 +65,11 @@ typedef struct literal_instruction
 {
     register_id into;
     value value_;
+    type type_of;
 } literal_instruction;
 
-literal_instruction literal_instruction_create(register_id into, value value_);
+literal_instruction literal_instruction_create(register_id into, value value_,
+                                               type type_of);
 bool literal_instruction_equals(literal_instruction const left,
                                 literal_instruction const right);
 
@@ -92,11 +94,13 @@ typedef struct match_instruction
     match_instruction_case *cases;
     size_t count;
     register_id result;
+    type result_type;
 } match_instruction;
 
 match_instruction match_instruction_create(register_id key,
                                            match_instruction_case *cases,
-                                           size_t count, register_id result);
+                                           size_t count, register_id result,
+                                           type result_type);
 void match_instruction_free(match_instruction const *match);
 bool match_instruction_equals(match_instruction const left,
                               match_instruction const right);

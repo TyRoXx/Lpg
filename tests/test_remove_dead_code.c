@@ -60,8 +60,8 @@ void test_remove_dead_code(void)
 
     {
         instruction const expected_main_function[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let t = 1\n"
             "let v = {t}\n"

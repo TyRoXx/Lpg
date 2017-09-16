@@ -390,20 +390,23 @@ read_element(function_checking_state *state, instruction_sequence *function,
                     {
                         value const literal = value_from_enum_element(i, NULL);
                         add_instruction(
-                            function,
-                            instruction_create_literal(
-                                literal_instruction_create(result, literal)));
+                            function, instruction_create_literal(
+                                          literal_instruction_create(
+                                              result, literal,
+                                              type_from_enumeration(enum_))));
                         return read_structure_element_result_create(
                             true, left_side_type,
                             optional_value_create(literal));
                     }
                     value const literal = value_from_enum_constructor();
-                    add_instruction(function, instruction_create_literal(
-                                                  literal_instruction_create(
-                                                      result, literal)));
                     enum_constructor_type *const constructor_type =
                         garbage_collector_allocate(
                             &state->program->memory, sizeof(*constructor_type));
+                    add_instruction(
+                        function,
+                        instruction_create_literal(literal_instruction_create(
+                            result, literal,
+                            type_from_enum_constructor(constructor_type))));
                     constructor_type->enumeration = enum_;
                     constructor_type->which = i;
                     return read_structure_element_result_create(
@@ -526,7 +529,7 @@ static evaluate_expression_result make_unit(register_id *const used_registers,
             optional_value_create(value_from_unit()));
     add_instruction(
         output, instruction_create_literal(literal_instruction_create(
-                    final_result.where, value_from_unit())));
+                    final_result.where, value_from_unit(), type_from_unit())));
     return final_result;
 }
 
@@ -639,7 +642,8 @@ static optional_checked_function check_function(
         add_instruction(
             &body_out,
             instruction_create_literal(literal_instruction_create(
-                return_value, body_evaluated.compile_time_value.value_)));
+                return_value, body_evaluated.compile_time_value.value_,
+                body_evaluated.type_)));
     }
     else
     {
@@ -726,15 +730,16 @@ evaluate_lambda(function_checking_state *const state,
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.value;
     register_id const destination = allocate_register(&state->used_registers);
+    type const result_type = type_from_function_pointer(
+        state->program->functions[this_lambda_id].signature);
     add_instruction(
-        function,
-        instruction_create_literal(literal_instruction_create(
-            destination,
-            value_from_function_pointer(
-                function_pointer_value_from_internal(this_lambda_id)))));
+        function, instruction_create_literal(literal_instruction_create(
+                      destination,
+                      value_from_function_pointer(
+                          function_pointer_value_from_internal(this_lambda_id)),
+                      result_type)));
     return evaluate_expression_result_create(
-        destination, type_from_function_pointer(
-                         state->program->functions[this_lambda_id].signature),
+        destination, result_type,
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_internal(this_lambda_id))));
 }
@@ -932,14 +937,15 @@ evaluate_call_expression(function_checking_state *state,
                     function,
                     instruction_create_literal(literal_instruction_create(
                         result, value_from_string_ref(
-                                    unicode_view_create(copy, length)))));
+                                    unicode_view_create(copy, length)),
+                        type_from_string_ref())));
             }
             else
             {
                 add_instruction(
                     function,
                     instruction_create_literal(literal_instruction_create(
-                        result, compile_time_result.value_)));
+                        result, compile_time_result.value_, return_type)));
             }
         }
     }
@@ -1004,16 +1010,16 @@ evaluate_expression(function_checking_state *state,
     case expression_type_integer_literal:
     {
         register_id const where = allocate_register(&state->used_registers);
+        type const what = type_from_integer_range(integer_range_create(
+            element.integer_literal.value, element.integer_literal.value));
         add_instruction(
             function,
             instruction_create_literal(literal_instruction_create(
-                where, value_from_integer(element.integer_literal.value))));
+                where, value_from_integer(element.integer_literal.value),
+                what)));
         return evaluate_expression_result_create(
-            where,
-            type_from_integer_range(integer_range_create(
-                element.integer_literal.value, element.integer_literal.value)),
-            optional_value_create(
-                value_from_integer(element.integer_literal.value)));
+            where, what, optional_value_create(value_from_integer(
+                             element.integer_literal.value)));
     }
 
     case expression_type_access_structure:
@@ -1182,7 +1188,7 @@ evaluate_expression(function_checking_state *state,
         add_instruction(
             function, instruction_create_match(match_instruction_create(
                           key.where, cases, element.match.number_of_cases,
-                          result_register)));
+                          result_register, result_type)));
         deallocate(enum_elements_handled);
         return evaluate_expression_result_create(
             result_register, result_type, optional_value_empty);
@@ -1205,7 +1211,8 @@ evaluate_expression(function_checking_state *state,
         memory_writer_free(&decoded);
         add_instruction(
             function, instruction_create_literal(literal_instruction_create(
-                          result, value_from_string_ref(literal))));
+                          result, value_from_string_ref(literal),
+                          type_from_string_ref())));
         type const string_type = {type_kind_string_ref, {NULL}};
         return evaluate_expression_result_create(
             result, string_type,
@@ -1273,7 +1280,8 @@ evaluate_expression(function_checking_state *state,
             add_instruction(
                 function,
                 instruction_create_literal(literal_instruction_create(
-                    initializer.where, initializer.compile_time_value.value_)));
+                    initializer.where, initializer.compile_time_value.value_,
+                    initializer.type_)));
         }
 
         if (element.declare.optional_type)

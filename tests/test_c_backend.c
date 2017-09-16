@@ -80,13 +80,14 @@ static void fix_line_endings(unicode_string *s)
     s->length = last_written;
 }
 
-static void check_generated_c_code(char const *const source,
-                                   structure const non_empty_global,
-                                   char const *const expected_c_file_name)
+static void
+check_generated_c_code(char const *const source,
+                       standard_library_description const standard_library,
+                       char const *const expected_c_file_name)
 {
     sequence root = parse(unicode_view_from_c_str(source));
     checked_program checked =
-        check(root, non_empty_global, expect_no_errors, NULL);
+        check(root, standard_library.globals, expect_no_errors, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
     remove_dead_code(&checked);
@@ -94,7 +95,8 @@ static void check_generated_c_code(char const *const source,
     checked_program_free(&checked);
 
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success == generate_c(optimized, memory_writer_erase(&generated)));
+    REQUIRE(success == generate_c(optimized, &standard_library.stable->boolean,
+                                  memory_writer_erase(&generated)));
     unicode_view const pieces[] = {
         path_remove_leaf(unicode_view_from_c_str(__FILE__)),
         unicode_view_from_c_str("c_backend"),
@@ -132,59 +134,59 @@ void test_c_backend(void)
     standard_library_description const std_library =
         describe_standard_library();
 
-    check_generated_c_code("", std_library.globals, "0_empty.c");
+    check_generated_c_code("", std_library, "0_empty.c");
 
     check_generated_c_code(
-        "print(\"Hello, world!\")\n", std_library.globals, "1_hello_world.c");
+        "print(\"Hello, world!\")\n", std_library, "1_hello_world.c");
 
     check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n",
-                           std_library.globals, "2_print_twice.c");
+                           std_library, "2_print_twice.c");
 
     check_generated_c_code("loop\n"
                            "    print(\"Hello, world!\")\n"
                            "    break\n",
-                           std_library.globals, "3_loop_break.c");
+                           std_library, "3_loop_break.c");
 
     check_generated_c_code("let s = concat(\"123\", \"456\")\n"
                            "print(s)\n",
-                           std_library.globals, "4_concat_compile_time.c");
+                           std_library, "4_concat_compile_time.c");
 
-    check_generated_c_code("print(read())\n", std_library.globals, "5_read.c");
+    check_generated_c_code("print(read())\n", std_library, "5_read.c");
 
     check_generated_c_code("loop\n"
                            "    break\n"
                            "    print(read())\n",
-                           std_library.globals, "6_loop_read.c");
+                           std_library, "6_loop_read.c");
 
     check_generated_c_code("loop\n"
                            "    break\n"
                            "    assert(boolean.false)\n",
-                           std_library.globals, "7_assert_false.c");
+                           std_library, "7_assert_false.c");
 
     check_generated_c_code(
-        "assert(boolean.true)\n", std_library.globals, "8_assert_true.c");
+        "assert(boolean.true)\n", std_library, "8_assert_true.c");
 
-    check_generated_c_code("assert(string-equals(read(), \"\"))\n",
-                           std_library.globals, "9_string_equals.c");
+    check_generated_c_code("assert(string-equals(read(), \"\"))\n", std_library,
+                           "9_string_equals.c");
 
     check_generated_c_code(
-        "print(concat(\"a\", read()))\n", std_library.globals, "10_concat.c");
+        "print(concat(\"a\", read()))\n", std_library, "10_concat.c");
 
     check_generated_c_code("let f = ()\n"
                            "    print(\"\")\n"
                            "    boolean.true\n"
                            "assert(f())\n",
-                           std_library.globals, "11_lambda.c");
+                           std_library, "11_lambda.c");
 
     check_generated_c_code("let f = () assert(boolean.true)\n"
                            "f()\n",
-                           std_library.globals, "12_lambda_call.c");
+                           std_library, "12_lambda_call.c");
 
     check_generated_c_code("let id = (a: boolean)\n"
                            "    print(\"\")\n"
                            "    a\n"
                            "assert(id(boolean.true))\n",
-                           std_library.globals, "13_lambda_parameter.c");
+                           std_library, "13_lambda_parameter.c");
 
     check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
                            "    print(\"\")\n"
@@ -193,31 +195,31 @@ void test_c_backend(void)
                            "assert(xor(boolean.false, boolean.true))\n"
                            "assert(not(xor(boolean.true, boolean.true)))\n"
                            "assert(not(xor(boolean.false, boolean.false)))\n",
-                           std_library.globals, "14_lambda_parameters.c");
+                           std_library, "14_lambda_parameters.c");
 
     check_generated_c_code("let s = () read()\n"
                            "print(s())\n",
-                           std_library.globals, "15_return_string.c");
+                           std_library, "15_return_string.c");
 
     check_generated_c_code("let s = (a: string-ref) print(a)\n"
                            "s(\"a\")\n",
-                           std_library.globals, "16_pass_string.c");
+                           std_library, "16_pass_string.c");
 
     check_generated_c_code("let s = (a: string-ref) print(a)\n"
                            "s(read())\n",
-                           std_library.globals, "17_pass_owning_string.c");
+                           std_library, "17_pass_owning_string.c");
 
     check_generated_c_code("let s = (a: string-ref) a\n"
                            "let t = s(concat(read(), \"\"))\n"
                            "assert(string-equals(\"\", t))\n",
-                           std_library.globals, "18_move_string.c");
+                           std_library, "18_move_string.c");
 
     check_generated_c_code("let s = (a: int(0, 3))\n"
                            "    print(\"\")\n"
                            "    a\n"
                            "let i = s(2)\n"
                            "assert(integer-equals(i, 2))\n",
-                           std_library.globals, "19_integer.c");
+                           std_library, "19_integer.c");
 
     check_generated_c_code("let s = ()\n"
                            "    print(\"\")\n"
@@ -228,7 +230,13 @@ void test_c_backend(void)
                            "let u = () (a: unit, b: unit) unit_value\n"
                            "let r = s()\n"
                            "assert(string-equals(r(\"a\"), \"a\"))\n",
-                           std_library.globals, "20_return_lambda.c");
+                           std_library, "20_return_lambda.c");
+
+    check_generated_c_code("assert(match string-equals(read(), \"a\")\n"
+                           "    case boolean.false: boolean.true\n"
+                           "    case boolean.true: boolean.false\n"
+                           ")\n",
+                           std_library, "21_match.c");
 
     standard_library_description_free(&std_library);
 }

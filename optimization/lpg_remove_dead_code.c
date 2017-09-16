@@ -55,7 +55,15 @@ static void find_used_registers(instruction_sequence const from,
             break;
 
         case instruction_match:
-            LPG_TO_DO();
+            registers_read_from[current_instruction.match.key] = true;
+            for (size_t j = 0; j < current_instruction.match.count; ++j)
+            {
+                registers_read_from[current_instruction.match.cases[j].key] =
+                    true;
+                registers_read_from[current_instruction.match.cases[j].value] =
+                    true;
+            }
+            break;
         }
     }
 }
@@ -123,7 +131,17 @@ static bool change_register_ids(instruction *const where,
             &where->enum_construct.into, new_register_ids);
 
     case instruction_match:
-        LPG_TO_DO();
+        ASSERT(update_register_id(&where->match.key, new_register_ids));
+        for (size_t j = 0; j < where->match.count; ++j)
+        {
+            ASSERT(update_register_id(
+                &where->match.cases[j].key, new_register_ids));
+            ASSERT(update_register_id(
+                &where->match.cases[j].value, new_register_ids));
+            change_register_ids_in_sequence(
+                &where->match.cases[j].action, new_register_ids);
+        }
+        return update_register_id(&where->match.result, new_register_ids);
     }
     LPG_UNREACHABLE();
 }

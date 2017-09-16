@@ -142,8 +142,8 @@ void test_semantic_errors(void)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(
-                literal_instruction_create(3, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                3, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
@@ -165,9 +165,10 @@ void test_semantic_errors(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
@@ -188,9 +189,10 @@ void test_semantic_errors(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
@@ -226,8 +228,8 @@ void test_semantic_errors(void)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(
-                literal_instruction_create(3, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                3, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(
@@ -381,7 +383,8 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, NULL))),
+                2, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         instruction_sequence const expected_body =
@@ -411,11 +414,13 @@ test_let_assignments(const standard_library_description *std_library)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, NULL))),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_unit()))};
+                1, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body =
             instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(

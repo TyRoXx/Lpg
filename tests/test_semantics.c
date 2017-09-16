@@ -154,7 +154,7 @@ void test_semantics(void)
         instruction *const expected_body_elements =
             allocate_array(1, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_literal(
-            literal_instruction_create(0, value_from_unit()));
+            literal_instruction_create(0, value_from_unit(), type_from_unit()));
         instruction_sequence const expected_body =
             instruction_sequence_create(expected_body_elements, 1);
         REQUIRE(instruction_sequence_equals(
@@ -191,9 +191,10 @@ void test_semantics(void)
         value state = value_from_integer(integer_create(0, 123));
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, &state))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_enum_element(1, &state),
+                type_from_enumeration(&std_library.stable->option))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let s = option.some(123)", std_library.globals,
             LPG_COPY_ARRAY(expected_body_elements));
@@ -206,12 +207,17 @@ void test_semantics(void)
             2, instruction_sequence_create(NULL, 0), 0);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
             instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, NULL))),
+                1, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(0, NULL))),
-            instruction_create_match(match_instruction_create(0, cases, 2, 3))};
+                2, value_from_enum_element(0, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_match(match_instruction_create(
+                0, cases, 2, 3,
+                type_from_enumeration(&std_library.stable->boolean)))};
         check_single_wellformed_function(
             "let s = boolean.true\n"
             "match s\n"
@@ -225,35 +231,44 @@ void test_semantics(void)
     standard_library_description_free(&std_library);
 }
 
+static type make_integer_constant_type(integer value)
+{
+    return type_from_integer_range(integer_range_create(value, value));
+}
+
 static void test_functions(const standard_library_description *std_library)
 {
     {
+        function_pointer *const signature_lambda =
+            allocate(sizeof(*signature_lambda));
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(signature_lambda))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_integer(integer_create(0, 123))))};
+                0, value_from_integer(integer_create(0, 123)),
+                make_integer_constant_type(integer_create(0, 123))))};
         checked_program const expected = {
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[0] = checked_function_create(
                 1, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
         }
         {
-            function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(
+            *signature_lambda = function_pointer_create(
                 type_from_integer_range(integer_range_create(
                     integer_create(0, 123), integer_create(0, 123))),
-                NULL, 0);
+                tuple_type_create(NULL, 0));
             expected.functions[1] = checked_function_create(
-                0, signature,
+                0, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
                 1);
         }
@@ -261,12 +276,15 @@ static void test_functions(const standard_library_description *std_library)
             "let f = () 123\n", (*std_library).globals, expected);
     }
     {
+        function_pointer *const signature_lambda =
+            allocate(sizeof(*signature_lambda));
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(signature_lambda))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_lambda[] = {
@@ -274,23 +292,25 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, NULL))),
+                2, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         checked_program const expected = {
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[0] = checked_function_create(
                 1, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
         }
         {
-            function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature_lambda = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[1] = checked_function_create(
-                3, signature,
+                3, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
                 4);
         }
@@ -299,35 +319,39 @@ static void test_functions(const standard_library_description *std_library)
                                  (*std_library).globals, expected);
     }
     {
+        function_pointer *const signature_lambda =
+            allocate(sizeof(*signature_lambda));
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(signature_lambda))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_literal(literal_instruction_create(
-                1, value_from_integer(integer_create(0, 123))))};
+                1, value_from_integer(integer_create(0, 123)),
+                make_integer_constant_type(integer_create(0, 123))))};
         checked_program const expected = {
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[0] = checked_function_create(
                 1, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
         }
         {
-            function_pointer *const signature = allocate(sizeof(*signature));
             type *const parameters = allocate_array(1, sizeof(*parameters));
             parameters[0] =
                 type_from_enumeration(&(*std_library).stable->boolean);
-            *signature = function_pointer_create(
+            *signature_lambda = function_pointer_create(
                 type_from_integer_range(integer_range_create(
                     integer_create(0, 123), integer_create(0, 123))),
-                parameters, 1);
+                tuple_type_create(parameters, 1));
             expected.functions[1] = checked_function_create(
-                1, signature,
+                1, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
                 2);
         }
@@ -335,14 +359,18 @@ static void test_functions(const standard_library_description *std_library)
             "let f = (a: boolean) 123\n", (*std_library).globals, expected);
     }
     {
+        function_pointer *const signature_lambda =
+            allocate(sizeof(*signature_lambda));
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)))),
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, NULL))),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_unit()))};
+                1, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_global(0),
             instruction_create_read_struct(
@@ -351,16 +379,17 @@ static void test_functions(const standard_library_description *std_library)
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[0] = checked_function_create(
                 2, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 3);
         }
         {
-            function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_type(), NULL, 0);
+            *signature_lambda = function_pointer_create(
+                type_from_type(), tuple_type_create(NULL, 0));
             expected.functions[1] = checked_function_create(
-                1, signature,
+                1, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
                 2);
         }
@@ -369,31 +398,35 @@ static void test_functions(const standard_library_description *std_library)
                                  (*std_library).globals, expected);
     }
     {
+        function_pointer *const signature_lambda =
+            allocate(sizeof(*signature_lambda));
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)))),
+                       function_pointer_value_from_internal(1)),
+                type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, NULL))),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_unit()))};
+                1, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_unit(), type_from_unit()))};
         checked_program const expected = {
             {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature = function_pointer_create(type_from_unit(), NULL, 0);
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0));
             expected.functions[0] = checked_function_create(
                 2, signature,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 3);
         }
         {
-            function_pointer *const signature = allocate(sizeof(*signature));
             type *const parameters = allocate_array(1, sizeof(*parameters));
             parameters[0] = type_from_type();
-            *signature =
-                function_pointer_create(type_from_type(), parameters, 1);
+            *signature_lambda = function_pointer_create(
+                type_from_type(), tuple_type_create(parameters, 1));
             expected.functions[1] = checked_function_create(
-                0, signature, instruction_sequence_create(NULL, 0), 1);
+                0, signature_lambda, instruction_sequence_create(NULL, 0), 1);
         }
         check_wellformed_program("let f = (a: type) a\n"
                                  "let v : f(boolean) = boolean.true",
@@ -405,14 +438,16 @@ static void test_functions(const standard_library_description *std_library)
         values[1] = 1;
         instruction const expected_main_function[] = {
             instruction_create_literal(literal_instruction_create(
-                values[0], value_from_enum_element(0, NULL))),
+                values[0], value_from_enum_element(0, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_literal(literal_instruction_create(
-                values[1], value_from_enum_element(1, NULL))),
+                values[1], value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
             instruction_create_read_struct(
                 read_struct_instruction_create(2, 1, 3)),
-            instruction_create_literal(
-                literal_instruction_create(4, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                4, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let t = {boolean.false, boolean.true}\n"
             "let u = t.1\n",
@@ -430,8 +465,9 @@ static void test_printing(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 2, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_string_ref(
-                       unicode_view_from_c_str("hello, world!")))),
+                2,
+                value_from_string_ref(unicode_view_from_c_str("hello, world!")),
+                type_from_string_ref())),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -446,8 +482,9 @@ static void test_printing(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 2, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_string_ref(
-                       unicode_view_from_c_str("hello, world!")))),
+                2,
+                value_from_string_ref(unicode_view_from_c_str("hello, world!")),
+                type_from_string_ref())),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -469,7 +506,7 @@ static void test_loops(const standard_library_description *std_library)
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] = instruction_create_literal(
-            literal_instruction_create(3, value_from_unit()));
+            literal_instruction_create(3, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
                                          "    read()",
                                          (*std_library).globals,
@@ -488,8 +525,8 @@ static void test_loops(const standard_library_description *std_library)
         instruction const expected_body_elements[] = {
             instruction_create_loop(
                 instruction_sequence_create(LPG_COPY_ARRAY(loop_body))),
-            instruction_create_literal(
-                literal_instruction_create(6, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                6, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "loop\n"
             "    read()\n"
@@ -503,7 +540,7 @@ static void test_loops(const standard_library_description *std_library)
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] = instruction_create_literal(
-            literal_instruction_create(0, value_from_unit()));
+            literal_instruction_create(0, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
                                          "    break",
                                          (*std_library).globals,
@@ -512,16 +549,19 @@ static void test_loops(const standard_library_description *std_library)
     {
         instruction const loop_body[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_break()};
         instruction *const expected_body_elements =
             allocate_array(3, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(
             instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
-        expected_body_elements[1] = instruction_create_literal(
-            literal_instruction_create(1, value_from_enum_element(0, NULL)));
+        expected_body_elements[1] =
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(0, NULL),
+                type_from_enumeration(&std_library->stable->boolean)));
         expected_body_elements[2] = instruction_create_literal(
-            literal_instruction_create(2, value_from_unit()));
+            literal_instruction_create(2, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
                                          "    let v = boolean.true\n"
                                          "    break\n"
@@ -541,7 +581,8 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, NULL))),
+                2, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -556,7 +597,8 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(0, NULL))),
+                2, value_from_enum_element(0, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -571,7 +613,8 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(0, NULL))),
+                2, value_from_enum_element(0, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -586,7 +629,8 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_read_struct(
                 read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, NULL))),
+                2, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(
                 call_instruction_create(1, arguments, 1, 3))};
         check_single_wellformed_function(
@@ -601,9 +645,10 @@ test_let_assignments(const standard_library_description *std_library)
     {
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_integer(integer_create(0, 1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_integer(integer_create(0, 1)),
+                make_integer_constant_type(integer_create(0, 1)))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let v = 1\n", std_library->globals,
             LPG_COPY_ARRAY(expected_body_elements));
@@ -611,9 +656,10 @@ test_let_assignments(const standard_library_description *std_library)
     {
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_integer(integer_create(0, 1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_integer(integer_create(0, 1)),
+                make_integer_constant_type(integer_create(0, 1)))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let v : int(1, 10) = 1\n", std_library->globals,
             LPG_COPY_ARRAY(expected_body_elements));
@@ -621,19 +667,20 @@ test_let_assignments(const standard_library_description *std_library)
     {
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_integer(integer_create(0, 1)))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit()))};
+                0, value_from_integer(integer_create(0, 1)),
+                make_integer_constant_type(integer_create(0, 1)))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let v : int(10, 1) = 1\n", std_library->globals,
             LPG_COPY_ARRAY(expected_body_elements));
     }
     {
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_unit())),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_unit()))};
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_unit(), type_from_unit())),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function(
             "let v : unit = unit_value\n", std_library->globals,
             LPG_COPY_ARRAY(expected_body_elements));
@@ -643,7 +690,8 @@ test_let_assignments(const standard_library_description *std_library)
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_global(1),
             instruction_create_read_struct(
                 read_struct_instruction_create(1, 4, 2)),
@@ -659,7 +707,8 @@ test_let_assignments(const standard_library_description *std_library)
         arguments[0] = 0;
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL))),
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_global(1),
             instruction_create_read_struct(
                 read_struct_instruction_create(1, 4, 2)),

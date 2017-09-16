@@ -50,10 +50,10 @@ typedef struct register_state
 {
     register_meaning meaning;
     register_resource_ownership ownership;
+    type type_of;
     union
     {
         value literal;
-        type type_of;
         register_id argument;
     };
 } register_state;
@@ -98,6 +98,7 @@ typedef struct c_backend_state
     size_t active_register_count;
     checked_function const *all_functions;
     type_definitions *definitions;
+    enumeration const *boolean;
 } c_backend_state;
 
 static void active_register(c_backend_state *const state, register_id const id)
@@ -162,11 +163,13 @@ find_register_resource_ownership(type const variable)
 
 static void set_register_variable(c_backend_state *const state,
                                   register_id const id,
-                                  register_resource_ownership ownership)
+                                  register_resource_ownership ownership,
+                                  type const type_of)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
+    state->registers[id].type_of = type_of;
     active_register(state, id);
 }
 
@@ -182,23 +185,27 @@ static void set_register_function_variable(
 }
 
 static void set_register_literal(c_backend_state *const state,
-                                 register_id const id, value const literal)
+                                 register_id const id, value const literal,
+                                 type const type_of)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_literal;
     state->registers[id].literal = literal;
+    state->registers[id].type_of = type_of;
     active_register(state, id);
 }
 
 static void set_register_argument(c_backend_state *const state,
                                   register_id const id,
                                   register_id const argument,
-                                  register_resource_ownership const ownership)
+                                  register_resource_ownership const ownership,
+                                  type const type_of)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_argument;
     state->registers[id].argument = argument;
     state->registers[id].ownership = ownership;
+    state->registers[id].type_of = type_of;
     active_register(state, id);
 }
 
@@ -686,6 +693,11 @@ static function_pointer signature_of(LPG_NON_NULL(c_backend_state *const state),
     return *state->all_functions[pointer.code].signature;
 }
 
+static type find_boolean(c_backend_state const *state)
+{
+    return type_from_enumeration(state->boolean);
+}
+
 static success_indicator generate_instruction(
     c_backend_state *state, checked_function const *const all_functions,
     register_id const current_function_result, instruction const input,
@@ -704,8 +716,9 @@ static success_indicator generate_instruction(
         case register_meaning_print:
             state->standard_library.using_stdio = true;
             state->standard_library.using_unit = true;
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  type_from_unit());
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
@@ -725,7 +738,8 @@ static success_indicator generate_instruction(
             state->standard_library.using_read = true;
             ASSERT(input.call.argument_count == 0);
             set_register_variable(state, input.call.result,
-                                  register_resource_ownership_owns_string);
+                                  register_resource_ownership_owns_string,
+                                  type_from_string_ref());
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = read_impl();\n"));
@@ -733,8 +747,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_assert:
             state->standard_library.using_assert = true;
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  type_from_unit());
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = assert_impl("));
@@ -746,8 +761,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_string_equals:
             standard_library_usage_use_string_ref(&state->standard_library);
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(
@@ -763,8 +779,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_integer_equals:
             state->standard_library.using_integer = true;
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = integer_equals("));
@@ -780,7 +797,8 @@ static success_indicator generate_instruction(
         case register_meaning_concat:
             standard_library_usage_use_string_ref(&state->standard_library);
             set_register_variable(state, input.call.result,
-                                  register_resource_ownership_owns_string);
+                                  register_resource_ownership_owns_string,
+                                  type_from_string_ref());
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(
@@ -824,8 +842,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_and:
             ASSUME(input.call.argument_count == 2);
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
@@ -839,8 +858,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_or:
             ASSUME(input.call.argument_count == 2);
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
@@ -854,8 +874,9 @@ static success_indicator generate_instruction(
 
         case register_meaning_not:
             ASSUME(input.call.argument_count == 1);
-            set_register_variable(
-                state, input.call.result, register_resource_ownership_none);
+            set_register_variable(state, input.call.result,
+                                  register_resource_ownership_none,
+                                  find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = !"));
@@ -960,8 +981,8 @@ static success_indicator generate_instruction(
                 return success;
 
             case 14:
-                set_register_literal(
-                    state, input.read_struct.into, value_from_unit());
+                set_register_literal(state, input.read_struct.into,
+                                     value_from_unit(), type_from_unit());
                 return success;
 
             default:
@@ -991,13 +1012,69 @@ static success_indicator generate_instruction(
     case instruction_literal:
         ASSERT(state->registers[input.literal.into].meaning ==
                register_meaning_nothing);
-        set_register_literal(state, input.literal.into, input.literal.value_);
+        set_register_literal(state, input.literal.into, input.literal.value_,
+                             input.literal.type_of);
         return success;
 
     case instruction_tuple:
     case instruction_enum_construct:
-    case instruction_match:
         LPG_TO_DO();
+
+    case instruction_match:
+    {
+        set_register_variable(
+            state, input.match.result,
+            find_register_resource_ownership(input.match.result_type),
+            input.match.result_type);
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(generate_type(input.match.result_type, &state->standard_library,
+                              state->definitions, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " "));
+        LPG_TRY(generate_register_name(input.match.result, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+
+        for (size_t i = 0; i < input.match.count; ++i)
+        {
+            LPG_TRY(indent(indentation, c_output));
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, "else"));
+            }
+            if (i != (input.match.count - 1))
+            {
+                if (i > 0)
+                {
+                    LPG_TRY(stream_writer_write_string(c_output, " "));
+                }
+                LPG_TRY(stream_writer_write_string(c_output, "if ("));
+                LPG_TRY(generate_c_read_access(
+                    state, input.match.cases[i].key, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " == "));
+                LPG_TRY(
+                    generate_c_read_access(state, input.match.key, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ")"));
+            }
+            LPG_TRY(stream_writer_write_string(c_output, "\n"));
+
+            LPG_TRY(indent(indentation, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+
+            LPG_TRY(generate_sequence(
+                state, all_functions, current_function_result,
+                input.match.cases[i].action, (indentation + 1), c_output));
+
+            LPG_TRY(indent(indentation + 1, c_output));
+            LPG_TRY(generate_register_name(input.match.result, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = "));
+            LPG_TRY(generate_c_read_access(
+                state, input.match.cases[i].value, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+
+            LPG_TRY(indent(indentation, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+        }
+        return success;
+    }
     }
     LPG_UNREACHABLE();
 }
@@ -1050,14 +1127,15 @@ generate_function_body(checked_function const current_function,
                        checked_function const *const all_functions,
                        stream_writer const c_output,
                        standard_library_usage *standard_library,
-                       type_definitions *const definitions, bool const return_0)
+                       type_definitions *const definitions, bool const return_0,
+                       enumeration const *const boolean)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
     c_backend_state state = {
         allocate_array(
             current_function.number_of_registers, sizeof(*state.registers)),
-        *standard_library, NULL, 0, all_functions, definitions};
+        *standard_library, NULL, 0, all_functions, definitions, boolean};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;
@@ -1066,12 +1144,13 @@ generate_function_body(checked_function const current_function,
     for (register_id i = 0; i < current_function.signature->parameters.length;
          ++i)
     {
-        set_register_argument(
-            &state, i, i,
-            (current_function.signature->parameters.elements[i].kind ==
-             type_kind_string_ref)
-                ? register_resource_ownership_borrows_string
-                : register_resource_ownership_none);
+        type const parameter =
+            current_function.signature->parameters.elements[i];
+        set_register_argument(&state, i, i,
+                              ((parameter.kind == type_kind_string_ref)
+                                   ? register_resource_ownership_borrows_string
+                                   : register_resource_ownership_none),
+                              parameter);
     }
     LPG_TRY(generate_sequence(&state, all_functions,
                               current_function.return_value,
@@ -1138,8 +1217,11 @@ generate_function_declaration(function_id const id,
 }
 
 success_indicator generate_c(checked_program const program,
+                             enumeration const *const boolean,
                              stream_writer const c_output)
 {
+    (void)boolean;
+
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer =
         memory_writer_erase(&program_defined);
@@ -1172,17 +1254,18 @@ success_indicator generate_c(checked_program const program,
         LPG_TRY_GOTO(
             generate_function_body(current_function, program.functions,
                                    program_defined_writer, &standard_library,
-                                   &definitions, false),
+                                   &definitions, false, boolean),
             fail);
     }
 
     LPG_TRY_GOTO(
         stream_writer_write_string(program_defined_writer, "int main(void)\n"),
         fail);
-    LPG_TRY_GOTO(generate_function_body(program.functions[0], program.functions,
-                                        program_defined_writer,
-                                        &standard_library, &definitions, true),
-                 fail);
+    LPG_TRY_GOTO(
+        generate_function_body(program.functions[0], program.functions,
+                               program_defined_writer, &standard_library,
+                               &definitions, true, boolean),
+        fail);
 
     if (standard_library.using_unit)
     {
