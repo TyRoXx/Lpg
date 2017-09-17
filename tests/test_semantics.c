@@ -238,6 +238,24 @@ void test_semantics(void)
             "    case boolean.false: s\n",
             std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
     }
+
+    /*compile-time evaluated match*/
+    {
+        instruction const expected_body_elements[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, NULL),
+                type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_string_ref(unicode_view_from_c_str("a")),
+                type_from_string_ref()))};
+        check_single_wellformed_function(
+            "let s = boolean.true\n"
+            "match s\n"
+            "    case boolean.true: \"a\"\n"
+            "    case boolean.false: \"b\"\n",
+            std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
+    }
+
     test_let_assignments(&std_library);
     test_functions(&std_library);
     test_assert(&std_library);
