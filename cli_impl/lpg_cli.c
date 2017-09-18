@@ -299,7 +299,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     standard_library_description const standard_library =
         describe_standard_library();
 
-    value globals_values[16];
+    value globals_values[17];
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
 
     for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)

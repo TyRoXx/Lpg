@@ -106,6 +106,18 @@ value integer_equals_impl(value const *const inferred,
     return value_from_enum_element(integer_equal(left, right), NULL);
 }
 
+value integer_less_impl(value const *const inferred,
+                        value const *const arguments,
+                        garbage_collector *const gc, void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    (void)gc;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
+    return value_from_enum_element(integer_less(left, right), NULL);
+}
+
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
@@ -187,6 +199,14 @@ standard_library_description describe_standard_library(void)
         stable->integer_equals =
             function_pointer_create(boolean, tuple_type_create(parameters, 2));
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_integer_range(
+            integer_range_create(integer_create(0, 0), integer_max()));
+        parameters[1] = parameters[0];
+        stable->integer_less =
+            function_pointer_create(boolean, tuple_type_create(parameters, 2));
+    }
     stable->read = function_pointer_create(
         type_from_string_ref(), tuple_type_create(NULL, 0));
 
@@ -260,19 +280,25 @@ standard_library_description describe_standard_library(void)
             function_pointer_value_from_external(integer_equals_impl, NULL))));
 
     globals[13] = structure_member_create(
+        type_from_function_pointer(&stable->integer_equals),
+        unicode_string_from_c_str("integer-less"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_less_impl, NULL))));
+
+    globals[14] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("unit"),
         optional_value_create(value_from_type(type_from_unit())));
 
-    globals[14] = structure_member_create(
+    globals[15] = structure_member_create(
         type_from_unit(), unicode_string_from_c_str("unit_value"),
         optional_value_create(value_from_unit()));
 
-    globals[15] = structure_member_create(
+    globals[16] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("option"),
         optional_value_create(
             value_from_type(type_from_enumeration(&stable->option))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 16);
+    LPG_STATIC_ASSERT(standard_library_element_count == 17);
 
     standard_library_description result = {
         structure_create(globals, standard_library_element_count), stable};

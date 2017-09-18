@@ -101,7 +101,10 @@ static void expect_output(char const *source, char const *input,
             function_pointer_value_from_external(int_impl, &environment)),
         /*integer-equals*/ value_from_function_pointer(
             function_pointer_value_from_external(
-                integer_equals_impl, &environment))};
+                integer_equals_impl, &environment)),
+        /*integer-less*/ value_from_function_pointer(
+            function_pointer_value_from_external(
+                integer_less_impl, &environment))};
     sequence root = parse(source);
     checked_program checked =
         check(root, global_object, expect_no_errors, NULL);
@@ -214,6 +217,13 @@ void test_interpreter(void)
                   "        boolean.true\n"
                   ")\n",
                   "", "jup", std_library.globals);
+
+    /* Integer less and greater than */
+    expect_output("let small = 20\n"
+                  "let big = 100\n"
+                  "assert(integer-less(small, big))\n"
+                  "assert(not(integer-less(big, small)))\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
