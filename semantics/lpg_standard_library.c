@@ -280,23 +280,23 @@ standard_library_description describe_standard_library(void)
             function_pointer_value_from_external(integer_equals_impl, NULL))));
 
     globals[13] = structure_member_create(
+        type_from_type(), unicode_string_from_c_str("unit"),
+        optional_value_create(value_from_type(type_from_unit())));
+
+    globals[14] = structure_member_create(
+        type_from_unit(), unicode_string_from_c_str("unit_value"),
+        optional_value_create(value_from_unit()));
+
+    globals[15] = structure_member_create(
+        type_from_type(), unicode_string_from_c_str("option"),
+        optional_value_create(
+            value_from_type(type_from_enumeration(&stable->option))));
+
+    globals[16] = structure_member_create(
         type_from_function_pointer(&stable->integer_equals),
         unicode_string_from_c_str("integer-less"),
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_less_impl, NULL))));
-
-    globals[14] = structure_member_create(
-        type_from_type(), unicode_string_from_c_str("unit"),
-        optional_value_create(value_from_type(type_from_unit())));
-
-    globals[15] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("unit_value"),
-        optional_value_create(value_from_unit()));
-
-    globals[16] = structure_member_create(
-        type_from_type(), unicode_string_from_c_str("option"),
-        optional_value_create(
-            value_from_type(type_from_enumeration(&stable->option))));
 
     LPG_STATIC_ASSERT(standard_library_element_count == 17);
 
