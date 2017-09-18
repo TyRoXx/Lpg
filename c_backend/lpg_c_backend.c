@@ -1220,8 +1220,6 @@ success_indicator generate_c(checked_program const program,
                              enumeration const *const boolean,
                              stream_writer const c_output)
 {
-    (void)boolean;
-
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer =
         memory_writer_erase(&program_defined);

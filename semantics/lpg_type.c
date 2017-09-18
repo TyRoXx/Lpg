@@ -214,7 +214,6 @@ bool type_equals(type const left, type const right)
 
 type type_clone(type const original, garbage_collector *const clone_gc)
 {
-    (void)clone_gc;
     switch (original.kind)
     {
     case type_kind_structure:
