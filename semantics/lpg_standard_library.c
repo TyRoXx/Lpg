@@ -16,6 +16,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->read);
     function_pointer_free(&stable->int_);
     function_pointer_free(&stable->integer_equals);
+    function_pointer_free(&stable->integer_less);
     enumeration_free(&stable->option);
 }
 
@@ -106,6 +107,18 @@ value integer_equals_impl(value const *const inferred,
     return value_from_enum_element(integer_equal(left, right), NULL);
 }
 
+value integer_less_impl(value const *const inferred,
+                        value const *const arguments,
+                        garbage_collector *const gc, void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    (void)gc;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
+    return value_from_enum_element(integer_less(left, right), NULL);
+}
+
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
@@ -185,6 +198,14 @@ standard_library_description describe_standard_library(void)
             integer_range_create(integer_create(0, 0), integer_max()));
         parameters[1] = parameters[0];
         stable->integer_equals =
+            function_pointer_create(boolean, tuple_type_create(parameters, 2));
+    }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_integer_range(
+            integer_range_create(integer_create(0, 0), integer_max()));
+        parameters[1] = parameters[0];
+        stable->integer_less =
             function_pointer_create(boolean, tuple_type_create(parameters, 2));
     }
     stable->read = function_pointer_create(
@@ -272,7 +293,13 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_type(type_from_enumeration(&stable->option))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 16);
+    globals[16] = structure_member_create(
+        type_from_function_pointer(&stable->integer_equals),
+        unicode_string_from_c_str("integer-less"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_less_impl, NULL))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 17);
 
     standard_library_description result = {
         structure_create(globals, standard_library_element_count), stable};

@@ -24,6 +24,10 @@ value integer_equals_impl(value const *const inferred,
                           value const *const arguments,
                           garbage_collector *const gc, void *environment);
 
+value integer_less_impl(value const *const inferred,
+                        value const *const arguments,
+                        garbage_collector *const gc, void *environment);
+
 typedef struct standard_library_stable
 {
     enumeration boolean;
@@ -38,11 +42,12 @@ typedef struct standard_library_stable
     function_pointer read;
     function_pointer int_;
     function_pointer integer_equals;
+    function_pointer integer_less;
 } standard_library_stable;
 
 enum
 {
-    standard_library_element_count = 16
+    standard_library_element_count = 17
 };
 
 typedef struct standard_library_description
