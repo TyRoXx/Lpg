@@ -16,6 +16,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->read);
     function_pointer_free(&stable->int_);
     function_pointer_free(&stable->integer_equals);
+    function_pointer_free(&stable->integer_less);
     enumeration_free(&stable->option);
 }
 
