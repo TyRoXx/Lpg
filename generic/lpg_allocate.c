@@ -1,8 +1,6 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_arithmetic.h"
-#include <stdlib.h>
-#include <assert.h>
 #include <string.h>
 
 static size_t total_allocations = 0;

@@ -2,7 +2,6 @@
 #include "test.h"
 #include "lpg_cli.h"
 #include "lpg_array_size.h"
-#include "lpg_unicode_string.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
 #include <string.h>

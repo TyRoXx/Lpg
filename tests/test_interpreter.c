@@ -2,11 +2,8 @@
 #include "test.h"
 #include "lpg_interpret.h"
 #include "lpg_stream_writer.h"
-#include "lpg_assert.h"
 #include "handle_parse_error.h"
-#include "lpg_find_next_token.h"
 #include "lpg_check.h"
-#include "lpg_structure_member.h"
 #include "lpg_standard_library.h"
 #include <string.h>
 

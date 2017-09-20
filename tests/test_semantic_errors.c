@@ -1,15 +1,11 @@
 #include "test_semantic_errors.h"
 #include "test.h"
 #include "lpg_check.h"
-#include "lpg_parse_expression.h"
 #include "lpg_allocate.h"
 #include <string.h>
 #include "handle_parse_error.h"
-#include "lpg_find_next_token.h"
 #include "lpg_instruction.h"
-#include "lpg_structure_member.h"
 #include "lpg_standard_library.h"
-#include "lpg_assert.h"
 
 static sequence parse(char const *input)
 {

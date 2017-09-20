@@ -1,7 +1,6 @@
 #include "test_tokenize.h"
 #include "test.h"
 #include "lpg_tokenize.h"
-#include "lpg_unicode_string.h"
 
 static void test_single_token(token_type expected_token, size_t expected_size,
                               char const *input)

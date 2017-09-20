@@ -6,7 +6,6 @@
 #include "lpg_save_expression.h"
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 
 static void testing_comment_expressions();
 
