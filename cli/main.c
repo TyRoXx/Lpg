@@ -1,5 +1,4 @@
 #include "lpg_cli.h"
-#include "lpg_stream_writer.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
