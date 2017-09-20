@@ -31,6 +31,8 @@ typedef struct test_environment
     unicode_view read_input;
 } test_environment;
 
+static void test_captures(const standard_library_description *std_library);
+
 static value print(value const *const inferred, value const *const arguments,
                    garbage_collector *const gc, void *environment)
 {
@@ -223,10 +225,16 @@ void test_interpreter(void)
                   "assert(not(integer-less(big, small)))\n",
                   "", "", std_library.globals);
 
+    test_captures(&std_library);
+
+    standard_library_description_free(&std_library);
+}
+
+static void test_captures(const standard_library_description *std_library) {
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
                   "f()\n",
-                  "", "hallo", std_library.globals);
+                  "", "hallo", (*std_library).globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
@@ -235,7 +243,7 @@ void test_interpreter(void)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yy", std_library.globals);
+                  "", "yy", (*std_library).globals);
 
     /*re-capture a captured runtime variable*/
     expect_output("let m = read()\n"
@@ -244,7 +252,7 @@ void test_interpreter(void)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "y", "yy", std_library.globals);
+                  "y", "yy", (*std_library).globals);
 
     /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
@@ -256,7 +264,7 @@ void test_interpreter(void)
                   "        print(n)\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yzzy", std_library.globals);
+                  "", "yzzy", (*std_library).globals);
 
     /*use a captured variable in a compile-time context*/
     expect_output("let m = boolean\n"
@@ -264,13 +272,11 @@ void test_interpreter(void)
                   "    let a : m = boolean.true\n"
                   "    a\n"
                   "assert(f())\n",
-                  "", "", std_library.globals);
+                  "", "", (*std_library).globals);
 
     /*capture an argument*/
     expect_output("let f = (a: boolean)\n"
                   "    () a\n"
                   "assert(f(boolean.true)())\n",
-                  "", "", std_library.globals);
-
-    standard_library_description_free(&std_library);
+                  "", "", (*std_library).globals);
 }
