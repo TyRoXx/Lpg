@@ -2,6 +2,8 @@
 #include "test.h"
 #include "lpg_value.h"
 
+static void test_integer_comparison(void);
+
 void test_value(void)
 {
     REQUIRE(!value_equals(
@@ -27,4 +29,20 @@ void test_value(void)
     }
     REQUIRE(!value_equals(
         value_from_enum_element(0, NULL), value_from_enum_element(1, NULL)));
+
+    test_integer_comparison();
+}
+
+static void test_integer_comparison(void)
+{
+    value small = value_from_integer(integer_create(10, 200));
+    value small2 = value_from_integer(integer_create(10, 200));
+    value big = value_from_integer(integer_create(302, 970));
+
+    REQUIRE(value_less_than(small, big));
+    REQUIRE(value_greater_than(big, small));
+
+    REQUIRE(value_equals(small, small2));
+    REQUIRE(!value_less_than(small, small2));
+    REQUIRE(!value_greater_than(small, small2));
 }
