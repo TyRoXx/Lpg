@@ -238,5 +238,11 @@ void test_c_backend(void)
                            ")\n",
                            std_library, "21_match.c");
 
+    check_generated_c_code("let f = ()\n"
+                           "    print(\"\")\n"
+                           "    boolean.true\n"
+                           "assert({boolean.false, f()}.1)\n",
+                           std_library, "22_tuple.c");
+
     standard_library_description_free(&std_library);
 }

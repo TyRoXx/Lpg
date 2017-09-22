@@ -200,7 +200,25 @@ static instruction clone_instruction(instruction const original,
             type_clone(original.literal.type_of, clone_gc)));
 
     case instruction_tuple:
-        LPG_TO_DO();
+    {
+        register_id *const elements =
+            allocate_array(original.tuple_.element_count, sizeof(*elements));
+        if (original.tuple_.element_count > 0)
+        {
+            memcpy(elements, original.tuple_.elements,
+                   original.tuple_.element_count * sizeof(*elements));
+        }
+        tuple_type const cloned_type = {
+            allocate_array(original.tuple_.result_type.length,
+                           sizeof(*cloned_type.elements)),
+            original.tuple_.result_type.length};
+        memcpy(cloned_type.elements, original.tuple_.result_type.elements,
+               (sizeof(*cloned_type.elements) *
+                original.tuple_.result_type.length));
+        return instruction_create_tuple(
+            tuple_instruction_create(elements, original.tuple_.element_count,
+                                     original.tuple_.result, cloned_type));
+    }
 
     case instruction_enum_construct:
         return original;

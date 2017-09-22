@@ -467,6 +467,9 @@ static void test_functions(const standard_library_description *std_library)
         register_id *values = allocate_array(2, sizeof(*values));
         values[0] = 0;
         values[1] = 1;
+        type tuple_element_types[2] = {
+            type_from_enumeration(&std_library->stable->boolean),
+            type_from_enumeration(&std_library->stable->boolean)};
         instruction const expected_main_function[] = {
             instruction_create_literal(literal_instruction_create(
                 values[0], value_from_enum_element(0, NULL),
@@ -474,7 +477,9 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(
                 values[1], value_from_enum_element(1, NULL),
                 type_from_enumeration(&std_library->stable->boolean))),
-            instruction_create_tuple(tuple_instruction_create(values, 2, 2)),
+            instruction_create_tuple(tuple_instruction_create(
+                values, 2, 2,
+                tuple_type_create(LPG_COPY_ARRAY(tuple_element_types)))),
             instruction_create_read_struct(
                 read_struct_instruction_create(2, 1, 3)),
             instruction_create_literal(literal_instruction_create(

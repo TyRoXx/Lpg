@@ -229,16 +229,30 @@ static success_indicator encode_string_literal(unicode_view const content,
     return success;
 }
 
+static success_indicator generate_integer(integer const value,
+                                          stream_writer const c_output)
+{
+    char buffer[64];
+    char const *const formatted =
+        integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer));
+    LPG_TRY(stream_writer_write_bytes(
+        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+    return success;
+}
+
 static success_indicator generate_register_name(register_id const id,
                                                 stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "r_"));
-    char buffer[64];
-    char const *const formatted = integer_format(
-        integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
-    LPG_TRY(stream_writer_write_bytes(
-        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-    return success;
+    return generate_integer(integer_create(0, id), c_output);
+}
+
+static success_indicator
+generate_tuple_element_name(struct_member_id const element,
+                            stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "e_"));
+    return generate_integer(integer_create(0, element), c_output);
 }
 
 static success_indicator generate_function_name(function_id const id,
@@ -279,6 +293,16 @@ static unicode_string make_type_definition_name(size_t const index)
     memcpy(name.data, prefix, strlen(prefix));
     memcpy(name.data + strlen(prefix), formatted, index_length);
     return name;
+}
+
+static success_indicator indent(size_t const indentation,
+                                stream_writer const c_output)
+{
+    for (size_t i = 0; i < indentation; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(c_output, "    "));
+    }
+    return success;
 }
 
 static success_indicator
@@ -357,6 +381,57 @@ generate_type(type const generated,
         return stream_writer_write_string(c_output, "size_t");
 
     case type_kind_tuple:
+    {
+        unicode_string const *const existing_definition =
+            find_type_definition(*definitions, generated);
+        if (existing_definition)
+        {
+            return stream_writer_write_unicode_view(
+                c_output, unicode_view_from_string(*existing_definition));
+        }
+        memory_writer definition_buffer = {NULL, 0, 0};
+        stream_writer definition_writer =
+            memory_writer_erase(&definition_buffer);
+        size_t const definition_index = definitions->count;
+        ++(definitions->count);
+        unicode_string name = make_type_definition_name(definition_index);
+        definitions->elements =
+            reallocate_array(definitions->elements, (definitions->count + 1),
+                             sizeof(*definitions->elements));
+        {
+            type_definition *const new_definition =
+                definitions->elements + definition_index;
+            new_definition->what = generated;
+            new_definition->name = name;
+        }
+        LPG_TRY(
+            stream_writer_write_string(definition_writer, "typedef struct "));
+        LPG_TRY(generate_type(
+            generated, standard_library, definitions, definition_writer));
+        LPG_TRY(stream_writer_write_string(definition_writer, "\n"));
+        LPG_TRY(stream_writer_write_string(definition_writer, "{\n"));
+        for (struct_member_id i = 0; i < generated.tuple_.length; ++i)
+        {
+            LPG_TRY(indent(1, definition_writer));
+            LPG_TRY(generate_type(generated.tuple_.elements[i],
+                                  standard_library, definitions,
+                                  definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, " "));
+            LPG_TRY(generate_tuple_element_name(i, definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
+        }
+        LPG_TRY(stream_writer_write_string(definition_writer, "} "));
+        LPG_TRY(generate_type(
+            generated, standard_library, definitions, definition_writer));
+        LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
+        type_definition *const new_definition =
+            definitions->elements + definition_index;
+        new_definition->definition.data = definition_buffer.data;
+        new_definition->definition.length = definition_buffer.used;
+        return stream_writer_write_unicode_view(
+            c_output, unicode_view_from_string(name));
+    }
+
     case type_kind_type:
         LPG_TO_DO();
 
@@ -673,16 +748,6 @@ generate_sequence(c_backend_state *state,
                   instruction_sequence const sequence, size_t const indentation,
                   stream_writer const c_output);
 
-static success_indicator indent(size_t const indentation,
-                                stream_writer const c_output)
-{
-    for (size_t i = 0; i < indentation; ++i)
-    {
-        LPG_TRY(stream_writer_write_string(c_output, "    "));
-    }
-    return success;
-}
-
 static function_pointer signature_of(LPG_NON_NULL(c_backend_state *const state),
                                      function_pointer_value const pointer)
 {
@@ -990,7 +1055,52 @@ static success_indicator generate_instruction(
             }
 
         case register_meaning_variable:
-            LPG_TO_DO();
+        {
+            type const object_type =
+                state->registers[input.read_struct.from_object].type_of;
+            switch (object_type.kind)
+            {
+            case type_kind_structure:
+                LPG_TO_DO();
+
+            case type_kind_function_pointer:
+            case type_kind_unit:
+            case type_kind_string_ref:
+            case type_kind_enumeration:
+                LPG_UNREACHABLE();
+
+            case type_kind_tuple:
+            {
+                type const element_type =
+                    object_type.tuple_.elements[input.read_struct.member];
+                set_register_variable(
+                    state, input.read_struct.into,
+                    find_register_resource_ownership(element_type),
+                    element_type);
+                LPG_TRY(indent(indentation, c_output));
+                LPG_TRY(generate_type(element_type, &state->standard_library,
+                                      state->definitions, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " const "));
+                LPG_TRY(
+                    generate_register_name(input.read_struct.into, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_register_name(
+                    input.read_struct.from_object, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, "."));
+                LPG_TRY(generate_tuple_element_name(
+                    input.read_struct.member, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+                return success;
+            }
+
+            case type_kind_type:
+            case type_kind_integer_range:
+            case type_kind_inferred:
+            case type_kind_enum_constructor:
+                LPG_UNREACHABLE();
+            }
+            LPG_UNREACHABLE();
+        }
 
         case register_meaning_print:
         case register_meaning_read:
@@ -1017,6 +1127,31 @@ static success_indicator generate_instruction(
         return success;
 
     case instruction_tuple:
+    {
+        set_register_variable(
+            state, input.tuple_.result,
+            /*TODO support owned resources*/ register_resource_ownership_none,
+            type_from_tuple_type(input.tuple_.result_type));
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(generate_type(type_from_tuple_type(input.tuple_.result_type),
+                              &state->standard_library, state->definitions,
+                              c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " const "));
+        LPG_TRY(generate_register_name(input.tuple_.result, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = {"));
+        for (size_t i = 0; i < input.tuple_.element_count; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", "));
+            }
+            LPG_TRY(generate_c_read_access(
+                state, input.tuple_.elements[i], c_output));
+        }
+        LPG_TRY(stream_writer_write_string(c_output, "};\n"));
+        return success;
+    }
+
     case instruction_enum_construct:
         LPG_TO_DO();
 

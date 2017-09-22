@@ -1388,10 +1388,15 @@ evaluate_expression(function_checking_state *state,
     {
         register_id *registers =
             allocate_array(element.tuple.length, sizeof(*registers));
-        tuple_type tt = {garbage_collector_allocate_array(
-                             &state->program->memory, element.tuple.length,
-                             sizeof(*tt.elements)),
-                         element.tuple.length};
+        tuple_type const tuple_type_for_instruction = {
+            allocate_array(element.tuple.length,
+                           sizeof(*tuple_type_for_instruction.elements)),
+            element.tuple.length};
+        tuple_type const tuple_type_for_result = {
+            garbage_collector_allocate_array(
+                &state->program->memory, element.tuple.length,
+                sizeof(*tuple_type_for_instruction.elements)),
+            element.tuple.length};
         for (size_t i = 0; i < element.tuple.length; ++i)
         {
             evaluate_expression_result result =
@@ -1402,16 +1407,18 @@ evaluate_expression(function_checking_state *state,
                 return evaluate_expression_result_empty;
             }
             registers[i] = result.where;
-            tt.elements[i] = result.type_;
+            tuple_type_for_instruction.elements[i] = result.type_;
+            tuple_type_for_result.elements[i] = result.type_;
         }
         register_id result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_tuple(tuple_instruction_create(
-                          registers, element.tuple.length, result_register)));
+                          registers, element.tuple.length, result_register,
+                          tuple_type_for_instruction)));
 
-        return evaluate_expression_result_create(true, result_register,
-                                                 type_from_tuple_type(tt),
-                                                 optional_value_empty, false);
+        return evaluate_expression_result_create(
+            true, result_register, type_from_tuple_type(tuple_type_for_result),
+            optional_value_empty, false);
     }
     }
     LPG_UNREACHABLE();

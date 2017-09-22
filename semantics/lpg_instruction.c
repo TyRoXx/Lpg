@@ -5,9 +5,11 @@
 
 tuple_instruction tuple_instruction_create(register_id *elements,
                                            size_t element_count,
-                                           register_id result)
+                                           register_id result,
+                                           tuple_type result_type)
 {
-    tuple_instruction tuple_instruction1 = {elements, element_count, result};
+    tuple_instruction tuple_instruction1 = {
+        elements, element_count, result, result_type};
     return tuple_instruction1;
 }
 
@@ -212,6 +214,7 @@ void instruction_free(instruction const *value)
 
     case instruction_tuple:
         deallocate(value->tuple_.elements);
+        deallocate(value->tuple_.result_type.elements);
         break;
 
     case instruction_enum_construct:

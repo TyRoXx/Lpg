@@ -26,11 +26,13 @@ typedef struct tuple_instruction
     register_id *elements;
     size_t element_count;
     register_id result;
+    tuple_type result_type;
 } tuple_instruction;
 
 tuple_instruction tuple_instruction_create(register_id *elements,
                                            size_t element_count,
-                                           register_id result);
+                                           register_id result,
+                                           tuple_type result_type);
 
 typedef struct call_instruction
 {
