@@ -565,10 +565,10 @@ static expression_parser_result parse_callable(expression_parser *parser,
         }
 
         case token_right_curly_brace:
+        case token_right_parenthesis:
         case token_newline:
         case token_space:
         case token_indentation:
-        case token_right_parenthesis:
         case token_colon:
         case token_comma:
         case token_assign:
@@ -577,6 +577,13 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_case:
         case token_dot:
         case token_let:
+        case token_greater_than:
+        case token_greater_than_or_equals:
+        case token_less_than:
+        case token_less_than_or_equals:
+        case token_not:
+        case token_not_equals:
+        case token_equals:
             pop(parser);
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),

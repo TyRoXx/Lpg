@@ -5,6 +5,13 @@
 #include "lpg_stream_writer.h"
 #include "lpg_string_literal.h"
 
+static tokenize_result tokenize_space(const char *input, size_t length);
+static tokenize_result tokenize_identifier(const char *input, size_t length);
+static tokenize_result tokenize_equal_signs(const char *input, size_t length);
+static tokenize_result tokenize_less_than(const char *input, size_t length);
+static tokenize_result tokenize_less_greater(const char *input, size_t length);
+static tokenize_result tokenize_not(const char *input, size_t length);
+
 static tokenize_result make_success(enum token_type token, size_t length)
 {
     tokenize_result const result = {tokenize_success, token, length};
@@ -52,21 +59,7 @@ tokenize_result tokenize(char const *input, size_t length)
     ASSUME(length > 0);
     if (*input == ' ')
     {
-        if (length >= spaces_for_indentation)
-        {
-            size_t i = 1;
-            while ((i < length) && (input[i] == ' '))
-            {
-                ++i;
-            }
-            if (i < spaces_for_indentation)
-            {
-                return make_success(token_space, 1);
-            }
-            return make_success(
-                token_indentation, (i - (i % spaces_for_indentation)));
-        }
-        return make_success(token_space, 1);
+        return tokenize_space(input, length);
     }
     if (*input == '/')
     {
@@ -110,36 +103,7 @@ tokenize_result tokenize(char const *input, size_t length)
     }
     if (is_identifier_begin(*input))
     {
-        size_t i;
-        for (i = 1; (i < length) && is_identifier_middle(input[i]); ++i)
-        {
-        }
-        unicode_view const content = unicode_view_create(input, i);
-        if (unicode_view_equals_c_str(content, "case"))
-        {
-            return make_success(token_case, content.length);
-        }
-        if (unicode_view_equals_c_str(content, "break"))
-        {
-            return make_success(token_break, content.length);
-        }
-        if (unicode_view_equals_c_str(content, "loop"))
-        {
-            return make_success(token_loop, content.length);
-        }
-        if (unicode_view_equals_c_str(content, "match"))
-        {
-            return make_success(token_match, content.length);
-        }
-        if (unicode_view_equals_c_str(content, "return"))
-        {
-            return make_success(token_return, content.length);
-        }
-        if (unicode_view_equals_c_str(content, "let"))
-        {
-            return make_success(token_let, content.length);
-        }
-        return make_success(token_identifier, i);
+        return tokenize_identifier(input, length);
     }
     if (is_digit(*input))
     {
@@ -188,11 +152,15 @@ tokenize_result tokenize(char const *input, size_t length)
         return make_success(token_dot, 1);
 
     case '=':
-        if ((length >= 2) && (input[1] == '>'))
-        {
-            return make_success(token_fat_arrow, 2);
-        }
-        return make_success(token_assign, 1);
+        return tokenize_equal_signs(input, length);
+
+    case '!':
+        return tokenize_not(input, length);
+
+    case '<':
+        return tokenize_less_than(input, length);
+    case '>':
+        return tokenize_less_greater(input, length);
 
     case '"':
     {
@@ -212,4 +180,124 @@ tokenize_result tokenize(char const *input, size_t length)
     }
     tokenize_result const result = {tokenize_invalid, token_space, 1};
     return result;
+}
+
+static tokenize_result tokenize_not(const char *input, size_t length)
+{
+    if (length < 2)
+    {
+        return make_success(token_not, 1);
+    }
+    char second = input[1];
+    switch (second)
+    {
+    case '=':
+        return make_success(token_not_equals, 2);
+    default:
+        return make_success(token_not, 1);
+    }
+}
+
+static tokenize_result tokenize_less_than(const char *input, size_t length)
+{
+    if (length < 2)
+    {
+        return make_success(token_less_than, 1);
+    }
+    char second = input[1];
+    switch (second)
+    {
+    case '=':
+        return make_success(token_less_than_or_equals, 2);
+    default:
+        return make_success(token_less_than, 1);
+    }
+}
+
+static tokenize_result tokenize_less_greater(const char *input, size_t length)
+{
+    if (length < 2)
+    {
+        return make_success(token_greater_than, 1);
+    }
+    char second = input[1];
+    switch (second)
+    {
+    case '=':
+        return make_success(token_greater_than_or_equals, 2);
+    default:
+        return make_success(token_greater_than, 1);
+    }
+}
+
+static tokenize_result tokenize_identifier(const char *input, size_t length)
+{
+    size_t i;
+
+    for (i = 1; (i < length) && is_identifier_middle(input[i]); ++i)
+    {
+    }
+
+    unicode_view const content = unicode_view_create(input, i);
+    if (unicode_view_equals_c_str(content, "case"))
+    {
+        return make_success(token_case, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "break"))
+    {
+        return make_success(token_break, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "loop"))
+    {
+        return make_success(token_loop, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "match"))
+    {
+        return make_success(token_match, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "return"))
+    {
+        return make_success(token_return, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "let"))
+    {
+        return make_success(token_let, content.length);
+    }
+    return make_success(token_identifier, i);
+}
+
+static tokenize_result tokenize_space(const char *input, size_t length)
+{
+    if (length >= spaces_for_indentation)
+    {
+        size_t i = 1;
+        while ((i < length) && (input[i] == ' '))
+        {
+            ++i;
+        }
+        if (i < spaces_for_indentation)
+        {
+            return make_success(token_space, 1);
+        }
+        return make_success(
+            token_indentation, (i - (i % spaces_for_indentation)));
+    }
+    return make_success(token_space, 1);
+}
+
+static tokenize_result tokenize_equal_signs(const char *input, size_t length)
+{
+    if (length < 2)
+    {
+        return make_success(token_assign, 1);
+    }
+    char second = input[1];
+    switch (second)
+    {
+    case '>':
+        return make_success(token_fat_arrow, 2);
+    case '=':
+        return make_success(token_equals, 2);
+    }
+    return make_success(token_assign, 1);
 }
