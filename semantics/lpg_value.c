@@ -154,7 +154,7 @@ bool value_equals(value const left, value const right)
         LPG_TO_DO();
 
     case value_kind_type:
-        LPG_TO_DO();
+        return type_equals(left.type_, right.type_);
 
     case value_kind_enum_element:
     {
@@ -193,6 +193,35 @@ bool value_equals(value const left, value const right)
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
+}
+
+bool value_less_than(value const left, value const right)
+{
+    if (left.kind != right.kind)
+    {
+        return false;
+    }
+    switch (left.kind)
+    {
+    case value_kind_integer:
+        return integer_less(left.integer_, right.integer_);
+    case value_kind_string:
+        return unicode_view_less(left.string_ref, right.string_ref);
+    case value_kind_function_pointer:
+    case value_kind_flat_object:
+    case value_kind_type:
+    case value_kind_enum_element:
+    case value_kind_unit:
+    case value_kind_tuple:
+    case value_kind_enum_constructor:
+        LPG_TO_DO();
+    }
+    LPG_UNREACHABLE();
+}
+
+bool value_greater_than(value const left, value const right)
+{
+    return !(value_less_than(left, right) || value_equals(left, right));
 }
 
 optional_value optional_value_create(value v)
