@@ -442,6 +442,70 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
     }
 }
 
+static expression_parser_result parse_tuple(expression_parser *const parser,
+                                            size_t const indentation)
+{
+    rich_token next = peek(parser);
+    if (next.token == token_right_curly_brace)
+    {
+        expression_parser_result const parser_result = {
+            true, expression_from_tuple(tuple_create(NULL, 0))};
+        return parser_result;
+    }
+
+    size_t element_count = 0;
+    bool more_elements = true;
+    expression *tuple_elements = allocate_array(0, sizeof(*tuple_elements));
+    while (next.token != token_right_curly_brace)
+    {
+        if (next.token == token_comma)
+        {
+            more_elements = true;
+            pop(parser);
+            next = peek(parser);
+            if (next.token == token_comma)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_comma, next.where),
+                    parser->user);
+                return expression_parser_result_failure;
+            }
+            if (next.token == token_space)
+            {
+                pop(parser);
+            }
+            else
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, next.where),
+                    parser->user);
+                return expression_parser_result_failure;
+            }
+        }
+        expression_parser_result parser_result =
+            parse_expression(parser, indentation, false);
+        if (parser_result.is_success && more_elements)
+        {
+            /*TODO: avoid O(N^2)*/
+            tuple_elements = reallocate_array(
+                tuple_elements, element_count + 1, sizeof(*tuple_elements));
+            tuple_elements[element_count] = parser_result.success;
+            element_count++;
+            more_elements = false;
+        }
+        else
+        {
+            return parser_result;
+        }
+        next = peek(parser);
+    }
+    pop(parser);
+    expression_parser_result const tuple_result = {
+        true,
+        expression_from_tuple(tuple_create(tuple_elements, element_count))};
+    return tuple_result;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser,
                                                size_t indentation)
 {
@@ -563,7 +627,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
                           tuple_create(tuple_elements, element_count))};
             return tuple_result;
         }
-
         case token_right_curly_brace:
         case token_right_parenthesis:
         case token_newline:
