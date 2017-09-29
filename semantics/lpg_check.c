@@ -43,7 +43,7 @@ static evaluate_expression_result const evaluate_expression_result_empty = {
     false,
     0,
     {type_kind_type, {NULL}},
-    {false, {value_kind_integer, {{0, 0}}}},
+    {false, {value_kind_integer, {NULL}}},
     false};
 
 typedef struct_member_id capture_index;
@@ -763,13 +763,6 @@ typedef struct optional_checked_function
     bool is_set;
     checked_function value;
 } optional_checked_function;
-
-static optional_checked_function
-optional_checked_function_create(checked_function const value)
-{
-    optional_checked_function result = {true, value};
-    return result;
-}
 
 static optional_checked_function const optional_checked_function_empty = {
     false, {0, NULL, {NULL, 0}, 0}};

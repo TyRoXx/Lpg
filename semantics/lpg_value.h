@@ -65,10 +65,10 @@ typedef struct value
     value_kind kind;
     union
     {
+        struct value const *flat_object;
         integer integer_;
         unicode_view string_ref;
         function_pointer_value function_pointer;
-        struct value const *flat_object;
         type type_;
         enum_element_value enum_element;
         value_tuple tuple_;
@@ -96,4 +96,4 @@ typedef struct optional_value
 optional_value optional_value_create(value v);
 
 static optional_value const optional_value_empty = {
-    false, {value_kind_integer, {{0, 0}}}};
+    false, {value_kind_integer, {NULL}}};
