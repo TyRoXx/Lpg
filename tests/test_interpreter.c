@@ -230,6 +230,16 @@ void test_interpreter(void)
                   "f()\n",
                   "", "hallo", std_library.globals);
 
+    /*re-capture a captured variable*/
+    expect_output("let m = \"y\"\n"
+                  "let f = ()\n"
+                  "    print(m)\n"
+                  "    ()\n"
+                  "        print(m)\n"
+                  "f()()\n",
+                  "", "yy", std_library.globals);
+
+    /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
                   "let f = ()\n"
                   "    let n = \"z\"\n"
@@ -240,6 +250,14 @@ void test_interpreter(void)
                   "        print(m)\n"
                   "f()()\n",
                   "", "yzzy", std_library.globals);
+
+    /*use a captured variable in a compile-time context*/
+    expect_output("let m = boolean\n"
+                  "let f = ()\n"
+                  "    let a : m = boolean.true\n"
+                  "    a\n"
+                  "assert(f())\n",
+                  "", "", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
