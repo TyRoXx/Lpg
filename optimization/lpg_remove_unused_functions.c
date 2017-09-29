@@ -68,6 +68,14 @@ mark_used_functions_in_sequence(instruction_sequence const sequence,
                     all_functions);
             }
             break;
+
+        case instruction_get_captures:
+            break;
+
+        case instruction_lambda_with_captures:
+            mark_function(used_functions, all_functions,
+                          current_instruction.lambda_with_captures.lambda);
+            break;
         }
     }
 }
@@ -120,8 +128,18 @@ static value adapt_value(value const from, garbage_collector *const clone_gc,
     }
 
     case value_kind_function_pointer:
+    {
+        value *const captures = garbage_collector_allocate_array(
+            clone_gc, from.function_pointer.capture_count, sizeof(*captures));
+        for (size_t i = 0; i < from.function_pointer.capture_count; ++i)
+        {
+            captures[i] = adapt_value(
+                from.function_pointer.captures[i], clone_gc, new_function_ids);
+        }
         return value_from_function_pointer(function_pointer_value_from_internal(
-            new_function_ids[from.function_pointer.code]));
+            new_function_ids[from.function_pointer.code], captures,
+            from.function_pointer.capture_count));
+    }
 
     case value_kind_flat_object:
     case value_kind_type:
@@ -240,6 +258,12 @@ static instruction clone_instruction(instruction const original,
             original.match.result,
             type_clone(original.match.result_type, clone_gc)));
     }
+
+    case instruction_get_captures:
+        return original;
+
+    case instruction_lambda_with_captures:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

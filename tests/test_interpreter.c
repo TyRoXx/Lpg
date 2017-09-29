@@ -225,5 +225,10 @@ void test_interpreter(void)
                   "assert(not(integer-less(big, small)))\n",
                   "", "", std_library.globals);
 
+    expect_output("let m = \"hallo\"\n"
+                  "let f = () print(m)\n"
+                  "f()\n",
+                  "", "hallo", std_library.globals);
+
     standard_library_description_free(&std_library);
 }

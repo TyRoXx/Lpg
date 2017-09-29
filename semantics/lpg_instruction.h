@@ -18,7 +18,9 @@ typedef enum instruction_type
     instruction_literal,
     instruction_tuple,
     instruction_enum_construct,
-    instruction_match
+    instruction_match,
+    instruction_get_captures,
+    instruction_lambda_with_captures
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -107,6 +109,24 @@ void match_instruction_free(match_instruction const *match);
 bool match_instruction_equals(match_instruction const left,
                               match_instruction const right);
 
+typedef struct lambda_with_captures_instruction
+{
+    register_id into;
+    function_id lambda;
+    register_id *captures;
+    size_t capture_count;
+} lambda_with_captures_instruction;
+
+lambda_with_captures_instruction
+lambda_with_captures_instruction_create(register_id into, function_id lambda,
+                                        register_id *captures,
+                                        size_t capture_count);
+void lambda_with_captures_instruction_free(
+    lambda_with_captures_instruction const freed);
+bool lambda_with_captures_instruction_equals(
+    lambda_with_captures_instruction const left,
+    lambda_with_captures_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -120,6 +140,8 @@ struct instruction
         tuple_instruction tuple_;
         enum_construct_instruction enum_construct;
         match_instruction match;
+        register_id captures;
+        lambda_with_captures_instruction lambda_with_captures;
     };
 };
 
@@ -145,6 +167,9 @@ instruction instruction_create_tuple(tuple_instruction argument);
 instruction
 instruction_create_enum_construct(enum_construct_instruction argument);
 instruction instruction_create_match(match_instruction argument);
+instruction instruction_create_get_captures(register_id const into);
+instruction instruction_create_lambda_with_captures(
+    lambda_with_captures_instruction const argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

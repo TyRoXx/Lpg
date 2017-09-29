@@ -46,8 +46,87 @@ static evaluate_expression_result const evaluate_expression_result_empty = {
     {false, {value_kind_integer, {{0, 0}}}},
     false};
 
+typedef struct_member_id capture_index;
+
+typedef struct optional_capture_index
+{
+    bool has_value;
+    capture_index value;
+} optional_capture_index;
+
+static optional_capture_index const optional_capture_index_empty = {false, 0};
+
+static optional_capture_index
+make_optional_capture_index(capture_index const value)
+{
+    optional_capture_index const result = {true, value};
+    return result;
+}
+
+static bool optional_capture_index_equals(optional_capture_index const left,
+                                          optional_capture_index const right)
+{
+    if (left.has_value)
+    {
+        if (right.has_value)
+        {
+            return (left.value == right.value);
+        }
+        return false;
+    }
+    if (right.has_value)
+    {
+        return false;
+    }
+    return true;
+}
+
+typedef struct variable_address
+{
+    optional_capture_index captured_in_current_lambda;
+
+    /*set if captured_in_current_lambda is empty:*/
+    register_id local_address;
+} variable_address;
+
+static variable_address variable_address_from_local(register_id const local)
+{
+    variable_address result = {optional_capture_index_empty, local};
+    return result;
+}
+
+static variable_address
+variable_address_from_capture(capture_index const captured)
+{
+    variable_address result = {{true, captured}, 0};
+    return result;
+}
+
+static bool variable_address_equals(variable_address const left,
+                                    variable_address const right)
+{
+    return optional_capture_index_equals(left.captured_in_current_lambda,
+                                         right.captured_in_current_lambda) &&
+           (left.local_address == right.local_address);
+}
+
+typedef struct capture
+{
+    variable_address from;
+    type what;
+} capture;
+
+static capture capture_create(variable_address const from, type const what)
+{
+    capture const result = {from, what};
+    return result;
+}
+
 typedef struct function_checking_state
 {
+    struct function_checking_state *parent;
+    capture *captures;
+    capture_index capture_count;
     register_id used_registers;
     bool is_in_loop;
     structure const *global;
@@ -55,15 +134,17 @@ typedef struct function_checking_state
     local_variable_container local_variables;
     void *user;
     checked_program *program;
+    instruction_sequence *body;
 } function_checking_state;
 
-static function_checking_state
-function_checking_state_create(structure const *global,
-                               check_error_handler *on_error, void *user,
-                               checked_program *const program)
+static function_checking_state function_checking_state_create(
+    function_checking_state *parent, structure const *global,
+    check_error_handler *on_error, void *user, checked_program *const program,
+    instruction_sequence *const body)
 {
-    function_checking_state result = {
-        0, false, global, on_error, {NULL, 0}, user, program};
+    function_checking_state result = {parent, NULL,    0,        0,
+                                      false,  global,  on_error, {NULL, 0},
+                                      user,   program, body};
     return result;
 }
 
@@ -488,24 +569,114 @@ static size_t expected_call_argument_count(const type callee)
     LPG_UNREACHABLE();
 }
 
-static evaluate_expression_result
-read_variable(function_checking_state *const state,
-              instruction_sequence *const to, unicode_view const name,
-              source_location const where)
+static capture_index
+require_capture(LPG_NON_NULL(function_checking_state *const state),
+                variable_address const captured, type const what)
 {
-    instruction_checkpoint const previous_code =
-        make_checkpoint(&state->used_registers, to);
+    for (capture_index i = 0; i < state->capture_count; ++i)
+    {
+        if (variable_address_equals(state->captures[i].from, captured))
+        {
+            return i;
+        }
+    }
+    capture_index const result = state->capture_count;
+    state->captures = reallocate_array(
+        state->captures, (state->capture_count + 1), sizeof(*state->captures));
+    state->captures[state->capture_count] = capture_create(captured, what);
+    ++(state->capture_count);
+    return result;
+}
 
+typedef struct read_local_variable_result
+{
+    /*if exists, the other members are set*/
+    bool exists;
+    variable_address where;
+    type what;
+    optional_value compile_time_value;
+    bool is_pure;
+} read_local_variable_result;
+
+static read_local_variable_result
+read_local_variable_result_create(variable_address where, type what,
+                                  optional_value compile_time_value,
+                                  bool is_pure)
+{
+    read_local_variable_result result = {
+        true, where, what, compile_time_value, is_pure};
+    return result;
+}
+
+static read_local_variable_result const read_local_variable_result_empty = {
+    false,
+    {{false, 0}, 0},
+    {type_kind_unit, {NULL}},
+    {false, {value_kind_unit, {0}}},
+    false};
+
+static read_local_variable_result
+read_local_variable(LPG_NON_NULL(function_checking_state *const state),
+                    unicode_view const name)
+{
     LPG_FOR(size_t, i, state->local_variables.count)
     {
         local_variable const *const variable =
             state->local_variables.elements + i;
         if (unicode_view_equals(unicode_view_from_string(variable->name), name))
         {
-            return evaluate_expression_result_create(
-                true, variable->where, variable->type_,
+            return read_local_variable_result_create(
+                variable_address_from_local(variable->where), variable->type_,
                 variable->compile_time_value, true);
         }
+    }
+    if (!state->parent)
+    {
+        return read_local_variable_result_empty;
+    }
+    read_local_variable_result const outer_variable =
+        read_local_variable(state->parent, name);
+    if (!outer_variable.exists)
+    {
+        return outer_variable;
+    }
+    capture_index const existing_capture =
+        require_capture(state, outer_variable.where, outer_variable.what);
+    return read_local_variable_result_create(
+        variable_address_from_capture(existing_capture), outer_variable.what,
+        outer_variable.compile_time_value, outer_variable.is_pure);
+}
+
+static evaluate_expression_result
+read_variable(LPG_NON_NULL(function_checking_state *const state),
+              LPG_NON_NULL(instruction_sequence *const to),
+              unicode_view const name, source_location const where)
+{
+    instruction_checkpoint const previous_code =
+        make_checkpoint(&state->used_registers, to);
+
+    read_local_variable_result const local = read_local_variable(state, name);
+    if (local.exists)
+    {
+        if (local.where.captured_in_current_lambda.has_value)
+        {
+            register_id const captures =
+                allocate_register(&state->used_registers);
+            add_instruction(to, instruction_create_get_captures(captures));
+            register_id const capture_result =
+                allocate_register(&state->used_registers);
+            add_instruction(
+                to,
+                instruction_create_read_struct(read_struct_instruction_create(
+                    captures, local.where.captured_in_current_lambda.value,
+                    capture_result)));
+            return evaluate_expression_result_create(
+                true, capture_result, local.what, local.compile_time_value,
+                local.is_pure);
+        }
+        return evaluate_expression_result_create(
+            true, local.where.local_address, local.what,
+            local.compile_time_value, local.is_pure);
     }
 
     register_id const global = allocate_register(&state->used_registers);
@@ -603,14 +774,35 @@ optional_checked_function_create(checked_function const value)
 static optional_checked_function const optional_checked_function_empty = {
     false, {0, NULL, {NULL, 0}, 0}};
 
-static optional_checked_function check_function(
-    expression const body_in, structure const global,
-    check_error_handler *on_error, void *user, checked_program *const program,
-    type const *const parameter_types, unicode_string *const parameter_names,
-    size_t const parameter_count)
+typedef struct check_function_result
 {
-    function_checking_state state =
-        function_checking_state_create(&global, on_error, user, program);
+    bool success;
+    checked_function function;
+    capture *captures;
+    size_t capture_count;
+} check_function_result;
+
+static check_function_result
+check_function_result_create(checked_function function, capture *captures,
+                             size_t capture_count)
+{
+    check_function_result const result = {
+        true, function, captures, capture_count};
+    return result;
+}
+
+static check_function_result const check_function_result_empty = {
+    false, {0, NULL, {NULL, 0}, 0}, NULL, 0};
+
+static check_function_result check_function(
+    function_checking_state *parent, expression const body_in,
+    structure const global, check_error_handler *on_error, void *user,
+    checked_program *const program, type const *const parameter_types,
+    unicode_string *const parameter_names, size_t const parameter_count)
+{
+    instruction_sequence body_out = instruction_sequence_create(NULL, 0);
+    function_checking_state state = function_checking_state_create(
+        parent, &global, on_error, user, program, &body_out);
 
     for (size_t i = 0; i < parameter_count; ++i)
     {
@@ -622,7 +814,6 @@ static optional_checked_function check_function(
                 allocate_register(&state.used_registers)));
     }
 
-    instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     evaluate_expression_result const body_evaluated =
         evaluate_expression(&state, &body_out, body_in);
 
@@ -652,7 +843,7 @@ static optional_checked_function check_function(
     else
     {
         instruction_sequence_free(&body_out);
-        return optional_checked_function_empty;
+        return check_function_result_empty;
     }
     function_pointer *const signature = allocate(sizeof(*signature));
     signature->result = body_evaluated.type_;
@@ -660,7 +851,8 @@ static optional_checked_function check_function(
     signature->parameters.elements = NULL;
     checked_function const result = {
         return_value, signature, body_out, state.used_registers};
-    return optional_checked_function_create(result);
+    return check_function_result_create(
+        result, state.captures, state.capture_count);
 }
 
 static evaluate_expression_result make_compile_time_unit(void)
@@ -713,41 +905,65 @@ evaluate_lambda(function_checking_state *const state,
         state->program->functions[this_lambda_id] = checked_function_create(
             0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }
-    optional_checked_function const checked =
-        check_function(*evaluated.result, *state->global, state->on_error,
-                       state->user, state->program, parameter_types,
-                       parameter_names, evaluated.parameter_count);
+    check_function_result const checked = check_function(
+        state, *evaluated.result, *state->global, state->on_error, state->user,
+        state->program, parameter_types, parameter_names,
+        evaluated.parameter_count);
     for (size_t i = 0; i < evaluated.parameter_count; ++i)
     {
         unicode_string_free(parameter_names + i);
     }
     deallocate(parameter_names);
-    if (!checked.is_set)
+    if (!checked.success)
     {
         deallocate(parameter_types);
         return evaluate_expression_result_empty;
     }
 
-    ASSUME(checked.value.signature->parameters.length == 0);
-    checked.value.signature->parameters.elements = parameter_types;
-    checked.value.signature->parameters.length = evaluated.parameter_count;
+    ASSUME(checked.function.signature->parameters.length == 0);
+    checked.function.signature->parameters.elements = parameter_types;
+    checked.function.signature->parameters.length = evaluated.parameter_count;
 
     checked_function_free(&state->program->functions[this_lambda_id]);
-    state->program->functions[this_lambda_id] = checked.value;
+    state->program->functions[this_lambda_id] = checked.function;
     register_id const destination = allocate_register(&state->used_registers);
     type const result_type = type_from_function_pointer(
         state->program->functions[this_lambda_id].signature);
-    add_instruction(
-        function, instruction_create_literal(literal_instruction_create(
-                      destination,
-                      value_from_function_pointer(
-                          function_pointer_value_from_internal(this_lambda_id)),
-                      result_type)));
-    return evaluate_expression_result_create(
-        true, destination, result_type,
-        optional_value_create(value_from_function_pointer(
-            function_pointer_value_from_internal(this_lambda_id))),
-        false);
+    if (checked.captures)
+    {
+        register_id *const captures =
+            allocate_array(checked.capture_count, sizeof(*captures));
+        for (size_t i = 0; i < checked.capture_count; ++i)
+        {
+            capture const current_capture = checked.captures[i];
+            if (current_capture.from.captured_in_current_lambda.has_value)
+            {
+                LPG_TO_DO();
+            }
+            else
+            {
+                captures[i] = current_capture.from.local_address;
+            }
+        }
+        deallocate(checked.captures);
+        add_instruction(function, instruction_create_lambda_with_captures(
+                                      lambda_with_captures_instruction_create(
+                                          destination, this_lambda_id, captures,
+                                          checked.capture_count)));
+        return evaluate_expression_result_create(
+            true, destination, result_type, optional_value_empty, false);
+    }
+    else
+    {
+        value const function_pointer = value_from_function_pointer(
+            function_pointer_value_from_internal(this_lambda_id, NULL, 0));
+        add_instruction(
+            function, instruction_create_literal(literal_instruction_create(
+                          destination, function_pointer, result_type)));
+        return evaluate_expression_result_create(
+            true, destination, result_type,
+            optional_value_create(function_pointer), false);
+    }
 }
 
 static evaluate_expression_result
@@ -1460,12 +1676,13 @@ checked_program check(sequence const root, structure const global,
 {
     checked_program program = {
         {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
-    optional_checked_function const checked =
-        check_function(expression_from_sequence(root), global, on_error, user,
-                       &program, NULL, NULL, 0);
-    if (checked.is_set)
+    check_function_result const checked =
+        check_function(NULL, expression_from_sequence(root), global, on_error,
+                       user, &program, NULL, NULL, 0);
+    if (checked.success)
     {
-        program.functions[0] = checked.value;
+        ASSUME(checked.capture_count == 0);
+        program.functions[0] = checked.function;
     }
     else
     {

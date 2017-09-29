@@ -109,6 +109,51 @@ match_instruction match_instruction_create(register_id key,
     return returning;
 }
 
+lambda_with_captures_instruction
+lambda_with_captures_instruction_create(register_id into, function_id lambda,
+                                        register_id *captures,
+                                        size_t capture_count)
+{
+    lambda_with_captures_instruction const result = {
+        into, lambda, captures, capture_count};
+    return result;
+}
+
+void lambda_with_captures_instruction_free(
+    lambda_with_captures_instruction const freed)
+{
+    if (freed.captures)
+    {
+        deallocate(freed.captures);
+    }
+}
+
+bool lambda_with_captures_instruction_equals(
+    lambda_with_captures_instruction const left,
+    lambda_with_captures_instruction const right)
+{
+    if (left.into != right.into)
+    {
+        return false;
+    }
+    if (left.lambda != right.lambda)
+    {
+        return false;
+    }
+    if (left.capture_count != right.capture_count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.capture_count; ++i)
+    {
+        if (left.captures[i] != right.captures[i])
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -131,6 +176,23 @@ instruction instruction_create_match(match_instruction argument)
     instruction result;
     result.type = instruction_match;
     result.match = argument;
+    return result;
+}
+
+instruction instruction_create_get_captures(register_id const into)
+{
+    instruction result;
+    result.type = instruction_get_captures;
+    result.captures = into;
+    return result;
+}
+
+instruction instruction_create_lambda_with_captures(
+    lambda_with_captures_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_lambda_with_captures;
+    result.lambda_with_captures = argument;
     return result;
 }
 
@@ -230,6 +292,13 @@ void instruction_free(instruction const *value)
             deallocate(value->match.cases);
         }
         break;
+
+    case instruction_get_captures:
+        break;
+
+    case instruction_lambda_with_captures:
+        lambda_with_captures_instruction_free(value->lambda_with_captures);
+        break;
     }
 }
 
@@ -297,6 +366,13 @@ bool instruction_equals(instruction const left, instruction const right)
             }
         }
         return true;
+
+    case instruction_get_captures:
+        return true;
+
+    case instruction_lambda_with_captures:
+        return lambda_with_captures_instruction_equals(
+            left.lambda_with_captures, right.lambda_with_captures);
     }
     LPG_UNREACHABLE();
 }

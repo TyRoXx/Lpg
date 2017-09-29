@@ -275,7 +275,7 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
                 1, value_from_unit(), type_from_unit()))};
@@ -312,7 +312,7 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
                 1, value_from_unit(), type_from_unit()))};
@@ -355,7 +355,7 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
                 1, value_from_unit(), type_from_unit()))};
@@ -395,7 +395,7 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
                 1, value_from_enum_element(1, NULL),
@@ -434,7 +434,7 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_main[] = {
             instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(
                 1, value_from_enum_element(1, NULL),

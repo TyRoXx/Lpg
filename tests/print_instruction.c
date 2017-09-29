@@ -114,6 +114,12 @@ void print_instruction(instruction const printed)
             printf("return %u }\n", printed.match.cases[i].value);
         }
         return;
+
+    case instruction_get_captures:
+        LPG_TO_DO();
+
+    case instruction_lambda_with_captures:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

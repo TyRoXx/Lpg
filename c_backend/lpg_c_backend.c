@@ -1210,6 +1210,12 @@ static success_indicator generate_instruction(
         }
         return success;
     }
+
+    case instruction_get_captures:
+        LPG_TO_DO();
+
+    case instruction_lambda_with_captures:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

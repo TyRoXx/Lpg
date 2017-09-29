@@ -17,13 +17,17 @@ typedef struct function_pointer_value
     function_id code;
     external_function *external;
     void *external_environment;
+    struct value *captures;
+    size_t capture_count;
 } function_pointer_value;
 
 function_pointer_value
 function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
                                      void *environment);
 function_pointer_value
-function_pointer_value_from_internal(function_id const code);
+function_pointer_value_from_internal(function_id const code,
+                                     struct value *const captures,
+                                     size_t const capture_count);
 bool function_pointer_value_equals(function_pointer_value const left,
                                    function_pointer_value const right);
 

@@ -32,7 +32,7 @@ void test_remove_unused_functions(void)
         instruction *const body = allocate_array(body_size, sizeof(*body));
         body[0] = instruction_create_literal(literal_instruction_create(
             0, value_from_function_pointer(
-                   function_pointer_value_from_internal(2)),
+                   function_pointer_value_from_internal(2, NULL, 0)),
             type_from_function_pointer(original.functions[2].signature)));
         original.functions[0].body =
             instruction_sequence_create(body, body_size);
@@ -48,7 +48,7 @@ void test_remove_unused_functions(void)
             instruction *const body = allocate_array(body_size, sizeof(*body));
             body[0] = instruction_create_literal(literal_instruction_create(
                 0, value_from_function_pointer(
-                       function_pointer_value_from_internal(1)),
+                       function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(optimized.functions[1].signature)));
             expected_main = instruction_sequence_create(body, body_size);
         }

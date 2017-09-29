@@ -6,7 +6,8 @@
 
 static optional_value
 call_interpreted_function(checked_function const callee, value *const arguments,
-                          value const *globals, garbage_collector *const gc,
+                          value const *globals, value const *const captures,
+                          garbage_collector *const gc,
                           checked_function const *const all_functions);
 
 typedef enum run_sequence_result
@@ -30,13 +31,15 @@ optional_value call_function(function_pointer_value const callee,
         return optional_value_create(callee.external(
             inferred, arguments, gc, callee.external_environment));
     }
-    return call_interpreted_function(
-        all_functions[callee.code], arguments, globals, gc, all_functions);
+    return call_interpreted_function(all_functions[callee.code], arguments,
+                                     globals, callee.captures, gc,
+                                     all_functions);
 }
 
 static run_sequence_result
 run_sequence(instruction_sequence const sequence, value const *globals,
-             value *registers, garbage_collector *const gc,
+             value *registers, value const *const captures,
+             garbage_collector *const gc,
              checked_function const *const all_functions)
 {
     LPG_FOR(size_t, i, sequence.length)
@@ -91,8 +94,8 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             bool is_running = true;
             while (is_running)
             {
-                switch (run_sequence(
-                    element.loop, globals, registers, gc, all_functions))
+                switch (run_sequence(element.loop, globals, registers, captures,
+                                     gc, all_functions))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -162,7 +165,7 @@ run_sequence(instruction_sequence const sequence, value const *globals,
                 if (value_equals(key, registers[this_case->key]))
                 {
                     switch (run_sequence(this_case->action, globals, registers,
-                                         gc, all_functions))
+                                         captures, gc, all_functions))
                     {
                     case run_sequence_result_break:
                         return run_sequence_result_break;
@@ -180,6 +183,29 @@ run_sequence(instruction_sequence const sequence, value const *globals,
             }
             break;
         }
+
+        case instruction_get_captures:
+            registers[element.captures] = value_from_flat_object(captures);
+            break;
+
+        case instruction_lambda_with_captures:
+        {
+            value *const inner_captures = garbage_collector_allocate_array(
+                gc, element.lambda_with_captures.capture_count,
+                sizeof(*inner_captures));
+            for (size_t j = 0; j < element.lambda_with_captures.capture_count;
+                 ++j)
+            {
+                inner_captures[j] =
+                    registers[element.lambda_with_captures.captures[j]];
+            }
+            registers[element.lambda_with_captures.into] =
+                value_from_function_pointer(
+                    function_pointer_value_from_internal(
+                        element.lambda_with_captures.lambda, inner_captures,
+                        element.lambda_with_captures.capture_count));
+            break;
+        }
         }
     }
     return run_sequence_result_continue;
@@ -187,7 +213,8 @@ run_sequence(instruction_sequence const sequence, value const *globals,
 
 static optional_value
 call_interpreted_function(checked_function const callee, value *const arguments,
-                          value const *globals, garbage_collector *const gc,
+                          value const *globals, value const *const captures,
+                          garbage_collector *const gc,
                           checked_function const *const all_functions)
 {
     /*there has to be at least one register for the return value, even if it is
@@ -202,7 +229,8 @@ call_interpreted_function(checked_function const callee, value *const arguments,
     {
         registers[i] = arguments[i];
     }
-    switch (run_sequence(callee.body, globals, registers, gc, all_functions))
+    switch (run_sequence(
+        callee.body, globals, registers, captures, gc, all_functions))
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
@@ -225,5 +253,5 @@ void interpret(checked_program const program, value const *globals,
 {
     checked_function const entry_point = program.functions[0];
     call_interpreted_function(
-        entry_point, NULL, globals, gc, program.functions);
+        entry_point, NULL, globals, NULL, gc, program.functions);
 }

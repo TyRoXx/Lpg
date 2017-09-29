@@ -64,6 +64,19 @@ static void find_used_registers(instruction_sequence const from,
                     true;
             }
             break;
+
+        case instruction_get_captures:
+            break;
+
+        case instruction_lambda_with_captures:
+            for (size_t j = 0;
+                 j < current_instruction.lambda_with_captures.capture_count;
+                 ++j)
+            {
+                registers_read_from[current_instruction.lambda_with_captures
+                                        .captures[j]] = true;
+            }
+            break;
         }
     }
 }
@@ -142,6 +155,18 @@ static bool change_register_ids(instruction *const where,
                 &where->match.cases[j].action, new_register_ids);
         }
         return update_register_id(&where->match.result, new_register_ids);
+
+    case instruction_get_captures:
+        return update_register_id(&where->captures, new_register_ids);
+
+    case instruction_lambda_with_captures:
+        for (size_t j = 0; j < where->lambda_with_captures.capture_count; ++j)
+        {
+            ASSERT(update_register_id(
+                where->lambda_with_captures.captures + j, new_register_ids));
+        }
+        return update_register_id(
+            &where->lambda_with_captures.into, new_register_ids);
     }
     LPG_UNREACHABLE();
 }
