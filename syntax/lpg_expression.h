@@ -151,6 +151,7 @@ tuple tuple_create(expression *elements, size_t length);
 bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
 expression expression_from_assign(assign value);
+expression expression_from_not(not value);
 expression expression_from_return(LPG_NON_NULL(expression *value));
 expression expression_from_loop(sequence body);
 expression expression_from_sequence(sequence value);

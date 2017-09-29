@@ -197,6 +197,14 @@ expression expression_from_assign(assign value)
     return result;
 }
 
+expression expression_from_not(not value)
+{
+    expression result;
+    result.type = expression_type_not;
+    result.not = value;
+    return result;
+}
+
 expression expression_from_return(expression *value)
 {
     expression result;
@@ -464,6 +472,7 @@ void expression_free(expression const *this)
 
     case expression_type_not:
         not_free(&this->not);
+        break;
 
     case expression_type_match:
         match_free(&this->match);
