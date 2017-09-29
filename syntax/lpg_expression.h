@@ -31,6 +31,7 @@ typedef enum expression_type
     expression_type_string,
     expression_type_identifier,
     expression_type_assign,
+    expression_type_not,
     expression_type_return,
     expression_type_loop,
     expression_type_break,
@@ -119,6 +120,15 @@ typedef struct assign
 assign assign_create(LPG_NON_NULL(expression *left),
                      LPG_NON_NULL(expression *right));
 
+typedef struct not
+{
+    expression *expr;
+}
+not;
+
+not not_expression_create(expression * value);
+void not_free(LPG_NON_NULL(not const *expression));
+
 typedef struct sequence
 {
     expression *elements;
@@ -193,6 +203,7 @@ struct expression
         string_expression string;
         identifier_expression identifier;
         assign assign;
+        not not;
         expression *return_;
         sequence loop_body;
         sequence sequence;

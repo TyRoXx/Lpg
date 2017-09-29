@@ -139,6 +139,9 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(stream_writer_write_string(to, " = "));
         return save_expression(to, value->assign.right, whitespace);
 
+    case expression_type_not:
+        LPG_TRY(stream_writer_write_string(to, "!"))
+        return save_expression(to, value->not.expr, whitespace);
     case expression_type_return:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "return "));
