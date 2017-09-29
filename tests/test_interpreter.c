@@ -232,13 +232,14 @@ void test_interpreter(void)
 
     expect_output("let m = \"y\"\n"
                   "let f = ()\n"
+                  "    let n = \"z\"\n"
                   "    print(m)\n"
-                  "    print(m)\n"
+                  "    print(n)\n"
                   "    ()\n"
-                  "        print(m)\n"
+                  "        print(n)\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yyyy", std_library.globals);
+                  "", "yzzy", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
