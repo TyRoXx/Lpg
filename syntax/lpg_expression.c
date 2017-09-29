@@ -108,6 +108,17 @@ assign assign_create(expression *left, expression *right)
     return result;
 }
 
+not not_expression_create(expression * value)
+{
+    not result = {value};
+    return result;
+}
+
+void not_free(LPG_NON_NULL(not const *value))
+{
+    expression_free(value->expr);
+}
+
 sequence sequence_create(expression *elements, size_t length)
 {
     sequence const result = {elements, length};
@@ -269,6 +280,7 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_sequence:
     case expression_type_declare:
+    case expression_type_not:
     case expression_type_tuple:
         LPG_TO_DO();
 
@@ -450,6 +462,9 @@ void expression_free(expression const *this)
         access_structure_free(&this->access_structure);
         break;
 
+    case expression_type_not:
+        not_free(&this->not);
+
     case expression_type_match:
         match_free(&this->match);
         break;
@@ -601,6 +616,8 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_string:
         LPG_TO_DO();
+    case expression_type_not:
+        return expression_equals(left->not.expr, right->not.expr);
 
     case expression_type_identifier:
         return unicode_view_equals(

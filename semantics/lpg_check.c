@@ -1292,6 +1292,44 @@ evaluate_expression(function_checking_state *state,
     case expression_type_comment:
         return make_compile_time_unit();
 
+    case expression_type_not:
+    {
+        evaluate_expression_result result =
+            evaluate_expression(state, function, *element.not.expr);
+        ASSUME(state->global->members[3].compile_time_value.is_set);
+        ASSUME(result.compile_time_value.is_set);
+
+        value boolean_value =
+            state->global->members[3].compile_time_value.value_;
+
+        if (value_equals(boolean_value, result.compile_time_value.value_))
+        {
+            const register_id global_register =
+                allocate_register(&state->used_registers);
+            add_instruction(
+                function, instruction_create_global(global_register));
+            const register_id not_register =
+                allocate_register(&state->used_registers);
+            add_instruction(
+                function,
+                instruction_create_read_struct(read_struct_instruction_create(
+                    global_register, 7, not_register)));
+            register_id *arguments = allocate_array(1, sizeof(*arguments));
+            arguments[0] = result.where;
+            const register_id result_register =
+                allocate_register(&state->used_registers);
+            add_instruction(
+                function, instruction_create_call(call_instruction_create(
+                              not_register, arguments, 1, result_register)));
+            return evaluate_expression_result_create(
+                true, result_register, result.type_, optional_value_empty,
+                false);
+        }
+        state->on_error(semantic_error_create(semantic_error_type_mismatch,
+                                              expression_source_begin(element)),
+                        state->user);
+    }
+
     case expression_type_match:
     {
         instruction_checkpoint const before =
