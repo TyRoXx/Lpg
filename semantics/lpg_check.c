@@ -938,7 +938,20 @@ evaluate_lambda(function_checking_state *const state,
             capture const current_capture = checked.captures[i];
             if (current_capture.from.captured_in_current_lambda.has_value)
             {
-                LPG_TO_DO();
+                register_id const captures_register =
+                    allocate_register(&state->used_registers);
+                add_instruction(function, instruction_create_get_captures(
+                                              captures_register));
+                register_id const transferred_capture =
+                    allocate_register(&state->used_registers);
+                add_instruction(
+                    function, instruction_create_read_struct(
+                                  read_struct_instruction_create(
+                                      captures_register,
+                                      current_capture.from
+                                          .captured_in_current_lambda.value,
+                                      transferred_capture)));
+                captures[i] = transferred_capture;
             }
             else
             {

@@ -230,5 +230,15 @@ void test_interpreter(void)
                   "f()\n",
                   "", "hallo", std_library.globals);
 
+    expect_output("let m = \"y\"\n"
+                  "let f = ()\n"
+                  "    print(m)\n"
+                  "    print(m)\n"
+                  "    ()\n"
+                  "        print(m)\n"
+                  "        print(m)\n"
+                  "f()()\n",
+                  "", "yyyy", std_library.globals);
+
     standard_library_description_free(&std_library);
 }
