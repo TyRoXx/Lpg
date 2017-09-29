@@ -230,7 +230,7 @@ void test_interpreter(void)
                   "f()\n",
                   "", "hallo", std_library.globals);
 
-    /*re-capture a captured variable*/
+    /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
                   "let f = ()\n"
                   "    print(m)\n"
@@ -238,6 +238,15 @@ void test_interpreter(void)
                   "        print(m)\n"
                   "f()()\n",
                   "", "yy", std_library.globals);
+
+    /*re-capture a captured runtime variable*/
+    expect_output("let m = read()\n"
+                  "let f = ()\n"
+                  "    print(m)\n"
+                  "    ()\n"
+                  "        print(m)\n"
+                  "f()()\n",
+                  "y", "yy", std_library.globals);
 
     /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
