@@ -640,12 +640,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_case:
         case token_dot:
         case token_let:
-        case token_greater_than:
-        case token_greater_than_or_equals:
-        case token_less_than:
-        case token_less_than_or_equals:
-        case token_not:
-        case token_not_equals:
         case token_equals:
             pop(parser);
             parser->on_error(
@@ -697,6 +691,23 @@ static expression_parser_result parse_callable(expression_parser *parser,
                        unicode_view_copy(head.content), head.where))};
             return result;
         }
+        case token_greater_than:
+        case token_greater_than_or_equals:
+        case token_less_than:
+        case token_less_than_or_equals:
+        case token_not_equals:
+            LPG_TO_DO();
+        case token_not:
+        {
+            pop(parser);
+            expression_parser_result result =
+                parse_expression(parser, indentation, false);
+            ASSUME(result.is_success);
+            expression expr =
+                expression_from_not(not_expression_create(&result.success));
+            expression_parser_result result1 = {1, expr};
+            return result1;
+        };
         }
     }
 }

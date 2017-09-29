@@ -1297,12 +1297,12 @@ evaluate_expression(function_checking_state *state,
         evaluate_expression_result result =
             evaluate_expression(state, function, *element.not.expr);
         ASSUME(state->global->members[3].compile_time_value.is_set);
-        ASSUME(result.compile_time_value.is_set);
 
         value boolean_value =
             state->global->members[3].compile_time_value.value_;
 
-        if (value_equals(boolean_value, result.compile_time_value.value_))
+        ASSUME(boolean_value.kind == value_kind_type);
+        if (type_equals(boolean_value.type_, result.type_))
         {
             const register_id global_register =
                 allocate_register(&state->used_registers);

@@ -137,6 +137,7 @@ void test_interpreter(void)
                   "    print(v)\n"
                   "    break",
                   "", "Hello, world!", std_library.globals);
+    expect_output("assert(!boolean.false)", "", "", std_library.globals);
     expect_output("assert(boolean.true)", "", "", std_library.globals);
     expect_output("assert(not(boolean.false))", "", "", std_library.globals);
     expect_output(
