@@ -214,7 +214,7 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_binary:
     {
         LPG_TRY(save_expression(to, value->binary.left, whitespace));
-        const char const *operator= "";
+        char const *operator= "";
         switch (value->binary.comparator)
         {
         case less_than:
