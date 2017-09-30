@@ -34,7 +34,7 @@ static evaluate_expression_result evaluate_expression_result_create(
     bool const has_value, register_id const where, type const type_,
     optional_value compile_time_value, bool const is_pure)
 {
-    evaluate_expression_result result = {
+    evaluate_expression_result const result = {
         has_value, where, type_, compile_time_value, is_pure};
     return result;
 }
@@ -82,14 +82,14 @@ typedef struct variable_address
 
 static variable_address variable_address_from_local(register_id const local)
 {
-    variable_address result = {optional_capture_index_empty, local};
+    variable_address const result = {optional_capture_index_empty, local};
     return result;
 }
 
 static variable_address
 variable_address_from_capture(capture_index const captured)
 {
-    variable_address result = {{true, captured}, 0};
+    variable_address const result = {{true, captured}, 0};
     return result;
 }
 
@@ -133,15 +133,15 @@ static function_checking_state function_checking_state_create(
     check_error_handler *on_error, void *user, checked_program *const program,
     instruction_sequence *const body)
 {
-    function_checking_state result = {parent, NULL,    0,        0,
-                                      false,  global,  on_error, {NULL, 0},
-                                      user,   program, body};
+    function_checking_state const result = {
+        parent,   NULL,      0,    0,       false, global,
+        on_error, {NULL, 0}, user, program, body};
     return result;
 }
 
 static register_id allocate_register(register_id *const used_registers)
 {
-    register_id id = *used_registers;
+    register_id const id = *used_registers;
     ++(*used_registers);
     return id;
 }
@@ -335,7 +335,8 @@ static read_structure_element_result
 read_structure_element_result_create(bool const success, type const type_,
                                      optional_value const compile_time_value)
 {
-    read_structure_element_result result = {success, type_, compile_time_value};
+    read_structure_element_result const result = {
+        success, type_, compile_time_value};
     return result;
 }
 
@@ -620,7 +621,7 @@ read_local_variable_result_create(variable_address where, type what,
                                   optional_value compile_time_value,
                                   bool is_pure)
 {
-    read_local_variable_result result = {
+    read_local_variable_result const result = {
         true, where, what, compile_time_value, is_pure};
     return result;
 }
@@ -1061,7 +1062,7 @@ evaluate_call_expression(function_checking_state *state,
                 state->user);
             break;
         }
-        evaluate_expression_result argument =
+        evaluate_expression_result const argument =
             evaluate_expression(state, function, argument_tree);
         if (!argument.has_value)
         {
@@ -1486,7 +1487,7 @@ evaluate_expression(function_checking_state *state,
     {
         register_id const result = allocate_register(&state->used_registers);
         memory_writer decoded = {NULL, 0, 0};
-        stream_writer decoded_writer = memory_writer_erase(&decoded);
+        stream_writer const decoded_writer = memory_writer_erase(&decoded);
         decode_string_literal(
             unicode_view_from_string(element.string.value), decoded_writer);
         char *const copy =
@@ -1511,7 +1512,7 @@ evaluate_expression(function_checking_state *state,
     {
         unicode_view const name =
             unicode_view_from_string(element.identifier.value);
-        evaluate_expression_result address =
+        evaluate_expression_result const address =
             read_variable(state, function, name, element.identifier.source);
         return address;
     }
@@ -1654,7 +1655,7 @@ evaluate_expression(function_checking_state *state,
             element.tuple.length};
         for (size_t i = 0; i < element.tuple.length; ++i)
         {
-            evaluate_expression_result result =
+            evaluate_expression_result const result =
                 evaluate_expression(state, function, element.tuple.elements[i]);
             if (!result.has_value)
             {
@@ -1665,7 +1666,8 @@ evaluate_expression(function_checking_state *state,
             tuple_type_for_instruction.elements[i] = result.type_;
             tuple_type_for_result.elements[i] = result.type_;
         }
-        register_id result_register = allocate_register(&state->used_registers);
+        register_id const result_register =
+            allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_tuple(tuple_instruction_create(
                           registers, element.tuple.length, result_register,

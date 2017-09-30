@@ -17,7 +17,7 @@ bool is_end_of_file(rich_token const *token)
 
 parse_error parse_error_create(parse_error_type type, source_location where)
 {
-    parse_error result = {type, where};
+    parse_error const result = {type, where};
     return result;
 }
 
@@ -31,11 +31,11 @@ expression_parser expression_parser_create(rich_token_producer find_next_token,
                                            parse_error_handler on_error,
                                            callback_user user)
 {
-    expression_parser result = {find_next_token,
-                                on_error,
-                                user,
-                                0,
-                                {tokenize_success, 0, {NULL, 0}, {0, 0}}};
+    expression_parser const result = {find_next_token,
+                                      on_error,
+                                      user,
+                                      0,
+                                      {tokenize_success, 0, {NULL, 0}, {0, 0}}};
     return result;
 }
 
@@ -340,7 +340,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
             if (whitespace.token == token_newline)
             {
                 pop(parser);
-                sequence body = parse_sequence(parser, (indentation + 1));
+                sequence const body = parse_sequence(parser, (indentation + 1));
                 expression_parser_result const result = {
                     1,
                     expression_from_lambda(lambda_create(
@@ -459,7 +459,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_identifier:
         {
             pop(parser);
-            expression_parser_result result = {
+            expression_parser_result const result = {
                 1, expression_from_identifier(identifier_expression_create(
                        unicode_view_copy(head.content), head.where))};
             return result;
@@ -468,7 +468,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_break:
         {
             pop(parser);
-            expression_parser_result result = {
+            expression_parser_result const result = {
                 1, expression_from_break(head.where)};
             return result;
         }
@@ -530,7 +530,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
                         return expression_parser_result_failure;
                     }
                 }
-                expression_parser_result parser_result =
+                expression_parser_result const parser_result =
                     parse_expression(parser, indentation, false);
                 if (parser_result.is_success && more_elements)
                 {
@@ -580,7 +580,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
             integer value;
             if (integer_parse(&value, head.content))
             {
-                expression_parser_result result = {
+                expression_parser_result const result = {
                     1,
                     expression_from_integer_literal(
                         integer_literal_expression_create(value, head.where))};
@@ -601,19 +601,19 @@ static expression_parser_result parse_callable(expression_parser *parser,
             {
                 end -= 2;
             }
-            unicode_view view = unicode_view_cut(head.content, 2, end);
+            unicode_view const view = unicode_view_cut(head.content, 2, end);
 
-            comment_expression comment =
+            comment_expression const comment =
                 comment_expression_create(unicode_view_copy(view), head.where);
 
-            expression_parser_result result = {
+            expression_parser_result const result = {
                 1, expression_from_comment(comment)};
             return result;
         }
         case token_string:
         {
             pop(parser);
-            expression_parser_result result = {
+            expression_parser_result const result = {
                 1, expression_from_string(string_expression_create(
                        unicode_view_copy(head.content), head.where))};
             return result;
@@ -727,13 +727,13 @@ static expression_parser_result parse_assignment(expression_parser *parser,
         parse_expression(parser, indentation, 0);
     if (value.is_success)
     {
-        expression_parser_result assign_result = {
+        expression_parser_result const assign_result = {
             1, expression_from_assign(
                    assign_create(expression_allocate(left_side),
                                  expression_allocate(value.success)))};
         return assign_result;
     }
-    expression_parser_result result = {1, left_side};
+    expression_parser_result const result = {1, left_side};
     return result;
 }
 
@@ -741,7 +741,7 @@ static expression_parser_result
 parse_returnable(expression_parser *const parser, size_t const indentation,
                  bool const may_be_statement)
 {
-    expression_parser_result callee = parse_callable(parser, indentation);
+    expression_parser_result const callee = parse_callable(parser, indentation);
     if (!callee.is_success)
     {
         return callee;
@@ -795,7 +795,7 @@ parse_returnable(expression_parser *const parser, size_t const indentation,
             if ((element_name.token == token_identifier) ||
                 (element_name.token == token_integer))
             {
-                expression access =
+                expression const access =
                     expression_from_access_structure(access_structure_create(
                         expression_allocate(result.success),
                         identifier_expression_create(

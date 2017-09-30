@@ -79,6 +79,6 @@ decode_string_literal_result decode_string_literal(unicode_view source,
 decode_string_literal_result decode_string_literal_result_create(bool is_valid,
                                                                  size_t length)
 {
-    decode_string_literal_result result = {is_valid, length};
+    decode_string_literal_result const result = {is_valid, length};
     return result;
 }

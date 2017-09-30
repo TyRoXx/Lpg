@@ -3,7 +3,7 @@
 source_location source_location_create(line_number line,
                                        column_number approximate_column)
 {
-    source_location result = {line, approximate_column};
+    source_location const result = {line, approximate_column};
     return result;
 }
 

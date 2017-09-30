@@ -12,7 +12,7 @@ void expression_deallocate(expression *this)
 lambda lambda_create(parameter *parameters, size_t parameter_count,
                      expression *result)
 {
-    lambda returning = {parameters, parameter_count, result};
+    lambda const returning = {parameters, parameter_count, result};
     return returning;
 }
 
@@ -48,13 +48,13 @@ bool lambda_equals(lambda const left, lambda const right)
 call call_create(expression *callee, tuple arguments,
                  source_location closing_parenthesis)
 {
-    call result = {callee, arguments, closing_parenthesis};
+    call const result = {callee, arguments, closing_parenthesis};
     return result;
 }
 
 parameter parameter_create(identifier_expression name, expression *type)
 {
-    parameter result = {name, type};
+    parameter const result = {name, type};
     return result;
 }
 
@@ -73,13 +73,13 @@ bool parameter_equals(parameter const left, parameter const right)
 access_structure access_structure_create(expression *object,
                                          identifier_expression member)
 {
-    access_structure result = {object, member};
+    access_structure const result = {object, member};
     return result;
 }
 
 match_case match_case_create(expression *key, expression *action)
 {
-    match_case result = {key, action};
+    match_case const result = {key, action};
     return result;
 }
 
@@ -98,19 +98,19 @@ bool match_case_equals(match_case const left, match_case const right)
 match match_create(source_location begin, expression *input, match_case *cases,
                    size_t number_of_cases)
 {
-    match result = {begin, input, cases, number_of_cases};
+    match const result = {begin, input, cases, number_of_cases};
     return result;
 }
 
 assign assign_create(expression *left, expression *right)
 {
-    assign result = {left, right};
+    assign const result = {left, right};
     return result;
 }
 
 sequence sequence_create(expression *elements, size_t length)
 {
-    sequence result = {elements, length};
+    sequence const result = {elements, length};
     return result;
 }
 
@@ -130,7 +130,7 @@ declare declare_create(identifier_expression name, expression *optional_type,
                        expression *initializer)
 {
     ASSUME(initializer);
-    declare result = {name, optional_type, initializer};
+    declare const result = {name, optional_type, initializer};
     return result;
 }
 
@@ -146,7 +146,7 @@ void declare_free(declare const *value)
 
 tuple tuple_create(expression *elements, size_t length)
 {
-    tuple result = {elements, length};
+    tuple const result = {elements, length};
     return result;
 }
 
@@ -281,14 +281,14 @@ source_location expression_source_begin(expression const value)
 comment_expression comment_expression_create(unicode_string value,
                                              source_location source)
 {
-    comment_expression result = {value, source};
+    comment_expression const result = {value, source};
     return result;
 }
 
 identifier_expression identifier_expression_create(unicode_string value,
                                                    source_location source)
 {
-    identifier_expression result = {value, source};
+    identifier_expression const result = {value, source};
     return result;
 }
 
@@ -307,7 +307,7 @@ bool identifier_expression_equals(identifier_expression const left,
 string_expression string_expression_create(unicode_string value,
                                            source_location source)
 {
-    string_expression result = {value, source};
+    string_expression const result = {value, source};
     return result;
 }
 
@@ -324,7 +324,7 @@ void comment_expression_free(comment_expression const *value)
 integer_literal_expression
 integer_literal_expression_create(integer value, source_location source)
 {
-    integer_literal_expression result = {value, source};
+    integer_literal_expression const result = {value, source};
     return result;
 }
 
@@ -553,7 +553,8 @@ bool match_equals(match const left, match const right)
 
 bool comment_equals(comment_expression left, comment_expression right)
 {
-    bool source_equals = source_location_equals(left.source, right.source);
+    bool const source_equals =
+        source_location_equals(left.source, right.source);
     return unicode_string_equals(left.value, right.value) && source_equals;
 }
 

@@ -47,7 +47,7 @@ static unicode_string path_combine(unicode_view const *begin, size_t count)
         total_length += begin[i].length;
         total_length += 1;
     }
-    unicode_string result = {allocate(total_length), total_length};
+    unicode_string const result = {allocate(total_length), total_length};
     size_t next_write = 0;
     for (size_t i = 0; i < count; ++i)
     {
@@ -66,7 +66,7 @@ static unicode_string path_combine(unicode_view const *begin, size_t count)
 
 static void fix_line_endings(unicode_string *s)
 {
-    size_t length = s->length;
+    size_t const length = s->length;
     size_t last_written = 0;
     for (size_t i = 0; i < length; ++i)
     {

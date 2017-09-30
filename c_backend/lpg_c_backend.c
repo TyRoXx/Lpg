@@ -305,7 +305,7 @@ static unicode_string make_type_definition_name(size_t const index)
     size_t const index_length = (size_t)((buffer + sizeof(buffer)) - formatted);
     char const *const prefix = "type_definition_";
     size_t const name_length = strlen(prefix) + index_length;
-    unicode_string name = {allocate(name_length), name_length};
+    unicode_string const name = {allocate(name_length), name_length};
     memcpy(name.data, prefix, strlen(prefix));
     memcpy(name.data + strlen(prefix), formatted, index_length);
     return name;

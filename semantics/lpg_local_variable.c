@@ -6,7 +6,7 @@ local_variable local_variable_create(unicode_string name, type const type_,
                                      optional_value compile_time_value,
                                      register_id where)
 {
-    local_variable result = {name, type_, compile_time_value, where};
+    local_variable const result = {name, type_, compile_time_value, where};
     return result;
 }
 

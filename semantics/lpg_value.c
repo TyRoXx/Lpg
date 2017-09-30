@@ -5,7 +5,7 @@ function_pointer_value
 function_pointer_value_from_external(external_function *external,
                                      void *environment)
 {
-    function_pointer_value result = {0, external, environment, NULL, 0};
+    function_pointer_value const result = {0, external, environment, NULL, 0};
     return result;
 }
 
@@ -14,7 +14,8 @@ function_pointer_value_from_internal(function_id const code,
                                      struct value *const captures,
                                      size_t const capture_count)
 {
-    function_pointer_value result = {code, NULL, NULL, captures, capture_count};
+    function_pointer_value const result = {
+        code, NULL, NULL, captures, capture_count};
     return result;
 }
 
@@ -54,7 +55,7 @@ bool function_pointer_value_equals(function_pointer_value const left,
 
 value_tuple value_tuple_create(struct value *elements, size_t element_count)
 {
-    value_tuple result = {elements, element_count};
+    value_tuple const result = {elements, element_count};
     return result;
 }
 
@@ -196,6 +197,6 @@ bool value_equals(value const left, value const right)
 
 optional_value optional_value_create(value v)
 {
-    optional_value result = {true, v};
+    optional_value const result = {true, v};
     return result;
 }

@@ -15,14 +15,14 @@ static success_indicator indent(const stream_writer to,
 static whitespace_state go_deeper(whitespace_state const whitespace,
                                   size_t additional_indentation)
 {
-    whitespace_state result = {
+    whitespace_state const result = {
         whitespace.indentation_depth + additional_indentation, 0};
     return result;
 }
 
 static whitespace_state add_space_or_newline(whitespace_state const whitespace)
 {
-    whitespace_state result = {whitespace.indentation_depth, 1};
+    whitespace_state const result = {whitespace.indentation_depth, 1};
     return result;
 }
 

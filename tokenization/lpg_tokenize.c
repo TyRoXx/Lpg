@@ -7,7 +7,7 @@
 
 static tokenize_result make_success(enum token_type token, size_t length)
 {
-    tokenize_result result = {tokenize_success, token, length};
+    tokenize_result const result = {tokenize_success, token, length};
     return result;
 }
 
@@ -72,7 +72,7 @@ tokenize_result tokenize(char const *input, size_t length)
     {
         if (length == 1)
         {
-            tokenize_result result = {tokenize_invalid, token_comment, 1};
+            tokenize_result const result = {tokenize_invalid, token_comment, 1};
             return result;
         }
 
@@ -103,7 +103,7 @@ tokenize_result tokenize(char const *input, size_t length)
                 asterisk = (input[comment_length] == '*');
                 ++comment_length;
             }
-            tokenize_result result = {
+            tokenize_result const result = {
                 tokenize_invalid, token_comment, comment_length};
             return result;
         }
@@ -149,7 +149,7 @@ tokenize_result tokenize(char const *input, size_t length)
         }
         if ((i < length) && !can_follow_integer(input[i]))
         {
-            tokenize_result result = {tokenize_invalid, token_space, i};
+            tokenize_result const result = {tokenize_invalid, token_space, i};
             return result;
         }
         return make_success(token_integer, i);
@@ -197,18 +197,19 @@ tokenize_result tokenize(char const *input, size_t length)
     case '"':
     {
         memory_writer decoded = {NULL, 0, 0};
-        decode_string_literal_result decoding_result = decode_string_literal(
-            unicode_view_create(input, length), memory_writer_erase(&decoded));
+        decode_string_literal_result const decoding_result =
+            decode_string_literal(unicode_view_create(input, length),
+                                  memory_writer_erase(&decoded));
         memory_writer_free(&decoded);
         if (decoding_result.is_valid)
         {
             return make_success(token_string, decoding_result.length);
         }
-        tokenize_result result = {
+        tokenize_result const result = {
             tokenize_invalid, token_string, decoding_result.length};
         return result;
     }
     }
-    tokenize_result result = {tokenize_invalid, token_space, 1};
+    tokenize_result const result = {tokenize_invalid, token_space, 1};
     return result;
 }

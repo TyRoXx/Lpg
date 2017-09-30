@@ -6,7 +6,7 @@
 
 structure structure_create(structure_member *members, struct_member_id count)
 {
-    structure result = {members, count};
+    structure const result = {members, count};
     return result;
 }
 
@@ -22,7 +22,7 @@ void structure_free(structure const *value)
 enumeration enumeration_create(enumeration_element *elements,
                                enum_element_id size)
 {
-    enumeration result = {elements, size};
+    enumeration const result = {elements, size};
     return result;
 }
 
@@ -40,7 +40,7 @@ void enumeration_free(enumeration const *value)
 
 tuple_type tuple_type_create(type *elements, size_t length)
 {
-    tuple_type result = {elements, length};
+    tuple_type const result = {elements, length};
     return result;
 }
 
@@ -62,7 +62,7 @@ bool tuple_type_equals(tuple_type const left, tuple_type const right)
 
 integer_range integer_range_create(integer minimum, integer maximum)
 {
-    integer_range result = {minimum, maximum};
+    integer_range const result = {minimum, maximum};
     return result;
 }
 
@@ -80,7 +80,7 @@ lambda_type lambda_type_create(function_id const lambda)
 
 enumeration_element enumeration_element_create(unicode_string name, type state)
 {
-    enumeration_element result = {name, state};
+    enumeration_element const result = {name, state};
     return result;
 }
 

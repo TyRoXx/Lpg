@@ -14,7 +14,7 @@ typedef struct string_ref
 static string_ref string_ref_create(char const *const data, size_t const length,
                                     size_t *const references)
 {
-    string_ref result = {data, length, references};
+    string_ref const result = {data, length, references};
     return result;
 }
 

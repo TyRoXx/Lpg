@@ -6,7 +6,7 @@
 instruction_sequence instruction_sequence_create(instruction *elements,
                                                  size_t length)
 {
-    instruction_sequence result = {elements, length};
+    instruction_sequence const result = {elements, length};
     return result;
 }
 

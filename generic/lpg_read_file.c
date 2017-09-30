@@ -5,13 +5,13 @@
 
 blob_or_error make_blob_success(blob success)
 {
-    blob_or_error result = {NULL, success};
+    blob_or_error const result = {NULL, success};
     return result;
 }
 
 blob_or_error make_blob_error(char const *const error)
 {
-    blob_or_error result = {error, {NULL, 0}};
+    blob_or_error const result = {error, {NULL, 0}};
     return result;
 }
 

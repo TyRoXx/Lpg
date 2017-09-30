@@ -7,7 +7,7 @@ checked_function checked_function_create(register_id return_value,
                                          instruction_sequence body,
                                          register_id number_of_registers)
 {
-    checked_function result = {
+    checked_function const result = {
         return_value, signature, body, number_of_registers};
     return result;
 }

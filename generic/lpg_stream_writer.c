@@ -32,7 +32,7 @@ success_indicator memory_writer_write(void *user, char const *data,
                                       size_t length)
 {
     memory_writer *writer = user;
-    size_t new_used = (writer->used + length);
+    size_t const new_used = (writer->used + length);
     if (new_used > writer->reserved)
     {
         size_t new_reserved = (writer->used * 2);
@@ -68,7 +68,7 @@ bool memory_writer_equals(memory_writer const writer, char const *c_str)
 
 stream_writer memory_writer_erase(memory_writer *writer)
 {
-    stream_writer result = {memory_writer_write, writer};
+    stream_writer const result = {memory_writer_write, writer};
     return result;
 }
 

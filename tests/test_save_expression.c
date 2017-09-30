@@ -412,15 +412,16 @@ void test_save_expression(void)
 static void testing_comment_expressions()
 {
     {
-        unicode_string content = unicode_string_from_c_str("Test");
-        expression comment = expression_from_comment(
+        unicode_string const content = unicode_string_from_c_str("Test");
+        expression const comment = expression_from_comment(
             comment_expression_create(content, source_location_create(0, 0)));
         check_expression_rendering(comment, "//Test");
     }
 
     {
-        unicode_string content = unicode_string_from_c_str("Test\nTesting");
-        expression comment = expression_from_comment(
+        unicode_string const content =
+            unicode_string_from_c_str("Test\nTesting");
+        expression const comment = expression_from_comment(
             comment_expression_create(content, source_location_create(0, 0)));
         check_expression_rendering(comment, "/*Test\nTesting*/");
     }

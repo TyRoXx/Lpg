@@ -279,7 +279,7 @@ static void test_match_cases(void)
 static void test_function_calls(void)
 {
     {
-        tuple arguments = tuple_create(NULL, 0);
+        tuple const arguments = tuple_create(NULL, 0);
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
@@ -290,7 +290,7 @@ static void test_function_calls(void)
             unicode_string_from_c_str("f()"), false);
     }
     {
-        tuple arguments = tuple_create(NULL, 0);
+        tuple const arguments = tuple_create(NULL, 0);
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(expression_from_call(call_create(
@@ -307,7 +307,7 @@ static void test_function_calls(void)
         arguments[0] =
             expression_from_integer_literal(integer_literal_expression_create(
                 integer_create(0, 1), source_location_create(0, 2)));
-        tuple arguments_tuple = tuple_create(arguments, 1);
+        tuple const arguments_tuple = tuple_create(arguments, 1);
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
@@ -325,7 +325,7 @@ static void test_function_calls(void)
         arguments[1] =
             expression_from_integer_literal(integer_literal_expression_create(
                 integer_create(0, 2), source_location_create(0, 5)));
-        tuple arguments_tuple = tuple_create(arguments, 2);
+        tuple const arguments_tuple = tuple_create(arguments, 2);
         test_successful_parse(
             expression_from_call(call_create(
                 expression_allocate(
@@ -340,9 +340,10 @@ static void test_function_calls(void)
 static void test_comment(void)
 {
     {
-        expression expr = expression_from_comment(comment_expression_create(
-            unicode_string_from_c_str("Testing the comments"),
-            source_location_create(0, 0)));
+        expression const expr =
+            expression_from_comment(comment_expression_create(
+                unicode_string_from_c_str("Testing the comments"),
+                source_location_create(0, 0)));
         test_successful_parse(
             expr, unicode_string_from_c_str("//Testing the comments"), false);
     }
@@ -441,7 +442,7 @@ static void test_tuples(void)
                     source_location_create(0, 9)))),
             1)));
 
-    identifier_expression variable_name = identifier_expression_create(
+    identifier_expression const variable_name = identifier_expression_create(
         unicode_string_from_c_str("t"), source_location_create(0, 4));
 
     expression const assign = expression_from_declare(

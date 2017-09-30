@@ -3,7 +3,7 @@
 structure_member structure_member_create(type what, unicode_string name,
                                          optional_value compile_time_value)
 {
-    structure_member result = {what, name, compile_time_value};
+    structure_member const result = {what, name, compile_time_value};
     return result;
 }
 
