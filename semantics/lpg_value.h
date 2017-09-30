@@ -77,14 +77,14 @@ typedef struct value
 
 value value_from_flat_object(LPG_NON_NULL(value const *flat_object));
 value value_from_function_pointer(function_pointer_value function_pointer);
-value value_from_string_ref(unicode_view string_ref);
+value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
-value value_from_type(type type_);
-value value_from_enum_element(enum_element_id element, value *state);
-value value_from_integer(integer content);
+value value_from_type(type const type_);
+value value_from_enum_element(enum_element_id const element, value *const state);
+value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
-bool value_equals(value left, value right);
+bool value_equals(value const left, value const right);
 bool value_less_than(value left, value right);
 bool value_greater_than(value left, value right);
 
