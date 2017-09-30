@@ -372,6 +372,8 @@ static expression_parser_result parse_lambda(expression_parser *const parser,
                         parse_error_create(
                             parse_error_expected_space, space.where),
                         parser->user);
+                    clean_up_parameters(parameters, parameter_count);
+                    return expression_parser_result_failure;
                 }
             }
             else
