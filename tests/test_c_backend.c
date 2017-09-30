@@ -252,5 +252,13 @@ void test_c_backend(void)
                            "assert(f(boolean.true)())\n",
                            std_library, "23_lambda_capture.c");
 
+    check_generated_c_code("let f = (a: string-ref)\n"
+                           "    print(\"\")\n"
+                           "    ()\n"
+                           "        print(\"\")\n"
+                           "        a\n"
+                           "assert(string-equals(\"a\", f(\"a\")()))\n",
+                           std_library, "24_lambda_capture_owning.c");
+
     standard_library_description_free(&std_library);
 }
