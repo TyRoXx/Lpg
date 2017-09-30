@@ -35,6 +35,7 @@ static void expect_errors(semantic_error const error, void *user)
 
 static void test_loops(const standard_library_description *std_library);
 static void test_assert(const standard_library_description *std_library);
+static void test_operators(const standard_library_description *std_library);
 static void
 test_let_assignments(const standard_library_description *std_library);
 
@@ -191,6 +192,7 @@ void test_semantic_errors(void)
         instruction_sequence_free(&expected_body);
     }
     test_assert(&std_library);
+    test_operators(&std_library);
     {
         sequence root = parse("let v : boolean.true = boolean.true\n");
         semantic_error const errors[] = {
@@ -690,4 +692,17 @@ test_let_assignments(const standard_library_description *std_library)
         REQUIRE(checked.functions[0].body.length == 2);
         checked_program_free(&checked);
     }
+}
+
+static void test_operators(const standard_library_description *std_library)
+{
+    sequence root = parse("assert(!3)");
+    semantic_error const errors[] = {semantic_error_create(
+        semantic_error_type_mismatch, source_location_create(0, 8))};
+    expected_errors expected = {errors, 1};
+    checked_program checked =
+        check(root, std_library->globals, expect_errors, &expected);
+    REQUIRE(expected.count == 0);
+    sequence_free(&root);
+    checked_program_free(&checked);
 }
