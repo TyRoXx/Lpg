@@ -90,7 +90,7 @@ static void expect_output(char const *source, char const *input,
             function_pointer_value_from_external(or_impl, NULL)),
         /*not*/ value_from_function_pointer(
             function_pointer_value_from_external(not_impl, NULL)),
-        /*concat*/ value_from_function_pointer(
+        /* concat */ value_from_function_pointer(
             function_pointer_value_from_external(concat_impl, NULL)),
         /*string-equals*/ value_from_function_pointer(
             function_pointer_value_from_external(string_equals_impl, NULL)),
@@ -231,7 +231,8 @@ void test_interpreter(void)
     standard_library_description_free(&std_library);
 }
 
-static void test_captures(const standard_library_description *std_library) {
+static void test_captures(const standard_library_description *std_library)
+{
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
                   "f()\n",
