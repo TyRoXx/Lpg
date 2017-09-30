@@ -117,6 +117,7 @@ not not_expression_create(expression * value)
 void not_free(LPG_NON_NULL(not const *value))
 {
     expression_free(value->expr);
+    deallocate(value->expr);
 }
 
 sequence sequence_create(expression *elements, size_t length)

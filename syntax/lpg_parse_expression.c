@@ -703,8 +703,12 @@ static expression_parser_result parse_callable(expression_parser *parser,
             expression_parser_result result =
                 parse_expression(parser, indentation, false);
             ASSUME(result.is_success);
+
+            expression *success = allocate(sizeof(*success));
+            *success = result.success;
+
             expression expr =
-                expression_from_not(not_expression_create(&result.success));
+                expression_from_not(not_expression_create(success));
             expression_parser_result result1 = {1, expr};
             return result1;
         };
