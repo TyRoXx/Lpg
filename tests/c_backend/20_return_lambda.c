@@ -3,7 +3,6 @@
 #include <lpg_std_string.h>
 #include <stdio.h>
 typedef string_ref (*type_definition_0)(string_ref);
-typedef string_ref (*type_definition_1)(string_ref);
 static type_definition_0 lambda_1(void);
 static string_ref lambda_2(string_ref const arg0);
 static type_definition_0 lambda_1(void)
@@ -21,7 +20,7 @@ static string_ref lambda_2(string_ref const arg0)
 }
 int main(void)
 {
-    type_definition_1 const r_1 = lambda_1();
+    type_definition_0 const r_1 = lambda_1();
     string_ref const r_7 = lambda_2(string_literal("a", 1));
     bool const r_9 = string_ref_equals(r_7, string_literal("a", 1));
     unit const r_10 = assert_impl(r_9);

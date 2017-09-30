@@ -390,16 +390,16 @@ static success_indicator generate_type(
 
     case type_kind_lambda:
     {
-        function_pointer const signature =
-            *all_functions[generated.lambda.lambda].signature;
-        if (signature.captures.length)
+        function_pointer const *const signature =
+            all_functions[generated.lambda.lambda].signature;
+        if (signature->captures.length)
         {
-            return generate_type(type_from_tuple_type(signature.captures),
+            return generate_type(type_from_tuple_type(signature->captures),
                                  standard_library, definitions, all_functions,
                                  c_output);
         }
         return generate_c_function_pointer(
-            type_from_function_pointer(&signature), standard_library,
+            type_from_function_pointer(signature), standard_library,
             definitions, all_functions, c_output);
     }
 
