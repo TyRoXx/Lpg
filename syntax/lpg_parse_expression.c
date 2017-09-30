@@ -875,6 +875,11 @@ parse_returnable(expression_parser *const parser, size_t const indentation,
                                                  result.success,
                                                  less_than_or_equals);
                 }
+                else if (next_operator.token == token_equals)
+                {
+                    return parse_binary_operator(
+                        parser, indentation, result.success, equals);
+                }
                 parser->on_error(
                     parse_error_create(
                         parse_error_expected_declaration_or_assignment,

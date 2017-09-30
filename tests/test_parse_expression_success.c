@@ -164,10 +164,47 @@ static void test_comparison(void)
     *right = expression_from_integer_literal(integer_literal_expression_create(
         integer_create(0, 2), source_location_create(0, 7)));
 
-    test_successful_parse(
-        expression_from_binary_operator(
-            binary_operator_expression_create(left, right, not_equals)),
-        unicode_string_from_c_str("200 != 2"), true);
+    {
+        test_successful_parse(
+            expression_from_binary_operator(
+                binary_operator_expression_create(left, right, not_equals)),
+            unicode_string_from_c_str("200 != 2"), true);
+    }
+
+    {
+        test_successful_parse(
+            expression_from_binary_operator(binary_operator_expression_create(
+                left, right, less_than_or_equals)),
+            unicode_string_from_c_str("200 <= 2"), true);
+    }
+    {
+        test_successful_parse(
+            expression_from_binary_operator(binary_operator_expression_create(
+                left, right, greater_than_or_equals)),
+            unicode_string_from_c_str("200 >= 2"), true);
+    }
+
+    {
+        test_successful_parse(
+            expression_from_binary_operator(
+                binary_operator_expression_create(left, right, equals)),
+            unicode_string_from_c_str("200 == 2"), true);
+    }
+
+    *right = expression_from_integer_literal(integer_literal_expression_create(
+        integer_create(0, 2), source_location_create(0, 6)));
+    {
+        test_successful_parse(
+            expression_from_binary_operator(
+                binary_operator_expression_create(left, right, less_than)),
+            unicode_string_from_c_str("200 < 2"), true);
+    }
+    {
+        test_successful_parse(
+            expression_from_binary_operator(
+                binary_operator_expression_create(left, right, greater_than)),
+            unicode_string_from_c_str("200 > 2"), true);
+    }
 
     expression_free(left);
     expression_free(right);
