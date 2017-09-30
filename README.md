@@ -72,10 +72,24 @@ xor(boolean.true, boolean.false)
 ``` 
 
 #### Match
-The match statement works similar to the switch statement in other languages.
+The match expression works similar to the switch statement in other languages.
+Currently it only supports stateless enumerations, for example `boolean`.
 
+```lpg
+let a = boolean.true
+let result = match a
+    case boolean.false:
+        print("nope")
+        1
+    case boolean.true:
+        print("it works")
+        2
+assert(integer-equals(2, result))
+```
 
-TODO!!!!
+`match` does not support `break` or fall-through yet.
+The last expression in a `case` is returned as the result of the `match` expression.
+The result can be `unit` if you don't want to return anything.
 
 #### Loops
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
