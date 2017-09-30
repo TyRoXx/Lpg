@@ -982,17 +982,14 @@ evaluate_lambda(function_checking_state *const state,
         return evaluate_expression_result_create(
             true, destination, result_type, optional_value_empty, false);
     }
-    else
-    {
-        value const function_pointer = value_from_function_pointer(
-            function_pointer_value_from_internal(this_lambda_id, NULL, 0));
-        add_instruction(
-            function, instruction_create_literal(literal_instruction_create(
-                          destination, function_pointer, result_type)));
-        return evaluate_expression_result_create(
-            true, destination, result_type,
-            optional_value_create(function_pointer), false);
-    }
+    value const function_pointer = value_from_function_pointer(
+        function_pointer_value_from_internal(this_lambda_id, NULL, 0));
+    add_instruction(
+        function, instruction_create_literal(literal_instruction_create(
+                      destination, function_pointer, result_type)));
+    return evaluate_expression_result_create(
+        true, destination, result_type, optional_value_create(function_pointer),
+        false);
 }
 
 static evaluate_expression_result
