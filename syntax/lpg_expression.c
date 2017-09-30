@@ -289,8 +289,9 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_sequence:
     case expression_type_declare:
-    case expression_type_not:
     case expression_type_tuple:
+    case expression_type_not:
+    case expression_type_binary:
         LPG_TO_DO();
 
     case expression_type_comment:
@@ -518,6 +519,9 @@ void expression_free(expression const *this)
     case expression_type_comment:
         comment_expression_free(&this->comment);
         break;
+    case expression_type_binary:
+        binary_operator_expression_free(&this->binary);
+        break;
     }
 }
 
@@ -624,6 +628,11 @@ bool expression_equals(expression const *left, expression const *right)
     case expression_type_match:
         return match_equals(left->match, right->match);
 
+    case expression_type_binary:
+        return expression_equals(left->binary.left, right->binary.left) &&
+               expression_equals(left->binary.right, right->binary.left) &&
+               left->binary.comparator == right->binary.comparator;
+
     case expression_type_string:
         LPG_TO_DO();
     case expression_type_not:
@@ -661,4 +670,29 @@ bool expression_equals(expression const *left, expression const *right)
         return comment_equals(left->comment, right->comment);
     }
     LPG_UNREACHABLE();
+}
+
+binary_operator_expression
+binary_operator_expression_create(expression *left, expression *right,
+                                  binary_operator anOperator)
+{
+    binary_operator_expression result;
+    result.comparator = anOperator;
+    result.left = left;
+    result.right = right;
+    return result;
+}
+
+void binary_operator_expression_free(binary_operator_expression const *value)
+{
+    expression_free(value->left);
+    expression_free(value->right);
+}
+
+expression expression_from_binary_operator(binary_operator_expression value)
+{
+    expression result;
+    result.type = expression_type_binary;
+    result.binary = value;
+    return result;
 }
