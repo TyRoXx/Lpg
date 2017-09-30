@@ -191,7 +191,8 @@ void test_interpreter(void)
                   "    option.some(arg)\n"
                   "f(123)\n",
                   "", "", std_library.globals);
-    expect_output("let t = {unit}\n"
+    expect_output("let s = {}\n"
+                  "let t = {unit}\n"
                   "let u = {1, 2, 3, 4, 5, 6}\n"
                   "let v = {123, \"abc\"}\n"
                   "assert(integer-equals(123, v.0))\n"

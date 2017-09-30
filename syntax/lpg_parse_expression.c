@@ -486,10 +486,12 @@ static expression_parser_result parse_callable(expression_parser *parser,
             return parse_lambda(parser, indentation);
 
         case token_left_curly_brace:
+        {
             pop(parser);
             rich_token next = peek(parser);
             if (next.token == token_right_curly_brace)
             {
+                pop(parser);
                 expression_parser_result const parser_result = {
                     true, expression_from_tuple(tuple_create(NULL, 0))};
                 return parser_result;
@@ -551,6 +553,7 @@ static expression_parser_result parse_callable(expression_parser *parser,
                 true, expression_from_tuple(
                           tuple_create(tuple_elements, element_count))};
             return tuple_result;
+        }
 
         case token_right_curly_brace:
         case token_newline:
@@ -565,7 +568,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_case:
         case token_dot:
         case token_let:
-
             pop(parser);
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),
