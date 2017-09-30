@@ -219,16 +219,22 @@ success_indicator save_expression(stream_writer const to,
         {
         case less_than:
             operator= "<";
+            break;
         case less_than_or_equals:
             operator= "<=";
+            break;
         case equals:
             operator= "==";
+            break;
         case greater_than:
             operator= ">";
+            break;
         case greater_than_or_equals:
             operator= ">=";
+            break;
         case not_equals:
             operator= "!=";
+            break;
         }
         LPG_TRY(stream_writer_write_string(to, operator));
         return save_expression(to, value->binary.right, whitespace);

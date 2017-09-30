@@ -237,5 +237,11 @@ optional_value optional_value_create(value v)
 bool enum_less_than(enum_element_value const left,
                     enum_element_value const right)
 {
+    if (left.which == right.which)
+    {
+        value left_value = left.state ? *left.state : value_from_unit();
+        value right_value = right.state ? *right.state : value_from_unit();
+        return value_less_than(left_value, right_value);
+    }
     return left.which < right.which;
 }
