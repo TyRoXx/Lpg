@@ -199,8 +199,7 @@ bool value_less_than(value const left, value const right)
 {
     if (left.kind != right.kind)
     {
-        // TODO: come up with a type size system
-        return false;
+        return left.kind < right.kind;
     }
     switch (left.kind)
     {
