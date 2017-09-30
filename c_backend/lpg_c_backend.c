@@ -464,7 +464,9 @@ static success_indicator generate_type(
                 LPG_TRY(generate_tuple_element_name(i, definition_writer));
                 LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
             }
-            LPG_TRY(stream_writer_write_string(definition_writer, "}\n"));
+            LPG_TRY(stream_writer_write_string(definition_writer, "} "));
+            /*no newline here because clang-format will replace it with a
+             * space*/
         }
         else
         {

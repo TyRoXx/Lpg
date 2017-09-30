@@ -7,8 +7,7 @@ typedef struct type_definition_1
     size_t e_0;
     size_t e_1;
     type_definition_0 e_2;
-}
-type_definition_1;
+} type_definition_1;
 static size_t lambda_1(void);
 static size_t lambda_1(void)
 {
