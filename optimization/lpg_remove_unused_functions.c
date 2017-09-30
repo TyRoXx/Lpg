@@ -98,14 +98,23 @@ clone_function_pointer(function_pointer const original,
                        garbage_collector *const clone_gc)
 {
     function_pointer *const result = allocate(sizeof(*result));
-    result->result = type_clone(original.result, clone_gc);
-    result->parameters.length = original.parameters.length;
-    result->parameters.elements = allocate_array(
-        original.parameters.length, sizeof(*result->parameters.elements));
+    *result = function_pointer_create(
+        type_clone(original.result, clone_gc),
+        tuple_type_create(allocate_array(original.parameters.length,
+                                         sizeof(*result->parameters.elements)),
+                          original.parameters.length),
+        tuple_type_create(allocate_array(original.captures.length,
+                                         sizeof(*result->captures.elements)),
+                          original.captures.length));
     for (size_t i = 0; i < original.parameters.length; ++i)
     {
         result->parameters.elements[i] =
             type_clone(original.parameters.elements[i], clone_gc);
+    }
+    for (size_t i = 0; i < original.captures.length; ++i)
+    {
+        result->captures.elements[i] =
+            type_clone(original.captures.elements[i], clone_gc);
     }
     return result;
 }
@@ -263,7 +272,18 @@ static instruction clone_instruction(instruction const original,
         return original;
 
     case instruction_lambda_with_captures:
-        LPG_TO_DO();
+    {
+        register_id *const captures = allocate_array(
+            original.lambda_with_captures.capture_count, sizeof(*captures));
+        memcpy(
+            captures, original.lambda_with_captures.captures,
+            (original.lambda_with_captures.capture_count * sizeof(*captures)));
+        return instruction_create_lambda_with_captures(
+            lambda_with_captures_instruction_create(
+                original.lambda_with_captures.into,
+                original.lambda_with_captures.lambda, captures,
+                original.lambda_with_captures.capture_count));
+    }
     }
     LPG_UNREACHABLE();
 }
@@ -288,11 +308,11 @@ static checked_function keep_function(checked_function const original,
                                       garbage_collector *const new_gc,
                                       function_id const *const new_function_ids)
 {
-    checked_function result = {
+    checked_function const result = checked_function_create(
         original.return_value,
         clone_function_pointer(*original.signature, new_gc),
         clone_sequence(original.body, new_gc, new_function_ids),
-        original.number_of_registers};
+        original.number_of_registers);
     return result;
 }
 

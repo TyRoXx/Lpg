@@ -20,13 +20,15 @@ static void test_function_pointer_convertible(void)
         integer_range_create(integer_create(0, 0), integer_create(700, 0)));
     type arguments[] = {small_range, small_range};
     function_pointer function_pointer1 =
-        function_pointer_create(small_range, tuple_type_create(arguments, 2));
+        function_pointer_create(small_range, tuple_type_create(arguments, 2),
+                                tuple_type_create(NULL, 0));
     type function1 = type_from_function_pointer(&function_pointer1);
 
     REQUIRE(is_implicitly_convertible(function1, function1));
     {
         function_pointer function_pointer2 =
-            function_pointer_create(big_range, tuple_type_create(arguments, 2));
+            function_pointer_create(big_range, tuple_type_create(arguments, 2),
+                                    tuple_type_create(NULL, 0));
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));
@@ -34,7 +36,8 @@ static void test_function_pointer_convertible(void)
     {
         type more_arguments[] = {small_range, small_range, small_range};
         function_pointer function_pointer2 = function_pointer_create(
-            big_range, tuple_type_create(more_arguments, 3));
+            big_range, tuple_type_create(more_arguments, 3),
+            tuple_type_create(NULL, 0));
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));
@@ -42,7 +45,8 @@ static void test_function_pointer_convertible(void)
     {
         type different_arguments[] = {small_range, big_range};
         function_pointer function_pointer2 = function_pointer_create(
-            big_range, tuple_type_create(different_arguments, 2));
+            big_range, tuple_type_create(different_arguments, 2),
+            tuple_type_create(NULL, 0));
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));

@@ -244,5 +244,13 @@ void test_c_backend(void)
                            "assert({boolean.false, f()}.1)\n",
                            std_library, "22_tuple.c");
 
+    check_generated_c_code("let f = (a: boolean)\n"
+                           "    print(\"\")\n"
+                           "    ()\n"
+                           "        print(\"\")\n"
+                           "        a\n"
+                           "assert(f(boolean.true)())\n",
+                           std_library, "23_lambda_capture.c");
+
     standard_library_description_free(&std_library);
 }

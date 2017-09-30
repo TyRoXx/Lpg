@@ -268,5 +268,11 @@ void test_interpreter(void)
                   "assert(f())\n",
                   "", "", std_library.globals);
 
+    /*capture an argument*/
+    expect_output("let f = (a: boolean)\n"
+                  "    () a\n"
+                  "assert(f(boolean.true)())\n",
+                  "", "", std_library.globals);
+
     standard_library_description_free(&std_library);
 }

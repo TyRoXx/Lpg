@@ -72,6 +72,12 @@ bool integer_range_equals(integer_range const left, integer_range const right)
            integer_equal(left.maximum, right.maximum);
 }
 
+lambda_type lambda_type_create(function_id const lambda)
+{
+    lambda_type const result = {lambda};
+    return result;
+}
+
 enumeration_element enumeration_element_create(unicode_string name, type state)
 {
     enumeration_element result = {name, state};
@@ -83,6 +89,13 @@ void enumeration_element_free(enumeration_element const *value)
     unicode_string_free(&value->name);
 }
 
+function_pointer function_pointer_create(type result, tuple_type parameters,
+                                         tuple_type captures)
+{
+    function_pointer const returning = {result, parameters, captures};
+    return returning;
+}
+
 bool function_pointer_equals(function_pointer const left,
                              function_pointer const right)
 {
@@ -90,7 +103,8 @@ bool function_pointer_equals(function_pointer const left,
     {
         return false;
     }
-    return tuple_type_equals(left.parameters, right.parameters);
+    return tuple_type_equals(left.parameters, right.parameters) &&
+           tuple_type_equals(left.captures, right.captures);
 }
 
 type type_from_function_pointer(function_pointer const *value)
@@ -163,6 +177,14 @@ type type_from_enum_constructor(
     return result;
 }
 
+type type_from_lambda(lambda_type const lambda)
+{
+    type result;
+    result.kind = type_kind_lambda;
+    result.lambda = lambda;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -179,6 +201,9 @@ bool type_equals(type const left, type const right)
     switch (left.kind)
     {
     case type_kind_structure:
+        LPG_TO_DO();
+
+    case type_kind_lambda:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
@@ -219,6 +244,9 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     case type_kind_structure:
         LPG_TO_DO();
 
+    case type_kind_lambda:
+        return type_from_lambda(original.lambda);
+
     case type_kind_function_pointer:
     {
         function_pointer *const copy =
@@ -235,7 +263,8 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         *copy = function_pointer_create(
             type_clone(original.function_pointer_->result, clone_gc),
             tuple_type_create(
-                arguments, original.function_pointer_->parameters.length));
+                arguments, original.function_pointer_->parameters.length),
+            tuple_type_create(NULL, 0));
         return type_from_function_pointer(copy);
     }
 
@@ -264,16 +293,14 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     LPG_UNREACHABLE();
 }
 
-function_pointer function_pointer_create(type result, tuple_type parameters)
-{
-    function_pointer returned = {result, parameters};
-    return returned;
-}
-
 void function_pointer_free(function_pointer const *value)
 {
     if (value->parameters.elements)
     {
         deallocate(value->parameters.elements);
+    }
+    if (value->captures.elements)
+    {
+        deallocate(value->captures.elements);
     }
 }

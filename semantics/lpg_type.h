@@ -5,6 +5,7 @@
 #include "lpg_enum_element_id.h"
 #include "lpg_integer.h"
 #include "lpg_garbage_collector.h"
+#include "lpg_function_id.h"
 
 typedef struct structure_member structure_member;
 
@@ -60,12 +61,20 @@ typedef enum type_kind
     type_kind_type,
     type_kind_integer_range,
     type_kind_inferred,
-    type_kind_enum_constructor
+    type_kind_enum_constructor,
+    type_kind_lambda
 } type_kind;
 
 typedef struct function_pointer function_pointer;
 
 typedef struct enum_constructor_type enum_constructor_type;
+
+typedef struct lambda_type
+{
+    function_id lambda;
+} lambda_type;
+
+lambda_type lambda_type_create(function_id const lambda);
 
 struct type
 {
@@ -79,6 +88,7 @@ struct type
         integer_range integer_range_;
         size_t inferred;
         enum_constructor_type *enum_constructor;
+        lambda_type lambda;
     };
 };
 
@@ -101,8 +111,11 @@ struct function_pointer
 {
     type result;
     tuple_type parameters;
+    tuple_type captures;
 };
 
+function_pointer function_pointer_create(type result, tuple_type parameters,
+                                         tuple_type captures);
 bool function_pointer_equals(function_pointer const left,
                              function_pointer const right);
 
@@ -116,9 +129,9 @@ type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
 type type_from_enum_constructor(
     LPG_NON_NULL(enum_constructor_type *enum_constructor));
+type type_from_lambda(lambda_type const lambda);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);
 
-function_pointer function_pointer_create(type result, tuple_type parameters);
 void function_pointer_free(LPG_NON_NULL(function_pointer const *value));

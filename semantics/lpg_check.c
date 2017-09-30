@@ -46,8 +46,6 @@ static evaluate_expression_result const evaluate_expression_result_empty = {
     {false, {value_kind_integer, {NULL}}},
     false};
 
-typedef struct_member_id capture_index;
-
 typedef struct optional_capture_index
 {
     bool has_value;
@@ -55,13 +53,6 @@ typedef struct optional_capture_index
 } optional_capture_index;
 
 static optional_capture_index const optional_capture_index_empty = {false, 0};
-
-static optional_capture_index
-make_optional_capture_index(capture_index const value)
-{
-    optional_capture_index const result = {true, value};
-    return result;
-}
 
 static bool optional_capture_index_equals(optional_capture_index const left,
                                           optional_capture_index const right)
@@ -159,12 +150,16 @@ static evaluate_expression_result
 check_sequence(function_checking_state *const state,
                instruction_sequence *const output, sequence const input);
 
-static type get_return_type(type const callee)
+static type get_return_type(type const callee,
+                            checked_function const *const all_functions)
 {
     switch (callee.kind)
     {
     case type_kind_structure:
         LPG_TO_DO();
+
+    case type_kind_lambda:
+        return all_functions[callee.lambda.lambda].signature->result;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->result;
@@ -215,6 +210,9 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_unit:
     case type_kind_string_ref:
         return true;
+
+    case type_kind_lambda:
+        LPG_TO_DO();
 
     case type_kind_structure:
         LPG_TO_DO();
@@ -275,15 +273,23 @@ static bool check_parameter_type(type const from, type const into,
     return is_implicitly_convertible(from, into);
 }
 
-static bool function_parameter_accepts_type(type const function,
-                                            size_t const parameter,
-                                            type const argument,
-                                            type_inference const inferring)
+static bool function_parameter_accepts_type(
+    type const function, size_t const parameter, type const argument,
+    type_inference const inferring, checked_function const *const all_functions)
 {
     switch (function.kind)
     {
     case type_kind_structure:
         LPG_TO_DO();
+
+    case type_kind_lambda:
+        ASSUME(
+            parameter <
+            all_functions[function.lambda.lambda].signature->parameters.length);
+        return check_parameter_type(
+            argument, all_functions[function.lambda.lambda]
+                          .signature->parameters.elements[parameter],
+            inferring);
 
     case type_kind_function_pointer:
         ASSUME(parameter < function.function_pointer_->parameters.length);
@@ -419,6 +425,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
             state, function, actual_type->structure_, object.where,
             unicode_view_from_string(element->value), element->source, result);
 
+    case type_kind_lambda:
+        LPG_TO_DO();
+
     case type_kind_function_pointer:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -457,6 +466,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_unit:
         case type_kind_string_ref:
         case type_kind_tuple:
+            LPG_TO_DO();
+
+        case type_kind_lambda:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -528,12 +540,17 @@ read_element(function_checking_state *state, instruction_sequence *function,
     LPG_UNREACHABLE();
 }
 
-static size_t expected_call_argument_count(const type callee)
+static size_t
+expected_call_argument_count(const type callee,
+                             checked_function const *const all_functions)
 {
     switch (callee.kind)
     {
     case type_kind_structure:
         LPG_TO_DO();
+
+    case type_kind_lambda:
+        return all_functions[callee.lambda.lambda].signature->parameters.length;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->parameters.length;
@@ -716,6 +733,9 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     case type_kind_function_pointer:
         LPG_TO_DO();
 
+    case type_kind_lambda:
+        LPG_TO_DO();
+
     case type_kind_unit:
         return 0;
 
@@ -838,12 +858,23 @@ static check_function_result check_function(
         instruction_sequence_free(&body_out);
         return check_function_result_empty;
     }
+
+    type *const capture_types =
+        state.capture_count
+            ? allocate_array(state.capture_count, sizeof(*capture_types))
+            : NULL;
+    for (size_t i = 0; i < state.capture_count; ++i)
+    {
+        capture_types[i] = state.captures[i].what;
+    }
+
     function_pointer *const signature = allocate(sizeof(*signature));
-    signature->result = body_evaluated.type_;
-    signature->parameters.length = 0;
-    signature->parameters.elements = NULL;
-    checked_function const result = {
-        return_value, signature, body_out, state.used_registers};
+    *signature = function_pointer_create(
+        body_evaluated.type_, tuple_type_create(NULL, 0),
+        tuple_type_create(capture_types, state.capture_count));
+
+    checked_function const result = checked_function_create(
+        return_value, signature, body_out, state.used_registers);
     return check_function_result_create(
         result, state.captures, state.capture_count);
 }
@@ -892,9 +923,9 @@ evaluate_lambda(function_checking_state *const state,
     {
         function_pointer *const dummy_signature =
             allocate(sizeof(*dummy_signature));
-        dummy_signature->result = type_from_unit();
-        dummy_signature->parameters.elements = NULL;
-        dummy_signature->parameters.length = 0;
+        *dummy_signature = function_pointer_create(type_from_unit(),
+                                                   tuple_type_create(NULL, 0),
+                                                   tuple_type_create(NULL, 0));
         state->program->functions[this_lambda_id] = checked_function_create(
             0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }
@@ -920,8 +951,8 @@ evaluate_lambda(function_checking_state *const state,
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
     register_id const destination = allocate_register(&state->used_registers);
-    type const result_type = type_from_function_pointer(
-        state->program->functions[this_lambda_id].signature);
+    type const result_type =
+        type_from_lambda(lambda_type_create(this_lambda_id));
     if (checked.captures)
     {
         register_id *const captures =
@@ -991,6 +1022,11 @@ evaluate_call_expression(function_checking_state *state,
     case type_kind_structure:
         LPG_TO_DO();
 
+    case type_kind_lambda:
+        inferred_value_count = count_inferred_values(
+            *state->program->functions[callee.type_.lambda.lambda].signature);
+        break;
+
     case type_kind_function_pointer:
         inferred_value_count =
             count_inferred_values(*callee.type_.function_pointer_);
@@ -1010,7 +1046,7 @@ evaluate_call_expression(function_checking_state *state,
         break;
     }
     size_t const expected_arguments =
-        expected_call_argument_count(callee.type_);
+        expected_call_argument_count(callee.type_, state->program->functions);
     register_id *const arguments =
         allocate_array(expected_arguments, sizeof(*arguments));
     value *const compile_time_arguments =
@@ -1044,8 +1080,9 @@ evaluate_call_expression(function_checking_state *state,
             type_inference_free(inferring);
             return evaluate_expression_result_empty;
         }
-        if (!function_parameter_accepts_type(
-                callee.type_, i, argument.type_, inferring))
+        if (!function_parameter_accepts_type(callee.type_, i, argument.type_,
+                                             inferring,
+                                             state->program->functions))
         {
             restore(previous_code);
             state->on_error(
@@ -1078,7 +1115,8 @@ evaluate_call_expression(function_checking_state *state,
                         state->user);
         return evaluate_expression_result_empty;
     }
-    type const return_type = get_return_type(callee.type_);
+    type const return_type =
+        get_return_type(callee.type_, state->program->functions);
     register_id result = ~(register_id)0;
     optional_value compile_time_result = {false, value_from_unit()};
     if (callee.compile_time_value.is_set && all_compile_time_arguments)
@@ -1189,6 +1227,7 @@ evaluate_call_expression(function_checking_state *state,
         case type_kind_structure:
             LPG_UNREACHABLE();
 
+        case type_kind_lambda:
         case type_kind_function_pointer:
             add_instruction(
                 function,
@@ -1288,6 +1327,9 @@ evaluate_expression(function_checking_state *state,
         case type_kind_function_pointer:
         case type_kind_unit:
         case type_kind_string_ref:
+            LPG_TO_DO();
+
+        case type_kind_lambda:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -1694,9 +1736,9 @@ checked_program check(sequence const root, structure const global,
     {
         function_pointer *const dummy_signature =
             allocate(sizeof(*dummy_signature));
-        dummy_signature->result = type_from_unit();
-        dummy_signature->parameters.elements = NULL;
-        dummy_signature->parameters.length = 0;
+        *dummy_signature = function_pointer_create(type_from_unit(),
+                                                   tuple_type_create(NULL, 0),
+                                                   tuple_type_create(NULL, 0));
         program.functions[0] = checked_function_create(
             0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
     }

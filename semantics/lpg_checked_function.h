@@ -3,6 +3,7 @@
 #include "lpg_register_id.h"
 #include <lpg_non_null.h>
 #include "lpg_unicode_string.h"
+#include "lpg_type.h"
 
 typedef struct function_pointer function_pointer;
 
