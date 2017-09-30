@@ -1257,6 +1257,7 @@ evaluate_expression(function_checking_state *state,
 
     case expression_type_binary:
         LPG_TO_DO();
+    // return evaluate_binary(state, function, element.binary);
 
     case expression_type_integer_literal:
     {

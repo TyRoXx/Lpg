@@ -123,6 +123,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected comma";
     case parse_error_expected_lambda_body:
         return "Expected lambda body";
+    case parse_error_unknown_binary_operator:
+        return "Unknown binary operator";
     }
     LPG_UNREACHABLE();
 }

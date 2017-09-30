@@ -9,6 +9,7 @@ static void test_loops(void);
 static void test_comment(void);
 static void test_function_calls(void);
 static void test_match_cases(void);
+static void test_comparison(void);
 static void test_assignments(void);
 static void test_lamdas();
 
@@ -63,6 +64,7 @@ void test_parse_expression_success(void)
     test_function_calls();
     test_comment();
     test_loops();
+    test_comparison();
     test_assignments();
     test_match_cases();
     test_lamdas();
@@ -150,6 +152,25 @@ static void test_lamdas()
                                       "    1"),
             false);
     }
+}
+
+static void test_comparison(void)
+{
+    expression *left = allocate(sizeof(*left));
+    *left = expression_from_integer_literal(integer_literal_expression_create(
+        integer_create(0, 200), source_location_create(0, 0)));
+
+    expression *right = allocate(sizeof(*right));
+    *right = expression_from_integer_literal(integer_literal_expression_create(
+        integer_create(0, 2), source_location_create(0, 7)));
+
+    test_successful_parse(
+        expression_from_binary_operator(
+            binary_operator_expression_create(left, right, not_equals)),
+        unicode_string_from_c_str("200 != 2"), true);
+
+    expression_free(left);
+    expression_free(right);
 }
 
 static void test_assignments(void)
