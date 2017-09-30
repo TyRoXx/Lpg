@@ -308,11 +308,21 @@ static checked_function keep_function(checked_function const original,
                                       garbage_collector *const new_gc,
                                       function_id const *const new_function_ids)
 {
+    unicode_string *const register_debug_names =
+        (original.number_of_registers > 0)
+            ? allocate_array(
+                  original.number_of_registers, sizeof(*register_debug_names))
+            : NULL;
+    for (size_t i = 0; i < original.number_of_registers; ++i)
+    {
+        register_debug_names[i] = unicode_view_copy(
+            unicode_view_from_string(original.register_debug_names[i]));
+    }
     checked_function const result = checked_function_create(
         original.return_value,
         clone_function_pointer(*original.signature, new_gc),
         clone_sequence(original.body, new_gc, new_function_ids),
-        original.number_of_registers);
+        register_debug_names, original.number_of_registers);
     return result;
 }
 

@@ -220,12 +220,15 @@ remove_one_layer_of_dead_code_from_function(checked_function *const from)
             if (registers_read_from[i])
             {
                 new_register_ids[i] = next_register;
+                from->register_debug_names[next_register] =
+                    from->register_debug_names[i];
                 ++next_register;
             }
             else
             {
                 new_register_ids[i] = no_register;
                 result = removed_something_yes;
+                unicode_string_free(from->register_debug_names + i);
             }
         }
         from->number_of_registers = next_register;

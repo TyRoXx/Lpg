@@ -61,6 +61,11 @@ static void check_function(checked_function const expected,
 {
     REQUIRE(expected.return_value == gotten.return_value);
     REQUIRE(expected.number_of_registers == gotten.number_of_registers);
+    for (register_id i = 0; i < expected.number_of_registers; ++i)
+    {
+        REQUIRE(unicode_string_equals(
+            expected.register_debug_names[i], gotten.register_debug_names[i]));
+    }
     REQUIRE(function_pointer_equals(*expected.signature, *gotten.signature));
     if (!instruction_sequence_equals(&expected.body, &gotten.body))
     {
@@ -290,19 +295,24 @@ static void test_functions(const standard_library_description *std_library)
             *signature = function_pointer_create(type_from_unit(),
                                                  tuple_type_create(NULL, 0),
                                                  tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] = checked_function_create(
                 1, signature,
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             *signature_lambda = function_pointer_create(
                 type_from_integer_range(integer_range_create(
                     integer_create(0, 123), integer_create(0, 123))),
                 tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
                 0, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                1);
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program(
             "let f = () 123\n", (*std_library).globals, expected);
@@ -335,18 +345,24 @@ static void test_functions(const standard_library_description *std_library)
             *signature = function_pointer_create(type_from_unit(),
                                                  tuple_type_create(NULL, 0),
                                                  tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] = checked_function_create(
                 1, signature,
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             *signature_lambda = function_pointer_create(
                 type_from_unit(), tuple_type_create(NULL, 0),
                 tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str(""), unicode_string_from_c_str(""),
+                unicode_string_from_c_str(""), unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
                 3, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                4);
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = ()\n"
                                  "    assert(boolean.true)\n",
@@ -373,9 +389,12 @@ static void test_functions(const standard_library_description *std_library)
             *signature = function_pointer_create(type_from_unit(),
                                                  tuple_type_create(NULL, 0),
                                                  tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] = checked_function_create(
                 1, signature,
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 2);
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             type *const parameters = allocate_array(1, sizeof(*parameters));
@@ -385,10 +404,12 @@ static void test_functions(const standard_library_description *std_library)
                 type_from_integer_range(integer_range_create(
                     integer_create(0, 123), integer_create(0, 123))),
                 tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("a"), unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
                 1, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                2);
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program(
             "let f = (a: boolean) 123\n", (*std_library).globals, expected);
@@ -417,18 +438,24 @@ static void test_functions(const standard_library_description *std_library)
             *signature = function_pointer_create(type_from_unit(),
                                                  tuple_type_create(NULL, 0),
                                                  tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("v"),
+                unicode_string_from_c_str("")};
             expected.functions[0] = checked_function_create(
                 2, signature,
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 3);
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             *signature_lambda = function_pointer_create(
                 type_from_type(), tuple_type_create(NULL, 0),
                 tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str(""), unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
                 1, signature_lambda,
                 instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                2);
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = () boolean\n"
                                  "let v : f() = boolean.true",
@@ -454,9 +481,13 @@ static void test_functions(const standard_library_description *std_library)
             *signature = function_pointer_create(type_from_unit(),
                                                  tuple_type_create(NULL, 0),
                                                  tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("v"),
+                unicode_string_from_c_str("")};
             expected.functions[0] = checked_function_create(
                 2, signature,
-                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)), 3);
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             type *const parameters = allocate_array(1, sizeof(*parameters));
@@ -464,8 +495,11 @@ static void test_functions(const standard_library_description *std_library)
             *signature_lambda = function_pointer_create(
                 type_from_type(), tuple_type_create(parameters, 1),
                 tuple_type_create(NULL, 0));
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("a")};
             expected.functions[1] = checked_function_create(
-                0, signature_lambda, instruction_sequence_create(NULL, 0), 1);
+                0, signature_lambda, instruction_sequence_create(NULL, 0),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = (a: type) a\n"
                                  "let v : f(boolean) = boolean.true",

@@ -14,7 +14,9 @@ unicode_string unicode_string_from_c_str(const char *c_str)
 {
     unicode_string result;
     result.length = strlen(c_str);
-    result.data = allocate_array(result.length, sizeof(*result.data));
+    result.data =
+        (result.length ? allocate_array(result.length, sizeof(*result.data))
+                       : NULL);
     memcpy(result.data, c_str, result.length);
     return result;
 }
