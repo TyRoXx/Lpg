@@ -155,29 +155,21 @@ static type get_return_type(type const callee,
 {
     switch (callee.kind)
     {
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->result;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->result;
 
-    case type_kind_unit:
-    case type_kind_string_ref:
-    case type_kind_enumeration:
-        LPG_TO_DO();
-
     case type_kind_tuple:
         return callee;
 
+    case type_kind_structure:
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
     case type_kind_type:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
-        LPG_TO_DO();
-
     case type_kind_inferred:
         LPG_TO_DO();
 
@@ -211,12 +203,6 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_string_ref:
         return true;
 
-    case type_kind_lambda:
-        LPG_TO_DO();
-
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_function_pointer:
         return type_equals(flat_from, flat_into);
 
@@ -239,15 +225,16 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
         }
         return true;
     }
+
     case type_kind_integer_range:
         return integer_less_or_equals(flat_into.integer_range_.minimum,
                                       flat_from.integer_range_.minimum) &&
                integer_less_or_equals(flat_from.integer_range_.maximum,
                                       flat_into.integer_range_.maximum);
 
+    case type_kind_lambda:
+    case type_kind_structure:
     case type_kind_inferred:
-        LPG_TO_DO();
-
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
@@ -279,9 +266,6 @@ static bool function_parameter_accepts_type(
 {
     switch (function.kind)
     {
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         ASSUME(
             parameter <
@@ -298,18 +282,13 @@ static bool function_parameter_accepts_type(
             function.function_pointer_->parameters.elements[parameter],
             inferring);
 
+    case type_kind_structure:
     case type_kind_unit:
     case type_kind_string_ref:
     case type_kind_enumeration:
     case type_kind_tuple:
-        LPG_TO_DO();
-
     case type_kind_type:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
-        LPG_TO_DO();
-
     case type_kind_inferred:
         LPG_TO_DO();
 
@@ -427,11 +406,20 @@ read_element(function_checking_state *state, instruction_sequence *function,
             state, function, actual_type->structure_, object.where,
             unicode_view_from_string(element->value), element->source, result);
 
-    case type_kind_lambda:
-    case type_kind_function_pointer:
-    case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_inferred:
         LPG_TO_DO();
+
+    case type_kind_enum_constructor:
+    case type_kind_integer_range:
+    case type_kind_lambda:
+    case type_kind_unit:
+    case type_kind_function_pointer:
+    case type_kind_string_ref:
+        state->on_error(semantic_error_create(
+                            semantic_error_unknown_element, element->source),
+                        state->user);
+        return read_structure_element_result_create(
+            false, type_from_unit(), optional_value_empty);
 
     case type_kind_enumeration:
         state->on_error(
@@ -461,12 +449,23 @@ read_element(function_checking_state *state, instruction_sequence *function,
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
+        case type_kind_string_ref:
+        case type_kind_unit:
+        case type_kind_type:
+        case type_kind_integer_range:
+            state->on_error(
+                semantic_error_create(
+                    semantic_error_unknown_element, element->source),
+                state->user);
+            return read_structure_element_result_create(
+                false, type_from_unit(), optional_value_empty);
+
         case type_kind_structure:
         case type_kind_function_pointer:
-        case type_kind_unit:
-        case type_kind_string_ref:
         case type_kind_tuple:
         case type_kind_lambda:
+        case type_kind_inferred:
+        case type_kind_enum_constructor:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -514,20 +513,9 @@ read_element(function_checking_state *state, instruction_sequence *function,
             return read_structure_element_result_create(
                 false, type_from_unit(), optional_value_empty);
         }
-
-        case type_kind_type:
-        case type_kind_integer_range:
-        case type_kind_inferred:
-        case type_kind_enum_constructor:
-            LPG_TO_DO();
         }
         LPG_UNREACHABLE();
     }
-
-    case type_kind_integer_range:
-    case type_kind_inferred:
-    case type_kind_enum_constructor:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -538,33 +526,19 @@ expected_call_argument_count(const type callee,
 {
     switch (callee.kind)
     {
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->parameters.length;
 
+    case type_kind_structure:
     case type_kind_unit:
-        LPG_TO_DO();
-
     case type_kind_string_ref:
-        LPG_TO_DO();
-
     case type_kind_enumeration:
-        LPG_TO_DO();
-
     case type_kind_tuple:
-        LPG_TO_DO();
-
     case type_kind_type:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
-        LPG_TO_DO();
-
     case type_kind_inferred:
         LPG_TO_DO();
 
@@ -723,34 +697,20 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     {
     case type_kind_structure:
     case type_kind_function_pointer:
-        LPG_TO_DO();
-
     case type_kind_lambda:
+    case type_kind_tuple:
+    case type_kind_enum_constructor:
         LPG_TO_DO();
 
     case type_kind_unit:
-        return 0;
-
     case type_kind_string_ref:
-        return 0;
-
     case type_kind_enumeration:
-        return 0;
-
     case type_kind_type:
-        return 0;
-
     case type_kind_integer_range:
         return 0;
 
-    case type_kind_tuple:
-        LPG_TO_DO();
-
     case type_kind_inferred:
         return (root.inferred + 1);
-
-    case type_kind_enum_constructor:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -999,9 +959,6 @@ evaluate_call_expression(function_checking_state *state,
         /*needs to be initialized to avoid compiler warnings due to the missing default case in the switch statement below*/ 0;
     switch (callee.type_.kind)
     {
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         inferred_value_count = count_inferred_values(
             *state->program->functions[callee.type_.lambda.lambda].signature);
@@ -1012,6 +969,7 @@ evaluate_call_expression(function_checking_state *state,
             count_inferred_values(*callee.type_.function_pointer_);
         break;
 
+    case type_kind_structure:
     case type_kind_unit:
     case type_kind_string_ref:
     case type_kind_enumeration:
@@ -1114,10 +1072,6 @@ evaluate_call_expression(function_checking_state *state,
         {
             switch (callee.compile_time_value.value_.kind)
             {
-            case value_kind_integer:
-            case value_kind_string:
-                LPG_UNREACHABLE();
-
             case value_kind_function_pointer:
             {
                 size_t const globals_count = state->global->count;
@@ -1145,6 +1099,8 @@ evaluate_call_expression(function_checking_state *state,
                 break;
             }
 
+            case value_kind_integer:
+            case value_kind_string:
             case value_kind_flat_object:
             case value_kind_type:
             case value_kind_enum_element:
@@ -1204,9 +1160,6 @@ evaluate_call_expression(function_checking_state *state,
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
-        case type_kind_structure:
-            LPG_UNREACHABLE();
-
         case type_kind_lambda:
         case type_kind_function_pointer:
             add_instruction(
@@ -1215,6 +1168,7 @@ evaluate_call_expression(function_checking_state *state,
                     callee.where, arguments, expected_arguments, result)));
             break;
 
+        case type_kind_structure:
         case type_kind_unit:
         case type_kind_string_ref:
         case type_kind_enumeration:
@@ -1303,15 +1257,6 @@ evaluate_expression(function_checking_state *state,
         }
         switch (key.type_.kind)
         {
-        case type_kind_structure:
-        case type_kind_function_pointer:
-        case type_kind_unit:
-        case type_kind_string_ref:
-            LPG_TO_DO();
-
-        case type_kind_lambda:
-            LPG_TO_DO();
-
         case type_kind_enumeration:
             if (key.type_.enum_->size != element.match.number_of_cases)
             {
@@ -1323,6 +1268,11 @@ evaluate_expression(function_checking_state *state,
             }
             break;
 
+        case type_kind_structure:
+        case type_kind_function_pointer:
+        case type_kind_unit:
+        case type_kind_string_ref:
+        case type_kind_lambda:
         case type_kind_tuple:
         case type_kind_type:
         case type_kind_integer_range:
