@@ -178,9 +178,6 @@ static void test_comparison(void)
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, not_equals)),
             unicode_string_from_c_str("200 != 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
 
     {
@@ -197,9 +194,6 @@ static void test_comparison(void)
             expression_from_binary_operator(binary_operator_expression_create(
                 left, right, less_than_or_equals)),
             unicode_string_from_c_str("200 <= 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
     {
         expression *left = allocate(sizeof(*left));
@@ -215,9 +209,6 @@ static void test_comparison(void)
             expression_from_binary_operator(binary_operator_expression_create(
                 left, right, greater_than_or_equals)),
             unicode_string_from_c_str("200 >= 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
     {
         expression *left = allocate(sizeof(*left));
@@ -233,9 +224,6 @@ static void test_comparison(void)
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, equals)),
             unicode_string_from_c_str("200 == 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
     {
         expression *left = allocate(sizeof(*left));
@@ -251,9 +239,6 @@ static void test_comparison(void)
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, less_than)),
             unicode_string_from_c_str("200 < 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
     {
         expression *left = allocate(sizeof(*left));
@@ -269,9 +254,6 @@ static void test_comparison(void)
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, greater_than)),
             unicode_string_from_c_str("200 > 2"), true);
-
-        deallocate(left);
-        deallocate(right);
     }
 }
 
