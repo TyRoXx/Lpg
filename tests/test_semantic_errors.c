@@ -237,6 +237,32 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
+    {
+        sequence root = parse("let v = {}.0\n");
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_unknown_element, source_location_create(0, 11))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let v = {}.a\n");
+        semantic_error const errors[] = {semantic_error_create(
+            semantic_error_unknown_element, source_location_create(0, 11))};
+        expected_errors expected = {errors, 1};
+        checked_program checked =
+            check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
     test_let_assignments(&std_library);
     standard_library_description_free(&std_library);
 }
