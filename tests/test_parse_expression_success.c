@@ -5,12 +5,19 @@
 #include "handle_parse_error.h"
 
 static void test_tuples(void);
+
 static void test_loops(void);
+
 static void test_comment(void);
+
 static void test_function_calls(void);
+
 static void test_match_cases(void);
+
 static void test_comparison(void);
+
 static void test_assignments(void);
+
 static void test_lamdas();
 
 static void test_successful_parse(expression const expected,
@@ -156,58 +163,116 @@ static void test_lamdas()
 
 static void test_comparison(void)
 {
-    expression *left = allocate(sizeof(*left));
-    *left = expression_from_integer_literal(integer_literal_expression_create(
-        integer_create(0, 200), source_location_create(0, 0)));
-
-    expression *right = allocate(sizeof(*right));
-    *right = expression_from_integer_literal(integer_literal_expression_create(
-        integer_create(0, 2), source_location_create(0, 7)));
 
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 7)));
         test_successful_parse(
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, not_equals)),
             unicode_string_from_c_str("200 != 2"), true);
+
+        deallocate(left);
+        deallocate(right);
     }
 
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 7)));
         test_successful_parse(
             expression_from_binary_operator(binary_operator_expression_create(
                 left, right, less_than_or_equals)),
             unicode_string_from_c_str("200 <= 2"), true);
+
+        deallocate(left);
+        deallocate(right);
     }
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 7)));
         test_successful_parse(
             expression_from_binary_operator(binary_operator_expression_create(
                 left, right, greater_than_or_equals)),
             unicode_string_from_c_str("200 >= 2"), true);
-    }
 
+        deallocate(left);
+        deallocate(right);
+    }
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 7)));
         test_successful_parse(
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, equals)),
             unicode_string_from_c_str("200 == 2"), true);
-    }
 
-    *right = expression_from_integer_literal(integer_literal_expression_create(
-        integer_create(0, 2), source_location_create(0, 6)));
+        deallocate(left);
+        deallocate(right);
+    }
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 6)));
         test_successful_parse(
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, less_than)),
             unicode_string_from_c_str("200 < 2"), true);
+
+        deallocate(left);
+        deallocate(right);
     }
     {
+        expression *left = allocate(sizeof(*left));
+        *left =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right =
+            expression_from_integer_literal(integer_literal_expression_create(
+                integer_create(0, 2), source_location_create(0, 6)));
         test_successful_parse(
             expression_from_binary_operator(
                 binary_operator_expression_create(left, right, greater_than)),
             unicode_string_from_c_str("200 > 2"), true);
-    }
 
-    expression_free(left);
-    expression_free(right);
+        deallocate(left);
+        deallocate(right);
+    }
 }
 
 static void test_assignments(void)
