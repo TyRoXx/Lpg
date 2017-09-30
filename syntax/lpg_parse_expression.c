@@ -519,7 +519,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
                     if (next.token == token_space)
                     {
                         pop(parser);
-                        next = peek(parser);
                     }
                     else
                     {
