@@ -678,9 +678,9 @@ binary_operator_expression_create(expression *left, expression *right,
                                   binary_operator anOperator)
 {
     binary_operator_expression result;
-    result.comparator = anOperator;
     result.left = left;
     result.right = right;
+    result.comparator = anOperator;
     return result;
 }
 

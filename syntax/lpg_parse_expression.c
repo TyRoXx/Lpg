@@ -510,6 +510,11 @@ static expression_parser_result parse_callable(expression_parser *parser,
         case token_dot:
         case token_let:
         case token_equals:
+        case token_not_equals:
+        case token_less_than:
+        case token_less_than_or_equals:
+        case token_greater_than:
+        case token_greater_than_or_equals:
             pop(parser);
             parser->on_error(
                 parse_error_create(parse_error_expected_expression, head.where),
@@ -560,12 +565,6 @@ static expression_parser_result parse_callable(expression_parser *parser,
                        unicode_view_copy(head.content), head.where))};
             return result;
         }
-        case token_greater_than:
-        case token_greater_than_or_equals:
-        case token_less_than:
-        case token_less_than_or_equals:
-        case token_not_equals:
-            LPG_TO_DO();
         case token_not:
         {
             pop(parser);
@@ -769,6 +768,45 @@ static expression_parser_result parse_assignment(expression_parser *parser,
 }
 
 static expression_parser_result
+parse_binary_operator(expression_parser *const parser, const size_t indentation,
+                      expression expression, binary_operator operator)
+{
+    // Checking the whitespaces
+    rich_token token = peek(parser);
+    if (token.token != token_space)
+    {
+        parser->on_error(
+            parse_error_create(parse_error_expected_space, peek(parser).where),
+            parser->user);
+    }
+    else
+    {
+        pop(parser);
+    }
+
+    binary_operator_expression binary_operator_expression1;
+    binary_operator_expression1.left = allocate(sizeof(expression));
+    *binary_operator_expression1.left = expression;
+
+    expression_parser_result right =
+        parse_expression(parser, indentation, true);
+    if (!right.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+
+    binary_operator_expression1.right =
+        allocate(sizeof(*binary_operator_expression1.right));
+    *binary_operator_expression1.right = right.success;
+
+    binary_operator_expression1.comparator = operator;
+
+    expression_parser_result result = {
+        1, expression_from_binary_operator(binary_operator_expression1)};
+    return result;
+}
+
+static expression_parser_result
 parse_returnable(expression_parser *const parser, size_t const indentation,
                  bool const may_be_statement)
 {
@@ -809,6 +847,33 @@ parse_returnable(expression_parser *const parser, size_t const indentation,
                 {
                     return parse_assignment(
                         parser, indentation, result.success);
+                }
+                else if (next_operator.token == token_not_equals)
+                {
+                    return parse_binary_operator(
+                        parser, indentation, result.success, not_equals);
+                }
+                else if (next_operator.token == token_greater_than)
+                {
+                    return parse_binary_operator(
+                        parser, indentation, result.success, greater_than);
+                }
+                else if (next_operator.token == token_greater_than_or_equals)
+                {
+                    return parse_binary_operator(parser, indentation,
+                                                 result.success,
+                                                 greater_than_or_equals);
+                }
+                else if (next_operator.token == token_less_than)
+                {
+                    return parse_binary_operator(
+                        parser, indentation, result.success, less_than);
+                }
+                else if (next_operator.token == token_less_than_or_equals)
+                {
+                    return parse_binary_operator(parser, indentation,
+                                                 result.success,
+                                                 less_than_or_equals);
                 }
                 parser->on_error(
                     parse_error_create(
