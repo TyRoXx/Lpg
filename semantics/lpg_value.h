@@ -85,8 +85,8 @@ value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
 bool value_equals(value const left, value const right);
-bool value_less_than(value left, value right);
-bool value_greater_than(value left, value right);
+bool value_less_than(value const left, value const right);
+bool value_greater_than(value const left, value const gright);
 
 typedef struct optional_value
 {
