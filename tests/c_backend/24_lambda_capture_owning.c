@@ -23,10 +23,10 @@ static string_ref lambda_2(type_definition_0 const *const captures)
 }
 int main(void)
 {
-    type_definition_0 const r_7 = lambda_1(string_literal("a", 1));
-    string_ref const r_8 = lambda_2(&r_7);
-    bool const r_9 = string_ref_equals(string_literal("a", 1), r_8);
+    type_definition_0 const inner_2 = lambda_1(string_literal("a", 1));
+    string_ref const result_3 = lambda_2(&inner_2);
+    bool const r_9 = string_ref_equals(string_literal("a", 1), result_3);
     unit const r_10 = assert_impl(r_9);
-    string_ref_free(&r_8);
+    string_ref_free(&result_3);
     return 0;
 }
