@@ -750,7 +750,7 @@ check_function_result_create(checked_function function, capture *captures,
 }
 
 static check_function_result const check_function_result_empty = {
-    false, {0, NULL, {NULL, 0}, 0}, NULL, 0};
+    false, {0, NULL, {NULL, 0}, NULL, 0}, NULL, 0};
 
 static void define_register_debug_name(function_checking_state *const state,
                                        register_id const which,
