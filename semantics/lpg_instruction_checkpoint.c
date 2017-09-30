@@ -4,7 +4,7 @@
 instruction_checkpoint make_checkpoint(register_id *const used_registers,
                                        instruction_sequence *sequence)
 {
-    instruction_checkpoint result = {
+    instruction_checkpoint const result = {
         used_registers, sequence, sequence->length, *used_registers};
     return result;
 }

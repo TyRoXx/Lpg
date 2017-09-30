@@ -84,8 +84,8 @@ value int_impl(value const *const inferred, value const *arguments,
     (void)environment;
     (void)inferred;
     (void)gc;
-    integer first = arguments[0].integer_;
-    integer second = arguments[1].integer_;
+    integer const first = arguments[0].integer_;
+    integer const second = arguments[1].integer_;
     if (integer_less(first, second))
     {
         return value_from_type(
@@ -312,7 +312,7 @@ standard_library_description describe_standard_library(void)
 
     LPG_STATIC_ASSERT(standard_library_element_count == 17);
 
-    standard_library_description result = {
+    standard_library_description const result = {
         structure_create(globals, standard_library_element_count), stable};
     return result;
 }

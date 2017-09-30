@@ -5,7 +5,7 @@
 static int check_identifier(char const *candidate)
 {
     unicode_string s = unicode_string_from_c_str(candidate);
-    int result = is_identifier(s.data, s.length);
+    int const result = is_identifier(s.data, s.length);
     unicode_string_free(&s);
     return result;
 }

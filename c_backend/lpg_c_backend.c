@@ -305,7 +305,7 @@ static unicode_string make_type_definition_name(size_t const index)
     size_t const index_length = (size_t)((buffer + sizeof(buffer)) - formatted);
     char const *const prefix = "type_definition_";
     size_t const name_length = strlen(prefix) + index_length;
-    unicode_string name = {allocate(name_length), name_length};
+    unicode_string const name = {allocate(name_length), name_length};
     memcpy(name.data, prefix, strlen(prefix));
     memcpy(name.data + strlen(prefix), formatted, index_length);
     return name;
@@ -446,23 +446,34 @@ static success_indicator generate_type(
             new_definition->what = generated;
             new_definition->name = name;
         }
-        LPG_TRY(
-            stream_writer_write_string(definition_writer, "typedef struct "));
-        LPG_TRY(generate_type(generated, standard_library, definitions,
-                              all_functions, definition_writer));
-        LPG_TRY(stream_writer_write_string(definition_writer, "\n"));
-        LPG_TRY(stream_writer_write_string(definition_writer, "{\n"));
-        for (struct_member_id i = 0; i < generated.tuple_.length; ++i)
+        if (generated.tuple_.length > 0)
         {
-            LPG_TRY(indent(1, definition_writer));
-            LPG_TRY(generate_type(generated.tuple_.elements[i],
-                                  standard_library, definitions, all_functions,
-                                  definition_writer));
-            LPG_TRY(stream_writer_write_string(definition_writer, " "));
-            LPG_TRY(generate_tuple_element_name(i, definition_writer));
-            LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
+            LPG_TRY(stream_writer_write_string(
+                definition_writer, "typedef struct "));
+            LPG_TRY(generate_type(generated, standard_library, definitions,
+                                  all_functions, definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, "\n"));
+            LPG_TRY(stream_writer_write_string(definition_writer, "{\n"));
+            for (struct_member_id i = 0; i < generated.tuple_.length; ++i)
+            {
+                LPG_TRY(indent(1, definition_writer));
+                LPG_TRY(generate_type(generated.tuple_.elements[i],
+                                      standard_library, definitions,
+                                      all_functions, definition_writer));
+                LPG_TRY(stream_writer_write_string(definition_writer, " "));
+                LPG_TRY(generate_tuple_element_name(i, definition_writer));
+                LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
+            }
+            LPG_TRY(stream_writer_write_string(definition_writer, "} "));
+            /*no newline here because clang-format will replace it with a
+             * space*/
         }
-        LPG_TRY(stream_writer_write_string(definition_writer, "}\n"));
+        else
+        {
+            standard_library->using_unit = true;
+            LPG_TRY(
+                stream_writer_write_string(definition_writer, "typedef unit "));
+        }
         LPG_TRY(generate_type(generated, standard_library, definitions,
                               all_functions, definition_writer));
         LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
@@ -836,13 +847,21 @@ generate_tuple_initializer(c_backend_state *state, tuple_type const tuple,
                            stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{"));
-    for (size_t i = 0; i < tuple.length; ++i)
+    if (tuple.length > 0)
     {
-        if (i > 0)
+        for (size_t i = 0; i < tuple.length; ++i)
         {
-            LPG_TRY(stream_writer_write_string(c_output, ", "));
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", "));
+            }
+            LPG_TRY(generate_c_read_access(state, elements[i], c_output));
         }
-        LPG_TRY(generate_c_read_access(state, elements[i], c_output));
+    }
+    else
+    {
+        /*for dummy in struct unit*/
+        LPG_TRY(stream_writer_write_string(c_output, "0"));
     }
     LPG_TRY(stream_writer_write_string(c_output, "}"));
     return success;

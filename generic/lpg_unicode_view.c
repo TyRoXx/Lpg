@@ -4,7 +4,7 @@
 
 unicode_view unicode_view_create(char const *begin, size_t length)
 {
-    unicode_view result = {begin, length};
+    unicode_view const result = {begin, length};
     return result;
 }
 
@@ -15,7 +15,7 @@ unicode_view unicode_view_from_c_str(char const *c_str)
 
 unicode_view unicode_view_from_string(unicode_string string)
 {
-    unicode_view result = {string.data, string.length};
+    unicode_view const result = {string.data, string.length};
     return result;
 }
 

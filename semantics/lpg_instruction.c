@@ -8,7 +8,7 @@ tuple_instruction tuple_instruction_create(register_id *elements,
                                            register_id result,
                                            tuple_type result_type)
 {
-    tuple_instruction tuple_instruction1 = {
+    tuple_instruction const tuple_instruction1 = {
         elements, element_count, result, result_type};
     return tuple_instruction1;
 }
@@ -18,7 +18,8 @@ call_instruction call_instruction_create(register_id callee,
                                          size_t argument_count,
                                          register_id result)
 {
-    call_instruction created = {callee, arguments, argument_count, result};
+    call_instruction const created = {
+        callee, arguments, argument_count, result};
     return created;
 }
 
@@ -59,7 +60,7 @@ read_struct_instruction read_struct_instruction_create(register_id from_object,
                                                        struct_member_id member,
                                                        register_id into)
 {
-    read_struct_instruction result = {from_object, member, into};
+    read_struct_instruction const result = {from_object, member, into};
     return result;
 }
 
@@ -73,7 +74,7 @@ bool read_struct_instruction_equals(read_struct_instruction const left,
 literal_instruction literal_instruction_create(register_id into, value value_,
                                                type type_of)
 {
-    literal_instruction result = {into, value_, type_of};
+    literal_instruction const result = {into, value_, type_of};
     return result;
 }
 
@@ -89,7 +90,7 @@ enum_construct_instruction
 enum_construct_instruction_create(register_id into, enum_element_id which,
                                   register_id state)
 {
-    enum_construct_instruction result = {into, which, state};
+    enum_construct_instruction const result = {into, which, state};
     return result;
 }
 
@@ -105,7 +106,8 @@ match_instruction match_instruction_create(register_id key,
                                            size_t count, register_id result,
                                            type result_type)
 {
-    match_instruction returning = {key, cases, count, result, result_type};
+    match_instruction const returning = {
+        key, cases, count, result, result_type};
     return returning;
 }
 
@@ -200,7 +202,7 @@ match_instruction_case
 match_instruction_case_create(register_id key, instruction_sequence action,
                               register_id value)
 {
-    match_instruction_case result = {key, action, value};
+    match_instruction_case const result = {key, action, value};
     return result;
 }
 

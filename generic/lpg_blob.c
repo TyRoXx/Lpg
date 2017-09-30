@@ -4,7 +4,7 @@
 
 blob blob_from_range(char const *data, size_t length)
 {
-    blob result = {allocate_array(length, sizeof(*data)), length};
+    blob const result = {allocate_array(length, sizeof(*data)), length};
     memcpy(result.data, data, length * sizeof(*data));
     return result;
 }

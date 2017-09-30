@@ -4,8 +4,7 @@
 typedef struct type_definition_0
 {
     size_t e_0;
-}
-type_definition_0;
+} type_definition_0;
 static type_definition_0 lambda_1(size_t const arg0);
 static size_t lambda_2(type_definition_0 const *const captures);
 static type_definition_0 lambda_1(size_t const arg0)

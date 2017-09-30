@@ -2,7 +2,7 @@
 
 optional_size make_optional_size(size_t const value)
 {
-    optional_size result = {optional_set, value};
+    optional_size const result = {optional_set, value};
     return result;
 }
 

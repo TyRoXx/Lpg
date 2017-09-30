@@ -62,7 +62,7 @@ static value read_impl(value const *const inferred, value const *arguments,
     (void)gc;
     (void)arguments;
     test_environment *const actual_environment = environment;
-    unicode_view result = actual_environment->read_input;
+    unicode_view const result = actual_environment->read_input;
     actual_environment->read_input = unicode_view_create(NULL, 0);
     return value_from_string_ref(result);
 }
@@ -188,7 +188,8 @@ void test_interpreter(void)
                   "    option.some(arg)\n"
                   "f(123)\n",
                   "", "", std_library.globals);
-    expect_output("let t = {unit}\n"
+    expect_output("let s = {}\n"
+                  "let t = {unit}\n"
                   "let u = {1, 2, 3, 4, 5, 6}\n"
                   "let v = {123, \"abc\"}\n"
                   "assert(integer-equals(123, v.0))\n"

@@ -3,7 +3,7 @@
 
 integer integer_create(uint64_t high, uint64_t low)
 {
-    integer result = {high, low};
+    integer const result = {high, low};
     return result;
 }
 
@@ -32,9 +32,10 @@ integer integer_shift_left_truncate(integer value, uint32_t bits)
         value.low = 0;
         bits -= 64;
     }
-    integer result = {((value.high << bits) | ((value.low >> (64u - bits)) &
-                                               ((uint64_t)-1) >> (64u - bits))),
-                      (value.low << bits)};
+    integer const result = {
+        ((value.high << bits) |
+         ((value.low >> (64u - bits)) & ((uint64_t)-1) >> (64u - bits))),
+        (value.low << bits)};
     return result;
 }
 
@@ -147,7 +148,7 @@ bool integer_multiply(integer *left, integer right)
 
 bool integer_add(integer *left, integer right)
 {
-    uint64_t low = (left->low + right.low);
+    uint64_t const low = (left->low + right.low);
     uint64_t high = left->high;
     if (low < right.low)
     {

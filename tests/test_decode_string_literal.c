@@ -7,9 +7,9 @@ static decode_string_literal_result
 expect_decoded_content(char const *string, char const *expected_content)
 {
     memory_writer m = {NULL, 0, 0};
-    stream_writer s = memory_writer_erase(&m);
-    unicode_view uv = unicode_view_create(string, strlen(string));
-    decode_string_literal_result result = decode_string_literal(uv, s);
+    stream_writer const s = memory_writer_erase(&m);
+    unicode_view const uv = unicode_view_create(string, strlen(string));
+    decode_string_literal_result const result = decode_string_literal(uv, s);
     REQUIRE(memory_writer_equals(m, expected_content));
     memory_writer_free(&m);
     return result;

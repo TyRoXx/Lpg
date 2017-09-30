@@ -3,7 +3,7 @@
 semantic_error semantic_error_create(semantic_error_type type,
                                      source_location where)
 {
-    semantic_error result = {type, where};
+    semantic_error const result = {type, where};
     return result;
 }
 
