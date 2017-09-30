@@ -199,6 +199,7 @@ bool value_less_than(value const left, value const right)
 {
     if (left.kind != right.kind)
     {
+        // TODO: come up with a type size system
         return false;
     }
     switch (left.kind)
@@ -221,7 +222,7 @@ bool value_less_than(value const left, value const right)
 
 bool value_greater_than(value const left, value const right)
 {
-    return !(value_less_than(left, right) || value_equals(left, right));
+    return value_less_than(right, left);
 }
 
 optional_value optional_value_create(value v)

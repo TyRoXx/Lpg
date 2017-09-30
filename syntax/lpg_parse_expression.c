@@ -702,7 +702,9 @@ static expression_parser_result parse_callable(expression_parser *parser,
             pop(parser);
             expression_parser_result result =
                 parse_expression(parser, indentation, false);
-            ASSUME(result.is_success);
+            if(!result.is_success){
+                return expression_parser_result_failure;
+            }
 
             expression *success = allocate(sizeof(*success));
             *success = result.success;

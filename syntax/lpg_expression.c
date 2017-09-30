@@ -631,7 +631,7 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_binary:
         return expression_equals(left->binary.left, right->binary.left) &&
-               expression_equals(left->binary.right, right->binary.left) &&
+               expression_equals(left->binary.right, right->binary.right) &&
                left->binary.comparator == right->binary.comparator;
 
     case expression_type_string:
