@@ -687,7 +687,9 @@ binary_operator_expression_create(expression *left, expression *right,
 void binary_operator_expression_free(binary_operator_expression const *value)
 {
     expression_free(value->left);
+    deallocate(value->left);
     expression_free(value->right);
+    deallocate(value->right);
 }
 
 expression expression_from_binary_operator(binary_operator_expression value)
