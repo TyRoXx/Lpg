@@ -778,15 +778,6 @@ static size_t count_inferred_values(function_pointer const signature)
     return count;
 }
 
-typedef struct optional_checked_function
-{
-    bool is_set;
-    checked_function value;
-} optional_checked_function;
-
-static optional_checked_function const optional_checked_function_empty = {
-    false, {0, NULL, {NULL, 0}, 0}};
-
 typedef struct check_function_result
 {
     bool success;
