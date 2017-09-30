@@ -28,12 +28,12 @@ typedef enum token_type
     token_let,
     token_string,
 
+    token_not,
     token_less_than,
     token_less_than_or_equals,
     token_equals,
     token_greater_than,
     token_greater_than_or_equals,
-    token_not,
     token_not_equals
 } token_type;
 

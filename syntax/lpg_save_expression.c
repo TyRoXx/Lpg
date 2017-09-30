@@ -211,6 +211,28 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(stream_writer_write_string(to, "//"));
         return stream_writer_write_unicode_view(to, view);
     }
+    case expression_type_binary:
+    {
+        LPG_TRY(save_expression(to, value->binary.left, whitespace));
+        char *operator= "";
+        switch (value->binary.comparator)
+        {
+        case less_than:
+            operator= "<";
+        case less_than_or_equals:
+            operator= "<=";
+        case equals:
+            operator= "==";
+        case greater_than:
+            operator= ">";
+        case greater_than_or_equals:
+            operator= ">=";
+        case not_equals:
+            operator= "!=";
+        }
+        LPG_TRY(stream_writer_write_string(to, operator));
+        LPG_TRY(save_expression(to, value->binary.right, whitespace));
+    }
     }
     LPG_UNREACHABLE();
 }

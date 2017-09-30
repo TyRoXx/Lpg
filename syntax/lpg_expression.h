@@ -32,6 +32,7 @@ typedef enum expression_type
     expression_type_identifier,
     expression_type_assign,
     expression_type_not,
+    expression_type_binary,
     expression_type_return,
     expression_type_loop,
     expression_type_break,
@@ -129,6 +130,30 @@ not;
 not not_expression_create(expression * value);
 void not_free(LPG_NON_NULL(not const *expression));
 
+typedef enum binary_operator
+{
+    less_than,
+    less_than_or_equals,
+    equals,
+    greater_than,
+    greater_than_or_equals,
+    not_equals
+} binary_operator;
+
+typedef struct binary_operator_expression
+{
+    expression *left;
+    expression *right;
+
+    binary_operator comparator;
+} binary_operator_expression;
+
+binary_operator_expression
+binary_operator_expression_create(LPG_NON_NULL(expression *left),
+                                  LPG_NON_NULL(expression *right),
+                                  binary_operator anOperator);
+void binary_operator_expression_free(binary_operator_expression const *value);
+
 typedef struct sequence
 {
     expression *elements;
@@ -152,6 +177,7 @@ bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
 expression expression_from_assign(assign value);
 expression expression_from_not(not value);
+expression expression_from_binary_operator(binary_operator_expression value);
 expression expression_from_return(LPG_NON_NULL(expression *value));
 expression expression_from_loop(sequence body);
 expression expression_from_sequence(sequence value);
@@ -205,6 +231,7 @@ struct expression
         identifier_expression identifier;
         assign assign;
         not not;
+        binary_operator_expression binary;
         expression *return_;
         sequence loop_body;
         sequence sequence;

@@ -1255,6 +1255,9 @@ evaluate_expression(function_checking_state *state,
     case expression_type_call:
         return evaluate_call_expression(state, function, element.call);
 
+    case expression_type_binary:
+        LPG_TO_DO();
+
     case expression_type_integer_literal:
     {
         register_id const where = allocate_register(&state->used_registers);
