@@ -462,7 +462,7 @@ static success_indicator generate_type(
             LPG_TRY(generate_tuple_element_name(i, definition_writer));
             LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
         }
-        LPG_TRY(stream_writer_write_string(definition_writer, "} "));
+        LPG_TRY(stream_writer_write_string(definition_writer, "}\n"));
         LPG_TRY(generate_type(generated, standard_library, definitions,
                               all_functions, definition_writer));
         LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));

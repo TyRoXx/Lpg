@@ -5,7 +5,8 @@ typedef struct type_definition_0
 {
     size_t e_0;
     size_t e_1;
-} type_definition_0;
+}
+type_definition_0;
 static size_t lambda_1(void);
 static size_t lambda_1(void)
 {

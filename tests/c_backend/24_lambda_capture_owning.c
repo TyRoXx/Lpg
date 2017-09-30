@@ -5,7 +5,8 @@
 typedef struct type_definition_0
 {
     string_ref e_0;
-} type_definition_0;
+}
+type_definition_0;
 static type_definition_0 lambda_1(string_ref const arg0);
 static string_ref lambda_2(type_definition_0 const *const captures);
 static type_definition_0 lambda_1(string_ref const arg0)
