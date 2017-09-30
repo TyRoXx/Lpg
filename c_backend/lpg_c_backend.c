@@ -151,14 +151,13 @@ find_register_resource_ownership(type const variable)
     case type_kind_function_pointer:
         return register_resource_ownership_none;
 
-    case type_kind_inferred:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
         return register_resource_ownership_none;
 
+    case type_kind_inferred:
     case type_kind_structure:
     case type_kind_type:
+    case type_kind_enum_constructor:
         LPG_TO_DO();
 
     case type_kind_string_ref:
@@ -166,9 +165,6 @@ find_register_resource_ownership(type const variable)
 
     case type_kind_unit:
         return register_resource_ownership_none;
-
-    case type_kind_enum_constructor:
-        LPG_TO_DO();
 
     case type_kind_lambda:
         /*TODO*/
@@ -385,9 +381,6 @@ static success_indicator generate_type(
 {
     switch (generated.kind)
     {
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_lambda:
     {
         function_pointer const *const signature =
@@ -485,9 +478,6 @@ static success_indicator generate_type(
             c_output, unicode_view_from_string(name));
     }
 
-    case type_kind_type:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
         if (integer_less(
                 generated.integer_range_.maximum, integer_create(1, 0)))
@@ -497,10 +487,10 @@ static success_indicator generate_type(
         }
         LPG_TO_DO();
 
+    case type_kind_type:
     case type_kind_inferred:
-        LPG_TO_DO();
-
     case type_kind_enum_constructor:
+    case type_kind_structure:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -527,30 +517,24 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     case register_meaning_nothing:
         LPG_UNREACHABLE();
 
-    case register_meaning_global:
-        LPG_TO_DO();
-
     case register_meaning_variable:
         return generate_register_name(from, c_output);
 
+    case register_meaning_global:
     case register_meaning_print:
-        LPG_TO_DO();
-
     case register_meaning_read:
-        LPG_TO_DO();
-
     case register_meaning_assert:
-        LPG_TO_DO();
-
     case register_meaning_string_equals:
+    case register_meaning_concat:
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
+    case register_meaning_captures:
         LPG_TO_DO();
 
     case register_meaning_integer_equals:
         state->standard_library.using_integer = true;
         return stream_writer_write_string(c_output, "integer_equals");
-
-    case register_meaning_concat:
-        LPG_TO_DO();
 
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
@@ -572,9 +556,6 @@ static success_indicator generate_c_read_access(c_backend_state *state,
                 LPG_TO_DO();
             }
         }
-
-        case value_kind_tuple:
-            LPG_TO_DO();
 
         case value_kind_string:
             state->standard_library.using_string_ref = true;
@@ -603,8 +584,10 @@ static success_indicator generate_c_read_access(c_backend_state *state,
             return generate_function_name(
                 state->registers[from].literal.function_pointer.code, c_output);
 
+        case value_kind_tuple:
         case value_kind_flat_object:
         case value_kind_type:
+        case value_kind_enum_constructor:
             LPG_TO_DO();
 
         case value_kind_enum_element:
@@ -621,22 +604,11 @@ static success_indicator generate_c_read_access(c_backend_state *state,
 
         case value_kind_unit:
             return stream_writer_write_string(c_output, "unit_impl");
-
-        case value_kind_enum_constructor:
-            LPG_TO_DO();
         }
 
     case register_meaning_argument:
         return generate_parameter_name(
             state->registers[from].argument, c_output);
-
-    case register_meaning_and:
-    case register_meaning_not:
-    case register_meaning_or:
-        LPG_TO_DO();
-
-    case register_meaning_captures:
-        LPG_TO_DO();
 
     case register_meaning_capture:
         LPG_TRY(stream_writer_write_string(c_output, "captures->"));
@@ -654,10 +626,6 @@ generate_add_reference_for_return_value(c_backend_state *state,
 {
     switch (state->registers[from].meaning)
     {
-    case register_meaning_nothing:
-    case register_meaning_global:
-        LPG_TO_DO();
-
     case register_meaning_capture:
     case register_meaning_variable:
     case register_meaning_argument:
@@ -688,9 +656,9 @@ generate_add_reference_for_return_value(c_backend_state *state,
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
-        LPG_TO_DO();
-
     case register_meaning_captures:
+    case register_meaning_nothing:
+    case register_meaning_global:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -702,11 +670,8 @@ static success_indicator generate_c_str(c_backend_state *state,
 {
     switch (state->registers[from].meaning)
     {
-    case register_meaning_nothing:
-    case register_meaning_global:
-        LPG_UNREACHABLE();
-
     case register_meaning_capture:
+    case register_meaning_captures:
         LPG_TO_DO();
 
     case register_meaning_variable:
@@ -720,6 +685,11 @@ static success_indicator generate_c_str(c_backend_state *state,
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
     case register_meaning_concat:
+    case register_meaning_nothing:
+    case register_meaning_global:
+    case register_meaning_and:
+    case register_meaning_not:
+    case register_meaning_or:
         LPG_UNREACHABLE();
 
     case register_meaning_literal:
@@ -741,14 +711,6 @@ static success_indicator generate_c_str(c_backend_state *state,
         case value_kind_enum_constructor:
             LPG_UNREACHABLE();
         }
-
-    case register_meaning_and:
-    case register_meaning_not:
-    case register_meaning_or:
-        LPG_UNREACHABLE();
-
-    case register_meaning_captures:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -759,11 +721,8 @@ static success_indicator generate_string_length(c_backend_state *state,
 {
     switch (state->registers[from].meaning)
     {
-    case register_meaning_nothing:
-    case register_meaning_global:
-        LPG_UNREACHABLE();
-
     case register_meaning_capture:
+    case register_meaning_captures:
         LPG_TO_DO();
 
     case register_meaning_argument:
@@ -777,8 +736,8 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
     case register_meaning_concat:
-        LPG_UNREACHABLE();
-
+    case register_meaning_nothing:
+    case register_meaning_global:
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
@@ -787,10 +746,6 @@ static success_indicator generate_string_length(c_backend_state *state,
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
-        case value_kind_integer:
-        case value_kind_tuple:
-            LPG_UNREACHABLE();
-
         case value_kind_string:
         {
             char buffer[40];
@@ -803,6 +758,8 @@ static success_indicator generate_string_length(c_backend_state *state,
                 (size_t)((buffer + sizeof(buffer)) - formatted));
         }
 
+        case value_kind_integer:
+        case value_kind_tuple:
         case value_kind_function_pointer:
         case value_kind_flat_object:
         case value_kind_type:
@@ -812,9 +769,6 @@ static success_indicator generate_string_length(c_backend_state *state,
             LPG_UNREACHABLE();
         }
         LPG_UNREACHABLE();
-
-    case register_meaning_captures:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -1140,8 +1094,6 @@ static success_indicator generate_instruction(
             return success;
 
         case register_meaning_argument:
-            LPG_TO_DO();
-
         case register_meaning_captures:
             LPG_TO_DO();
         }
@@ -1187,8 +1139,6 @@ static success_indicator generate_instruction(
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
-            LPG_TO_DO();
-
         case register_meaning_argument:
             LPG_TO_DO();
 
@@ -1256,16 +1206,8 @@ static success_indicator generate_instruction(
             switch (object_type.kind)
             {
             case type_kind_structure:
-                LPG_TO_DO();
-
             case type_kind_lambda:
                 LPG_TO_DO();
-
-            case type_kind_function_pointer:
-            case type_kind_unit:
-            case type_kind_string_ref:
-            case type_kind_enumeration:
-                LPG_UNREACHABLE();
 
             case type_kind_tuple:
             {
@@ -1292,6 +1234,10 @@ static success_indicator generate_instruction(
                 return success;
             }
 
+            case type_kind_function_pointer:
+            case type_kind_unit:
+            case type_kind_string_ref:
+            case type_kind_enumeration:
             case type_kind_type:
             case type_kind_integer_range:
             case type_kind_inferred:
