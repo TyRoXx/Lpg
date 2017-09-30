@@ -12,8 +12,8 @@ static uint64_t lambda_1(uint64_t const arg0)
 }
 int main(void)
 {
-    uint64_t const r_2 = lambda_1(2);
-    bool const r_8 = integer_equals(r_2, 2);
+    uint64_t const i_2 = lambda_1(2);
+    bool const r_8 = integer_equals(i_2, 2);
     unit const r_9 = assert_impl(r_8);
     return 0;
 }

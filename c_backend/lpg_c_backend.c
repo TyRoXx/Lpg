@@ -252,10 +252,22 @@ static success_indicator generate_integer(integer const value,
     return success;
 }
 
-static success_indicator generate_register_name(register_id const id,
-                                                stream_writer const c_output)
+static success_indicator
+generate_register_name(register_id const id,
+                       checked_function const *const current_function,
+                       stream_writer const c_output)
 {
-    LPG_TRY(stream_writer_write_string(c_output, "r_"));
+    unicode_view const original_name =
+        unicode_view_from_string(current_function->register_debug_names[id]);
+    if (original_name.length > 0)
+    {
+        LPG_TRY(stream_writer_write_unicode_view(c_output, original_name));
+        LPG_TRY(stream_writer_write_string(c_output, "_"));
+    }
+    else
+    {
+        LPG_TRY(stream_writer_write_string(c_output, "r_"));
+    }
     return generate_integer(integer_create(0, id), c_output);
 }
 
@@ -508,9 +520,10 @@ static success_indicator generate_parameter_name(register_id const argument,
         c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted));
 }
 
-static success_indicator generate_c_read_access(c_backend_state *state,
-                                                register_id const from,
-                                                stream_writer const c_output)
+static success_indicator
+generate_c_read_access(c_backend_state *state,
+                       checked_function const *const current_function,
+                       register_id const from, stream_writer const c_output)
 {
     switch (state->registers[from].meaning)
     {
@@ -518,7 +531,7 @@ static success_indicator generate_c_read_access(c_backend_state *state,
         LPG_UNREACHABLE();
 
     case register_meaning_variable:
-        return generate_register_name(from, c_output);
+        return generate_register_name(from, current_function, c_output);
 
     case register_meaning_global:
     case register_meaning_print:
@@ -619,10 +632,9 @@ static success_indicator generate_c_read_access(c_backend_state *state,
     LPG_UNREACHABLE();
 }
 
-static success_indicator
-generate_add_reference_for_return_value(c_backend_state *state,
-                                        register_id const from,
-                                        stream_writer const c_output)
+static success_indicator generate_add_reference_for_return_value(
+    c_backend_state *state, checked_function const *const current_function,
+    register_id const from, stream_writer const c_output)
 {
     switch (state->registers[from].meaning)
     {
@@ -637,7 +649,8 @@ generate_add_reference_for_return_value(c_backend_state *state,
         case register_resource_ownership_borrows_string:
             LPG_TRY(stream_writer_write_string(
                 c_output, "    string_ref_add_reference(&"));
-            LPG_TRY(generate_c_read_access(state, from, c_output));
+            LPG_TRY(generate_c_read_access(
+                state, current_function, from, c_output));
             return stream_writer_write_string(c_output, ");\n");
 
         case register_resource_ownership_owns_string:
@@ -664,9 +677,10 @@ generate_add_reference_for_return_value(c_backend_state *state,
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_c_str(c_backend_state *state,
-                                        register_id const from,
-                                        stream_writer const c_output)
+static success_indicator
+generate_c_str(c_backend_state *state,
+               checked_function const *const current_function,
+               register_id const from, stream_writer const c_output)
 {
     switch (state->registers[from].meaning)
     {
@@ -676,7 +690,8 @@ static success_indicator generate_c_str(c_backend_state *state,
 
     case register_meaning_variable:
     case register_meaning_argument:
-        LPG_TRY(generate_c_read_access(state, from, c_output));
+        LPG_TRY(
+            generate_c_read_access(state, current_function, from, c_output));
         return stream_writer_write_string(c_output, ".data");
 
     case register_meaning_print:
@@ -715,9 +730,10 @@ static success_indicator generate_c_str(c_backend_state *state,
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_string_length(c_backend_state *state,
-                                                register_id const from,
-                                                stream_writer const c_output)
+static success_indicator
+generate_string_length(c_backend_state *state,
+                       checked_function const *const current_function,
+                       register_id const from, stream_writer const c_output)
 {
     switch (state->registers[from].meaning)
     {
@@ -727,7 +743,8 @@ static success_indicator generate_string_length(c_backend_state *state,
 
     case register_meaning_argument:
     case register_meaning_variable:
-        LPG_TRY(generate_c_read_access(state, from, c_output));
+        LPG_TRY(
+            generate_c_read_access(state, current_function, from, c_output));
         return stream_writer_write_string(c_output, ".length");
 
     case register_meaning_print:
@@ -776,6 +793,7 @@ static success_indicator generate_string_length(c_backend_state *state,
 static success_indicator
 generate_sequence(c_backend_state *state,
                   checked_function const *const all_functions,
+                  checked_function const *const current_function,
                   register_id const current_function_result,
                   instruction_sequence const sequence, size_t const indentation,
                   stream_writer const c_output);
@@ -796,8 +814,9 @@ static type find_boolean(c_backend_state const *state)
 }
 
 static success_indicator
-generate_tuple_initializer(c_backend_state *state, tuple_type const tuple,
-                           register_id *const elements,
+generate_tuple_initializer(c_backend_state *state,
+                           checked_function const *const current_function,
+                           tuple_type const tuple, register_id *const elements,
                            stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{"));
@@ -809,7 +828,8 @@ generate_tuple_initializer(c_backend_state *state, tuple_type const tuple,
             {
                 LPG_TRY(stream_writer_write_string(c_output, ", "));
             }
-            LPG_TRY(generate_c_read_access(state, elements[i], c_output));
+            LPG_TRY(generate_c_read_access(
+                state, current_function, elements[i], c_output));
         }
     }
     else
@@ -822,9 +842,11 @@ generate_tuple_initializer(c_backend_state *state, tuple_type const tuple,
 }
 
 static success_indicator
-generate_tuple_variable(c_backend_state *state, tuple_type const tuple,
-                        register_id *const elements, register_id const result,
-                        size_t const indentation, stream_writer const c_output)
+generate_tuple_variable(c_backend_state *state,
+                        checked_function const *const current_function,
+                        tuple_type const tuple, register_id *const elements,
+                        register_id const result, size_t const indentation,
+                        stream_writer const c_output)
 {
     set_register_variable(
         state, result,
@@ -834,15 +856,17 @@ generate_tuple_variable(c_backend_state *state, tuple_type const tuple,
     LPG_TRY(generate_type(type_from_tuple_type(tuple), &state->standard_library,
                           state->definitions, state->all_functions, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const "));
-    LPG_TRY(generate_register_name(result, c_output));
+    LPG_TRY(generate_register_name(result, current_function, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " = "));
-    LPG_TRY(generate_tuple_initializer(state, tuple, elements, c_output));
+    LPG_TRY(generate_tuple_initializer(
+        state, current_function, tuple, elements, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     return success;
 }
 
 static success_indicator generate_instruction(
     c_backend_state *state, checked_function const *const all_functions,
+    checked_function const *const current_function,
     register_id const current_function_result, instruction const input,
     size_t const indentation, stream_writer const c_output)
 {
@@ -866,15 +890,17 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   type_from_unit());
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "fwrite("));
             ASSERT(input.call.argument_count == 1);
-            LPG_TRY(generate_c_str(state, input.call.arguments[0], c_output));
+            LPG_TRY(generate_c_str(
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", 1, "));
             LPG_TRY(generate_string_length(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", stdout);\n"));
             return success;
 
@@ -887,7 +913,8 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_owns_string,
                                   type_from_string_ref());
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = read_impl();\n"));
             return success;
 
@@ -897,11 +924,12 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   type_from_unit());
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = assert_impl("));
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -911,15 +939,16 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(
                 stream_writer_write_string(c_output, " = string_ref_equals("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[1], c_output));
+                state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -929,14 +958,15 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = integer_equals("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[1], c_output));
+                state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -946,15 +976,16 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_owns_string,
                                   type_from_string_ref());
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(
                 stream_writer_write_string(c_output, " = string_ref_concat("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[1], c_output));
+                state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -993,7 +1024,8 @@ static success_indicator generate_instruction(
                                       state->definitions, state->all_functions,
                                       c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " const "));
-                LPG_TRY(generate_register_name(input.call.result, c_output));
+                LPG_TRY(generate_register_name(
+                    input.call.result, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
                 LPG_TRY(generate_function_name(
                     state->registers[input.call.callee].type_of.lambda.lambda,
@@ -1003,8 +1035,8 @@ static success_indicator generate_instruction(
                 if (callee_signature.captures.length > 0)
                 {
                     LPG_TRY(stream_writer_write_string(c_output, "&"));
-                    LPG_TRY(
-                        generate_register_name(input.call.callee, c_output));
+                    LPG_TRY(generate_register_name(
+                        input.call.callee, current_function, c_output));
                     comma = true;
                 }
                 for (size_t i = 0; i < input.call.argument_count; ++i)
@@ -1017,8 +1049,9 @@ static success_indicator generate_instruction(
                     {
                         comma = true;
                     }
-                    LPG_TRY(generate_c_read_access(
-                        state, input.call.arguments[i], c_output));
+                    LPG_TRY(generate_c_read_access(state, current_function,
+                                                   input.call.arguments[i],
+                                                   c_output));
                 }
                 LPG_TRY(stream_writer_write_string(c_output, ");\n"));
                 return success;
@@ -1054,13 +1087,14 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, " & "));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[1], c_output));
+                state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -1070,13 +1104,14 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, " | "));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[1], c_output));
+                state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
@@ -1086,10 +1121,11 @@ static success_indicator generate_instruction(
                                   register_resource_ownership_none,
                                   find_boolean(state));
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
-            LPG_TRY(generate_register_name(input.call.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = !"));
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[0], c_output));
+                state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
 
@@ -1098,9 +1134,11 @@ static success_indicator generate_instruction(
             LPG_TO_DO();
         }
         LPG_TRY(stream_writer_write_string(c_output, " const "));
-        LPG_TRY(generate_register_name(input.call.result, c_output));
+        LPG_TRY(generate_register_name(
+            input.call.result, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
-        LPG_TRY(generate_c_read_access(state, input.call.callee, c_output));
+        LPG_TRY(generate_c_read_access(
+            state, current_function, input.call.callee, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "("));
         for (size_t i = 0; i < input.call.argument_count; ++i)
         {
@@ -1109,7 +1147,7 @@ static success_indicator generate_instruction(
                 LPG_TRY(stream_writer_write_string(c_output, ", "));
             }
             LPG_TRY(generate_c_read_access(
-                state, input.call.arguments[i], c_output));
+                state, current_function, input.call.arguments[i], c_output));
         }
         LPG_TRY(stream_writer_write_string(c_output, ");\n"));
         return success;
@@ -1119,8 +1157,9 @@ static success_indicator generate_instruction(
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-        LPG_TRY(generate_sequence(state, all_functions, current_function_result,
-                                  input.loop, indentation + 1, c_output));
+        LPG_TRY(generate_sequence(state, all_functions, current_function,
+                                  current_function_result, input.loop,
+                                  indentation + 1, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         return success;
@@ -1222,11 +1261,11 @@ static success_indicator generate_instruction(
                                       state->definitions, state->all_functions,
                                       c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " const "));
-                LPG_TRY(
-                    generate_register_name(input.read_struct.into, c_output));
+                LPG_TRY(generate_register_name(
+                    input.read_struct.into, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
                 LPG_TRY(generate_register_name(
-                    input.read_struct.from_object, c_output));
+                    input.read_struct.from_object, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, "."));
                 LPG_TRY(generate_tuple_element_name(
                     input.read_struct.member, c_output));
@@ -1278,8 +1317,8 @@ static success_indicator generate_instruction(
 
     case instruction_tuple:
         return generate_tuple_variable(
-            state, input.tuple_.result_type, input.tuple_.elements,
-            input.tuple_.result, indentation, c_output);
+            state, current_function, input.tuple_.result_type,
+            input.tuple_.elements, input.tuple_.result, indentation, c_output);
 
     case instruction_enum_construct:
         LPG_TO_DO();
@@ -1295,7 +1334,8 @@ static success_indicator generate_instruction(
                               state->definitions, state->all_functions,
                               c_output));
         LPG_TRY(stream_writer_write_string(c_output, " "));
-        LPG_TRY(generate_register_name(input.match.result, c_output));
+        LPG_TRY(generate_register_name(
+            input.match.result, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
 
         for (size_t i = 0; i < input.match.count; ++i)
@@ -1312,11 +1352,12 @@ static success_indicator generate_instruction(
                     LPG_TRY(stream_writer_write_string(c_output, " "));
                 }
                 LPG_TRY(stream_writer_write_string(c_output, "if ("));
-                LPG_TRY(generate_c_read_access(
-                    state, input.match.cases[i].key, c_output));
+                LPG_TRY(generate_c_read_access(state, current_function,
+                                               input.match.cases[i].key,
+                                               c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " == "));
-                LPG_TRY(
-                    generate_c_read_access(state, input.match.key, c_output));
+                LPG_TRY(generate_c_read_access(
+                    state, current_function, input.match.key, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ")"));
             }
             LPG_TRY(stream_writer_write_string(c_output, "\n"));
@@ -1325,14 +1366,15 @@ static success_indicator generate_instruction(
             LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
             LPG_TRY(generate_sequence(
-                state, all_functions, current_function_result,
+                state, all_functions, current_function, current_function_result,
                 input.match.cases[i].action, (indentation + 1), c_output));
 
             LPG_TRY(indent(indentation + 1, c_output));
-            LPG_TRY(generate_register_name(input.match.result, c_output));
+            LPG_TRY(generate_register_name(
+                input.match.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_c_read_access(
-                state, input.match.cases[i].value, c_output));
+                state, current_function, input.match.cases[i].value, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
 
             LPG_TRY(indent(indentation, c_output));
@@ -1357,12 +1399,13 @@ static success_indicator generate_instruction(
                               state->definitions, state->all_functions,
                               c_output));
         LPG_TRY(stream_writer_write_string(c_output, " const "));
-        LPG_TRY(
-            generate_register_name(input.lambda_with_captures.into, c_output));
+        LPG_TRY(generate_register_name(
+            input.lambda_with_captures.into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_tuple_initializer(
-            state, all_functions[input.lambda_with_captures.lambda]
-                       .signature->captures,
+            state, current_function,
+            all_functions[input.lambda_with_captures.lambda]
+                .signature->captures,
             input.lambda_with_captures.captures, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
         return success;
@@ -1374,6 +1417,7 @@ static success_indicator generate_instruction(
 static success_indicator
 generate_sequence(c_backend_state *state,
                   checked_function const *const all_functions,
+                  checked_function const *const current_function,
                   register_id const current_function_result,
                   instruction_sequence const sequence, size_t const indentation,
                   stream_writer const c_output)
@@ -1381,9 +1425,9 @@ generate_sequence(c_backend_state *state,
     size_t const previously_active_registers = state->active_register_count;
     for (size_t i = 0; i < sequence.length; ++i)
     {
-        LPG_TRY(
-            generate_instruction(state, all_functions, current_function_result,
-                                 sequence.elements[i], indentation, c_output));
+        LPG_TRY(generate_instruction(
+            state, all_functions, current_function, current_function_result,
+            sequence.elements[i], indentation, c_output));
     }
     for (size_t i = previously_active_registers;
          i < state->active_register_count; ++i)
@@ -1402,7 +1446,7 @@ generate_sequence(c_backend_state *state,
             ASSERT(state->standard_library.using_string_ref);
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
-            LPG_TRY(generate_register_name(which, c_output));
+            LPG_TRY(generate_register_name(which, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             break;
 
@@ -1444,14 +1488,15 @@ generate_function_body(checked_function const current_function,
                                    : register_resource_ownership_none),
                               parameter);
     }
-    LPG_TRY(generate_sequence(&state, all_functions,
+    LPG_TRY(generate_sequence(&state, all_functions, &current_function,
                               current_function.return_value,
                               current_function.body, 1, c_output));
 
     if (!return_0)
     {
         LPG_TRY(generate_add_reference_for_return_value(
-            &state, current_function.return_value, c_output));
+            &state, &current_function, current_function.return_value,
+            c_output));
     }
 
     LPG_TRY(stream_writer_write_string(c_output, "    return "));
@@ -1461,8 +1506,9 @@ generate_function_body(checked_function const current_function,
     }
     else
     {
-        LPG_TRY(generate_c_read_access(
-            &state, current_function.return_value, c_output));
+        LPG_TRY(generate_c_read_access(&state, &current_function,
+                                       current_function.return_value,
+                                       c_output));
     }
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     LPG_TRY(stream_writer_write_string(c_output, "}\n"));

@@ -119,6 +119,8 @@ typedef struct function_checking_state
     capture *captures;
     capture_index capture_count;
     register_id used_registers;
+    unicode_string *register_debug_names;
+    register_id register_debug_name_count;
     bool is_in_loop;
     structure const *global;
     check_error_handler *on_error;
@@ -134,8 +136,8 @@ static function_checking_state function_checking_state_create(
     instruction_sequence *const body)
 {
     function_checking_state const result = {
-        parent,   NULL,      0,    0,       false, global,
-        on_error, {NULL, 0}, user, program, body};
+        parent, NULL,     0,         0,    NULL,    0,   false,
+        global, on_error, {NULL, 0}, user, program, body};
     return result;
 }
 
@@ -748,7 +750,28 @@ check_function_result_create(checked_function function, capture *captures,
 }
 
 static check_function_result const check_function_result_empty = {
-    false, {0, NULL, {NULL, 0}, 0}, NULL, 0};
+    false, {0, NULL, {NULL, 0}, NULL, 0}, NULL, 0};
+
+static void define_register_debug_name(function_checking_state *const state,
+                                       register_id const which,
+                                       unicode_string const name)
+{
+    register_id const previous_size = state->register_debug_name_count;
+    if (which >= previous_size)
+    {
+        register_id const new_size = (which + 1);
+        state->register_debug_names =
+            reallocate_array(state->register_debug_names, new_size,
+                             sizeof(*state->register_debug_names));
+        for (size_t i = previous_size; i < new_size; ++i)
+        {
+            state->register_debug_names[i] = unicode_string_from_c_str("");
+        }
+        state->register_debug_name_count = new_size;
+    }
+    unicode_string_free(state->register_debug_names + which);
+    state->register_debug_names[which] = name;
+}
 
 static check_function_result check_function(
     function_checking_state *parent, expression const body_in,
@@ -762,20 +785,24 @@ static check_function_result check_function(
 
     for (size_t i = 0; i < parameter_count; ++i)
     {
+        register_id const address = allocate_register(&state.used_registers);
         add_local_variable(
             &state.local_variables,
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(parameter_names[i])),
-                parameter_types[i], optional_value_empty,
-                allocate_register(&state.used_registers)));
+                parameter_types[i], optional_value_empty, address));
+        define_register_debug_name(
+            &state, address,
+            unicode_view_copy(unicode_view_from_string(parameter_names[i])));
     }
 
     evaluate_expression_result const body_evaluated =
         evaluate_expression(&state, &body_out, body_in);
 
-    for (size_t i = 0; i < parameter_count; ++i)
+    for (size_t i = 0; i < state.local_variables.count; ++i)
     {
-        local_variable_free(state.local_variables.elements + i);
+        local_variable *const variable = (state.local_variables.elements + i);
+        local_variable_free(variable);
     }
     if (state.local_variables.elements)
     {
@@ -798,6 +825,14 @@ static check_function_result check_function(
     }
     else
     {
+        for (size_t i = 0; i < state.register_debug_name_count; ++i)
+        {
+            unicode_string_free(state.register_debug_names + i);
+        }
+        if (state.register_debug_names)
+        {
+            deallocate(state.register_debug_names);
+        }
         instruction_sequence_free(&body_out);
         return check_function_result_empty;
     }
@@ -816,8 +851,20 @@ static check_function_result check_function(
         body_evaluated.type_, tuple_type_create(NULL, 0),
         tuple_type_create(capture_types, state.capture_count));
 
+    if (state.register_debug_name_count < state.used_registers)
+    {
+        state.register_debug_names =
+            reallocate_array(state.register_debug_names, state.used_registers,
+                             sizeof(*state.register_debug_names));
+        for (register_id i = state.register_debug_name_count;
+             i < state.used_registers; ++i)
+        {
+            state.register_debug_names[i] = unicode_string_from_c_str("");
+        }
+    }
     checked_function const result = checked_function_create(
-        return_value, signature, body_out, state.used_registers);
+        return_value, signature, body_out, state.register_debug_names,
+        state.used_registers);
     return check_function_result_create(
         result, state.captures, state.capture_count);
 }
@@ -870,7 +917,7 @@ evaluate_lambda(function_checking_state *const state,
                                                    tuple_type_create(NULL, 0),
                                                    tuple_type_create(NULL, 0));
         state->program->functions[this_lambda_id] = checked_function_create(
-            0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
+            0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
     check_function_result const checked = check_function(
         state, *evaluated.result, *state->global, state->on_error, state->user,
@@ -1588,6 +1635,10 @@ evaluate_expression(function_checking_state *state,
                         unicode_view_from_string(element.declare.name.value)),
                     initializer.type_, initializer.compile_time_value,
                     initializer.where));
+            define_register_debug_name(
+                state, initializer.where,
+                unicode_view_copy(
+                    unicode_view_from_string(element.declare.name.value)));
         }
         evaluate_expression_result const result = {
             false, 0, type_from_unit(),
@@ -1689,7 +1740,7 @@ checked_program check(sequence const root, structure const global,
                                                    tuple_type_create(NULL, 0),
                                                    tuple_type_create(NULL, 0));
         program.functions[0] = checked_function_create(
-            0, dummy_signature, instruction_sequence_create(NULL, 0), 0);
+            0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
     return program;
 }
