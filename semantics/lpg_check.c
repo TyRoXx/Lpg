@@ -415,7 +415,8 @@ read_element(function_checking_state *state, instruction_sequence *function,
         evaluate_expression(state, function, object_tree);
     if (!object.has_value)
     {
-        LPG_TO_DO();
+        return read_structure_element_result_create(
+            false, type_from_unit(), optional_value_empty);
     }
 
     type const *const actual_type = &object.type_;
