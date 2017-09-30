@@ -510,20 +510,20 @@ static expression_parser_result parse_callable(expression_parser *parser,
                     more_elements = true;
                     pop(parser);
                     next = peek(parser);
-                    if (next.token == token_comma)
-                    {
-                        parser->on_error(
-                            parse_error_create(
-                                parse_error_expected_comma, next.where),
-                            parser->user);
-                        return expression_parser_result_failure;
-                    }
                     if (next.token == token_space)
                     {
                         pop(parser);
                     }
                     else
                     {
+                        for (size_t i = 0; i < element_count; ++i)
+                        {
+                            expression_free(tuple_elements + i);
+                        }
+                        if (tuple_elements)
+                        {
+                            deallocate(tuple_elements);
+                        }
                         parser->on_error(
                             parse_error_create(
                                 parse_error_expected_space, next.where),
@@ -545,6 +545,14 @@ static expression_parser_result parse_callable(expression_parser *parser,
                 }
                 else
                 {
+                    for (size_t i = 0; i < element_count; ++i)
+                    {
+                        expression_free(tuple_elements + i);
+                    }
+                    if (tuple_elements)
+                    {
+                        deallocate(tuple_elements);
+                    }
                     return parser_result;
                 }
                 next = peek(parser);

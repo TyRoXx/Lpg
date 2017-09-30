@@ -476,6 +476,23 @@ static void test_function(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
                           NULL, unicode_string_from_c_str("let f = (a: ?)"));
     }
+
+    {
+        parse_error const expected_errors[] = {parse_error_create(
+            parse_error_expected_space, source_location_create(0, 11))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("let f = {a,a}"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(
+                parse_error_expected_expression, source_location_create(0, 12)),
+            parse_error_create(parse_error_expected_expression,
+                               source_location_create(0, 13))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
+                          NULL, unicode_string_from_c_str("let f = {a, }"));
+    }
 }
 
 static void test_let(void)
