@@ -428,8 +428,6 @@ read_element(function_checking_state *state, instruction_sequence *function,
             unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_lambda:
-        LPG_TO_DO();
-
     case type_kind_function_pointer:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -468,8 +466,6 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_unit:
         case type_kind_string_ref:
         case type_kind_tuple:
-            LPG_TO_DO();
-
         case type_kind_lambda:
             LPG_TO_DO();
 
@@ -522,20 +518,14 @@ read_element(function_checking_state *state, instruction_sequence *function,
         case type_kind_type:
         case type_kind_integer_range:
         case type_kind_inferred:
-            LPG_TO_DO();
-
         case type_kind_enum_constructor:
             LPG_TO_DO();
         }
-        break;
+        LPG_UNREACHABLE();
     }
 
     case type_kind_integer_range:
-        LPG_TO_DO();
-
     case type_kind_inferred:
-        LPG_TO_DO();
-
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
