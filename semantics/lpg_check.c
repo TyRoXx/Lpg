@@ -1354,6 +1354,14 @@ evaluate_expression(function_checking_state *state,
                 evaluate_expression(state, function, *case_tree.key);
             if (!key_evaluated.has_value)
             {
+                for (size_t j = 0; j < i; ++j)
+                {
+                    match_instruction_case_free(cases[j]);
+                }
+                if (cases)
+                {
+                    deallocate(cases);
+                }
                 deallocate(enum_elements_handled);
                 return key_evaluated;
             }
@@ -1411,6 +1419,15 @@ evaluate_expression(function_checking_state *state,
                 evaluate_expression(state, &action, *case_tree.action);
             if (!action_evaluated.has_value)
             {
+                for (size_t j = 0; j < i; ++j)
+                {
+                    match_instruction_case_free(cases[j]);
+                }
+                if (cases)
+                {
+                    deallocate(cases);
+                }
+                instruction_sequence_free(&action);
                 deallocate(enum_elements_handled);
                 return action_evaluated;
             }
