@@ -428,10 +428,14 @@ read_element(function_checking_state *state, instruction_sequence *function,
             unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_lambda:
-    case type_kind_function_pointer:
     case type_kind_unit:
+    case type_kind_function_pointer:
     case type_kind_string_ref:
-        LPG_TO_DO();
+        state->on_error(semantic_error_create(
+                            semantic_error_unknown_element, element->source),
+                        state->user);
+        return read_structure_element_result_create(
+            false, type_from_unit(), optional_value_empty);
 
     case type_kind_enumeration:
         state->on_error(
