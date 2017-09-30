@@ -1,5 +1,4 @@
 #pragma once
-#include "lpg_std_string.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdbool.h>
