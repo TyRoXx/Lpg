@@ -241,7 +241,7 @@ void test_c_backend(void)
     check_generated_c_code("let f = ()\n"
                            "    print(\"\")\n"
                            "    boolean.true\n"
-                           "assert({boolean.false, f()}.1)\n",
+                           "assert({boolean.false, f(), {}}.1)\n",
                            std_library, "22_tuple.c");
 
     check_generated_c_code("let f = (a: boolean)\n"
