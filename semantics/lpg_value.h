@@ -88,6 +88,8 @@ value value_from_enum_constructor(void);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);
+bool enum_less_than(enum_element_value const left,
+                    enum_element_value const right);
 
 typedef struct optional_value
 {
