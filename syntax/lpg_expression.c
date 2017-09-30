@@ -290,9 +290,10 @@ source_location expression_source_begin(expression const value)
     case expression_type_sequence:
     case expression_type_declare:
     case expression_type_tuple:
-    case expression_type_not:
     case expression_type_binary:
         LPG_TO_DO();
+    case expression_type_not:
+        return expression_source_begin(*value.not.expr);
 
     case expression_type_comment:
         return value.comment.source;

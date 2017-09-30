@@ -1331,6 +1331,7 @@ evaluate_expression(function_checking_state *state,
         state->on_error(semantic_error_create(semantic_error_type_mismatch,
                                               expression_source_begin(element)),
                         state->user);
+        return evaluate_expression_result_empty;
     }
 
     case expression_type_match:
