@@ -1660,6 +1660,7 @@ evaluate_expression(function_checking_state *state,
             if (!result.has_value)
             {
                 deallocate(registers);
+                deallocate(tuple_type_for_instruction.elements);
                 return evaluate_expression_result_empty;
             }
             registers[i] = result.where;
