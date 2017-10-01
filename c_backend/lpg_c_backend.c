@@ -55,7 +55,6 @@ typedef struct register_state
     union
     {
         value literal;
-        register_id argument;
         capture_index capture;
     };
 } register_state;
@@ -209,13 +208,11 @@ static void set_register_literal(c_backend_state *const state,
 
 static void set_register_argument(c_backend_state *const state,
                                   register_id const id,
-                                  register_id const argument,
                                   register_resource_ownership const ownership,
                                   type const type_of)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_argument;
-    state->registers[id].argument = argument;
     state->registers[id].ownership = ownership;
     state->registers[id].type_of = type_of;
     active_register(state, id);
@@ -508,18 +505,6 @@ static success_indicator generate_type(
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_parameter_name(register_id const argument,
-                                                 stream_writer const c_output)
-{
-    LPG_TRY(stream_writer_write_string(c_output, "arg"));
-    char buffer[64];
-    char const *const formatted =
-        integer_format(integer_create(0, argument), lower_case_digits, 10,
-                       buffer, sizeof(buffer));
-    return stream_writer_write_bytes(
-        c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted));
-}
-
 static success_indicator
 generate_c_read_access(c_backend_state *state,
                        checked_function const *const current_function,
@@ -531,6 +516,7 @@ generate_c_read_access(c_backend_state *state,
         LPG_UNREACHABLE();
 
     case register_meaning_variable:
+    case register_meaning_argument:
         return generate_register_name(from, current_function, c_output);
 
     case register_meaning_global:
@@ -618,10 +604,6 @@ generate_c_read_access(c_backend_state *state,
         case value_kind_unit:
             return stream_writer_write_string(c_output, "unit_impl");
         }
-
-    case register_meaning_argument:
-        return generate_parameter_name(
-            state->registers[from].argument, c_output);
 
     case register_meaning_capture:
         LPG_TRY(stream_writer_write_string(c_output, "captures->"));
@@ -1482,7 +1464,7 @@ generate_function_body(checked_function const current_function,
     {
         type const parameter =
             current_function.signature->parameters.elements[i];
-        set_register_argument(&state, i, i,
+        set_register_argument(&state, i,
                               ((parameter.kind == type_kind_string_ref)
                                    ? register_resource_ownership_borrows_string
                                    : register_resource_ownership_none),
@@ -1563,7 +1545,8 @@ generate_function_declaration(function_id const id,
                               standard_library, definitions, all_functions,
                               program_defined_writer));
         LPG_TRY(stream_writer_write_string(program_defined_writer, " const "));
-        LPG_TRY(generate_parameter_name(j, program_defined_writer));
+        LPG_TRY(generate_register_name(
+            j, all_functions + id, program_defined_writer));
     }
     LPG_TRY(stream_writer_write_string(program_defined_writer, ")"));
     return success;

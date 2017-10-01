@@ -2,11 +2,11 @@
 #include <lpg_std_string.h>
 #include <stdio.h>
 #include <lpg_std_read.h>
-static unit lambda_1(string_ref const arg0);
-static unit lambda_1(string_ref const arg0)
+static unit lambda_1(string_ref const a_0);
+static unit lambda_1(string_ref const a_0)
 {
     unit const r_3 = unit_impl;
-    fwrite(arg0.data, 1, arg0.length, stdout);
+    fwrite(a_0.data, 1, a_0.length, stdout);
     return r_3;
 }
 int main(void)

@@ -4,19 +4,19 @@
 #include <stdio.h>
 typedef string_ref (*type_definition_0)(string_ref);
 static type_definition_0 lambda_1(void);
-static string_ref lambda_2(string_ref const arg0);
+static string_ref lambda_2(string_ref const a_0);
 static type_definition_0 lambda_1(void)
 {
     unit const r_3 = unit_impl;
     fwrite("", 1, 0, stdout);
     return lambda_2;
 }
-static string_ref lambda_2(string_ref const arg0)
+static string_ref lambda_2(string_ref const a_0)
 {
     unit const r_4 = unit_impl;
     fwrite("", 1, 0, stdout);
-    string_ref_add_reference(&arg0);
-    return arg0;
+    string_ref_add_reference(&a_0);
+    return a_0;
 }
 int main(void)
 {
