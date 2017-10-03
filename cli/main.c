@@ -4,8 +4,7 @@
 #include <vld.h>
 #endif
 
-static success_indicator write_file(void *const user, char const *const data,
-                                    size_t const length)
+static success_indicator write_file(void *const user, char const *const data, size_t const length)
 {
     if (fwrite(data, 1, length, user) == length)
     {

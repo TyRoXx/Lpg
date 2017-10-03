@@ -11,8 +11,7 @@ typedef struct string_ref
     size_t *references;
 } string_ref;
 
-static string_ref string_ref_create(char const *const data, size_t const length,
-                                    size_t *const references)
+static string_ref string_ref_create(char const *const data, size_t const length, size_t *const references)
 {
     string_ref const result = {data, length, references};
     return result;
@@ -56,8 +55,7 @@ static bool string_ref_equals(string_ref const left, string_ref const right)
     return !memcmp(left.data, right.data, left.length);
 }
 
-static string_ref string_ref_concat(string_ref const left,
-                                    string_ref const right)
+static string_ref string_ref_concat(string_ref const left, string_ref const right)
 {
     size_t const result_length = (left.length + right.length);
     char *const allocation = malloc(sizeof(size_t) + result_length);
@@ -67,8 +65,7 @@ static string_ref string_ref_concat(string_ref const left,
     }
     size_t *const references = (size_t *)allocation;
     *references = 1;
-    string_ref const result = {
-        allocation + sizeof(*references), result_length, references};
+    string_ref const result = {allocation + sizeof(*references), result_length, references};
     if (left.data)
     {
         memcpy((char *)result.data, left.data, left.length);

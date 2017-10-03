@@ -4,21 +4,18 @@
 #include "lpg_allocate.h"
 #include <string.h>
 
-static void find_used_registers(instruction_sequence const from,
-                                bool *const registers_read_from)
+static void find_used_registers(instruction_sequence const from, bool *const registers_read_from)
 {
     for (size_t i = 0; i < from.length; ++i)
     {
-        instruction const current_instruction =
-            from.elements[from.length - i - 1u];
+        instruction const current_instruction = from.elements[from.length - i - 1u];
         switch (current_instruction.type)
         {
         case instruction_call:
             registers_read_from[current_instruction.call.callee] = true;
             for (size_t j = 0; j < current_instruction.call.argument_count; ++j)
             {
-                registers_read_from[current_instruction.call.arguments[j]] =
-                    true;
+                registers_read_from[current_instruction.call.arguments[j]] = true;
             }
             /*never remove function calls because they might have side effects*/
             registers_read_from[current_instruction.call.result] = true;
@@ -32,8 +29,7 @@ static void find_used_registers(instruction_sequence const from,
             break;
 
         case instruction_read_struct:
-            registers_read_from[current_instruction.read_struct.from_object] =
-                true;
+            registers_read_from[current_instruction.read_struct.from_object] = true;
             break;
 
         case instruction_break:
@@ -41,27 +37,22 @@ static void find_used_registers(instruction_sequence const from,
             break;
 
         case instruction_tuple:
-            for (size_t j = 0; j < current_instruction.tuple_.element_count;
-                 ++j)
+            for (size_t j = 0; j < current_instruction.tuple_.element_count; ++j)
             {
-                registers_read_from[current_instruction.tuple_.elements[j]] =
-                    true;
+                registers_read_from[current_instruction.tuple_.elements[j]] = true;
             }
             break;
 
         case instruction_enum_construct:
-            registers_read_from[current_instruction.enum_construct.state] =
-                true;
+            registers_read_from[current_instruction.enum_construct.state] = true;
             break;
 
         case instruction_match:
             registers_read_from[current_instruction.match.key] = true;
             for (size_t j = 0; j < current_instruction.match.count; ++j)
             {
-                registers_read_from[current_instruction.match.cases[j].key] =
-                    true;
-                registers_read_from[current_instruction.match.cases[j].value] =
-                    true;
+                registers_read_from[current_instruction.match.cases[j].key] = true;
+                registers_read_from[current_instruction.match.cases[j].value] = true;
             }
             break;
 
@@ -69,12 +60,9 @@ static void find_used_registers(instruction_sequence const from,
             break;
 
         case instruction_lambda_with_captures:
-            for (size_t j = 0;
-                 j < current_instruction.lambda_with_captures.capture_count;
-                 ++j)
+            for (size_t j = 0; j < current_instruction.lambda_with_captures.capture_count; ++j)
             {
-                registers_read_from[current_instruction.lambda_with_captures
-                                        .captures[j]] = true;
+                registers_read_from[current_instruction.lambda_with_captures.captures[j]] = true;
             }
             break;
         }
@@ -83,20 +71,17 @@ static void find_used_registers(instruction_sequence const from,
 
 static register_id const no_register = ~(register_id)0;
 
-static bool update_register_id(register_id *const updated,
-                               register_id const *const new_register_ids)
+static bool update_register_id(register_id *const updated, register_id const *const new_register_ids)
 {
     ASSUME(*updated != no_register);
     *updated = new_register_ids[*updated];
     return (*updated != no_register);
 }
 
-static void
-change_register_ids_in_sequence(instruction_sequence *const sequence,
-                                register_id const *const new_register_ids);
+static void change_register_ids_in_sequence(instruction_sequence *const sequence,
+                                            register_id const *const new_register_ids);
 
-static bool change_register_ids(instruction *const where,
-                                register_id const *const new_register_ids)
+static bool change_register_ids(instruction *const where, register_id const *const new_register_ids)
 {
     switch (where->type)
     {
@@ -104,8 +89,7 @@ static bool change_register_ids(instruction *const where,
         ASSERT(update_register_id(&where->call.callee, new_register_ids));
         for (size_t j = 0; j < where->call.argument_count; ++j)
         {
-            ASSERT(update_register_id(
-                where->call.arguments + j, new_register_ids));
+            ASSERT(update_register_id(where->call.arguments + j, new_register_ids));
         }
         ASSERT(update_register_id(&where->call.result, new_register_ids));
         /*never remove function calls because they might have side effects*/
@@ -119,8 +103,7 @@ static bool change_register_ids(instruction *const where,
         return update_register_id(&where->global_into, new_register_ids);
 
     case instruction_read_struct:
-        ASSERT(update_register_id(
-            &where->read_struct.from_object, new_register_ids));
+        ASSERT(update_register_id(&where->read_struct.from_object, new_register_ids));
         return update_register_id(&where->read_struct.into, new_register_ids);
 
     case instruction_break:
@@ -132,27 +115,21 @@ static bool change_register_ids(instruction *const where,
     case instruction_tuple:
         for (size_t j = 0; j < where->tuple_.element_count; ++j)
         {
-            ASSERT(update_register_id(
-                where->tuple_.elements + j, new_register_ids));
+            ASSERT(update_register_id(where->tuple_.elements + j, new_register_ids));
         }
         return update_register_id(&where->tuple_.result, new_register_ids);
 
     case instruction_enum_construct:
-        ASSERT(
-            update_register_id(&where->enum_construct.state, new_register_ids));
-        return update_register_id(
-            &where->enum_construct.into, new_register_ids);
+        ASSERT(update_register_id(&where->enum_construct.state, new_register_ids));
+        return update_register_id(&where->enum_construct.into, new_register_ids);
 
     case instruction_match:
         ASSERT(update_register_id(&where->match.key, new_register_ids));
         for (size_t j = 0; j < where->match.count; ++j)
         {
-            ASSERT(update_register_id(
-                &where->match.cases[j].key, new_register_ids));
-            ASSERT(update_register_id(
-                &where->match.cases[j].value, new_register_ids));
-            change_register_ids_in_sequence(
-                &where->match.cases[j].action, new_register_ids);
+            ASSERT(update_register_id(&where->match.cases[j].key, new_register_ids));
+            ASSERT(update_register_id(&where->match.cases[j].value, new_register_ids));
+            change_register_ids_in_sequence(&where->match.cases[j].action, new_register_ids);
         }
         return update_register_id(&where->match.result, new_register_ids);
 
@@ -162,18 +139,15 @@ static bool change_register_ids(instruction *const where,
     case instruction_lambda_with_captures:
         for (size_t j = 0; j < where->lambda_with_captures.capture_count; ++j)
         {
-            ASSERT(update_register_id(
-                where->lambda_with_captures.captures + j, new_register_ids));
+            ASSERT(update_register_id(where->lambda_with_captures.captures + j, new_register_ids));
         }
-        return update_register_id(
-            &where->lambda_with_captures.into, new_register_ids);
+        return update_register_id(&where->lambda_with_captures.into, new_register_ids);
     }
     LPG_UNREACHABLE();
 }
 
-static void
-change_register_ids_in_sequence(instruction_sequence *const sequence,
-                                register_id const *const new_register_ids)
+static void change_register_ids_in_sequence(instruction_sequence *const sequence,
+                                            register_id const *const new_register_ids)
 {
     size_t used_until = 0;
     for (size_t i = 0; i < sequence->length; ++i)
@@ -197,21 +171,17 @@ typedef enum removed_something
     removed_something_no
 } removed_something;
 
-static removed_something
-remove_one_layer_of_dead_code_from_function(checked_function *const from)
+static removed_something remove_one_layer_of_dead_code_from_function(checked_function *const from)
 {
-    bool *const registers_read_from =
-        allocate_array(from->number_of_registers, sizeof(*registers_read_from));
-    memset(registers_read_from, 0,
-           from->number_of_registers * sizeof(*registers_read_from));
+    bool *const registers_read_from = allocate_array(from->number_of_registers, sizeof(*registers_read_from));
+    memset(registers_read_from, 0, from->number_of_registers * sizeof(*registers_read_from));
     registers_read_from[from->return_value] = true;
     for (size_t i = 0; i < from->signature->parameters.length; ++i)
     {
         registers_read_from[i] = true;
     }
     find_used_registers(from->body, registers_read_from);
-    register_id *const new_register_ids =
-        allocate_array(from->number_of_registers, sizeof(*new_register_ids));
+    register_id *const new_register_ids = allocate_array(from->number_of_registers, sizeof(*new_register_ids));
     removed_something result = removed_something_no;
     {
         register_id next_register = 0;
@@ -220,8 +190,7 @@ remove_one_layer_of_dead_code_from_function(checked_function *const from)
             if (registers_read_from[i])
             {
                 new_register_ids[i] = next_register;
-                from->register_debug_names[next_register] =
-                    from->register_debug_names[i];
+                from->register_debug_names[next_register] = from->register_debug_names[i];
                 ++next_register;
             }
             else

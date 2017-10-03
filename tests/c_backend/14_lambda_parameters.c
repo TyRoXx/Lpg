@@ -1,15 +1,15 @@
 #include <lpg_std_unit.h>
 #include <lpg_std_assert.h>
 #include <stdio.h>
-static size_t lambda_1(size_t const arg0, size_t const arg1);
-static size_t lambda_1(size_t const arg0, size_t const arg1)
+static size_t lambda_1(size_t const a_0, size_t const b_1);
+static size_t lambda_1(size_t const a_0, size_t const b_1)
 {
     unit const r_5 = unit_impl;
     fwrite("", 1, 0, stdout);
-    size_t const r_12 = !arg1;
-    size_t const r_13 = (arg0 & r_12);
-    size_t const r_18 = !arg0;
-    size_t const r_19 = (r_18 & arg1);
+    size_t const r_12 = !b_1;
+    size_t const r_13 = (a_0 & r_12);
+    size_t const r_18 = !a_0;
+    size_t const r_19 = (r_18 & b_1);
     size_t const r_20 = (r_13 | r_19);
     return r_20;
 }

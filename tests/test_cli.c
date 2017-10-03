@@ -43,30 +43,26 @@ static unicode_string write_file(char const *const content)
 #endif
 }
 
-static void expect_output(int argc, char **argv, bool const expected_exit_code,
-                          char const *const expected_diagnostics,
+static void expect_output(int argc, char **argv, bool const expected_exit_code, char const *const expected_diagnostics,
                           char const *const expected_print_output)
 {
     memory_writer diagnostics = {NULL, 0, 0};
     memory_writer print_output = {NULL, 0, 0};
-    REQUIRE(expected_exit_code == run_cli(argc, argv,
-                                          memory_writer_erase(&diagnostics),
-                                          memory_writer_erase(&print_output)));
+    REQUIRE(expected_exit_code ==
+            run_cli(argc, argv, memory_writer_erase(&diagnostics), memory_writer_erase(&print_output)));
     REQUIRE(memory_writer_equals(diagnostics, expected_diagnostics));
     REQUIRE(memory_writer_equals(print_output, expected_print_output));
     memory_writer_free(&print_output);
     memory_writer_free(&diagnostics);
 }
 
-static void expect_output_with_source(char const *const source,
-                                      bool const expected_exit_code,
-                                      char const *const expected_diagnostics,
-                                      char const *const expected_print_output)
+static void expect_output_with_source(char const *const source, bool const expected_exit_code,
+                                      char const *const expected_diagnostics, char const *const expected_print_output)
 {
     unicode_string name = write_file(source);
     char *arguments[] = {"lpg", unicode_string_c_str(&name)};
-    expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code,
-                  expected_diagnostics, expected_print_output);
+    expect_output(
+        LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics, expected_print_output);
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
 }
@@ -75,13 +71,11 @@ void test_cli(void)
 {
     {
         char *arguments[] = {"lpg"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
-                      "Arguments: filename\n", "");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: filename\n", "");
     }
     {
         char *arguments[] = {"lpg", "not-found"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
-                      "Could not open source file\n", "");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n", "");
     }
     expect_output_with_source("print(\"\")\n"
                               "print(a)\n"
@@ -135,40 +129,35 @@ void test_cli(void)
                                     "let v = ?\n"
                                     "         ^\n",
                               "");
-    expect_output_with_source(
-        "print(a)\n"
-        "print(b)\n"
-        "print(c)\n",
-        true, "Unknown structure element or global identifier in line 1:\n"
-              "print(a)\n"
-              "      ^\n"
-              "Unknown structure element or global identifier in line 2:\n"
-              "print(b)\n"
-              "      ^\n"
-              "Unknown structure element or global identifier in line 3:\n"
-              "print(c)\n"
-              "      ^\n",
-        "");
-    expect_output_with_source(
-        "print(\"Hello, world!\\n\")", false, "", "Hello, world!\n");
-    expect_output_with_source("syntax error here", true,
-                              "Expected declaration or assignment in line 1:\n"
-                              "syntax error here\n"
-                              "       ^\n"
-                              "Expected expression in line 1:\n"
-                              "syntax error here\n"
-                              "            ^\n",
+    expect_output_with_source("print(a)\n"
+                              "print(b)\n"
+                              "print(c)\n",
+                              true, "Unknown structure element or global identifier in line 1:\n"
+                                    "print(a)\n"
+                                    "      ^\n"
+                                    "Unknown structure element or global identifier in line 2:\n"
+                                    "print(b)\n"
+                                    "      ^\n"
+                                    "Unknown structure element or global identifier in line 3:\n"
+                                    "print(c)\n"
+                                    "      ^\n",
                               "");
-    expect_output_with_source(
-        "unknown_identifier()", true,
-        "Unknown structure element or global identifier in line 1:\n"
-        "unknown_identifier()\n"
-        "^\n",
-        "");
-    expect_output_with_source(
-        "print(\"\")\nprint(a)", true,
-        "Unknown structure element or global identifier in line 2:\n"
-        "print(a)\n"
-        "      ^\n",
-        "");
+    expect_output_with_source("print(\"Hello, world!\\n\")", false, "", "Hello, world!\n");
+    expect_output_with_source("syntax error here", true, "Expected declaration or assignment in line 1:\n"
+                                                         "syntax error here\n"
+                                                         "       ^\n"
+                                                         "Expected expression in line 1:\n"
+                                                         "syntax error here\n"
+                                                         "            ^\n",
+                              "");
+    expect_output_with_source("unknown_identifier()", true,
+                              "Unknown structure element or global identifier in line 1:\n"
+                              "unknown_identifier()\n"
+                              "^\n",
+                              "");
+    expect_output_with_source("print(\"\")\nprint(a)", true,
+                              "Unknown structure element or global identifier in line 2:\n"
+                              "print(a)\n"
+                              "      ^\n",
+                              "");
 }

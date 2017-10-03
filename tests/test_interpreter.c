@@ -9,10 +9,8 @@
 
 static sequence parse(char const *input)
 {
-    test_parser_user user = {
-        {input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser =
-        expression_parser_create(find_next_token, handle_error, &user);
+    test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
+    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
@@ -31,21 +29,22 @@ typedef struct test_environment
     unicode_view read_input;
 } test_environment;
 
-static value print(value const *const inferred, value const *const arguments,
-                   garbage_collector *const gc, void *environment)
+static void test_captures(const standard_library_description *std_library);
+
+static value print(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                   void *environment)
 {
     (void)inferred;
     (void)gc;
     unicode_view const text = arguments[0].string_ref;
     test_environment *const actual_environment = environment;
     stream_writer *destination = &actual_environment->print_destination;
-    REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) ==
-            success);
+    REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
     return value_from_unit();
 }
 
-static value assert_impl(value const *const inferred, value const *arguments,
-                         garbage_collector *const gc, void *environment)
+static value assert_impl(value const *const inferred, value const *arguments, garbage_collector *const gc,
+                         void *environment)
 {
     (void)environment;
     (void)inferred;
@@ -55,8 +54,8 @@ static value assert_impl(value const *const inferred, value const *arguments,
     return value_from_unit();
 }
 
-static value read_impl(value const *const inferred, value const *arguments,
-                       garbage_collector *const gc, void *environment)
+static value read_impl(value const *const inferred, value const *arguments, garbage_collector *const gc,
+                       void *environment)
 {
     (void)inferred;
     (void)gc;
@@ -67,44 +66,30 @@ static value read_impl(value const *const inferred, value const *arguments,
     return value_from_string_ref(result);
 }
 
-static void expect_output(char const *source, char const *input,
-                          char const *output, structure const global_object)
+static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
 {
     memory_writer print_buffer = {NULL, 0, 0};
-    test_environment environment = {
-        memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
+    test_environment environment = {memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
     garbage_collector gc = {NULL};
     value const globals_values[standard_library_element_count] = {
         /*type*/ value_from_unit(),
         /*string-ref*/ value_from_unit(),
-        /*print*/ value_from_function_pointer(
-            function_pointer_value_from_external(print, &environment)),
+        /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment)),
         /*boolean*/ value_from_unit(),
-        /*assert*/ value_from_function_pointer(
-            function_pointer_value_from_external(assert_impl, NULL)),
-        /*and*/ value_from_function_pointer(
-            function_pointer_value_from_external(and_impl, NULL)),
-        /*or*/ value_from_function_pointer(
-            function_pointer_value_from_external(or_impl, NULL)),
-        /*not*/ value_from_function_pointer(
-            function_pointer_value_from_external(not_impl, NULL)),
-        /*concat*/ value_from_function_pointer(
-            function_pointer_value_from_external(concat_impl, NULL)),
-        /*string-equals*/ value_from_function_pointer(
-            function_pointer_value_from_external(string_equals_impl, NULL)),
-        /*read*/ value_from_function_pointer(
-            function_pointer_value_from_external(read_impl, &environment)),
-        /*int*/ value_from_function_pointer(
-            function_pointer_value_from_external(int_impl, &environment)),
+        /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL)),
+        /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL)),
+        /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL)),
+        /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL)),
+        /* concat */ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL)),
+        /*string-equals*/ value_from_function_pointer(function_pointer_value_from_external(string_equals_impl, NULL)),
+        /*read*/ value_from_function_pointer(function_pointer_value_from_external(read_impl, &environment)),
+        /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment)),
         /*integer-equals*/ value_from_function_pointer(
-            function_pointer_value_from_external(
-                integer_equals_impl, &environment)),
+            function_pointer_value_from_external(integer_equals_impl, &environment)),
         /*integer-less*/ value_from_function_pointer(
-            function_pointer_value_from_external(
-                integer_less_impl, &environment))};
+            function_pointer_value_from_external(integer_less_impl, &environment))};
     sequence root = parse(source);
-    checked_program checked =
-        check(root, global_object, expect_no_errors, NULL);
+    checked_program checked = check(root, global_object, expect_no_errors, NULL);
     sequence_free(&root);
     interpret(checked, globals_values, &gc);
     REQUIRE(memory_writer_equals(print_buffer, output));
@@ -115,61 +100,40 @@ static void expect_output(char const *source, char const *input,
 
 void test_interpreter(void)
 {
-    standard_library_description const std_library =
-        describe_standard_library();
+    standard_library_description const std_library = describe_standard_library();
 
     expect_output("", "", "", std_library.globals);
     expect_output("print(\"\")", "", "", std_library.globals);
-    expect_output(
-        "print(\"Hello, world!\")", "", "Hello, world!", std_library.globals);
-    expect_output(
-        "print(\"Hello, world!\")\n", "", "Hello, world!", std_library.globals);
-    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "", "Hello, world!",
-                  std_library.globals);
-    expect_output("print(\"Hello, world!\")\r\n", "", "Hello, world!",
-                  std_library.globals);
-    expect_output("print(\"Hello, \")\nprint(\"world!\")", "", "Hello, world!",
-                  std_library.globals);
+    expect_output("print(\"Hello, world!\")", "", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, world!\")\n", "", "Hello, world!", std_library.globals);
+    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, world!\")\r\n", "", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, \")\nprint(\"world!\")", "", "Hello, world!", std_library.globals);
     expect_output("loop\n"
                   "    let v = \"Hello, world!\"\n"
                   "    print(v)\n"
                   "    break",
                   "", "Hello, world!", std_library.globals);
+    expect_output("assert(!boolean.false)", "", "", std_library.globals);
     expect_output("assert(boolean.true)", "", "", std_library.globals);
     expect_output("assert(not(boolean.false))", "", "", std_library.globals);
-    expect_output(
-        "assert(and(boolean.true, boolean.true))", "", "", std_library.globals);
-    expect_output(
-        "assert(or(boolean.true, boolean.true))", "", "", std_library.globals);
-    expect_output(
-        "assert(or(boolean.false, boolean.true))", "", "", std_library.globals);
-    expect_output(
-        "assert(or(boolean.true, boolean.false))", "", "", std_library.globals);
-    expect_output(
-        "let v = boolean.true\nassert(v)", "", "", std_library.globals);
-    expect_output(
-        "let v = boolean.false\nassert(not(v))", "", "", std_library.globals);
-    expect_output(
-        "let v = not(boolean.false)\nassert(v)", "", "", std_library.globals);
+    expect_output("assert(and(boolean.true, boolean.true))", "", "", std_library.globals);
+    expect_output("assert(or(boolean.true, boolean.true))", "", "", std_library.globals);
+    expect_output("assert(or(boolean.false, boolean.true))", "", "", std_library.globals);
+    expect_output("assert(or(boolean.true, boolean.false))", "", "", std_library.globals);
+    expect_output("let v = boolean.true\nassert(v)", "", "", std_library.globals);
+    expect_output("let v = boolean.false\nassert(not(v))", "", "", std_library.globals);
+    expect_output("let v = not(boolean.false)\nassert(v)", "", "", std_library.globals);
     expect_output("let v = 123\n", "", "", std_library.globals);
-    expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "", "123456",
-                  std_library.globals);
-    expect_output(
-        "assert(string-equals(\"\", \"\"))\n", "", "", std_library.globals);
-    expect_output("assert(string-equals(\"aaa\", \"aaa\"))\n", "", "",
-                  std_library.globals);
-    expect_output("assert(string-equals(concat(\"aa\", \"a\"), \"aaa\"))\n", "",
-                  "", std_library.globals);
-    expect_output("assert(string-equals(concat(\"aa\", read()), \"aaa\"))\n",
-                  "a", "", std_library.globals);
-    expect_output("assert(not(string-equals(\"a\", \"\")))\n", "", "",
-                  std_library.globals);
-    expect_output("assert(not(string-equals(\"a\", \"b\")))\n", "", "",
-                  std_library.globals);
-    expect_output(
-        "assert(string-equals(read(), \"\"))\n", "", "", std_library.globals);
-    expect_output("assert(string-equals(read(), \"aaa\"))\n", "aaa", "",
-                  std_library.globals);
+    expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "", "123456", std_library.globals);
+    expect_output("assert(string-equals(\"\", \"\"))\n", "", "", std_library.globals);
+    expect_output("assert(string-equals(\"aaa\", \"aaa\"))\n", "", "", std_library.globals);
+    expect_output("assert(string-equals(concat(\"aa\", \"a\"), \"aaa\"))\n", "", "", std_library.globals);
+    expect_output("assert(string-equals(concat(\"aa\", read()), \"aaa\"))\n", "a", "", std_library.globals);
+    expect_output("assert(not(string-equals(\"a\", \"\")))\n", "", "", std_library.globals);
+    expect_output("assert(not(string-equals(\"a\", \"b\")))\n", "", "", std_library.globals);
+    expect_output("assert(string-equals(read(), \"\"))\n", "", "", std_library.globals);
+    expect_output("assert(string-equals(read(), \"aaa\"))\n", "aaa", "", std_library.globals);
     expect_output("let f = () boolean.true\n"
                   "assert(f())\n",
                   "", "", std_library.globals);
@@ -223,10 +187,17 @@ void test_interpreter(void)
                   "assert(not(integer-less(big, small)))\n",
                   "", "", std_library.globals);
 
+    test_captures(&std_library);
+
+    standard_library_description_free(&std_library);
+}
+
+static void test_captures(const standard_library_description *std_library)
+{
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
                   "f()\n",
-                  "", "hallo", std_library.globals);
+                  "", "hallo", (*std_library).globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
@@ -235,7 +206,7 @@ void test_interpreter(void)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yy", std_library.globals);
+                  "", "yy", (*std_library).globals);
 
     /*re-capture a captured runtime variable*/
     expect_output("let m = read()\n"
@@ -244,7 +215,7 @@ void test_interpreter(void)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "y", "yy", std_library.globals);
+                  "y", "yy", (*std_library).globals);
 
     /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
@@ -256,7 +227,7 @@ void test_interpreter(void)
                   "        print(n)\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yzzy", std_library.globals);
+                  "", "yzzy", (*std_library).globals);
 
     /*use a captured variable in a compile-time context*/
     expect_output("let m = boolean\n"
@@ -264,13 +235,11 @@ void test_interpreter(void)
                   "    let a : m = boolean.true\n"
                   "    a\n"
                   "assert(f())\n",
-                  "", "", std_library.globals);
+                  "", "", (*std_library).globals);
 
     /*capture an argument*/
     expect_output("let f = (a: boolean)\n"
                   "    () a\n"
                   "assert(f(boolean.true)())\n",
-                  "", "", std_library.globals);
-
-    standard_library_description_free(&std_library);
+                  "", "", (*std_library).globals);
 }

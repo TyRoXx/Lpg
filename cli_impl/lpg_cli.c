@@ -19,8 +19,7 @@ typedef struct cli_parser_user
     bool has_error;
 } cli_parser_user;
 
-static unicode_view find_whole_line(unicode_view const source,
-                                    line_number const found_line)
+static unicode_view find_whole_line(unicode_view const source, line_number const found_line)
 {
     char const *begin_of_line = source.begin;
     char const *const end_of_file = source.begin + source.length;
@@ -67,22 +66,18 @@ static unicode_view find_whole_line(unicode_view const source,
         }
     }
     size_t line_length = 0;
-    for (char const *i = begin_of_line;
-         (i != end_of_file) && (*i != '\n') && (*i != '\r'); ++i)
+    for (char const *i = begin_of_line; (i != end_of_file) && (*i != '\n') && (*i != '\r'); ++i)
     {
         ++line_length;
     }
     return unicode_view_create(begin_of_line, line_length);
 }
 
-static void print_source_location_hint(unicode_view const source,
-                                       stream_writer const diagnostics,
+static void print_source_location_hint(unicode_view const source, stream_writer const diagnostics,
                                        source_location const where)
 {
     unicode_view const affected_line = find_whole_line(source, where.line);
-    ASSERT(success == stream_writer_write_bytes(diagnostics,
-                                                affected_line.begin,
-                                                affected_line.length));
+    ASSERT(success == stream_writer_write_bytes(diagnostics, affected_line.begin, affected_line.length));
     ASSERT(success == stream_writer_write_string(diagnostics, "\n"));
     for (column_number i = 0; i < where.approximate_column; ++i)
     {
@@ -123,32 +118,26 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected comma";
     case parse_error_expected_lambda_body:
         return "Expected lambda body";
+    case parse_error_unknown_binary_operator:
+        return "Unknown binary operator";
     }
     LPG_UNREACHABLE();
 }
 
-static void handle_parse_error(parse_error const error,
-                               callback_user const user)
+static void handle_parse_error(parse_error const error, callback_user const user)
 {
     cli_parser_user *const actual_user = user;
     actual_user->has_error = true;
-    ASSERT(success ==
-           stream_writer_write_string(
-               actual_user->diagnostics, describe_parse_error(error.type)));
-    ASSERT(success ==
-           stream_writer_write_string(actual_user->diagnostics, " in line "));
+    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.type)));
+    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
-        integer_format(integer_create(0, error.where.line + 1),
-                       lower_case_digits, 10, buffer, sizeof(buffer));
+        integer_format(integer_create(0, error.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
     ASSERT(success ==
-           stream_writer_write_bytes(actual_user->diagnostics, line,
-                                     (size_t)(buffer + sizeof(buffer) - line)));
-    ASSERT(success ==
-           stream_writer_write_string(actual_user->diagnostics, ":\n"));
-    print_source_location_hint(
-        actual_user->source, actual_user->diagnostics, error.where);
+           stream_writer_write_bytes(actual_user->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, ":\n"));
+    print_source_location_hint(actual_user->source, actual_user->diagnostics, error.where);
 }
 
 typedef struct optional_sequence
@@ -165,16 +154,10 @@ static optional_sequence make_optional_sequence(sequence const value)
 
 static optional_sequence const optional_sequence_none = {false, {NULL, 0}};
 
-static optional_sequence parse(unicode_view const input,
-                               stream_writer const diagnostics)
+static optional_sequence parse(unicode_view const input, stream_writer const diagnostics)
 {
-    cli_parser_user user = {
-        {input.begin, input.length, source_location_create(0, 0)},
-        input,
-        diagnostics,
-        false};
-    expression_parser parser =
-        expression_parser_create(find_next_token, handle_parse_error, &user);
+    cli_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, input, diagnostics, false};
+    expression_parser parser = expression_parser_create(find_next_token, handle_parse_error, &user);
     sequence const result = parse_program(&parser);
     if (user.has_error)
     {
@@ -233,67 +216,51 @@ static void handle_semantic_error(semantic_error const error, void *user)
 {
     semantic_error_context *const context = user;
     context->has_error = true;
-    ASSERT(success ==
-           stream_writer_write_string(
-               context->diagnostics, semantic_error_text(error.type)));
-    ASSERT(success ==
-           stream_writer_write_string(context->diagnostics, " in line "));
+    ASSERT(success == stream_writer_write_string(context->diagnostics, semantic_error_text(error.type)));
+    ASSERT(success == stream_writer_write_string(context->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
-        integer_format(integer_create(0, error.where.line + 1),
-                       lower_case_digits, 10, buffer, sizeof(buffer));
+        integer_format(integer_create(0, error.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
-    ASSERT(success ==
-           stream_writer_write_bytes(context->diagnostics, line,
-                                     (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(success == stream_writer_write_bytes(context->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
     ASSERT(success == stream_writer_write_string(context->diagnostics, ":\n"));
-    print_source_location_hint(
-        context->source, context->diagnostics, error.where);
+    print_source_location_hint(context->source, context->diagnostics, error.where);
 }
 
-static value print(value const *const inferred, value const *const arguments,
-                   garbage_collector *const gc, void *environment)
+static value print(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                   void *environment)
 {
     (void)inferred;
     (void)gc;
     unicode_view const text = arguments[0].string_ref;
     stream_writer *const destination = environment;
-    ASSERT(stream_writer_write_bytes(*destination, text.begin, text.length) ==
-           success);
+    ASSERT(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
     return value_from_unit();
 }
 
-bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
-             stream_writer print_destination)
+bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, stream_writer print_destination)
 {
     if (argc < 2)
     {
-        ASSERT(success == stream_writer_write_string(
-                              diagnostics, "Arguments: filename\n"));
+        ASSERT(success == stream_writer_write_string(diagnostics, "Arguments: filename\n"));
         return true;
     }
 
     blob_or_error const source_or_error = read_file(argv[1]);
     if (source_or_error.error)
     {
-        ASSERT(success ==
-               stream_writer_write_string(diagnostics, source_or_error.error));
+        ASSERT(success == stream_writer_write_string(diagnostics, source_or_error.error));
         return true;
     }
 
-    unicode_string const source =
-        unicode_string_validate(source_or_error.success);
+    unicode_string const source = unicode_string_validate(source_or_error.success);
     if (source.length != source_or_error.success.length)
     {
-        ASSERT(
-            success ==
-            stream_writer_write_string(
-                diagnostics, "Source code must in in ASCII (UTF-8 is TODO)\n"));
+        ASSERT(success == stream_writer_write_string(diagnostics, "Source code must in in ASCII (UTF-8 is TODO)\n"));
         return true;
     }
 
-    standard_library_description const standard_library =
-        describe_standard_library();
+    standard_library_description const standard_library = describe_standard_library();
 
     value globals_values[17];
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
@@ -302,11 +269,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     {
         globals_values[i] = value_from_unit();
     }
-    globals_values[2] = value_from_function_pointer(
-        function_pointer_value_from_external(print, &print_destination));
+    globals_values[2] = value_from_function_pointer(function_pointer_value_from_external(print, &print_destination));
 
-    optional_sequence const root =
-        parse(unicode_view_from_string(source), diagnostics);
+    optional_sequence const root = parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)
     {
         sequence_free(&root.value);
@@ -314,10 +279,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         unicode_string_free(&source);
         return true;
     }
-    semantic_error_context context = {
-        unicode_view_from_string(source), diagnostics, false};
-    checked_program checked = check(
-        root.value, standard_library.globals, handle_semantic_error, &context);
+    semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
+    checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &context);
     sequence_free(&root.value);
     if (!context.has_error)
     {

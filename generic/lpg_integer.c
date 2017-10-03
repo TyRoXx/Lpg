@@ -33,9 +33,7 @@ integer integer_shift_left_truncate(integer value, uint32_t bits)
         bits -= 64;
     }
     integer const result = {
-        ((value.high << bits) |
-         ((value.low >> (64u - bits)) & ((uint64_t)-1) >> (64u - bits))),
-        (value.low << bits)};
+        ((value.high << bits) | ((value.low >> (64u - bits)) & ((uint64_t)-1) >> (64u - bits))), (value.low << bits)};
     return result;
 }
 
@@ -179,8 +177,7 @@ bool integer_parse(integer *into, unicode_view from)
         {
             return 0;
         }
-        if (!integer_add(
-                &result, integer_create(0, (uint64_t)(from.begin[i] - '0'))))
+        if (!integer_add(&result, integer_create(0, (uint64_t)(from.begin[i] - '0'))))
         {
             return 0;
         }
@@ -208,8 +205,7 @@ integer_division integer_divide(integer numerator, integer denominator)
 
 char const lower_case_digits[] = "0123456789abcdef";
 
-char *integer_format(integer const value, char const *digits, unsigned base,
-                     char *buffer, size_t buffer_size)
+char *integer_format(integer const value, char const *digits, unsigned base, char *buffer, size_t buffer_size)
 {
     ASSUME(base >= 2);
     ASSUME(base <= 16);
@@ -218,8 +214,7 @@ char *integer_format(integer const value, char const *digits, unsigned base,
     integer rest = value;
     for (;;)
     {
-        integer_division const divided =
-            integer_divide(rest, integer_create(0, base));
+        integer_division const divided = integer_divide(rest, integer_create(0, base));
         buffer[next_digit] = digits[divided.remainder.low];
         rest = divided.quotient;
         if (rest.high == 0 && rest.low == 0)

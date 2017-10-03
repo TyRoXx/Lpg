@@ -8,6 +8,5 @@ typedef struct whitespace_state
     bool pending_space;
 } whitespace_state;
 
-success_indicator save_expression(stream_writer const to,
-                                  LPG_NON_NULL(expression const *value),
+success_indicator save_expression(stream_writer const to, LPG_NON_NULL(expression const *value),
                                   whitespace_state whitespace);

@@ -3,23 +3,17 @@
 #include "lpg_for.h"
 #include "lpg_assert.h"
 
-tuple_instruction tuple_instruction_create(register_id *elements,
-                                           size_t element_count,
-                                           register_id result,
+tuple_instruction tuple_instruction_create(register_id *elements, size_t element_count, register_id result,
                                            tuple_type result_type)
 {
-    tuple_instruction const tuple_instruction1 = {
-        elements, element_count, result, result_type};
+    tuple_instruction const tuple_instruction1 = {elements, element_count, result, result_type};
     return tuple_instruction1;
 }
 
-call_instruction call_instruction_create(register_id callee,
-                                         register_id *arguments,
-                                         size_t argument_count,
+call_instruction call_instruction_create(register_id callee, register_id *arguments, size_t argument_count,
                                          register_id result)
 {
-    call_instruction const created = {
-        callee, arguments, argument_count, result};
+    call_instruction const created = {callee, arguments, argument_count, result};
     return created;
 }
 
@@ -31,8 +25,7 @@ void call_instruction_free(call_instruction const *value)
     }
 }
 
-bool call_instruction_equals(call_instruction const left,
-                             call_instruction const right)
+bool call_instruction_equals(call_instruction const left, call_instruction const right)
 {
     if (left.callee != right.callee)
     {
@@ -56,73 +49,56 @@ bool call_instruction_equals(call_instruction const left,
     return true;
 }
 
-read_struct_instruction read_struct_instruction_create(register_id from_object,
-                                                       struct_member_id member,
+read_struct_instruction read_struct_instruction_create(register_id from_object, struct_member_id member,
                                                        register_id into)
 {
     read_struct_instruction const result = {from_object, member, into};
     return result;
 }
 
-bool read_struct_instruction_equals(read_struct_instruction const left,
-                                    read_struct_instruction const right)
+bool read_struct_instruction_equals(read_struct_instruction const left, read_struct_instruction const right)
 {
-    return (left.from_object == right.from_object) &&
-           (left.member == right.member) && (left.into == right.into);
+    return (left.from_object == right.from_object) && (left.member == right.member) && (left.into == right.into);
 }
 
-literal_instruction literal_instruction_create(register_id into, value value_,
-                                               type type_of)
+literal_instruction literal_instruction_create(register_id into, value value_, type type_of)
 {
     literal_instruction const result = {into, value_, type_of};
     return result;
 }
 
-bool literal_instruction_equals(literal_instruction const left,
-                                literal_instruction const right)
+bool literal_instruction_equals(literal_instruction const left, literal_instruction const right)
 {
-    return (left.into == right.into) &&
-           value_equals(left.value_, right.value_) &&
+    return (left.into == right.into) && value_equals(left.value_, right.value_) &&
            type_equals(left.type_of, right.type_of);
 }
 
-enum_construct_instruction
-enum_construct_instruction_create(register_id into, enum_element_id which,
-                                  register_id state)
+enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state)
 {
     enum_construct_instruction const result = {into, which, state};
     return result;
 }
 
-bool enum_construct_instruction_equals(enum_construct_instruction const left,
-                                       enum_construct_instruction const right)
+bool enum_construct_instruction_equals(enum_construct_instruction const left, enum_construct_instruction const right)
 {
-    return (left.into == right.into) && (left.which == right.which) &&
-           (left.state == right.state);
+    return (left.into == right.into) && (left.which == right.which) && (left.state == right.state);
 }
 
-match_instruction match_instruction_create(register_id key,
-                                           match_instruction_case *cases,
-                                           size_t count, register_id result,
-                                           type result_type)
+match_instruction match_instruction_create(register_id key, match_instruction_case *cases, size_t count,
+                                           register_id result, type result_type)
 {
-    match_instruction const returning = {
-        key, cases, count, result, result_type};
+    match_instruction const returning = {key, cases, count, result, result_type};
     return returning;
 }
 
-lambda_with_captures_instruction
-lambda_with_captures_instruction_create(register_id into, function_id lambda,
-                                        register_id *captures,
-                                        size_t capture_count)
+lambda_with_captures_instruction lambda_with_captures_instruction_create(register_id into, function_id lambda,
+                                                                         register_id *captures, size_t capture_count)
 {
-    lambda_with_captures_instruction const result = {
-        into, lambda, captures, capture_count};
+    lambda_with_captures_instruction const result = {into, lambda, captures, capture_count};
     return result;
 }
 
-void lambda_with_captures_instruction_free(
-    lambda_with_captures_instruction const freed)
+void lambda_with_captures_instruction_free(lambda_with_captures_instruction const freed)
 {
     if (freed.captures)
     {
@@ -130,9 +106,8 @@ void lambda_with_captures_instruction_free(
     }
 }
 
-bool lambda_with_captures_instruction_equals(
-    lambda_with_captures_instruction const left,
-    lambda_with_captures_instruction const right)
+bool lambda_with_captures_instruction_equals(lambda_with_captures_instruction const left,
+                                             lambda_with_captures_instruction const right)
 {
     if (left.into != right.into)
     {
@@ -164,8 +139,7 @@ instruction instruction_create_tuple(tuple_instruction argument)
     return result;
 }
 
-instruction
-instruction_create_enum_construct(enum_construct_instruction argument)
+instruction instruction_create_enum_construct(enum_construct_instruction argument)
 {
     instruction result;
     result.type = instruction_enum_construct;
@@ -189,8 +163,7 @@ instruction instruction_create_get_captures(register_id const into)
     return result;
 }
 
-instruction instruction_create_lambda_with_captures(
-    lambda_with_captures_instruction const argument)
+instruction instruction_create_lambda_with_captures(lambda_with_captures_instruction const argument)
 {
     instruction result;
     result.type = instruction_lambda_with_captures;
@@ -198,9 +171,7 @@ instruction instruction_create_lambda_with_captures(
     return result;
 }
 
-match_instruction_case
-match_instruction_case_create(register_id key, instruction_sequence action,
-                              register_id value)
+match_instruction_case match_instruction_case_create(register_id key, instruction_sequence action, register_id value)
 {
     match_instruction_case const result = {key, action, value};
     return result;
@@ -322,15 +293,13 @@ bool instruction_equals(instruction const left, instruction const right)
         return (left.global_into == right.global_into);
 
     case instruction_read_struct:
-        return read_struct_instruction_equals(
-            left.read_struct, right.read_struct);
+        return read_struct_instruction_equals(left.read_struct, right.read_struct);
 
     case instruction_break:
         return true;
 
     case instruction_literal:
-        return (left.literal.into == right.literal.into) &&
-               value_equals(left.literal.value_, right.literal.value_);
+        return (left.literal.into == right.literal.into) && value_equals(left.literal.value_, right.literal.value_);
 
     case instruction_tuple:
         return left.tuple_.result == right.tuple_.result;
@@ -357,8 +326,7 @@ bool instruction_equals(instruction const left, instruction const right)
             {
                 return false;
             }
-            if (!instruction_sequence_equals(
-                    &left.match.cases[i].action, &right.match.cases[i].action))
+            if (!instruction_sequence_equals(&left.match.cases[i].action, &right.match.cases[i].action))
             {
                 return false;
             }
@@ -373,8 +341,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return true;
 
     case instruction_lambda_with_captures:
-        return lambda_with_captures_instruction_equals(
-            left.lambda_with_captures, right.lambda_with_captures);
+        return lambda_with_captures_instruction_equals(left.lambda_with_captures, right.lambda_with_captures);
     }
     LPG_UNREACHABLE();
 }

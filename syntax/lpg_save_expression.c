@@ -2,8 +2,7 @@
 #include "lpg_assert.h"
 #include "lpg_for.h"
 
-static success_indicator indent(const stream_writer to,
-                                whitespace_state const whitespace)
+static success_indicator indent(const stream_writer to, whitespace_state const whitespace)
 {
     LPG_FOR(size_t, j, whitespace.indentation_depth)
     {
@@ -12,11 +11,9 @@ static success_indicator indent(const stream_writer to,
     return success;
 }
 
-static whitespace_state go_deeper(whitespace_state const whitespace,
-                                  size_t additional_indentation)
+static whitespace_state go_deeper(whitespace_state const whitespace, size_t additional_indentation)
 {
-    whitespace_state const result = {
-        whitespace.indentation_depth + additional_indentation, 0};
+    whitespace_state const result = {whitespace.indentation_depth + additional_indentation, 0};
     return result;
 }
 
@@ -26,8 +23,7 @@ static whitespace_state add_space_or_newline(whitespace_state const whitespace)
     return result;
 }
 
-static success_indicator space_here(stream_writer const to,
-                                    whitespace_state *whitespace)
+static success_indicator space_here(stream_writer const to, whitespace_state *whitespace)
 {
     if (whitespace->pending_space)
     {
@@ -37,9 +33,7 @@ static success_indicator space_here(stream_writer const to,
     return success;
 }
 
-success_indicator save_expression(stream_writer const to,
-                                  expression const *value,
-                                  whitespace_state whitespace)
+success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
     {
@@ -53,8 +47,7 @@ success_indicator save_expression(stream_writer const to,
                 LPG_TRY(stream_writer_write_string(to, ", "));
             }
             parameter const *param = value->lambda.parameters + i;
-            LPG_TRY(stream_writer_write_bytes(
-                to, param->name.value.data, param->name.value.length));
+            LPG_TRY(stream_writer_write_bytes(to, param->name.value.data, param->name.value.length));
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, param->type, whitespace));
         }
@@ -65,8 +58,7 @@ success_indicator save_expression(stream_writer const to,
     case expression_type_call:
     {
         LPG_TRY(save_expression(to, value->call.callee, whitespace));
-        expression const arguments =
-            expression_from_tuple(value->call.arguments);
+        expression const arguments = expression_from_tuple(value->call.arguments);
         return save_expression(to, &arguments, whitespace);
     }
 
@@ -75,19 +67,15 @@ success_indicator save_expression(stream_writer const to,
         LPG_TRY(space_here(to, &whitespace));
         char buffer[39];
         char *const formatted =
-            integer_format(value->integer_literal.value, lower_case_digits, 10,
-                           buffer, sizeof(buffer));
-        return stream_writer_write_bytes(
-            to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
+            integer_format(value->integer_literal.value, lower_case_digits, 10, buffer, sizeof(buffer));
+        return stream_writer_write_bytes(to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
     }
 
     case expression_type_access_structure:
     {
-        LPG_TRY(
-            save_expression(to, value->access_structure.object, whitespace));
+        LPG_TRY(save_expression(to, value->access_structure.object, whitespace));
         LPG_TRY(stream_writer_write_string(to, "."));
-        expression const member =
-            expression_from_identifier(value->access_structure.member);
+        expression const member = expression_from_identifier(value->access_structure.member);
         return save_expression(to, &member, whitespace);
     }
 
@@ -100,13 +88,9 @@ success_indicator save_expression(stream_writer const to,
         {
             LPG_TRY(indent(to, go_deeper(whitespace, 1)));
             LPG_TRY(stream_writer_write_string(to, "case"));
-            LPG_TRY(save_expression(
-                to, value->match.cases[i].key,
-                add_space_or_newline(go_deeper(whitespace, 2))));
+            LPG_TRY(save_expression(to, value->match.cases[i].key, add_space_or_newline(go_deeper(whitespace, 2))));
             LPG_TRY(stream_writer_write_string(to, ":"));
-            LPG_TRY(save_expression(
-                to, value->match.cases[i].action,
-                add_space_or_newline(go_deeper(whitespace, 2))));
+            LPG_TRY(save_expression(to, value->match.cases[i].action, add_space_or_newline(go_deeper(whitespace, 2))));
             LPG_TRY(stream_writer_write_string(to, "\n"));
         }
         return success;
@@ -124,21 +108,22 @@ success_indicator save_expression(stream_writer const to,
                 LPG_TRY(stream_writer_write_string(to, "\\"));
                 break;
             }
-            LPG_TRY(stream_writer_write_bytes(
-                to, (value->string.value.data + i), 1));
+            LPG_TRY(stream_writer_write_bytes(to, (value->string.value.data + i), 1));
         }
         return stream_writer_write_string(to, "\"");
 
     case expression_type_identifier:
         LPG_TRY(space_here(to, &whitespace));
-        return stream_writer_write_unicode_view(
-            to, unicode_view_from_string(value->identifier.value));
+        return stream_writer_write_unicode_view(to, unicode_view_from_string(value->identifier.value));
 
     case expression_type_assign:
         LPG_TRY(save_expression(to, value->assign.left, whitespace));
         LPG_TRY(stream_writer_write_string(to, " = "));
         return save_expression(to, value->assign.right, whitespace);
 
+    case expression_type_not:
+        LPG_TRY(stream_writer_write_string(to, "!"))
+        return save_expression(to, value->not.expr, whitespace);
     case expression_type_return:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "return "));
@@ -165,20 +150,17 @@ success_indicator save_expression(stream_writer const to,
 
             LPG_TRY(stream_writer_write_string(to, "\n"));
             LPG_TRY(indent(to, whitespace));
-            LPG_TRY(
-                save_expression(to, value->sequence.elements + i, whitespace));
+            LPG_TRY(save_expression(to, value->sequence.elements + i, whitespace));
         }
         return success;
 
     case expression_type_declare:
         LPG_TRY(stream_writer_write_string(to, "let "));
-        LPG_TRY(stream_writer_write_unicode_view(
-            to, unicode_view_from_string(value->declare.name.value)));
+        LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(value->declare.name.value)));
         if (value->declare.optional_type)
         {
             LPG_TRY(stream_writer_write_string(to, " : "));
-            LPG_TRY(
-                save_expression(to, value->declare.optional_type, whitespace));
+            LPG_TRY(save_expression(to, value->declare.optional_type, whitespace));
         }
         LPG_TRY(stream_writer_write_string(to, " = "));
         LPG_TRY(save_expression(to, value->declare.initializer, whitespace));
@@ -207,6 +189,34 @@ success_indicator save_expression(stream_writer const to,
         }
         LPG_TRY(stream_writer_write_string(to, "//"));
         return stream_writer_write_unicode_view(to, view);
+    }
+    case expression_type_binary:
+    {
+        LPG_TRY(save_expression(to, value->binary.left, whitespace));
+        char const *operator= "";
+        switch (value->binary.comparator)
+        {
+        case less_than:
+            operator= "<";
+            break;
+        case less_than_or_equals:
+            operator= "<=";
+            break;
+        case equals:
+            operator= "==";
+            break;
+        case greater_than:
+            operator= ">";
+            break;
+        case greater_than_or_equals:
+            operator= ">=";
+            break;
+        case not_equals:
+            operator= "!=";
+            break;
+        }
+        LPG_TRY(stream_writer_write_string(to, operator));
+        return save_expression(to, value->binary.right, whitespace);
     }
     }
     LPG_UNREACHABLE();

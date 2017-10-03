@@ -16,8 +16,7 @@ typedef struct lambda
     expression *result;
 } lambda;
 
-lambda lambda_create(parameter *parameters, size_t parameter_count,
-                     LPG_NON_NULL(expression *result));
+lambda lambda_create(parameter *parameters, size_t parameter_count, LPG_NON_NULL(expression *result));
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 
@@ -31,6 +30,8 @@ typedef enum expression_type
     expression_type_string,
     expression_type_identifier,
     expression_type_assign,
+    expression_type_not,
+    expression_type_binary,
     expression_type_return,
     expression_type_loop,
     expression_type_break,
@@ -53,8 +54,7 @@ typedef struct call
     source_location closing_parenthesis;
 } call;
 
-call call_create(LPG_NON_NULL(expression *callee), tuple arguments,
-                 source_location closing_parenthesis);
+call call_create(LPG_NON_NULL(expression *callee), tuple arguments, source_location closing_parenthesis);
 
 typedef struct comment_expression
 {
@@ -74,8 +74,7 @@ struct parameter
     expression *type;
 };
 
-parameter parameter_create(identifier_expression name,
-                           LPG_NON_NULL(expression *type));
+parameter parameter_create(identifier_expression name, LPG_NON_NULL(expression *type));
 void parameter_free(LPG_NON_NULL(parameter *value));
 bool parameter_equals(parameter const left, parameter const right);
 
@@ -85,8 +84,7 @@ typedef struct access_structure
     identifier_expression member;
 } access_structure;
 
-access_structure access_structure_create(LPG_NON_NULL(expression *object),
-                                         identifier_expression member);
+access_structure access_structure_create(LPG_NON_NULL(expression *object), identifier_expression member);
 
 typedef struct match_case
 {
@@ -94,8 +92,7 @@ typedef struct match_case
     expression *action;
 } match_case;
 
-match_case match_case_create(LPG_NON_NULL(expression *key),
-                             LPG_NON_NULL(expression *action));
+match_case match_case_create(LPG_NON_NULL(expression *key), LPG_NON_NULL(expression *action));
 void match_case_free(LPG_NON_NULL(match_case *value));
 bool match_case_equals(match_case const left, match_case const right);
 
@@ -107,8 +104,8 @@ typedef struct match
     size_t number_of_cases;
 } match;
 
-match match_create(source_location begin, LPG_NON_NULL(expression *input),
-                   LPG_NON_NULL(match_case *cases), size_t number_of_cases);
+match match_create(source_location begin, LPG_NON_NULL(expression *input), LPG_NON_NULL(match_case *cases),
+                   size_t number_of_cases);
 
 typedef struct assign
 {
@@ -116,8 +113,39 @@ typedef struct assign
     expression *right;
 } assign;
 
-assign assign_create(LPG_NON_NULL(expression *left),
-                     LPG_NON_NULL(expression *right));
+assign assign_create(LPG_NON_NULL(expression *left), LPG_NON_NULL(expression *right));
+
+typedef struct not
+{
+    expression *expr;
+}
+not;
+
+not not_expression_create(expression * value);
+void not_free(LPG_NON_NULL(not const *expression));
+
+typedef enum binary_operator
+{
+    less_than,
+    less_than_or_equals,
+    equals,
+    greater_than,
+    greater_than_or_equals,
+    not_equals
+} binary_operator;
+
+typedef struct binary_operator_expression
+{
+    expression *left;
+    expression *right;
+
+    binary_operator comparator;
+} binary_operator_expression;
+
+binary_operator_expression binary_operator_expression_create(LPG_NON_NULL(expression *left),
+                                                             LPG_NON_NULL(expression *right),
+                                                             binary_operator anOperator);
+void binary_operator_expression_free(binary_operator_expression const *value);
 
 typedef struct sequence
 {
@@ -134,13 +162,14 @@ typedef struct declare
 
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
-declare declare_create(identifier_expression name, expression *optional_type,
-                       LPG_NON_NULL(expression *initializer));
+declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
 void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);
 bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
 expression expression_from_assign(assign value);
+expression expression_from_not(not value);
+expression expression_from_binary_operator(binary_operator_expression value);
 expression expression_from_return(LPG_NON_NULL(expression *value));
 expression expression_from_loop(sequence body);
 expression expression_from_sequence(sequence value);
@@ -149,12 +178,9 @@ expression expression_from_declare(declare value);
 expression expression_from_match(match value);
 source_location expression_source_begin(expression const value);
 
-identifier_expression identifier_expression_create(unicode_string value,
-                                                   source_location source);
-void identifier_expression_free(
-    LPG_NON_NULL(identifier_expression const *value));
-bool identifier_expression_equals(identifier_expression const left,
-                                  identifier_expression const right);
+identifier_expression identifier_expression_create(unicode_string value, source_location source);
+void identifier_expression_free(LPG_NON_NULL(identifier_expression const *value));
+bool identifier_expression_equals(identifier_expression const left, identifier_expression const right);
 
 typedef struct string_expression
 {
@@ -162,8 +188,7 @@ typedef struct string_expression
     source_location source;
 } string_expression;
 
-string_expression string_expression_create(unicode_string value,
-                                           source_location source);
+string_expression string_expression_create(unicode_string value, source_location source);
 void string_expression_free(LPG_NON_NULL(string_expression const *value));
 
 typedef struct integer_literal_expression
@@ -172,13 +197,10 @@ typedef struct integer_literal_expression
     source_location source;
 } integer_literal_expression;
 
-integer_literal_expression
-integer_literal_expression_create(integer value, source_location source);
-bool integer_literal_expression_equals(integer_literal_expression const left,
-                                       integer_literal_expression const right);
+integer_literal_expression integer_literal_expression_create(integer value, source_location source);
+bool integer_literal_expression_equals(integer_literal_expression const left, integer_literal_expression const right);
 
-comment_expression comment_expression_create(unicode_string value,
-                                             source_location source);
+comment_expression comment_expression_create(unicode_string value, source_location source);
 
 struct expression
 {
@@ -193,6 +215,8 @@ struct expression
         string_expression string;
         identifier_expression identifier;
         assign assign;
+        not not;
+        binary_operator_expression binary;
         expression *return_;
         sequence loop_body;
         sequence sequence;
@@ -222,5 +246,4 @@ bool sequence_equals(sequence const left, sequence const right);
 bool declare_equals(declare const left, declare const right);
 bool assign_equals(assign const left, assign const right);
 bool match_equals(match const left, match const right);
-bool expression_equals(LPG_NON_NULL(expression const *left),
-                       LPG_NON_NULL(expression const *right));
+bool expression_equals(LPG_NON_NULL(expression const *left), LPG_NON_NULL(expression const *right));

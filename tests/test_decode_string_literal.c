@@ -3,8 +3,7 @@
 #include "test_decode_string_literal.h"
 #include "test.h"
 
-static decode_string_literal_result
-expect_decoded_content(char const *string, char const *expected_content)
+static decode_string_literal_result expect_decoded_content(char const *string, char const *expected_content)
 {
     memory_writer m = {NULL, 0, 0};
     stream_writer const s = memory_writer_erase(&m);
@@ -18,50 +17,42 @@ expect_decoded_content(char const *string, char const *expected_content)
 void test_decode_string_literal(void)
 {
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello\"", "Hello");
+        decode_string_literal_result result = expect_decoded_content("\"Hello\"", "Hello");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 7);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \n World\"", "Hello ");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \n World\"", "Hello ");
         REQUIRE(!result.is_valid);
         REQUIRE(result.length == 7);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \\\\ World\"", "Hello \\ World");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \\\\ World\"", "Hello \\ World");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 16);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \\ World\"", "Hello ");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \\ World\"", "Hello ");
         REQUIRE(!result.is_valid);
         REQUIRE(result.length == 8);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \\\" World\"", "Hello \" World");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \\\" World\"", "Hello \" World");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 16);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \\n World\"", "Hello \n World");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \\n World\"", "Hello \n World");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 16);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \\t World\"", "Hello \t World");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \\t World\"", "Hello \t World");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 16);
     }
     {
-        decode_string_literal_result result =
-            expect_decoded_content("\"Hello \' World\"", "Hello \' World");
+        decode_string_literal_result result = expect_decoded_content("\"Hello \' World\"", "Hello \' World");
         REQUIRE(result.is_valid);
         REQUIRE(result.length == 15);
     }

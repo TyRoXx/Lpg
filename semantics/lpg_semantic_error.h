@@ -21,7 +21,5 @@ typedef struct semantic_error
     source_location where;
 } semantic_error;
 
-semantic_error semantic_error_create(semantic_error_type type,
-                                     source_location where);
-bool semantic_error_equals(semantic_error const left,
-                           semantic_error const right);
+semantic_error semantic_error_create(semantic_error_type type, source_location where);
+bool semantic_error_equals(semantic_error const left, semantic_error const right);

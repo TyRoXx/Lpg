@@ -13,16 +13,10 @@ typedef struct stream_writer
     void *user;
 } stream_writer;
 
-success_indicator
-stream_writer_write_unicode_view(stream_writer writer,
-                                 unicode_view string) LPG_USE_RESULT;
+success_indicator stream_writer_write_unicode_view(stream_writer writer, unicode_view string) LPG_USE_RESULT;
 
-success_indicator
-stream_writer_write_string(stream_writer writer,
-                           LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
-success_indicator stream_writer_write_bytes(stream_writer writer,
-                                            char const *data,
-                                            size_t size) LPG_USE_RESULT;
+success_indicator stream_writer_write_string(stream_writer writer, LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
+success_indicator stream_writer_write_bytes(stream_writer writer, char const *data, size_t size) LPG_USE_RESULT;
 
 typedef struct memory_writer
 {
@@ -32,10 +26,7 @@ typedef struct memory_writer
 } memory_writer;
 
 void memory_writer_free(LPG_NON_NULL(memory_writer *writer));
-success_indicator memory_writer_write(void *user, char const *data,
-                                      size_t length) LPG_USE_RESULT;
-bool memory_writer_equals(memory_writer const writer,
-                          LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
-stream_writer
-memory_writer_erase(LPG_NON_NULL(memory_writer *writer)) LPG_USE_RESULT;
+success_indicator memory_writer_write(void *user, char const *data, size_t length) LPG_USE_RESULT;
+bool memory_writer_equals(memory_writer const writer, LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
+stream_writer memory_writer_erase(LPG_NON_NULL(memory_writer *writer)) LPG_USE_RESULT;
 unicode_view memory_writer_content(memory_writer const writer) LPG_USE_RESULT;

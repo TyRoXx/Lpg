@@ -28,6 +28,5 @@ void blob_free(blob const *s)
 
 bool blob_equals(blob const left, blob const right)
 {
-    return (left.length == right.length) &&
-           !memcmp(left.data, right.data, left.length);
+    return (left.length == right.length) && !memcmp(left.data, right.data, left.length);
 }

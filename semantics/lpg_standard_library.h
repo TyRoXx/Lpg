@@ -1,32 +1,25 @@
 #pragma once
 #include "lpg_structure_member.h"
 
-value not_impl(value const *const inferred, value const *arguments,
-               garbage_collector *const gc, void *environment);
+value not_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
 
-value concat_impl(value const *const inferred, value const *const arguments,
-                  garbage_collector *const gc, void *environment);
+value concat_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                  void *environment);
 
-value and_impl(value const *const inferred, value const *arguments,
-               garbage_collector *const gc, void *environment);
+value and_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
 
-value or_impl(value const *const inferred, value const *arguments,
-              garbage_collector *const gc, void *environment);
+value or_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
 
-value string_equals_impl(value const *const inferred,
-                         value const *const arguments,
-                         garbage_collector *const gc, void *environment);
+value string_equals_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                         void *environment);
 
-value int_impl(value const *const inferred, value const *arguments,
-               garbage_collector *const gc, void *environment);
+value int_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
 
-value integer_equals_impl(value const *const inferred,
-                          value const *const arguments,
-                          garbage_collector *const gc, void *environment);
+value integer_equals_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                          void *environment);
 
-value integer_less_impl(value const *const inferred,
-                        value const *const arguments,
-                        garbage_collector *const gc, void *environment);
+value integer_less_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                        void *environment);
 
 typedef struct standard_library_stable
 {
@@ -57,5 +50,4 @@ typedef struct standard_library_description
 } standard_library_description;
 
 standard_library_description describe_standard_library(void);
-void standard_library_description_free(
-    LPG_NON_NULL(standard_library_description const *value));
+void standard_library_description_free(LPG_NON_NULL(standard_library_description const *value));

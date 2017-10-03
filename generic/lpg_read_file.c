@@ -53,8 +53,7 @@ blob_or_error read_file(char const *const name)
     fseek(source_file, 0, SEEK_SET);
     size_t const checked_source_size = (size_t)source_size;
     blob const source = {allocate(checked_source_size), checked_source_size};
-    size_t const read_result =
-        fread(source.data, 1, source.length, source_file);
+    size_t const read_result = fread(source.data, 1, source.length, source_file);
     if (read_result != source.length)
     {
         fclose(source_file);

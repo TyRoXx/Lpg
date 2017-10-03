@@ -43,13 +43,32 @@ bool unicode_view_equals(unicode_view left, unicode_view right)
     return !memcmp(left.begin, right.begin, left.length * sizeof(*left.begin));
 }
 
+bool unicode_view_less(unicode_view const left, unicode_view const right)
+{
+    if (left.length == right.length)
+    {
+        for (size_t i = 0; i < left.length; ++i)
+        {
+            if (left.begin[i] < right.begin[i])
+            {
+                return true;
+            }
+            else if (left.begin[i] > right.begin[i])
+            {
+                return false;
+            }
+        }
+        return false;
+    }
+    return left.length < right.length;
+}
+
 unicode_string unicode_view_copy(unicode_view value)
 {
     return unicode_string_from_range(value.begin, value.length);
 }
 
-unicode_view unicode_view_cut(unicode_view const whole, size_t const begin,
-                              size_t const end)
+unicode_view unicode_view_cut(unicode_view const whole, size_t const begin, size_t const end)
 {
     ASSUME(begin <= end);
     ASSUME(end <= whole.length);

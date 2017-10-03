@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include "lpg_string_literal.h"
 
-decode_string_literal_result decode_string_literal(unicode_view source,
-                                                   stream_writer decoded)
+decode_string_literal_result decode_string_literal(unicode_view source, stream_writer decoded)
 {
     bool escaped = false;
     for (size_t i = 1; i < source.length; i++)
@@ -76,8 +75,7 @@ decode_string_literal_result decode_string_literal(unicode_view source,
     return decode_string_literal_result_create(false, source.length);
 }
 
-decode_string_literal_result decode_string_literal_result_create(bool is_valid,
-                                                                 size_t length)
+decode_string_literal_result decode_string_literal_result_create(bool is_valid, size_t length)
 {
     decode_string_literal_result const result = {is_valid, length};
     return result;

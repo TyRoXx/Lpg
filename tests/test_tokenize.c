@@ -2,8 +2,7 @@
 #include "test.h"
 #include "lpg_tokenize.h"
 
-static void test_single_token(token_type expected_token, size_t expected_size,
-                              char const *input)
+static void test_single_token(token_type expected_token, size_t expected_size, char const *input)
 {
     unicode_string s = unicode_string_from_c_str(input);
     tokenize_result const result = tokenize(s.data, s.length);
@@ -54,7 +53,13 @@ void test_tokenize(void)
     test_single_token(token_colon, 1, ":a");
     test_single_token(token_colon, 1, "::");
     test_single_token(token_assign, 1, "=");
-    test_single_token(token_assign, 1, "==");
+    test_single_token(token_equals, 2, "==");
+    test_single_token(token_not_equals, 2, "!=");
+    test_single_token(token_not, 1, "!abs");
+    test_single_token(token_less_than, 1, "<");
+    test_single_token(token_less_than_or_equals, 2, "<=");
+    test_single_token(token_greater_than, 1, ">");
+    test_single_token(token_greater_than_or_equals, 2, ">=");
     test_single_token(token_fat_arrow, 2, "=>");
     test_single_token(token_comma, 1, ",");
     test_single_token(token_dot, 1, ".");

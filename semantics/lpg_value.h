@@ -7,9 +7,7 @@
 
 typedef struct enumeration enumeration;
 
-typedef struct value external_function(struct value const *,
-                                       struct value const *,
-                                       LPG_NON_NULL(garbage_collector *),
+typedef struct value external_function(struct value const *, struct value const *, LPG_NON_NULL(garbage_collector *),
                                        void *);
 
 typedef struct function_pointer_value
@@ -21,15 +19,11 @@ typedef struct function_pointer_value
     size_t capture_count;
 } function_pointer_value;
 
-function_pointer_value
-function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
-                                     void *environment);
-function_pointer_value
-function_pointer_value_from_internal(function_id const code,
-                                     struct value *const captures,
-                                     size_t const capture_count);
-bool function_pointer_value_equals(function_pointer_value const left,
-                                   function_pointer_value const right);
+function_pointer_value function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
+                                                            void *environment);
+function_pointer_value function_pointer_value_from_internal(function_id const code, struct value *const captures,
+                                                            size_t const capture_count);
+bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right);
 
 typedef enum value_kind
 {
@@ -80,12 +74,14 @@ value value_from_function_pointer(function_pointer_value function_pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
 value value_from_type(type const type_);
-value value_from_enum_element(enum_element_id const element,
-                              value *const state);
+value value_from_enum_element(enum_element_id const element, value *const state);
 value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
 bool value_equals(value const left, value const right);
+bool value_less_than(value const left, value const right);
+bool value_greater_than(value const left, value const right);
+bool enum_less_than(enum_element_value const left, enum_element_value const right);
 
 typedef struct optional_value
 {
@@ -95,5 +91,4 @@ typedef struct optional_value
 
 optional_value optional_value_create(value v);
 
-static optional_value const optional_value_empty = {
-    false, {value_kind_integer, {NULL}}};
+static optional_value const optional_value_empty = {false, {value_kind_integer, {NULL}}};

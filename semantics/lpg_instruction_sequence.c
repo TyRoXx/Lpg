@@ -3,8 +3,7 @@
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
 
-instruction_sequence instruction_sequence_create(instruction *elements,
-                                                 size_t length)
+instruction_sequence instruction_sequence_create(instruction *elements, size_t length)
 {
     instruction_sequence const result = {elements, length};
     return result;
@@ -22,8 +21,7 @@ void instruction_sequence_free(instruction_sequence const *value)
     }
 }
 
-bool instruction_sequence_equals(instruction_sequence const *left,
-                                 instruction_sequence const *right)
+bool instruction_sequence_equals(instruction_sequence const *left, instruction_sequence const *right)
 {
     if (left->length != right->length)
     {

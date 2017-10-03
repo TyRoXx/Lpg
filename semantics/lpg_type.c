@@ -19,8 +19,7 @@ void structure_free(structure const *value)
     deallocate(value->members);
 }
 
-enumeration enumeration_create(enumeration_element *elements,
-                               enum_element_id size)
+enumeration enumeration_create(enumeration_element *elements, enum_element_id size)
 {
     enumeration const result = {elements, size};
     return result;
@@ -68,8 +67,7 @@ integer_range integer_range_create(integer minimum, integer maximum)
 
 bool integer_range_equals(integer_range const left, integer_range const right)
 {
-    return integer_equal(left.minimum, right.minimum) &&
-           integer_equal(left.maximum, right.maximum);
+    return integer_equal(left.minimum, right.minimum) && integer_equal(left.maximum, right.maximum);
 }
 
 lambda_type lambda_type_create(function_id const lambda)
@@ -89,22 +87,19 @@ void enumeration_element_free(enumeration_element const *value)
     unicode_string_free(&value->name);
 }
 
-function_pointer function_pointer_create(type result, tuple_type parameters,
-                                         tuple_type captures)
+function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures)
 {
     function_pointer const returning = {result, parameters, captures};
     return returning;
 }
 
-bool function_pointer_equals(function_pointer const left,
-                             function_pointer const right)
+bool function_pointer_equals(function_pointer const left, function_pointer const right)
 {
     if (!type_equals(left.result, right.result))
     {
         return false;
     }
-    return tuple_type_equals(left.parameters, right.parameters) &&
-           tuple_type_equals(left.captures, right.captures);
+    return tuple_type_equals(left.parameters, right.parameters) && tuple_type_equals(left.captures, right.captures);
 }
 
 type type_from_function_pointer(function_pointer const *value)
@@ -168,8 +163,7 @@ type type_from_inferred(size_t const inferred)
     return result;
 }
 
-type type_from_enum_constructor(
-    LPG_NON_NULL(enum_constructor_type *enum_constructor))
+type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor))
 {
     type result;
     result.kind = type_kind_enum_constructor;
@@ -207,8 +201,7 @@ bool type_equals(type const left, type const right)
         LPG_TO_DO();
 
     case type_kind_function_pointer:
-        return function_pointer_equals(
-            *left.function_pointer_, *right.function_pointer_);
+        return function_pointer_equals(*left.function_pointer_, *right.function_pointer_);
 
     case type_kind_unit:
         return true;
@@ -249,22 +242,16 @@ type type_clone(type const original, garbage_collector *const clone_gc)
 
     case type_kind_function_pointer:
     {
-        function_pointer *const copy =
-            garbage_collector_allocate(clone_gc, sizeof(*copy));
+        function_pointer *const copy = garbage_collector_allocate(clone_gc, sizeof(*copy));
         type *const arguments = garbage_collector_allocate_array(
-            clone_gc, original.function_pointer_->parameters.length,
-            sizeof(*arguments));
-        for (size_t i = 0; i < original.function_pointer_->parameters.length;
-             ++i)
+            clone_gc, original.function_pointer_->parameters.length, sizeof(*arguments));
+        for (size_t i = 0; i < original.function_pointer_->parameters.length; ++i)
         {
-            arguments[i] = type_clone(
-                original.function_pointer_->parameters.elements[i], clone_gc);
+            arguments[i] = type_clone(original.function_pointer_->parameters.elements[i], clone_gc);
         }
-        *copy = function_pointer_create(
-            type_clone(original.function_pointer_->result, clone_gc),
-            tuple_type_create(
-                arguments, original.function_pointer_->parameters.length),
-            tuple_type_create(NULL, 0));
+        *copy = function_pointer_create(type_clone(original.function_pointer_->result, clone_gc),
+                                        tuple_type_create(arguments, original.function_pointer_->parameters.length),
+                                        tuple_type_create(NULL, 0));
         return type_from_function_pointer(copy);
     }
 

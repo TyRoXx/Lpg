@@ -2,11 +2,11 @@
 #include <lpg_std_string.h>
 #include <stdio.h>
 #include <lpg_std_read.h>
-static string_ref lambda_1(string_ref const arg0);
-static string_ref lambda_1(string_ref const arg0)
+static string_ref lambda_1(string_ref const a_0);
+static string_ref lambda_1(string_ref const a_0)
 {
-    string_ref_add_reference(&arg0);
-    return arg0;
+    string_ref_add_reference(&a_0);
+    return a_0;
 }
 int main(void)
 {
