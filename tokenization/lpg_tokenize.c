@@ -96,8 +96,7 @@ tokenize_result tokenize(char const *input, size_t length)
                 asterisk = (input[comment_length] == '*');
                 ++comment_length;
             }
-            tokenize_result const result = {
-                tokenize_invalid, token_comment, comment_length};
+            tokenize_result const result = {tokenize_invalid, token_comment, comment_length};
             return result;
         }
     }
@@ -166,15 +165,13 @@ tokenize_result tokenize(char const *input, size_t length)
     {
         memory_writer decoded = {NULL, 0, 0};
         decode_string_literal_result const decoding_result =
-            decode_string_literal(unicode_view_create(input, length),
-                                  memory_writer_erase(&decoded));
+            decode_string_literal(unicode_view_create(input, length), memory_writer_erase(&decoded));
         memory_writer_free(&decoded);
         if (decoding_result.is_valid)
         {
             return make_success(token_string, decoding_result.length);
         }
-        tokenize_result const result = {
-            tokenize_invalid, token_string, decoding_result.length};
+        tokenize_result const result = {tokenize_invalid, token_string, decoding_result.length};
         return result;
     }
     }
@@ -279,8 +276,7 @@ static tokenize_result tokenize_space(const char *input, size_t length)
         {
             return make_success(token_space, 1);
         }
-        return make_success(
-            token_indentation, (i - (i % spaces_for_indentation)));
+        return make_success(token_indentation, (i - (i % spaces_for_indentation)));
     }
     return make_success(token_space, 1);
 }

@@ -2,8 +2,7 @@
 #include "test.h"
 #include "lpg_tokenize.h"
 
-static void test_single_token(token_type expected_token, size_t expected_size,
-                              char const *input)
+static void test_single_token(token_type expected_token, size_t expected_size, char const *input)
 {
     unicode_string s = unicode_string_from_c_str(input);
     tokenize_result const result = tokenize(s.data, s.length);

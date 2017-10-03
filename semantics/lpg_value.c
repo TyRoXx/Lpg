@@ -1,33 +1,26 @@
 #include "lpg_value.h"
 #include "lpg_assert.h"
 
-function_pointer_value
-function_pointer_value_from_external(external_function *external,
-                                     void *environment)
+function_pointer_value function_pointer_value_from_external(external_function *external, void *environment)
 {
     function_pointer_value const result = {0, external, environment, NULL, 0};
     return result;
 }
 
-function_pointer_value
-function_pointer_value_from_internal(function_id const code,
-                                     struct value *const captures,
-                                     size_t const capture_count)
+function_pointer_value function_pointer_value_from_internal(function_id const code, struct value *const captures,
+                                                            size_t const capture_count)
 {
-    function_pointer_value const result = {
-        code, NULL, NULL, captures, capture_count};
+    function_pointer_value const result = {code, NULL, NULL, captures, capture_count};
     return result;
 }
 
-bool function_pointer_value_equals(function_pointer_value const left,
-                                   function_pointer_value const right)
+bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right)
 {
     if (left.external)
     {
         if (right.external)
         {
-            return (left.external == right.external) &&
-                   (left.external_environment == right.external_environment);
+            return (left.external == right.external) && (left.external_environment == right.external_environment);
         }
         return false;
     }
@@ -147,8 +140,7 @@ bool value_equals(value const left, value const right)
         return unicode_view_equals(left.string_ref, right.string_ref);
 
     case value_kind_function_pointer:
-        return function_pointer_value_equals(
-            left.function_pointer, right.function_pointer);
+        return function_pointer_value_equals(left.function_pointer, right.function_pointer);
 
     case value_kind_flat_object:
         LPG_TO_DO();
@@ -162,12 +154,8 @@ bool value_equals(value const left, value const right)
         {
             return false;
         }
-        value const left_state = left.enum_element.state
-                                     ? *left.enum_element.state
-                                     : value_from_unit();
-        value const right_state = right.enum_element.state
-                                      ? *right.enum_element.state
-                                      : value_from_unit();
+        value const left_state = left.enum_element.state ? *left.enum_element.state : value_from_unit();
+        value const right_state = right.enum_element.state ? *right.enum_element.state : value_from_unit();
         return value_equals(left_state, right_state);
     }
 
@@ -181,8 +169,7 @@ bool value_equals(value const left, value const right)
         }
         for (size_t i = 0; i < left.tuple_.element_count; ++i)
         {
-            if (!value_equals(
-                    left.tuple_.elements[i], right.tuple_.elements[i]))
+            if (!value_equals(left.tuple_.elements[i], right.tuple_.elements[i]))
             {
                 return false;
             }
@@ -234,8 +221,7 @@ optional_value optional_value_create(value v)
     return result;
 }
 
-bool enum_less_than(enum_element_value const left,
-                    enum_element_value const right)
+bool enum_less_than(enum_element_value const left, enum_element_value const right)
 {
     if (left.which == right.which)
     {

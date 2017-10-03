@@ -14,16 +14,11 @@ static void test_loops(void);
 static void test_tokenizer_error(void);
 static void test_assignment(void);
 
-static void test_syntax_error(parse_error const *expected_errors,
-                              size_t const expected_count,
+static void test_syntax_error(parse_error const *expected_errors, size_t const expected_count,
                               expression *const expected, unicode_string input)
 {
-    test_parser_user user = {
-        {input.data, input.length, source_location_create(0, 0)},
-        expected_errors,
-        expected_count};
-    expression_parser parser =
-        expression_parser_create(find_next_token, handle_error, &user);
+    test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, expected_errors, expected_count};
+    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
     expression_parser_result result = parse_expression(&parser, 0, 1);
     if (expected)
     {
@@ -45,25 +40,19 @@ void test_parse_expression_syntax_error(void)
 {
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_integer_literal_out_of_range,
-                               source_location_create(0, 0)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 39))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str(
-                                    "340282366920938463463374607431768211456"));
+            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 39))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
+                          unicode_string_from_c_str("340282366920938463463374607431768211456"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_integer_literal_out_of_range,
-                               source_location_create(0, 0)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 95))};
-        test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
-            unicode_string_from_c_str("3402823669209384634633746074317682114569"
-                                      "9999999999999999999999999999999999999999"
-                                      "999999999999999"));
+            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 95))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
+                          unicode_string_from_c_str("3402823669209384634633746074317682114569"
+                                                    "9999999999999999999999999999999999999999"
+                                                    "999999999999999"));
     }
 
     test_tokenizer_error();
@@ -79,68 +68,54 @@ void test_parse_expression_syntax_error(void)
 static void test_assignment(void)
 {
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 3))};
-        expression expected = expression_from_assign(assign_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 3))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("a =1"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
+        expression expected = expression_from_assign(
+            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+                          expression_allocate(expression_from_integer_literal(
+                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a =1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 1)),
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 2))};
-        expression expected = expression_from_assign(assign_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 2))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("a=1"));
-    }
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 1))};
-        expression expected = expression_from_assign(assign_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 3))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("a= 1"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
+            parse_error_create(parse_error_expected_space, source_location_create(0, 2))};
+        expression expected = expression_from_assign(
+            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+                          expression_allocate(expression_from_integer_literal(
+                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a=1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_declaration_or_assignment,
-                               source_location_create(0, 2))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("a "));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 1))};
+        expression expected = expression_from_assign(
+            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+                          expression_allocate(expression_from_integer_literal(
+                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a= 1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 4)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 5))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("a = ?"));
+            parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 2))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a "));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 5))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a = ?"));
     }
 }
 
@@ -148,70 +123,56 @@ static void test_tokenizer_error(void)
 {
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 1))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("?"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_invalid_token, source_location_create(0, 0))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 1)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("?a"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_invalid_token, source_location_create(0, 0))};
-        expression expected =
-            expression_from_break(source_location_create(0, 1));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("?break"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_invalid_token, source_location_create(0, 0))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 1)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("1a"));
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 1))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("?"));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 1)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("1?"));
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 1)));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("?a"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_invalid_token, source_location_create(0, 0))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 5)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("12345a"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0))};
+        expression expected = expression_from_break(source_location_create(0, 1));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("?break"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_element_name, source_location_create(0, 2))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("a.."));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 1)));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("1a"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0)),
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 1)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("1?"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 0))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 5)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("12345a"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_element_name, source_location_create(0, 2))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("a.."));
     }
 }
 
@@ -220,420 +181,323 @@ static void test_unnamed_function(void)
     {
 
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 3)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("=> a"));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 3)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("=> a"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("=>"));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("=>"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 4))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("=>\n    "));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 4))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("=>\n    "));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 2))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(1, 3)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("\n=> a"));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 2))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 3)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("\n=> a"));
     }
     {
 
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 4)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 6))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(1, 7)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("\n    => a"));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 6))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 7)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("\n    => a"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 2)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(2, 0)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(2, 2))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(2, 3)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("=>\n"
-                                                               "=>\n"
-                                                               "=> a"));
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 2)),
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 0)),
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 2))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(2, 3)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("=>\n"
+                                                                                                   "=>\n"
+                                                                                                   "=> a"));
     }
 }
 
 static void test_function(void)
 {
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 2));
+        parse_error const expected_error =
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2));
         expression *arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] =
-            expression_from_integer_literal(integer_literal_expression_create(
-                integer_create(0, 1), source_location_create(0, 3)));
-        expression expected = expression_from_call(call_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("f"),
-                                             source_location_create(0, 0)))),
-            tuple_create(arguments, 1), source_location_create(0, 4)));
-        test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
+        arguments[0] = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)));
+        expression expected = expression_from_call(
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                            unicode_string_from_c_str("f"), source_location_create(0, 0)))),
+                        tuple_create(arguments, 1), source_location_create(0, 4)));
+        test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 4)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 4))};
+            parse_error_create(parse_error_expected_space, source_location_create(0, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 4))};
         expression *arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] =
-            expression_from_integer_literal(integer_literal_expression_create(
-                integer_create(0, 1), source_location_create(0, 2)));
-        expression expected = expression_from_call(call_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("f"),
-                                             source_location_create(0, 0)))),
-            tuple_create(arguments, 1), source_location_create(0, 4)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("f(1,)"));
-    }
-    {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_arguments, source_location_create(0, 2));
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("f"), source_location_create(0, 0)));
+        arguments[0] = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)));
+        expression expected = expression_from_call(
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                            unicode_string_from_c_str("f"), source_location_create(0, 0)))),
+                        tuple_create(arguments, 1), source_location_create(0, 4)));
         test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("f("));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("f(1,)"));
     }
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_arguments, source_location_create(0, 4));
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("f"), source_location_create(0, 0)));
-        test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("f(1,"));
+        parse_error const expected_error =
+            parse_error_create(parse_error_expected_arguments, source_location_create(0, 2));
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 0)));
+        test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f("));
     }
     {
-        parse_error const expected_error = parse_error_create(
-            parse_error_expected_space, source_location_create(0, 4));
+        parse_error const expected_error =
+            parse_error_create(parse_error_expected_arguments, source_location_create(0, 4));
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 0)));
+        test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(1,"));
+    }
+    {
+        parse_error const expected_error = parse_error_create(parse_error_expected_space, source_location_create(0, 4));
         expression *const arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] =
-            expression_from_integer_literal(integer_literal_expression_create(
-                integer_create(0, 1), source_location_create(0, 2)));
-        arguments[1] =
-            expression_from_integer_literal(integer_literal_expression_create(
-                integer_create(0, 2), source_location_create(0, 4)));
-        expression expected = expression_from_call(call_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("f"),
-                                             source_location_create(0, 0)))),
-            tuple_create(arguments, 2), source_location_create(0, 5)));
+        arguments[0] = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)));
+        arguments[1] = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 4)));
+        expression expected = expression_from_call(
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                            unicode_string_from_c_str("f"), source_location_create(0, 0)))),
+                        tuple_create(arguments, 2), source_location_create(0, 5)));
+        test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(1,2)"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 2)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 3)),
+            parse_error_create(parse_error_expected_arguments, source_location_create(0, 3))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 0)));
         test_syntax_error(
-            &expected_error, 1, &expected, unicode_string_from_c_str("f(1,2)"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("f(,"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 2)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 3)),
-            parse_error_create(
-                parse_error_expected_arguments, source_location_create(0, 3))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("f"), source_location_create(0, 0)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("f(,"));
-    }
-    {
-        parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 4)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 4)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 5)),
-            parse_error_create(
-                parse_error_expected_arguments, source_location_create(0, 5))};
-        expression expected =
-            expression_from_identifier(identifier_expression_create(
-                unicode_string_from_c_str("f"), source_location_create(0, 0)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected, unicode_string_from_c_str("f(1,,"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 5)),
+            parse_error_create(parse_error_expected_arguments, source_location_create(0, 5))};
+        expression expected = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 0)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("f(1,,"));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 11)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 12))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = () ?"));
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 11)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 12))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = () ?"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_lambda_body, source_location_create(0, 10))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = ()1"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_lambda_body, source_location_create(0, 10))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = ()1"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 17))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL,
-                          unicode_string_from_c_str("let f = (a: unit,) 1"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 17))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = (a: unit,) 1"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_comma, source_location_create(0, 16))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL,
-                          unicode_string_from_c_str("let f = (a: unit ) 1"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_comma, source_location_create(0, 16))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = (a: unit ) 1"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_identifier, source_location_create(0, 18))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL,
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_identifier, source_location_create(0, 18))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
                           unicode_string_from_c_str("let f = (a: unit, 1) 1"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_colon, source_location_create(0, 10))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = (a ) 1"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 11))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = (a:) 1"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_colon, source_location_create(0, 10))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = (a ) 1"));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 12)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 13)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 14))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = (a: ?)"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 11))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = {a,a}"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 11))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = (a:) 1"));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 12)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 13))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let f = {a, }"));
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 12)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 13)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 14))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = (a: ?)"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 11))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = {a,a}"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 12)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 13))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = {a, }"));
     }
 }
 
 static void test_let(void)
 {
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 5))};
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 5))};
         expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 4)),
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
             expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"),
-                                             source_location_create(0, 7)))),
+                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 7)))),
             expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
-                          unicode_string_from_c_str("let a: int = 1"));
-    }
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 7))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"),
-                                             source_location_create(0, 7)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
-                          unicode_string_from_c_str("let a :int = 1"));
-    }
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 11))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"),
-                                             source_location_create(0, 8)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
-                          unicode_string_from_c_str("let a : int= 1"));
-    }
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 13))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(
-                unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"),
-                                             source_location_create(0, 8)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
-                          unicode_string_from_c_str("let a : int =1"));
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a: int = 1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 14)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 15))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let a : int = ?"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 7))};
+        expression expected = expression_from_declare(declare_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 7)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a :int = 1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 4)),
-            parse_error_create(
-                parse_error_expected_identifier, source_location_create(0, 5))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let ?"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 11))};
+        expression expected = expression_from_declare(declare_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 8)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a : int= 1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 3)),
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 4))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let?"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 13))};
+        expression expected = expression_from_declare(declare_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 8)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a : int =1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_invalid_token, source_location_create(0, 8)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 9)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 10)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 11)),
-            parse_error_create(
-                parse_error_expected_space, source_location_create(0, 13)),
-            parse_error_create(parse_error_expected_declaration_or_assignment,
-                               source_location_create(0, 13))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let a : ? = 1"));
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 14)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 15))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let a : int = ?"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 4)),
+            parse_error_create(parse_error_expected_identifier, source_location_create(0, 5))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let ?"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 3)),
+            parse_error_create(parse_error_expected_space, source_location_create(0, 4))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let?"));
+    }
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 8)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 9)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 10)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 11)),
+            parse_error_create(parse_error_expected_space, source_location_create(0, 13)),
+            parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 13))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let a : ? = 1"));
     }
 }
 
 static void test_return(void)
 {
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 6))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("return"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 7))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("return "));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 6))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("return"));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(0, 7)),
-            parse_error_create(parse_error_expected_expression,
-                               source_location_create(0, 13))};
-        expression expected = expression_from_return(expression_allocate(
-            expression_from_integer_literal(integer_literal_expression_create(
-                integer_create(0, 123), source_location_create(0, 14)))));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 7))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("return "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 7)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 13))};
+        expression expected = expression_from_return(expression_allocate(expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 14)))));
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected,
                           unicode_string_from_c_str("return return 123"));
     }
 }
@@ -641,131 +505,121 @@ static void test_return(void)
 static void test_match_case(void)
 {
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 8))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("let a : "));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(0, 5))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match:a\n"
-                                                          "    case 1: 2\n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_newline, source_location_create(0, 7))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a:\n"
-                                                          "    case 1: 2\n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_case, source_location_create(1, 4))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    \n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(0, 6))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match "));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(1, 8))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case\n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(2, 9))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 0: 2\n"
-                                                          "    case "));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_colon, source_location_create(1, 10))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 1\n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(2, 0))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 1:\n"));
-    }
-
-    {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_expression, source_location_create(1, 12))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 1: "));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let a : "));
     }
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(1, 12)),
-            parse_error_create(
-                parse_error_expected_expression, source_location_create(2, 0))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 1: \n"));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 5))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match:a\n"
+                                                                                              "    case 1: 2\n"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_newline, source_location_create(1, 13))};
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          NULL, unicode_string_from_c_str("match a\n"
-                                                          "    case 1: 2"));
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_newline, source_location_create(0, 7))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a:\n"
+                                                                                              "    case 1: 2\n"));
     }
 
     {
-        parse_error const expected_errors[] = {parse_error_create(
-            parse_error_expected_space, source_location_create(1, 11))};
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_case, source_location_create(1, 4))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                                            "    \n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 6))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(1, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 9))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 0: 2\n"
+                                                                                              "    case "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_colon, source_location_create(1, 10))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 1\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 0))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 1:\n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 12))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 1: "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 12)),
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 0))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 1: \n"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_newline, source_location_create(1, 13))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
+                                                                                              "    case 1: 2"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(1, 11))};
         match_case *const cases = allocate_array(1, sizeof(*cases));
-        cases[0] = match_case_create(
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 1), source_location_create(1, 9)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(
-                    integer_create(0, 2), source_location_create(1, 11)))));
+        cases[0] =
+            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                  integer_create(0, 1), source_location_create(1, 9)))),
+                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                  integer_create(0, 2), source_location_create(1, 11)))));
         expression expected = expression_from_match(match_create(
-            source_location_create(0, 0),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"),
-                                             source_location_create(0, 6)))),
+            source_location_create(0, 0), expression_allocate(expression_from_identifier(identifier_expression_create(
+                                              unicode_string_from_c_str("a"), source_location_create(0, 6)))),
             cases, 1));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors),
-                          &expected,
-                          unicode_string_from_c_str("match a\n"
-                                                    "    case 1:2\n"));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("match a\n"
+                                                                                                   "    case 1:2\n"));
     }
 }
 
 static void test_loops(void)
 {
-    parse_error const expected_errors[] = {parse_error_create(
-        parse_error_expected_newline, source_location_create(0, 4))};
-    test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
-                      unicode_string_from_c_str("loop"));
+    parse_error const expected_errors[] = {
+        parse_error_create(parse_error_expected_newline, source_location_create(0, 4))};
+    test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("loop"));
 }

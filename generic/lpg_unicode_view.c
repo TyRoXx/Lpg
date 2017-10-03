@@ -68,8 +68,7 @@ unicode_string unicode_view_copy(unicode_view value)
     return unicode_string_from_range(value.begin, value.length);
 }
 
-unicode_view unicode_view_cut(unicode_view const whole, size_t const begin,
-                              size_t const end)
+unicode_view unicode_view_cut(unicode_view const whole, size_t const begin, size_t const end)
 {
     ASSUME(begin <= end);
     ASSUME(end <= whole.length);

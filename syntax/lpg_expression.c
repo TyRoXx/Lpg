@@ -9,8 +9,7 @@ void expression_deallocate(expression *this)
     deallocate(this);
 }
 
-lambda lambda_create(parameter *parameters, size_t parameter_count,
-                     expression *result)
+lambda lambda_create(parameter *parameters, size_t parameter_count, expression *result)
 {
     lambda const returning = {parameters, parameter_count, result};
     return returning;
@@ -45,8 +44,7 @@ bool lambda_equals(lambda const left, lambda const right)
     return expression_equals(left.result, right.result);
 }
 
-call call_create(expression *callee, tuple arguments,
-                 source_location closing_parenthesis)
+call call_create(expression *callee, tuple arguments, source_location closing_parenthesis)
 {
     call const result = {callee, arguments, closing_parenthesis};
     return result;
@@ -66,12 +64,10 @@ void parameter_free(parameter *value)
 
 bool parameter_equals(parameter const left, parameter const right)
 {
-    return identifier_expression_equals(left.name, right.name) &&
-           expression_equals(left.type, right.type);
+    return identifier_expression_equals(left.name, right.name) && expression_equals(left.type, right.type);
 }
 
-access_structure access_structure_create(expression *object,
-                                         identifier_expression member)
+access_structure access_structure_create(expression *object, identifier_expression member)
 {
     access_structure const result = {object, member};
     return result;
@@ -91,12 +87,10 @@ void match_case_free(match_case *value)
 
 bool match_case_equals(match_case const left, match_case const right)
 {
-    return expression_equals(left.key, right.key) &&
-           expression_equals(left.action, right.action);
+    return expression_equals(left.key, right.key) && expression_equals(left.action, right.action);
 }
 
-match match_create(source_location begin, expression *input, match_case *cases,
-                   size_t number_of_cases)
+match match_create(source_location begin, expression *input, match_case *cases, size_t number_of_cases)
 {
     match const result = {begin, input, cases, number_of_cases};
     return result;
@@ -138,8 +132,7 @@ void sequence_free(sequence const *value)
     }
 }
 
-declare declare_create(identifier_expression name, expression *optional_type,
-                       expression *initializer)
+declare declare_create(identifier_expression name, expression *optional_type, expression *initializer)
 {
     ASSUME(initializer);
     declare const result = {name, optional_type, initializer};
@@ -301,15 +294,13 @@ source_location expression_source_begin(expression const value)
     LPG_UNREACHABLE();
 }
 
-comment_expression comment_expression_create(unicode_string value,
-                                             source_location source)
+comment_expression comment_expression_create(unicode_string value, source_location source)
 {
     comment_expression const result = {value, source};
     return result;
 }
 
-identifier_expression identifier_expression_create(unicode_string value,
-                                                   source_location source)
+identifier_expression identifier_expression_create(unicode_string value, source_location source)
 {
     identifier_expression const result = {value, source};
     return result;
@@ -320,15 +311,12 @@ void identifier_expression_free(identifier_expression const *value)
     unicode_string_free(&value->value);
 }
 
-bool identifier_expression_equals(identifier_expression const left,
-                                  identifier_expression const right)
+bool identifier_expression_equals(identifier_expression const left, identifier_expression const right)
 {
-    return unicode_string_equals(left.value, right.value) &&
-           source_location_equals(left.source, right.source);
+    return unicode_string_equals(left.value, right.value) && source_location_equals(left.source, right.source);
 }
 
-string_expression string_expression_create(unicode_string value,
-                                           source_location source)
+string_expression string_expression_create(unicode_string value, source_location source)
 {
     string_expression const result = {value, source};
     return result;
@@ -344,18 +332,15 @@ void comment_expression_free(comment_expression const *value)
     unicode_string_free(&value->value);
 }
 
-integer_literal_expression
-integer_literal_expression_create(integer value, source_location source)
+integer_literal_expression integer_literal_expression_create(integer value, source_location source)
 {
     integer_literal_expression const result = {value, source};
     return result;
 }
 
-bool integer_literal_expression_equals(integer_literal_expression const left,
-                                       integer_literal_expression const right)
+bool integer_literal_expression_equals(integer_literal_expression const left, integer_literal_expression const right)
 {
-    return integer_equal(left.value, right.value) &&
-           source_location_equals(left.source, right.source);
+    return integer_equal(left.value, right.value) && source_location_equals(left.source, right.source);
 }
 
 expression expression_from_integer_literal(integer_literal_expression value)
@@ -557,8 +542,7 @@ bool declare_equals(declare const left, declare const right)
 
 bool assign_equals(assign const left, assign const right)
 {
-    return expression_equals(left.left, right.left) &&
-           expression_equals(left.right, right.right);
+    return expression_equals(left.left, right.left) && expression_equals(left.right, right.right);
 }
 
 bool match_equals(match const left, match const right)
@@ -583,8 +567,7 @@ bool match_equals(match const left, match const right)
 
 bool comment_equals(comment_expression left, comment_expression right)
 {
-    bool const source_equals =
-        source_location_equals(left.source, right.source);
+    bool const source_equals = source_location_equals(left.source, right.source);
     return unicode_string_equals(left.value, right.value) && source_equals;
 }
 
@@ -610,18 +593,15 @@ bool expression_equals(expression const *left, expression const *right)
         }
         LPG_FOR(size_t, i, left->call.arguments.length)
         {
-            if (!expression_equals(left->call.arguments.elements + i,
-                                   right->call.arguments.elements + i))
+            if (!expression_equals(left->call.arguments.elements + i, right->call.arguments.elements + i))
             {
                 return 0;
             }
         }
-        return source_location_equals(
-            left->call.closing_parenthesis, right->call.closing_parenthesis);
+        return source_location_equals(left->call.closing_parenthesis, right->call.closing_parenthesis);
 
     case expression_type_integer_literal:
-        return integer_literal_expression_equals(
-            left->integer_literal, right->integer_literal);
+        return integer_literal_expression_equals(left->integer_literal, right->integer_literal);
 
     case expression_type_access_structure:
         LPG_TO_DO();
@@ -640,11 +620,9 @@ bool expression_equals(expression const *left, expression const *right)
         return expression_equals(left->not.expr, right->not.expr);
 
     case expression_type_identifier:
-        return unicode_view_equals(
-                   unicode_view_from_string(left->identifier.value),
-                   unicode_view_from_string(right->identifier.value)) &&
-               source_location_equals(
-                   left->identifier.source, right->identifier.source);
+        return unicode_view_equals(unicode_view_from_string(left->identifier.value),
+                                   unicode_view_from_string(right->identifier.value)) &&
+               source_location_equals(left->identifier.source, right->identifier.source);
 
     case expression_type_assign:
         return assign_equals(left->assign, right->assign);
@@ -673,9 +651,8 @@ bool expression_equals(expression const *left, expression const *right)
     LPG_UNREACHABLE();
 }
 
-binary_operator_expression
-binary_operator_expression_create(expression *left, expression *right,
-                                  binary_operator anOperator)
+binary_operator_expression binary_operator_expression_create(expression *left, expression *right,
+                                                             binary_operator anOperator)
 {
     binary_operator_expression result;
     result.left = left;

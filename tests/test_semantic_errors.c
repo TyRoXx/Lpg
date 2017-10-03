@@ -9,10 +9,8 @@
 
 static sequence parse(char const *input)
 {
-    test_parser_user user = {
-        {input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser =
-        expression_parser_create(find_next_token, handle_error, &user);
+    test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
+    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
@@ -36,13 +34,11 @@ static void expect_errors(semantic_error const error, void *user)
 static void test_loops(const standard_library_description *std_library);
 static void test_assert(const standard_library_description *std_library);
 static void test_operators(const standard_library_description *std_library);
-static void
-test_let_assignments(const standard_library_description *std_library);
+static void test_let_assignments(const standard_library_description *std_library);
 
 void test_semantic_errors(void)
 {
-    standard_library_description const std_library =
-        describe_standard_library();
+    standard_library_description const std_library = describe_standard_library();
 
     test_loops(&std_library);
 
@@ -51,11 +47,10 @@ void test_semantic_errors(void)
                               "match s\n"
                               "    case boolean.false: s\n"
                               "    case 123: s\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(3, 9))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 9))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -67,11 +62,10 @@ void test_semantic_errors(void)
                               "match s\n"
                               "    case boolean.true: s\n"
                               "    case boolean.false: 123\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(3, 24))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 24))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -82,11 +76,10 @@ void test_semantic_errors(void)
         sequence root = parse("let s = boolean.true\n"
                               "match s\n"
                               "    case boolean.true: s\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_missing_match_case, source_location_create(1, 0))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_match_case, source_location_create(1, 0))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -98,11 +91,10 @@ void test_semantic_errors(void)
                               "match s\n"
                               "    case boolean.true: s\n"
                               "    case boolean.true: 123\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_duplicate_match_case, source_location_create(3, 9))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_match_case, source_location_create(3, 9))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -112,11 +104,10 @@ void test_semantic_errors(void)
     {
         sequence root = parse("let s = boolean.true\n"
                               "match s\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_missing_match_case, source_location_create(1, 0))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_match_case, source_location_create(1, 0))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -125,11 +116,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = match a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 14))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 14))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -140,11 +130,10 @@ void test_semantic_errors(void)
         sequence root = parse("let v = match boolean.true\n"
                               "    case boolean.false: 1\n"
                               "    case a: 2\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(2, 9))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 9))};
         expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -155,11 +144,10 @@ void test_semantic_errors(void)
         sequence root = parse("let v = match boolean.true\n"
                               "    case boolean.false: 1\n"
                               "    case boolean.true: a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(2, 23))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 23))};
         expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -169,25 +157,19 @@ void test_semantic_errors(void)
     {
         sequence root = parse("read()\n"
                               "h()");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(1, 0))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 10, 1)),
+            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(literal_instruction_create(
-                3, value_from_unit(), type_from_unit()))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
@@ -196,58 +178,45 @@ void test_semantic_errors(void)
     {
         sequence root = parse("let v : boolean.true = boolean.true\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type,
-                                  source_location_create(0, 8))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 8))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL),
-                type_from_enumeration(&std_library.stable->boolean))),
-            instruction_create_literal(literal_instruction_create(
-                1, value_from_unit(), type_from_unit()))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+                0, value_from_enum_element(1, NULL), type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v : read() = boolean.true\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type,
-                                  source_location_create(0, 8))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 8))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL),
-                type_from_enumeration(&std_library.stable->boolean))),
-            instruction_create_literal(literal_instruction_create(
-                1, value_from_unit(), type_from_unit()))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+                0, value_from_enum_element(1, NULL), type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v = w\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 8))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -256,35 +225,28 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v : boolean = read()\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 18))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 18))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 10, 1)),
+            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(literal_instruction_create(
-                3, value_from_unit(), type_from_unit()))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v = {}.0\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 11))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -293,11 +255,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = {}.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 11))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -306,11 +267,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = {a}\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 9))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 9))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -319,11 +279,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = () a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 11))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
@@ -332,11 +291,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = w.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 8))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -345,11 +303,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = unit_value.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 19))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 19))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -358,11 +315,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = print.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 14))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 14))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -372,11 +328,10 @@ void test_semantic_errors(void)
     {
         sequence root = parse("let v = () 1\n"
                               "v.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(1, 2))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 2))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
@@ -385,11 +340,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = \"\".a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 11))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -398,11 +352,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = 1.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 10))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 10))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -411,11 +364,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = option.some.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 20))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 20))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -424,11 +376,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = unit.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 13))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 13))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -437,11 +388,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = string-ref.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 19))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 19))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -450,11 +400,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = type.a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 13))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 13))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -463,11 +412,10 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let v = int(0, 1).a\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 18))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 18))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -477,11 +425,9 @@ void test_semantic_errors(void)
     {
         sequence root = parse("let v = (a: type) a.true\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type,
-                                  source_location_create(0, 20))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 20))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library.globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
@@ -497,11 +443,9 @@ static void test_loops(const standard_library_description *std_library)
     {
         sequence root = parse("break\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_break_outside_of_loop,
-                                  source_location_create(0, 0))};
+            semantic_error_create(semantic_error_break_outside_of_loop, source_location_create(0, 0))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -514,11 +458,10 @@ static void test_assert(const standard_library_description *std_library)
 {
     {
         sequence root = parse("assert(boolean.something)");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_unknown_element, source_location_create(0, 15))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 15))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -528,11 +471,9 @@ static void test_assert(const standard_library_description *std_library)
     {
         sequence root = parse("assert(boolean.true.true)");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_no_members_on_enum_elements,
-                                  source_location_create(0, 20))};
+            semantic_error_create(semantic_error_no_members_on_enum_elements, source_location_create(0, 20))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -541,11 +482,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert(\"true\")");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -554,11 +494,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert(2)");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -567,11 +506,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert(assert)");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -580,11 +518,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert(boolean)");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -593,11 +530,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert(read())");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -606,11 +542,10 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence root = parse("assert()");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_missing_argument, source_location_create(0, 7))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -619,73 +554,57 @@ static void test_assert(const standard_library_description *std_library)
     }
     {
         sequence const root = parse("assert(boolean.true, boolean.false)");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_extraneous_argument, source_location_create(0, 21))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(0, 21))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_body_elements[] = {
-            instruction_create_global(0),
-            instruction_create_read_struct(
-                read_struct_instruction_create(0, 4, 1)),
+            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, NULL),
-                type_from_enumeration(&std_library->stable->boolean))),
-            instruction_create_call(
-                call_instruction_create(1, arguments, 1, 3))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+                2, value_from_enum_element(1, NULL), type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_call(call_instruction_create(1, arguments, 1, 3))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
 }
 
-static void
-test_let_assignments(const standard_library_description *std_library)
+static void test_let_assignments(const standard_library_description *std_library)
 {
 
     {
         sequence root = parse("let v : boolean = boolean.true\n"
                               "let v : boolean = boolean.true\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_declaration_with_existing_name,
-                                  source_location_create(1, 4))};
+            semantic_error_create(semantic_error_declaration_with_existing_name, source_location_create(1, 4))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, NULL),
-                type_from_enumeration(&std_library->stable->boolean))),
+                0, value_from_enum_element(1, NULL), type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, NULL),
-                type_from_enumeration(&std_library->stable->boolean))),
-            instruction_create_literal(literal_instruction_create(
-                2, value_from_unit(), type_from_unit()))};
-        instruction_sequence const expected_body =
-            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(
-            &expected_body, &checked.functions[0].body));
+                1, value_from_enum_element(1, NULL), type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit()))};
+        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v : int(1, 10) = 11\n");
-        semantic_error const errors[] = {semantic_error_create(
-            semantic_error_type_mismatch, source_location_create(0, 21))};
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 21))};
         expected_errors expected = {errors, 1};
-        checked_program checked =
-            check(root, std_library->globals, expect_errors, &expected);
+        checked_program checked = check(root, std_library->globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -697,11 +616,9 @@ test_let_assignments(const standard_library_description *std_library)
 static void test_operators(const standard_library_description *std_library)
 {
     sequence root = parse("assert(!3)");
-    semantic_error const errors[] = {semantic_error_create(
-        semantic_error_type_mismatch, source_location_create(0, 8))};
+    semantic_error const errors[] = {semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 8))};
     expected_errors expected = {errors, 1};
-    checked_program checked =
-        check(root, std_library->globals, expect_errors, &expected);
+    checked_program checked = check(root, std_library->globals, expect_errors, &expected);
     REQUIRE(expected.count == 0);
     sequence_free(&root);
     checked_program_free(&checked);

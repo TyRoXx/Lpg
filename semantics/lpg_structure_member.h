@@ -9,6 +9,5 @@ struct structure_member
     optional_value compile_time_value;
 };
 
-structure_member structure_member_create(type what, unicode_string name,
-                                         optional_value compile_time_value);
+structure_member structure_member_create(type what, unicode_string name, optional_value compile_time_value);
 void struct_member_free(LPG_NON_NULL(structure_member const *value));

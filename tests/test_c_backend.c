@@ -13,10 +13,8 @@
 
 static sequence parse(unicode_view const input)
 {
-    test_parser_user user = {
-        {input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser =
-        expression_parser_create(find_next_token, handle_error, &user);
+    test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
+    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
@@ -80,14 +78,11 @@ static void fix_line_endings(unicode_string *s)
     s->length = last_written;
 }
 
-static void
-check_generated_c_code(char const *const source,
-                       standard_library_description const standard_library,
-                       char const *const expected_c_file_name)
+static void check_generated_c_code(char const *const source, standard_library_description const standard_library,
+                                   char const *const expected_c_file_name)
 {
     sequence root = parse(unicode_view_from_c_str(source));
-    checked_program checked =
-        check(root, standard_library.globals, expect_no_errors, NULL);
+    checked_program checked = check(root, standard_library.globals, expect_no_errors, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
     remove_dead_code(&checked);
@@ -95,18 +90,13 @@ check_generated_c_code(char const *const source,
     checked_program_free(&checked);
 
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success == generate_c(optimized, &standard_library.stable->boolean,
-                                  memory_writer_erase(&generated)));
-    unicode_view const pieces[] = {
-        path_remove_leaf(unicode_view_from_c_str(__FILE__)),
-        unicode_view_from_c_str("c_backend"),
-        unicode_view_from_c_str(expected_c_file_name)};
-    unicode_string const full_expected_file_path =
-        path_combine(pieces, LPG_ARRAY_SIZE(pieces));
+    REQUIRE(success == generate_c(optimized, &standard_library.stable->boolean, memory_writer_erase(&generated)));
+    unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
+                                   unicode_view_from_c_str("c_backend"), unicode_view_from_c_str(expected_c_file_name)};
+    unicode_string const full_expected_file_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     blob_or_error expected_or_error = read_file(full_expected_file_path.data);
     REQUIRE(!expected_or_error.error);
-    unicode_string expected =
-        unicode_string_validate(expected_or_error.success);
+    unicode_string expected = unicode_string_validate(expected_or_error.success);
     REQUIRE(expected.length == expected_or_error.success.length);
     fix_line_endings(&expected);
     {
@@ -117,8 +107,7 @@ check_generated_c_code(char const *const source,
             FAIL();
         }
     }
-    if (!unicode_view_equals(memory_writer_content(generated),
-                             unicode_view_from_string(expected)))
+    if (!unicode_view_equals(memory_writer_content(generated), unicode_view_from_string(expected)))
     {
         fwrite(generated.data, 1, generated.used, stdout);
         FAIL();
@@ -131,16 +120,13 @@ check_generated_c_code(char const *const source,
 
 void test_c_backend(void)
 {
-    standard_library_description const std_library =
-        describe_standard_library();
+    standard_library_description const std_library = describe_standard_library();
 
     check_generated_c_code("", std_library, "0_empty.c");
 
-    check_generated_c_code(
-        "print(\"Hello, world!\")\n", std_library, "1_hello_world.c");
+    check_generated_c_code("print(\"Hello, world!\")\n", std_library, "1_hello_world.c");
 
-    check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n",
-                           std_library, "2_print_twice.c");
+    check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n", std_library, "2_print_twice.c");
 
     check_generated_c_code("loop\n"
                            "    print(\"Hello, world!\")\n"
@@ -163,14 +149,11 @@ void test_c_backend(void)
                            "    assert(boolean.false)\n",
                            std_library, "7_assert_false.c");
 
-    check_generated_c_code(
-        "assert(boolean.true)\n", std_library, "8_assert_true.c");
+    check_generated_c_code("assert(boolean.true)\n", std_library, "8_assert_true.c");
 
-    check_generated_c_code("assert(string-equals(read(), \"\"))\n", std_library,
-                           "9_string_equals.c");
+    check_generated_c_code("assert(string-equals(read(), \"\"))\n", std_library, "9_string_equals.c");
 
-    check_generated_c_code(
-        "print(concat(\"a\", read()))\n", std_library, "10_concat.c");
+    check_generated_c_code("print(concat(\"a\", read()))\n", std_library, "10_concat.c");
 
     check_generated_c_code("let f = ()\n"
                            "    print(\"\")\n"

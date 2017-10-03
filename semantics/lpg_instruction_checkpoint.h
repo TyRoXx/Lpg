@@ -10,8 +10,7 @@ typedef struct instruction_checkpoint
     register_id originally_used_registers;
 } instruction_checkpoint;
 
-instruction_checkpoint make_checkpoint(register_id *const used_registers,
-                                       instruction_sequence *sequence);
+instruction_checkpoint make_checkpoint(register_id *const used_registers, instruction_sequence *sequence);
 
 void restore_instructions(instruction_checkpoint const previous_code);
 
