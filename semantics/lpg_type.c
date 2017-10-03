@@ -265,6 +265,15 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         return original;
 
     case type_kind_tuple:
+    {
+        type *const elements = garbage_collector_allocate_array(clone_gc, original.tuple_.length, sizeof(*elements));
+        for (size_t i = 0; i < original.tuple_.length; ++i)
+        {
+            elements[i] = type_clone(original.tuple_.elements[i], clone_gc);
+        }
+        return type_from_tuple_type(tuple_type_create(elements, original.tuple_.length));
+    }
+
     case type_kind_type:
         LPG_TO_DO();
 

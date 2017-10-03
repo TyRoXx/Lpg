@@ -28,8 +28,7 @@ typedef struct enumeration
     enum_element_id size;
 } enumeration;
 
-enumeration enumeration_create(enumeration_element *elements,
-                               enum_element_id size);
+enumeration enumeration_create(enumeration_element *elements, enum_element_id size);
 void enumeration_free(LPG_NON_NULL(enumeration const *value));
 
 typedef struct tuple_type
@@ -114,10 +113,8 @@ struct function_pointer
     tuple_type captures;
 };
 
-function_pointer function_pointer_create(type result, tuple_type parameters,
-                                         tuple_type captures);
-bool function_pointer_equals(function_pointer const left,
-                             function_pointer const right);
+function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures);
+bool function_pointer_equals(function_pointer const left, function_pointer const right);
 
 type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
@@ -127,8 +124,7 @@ type type_from_tuple_type(tuple_type const value);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
-type type_from_enum_constructor(
-    LPG_NON_NULL(enum_constructor_type *enum_constructor));
+type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type type_from_lambda(lambda_type const lambda);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
