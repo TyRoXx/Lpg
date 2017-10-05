@@ -409,6 +409,20 @@ static void test_function(void)
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = 1 ==2"));
     }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 10))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f : 1 == 2 = 3"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 12))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = 3 !="));
+    }
 }
 
 static void test_let(void)

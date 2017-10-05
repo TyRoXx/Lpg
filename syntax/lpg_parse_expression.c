@@ -708,6 +708,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     expression_parser_result right = parse_expression(parser, indentation, true);
     if (!right.is_success)
     {
+        expression_deallocate(binary_operator_expression1.left);
         return expression_parser_result_failure;
     }
 
