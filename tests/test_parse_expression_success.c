@@ -28,6 +28,7 @@ static void test_successful_parse(expression const expected, unicode_string cons
     REQUIRE(result.is_success);
     REQUIRE(user.base.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
+    REQUIRE(!expression_parser_has_remaining_non_empty_tokens(&parser));
     expression_free(&expected);
     expression_free(&result.success);
     unicode_string_free(&input);

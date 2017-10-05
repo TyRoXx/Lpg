@@ -143,9 +143,9 @@ void test_cli(void)
                                     "      ^\n",
                               "");
     expect_output_with_source("print(\"Hello, world!\\n\")", false, "", "Hello, world!\n");
-    expect_output_with_source("syntax error here", true, "Expected declaration or assignment in line 1:\n"
+    expect_output_with_source("syntax error here", true, "Expected expression in line 1:\n"
                                                          "syntax error here\n"
-                                                         "       ^\n"
+                                                         "      ^\n"
                                                          "Expected expression in line 1:\n"
                                                          "syntax error here\n"
                                                          "            ^\n",
