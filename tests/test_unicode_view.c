@@ -51,5 +51,19 @@ void test_unicode_view(void)
         REQUIRE(view.length == 3);
         REQUIRE(unicode_view_equals_c_str(view, "abc"));
     }
+    {
+        unicode_view const a = unicode_view_from_c_str("");
+        unicode_view const b = unicode_view_from_c_str("b");
+        REQUIRE(unicode_view_less(a, b));
+        REQUIRE(!unicode_view_less(a, a));
+        REQUIRE(!unicode_view_less(b, a));
+    }
+    {
+        unicode_view const a = unicode_view_from_c_str("a");
+        unicode_view const b = unicode_view_from_c_str("b");
+        REQUIRE(unicode_view_less(a, b));
+        REQUIRE(!unicode_view_less(a, a));
+        REQUIRE(!unicode_view_less(b, a));
+    }
     test_unicode_view_finder();
 }

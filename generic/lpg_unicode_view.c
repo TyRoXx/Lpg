@@ -53,7 +53,7 @@ bool unicode_view_less(unicode_view const left, unicode_view const right)
             {
                 return true;
             }
-            else if (left.begin[i] > right.begin[i])
+            if (left.begin[i] > right.begin[i])
             {
                 return false;
             }
