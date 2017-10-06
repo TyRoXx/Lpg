@@ -6,6 +6,8 @@
 #include "lpg_check.h"
 #include "lpg_standard_library.h"
 #include <string.h>
+#include "duktape.h"
+#include "lpg_javascript_backend.h"
 
 static sequence parse(char const *input)
 {
@@ -66,36 +68,59 @@ static value read_impl(value const *const inferred, value const *arguments, garb
     return value_from_string_ref(result);
 }
 
+static duk_ret_t javascript_print(duk_context *const duktape)
+{
+    (void)duktape;
+    return 0;
+}
+
 static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
 {
-    memory_writer print_buffer = {NULL, 0, 0};
-    test_environment environment = {memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
-    garbage_collector gc = {NULL};
-    value const globals_values[standard_library_element_count] = {
-        /*type*/ value_from_unit(),
-        /*string-ref*/ value_from_unit(),
-        /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment)),
-        /*boolean*/ value_from_unit(),
-        /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL)),
-        /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL)),
-        /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL)),
-        /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL)),
-        /* concat */ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL)),
-        /*string-equals*/ value_from_function_pointer(function_pointer_value_from_external(string_equals_impl, NULL)),
-        /*read*/ value_from_function_pointer(function_pointer_value_from_external(read_impl, &environment)),
-        /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment)),
-        /*integer-equals*/ value_from_function_pointer(
-            function_pointer_value_from_external(integer_equals_impl, &environment)),
-        /*integer-less*/ value_from_function_pointer(
-            function_pointer_value_from_external(integer_less_impl, &environment))};
-    sequence root = parse(source);
-    checked_program checked = check(root, global_object, expect_no_errors, NULL);
-    sequence_free(&root);
-    interpret(checked, globals_values, &gc);
-    REQUIRE(memory_writer_equals(print_buffer, output));
-    memory_writer_free(&print_buffer);
+    sequence const root = parse(source);
+    checked_program const checked = check(root, global_object, expect_no_errors, NULL);
+
+    {
+        memory_writer print_buffer = {NULL, 0, 0};
+        test_environment environment = {memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
+        value const globals_values[standard_library_element_count] = {
+            /*type*/ value_from_unit(),
+            /*string-ref*/ value_from_unit(),
+            /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment)),
+            /*boolean*/ value_from_unit(),
+            /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL)),
+            /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL)),
+            /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL)),
+            /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL)),
+            /*concat*/ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL)),
+            /*string-equals*/ value_from_function_pointer(
+                function_pointer_value_from_external(string_equals_impl, NULL)),
+            /*read*/ value_from_function_pointer(function_pointer_value_from_external(read_impl, &environment)),
+            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment)),
+            /*integer-equals*/ value_from_function_pointer(
+                function_pointer_value_from_external(integer_equals_impl, &environment)),
+            /*integer-less*/ value_from_function_pointer(
+                function_pointer_value_from_external(integer_less_impl, &environment))};
+        sequence_free(&root);
+        garbage_collector gc = {NULL};
+        interpret(checked, globals_values, &gc);
+        REQUIRE(memory_writer_equals(print_buffer, output));
+        memory_writer_free(&print_buffer);
+        garbage_collector_free(gc);
+    }
+
+    {
+        memory_writer generated = {NULL, 0, 0};
+        REQUIRE(success == generate_javascript(checked, memory_writer_erase(&generated)));
+        duk_context *const duktape = duk_create_heap_default();
+        REQUIRE(duktape);
+        duk_push_c_function(duktape, javascript_print, 1);
+        duk_put_global_string(duktape, "print");
+        duk_eval_lstring(duktape, generated.data, generated.used);
+        memory_writer_free(&generated);
+        duk_destroy_heap(duktape);
+    }
+
     checked_program_free(&checked);
-    garbage_collector_free(gc);
 }
 
 void test_interpreter(void)

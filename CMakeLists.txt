@@ -43,7 +43,18 @@ if(UNIX)
     endif()
 endif()
 
-file(GLOB_RECURSE formatted "*.c" "*.h")
+file(GLOB_RECURSE formatted
+	c_backend/**.c c_backend/**.h
+	cli/**.c cli/**.h
+	cli_impl/**.c cli_impl/**.h
+	generic/**.c generic/**.h
+	javascript_backend/**.c javascript_backend/**.h
+	optimization/**.c optimization/**.h
+	semantics/**.c semantics/**.h
+	syntax/**.c syntax/**.h
+	tests/**.c tests/**.h
+	tokenization/**.c tokenization/**.h
+)
 
 option(LPG_WITH_CLANG_FORMAT "use clang-format to format the source code" ON)
 if(LPG_WITH_CLANG_FORMAT)
@@ -54,10 +65,34 @@ if(LPG_WITH_CLANG_FORMAT)
 	endif()
 endif()
 
+set(LPG_DUKTAPE_VERSION 2.2.0)
+set(LPG_DOWNLOAD_PATH ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz)
+set(LPG_DUKTAPE ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION})
+
+if(NOT EXISTS ${LPG_DUKTAPE})
+    file(DOWNLOAD "https://github.com/svaarala/duktape/releases/download/v${LPG_DUKTAPE_VERSION}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz" ${LPG_DOWNLOAD_PATH})
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xzf ${LPG_DOWNLOAD_PATH}
+        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+    )
+    file(REMOVE ${LPG_DOWNLOAD_PATH})
+endif()
+
+file(GLOB duktape_sources ${LPG_DUKTAPE}/src/*.h ${LPG_DUKTAPE}/src/*.c)
+add_library(duktape STATIC ${duktape_sources})
+target_include_directories(duktape PUBLIC ${LPG_DUKTAPE}/src)
+if(NOT MSVC)
+	target_link_libraries(duktape m)
+endif()
+
 if(MSVC)
-	add_definitions(/WX /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221 /D_WIN32_WINNT_WINTHRESHOLD=0 /DNTDDI_WIN7SP1=0 /DWINAPI_PARTITION_SYSTEM=0)
+	target_compile_options(duktape PUBLIC /DDUK_USE_DATE_NOW_WINDOWS)
+	add_definitions(/D_WIN32_WINNT_WINTHRESHOLD=0)
+	add_definitions(/DNTDDI_WIN7SP1=0)
+	add_definitions(/DWINAPI_PARTITION_SYSTEM=0)
+	set(LPG_COMPILE_FLAGS /WX /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221)
 else()
-	add_definitions(-std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
+	set(LPG_COMPILE_FLAGS -std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla)
 endif()
 
 add_subdirectory(generic)
@@ -67,5 +102,6 @@ add_subdirectory(semantics)
 add_subdirectory(optimization)
 add_subdirectory(cli_impl)
 add_subdirectory(c_backend)
+add_subdirectory(javascript_backend)
 add_subdirectory(tests)
 add_subdirectory(cli)
