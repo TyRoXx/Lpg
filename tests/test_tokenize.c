@@ -56,6 +56,7 @@ void test_tokenize(void)
     test_single_token(token_equals, 2, "==");
     test_single_token(token_not_equals, 2, "!=");
     test_single_token(token_not, 1, "!abs");
+    test_single_token(token_not, 1, "!");
     test_single_token(token_less_than, 1, "<");
     test_single_token(token_less_than_or_equals, 2, "<=");
     test_single_token(token_greater_than, 1, ">");

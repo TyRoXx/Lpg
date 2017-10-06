@@ -245,5 +245,13 @@ void test_c_backend(void)
                            "assert(string-equals(\"a\", result))\n",
                            std_library, "24_lambda_capture_owning.c");
 
+    check_generated_c_code("let construct = ()\n"
+                           "    print(\"\")\n"
+                           "    let result = concat(read(), \"123\")\n"
+                           "    {result, result}\n"
+                           "let tuple = construct()\n"
+                           "assert(string-equals(\"123\", tuple.0))\n",
+                           std_library, "25_tuple_ownership.c");
+
     standard_library_description_free(&std_library);
 }
