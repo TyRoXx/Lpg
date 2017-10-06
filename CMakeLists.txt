@@ -23,19 +23,19 @@ if(UNIX)
     if(LPG_WITH_UB_SANITIZER)
         add_definitions(-fsanitize=undefined -fno-omit-frame-pointer)
     endif()
-   
+
     option(LPG_WITH_MEMORY_SANITIZER "compile with clang memory sanitizer" OFF)
     if(LPG_WITH_MEMORY_SANITIZER)
         add_definitions(-fsanitize=memory -fno-omit-frame-pointer -fPIE)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=memory -pie")
     endif()
-   
+
     option(LPG_WITH_ADDRESS_SANITIZER "compile with clang address sanitizer" OFF)
     if(LPG_WITH_ADDRESS_SANITIZER)
         add_definitions(-fsanitize=address -fno-omit-frame-pointer -shared-libasan)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address -shared-libasan")
     endif()
-   
+
     option(LPG_WITH_THREAD_SANITIZER "compile with clang thread sanitizer" OFF)
     if(LPG_WITH_THREAD_SANITIZER)
         add_definitions(-fsanitize=thread)
