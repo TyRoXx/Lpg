@@ -1471,13 +1471,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
             restore(previous_code);
             if (declared_type.has_value)
             {
-                if (!declared_type.compile_time_value.is_set)
-                {
-                    state->on_error(semantic_error_create(semantic_error_expected_compile_time_type,
-                                                          expression_source_begin(*element.declare.optional_type)),
-                                    state->user);
-                }
-                else if (declared_type.type_.kind != type_kind_type)
+                if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
                 {
                     state->on_error(semantic_error_create(semantic_error_expected_compile_time_type,
                                                           expression_source_begin(*element.declare.optional_type)),
