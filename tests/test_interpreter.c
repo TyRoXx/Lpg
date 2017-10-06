@@ -8,6 +8,7 @@
 #include <string.h>
 #include "duktape.h"
 #include "lpg_javascript_backend.h"
+#include "lpg_allocate.h"
 
 static sequence parse(char const *input)
 {
@@ -74,6 +75,43 @@ static duk_ret_t javascript_print(duk_context *const duktape)
     return 0;
 }
 
+static void *duktape_allocate(void *udata, duk_size_t size)
+{
+    (void)udata;
+    return allocate(size);
+}
+
+static void *duktape_realloc(void *udata, void *ptr, duk_size_t size)
+{
+    (void)udata;
+    if (size == 0)
+    {
+        if (ptr)
+        {
+            deallocate(ptr);
+        }
+        return NULL;
+    }
+    return reallocate(ptr, size);
+}
+
+static void duktape_free(void *udata, void *ptr)
+{
+    (void)udata;
+    if (!ptr)
+    {
+        return;
+    }
+    deallocate(ptr);
+}
+
+static void duktake_handle_fatal(void *udata, const char *msg)
+{
+    (void)udata;
+    fprintf(stderr, "%s\n", msg);
+    FAIL();
+}
+
 static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
 {
     sequence const root = parse(source);
@@ -111,7 +149,8 @@ static void expect_output(char const *source, char const *input, char const *out
     {
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_javascript(checked, memory_writer_erase(&generated)));
-        duk_context *const duktape = duk_create_heap_default();
+        duk_context *const duktape =
+            duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
         duk_push_c_function(duktape, javascript_print, 1);
         duk_put_global_string(duktape, "print");
