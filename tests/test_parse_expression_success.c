@@ -3,6 +3,7 @@
 #include "lpg_parse_expression.h"
 #include "lpg_allocate.h"
 #include "handle_parse_error.h"
+#include "lpg_save_expression.h"
 
 static void test_tuples(void);
 
@@ -18,9 +19,9 @@ static void test_comparison(void);
 
 static void test_assignments(void);
 
-static void test_lamdas();
+static void test_lambdas(void);
 
-static void test_successful_parse(expression const expected, unicode_string const input, bool const is_statement)
+static void test_successful_parse_impl(expression const expected, unicode_string const input, bool const is_statement)
 {
     test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
     expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
@@ -28,9 +29,25 @@ static void test_successful_parse(expression const expected, unicode_string cons
     REQUIRE(result.is_success);
     REQUIRE(user.base.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
-    expression_free(&expected);
+    REQUIRE(!expression_parser_has_remaining_non_empty_tokens(&parser));
     expression_free(&result.success);
     unicode_string_free(&input);
+}
+
+static void test_save_expression_roundtrip(expression const tree, bool const is_statement)
+{
+    memory_writer buffer = {NULL, 0, 0};
+    whitespace_state const whitespace = {0, false};
+    REQUIRE(success == save_expression(memory_writer_erase(&buffer), &tree, whitespace));
+    test_successful_parse_impl(tree, unicode_string_from_range(buffer.data, buffer.used), is_statement);
+    memory_writer_free(&buffer);
+}
+
+static void test_successful_parse(expression const expected, unicode_string const input, bool const is_statement)
+{
+    test_successful_parse_impl(expected, input, is_statement);
+    test_save_expression_roundtrip(expected, is_statement);
+    expression_free(&expected);
 }
 
 void test_parse_expression_success(void)
@@ -57,17 +74,21 @@ void test_parse_expression_success(void)
                               integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0))),
                           unicode_string_from_c_str("123"), false);
 
+    test_successful_parse(expression_from_not(not_expression_create(expression_allocate(expression_from_integer_literal(
+                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 1)))))),
+                          unicode_string_from_c_str("!1"), true);
+
     test_function_calls();
     test_comment();
     test_loops();
     test_comparison();
     test_assignments();
     test_match_cases();
-    test_lamdas();
+    test_lambdas();
     test_tuples();
 }
 
-static void test_lamdas()
+static void test_lambdas()
 {
     test_successful_parse(
         expression_from_lambda(lambda_create(
@@ -135,7 +156,6 @@ static void test_lamdas()
 
 static void test_comparison(void)
 {
-
     {
         expression *left = allocate(sizeof(*left));
         *left = expression_from_integer_literal(

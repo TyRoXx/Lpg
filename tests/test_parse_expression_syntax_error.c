@@ -27,6 +27,7 @@ static void test_syntax_error(parse_error const *expected_errors, size_t const e
         expression_free(expected);
         expression_free(&result.success);
         REQUIRE(user.base.remaining_size == 0);
+        REQUIRE(!expression_parser_has_remaining_non_empty_tokens(&parser));
     }
     else
     {
@@ -100,13 +101,6 @@ static void test_assignment(void)
                               integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3))))));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a= 1"));
-    }
-    {
-        parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 2))};
-        expression expected = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a "));
     }
     {
         parse_error const expected_errors[] = {
@@ -392,6 +386,42 @@ static void test_function(void)
             parse_error_create(parse_error_expected_expression, source_location_create(0, 13))};
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = {a, }"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 9))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = !"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 12))};
+        expression expected = expression_from_declare(declare_create(
+            identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
+            expression_allocate(expression_from_binary_operator(binary_operator_expression_create(
+                expression_allocate(expression_from_integer_literal(
+                    integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 8)))),
+                expression_allocate(expression_from_integer_literal(
+                    integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 11)))),
+                equals)))));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = 1 ==2"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 10))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f : 1 == 2 = 3"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 12))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = 3 !="));
     }
 }
 

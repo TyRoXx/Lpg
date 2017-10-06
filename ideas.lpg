@@ -1,23 +1,23 @@
-let f = () => print("Hello, world!\n")
+let f = () print("Hello, world!\n")
 f()
 
-let g = () =>
+let g = ()
     f()
     f()
 
 assert(type-of("") == string-ref)
 
-let print-twice = (message: string-ref) =>
+let print-twice = (message: string-ref)
     print(message)
     print(message)
 
 print-twice("woo")
 
-let h = () => print-twice("a")
+let h = () print-twice("a")
 h()
 
 assert(type-of(h) == function(unit, unit))
-assert(type-of((a: boolean) => unit) == function(boolean, unit))
+assert(type-of((a: boolean) unit) == function(boolean, unit))
 
 let tuple = (1, "abc", unit, boolean)
 assert(tuple.size == 4)
@@ -62,9 +62,9 @@ assert(x != y)
 //unsolved problem: Implicit conversion from option(T) to option(U) if T converts to U?
 let z : option(int(0, 999)) = option.some(123)
 
-let make-counter = () =>
+let make-counter = ()
     mutable count : int(0, 9999) = 0
-    return () =>
+    return ()
         match count.add(1)
             case next: type-of(count)
                 count = next
@@ -79,7 +79,7 @@ let counter = interface(number: type)
     mutable increment(): boolean
     count(): number
 
-let make-counter-2 = () =>
+let make-counter-2 = ()
     mutable state: int(0, 100000) = 0
     new counter(type-of(state))
         increment()
@@ -93,7 +93,7 @@ let make-counter-2 = () =>
             return state
 
 mutable d = make-counter-2()
-let result = thread.spawn(() =>
+let result = thread.spawn(()
     d.increment()
     return d.count()
 )
@@ -114,7 +114,7 @@ enum option<T: type>
     none
     some(T)
 
-let print-option (printed: option<let T>) -> unit
+let print-option (printed: option<let T>): unit
     match printed
         case option.none
             print("none")
@@ -143,9 +143,9 @@ enum ordering
     greater
 
 interface Comparator<Compared: type>
-    compare(left: Compared, right: Compared) -> ordering
+    compare(left: Compared, right: Compared): ordering
 
-let insert = (into: binary-tree<let Payload>, element: Payload, compare: Comparator<Payload>) -> binary-tree<Payload>
+let insert = (into: binary-tree<let Payload>, element: Payload, compare: Comparator<Payload>): binary-tree<Payload>
     match compare(element, into.payload)
         case ordering.less
             match into.left
@@ -162,7 +162,7 @@ let insert = (into: binary-tree<let Payload>, element: Payload, compare: Compara
                 case option.none
                     return {into.payload, into.left, option.some({element, option.none, option.none})}
 
-let insert-mutable = (into: reference mutable binary-tree<let Payload>, element: Payload, compare: Comparator<Payload>) -> unit
+let insert-mutable = (into: reference mutable binary-tree<let Payload>, element: Payload, compare: Comparator<Payload>): unit
     match compare(element, into.payload)
         case ordering.less
             match into.left
@@ -179,9 +179,9 @@ let insert-mutable = (into: reference mutable binary-tree<let Payload>, element:
                     into.right = option.some({element, option.none, option.none})
 
 interface AsyncOperation
-    [destructive] cancel() -> unit
+    [destructive] cancel(): unit
 
-let g = () -> option<AsyncOperation>
+let g = (): option<AsyncOperation>
     let a : AsyncOperation = f()
     match ..
         case
@@ -191,35 +191,35 @@ let g = () -> option<AsyncOperation>
             return some(a)
 
 interface Continuation<result: type>
-    [destructive] continue(result) -> unit
+    [destructive] continue(result): unit
 
 interface AsyncPlan<parameter: type, result: type>
-    [destructive] start(Continuation<result>, parameter) -> AsyncOperation
+    [destructive] start(Continuation<result>, parameter): AsyncOperation
 
 interface Context
-    yield<parameter: type, result: type>(AsyncPlan<parameter, result>, parameter) -> result
+    yield<parameter: type, result: type>(AsyncPlan<parameter, result>, parameter): result
 
 this_thread.yield(clock.wait(seconds(1))
 
 interface Clock
-    wait(duration) -> AsyncPlan<unit, unit>
+    wait(duration): AsyncPlan<unit, unit>
 
 interface Writer<error: type>
-    write-some(slice<byte>) -> AsyncPlan<unit, outcome<size, error>>
+    write-some(slice<byte>): AsyncPlan<unit, outcome<size, error>>
 
-let then = (input: AsyncPlan<let parameter, let result>, transform: (result) -> let final)
+let then = (input: AsyncPlan<let parameter, let result>, transform: (result): let final)
     return new AsyncPlan<parameter, final>
          start = (handler: Continuation<final>, argument: parameter)
               input.start( ... 
 
 interface Reader<error: type>
-    read-some(buffer<byte>) -> AsyncPlan<unit, outcome<size, error>>
+    read-some(buffer<byte>): AsyncPlan<unit, outcome<size, error>>
 
 struct Pipe<error: type>
     read: Reader<error>
     write: Writer<error>
 
-let make-pipe = () -> outcome<Pipe<system-error>>
+let make-pipe = (): outcome<Pipe<system-error>>
     let fd = match linux.pipe()
         case outcome.success(fd)
             fd
@@ -227,9 +227,9 @@ let make-pipe = () -> outcome<Pipe<system-error>>
             return outcome.error(error)
     let pipe = new Pipe<system-error>
         read = new Reader<system-error>
-            read-some = (into: buffer<byte>) -> AsyncPlan<unit, outcome<size, error>>
+            read-some = (into: buffer<byte>): AsyncPlan<unit, outcome<size, error>>
                 ...
         write = new Writer<system-error>
-            write-some = (from: slice<byte>) -> AsyncPlan<unit, outcome<size, error>>
+            write-some = (from: slice<byte>): AsyncPlan<unit, outcome<size, error>>
                 ...
-    return add-destructor(pipe, () => linux.close(fd))
+    return add-destructor(pipe, () linux.close(fd))

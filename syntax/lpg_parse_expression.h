@@ -53,12 +53,13 @@ typedef struct expression_parser
     rich_token_producer find_next_token;
     parse_error_handler on_error;
     callback_user user;
-    bool has_cached_token;
-    rich_token cached_token;
+    rich_token cached_tokens[2];
+    size_t cached_token_count;
 } expression_parser;
 
 expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),
                                            LPG_NON_NULL(parse_error_handler on_error), callback_user user);
+bool expression_parser_has_remaining_non_empty_tokens(LPG_NON_NULL(expression_parser const *const parser));
 
 typedef struct expression_parser_result
 {

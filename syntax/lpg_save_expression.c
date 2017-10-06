@@ -33,6 +33,19 @@ static success_indicator space_here(stream_writer const to, whitespace_state *wh
     return success;
 }
 
+static success_indicator save_tuple_elements(stream_writer const to, tuple const value, whitespace_state whitespace)
+{
+    LPG_FOR(size_t, i, value.length)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(to, ", "));
+        }
+        LPG_TRY(save_expression(to, value.elements + i, whitespace));
+    }
+    return success;
+}
+
 success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
@@ -51,15 +64,17 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, param->type, whitespace));
         }
-        LPG_TRY(stream_writer_write_string(to, ") => "));
-        LPG_TRY(save_expression(to, value->lambda.result, whitespace));
+        LPG_TRY(stream_writer_write_string(to, ")"));
+        LPG_TRY(save_expression(to, value->lambda.result, add_space_or_newline(whitespace)));
         return success;
 
     case expression_type_call:
     {
+        LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(save_expression(to, value->call.callee, whitespace));
-        expression const arguments = expression_from_tuple(value->call.arguments);
-        return save_expression(to, &arguments, whitespace);
+        LPG_TRY(stream_writer_write_string(to, "("));
+        LPG_TRY(save_tuple_elements(to, value->call.arguments, whitespace));
+        return stream_writer_write_string(to, ")");
     }
 
     case expression_type_integer_literal:
@@ -88,9 +103,9 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         {
             LPG_TRY(indent(to, go_deeper(whitespace, 1)));
             LPG_TRY(stream_writer_write_string(to, "case"));
-            LPG_TRY(save_expression(to, value->match.cases[i].key, add_space_or_newline(go_deeper(whitespace, 2))));
+            LPG_TRY(save_expression(to, value->match.cases[i].key, add_space_or_newline(go_deeper(whitespace, 1))));
             LPG_TRY(stream_writer_write_string(to, ":"));
-            LPG_TRY(save_expression(to, value->match.cases[i].action, add_space_or_newline(go_deeper(whitespace, 2))));
+            LPG_TRY(save_expression(to, value->match.cases[i].action, add_space_or_newline(go_deeper(whitespace, 1))));
             LPG_TRY(stream_writer_write_string(to, "\n"));
         }
         return success;
@@ -124,6 +139,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_not:
         LPG_TRY(stream_writer_write_string(to, "!"))
         return save_expression(to, value->not.expr, whitespace);
+
     case expression_type_return:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "return "));
@@ -134,7 +150,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "loop"));
         expression const loop_body = expression_from_sequence(value->loop_body);
-        return save_expression(to, &loop_body, go_deeper(whitespace, 1));
+        return save_expression(to, &loop_body, whitespace);
     }
 
     case expression_type_break:
@@ -142,17 +158,20 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         return stream_writer_write_string(to, "break");
 
     case expression_type_sequence:
+    {
+        whitespace_state in_sequence = go_deeper(whitespace, 1);
         LPG_FOR(size_t, i, value->sequence.length)
         {
             /*we break the line here, so the space should not be generated
              * before the sequence element:*/
-            whitespace.pending_space = 0;
+            in_sequence.pending_space = 0;
 
             LPG_TRY(stream_writer_write_string(to, "\n"));
-            LPG_TRY(indent(to, whitespace));
-            LPG_TRY(save_expression(to, value->sequence.elements + i, whitespace));
+            LPG_TRY(indent(to, in_sequence));
+            LPG_TRY(save_expression(to, value->sequence.elements + i, in_sequence));
         }
         return success;
+    }
 
     case expression_type_declare:
         LPG_TRY(stream_writer_write_string(to, "let "));
@@ -168,16 +187,10 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 
     case expression_type_tuple:
         LPG_TRY(space_here(to, &whitespace));
-        LPG_TRY(stream_writer_write_string(to, "("));
-        LPG_FOR(size_t, i, value->tuple.length)
-        {
-            if (i > 0)
-            {
-                LPG_TRY(stream_writer_write_string(to, ", "));
-            }
-            LPG_TRY(save_expression(to, value->tuple.elements + i, whitespace));
-        }
-        return stream_writer_write_string(to, ")");
+        LPG_TRY(stream_writer_write_string(to, "{"));
+        LPG_TRY(save_tuple_elements(to, value->tuple, whitespace));
+        return stream_writer_write_string(to, "}");
+
     case expression_type_comment:
     {
         unicode_view view = unicode_view_from_string(value->comment.value);
@@ -190,6 +203,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(stream_writer_write_string(to, "//"));
         return stream_writer_write_unicode_view(to, view);
     }
+
     case expression_type_binary:
     {
         LPG_TRY(save_expression(to, value->binary.left, whitespace));
@@ -215,7 +229,9 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             operator= "!=";
             break;
         }
+        LPG_TRY(stream_writer_write_string(to, " "));
         LPG_TRY(stream_writer_write_string(to, operator));
+        LPG_TRY(stream_writer_write_string(to, " "));
         return save_expression(to, value->binary.right, whitespace);
     }
     }

@@ -2,6 +2,7 @@
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
 #include "lpg_for.h"
+#include <string.h>
 
 rich_token rich_token_create(tokenize_status status, token_type token, unicode_view content, source_location where)
 {
@@ -28,34 +29,58 @@ bool parse_error_equals(parse_error left, parse_error right)
 expression_parser expression_parser_create(rich_token_producer find_next_token, parse_error_handler on_error,
                                            callback_user user)
 {
-    expression_parser result = {find_next_token, on_error, user, 0, {tokenize_success, 0, {NULL, 0}, {0, 0}}};
+    expression_parser result = {find_next_token,
+                                on_error,
+                                user,
+                                {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
+                                0};
     return result;
+}
+
+bool expression_parser_has_remaining_non_empty_tokens(expression_parser const *const parser)
+{
+    return (parser->cached_token_count > 0) && (parser->cached_tokens[0].content.length > 0);
+}
+
+static rich_token peek_at(expression_parser *parser, size_t const offset)
+{
+    ASSUME(offset < LPG_ARRAY_SIZE(parser->cached_tokens));
+    while (parser->cached_token_count <= offset)
+    {
+        parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->user);
+        switch (parser->cached_tokens[parser->cached_token_count].status)
+        {
+        case tokenize_success:
+            parser->cached_token_count += 1;
+            break;
+
+        case tokenize_invalid:
+            parser->on_error(
+                parse_error_create(parse_error_invalid_token, parser->cached_tokens[parser->cached_token_count].where),
+                parser->user);
+            break;
+        }
+    }
+    ASSUME(parser->cached_tokens[offset].status == tokenize_success);
+    return parser->cached_tokens[offset];
 }
 
 static rich_token peek(expression_parser *parser)
 {
-    while (!parser->has_cached_token)
-    {
-        parser->cached_token = parser->find_next_token(parser->user);
-        switch (parser->cached_token.status)
-        {
-        case tokenize_success:
-            parser->has_cached_token = 1;
-            break;
+    return peek_at(parser, 0);
+}
 
-        case tokenize_invalid:
-            parser->on_error(parse_error_create(parse_error_invalid_token, parser->cached_token.where), parser->user);
-            break;
-        }
-    }
-    ASSUME(parser->cached_token.status == tokenize_success);
-    return parser->cached_token;
+static void pop_n(expression_parser *parser, size_t const count)
+{
+    ASSUME(parser->cached_token_count >= count);
+    parser->cached_token_count -= count;
+    memmove(parser->cached_tokens, parser->cached_tokens + count,
+            (sizeof(*parser->cached_tokens) * parser->cached_token_count));
 }
 
 static void pop(expression_parser *parser)
 {
-    ASSUME(parser->has_cached_token);
-    parser->has_cached_token = 0;
+    pop_n(parser, 1);
 }
 
 static sequence parse_sequence(expression_parser *parser, size_t indentation)
@@ -683,6 +708,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     expression_parser_result right = parse_expression(parser, indentation, true);
     if (!right.is_success)
     {
+        expression_deallocate(binary_operator_expression1.left);
         return expression_parser_result_failure;
     }
 
@@ -696,7 +722,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
 }
 
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
-                                                 bool const may_be_statement)
+                                                 bool const may_be_statement, bool const may_be_binary)
 {
     expression_parser_result const callee = parse_callable(parser, indentation);
     if (!callee.is_success)
@@ -723,43 +749,45 @@ static expression_parser_result parse_returnable(expression_parser *const parser
                 parser->on_error(parse_error_create(parse_error_expected_space, maybe_operator.where), parser->user);
                 return parse_assignment(parser, indentation, result.success);
             }
-            if ((maybe_operator.token == token_space) && (maybe_operator.content.length == 1))
+            rich_token const next_operator = peek_at(parser, 1);
+            if (next_operator.token == token_assign)
             {
-                pop(parser);
-                rich_token const next_operator = peek(parser);
-                pop(parser);
-                if (next_operator.token == token_assign)
-                {
-                    return parse_assignment(parser, indentation, result.success);
-                }
-                else if (next_operator.token == token_not_equals)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, not_equals);
-                }
-                else if (next_operator.token == token_greater_than)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, greater_than);
-                }
-                else if (next_operator.token == token_greater_than_or_equals)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, greater_than_or_equals);
-                }
-                else if (next_operator.token == token_less_than)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, less_than);
-                }
-                else if (next_operator.token == token_less_than_or_equals)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, less_than_or_equals);
-                }
-                else if (next_operator.token == token_equals)
-                {
-                    return parse_binary_operator(parser, indentation, result.success, equals);
-                }
-                parser->on_error(
-                    parse_error_create(parse_error_expected_declaration_or_assignment, next_operator.where),
-                    parser->user);
-                return result;
+                pop_n(parser, 2);
+                return parse_assignment(parser, indentation, result.success);
+            }
+        }
+        if (may_be_binary && (maybe_operator.token == token_space) && (maybe_operator.content.length == 1))
+        {
+            rich_token const next_operator = peek_at(parser, 1);
+            if (next_operator.token == token_not_equals)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, not_equals);
+            }
+            if (next_operator.token == token_greater_than)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, greater_than);
+            }
+            if (next_operator.token == token_greater_than_or_equals)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, greater_than_or_equals);
+            }
+            if (next_operator.token == token_less_than)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, less_than);
+            }
+            if (next_operator.token == token_less_than_or_equals)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, less_than_or_equals);
+            }
+            if (next_operator.token == token_equals)
+            {
+                pop_n(parser, 2);
+                return parse_binary_operator(parser, indentation, result.success, equals);
             }
         }
         if (maybe_operator.token == token_dot)
@@ -797,7 +825,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             pop(parser);
             if ((space.token == token_space) && (space.content.length == 1))
             {
-                expression_parser_result result = parse_returnable(parser, indentation, 0);
+                expression_parser_result result = parse_returnable(parser, indentation, false, true);
                 if (result.is_success)
                 {
                     result.success = expression_from_return(expression_allocate(result.success));
@@ -850,7 +878,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 {
                     parser->on_error(parse_error_create(parse_error_expected_space, third_space.where), parser->user);
                 }
-                declared_variable_type = parse_returnable(parser, indentation, false);
+                declared_variable_type = parse_returnable(parser, indentation, false, false);
                 if (!declared_variable_type.is_success)
                 {
                     return expression_parser_result_failure;
@@ -887,7 +915,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             {
                 parser->on_error(parse_error_create(parse_error_expected_space, another_space.where), parser->user);
             }
-            expression_parser_result const initial_value = parse_returnable(parser, indentation, false);
+            expression_parser_result const initial_value = parse_returnable(parser, indentation, false, true);
             if (!initial_value.is_success)
             {
                 if (declared_variable_type.is_success)
@@ -905,7 +933,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             return result;
         }
     }
-    return parse_returnable(parser, indentation, may_be_statement);
+    return parse_returnable(parser, indentation, may_be_statement, true);
 }
 
 sequence parse_program(expression_parser *parser)

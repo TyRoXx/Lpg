@@ -133,7 +133,7 @@ git clone https://github.com/TyRoXx/Lpg.git
 mkdir build
 cd build
 cmake ../Lpg -G "CodeBlocks - Unix Makefiles"
-make
+cmake --build .
 ./tests/tests
 ```
 
@@ -166,4 +166,7 @@ make clang-format
 ```
 
 ### Build and run on Windows
-TODO!
+
+* Use CMake GUI to generate a solution for your favorite version of Visual Studio.
+* Open the solution in Visual Studio as usual.
+* Run the `tests` project to check whether your changes work.

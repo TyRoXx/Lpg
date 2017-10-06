@@ -84,7 +84,7 @@ void test_save_expression(void)
             expression_from_lambda(lambda_create(
                 parameters, 1, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                    integer_create(0, 1234), source_location_create(0, 0)))))),
-            "(a: uint32) => 1234");
+            "(a: uint32) 1234");
     }
 
     {
@@ -211,7 +211,7 @@ void test_save_expression(void)
         check_expression_rendering(
             expression_from_lambda(lambda_create(
                 parameters, 1, expression_allocate(expression_from_loop(sequence_create(outer_loop, 2))))),
-            "(a: uint32) => loop\n"
+            "(a: uint32) loop\n"
             "    a = 123\n"
             "    loop\n"
             "        break");
@@ -232,16 +232,16 @@ void test_save_expression(void)
             expression_from_lambda(lambda_create(
                 parameters, 2, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                    integer_create(0, 123), source_location_create(0, 0)))))),
-            "(a: float, b: string) => 123");
+            "(a: float, b: string) 123");
     }
 
-    check_expression_rendering(expression_from_tuple(tuple_create(NULL, 0)), "()");
+    check_expression_rendering(expression_from_tuple(tuple_create(NULL, 0)), "{}");
 
     {
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        check_expression_rendering(expression_from_tuple(tuple_create(elements, 1)), "(a)");
+        check_expression_rendering(expression_from_tuple(tuple_create(elements, 1)), "{a}");
     }
 
     {
@@ -250,7 +250,7 @@ void test_save_expression(void)
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
         elements[1] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)));
-        check_expression_rendering(expression_from_tuple(tuple_create(elements, 2)), "(a, 123)");
+        check_expression_rendering(expression_from_tuple(tuple_create(elements, 2)), "{a, 123}");
     }
 
     {
