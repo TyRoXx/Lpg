@@ -3,6 +3,8 @@
 #include <stddef.h>
 #include "lpg_unicode_view.h"
 #include <stdbool.h>
+#include "math.h"
+#include "lpg_assert.h"
 
 typedef struct integer
 {
@@ -36,3 +38,5 @@ extern char const lower_case_digits[];
 
 char *integer_format(integer const value, LPG_NON_NULL(char const *digits), unsigned base, LPG_NON_NULL(char *buffer),
                      size_t buffer_size) LPG_USE_RESULT;
+
+size_t integer_string_max_length(unsigned int base);
