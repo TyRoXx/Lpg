@@ -233,5 +233,5 @@ size_t integer_string_max_length(unsigned int base)
 {
     ASSUME(base >= 2);
     unsigned int length_base2 = sizeof(integer) * 8;
-    return (size_t)ceil(length_base2 / log2(base));
+    return (size_t)ceil(log(length_base2) / log(base));
 }

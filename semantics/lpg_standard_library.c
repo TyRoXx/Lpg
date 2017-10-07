@@ -121,11 +121,12 @@ value integer_to_string_impl(value const *const inferred, value const *const arg
 
     integer const left = arguments[0].integer_;
     const unsigned int printing_base = 10;
-    const size_t buffer_size = integer_string_max_length(printing_base);
+    const size_t buffer_max_size = integer_string_max_length(printing_base);
 
-    char *buffer = garbage_collector_allocate(gc, sizeof(char) * buffer_size);
-    char *buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_size);
-    size_t const index_length = (size_t)((buffer + sizeof(buffer)) - buffer_begin);
+    const size_t bytes = sizeof(char) * buffer_max_size;
+    char *buffer = garbage_collector_allocate(gc, bytes);
+    char *buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
+    size_t const index_length = (size_t)((buffer + bytes) - buffer_begin);
 
     return value_from_string_ref(unicode_view_create(buffer_begin, index_length));
 }
