@@ -71,7 +71,10 @@ static value read_impl(value const *const inferred, value const *arguments, garb
 
 static duk_ret_t javascript_print(duk_context *const duktape)
 {
-    (void)duktape;
+    duk_push_current_function(duktape);
+    duk_get_prop_string(duktape, -1, DUK_HIDDEN_SYMBOL("print-buffer"));
+    memory_writer *const print_buffer = duk_get_pointer(duktape, -1);
+    REQUIRE(success == stream_writer_write_string(memory_writer_erase(print_buffer), duk_get_string(duktape, 0)));
     return 0;
 }
 
@@ -141,22 +144,31 @@ static void expect_output(char const *source, char const *input, char const *out
         sequence_free(&root);
         garbage_collector gc = {NULL};
         interpret(checked, globals_values, &gc);
+        garbage_collector_free(gc);
+
         REQUIRE(memory_writer_equals(print_buffer, output));
         memory_writer_free(&print_buffer);
-        garbage_collector_free(gc);
     }
 
     {
+        memory_writer print_buffer = {NULL, 0, 0};
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_javascript(checked, memory_writer_erase(&generated)));
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
         duk_push_c_function(duktape, javascript_print, 1);
+
+        duk_push_pointer(duktape, &print_buffer);
+        duk_put_prop_string(duktape, -2, DUK_HIDDEN_SYMBOL("print-buffer"));
+
         duk_put_global_string(duktape, "print");
+
         duk_eval_lstring(duktape, generated.data, generated.used);
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
+
+        memory_writer_free(&print_buffer);
     }
 
     checked_program_free(&checked);
