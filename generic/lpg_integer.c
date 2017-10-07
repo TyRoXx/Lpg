@@ -1,5 +1,4 @@
 #include "lpg_integer.h"
-#include "lpg_assert.h"
 
 integer integer_create(uint64_t high, uint64_t low)
 {
@@ -228,4 +227,11 @@ char *integer_format(integer const value, char const *digits, unsigned base, cha
         --next_digit;
     }
     return buffer + next_digit;
+}
+
+size_t integer_string_max_length(unsigned int base)
+{
+    ASSUME(base >= 2);
+    unsigned int length_base2 = sizeof(integer) * 8;
+    return (size_t)ceil(log(length_base2) / log(base));
 }

@@ -17,6 +17,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->int_);
     function_pointer_free(&stable->integer_equals);
     function_pointer_free(&stable->integer_less);
+    function_pointer_free(&stable->integer_to_string);
     enumeration_free(&stable->option);
 }
 
@@ -110,6 +111,25 @@ value integer_less_impl(value const *const inferred, value const *const argument
     return value_from_enum_element(integer_less(left, right), NULL);
 }
 
+value integer_to_string_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                             void *environment)
+{
+    (void)inferred;
+    (void)environment;
+    (void)gc;
+
+    integer const left = arguments[0].integer_;
+    const unsigned int printing_base = 10;
+    const size_t buffer_max_size = integer_string_max_length(printing_base);
+
+    const size_t bytes = sizeof(char) * buffer_max_size;
+    char *buffer = garbage_collector_allocate(gc, bytes);
+    char *buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
+    size_t const index_length = (size_t)((buffer + bytes) - buffer_begin);
+
+    return value_from_string_ref(unicode_view_create(buffer_begin, index_length));
+}
+
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
@@ -188,6 +208,13 @@ standard_library_description describe_standard_library(void)
         stable->integer_less =
             function_pointer_create(boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
     }
+    {
+        type *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
+
+        stable->integer_to_string = function_pointer_create(
+            type_from_string_ref(), tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
+    }
     stable->read =
         function_pointer_create(type_from_string_ref(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
 
@@ -252,11 +279,16 @@ standard_library_description describe_standard_library(void)
                                 optional_value_create(value_from_type(type_from_enumeration(&stable->option))));
 
     globals[16] = structure_member_create(
-        type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer-less"),
+        type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(integer_less_impl, NULL))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 17);
+    globals[17] = structure_member_create(
+        type_from_function_pointer(&stable->integer_to_string), unicode_string_from_c_str("integer-to-string"),
+        optional_value_create(
+            value_from_function_pointer(function_pointer_value_from_external(integer_to_string_impl, NULL))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 18);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;
