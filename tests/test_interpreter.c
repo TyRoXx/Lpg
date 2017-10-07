@@ -9,6 +9,7 @@
 #include "duktape.h"
 #include "lpg_javascript_backend.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
 
 static sequence parse(char const *input)
 {
@@ -76,6 +77,48 @@ static duk_ret_t javascript_print(duk_context *const duktape)
     memory_writer *const print_buffer = duk_get_pointer(duktape, -1);
     REQUIRE(success == stream_writer_write_string(memory_writer_erase(print_buffer), duk_get_string(duktape, 0)));
     return 0;
+}
+
+static bool from_javascript_bool(double const value)
+{
+    if (value == 0.0)
+    {
+        return false;
+    }
+    if (value == 1.0)
+    {
+        return true;
+    }
+    FAIL();
+}
+
+static double to_javascript_bool(bool const value)
+{
+    return (value ? 1.0 : 0.0);
+}
+
+static duk_ret_t javascript_assert(duk_context *const duktape)
+{
+    REQUIRE(from_javascript_bool(duk_get_number(duktape, 0)));
+    return 0;
+}
+
+static duk_ret_t javascript_not(duk_context *const duktape)
+{
+    double const argument = duk_get_number(duktape, 0);
+    double const result = to_javascript_bool(!from_javascript_bool(argument));
+    duk_push_number(duktape, result);
+    return 1;
+}
+
+static duk_ret_t javascript_read(duk_context *const duktape)
+{
+    duk_push_current_function(duktape);
+    duk_get_prop_string(duktape, -1, DUK_HIDDEN_SYMBOL("input"));
+    unicode_view *const read_input = duk_get_pointer(duktape, -1);
+    duk_push_lstring(duktape, read_input->begin, read_input->length);
+    read_input->length = 0;
+    return 1;
 }
 
 static void *duktape_allocate(void *udata, duk_size_t size)
@@ -157,17 +200,29 @@ static void expect_output(char const *source, char const *input, char const *out
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
-        duk_push_c_function(duktape, javascript_print, 1);
 
+        duk_push_c_function(duktape, javascript_print, 1);
         duk_push_pointer(duktape, &print_buffer);
         duk_put_prop_string(duktape, -2, DUK_HIDDEN_SYMBOL("print-buffer"));
-
         duk_put_global_string(duktape, "print");
+
+        duk_push_c_function(duktape, javascript_assert, 1);
+        duk_put_global_string(duktape, "assert");
+
+        duk_push_c_function(duktape, javascript_not, 1);
+        duk_put_global_string(duktape, "not");
+
+        unicode_view read_input = unicode_view_from_c_str(input);
+        duk_push_c_function(duktape, javascript_read, 0);
+        duk_push_pointer(duktape, &read_input);
+        duk_put_prop_string(duktape, -2, DUK_HIDDEN_SYMBOL("input"));
+        duk_put_global_string(duktape, "read");
 
         duk_eval_lstring(duktape, generated.data, generated.used);
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
 
+        REQUIRE(memory_writer_equals(print_buffer, output));
         memory_writer_free(&print_buffer);
     }
 

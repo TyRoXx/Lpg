@@ -6,6 +6,7 @@
 #include "lpg_unicode_view.h"
 #include "lpg_non_null.h"
 #include "lpg_use_result.h"
+#include "lpg_integer.h"
 
 typedef struct stream_writer
 {
@@ -17,6 +18,7 @@ success_indicator stream_writer_write_unicode_view(stream_writer writer, unicode
 
 success_indicator stream_writer_write_string(stream_writer writer, LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
 success_indicator stream_writer_write_bytes(stream_writer writer, char const *data, size_t size) LPG_USE_RESULT;
+success_indicator stream_writer_write_integer(stream_writer writer, integer const value) LPG_USE_RESULT;
 
 typedef struct memory_writer
 {
