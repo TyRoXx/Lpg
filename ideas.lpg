@@ -233,3 +233,17 @@ let make-pipe = (): outcome<Pipe<system-error>>
             write-some = (from: slice<byte>): AsyncPlan<unit, outcome<size, error>>
                 ...
     return add-destructor(pipe, () linux.close(fd))
+
+interface Printable
+    print(): string-ref
+
+impl Printable for string-ref
+    print()
+        return this
+
+impl Printable for integer<let Min, let Max>
+    print()
+        return integer-to-string(this)
+
+let print = (printed: Printable): unit
+    printed.print()
