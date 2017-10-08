@@ -153,7 +153,7 @@ static void expect_output(char const *source, char const *input, char const *out
     {
         memory_writer print_buffer = {NULL, 0, 0};
         test_environment environment = {memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
-        value const globals_values[standard_library_element_count] = {
+        value const globals_values[] = {
             /*type*/ value_from_unit(),
             /*string-ref*/ value_from_unit(),
             /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment)),
@@ -169,8 +169,14 @@ static void expect_output(char const *source, char const *input, char const *out
             /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment)),
             /*integer-equals*/ value_from_function_pointer(
                 function_pointer_value_from_external(integer_equals_impl, &environment)),
+            /*unit*/ value_from_unit(),
+            /*unit_value*/ value_from_unit(),
+            /*option*/ value_from_unit(),
             /*integer-less*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_less_impl, &environment))};
+                function_pointer_value_from_external(integer_less_impl, &environment)),
+            /*integer-to-string*/ value_from_function_pointer(
+                function_pointer_value_from_external(integer_to_string_impl, &environment))};
+        LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         sequence_free(&root);
         garbage_collector gc = {NULL};
         interpret(checked, globals_values, &gc);

@@ -21,6 +21,9 @@ value integer_equals_impl(value const *const inferred, value const *const argume
 value integer_less_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
                         void *environment);
 
+value integer_to_string_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                             void *environment);
+
 typedef struct standard_library_stable
 {
     enumeration boolean;
