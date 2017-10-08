@@ -17,7 +17,7 @@ bool is_end_of_file(rich_token const *token)
 
 parse_error parse_error_create(parse_error_type type, source_location where)
 {
-    parse_error result = {type, where};
+    parse_error const result = {type, where};
     return result;
 }
 
@@ -29,11 +29,12 @@ bool parse_error_equals(parse_error left, parse_error right)
 expression_parser expression_parser_create(rich_token_producer find_next_token, parse_error_handler on_error,
                                            callback_user user)
 {
-    expression_parser result = {find_next_token,
-                                on_error,
-                                user,
-                                {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
-                                0};
+    expression_parser const result = {
+        find_next_token,
+        on_error,
+        user,
+        {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
+        0};
     return result;
 }
 
@@ -507,7 +508,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         case token_not:
         {
             pop(parser);
-            expression_parser_result result = parse_expression(parser, indentation, false);
+            expression_parser_result const result = parse_expression(parser, indentation, false);
             if (!result.is_success)
             {
                 return expression_parser_result_failure;
@@ -516,8 +517,8 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             expression *success = allocate(sizeof(*success));
             *success = result.success;
 
-            expression expr = expression_from_not(not_expression_create(success));
-            expression_parser_result result1 = {1, expr};
+            expression const expr = expression_from_not(not_expression_create(success));
+            expression_parser_result const result1 = {1, expr};
             return result1;
         };
         }
@@ -695,7 +696,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
                                                       expression expression, binary_operator operator)
 {
     // Checking the whitespaces
-    rich_token token = peek(parser);
+    rich_token const token = peek(parser);
     if (token.token != token_space)
     {
         parser->on_error(parse_error_create(parse_error_expected_space, peek(parser).where), parser->user);
@@ -709,7 +710,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     binary_operator_expression1.left = allocate(sizeof(expression));
     *binary_operator_expression1.left = expression;
 
-    expression_parser_result right = parse_expression(parser, indentation, true);
+    expression_parser_result const right = parse_expression(parser, indentation, true);
     if (!right.is_success)
     {
         expression_deallocate(binary_operator_expression1.left);
@@ -721,7 +722,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
 
     binary_operator_expression1.comparator = operator;
 
-    expression_parser_result result = {1, expression_from_binary_operator(binary_operator_expression1)};
+    expression_parser_result const result = {1, expression_from_binary_operator(binary_operator_expression1)};
     return result;
 }
 

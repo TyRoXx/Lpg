@@ -1043,7 +1043,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 evaluate_expression_result evaluate_not_expression(function_checking_state *state, instruction_sequence *function,
                                                    const expression *element)
 {
-    evaluate_expression_result result = evaluate_expression(state, function, *(*element).not.expr);
+    evaluate_expression_result const result = evaluate_expression(state, function, *(*element).not.expr);
     ASSUME(state->global->members[3].compile_time_value.is_set);
 
     value boolean_value = state->global->members[3].compile_time_value.value_;

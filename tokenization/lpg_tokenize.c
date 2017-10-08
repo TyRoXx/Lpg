@@ -185,7 +185,7 @@ static tokenize_result tokenize_not(const char *input, size_t length)
     {
         return make_success(token_not, 1);
     }
-    char second = input[1];
+    char const second = input[1];
     switch (second)
     {
     case '=':
@@ -201,7 +201,7 @@ static tokenize_result tokenize_less_than(const char *input, size_t length)
     {
         return make_success(token_less_than, 1);
     }
-    char second = input[1];
+    char const second = input[1];
     switch (second)
     {
     case '=':
@@ -217,7 +217,7 @@ static tokenize_result tokenize_less_greater(const char *input, size_t length)
     {
         return make_success(token_greater_than, 1);
     }
-    char second = input[1];
+    char const second = input[1];
     switch (second)
     {
     case '=':
@@ -287,7 +287,7 @@ static tokenize_result tokenize_equal_signs(const char *input, size_t length)
     {
         return make_success(token_assign, 1);
     }
-    char second = input[1];
+    char const second = input[1];
     switch (second)
     {
     case '>':

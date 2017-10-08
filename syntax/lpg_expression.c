@@ -104,7 +104,7 @@ assign assign_create(expression *left, expression *right)
 
 not not_expression_create(expression * value)
 {
-    not result = {value};
+    not const result = {value};
     return result;
 }
 
