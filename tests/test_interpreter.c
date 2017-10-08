@@ -103,14 +103,6 @@ static duk_ret_t javascript_assert(duk_context *const duktape)
     return 0;
 }
 
-static duk_ret_t javascript_not(duk_context *const duktape)
-{
-    double const argument = duk_get_number(duktape, 0);
-    double const result = to_javascript_bool(!from_javascript_bool(argument));
-    duk_push_number(duktape, result);
-    return 1;
-}
-
 static duk_ret_t javascript_read(duk_context *const duktape)
 {
     duk_push_current_function(duktape);
@@ -208,9 +200,6 @@ static void expect_output(char const *source, char const *input, char const *out
 
         duk_push_c_function(duktape, javascript_assert, 1);
         duk_put_global_string(duktape, "assert");
-
-        duk_push_c_function(duktape, javascript_not, 1);
-        duk_put_global_string(duktape, "not");
 
         unicode_view read_input = unicode_view_from_c_str(input);
         duk_push_c_function(duktape, javascript_read, 0);

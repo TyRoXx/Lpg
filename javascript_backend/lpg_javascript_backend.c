@@ -490,6 +490,8 @@ success_indicator generate_javascript(checked_program const program, stream_writ
     LPG_TRY(stream_writer_write_string(
         javascript_output,
         "var and = function (left, right) { return ((left === 1.0) && (right === 1.0)) ? 1.0 : 0.0; };\n"));
+    LPG_TRY(stream_writer_write_string(
+        javascript_output, "var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"));
     for (function_id i = 1; i < program.function_count; ++i)
     {
         LPG_TRY(declare_function(i, javascript_output));
