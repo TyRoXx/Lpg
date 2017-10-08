@@ -92,11 +92,6 @@ static bool from_javascript_bool(double const value)
     FAIL();
 }
 
-static double to_javascript_bool(bool const value)
-{
-    return (value ? 1.0 : 0.0);
-}
-
 static duk_ret_t javascript_assert(duk_context *const duktape)
 {
     REQUIRE(from_javascript_bool(duk_get_number(duktape, 0)));
