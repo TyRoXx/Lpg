@@ -636,6 +636,10 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
         {
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_arguments, maybe_comma.where), parser->user);
+            for (size_t i = 0; i < argument_count; ++i)
+            {
+                expression_free(arguments + i);
+            }
             if (arguments)
             {
                 deallocate(arguments);
