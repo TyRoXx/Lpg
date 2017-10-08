@@ -151,8 +151,6 @@ static type get_return_type(type const callee, checked_function const *const all
         return callee.function_pointer_->result;
 
     case type_kind_tuple:
-        return callee;
-
     case type_kind_structure:
     case type_kind_unit:
     case type_kind_string_ref:
