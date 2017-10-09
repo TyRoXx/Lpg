@@ -11,6 +11,9 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
         instruction const current_instruction = from.elements[from.length - i - 1u];
         switch (current_instruction.type)
         {
+        case instruction_get_method:
+            LPG_TO_DO();
+
         case instruction_call:
             registers_read_from[current_instruction.call.callee] = true;
             for (size_t j = 0; j < current_instruction.call.argument_count; ++j)
@@ -85,6 +88,9 @@ static bool change_register_ids(instruction *const where, register_id const *con
 {
     switch (where->type)
     {
+    case instruction_get_method:
+        LPG_TO_DO();
+
     case instruction_call:
         ASSERT(update_register_id(&where->call.callee, new_register_ids));
         for (size_t j = 0; j < where->call.argument_count; ++j)

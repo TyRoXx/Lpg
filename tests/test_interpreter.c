@@ -316,7 +316,11 @@ void test_interpreter(void)
                   "assert(not(integer-less(big, small)))\n",
                   "", "", std_library.globals);
 
-    expect_output("let f = (printed: printable) unit_value\n", "", "", std_library.globals);
+    expect_output("let f = (printed: printable)\n"
+                  "    let method = printed.print\n"
+                  "    let string = method()\n"
+                  "    print(string)\n",
+                  "", "", std_library.globals);
 
     test_captures(&std_library);
 

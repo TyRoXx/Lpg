@@ -55,6 +55,9 @@ void print_instruction(instruction const printed)
 {
     switch (printed.type)
     {
+    case instruction_get_method:
+        LPG_TO_DO();
+
     case instruction_call:
         printf("call callee %u result %u arguments", printed.call.callee, printed.call.result);
         for (size_t i = 0; i < printed.call.argument_count; ++i)

@@ -60,7 +60,7 @@ bool tuple_type_equals(tuple_type const left, tuple_type const right)
     return true;
 }
 
-interface interface_create(method_description *methods, size_t method_count)
+interface interface_create(method_description *methods, function_id method_count)
 {
     interface const result = {methods, method_count};
     return result;
@@ -68,7 +68,7 @@ interface interface_create(method_description *methods, size_t method_count)
 
 void interface_free(interface const value)
 {
-    for (size_t i = 0; i < value.method_count; ++i)
+    for (function_id i = 0; i < value.method_count; ++i)
     {
         method_description_free(value.methods[i]);
     }

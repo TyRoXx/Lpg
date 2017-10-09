@@ -15,6 +15,9 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         instruction const current_instruction = sequence.elements[j];
         switch (current_instruction.type)
         {
+        case instruction_get_method:
+            LPG_TO_DO();
+
         case instruction_call:
             break;
 
@@ -163,6 +166,9 @@ static instruction clone_instruction(instruction const original, garbage_collect
 {
     switch (original.type)
     {
+    case instruction_get_method:
+        LPG_TO_DO();
+
     case instruction_call:
     {
         register_id *const arguments = allocate_array(original.call.argument_count, sizeof(*arguments));

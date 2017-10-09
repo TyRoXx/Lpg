@@ -337,6 +337,37 @@ static read_structure_element_result read_tuple_element(function_checking_state 
 static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
                                                       expression const element);
 
+static read_structure_element_result read_interface_element_at(function_checking_state *state,
+                                                               instruction_sequence *function, register_id const from,
+                                                               LPG_NON_NULL(interface const *const from_type),
+                                                               function_id const method_index, register_id const result)
+{
+    add_instruction(
+        function, instruction_create_get_method(get_method_instruction_create(from_type, from, method_index, result)));
+    function_pointer *const method_object = garbage_collector_allocate(&state->program->memory, sizeof(*method_object));
+    type *const captures = garbage_collector_allocate_array(&state->program->memory, 1, sizeof(*captures));
+    captures[0] = type_from_interface(from_type);
+    method_description const method = from_type->methods[method_index];
+    *method_object = function_pointer_create(method.result, method.parameters, tuple_type_create(captures, 1));
+    return read_structure_element_result_create(true, type_from_function_pointer(method_object), optional_value_empty);
+}
+
+static read_structure_element_result
+read_interface_element(function_checking_state *state, instruction_sequence *function, register_id const from,
+                       LPG_NON_NULL(interface const *const from_type), unicode_view const element_name,
+                       source_location const element_source, register_id const result)
+{
+    for (function_id i = 0; i < from_type->method_count; ++i)
+    {
+        if (unicode_view_equals(unicode_view_from_string(from_type->methods[i].name), element_name))
+        {
+            return read_interface_element_at(state, function, from, from_type, i, result);
+        }
+    }
+    state->on_error(semantic_error_create(semantic_error_unknown_element, element_source), state->user);
+    return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+}
+
 static read_structure_element_result read_element(function_checking_state *state, instruction_sequence *function,
                                                   expression const object_tree,
                                                   const identifier_expression *const element, register_id const result)
@@ -356,8 +387,11 @@ static read_structure_element_result read_element(function_checking_state *state
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_inferred:
-    case type_kind_interface:
         LPG_TO_DO();
+
+    case type_kind_interface:
+        return read_interface_element(state, function, object.where, actual_type->interface_,
+                                      unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_enum_constructor:
     case type_kind_integer_range:

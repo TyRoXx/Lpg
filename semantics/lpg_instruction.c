@@ -131,6 +131,19 @@ bool lambda_with_captures_instruction_equals(lambda_with_captures_instruction co
     return true;
 }
 
+get_method_instruction get_method_instruction_create(interface const *interface_, register_id from, function_id method,
+                                                     register_id into)
+{
+    get_method_instruction const result = {interface_, from, method, into};
+    return result;
+}
+
+bool get_method_instruction_equals(get_method_instruction const left, get_method_instruction const right)
+{
+    return (left.interface_ == right.interface_) && (left.from == right.from) && (left.method == right.method) &&
+           (left.into == right.into);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -168,6 +181,14 @@ instruction instruction_create_lambda_with_captures(lambda_with_captures_instruc
     instruction result;
     result.type = instruction_lambda_with_captures;
     result.lambda_with_captures = argument;
+    return result;
+}
+
+instruction instruction_create_get_method(get_method_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_get_method;
+    result.get_method = argument;
     return result;
 }
 
@@ -241,6 +262,7 @@ void instruction_free(instruction const *value)
         instruction_sequence_free(&value->loop);
         break;
 
+    case instruction_get_method:
     case instruction_global:
     case instruction_read_struct:
     case instruction_break:
@@ -283,6 +305,9 @@ bool instruction_equals(instruction const left, instruction const right)
     }
     switch (left.type)
     {
+    case instruction_get_method:
+        LPG_TO_DO();
+
     case instruction_call:
         return call_instruction_equals(left.call, right.call);
 

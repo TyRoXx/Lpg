@@ -40,6 +40,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         instruction const element = sequence.elements[i];
         switch (element.type)
         {
+        case instruction_get_method:
+            LPG_TO_DO();
+
         case instruction_call:
         {
             value const callee = registers[element.call.callee];

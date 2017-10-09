@@ -364,11 +364,41 @@ static success_indicator generate_lambda_with_captures(function_generation *cons
     return success;
 }
 
+static success_indicator generate_get_method(function_generation *const state, get_method_instruction const generated,
+                                             stream_writer const javascript_output)
+{
+    LPG_TRY(write_register(state, generated.into, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "function ("));
+    struct method_description const method = generated.interface_->methods[generated.method];
+    for (register_id i = 0; i < method.parameters.length; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        LPG_TRY(generate_argument_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
+    LPG_TRY(generate_register_name(generated.from, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, ".call_method("));
+    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, generated.method)));
+    for (register_id i = 0; i < method.parameters.length; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        LPG_TRY(generate_argument_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));
+    return success;
+}
+
 static success_indicator generate_instruction(function_generation *const state, instruction const generated,
                                               stream_writer const javascript_output)
 {
     switch (generated.type)
     {
+    case instruction_get_method:
+        return generate_get_method(state, generated.get_method, javascript_output);
+
     case instruction_call:
         return generate_call(state, generated.call, javascript_output);
 

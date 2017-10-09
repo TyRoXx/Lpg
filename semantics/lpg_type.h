@@ -45,10 +45,10 @@ typedef struct method_description method_description;
 typedef struct interface
 {
     method_description *methods;
-    size_t method_count;
+    function_id method_count;
 } interface;
 
-interface interface_create(method_description *methods, size_t method_count);
+interface interface_create(method_description *methods, function_id method_count);
 void interface_free(interface const value);
 
 typedef struct integer_range
