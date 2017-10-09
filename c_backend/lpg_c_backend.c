@@ -136,6 +136,9 @@ static register_resource_ownership find_register_resource_ownership(type const v
 {
     switch (variable.kind)
     {
+    case type_kind_interface:
+        LPG_TO_DO();
+
     case type_kind_enumeration:
         /*TODO: support owning, stateful enums*/
         return register_resource_ownership_owns;
@@ -354,6 +357,9 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
+    case type_kind_interface:
+        LPG_TO_DO();
+
     case type_kind_lambda:
     {
         function_pointer const *const signature = all_functions[generated.lambda.lambda].signature;
@@ -550,6 +556,9 @@ static success_indicator generate_add_reference(unicode_view const value, type c
 {
     switch (what.kind)
     {
+    case type_kind_interface:
+        LPG_TO_DO();
+
     case type_kind_string_ref:
         LPG_TRY(stream_writer_write_string(c_output, "    string_ref_add_reference(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, value));
@@ -810,6 +819,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 {
     switch (input.type)
     {
+    case type_kind_interface:
+        LPG_TO_DO();
+
     case instruction_call:
         LPG_TRY(indent(indentation, c_output));
         switch (state->registers[input.call.callee].meaning)
@@ -903,6 +915,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type result_type = type_from_unit();
             switch (state->registers[input.call.callee].type_of.kind)
             {
+            case type_kind_interface:
+                LPG_TO_DO();
+
             case type_kind_function_pointer:
                 result_type = state->registers[input.call.callee].type_of.function_pointer_->result;
                 break;
@@ -1107,6 +1122,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const object_type = state->registers[input.read_struct.from_object].type_of;
             switch (object_type.kind)
             {
+            case type_kind_interface:
+                LPG_TO_DO();
+
             case type_kind_structure:
             case type_kind_lambda:
                 LPG_TO_DO();
@@ -1262,6 +1280,9 @@ static success_indicator generate_free(c_backend_state *state, unicode_view cons
 {
     switch (what.kind)
     {
+    case type_kind_interface:
+        LPG_TO_DO();
+
     case type_kind_string_ref:
         state->standard_library.using_string_ref = true;
         LPG_TRY(indent(indentation, c_output));

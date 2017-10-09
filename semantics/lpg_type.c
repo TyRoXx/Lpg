@@ -104,7 +104,10 @@ method_description method_description_create(unicode_string name, tuple_type par
 void method_description_free(method_description const value)
 {
     unicode_string_free(&value.name);
-    LPG_TO_DO();
+    if (value.parameters.elements)
+    {
+        deallocate(value.parameters.elements);
+    }
 }
 
 enumeration_element enumeration_element_create(unicode_string name, type state)
