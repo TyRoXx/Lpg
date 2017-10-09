@@ -373,4 +373,11 @@ static void test_captures(const standard_library_description *std_library)
                   "    () a\n"
                   "assert(f(boolean.true)())\n",
                   "", "", (*std_library).globals);
+
+    expect_output("let f = (a: string-ref, b: boolean)\n"
+                  "    assert(string-equals(\"abc\", a))\n"
+                  "    assert(not(b))\n"
+                  "    print(a)\n"
+                  "f(\"abc\", boolean.false)\n",
+                  "", "abc", (*std_library).globals);
 }

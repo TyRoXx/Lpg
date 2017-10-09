@@ -314,9 +314,7 @@ static success_indicator generate_match(function_generation *const state, match_
 
 static success_indicator generate_argument_name(register_id const index, stream_writer const javascript_output)
 {
-    LPG_TRY(stream_writer_write_string(javascript_output, "a_"));
-    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, index)));
-    return success;
+    return generate_register_name(index, javascript_output);
 }
 
 static success_indicator generate_lambda_with_captures(function_generation *const state,
