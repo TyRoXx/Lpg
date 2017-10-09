@@ -205,6 +205,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 13:
             return stream_writer_write_string(javascript_output, "undefined");
 
+        case 14:
+            return stream_writer_write_string(javascript_output, "undefined");
+
         default:
             LPG_TO_DO();
         }

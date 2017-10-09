@@ -158,6 +158,7 @@ static type get_return_type(type const callee, checked_function const *const all
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_inferred:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -220,6 +221,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_structure:
     case type_kind_inferred:
     case type_kind_enum_constructor:
+    case type_kind_interface:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -264,6 +266,7 @@ static bool function_parameter_accepts_type(type const function, size_t const pa
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_inferred:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -353,6 +356,7 @@ static read_structure_element_result read_element(function_checking_state *state
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_inferred:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -398,6 +402,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_lambda:
         case type_kind_inferred:
         case type_kind_enum_constructor:
+        case type_kind_interface:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -456,6 +461,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_inferred:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -584,6 +590,7 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_enum_constructor:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_unit:
@@ -853,6 +860,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_inferred:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -1030,6 +1038,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                                           result, callee.type_.enum_constructor->which, arguments[0])));
             deallocate(arguments);
             break;
+
+        case type_kind_interface:
+            LPG_TO_DO();
         }
     }
 
@@ -1097,6 +1108,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_integer_range:
     case type_kind_inferred:
     case type_kind_enum_constructor:
+    case type_kind_interface:
         LPG_TO_DO();
     }
     match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));

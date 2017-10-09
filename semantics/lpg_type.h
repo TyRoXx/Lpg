@@ -40,6 +40,17 @@ typedef struct tuple_type
 tuple_type tuple_type_create(type *elements, size_t length);
 bool tuple_type_equals(tuple_type const left, tuple_type const right);
 
+typedef struct method_description method_description;
+
+typedef struct interface
+{
+    method_description *methods;
+    size_t method_count;
+} interface;
+
+interface interface_create(method_description *methods, size_t method_count);
+void interface_free(interface const value);
+
 typedef struct integer_range
 {
     integer minimum;
@@ -61,7 +72,8 @@ typedef enum type_kind
     type_kind_integer_range,
     type_kind_inferred,
     type_kind_enum_constructor,
-    type_kind_lambda
+    type_kind_lambda,
+    type_kind_interface
 } type_kind;
 
 typedef struct function_pointer function_pointer;
@@ -88,8 +100,19 @@ struct type
         size_t inferred;
         enum_constructor_type *enum_constructor;
         lambda_type lambda;
+        interface const *interface_;
     };
 };
+
+struct method_description
+{
+    unicode_string name;
+    tuple_type parameters;
+    type result;
+};
+
+method_description method_description_create(unicode_string name, tuple_type parameters, type result);
+void method_description_free(method_description const value);
 
 struct enum_constructor_type
 {
@@ -126,6 +149,7 @@ type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
 type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type type_from_lambda(lambda_type const lambda);
+type type_from_interface(LPG_NON_NULL(interface const *value));
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

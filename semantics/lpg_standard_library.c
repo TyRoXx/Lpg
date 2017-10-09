@@ -19,6 +19,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->integer_less);
     function_pointer_free(&stable->integer_to_string);
     enumeration_free(&stable->option);
+    interface_free(stable->printable);
 }
 
 value not_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment)
@@ -218,6 +219,8 @@ standard_library_description describe_standard_library(void)
     stable->read =
         function_pointer_create(type_from_string_ref(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
 
+    stable->printable = interface_create(NULL, 0);
+
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"), optional_value_create(value_from_type(type_from_type())));
@@ -288,7 +291,11 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(integer_to_string_impl, NULL))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 18);
+    globals[18] =
+        structure_member_create(type_from_type(), unicode_string_from_c_str("printable"),
+                                optional_value_create(value_from_type(type_from_interface(&stable->printable))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 19);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

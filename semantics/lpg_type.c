@@ -3,6 +3,7 @@
 #include "lpg_allocate.h"
 #include "lpg_structure_member.h"
 #include "lpg_assert.h"
+#include "lpg_expression.h"
 
 structure structure_create(structure_member *members, struct_member_id count)
 {
@@ -59,6 +60,24 @@ bool tuple_type_equals(tuple_type const left, tuple_type const right)
     return true;
 }
 
+interface interface_create(method_description *methods, size_t method_count)
+{
+    interface const result = {methods, method_count};
+    return result;
+}
+
+void interface_free(interface const value)
+{
+    for (size_t i = 0; i < value.method_count; ++i)
+    {
+        method_description_free(value.methods[i]);
+    }
+    if (value.methods)
+    {
+        deallocate(value.methods);
+    }
+}
+
 integer_range integer_range_create(integer minimum, integer maximum)
 {
     integer_range const result = {minimum, maximum};
@@ -74,6 +93,18 @@ lambda_type lambda_type_create(function_id const lambda)
 {
     lambda_type const result = {lambda};
     return result;
+}
+
+method_description method_description_create(unicode_string name, tuple_type parameters, type result)
+{
+    method_description const returning = {name, parameters, result};
+    return returning;
+}
+
+void method_description_free(method_description const value)
+{
+    unicode_string_free(&value.name);
+    LPG_TO_DO();
 }
 
 enumeration_element enumeration_element_create(unicode_string name, type state)
@@ -179,6 +210,14 @@ type type_from_lambda(lambda_type const lambda)
     return result;
 }
 
+type type_from_interface(interface const *value)
+{
+    type result;
+    result.kind = type_kind_interface;
+    result.interface_ = value;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -195,18 +234,18 @@ bool type_equals(type const left, type const right)
     switch (left.kind)
     {
     case type_kind_structure:
-        LPG_TO_DO();
-
+    case type_kind_interface:
     case type_kind_lambda:
+    case type_kind_inferred:
+    case type_kind_enum_constructor:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
         return function_pointer_equals(*left.function_pointer_, *right.function_pointer_);
 
     case type_kind_unit:
-        return true;
-
     case type_kind_string_ref:
+    case type_kind_type:
         return true;
 
     case type_kind_enumeration:
@@ -215,17 +254,8 @@ bool type_equals(type const left, type const right)
     case type_kind_tuple:
         return tuple_type_equals(left.tuple_, right.tuple_);
 
-    case type_kind_type:
-        return true;
-
     case type_kind_integer_range:
         return integer_range_equals(left.integer_range_, right.integer_range_);
-
-    case type_kind_inferred:
-        LPG_TO_DO();
-
-    case type_kind_enum_constructor:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -235,6 +265,7 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     switch (original.kind)
     {
     case type_kind_structure:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_lambda:
