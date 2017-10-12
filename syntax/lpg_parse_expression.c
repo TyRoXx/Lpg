@@ -102,6 +102,11 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
             {
                 pop(parser);
             }
+            if ((indentation == 0) && (peek(parser).token == token_newline))
+            {
+                pop(parser);
+                continue;
+            }
             expression_parser_result const element = parse_expression(parser, indentation, 1);
             if (element.is_success)
             {
