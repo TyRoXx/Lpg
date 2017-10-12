@@ -234,16 +234,16 @@ let make-pipe = (): outcome<Pipe<system-error>>
                 ...
     return add-destructor(pipe, () linux.close(fd))
 
-interface Printable
+interface printable
     print(): string-ref
 
-impl Printable for string-ref
+impl printable for string-ref
     print()
         return this
 
-impl Printable for integer<let Min, let Max>
+impl printable for integer<let Min, let Max>
     print()
         return integer-to-string(this)
 
-let print = (printed: Printable): unit
+let print = (printed: printable): unit
     printed.print()

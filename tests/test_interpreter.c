@@ -10,10 +10,12 @@
 #include "lpg_javascript_backend.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_read_file.h"
+#include "path.h"
 
-static sequence parse(char const *input)
+static sequence parse(unicode_view const input)
 {
-    test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
+    test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
     expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -145,7 +147,8 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     FAIL();
 }
 
-static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
+static void expect_output_impl(unicode_view const source, char const *input, char const *output,
+                               structure const global_object)
 {
     sequence const root = parse(source);
     checked_program const checked = check(root, global_object, expect_no_errors, NULL);
@@ -218,6 +221,24 @@ static void expect_output(char const *source, char const *input, char const *out
     }
 
     checked_program_free(&checked);
+}
+
+static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
+{
+    expect_output_impl(unicode_view_from_c_str(source), input, output, global_object);
+}
+
+static void run_file(char const *const source_file, structure const global_object)
+{
+    unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
+                                   unicode_view_from_c_str("in_lpg"), unicode_view_from_c_str(source_file)};
+    unicode_string const full_expected_file_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
+    blob_or_error expected_or_error = read_file(full_expected_file_path.data);
+    unicode_string_free(&full_expected_file_path);
+    REQUIRE(!expected_or_error.error);
+    unicode_string const expected = unicode_string_validate(expected_or_error.success);
+    expect_output_impl(unicode_view_from_string(expected), "", "", global_object);
+    unicode_string_free(&expected);
 }
 
 void test_interpreter(void)
@@ -323,6 +344,8 @@ void test_interpreter(void)
                   "", "", std_library.globals);
 
     test_captures(&std_library);
+
+    run_file("tests.lpg", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
