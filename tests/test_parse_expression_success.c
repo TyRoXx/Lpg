@@ -60,10 +60,10 @@ void test_parse_expression_success(void)
             integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 7))))),
         unicode_string_from_c_str("return 123"), true);
 
-    test_successful_parse(expression_from_return(expression_allocate(expression_from_call(
-                              call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                                              unicode_string_from_c_str("f"), source_location_create(0, 7)))),
-                                          tuple_create(NULL, 0), source_location_create(0, 9))))),
+    test_successful_parse(expression_from_return(expression_allocate(expression_from_call(call_create(
+                              expression_allocate(expression_from_identifier(identifier_expression_create(
+                                  unicode_string_from_c_str("f"), source_location_create(0, 7)))),
+                              tuple_create(NULL, 0, source_location_create(0, 0)), source_location_create(0, 9))))),
                           unicode_string_from_c_str("return f()"), true);
 
     test_successful_parse(expression_from_identifier(identifier_expression_create(
@@ -348,7 +348,7 @@ static void test_match_cases(void)
 static void test_function_calls(void)
 {
     {
-        tuple const arguments = tuple_create(NULL, 0);
+        tuple const arguments = tuple_create(NULL, 0, source_location_create(0, 0));
         test_successful_parse(expression_from_call(call_create(
                                   expression_allocate(expression_from_identifier(identifier_expression_create(
                                       unicode_string_from_c_str("f"), source_location_create(0, 0)))),
@@ -356,7 +356,7 @@ static void test_function_calls(void)
                               unicode_string_from_c_str("f()"), false);
     }
     {
-        tuple const arguments = tuple_create(NULL, 0);
+        tuple const arguments = tuple_create(NULL, 0, source_location_create(0, 0));
         test_successful_parse(expression_from_call(call_create(
                                   expression_allocate(expression_from_call(call_create(
                                       expression_allocate(expression_from_identifier(identifier_expression_create(
@@ -369,7 +369,7 @@ static void test_function_calls(void)
         expression *arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)));
-        tuple const arguments_tuple = tuple_create(arguments, 1);
+        tuple const arguments_tuple = tuple_create(arguments, 1, source_location_create(0, 0));
         test_successful_parse(expression_from_call(call_create(
                                   expression_allocate(expression_from_identifier(identifier_expression_create(
                                       unicode_string_from_c_str("f"), source_location_create(0, 0)))),
@@ -382,7 +382,7 @@ static void test_function_calls(void)
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)));
         arguments[1] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 5)));
-        tuple const arguments_tuple = tuple_create(arguments, 2);
+        tuple const arguments_tuple = tuple_create(arguments, 2, source_location_create(0, 0));
         test_successful_parse(expression_from_call(call_create(
                                   expression_allocate(expression_from_identifier(identifier_expression_create(
                                       unicode_string_from_c_str("f"), source_location_create(0, 0)))),
@@ -474,12 +474,13 @@ static void test_tuples(void)
     expression *const tuple_elements = expression_allocate(expression_from_string(
         string_expression_create(unicode_string_from_c_str("Test"), source_location_create(0, 0))));
 
-    expression *const tuple_expression = expression_allocate(expression_from_tuple(tuple_create(tuple_elements, 1)));
+    expression *const tuple_expression =
+        expression_allocate(expression_from_tuple(tuple_create(tuple_elements, 1, source_location_create(0, 23))));
 
     expression *const tuple_type_expression = expression_allocate(
         expression_from_tuple(tuple_create(expression_allocate(expression_from_identifier(identifier_expression_create(
                                                unicode_string_from_c_str("string-ref"), source_location_create(0, 9)))),
-                                           1)));
+                                           1, source_location_create(0, 8))));
 
     identifier_expression const variable_name =
         identifier_expression_create(unicode_string_from_c_str("t"), source_location_create(0, 4));

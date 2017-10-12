@@ -227,23 +227,6 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     LPG_UNREACHABLE();
 }
 
-static bool check_parameter_type(type const from, type const into, type_inference const inferring)
-{
-    if (into.kind == type_kind_inferred)
-    {
-        ASSUME(into.inferred < inferring.count);
-        optional_value *const inferred_parameter_type = &inferring.values[into.inferred];
-        if (inferred_parameter_type->is_set)
-        {
-            /*TODO: find conflicts*/
-            LPG_TO_DO();
-        }
-        *inferred_parameter_type = optional_value_create(value_from_type(from));
-        return true;
-    }
-    return is_implicitly_convertible(from, into);
-}
-
 static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions)
 {
     switch (callee.kind)
@@ -620,9 +603,9 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_enum_constructor:
-    case type_kind_interface:
         LPG_TO_DO();
 
+    case type_kind_interface:
     case type_kind_unit:
     case type_kind_string_ref:
     case type_kind_enumeration:
@@ -861,6 +844,54 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         true, destination, result_type, optional_value_create(function_pointer), false);
 }
 
+typedef struct conversion_result
+{
+    success_indicator ok;
+    register_id where;
+    optional_value compile_time_value;
+} conversion_result;
+
+static conversion_result convert(function_checking_state *const state, register_id const original, type const from,
+                                 optional_value const original_compile_time_value,
+                                 source_location const original_source, type const to)
+{
+    if (type_equals(from, to))
+    {
+        conversion_result const result = {success, original, original_compile_time_value};
+        return result;
+    }
+    switch (to.kind)
+    {
+    case type_kind_enum_constructor:
+    case type_kind_enumeration:
+    case type_kind_function_pointer:
+    case type_kind_inferred:
+    case type_kind_lambda:
+    case type_kind_string_ref:
+    case type_kind_unit:
+    case type_kind_structure:
+    case type_kind_type:
+    {
+        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+        conversion_result const result = {failure, original, optional_value_empty};
+        return result;
+    }
+
+    case type_kind_tuple:
+        LPG_TO_DO();
+
+    case type_kind_integer_range:
+    {
+        conversion_result const result = {success, original, original_compile_time_value};
+        return result;
+    }
+
+    case type_kind_interface:
+        LPG_TO_DO();
+    }
+    LPG_UNREACHABLE();
+}
+
 typedef struct argument_evaluation_result
 {
     success_indicator ok;
@@ -871,7 +902,7 @@ typedef struct argument_evaluation_result
 static argument_evaluation_result evaluate_argument(function_checking_state *const state,
                                                     instruction_sequence *const function,
                                                     expression const argument_tree, type const callee_type,
-                                                    size_t const parameter_id, type_inference const inferring)
+                                                    size_t const parameter_id)
 {
     evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree);
     if (!argument.has_value)
@@ -879,15 +910,10 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
         argument_evaluation_result const result = {failure, optional_value_empty, 0};
         return result;
     }
-    if (!check_parameter_type(
-            argument.type_, get_parameter_type(callee_type, parameter_id, state->program->functions), inferring))
-    {
-        state->on_error(
-            semantic_error_create(semantic_error_type_mismatch, expression_source_begin(argument_tree)), state->user);
-        argument_evaluation_result const result = {failure, optional_value_empty, 0};
-        return result;
-    }
-    argument_evaluation_result const result = {success, argument.compile_time_value, argument.where};
+    conversion_result const converted = convert(
+        state, argument.where, argument.type_, argument.compile_time_value, expression_source_begin(argument_tree),
+        get_parameter_type(callee_type, parameter_id, state->program->functions));
+    argument_evaluation_result const result = {converted.ok, converted.compile_time_value, converted.where};
     return result;
 }
 
@@ -946,8 +972,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 state->user);
             break;
         }
-        argument_evaluation_result const result =
-            evaluate_argument(state, function, argument_tree, callee.type_, i, inferring);
+        argument_evaluation_result const result = evaluate_argument(state, function, argument_tree, callee.type_, i);
         if (result.ok != success)
         {
             restore(previous_code);

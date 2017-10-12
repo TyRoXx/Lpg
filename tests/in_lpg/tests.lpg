@@ -1,1 +1,7 @@
 assert(boolean.true)
+
+let f = (a: printable)
+    let s = a.print()
+    s
+//assert(string-equals("", f("")))
+//assert(string-equals("a", f("a")))

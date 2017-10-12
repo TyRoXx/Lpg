@@ -251,7 +251,7 @@ static void test_function(void)
         expression expected = expression_from_call(
             call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
                             unicode_string_from_c_str("f"), source_location_create(0, 0)))),
-                        tuple_create(arguments, 1), source_location_create(0, 4)));
+                        tuple_create(arguments, 1, source_location_create(0, 0)), source_location_create(0, 4)));
         test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
     }
     {
@@ -264,7 +264,7 @@ static void test_function(void)
         expression expected = expression_from_call(
             call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
                             unicode_string_from_c_str("f"), source_location_create(0, 0)))),
-                        tuple_create(arguments, 1), source_location_create(0, 4)));
+                        tuple_create(arguments, 1, source_location_create(0, 0)), source_location_create(0, 4)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("f(1,)"));
     }
@@ -292,7 +292,7 @@ static void test_function(void)
         expression expected = expression_from_call(
             call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
                             unicode_string_from_c_str("f"), source_location_create(0, 0)))),
-                        tuple_create(arguments, 2), source_location_create(0, 5)));
+                        tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 5)));
         test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(1,2)"));
     }
     {

@@ -68,11 +68,12 @@ void test_save_expression(void)
             string_expression_create(unicode_string_from_c_str("test"), source_location_create(0, 0)));
         arguments[1] = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        check_expression_rendering(expression_from_call(call_create(
-                                       expression_allocate(expression_from_identifier(identifier_expression_create(
-                                           unicode_string_from_c_str("f"), source_location_create(0, 0)))),
-                                       tuple_create(arguments, 2), source_location_create(0, 0))),
-                                   "f(\"test\", a)");
+        check_expression_rendering(
+            expression_from_call(
+                call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                                unicode_string_from_c_str("f"), source_location_create(0, 0)))),
+                            tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 0))),
+            "f(\"test\", a)");
     }
     {
         parameter *parameters = allocate_array(1, sizeof(*parameters));
@@ -97,10 +98,10 @@ void test_save_expression(void)
         check_expression_rendering(
             expression_from_declare(declare_create(
                 identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
-                expression_allocate(expression_from_call(
-                    call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                                    unicode_string_from_c_str("integer"), source_location_create(0, 0)))),
-                                tuple_create(arguments, 2), source_location_create(0, 0)))),
+                expression_allocate(expression_from_call(call_create(
+                    expression_allocate(expression_from_identifier(identifier_expression_create(
+                        unicode_string_from_c_str("integer"), source_location_create(0, 0)))),
+                    tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 0)))),
                 expression_allocate(expression_from_integer_literal(
                     integer_literal_expression_create(integer_create(0, 6), source_location_create(0, 0)))))),
             "let a : integer(0, 10) = 6");
@@ -244,13 +245,14 @@ void test_save_expression(void)
             "(a: float, b: string) 123");
     }
 
-    check_expression_rendering(expression_from_tuple(tuple_create(NULL, 0)), "{}");
+    check_expression_rendering(expression_from_tuple(tuple_create(NULL, 0, source_location_create(0, 0))), "{}");
 
     {
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        check_expression_rendering(expression_from_tuple(tuple_create(elements, 1)), "{a}");
+        check_expression_rendering(
+            expression_from_tuple(tuple_create(elements, 1, source_location_create(0, 0))), "{a}");
     }
 
     {
@@ -259,7 +261,8 @@ void test_save_expression(void)
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
         elements[1] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)));
-        check_expression_rendering(expression_from_tuple(tuple_create(elements, 2)), "{a, 123}");
+        check_expression_rendering(
+            expression_from_tuple(tuple_create(elements, 2, source_location_create(0, 0))), "{a, 123}");
     }
 
     {

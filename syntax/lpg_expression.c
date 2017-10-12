@@ -147,9 +147,9 @@ void declare_free(declare const *value)
     expression_deallocate(value->initializer);
 }
 
-tuple tuple_create(expression *elements, size_t length)
+tuple tuple_create(expression *elements, size_t length, source_location const opening_brace)
 {
-    tuple const result = {elements, length};
+    tuple const result = {elements, length, opening_brace};
     return result;
 }
 
@@ -166,7 +166,7 @@ bool tuple_equals(tuple const *left, tuple const *right)
             return false;
         }
     }
-    return true;
+    return source_location_equals(left->opening_brace, right->opening_brace);
 }
 
 void tuple_free(tuple const *value)
@@ -281,18 +281,11 @@ source_location expression_source_begin(expression const value)
     case expression_type_declare:
         return value.declare.name.source;
 
-    case expression_type_tuple:
-        if (value.tuple.length > 0)
-        {
-            return expression_source_begin(value.tuple.elements[0]);
-        }
-        else
-        {
-            LPG_TO_DO();
-        }
-
     case expression_type_binary:
         return expression_source_begin(*value.binary.left);
+
+    case expression_type_tuple:
+        return value.tuple.opening_brace;
 
     case expression_type_not:
         return expression_source_begin(*value.not.expr);

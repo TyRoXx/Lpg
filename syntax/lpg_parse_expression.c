@@ -132,7 +132,8 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 static expression_parser_result const expression_parser_result_failure = {
     0, {expression_type_lambda, {{NULL, 0, NULL, NULL}}}};
 
-static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation);
+static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
+                                            source_location const opening_brace);
 
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
                                                  bool const may_be_binary);
@@ -479,7 +480,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         case token_left_curly_brace:
         {
             pop(parser);
-            return parse_tuple(parser, indentation);
+            return parse_tuple(parser, indentation, head.where);
         }
 
         case token_right_curly_brace:
@@ -561,13 +562,15 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
     }
 }
 
-static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation)
+static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
+                                            source_location const opening_brace)
 {
     rich_token next = peek(parser);
     if (next.token == token_right_curly_brace)
     {
         pop(parser);
-        expression_parser_result const parser_result = {true, expression_from_tuple(tuple_create(NULL, 0))};
+        expression_parser_result const parser_result = {
+            true, expression_from_tuple(tuple_create(NULL, 0, opening_brace))};
         return parser_result;
     }
 
@@ -624,11 +627,12 @@ static expression_parser_result parse_tuple(expression_parser *parser, size_t in
     }
     pop(parser);
     expression_parser_result const tuple_result = {
-        true, expression_from_tuple(tuple_create(tuple_elements, element_count))};
+        true, expression_from_tuple(tuple_create(tuple_elements, element_count, opening_brace))};
     return tuple_result;
 }
 
-static int parse_call(expression_parser *parser, size_t indentation, expression *result)
+static int parse_call(expression_parser *parser, size_t indentation, expression *result,
+                      source_location const opening_parenthesis)
 {
     expression *arguments = NULL;
     size_t argument_count = 0;
@@ -655,8 +659,9 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                     parser->on_error(
                         parse_error_create(parse_error_expected_expression, maybe_close.where), parser->user);
                 }
-                *result = expression_from_call(call_create(
-                    expression_allocate(*result), tuple_create(arguments, argument_count), maybe_close.where));
+                *result = expression_from_call(call_create(expression_allocate(*result),
+                                                           tuple_create(arguments, argument_count, opening_parenthesis),
+                                                           maybe_close.where));
                 return 1;
             }
         }
@@ -753,7 +758,7 @@ static expression_parser_result parse_returnable(expression_parser *const parser
         if (maybe_operator.token == token_left_parenthesis)
         {
             pop(parser);
-            if (parse_call(parser, indentation, &result.success))
+            if (parse_call(parser, indentation, &result.success, maybe_operator.where))
             {
                 continue;
             }

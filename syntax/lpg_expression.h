@@ -45,6 +45,7 @@ typedef struct tuple
 {
     expression *elements;
     size_t length;
+    source_location opening_brace;
 } tuple;
 
 typedef struct call
@@ -156,7 +157,7 @@ sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
 void declare_free(declare const *value);
-tuple tuple_create(expression *elements, size_t length);
+tuple tuple_create(expression *elements, size_t length, source_location const opening_brace);
 bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
 expression expression_from_not(not value);

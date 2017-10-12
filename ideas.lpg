@@ -234,8 +234,16 @@ let make-pipe = (): outcome<Pipe<system-error>>
                 ...
     return add-destructor(pipe, () linux.close(fd))
 
+let printable = interface
+    print(): string-ref
+
 interface printable
     print(): string-ref
+
+let make-printable = ()
+    interface
+        print(): string-ref
+let printable = make-printable()
 
 impl printable for string-ref
     print()
