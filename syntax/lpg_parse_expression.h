@@ -31,6 +31,7 @@ typedef enum parse_error_type
     parse_error_expected_element_name,
     parse_error_expected_identifier,
     parse_error_expected_lambda_body,
+    parse_error_expected_return_type,
     parse_error_unknown_binary_operator
 } parse_error_type;
 

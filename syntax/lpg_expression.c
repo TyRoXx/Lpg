@@ -9,9 +9,9 @@ void expression_deallocate(expression *this)
     deallocate(this);
 }
 
-lambda lambda_create(parameter *parameters, size_t parameter_count, expression *result)
+lambda lambda_create(parameter *parameters, size_t parameter_count, expression *return_type, expression *result)
 {
-    lambda const returning = {parameters, parameter_count, result};
+    lambda const returning = {parameters, parameter_count, return_type, result};
     return returning;
 }
 
@@ -25,6 +25,7 @@ void lambda_free(lambda const *this)
     {
         deallocate(this->parameters);
     }
+    expression_deallocate(this->return_type);
     expression_deallocate(this->result);
 }
 

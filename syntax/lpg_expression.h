@@ -13,10 +13,11 @@ typedef struct lambda
 {
     parameter *parameters;
     size_t parameter_count;
+    expression *return_type;
     expression *result;
 } lambda;
 
-lambda lambda_create(parameter *parameters, size_t parameter_count, LPG_NON_NULL(expression *result));
+lambda lambda_create(parameter *parameters, size_t parameter_count, expression *return_type, expression *result);
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 
