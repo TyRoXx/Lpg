@@ -232,12 +232,13 @@ static void test_comparison(void)
 
 static void test_assignments(void)
 {
-    test_successful_parse(expression_from_assign(assign_create(
+    test_successful_parse(expression_from_binary_operator(binary_operator_expression_create(
                               expression_allocate(expression_from_identifier(identifier_expression_create(
                                   unicode_string_from_c_str("a"), source_location_create(0, 0)))),
                               expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 1), source_location_create(0, 4)))))),
-                          unicode_string_from_c_str("a = 1"), true);
+                                  integer_create(0, 1), source_location_create(0, 5)))),
+                              equals)),
+                          unicode_string_from_c_str("a == 1"), true);
 
     test_successful_parse(
         expression_from_declare(

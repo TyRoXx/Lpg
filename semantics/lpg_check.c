@@ -1389,7 +1389,6 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         return address;
     }
 
-    case expression_type_assign:
     case expression_type_return:
         LPG_TO_DO();
 

@@ -131,11 +131,6 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(space_here(to, &whitespace));
         return stream_writer_write_unicode_view(to, unicode_view_from_string(value->identifier.value));
 
-    case expression_type_assign:
-        LPG_TRY(save_expression(to, value->assign.left, whitespace));
-        LPG_TRY(stream_writer_write_string(to, " = "));
-        return save_expression(to, value->assign.right, whitespace);
-
     case expression_type_not:
         LPG_TRY(stream_writer_write_string(to, "!"))
         return save_expression(to, value->not.expr, whitespace);

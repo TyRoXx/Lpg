@@ -29,7 +29,6 @@ typedef enum expression_type
     expression_type_match,
     expression_type_string,
     expression_type_identifier,
-    expression_type_assign,
     expression_type_not,
     expression_type_binary,
     expression_type_return,
@@ -107,14 +106,6 @@ typedef struct match
 match match_create(source_location begin, LPG_NON_NULL(expression *input), LPG_NON_NULL(match_case *cases),
                    size_t number_of_cases);
 
-typedef struct assign
-{
-    expression *left;
-    expression *right;
-} assign;
-
-assign assign_create(LPG_NON_NULL(expression *left), LPG_NON_NULL(expression *right));
-
 typedef struct not
 {
     expression *expr;
@@ -167,7 +158,6 @@ void declare_free(declare const *value);
 tuple tuple_create(expression *elements, size_t length);
 bool tuple_equals(tuple const *left, tuple const *right);
 void tuple_free(LPG_NON_NULL(tuple const *value));
-expression expression_from_assign(assign value);
 expression expression_from_not(not value);
 expression expression_from_binary_operator(binary_operator_expression value);
 expression expression_from_return(LPG_NON_NULL(expression *value));
@@ -214,7 +204,6 @@ struct expression
         match match;
         string_expression string;
         identifier_expression identifier;
-        assign assign;
         not not;
         binary_operator_expression binary;
         expression *return_;
@@ -244,6 +233,5 @@ expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);
 bool declare_equals(declare const left, declare const right);
-bool assign_equals(assign const left, assign const right);
 bool match_equals(match const left, match const right);
 bool expression_equals(LPG_NON_NULL(expression const *left), LPG_NON_NULL(expression const *right));

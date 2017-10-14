@@ -673,32 +673,8 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
     }
 }
 
-static expression_parser_result parse_assignment(expression_parser *parser, size_t indentation,
-                                                 expression const left_side)
-{
-    rich_token const space = peek(parser);
-    if (space.token == token_space)
-    {
-        pop(parser);
-    }
-    else
-    {
-        parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
-    }
-    expression_parser_result const value = parse_expression(parser, indentation, 0);
-    if (value.is_success)
-    {
-        expression_parser_result const assign_result = {
-            1,
-            expression_from_assign(assign_create(expression_allocate(left_side), expression_allocate(value.success)))};
-        return assign_result;
-    }
-    expression_parser_result const result = {1, left_side};
-    return result;
-}
-
 static expression_parser_result parse_binary_operator(expression_parser *const parser, const size_t indentation,
-                                                      expression expression, binary_operator operator)
+                                                      expression left_side, binary_operator operator)
 {
     // Checking the whitespaces
     rich_token const token = peek(parser);
@@ -711,28 +687,28 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
         pop(parser);
     }
 
-    binary_operator_expression binary_operator_expression1;
-    binary_operator_expression1.left = allocate(sizeof(expression));
-    *binary_operator_expression1.left = expression;
-
     expression_parser_result const right = parse_expression(parser, indentation, true);
     if (!right.is_success)
     {
-        expression_deallocate(binary_operator_expression1.left);
-        return expression_parser_result_failure;
+        expression_parser_result const result = {true, left_side};
+        return result;
     }
+
+    binary_operator_expression binary_operator_expression1;
+    binary_operator_expression1.left = allocate(sizeof(expression));
+    *binary_operator_expression1.left = left_side;
 
     binary_operator_expression1.right = allocate(sizeof(*binary_operator_expression1.right));
     *binary_operator_expression1.right = right.success;
 
     binary_operator_expression1.comparator = operator;
 
-    expression_parser_result const result = {1, expression_from_binary_operator(binary_operator_expression1)};
+    expression_parser_result const result = {true, expression_from_binary_operator(binary_operator_expression1)};
     return result;
 }
 
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
-                                                 bool const may_be_statement, bool const may_be_binary)
+                                                 bool const may_be_binary)
 {
     expression_parser_result const callee = parse_callable(parser, indentation);
     if (!callee.is_success)
@@ -751,52 +727,66 @@ static expression_parser_result parse_returnable(expression_parser *const parser
                 continue;
             }
         }
-        if (may_be_statement)
+        if (may_be_binary)
         {
-            if (maybe_operator.token == token_assign)
+            size_t peeking = 0;
+            if ((maybe_operator.token == token_space) && (maybe_operator.content.length == 1))
             {
-                pop(parser);
-                parser->on_error(parse_error_create(parse_error_expected_space, maybe_operator.where), parser->user);
-                return parse_assignment(parser, indentation, result.success);
+                peeking += 1;
             }
-            rich_token const next_operator = peek_at(parser, 1);
-            if (next_operator.token == token_assign)
-            {
-                pop_n(parser, 2);
-                return parse_assignment(parser, indentation, result.success);
-            }
-        }
-        if (may_be_binary && (maybe_operator.token == token_space) && (maybe_operator.content.length == 1))
-        {
-            rich_token const next_operator = peek_at(parser, 1);
+            rich_token const next_operator = peek_at(parser, peeking);
             if (next_operator.token == token_not_equals)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, not_equals);
             }
             if (next_operator.token == token_greater_than)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, greater_than);
             }
             if (next_operator.token == token_greater_than_or_equals)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, greater_than_or_equals);
             }
             if (next_operator.token == token_less_than)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, less_than);
             }
             if (next_operator.token == token_less_than_or_equals)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, less_than_or_equals);
             }
             if (next_operator.token == token_equals)
             {
-                pop_n(parser, 2);
+                if (peeking == 0)
+                {
+                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                }
+                pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, equals);
             }
         }
@@ -835,7 +825,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             pop(parser);
             if ((space.token == token_space) && (space.content.length == 1))
             {
-                expression_parser_result result = parse_returnable(parser, indentation, false, true);
+                expression_parser_result result = parse_returnable(parser, indentation, true);
                 if (result.is_success)
                 {
                     result.success = expression_from_return(expression_allocate(result.success));
@@ -888,7 +878,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 {
                     parser->on_error(parse_error_create(parse_error_expected_space, third_space.where), parser->user);
                 }
-                declared_variable_type = parse_returnable(parser, indentation, false, false);
+                declared_variable_type = parse_returnable(parser, indentation, false);
                 if (!declared_variable_type.is_success)
                 {
                     return expression_parser_result_failure;
@@ -925,7 +915,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             {
                 parser->on_error(parse_error_create(parse_error_expected_space, another_space.where), parser->user);
             }
-            expression_parser_result const initial_value = parse_returnable(parser, indentation, false, true);
+            expression_parser_result const initial_value = parse_returnable(parser, indentation, true);
             if (!initial_value.is_success)
             {
                 if (declared_variable_type.is_success)
@@ -943,7 +933,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
             return result;
         }
     }
-    return parse_returnable(parser, indentation, may_be_statement, true);
+    return parse_returnable(parser, indentation, true);
 }
 
 sequence parse_program(expression_parser *parser)

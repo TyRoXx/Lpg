@@ -53,7 +53,7 @@ typedef struct expression_parser
     rich_token_producer find_next_token;
     parse_error_handler on_error;
     callback_user user;
-    rich_token cached_tokens[2];
+    rich_token cached_tokens[3];
     size_t cached_token_count;
 } expression_parser;
 

@@ -70,46 +70,49 @@ static void test_assignment(void)
 {
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
-        expression expected = expression_from_assign(
-            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-                          expression_allocate(expression_from_integer_literal(
-                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3))))));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 4))};
+        expression expected = expression_from_binary_operator(binary_operator_expression_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)))),
+            equals));
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a =1"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a ==1"));
     }
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
-            parse_error_create(parse_error_expected_space, source_location_create(0, 2))};
-        expression expected = expression_from_assign(
-            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-                          expression_allocate(expression_from_integer_literal(
-                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2))))));
+            parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
+        expression expected = expression_from_binary_operator(binary_operator_expression_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))),
+            equals));
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a=1"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a==1"));
     }
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_space, source_location_create(0, 1))};
-        expression expected = expression_from_assign(
-            assign_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                              unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-                          expression_allocate(expression_from_integer_literal(
-                              integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3))))));
+        expression expected = expression_from_binary_operator(binary_operator_expression_create(
+            expression_allocate(expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)))),
+            equals));
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a= 1"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a== 1"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_invalid_token, source_location_create(0, 4)),
-            parse_error_create(parse_error_expected_expression, source_location_create(0, 5))};
+            parse_error_create(parse_error_invalid_token, source_location_create(0, 5)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 6))};
         expression expected = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a = ?"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a == ?"));
     }
 }
 
@@ -419,9 +422,10 @@ static void test_function(void)
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_expression, source_location_create(0, 12))};
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 8)),
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 10))};
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = 3 !="));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = !="));
     }
 }
 

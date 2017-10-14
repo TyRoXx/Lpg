@@ -96,12 +96,6 @@ match match_create(source_location begin, expression *input, match_case *cases, 
     return result;
 }
 
-assign assign_create(expression *left, expression *right)
-{
-    assign const result = {left, right};
-    return result;
-}
-
 not not_expression_create(expression * value)
 {
     not const result = {value};
@@ -181,14 +175,6 @@ void tuple_free(tuple const *value)
     {
         deallocate(value->elements);
     }
-}
-
-expression expression_from_assign(assign value)
-{
-    expression result;
-    result.type = expression_type_assign;
-    result.assign = value;
-    return result;
 }
 
 expression expression_from_not(not value)
@@ -272,7 +258,6 @@ source_location expression_source_begin(expression const value)
     case expression_type_identifier:
         return value.identifier.source;
 
-    case expression_type_assign:
     case expression_type_return:
     case expression_type_loop:
         LPG_TO_DO();
@@ -474,11 +459,6 @@ void expression_free(expression const *this)
         identifier_expression_free(&this->identifier);
         break;
 
-    case expression_type_assign:
-        expression_deallocate(this->assign.left);
-        expression_deallocate(this->assign.right);
-        break;
-
     case expression_type_return:
         expression_deallocate(this->return_);
         break;
@@ -538,11 +518,6 @@ bool declare_equals(declare const left, declare const right)
         return expression_equals(left.optional_type, right.optional_type);
     }
     return !left.optional_type && !right.optional_type;
-}
-
-bool assign_equals(assign const left, assign const right)
-{
-    return expression_equals(left.left, right.left) && expression_equals(left.right, right.right);
 }
 
 bool match_equals(match const left, match const right)
@@ -623,9 +598,6 @@ bool expression_equals(expression const *left, expression const *right)
         return unicode_view_equals(unicode_view_from_string(left->identifier.value),
                                    unicode_view_from_string(right->identifier.value)) &&
                source_location_equals(left->identifier.source, right->identifier.source);
-
-    case expression_type_assign:
-        return assign_equals(left->assign, right->assign);
 
     case expression_type_return:
         return expression_equals(left->return_, right->return_);
