@@ -135,7 +135,7 @@ static expression_parser_result const expression_parser_result_failure = {
 static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation);
 
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
-                                                 bool const may_be_statement, bool const may_be_binary);
+                                                 bool const may_be_binary);
 
 static expression_parser_result parse_loop(expression_parser *parser, size_t indentation)
 {
@@ -321,7 +321,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                 {
                     pop(parser);
                 }
-                expression_parser_result const type = parse_returnable(parser, indentation, false, false);
+                expression_parser_result const type = parse_returnable(parser, indentation, false);
                 result_type = expression_allocate(type.success);
                 if (!type.is_success)
                 {
