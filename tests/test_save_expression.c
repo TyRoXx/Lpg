@@ -81,9 +81,10 @@ void test_save_expression(void)
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("uint32"), source_location_create(0, 0)))));
         check_expression_rendering(
-            expression_from_lambda(lambda_create(
-                parameters, 1, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 1234), source_location_create(0, 0)))))),
+            expression_from_lambda(
+                lambda_create(parameters, 1, NULL,
+                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                  integer_create(0, 1234), source_location_create(0, 0)))))),
             "(a: uint32) 1234");
     }
 
@@ -217,7 +218,7 @@ void test_save_expression(void)
 
         check_expression_rendering(
             expression_from_lambda(lambda_create(
-                parameters, 1, expression_allocate(expression_from_loop(sequence_create(outer_loop, 2))))),
+                parameters, 1, NULL, expression_allocate(expression_from_loop(sequence_create(outer_loop, 2))))),
             "(a: uint32) loop\n"
             "    a == 123\n"
             "    loop\n"
@@ -236,9 +237,10 @@ void test_save_expression(void)
                                  unicode_string_from_c_str("string"), source_location_create(0, 0)))));
 
         check_expression_rendering(
-            expression_from_lambda(lambda_create(
-                parameters, 2, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 123), source_location_create(0, 0)))))),
+            expression_from_lambda(
+                lambda_create(parameters, 2, NULL,
+                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                  integer_create(0, 123), source_location_create(0, 0)))))),
             "(a: float, b: string) 123");
     }
 

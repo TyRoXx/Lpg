@@ -92,15 +92,34 @@ static void test_lambdas()
 {
     test_successful_parse(
         expression_from_lambda(lambda_create(
-            NULL, 0, expression_allocate(expression_from_integer_literal(
-                         integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))))),
+            NULL, 0, NULL, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                               integer_create(0, 1), source_location_create(0, 3)))))),
         unicode_string_from_c_str("() 1"), false);
+
+    {
+        expression *result_expression = allocate(sizeof(*result_expression));
+        *result_expression = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)));
+
+        expression *const elements = allocate_array(1, sizeof(*elements));
+        elements[0] = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
+        test_successful_parse(
+            expression_from_lambda(lambda_create(
+                NULL, 0, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+            unicode_string_from_c_str("(): 1\n"
+                                      "    1"),
+            false);
+
+        expression_deallocate(result_expression);
+    }
 
     test_successful_parse(
         expression_from_lambda(lambda_create(
-            NULL, 0, expression_allocate(expression_from_lambda(lambda_create(
-                         NULL, 0, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                      integer_create(0, 1), source_location_create(0, 6))))))))),
+            NULL, 0, NULL,
+            expression_allocate(expression_from_lambda(lambda_create(
+                NULL, 0, NULL, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                   integer_create(0, 1), source_location_create(0, 6))))))))),
         unicode_string_from_c_str("() () 1"), false);
 
     {
@@ -108,8 +127,8 @@ static void test_lambdas()
         elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
         test_successful_parse(
-            expression_from_lambda(
-                lambda_create(NULL, 0, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+            expression_from_lambda(lambda_create(
+                NULL, 0, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
             unicode_string_from_c_str("()\n"
                                       "    1"),
             false);
@@ -126,7 +145,7 @@ static void test_lambdas()
                                  unicode_string_from_c_str("type"), source_location_create(0, 4)))));
         test_successful_parse(
             expression_from_lambda(lambda_create(
-                parameters, 1, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                parameters, 1, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
             unicode_string_from_c_str("(a: type)\n"
                                       "    1"),
             false);
@@ -147,7 +166,7 @@ static void test_lambdas()
                                  unicode_string_from_c_str("d"), source_location_create(0, 10)))));
         test_successful_parse(
             expression_from_lambda(lambda_create(
-                parameters, 2, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                parameters, 2, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
             unicode_string_from_c_str("(a: b, c: d)\n"
                                       "    1"),
             false);
