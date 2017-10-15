@@ -25,7 +25,10 @@ void lambda_free(lambda const *this)
     {
         deallocate(this->parameters);
     }
-    expression_deallocate(this->return_type);
+    if (this->return_type != NULL)
+    {
+        expression_deallocate(this->return_type);
+    }
     expression_deallocate(this->result);
 }
 

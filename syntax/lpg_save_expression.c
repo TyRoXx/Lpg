@@ -65,7 +65,8 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(save_expression(to, param->type, whitespace));
         }
         LPG_TRY(stream_writer_write_string(to, ")"));
-        if(value->lambda.return_type != NULL){
+        if (value->lambda.return_type != NULL)
+        {
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, value->lambda.return_type, whitespace));
         }

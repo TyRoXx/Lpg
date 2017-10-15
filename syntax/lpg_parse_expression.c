@@ -130,7 +130,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 }
 
 static expression_parser_result const expression_parser_result_failure = {
-    0, {expression_type_lambda, {{NULL, 0, NULL}}}};
+    0, {expression_type_lambda, {{NULL, 0, NULL, NULL}}}};
 
 static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation);
 
@@ -307,7 +307,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
         rich_token const head = peek(parser);
         if (head.token == token_right_parenthesis)
         {
-            expression* result_type = allocate(sizeof(*result_type));
+            expression *result_type = allocate(sizeof(*result_type));
             pop(parser);
             bool has_type = (peek(parser).token == token_colon);
             if (has_type)
@@ -328,33 +328,15 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                     return expression_parser_result_failure;
                 }
                 //                return type;
-            }else{
-                *result_type = NULL;
+            }
+            else
+            {
+                result_type = NULL;
             }
             rich_token next_token = peek(parser);
-            if (next_token.token == token_space)
+            if (next_token.token == token_space && !has_type)
             {
                 pop(parser);
-                next_token = peek(parser);
-                if (next_token.token == token_fat_arrow && has_type)
-                {
-                    pop(parser);
-                    if (peek(parser).token == token_space)
-                    {
-                        pop(parser);
-                    }
-                    else
-                    {
-                        return expression_parser_result_failure;
-                    }
-                }
-                else if (has_type)
-                {
-                    parser->on_error(
-                        parse_error_create(parse_error_expected_return_type, next_token.where), parser->user);
-                    return expression_parser_result_failure;
-                }
-
                 expression_parser_result const body = parse_expression(parser, indentation, false);
                 if (!body.is_success)
                 {
@@ -362,7 +344,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                 }
                 expression_parser_result const result = {
                     1, expression_from_lambda(
-                                lambda_create(parameters, parameter_count, result_type, expression_allocate(body.success)))};
+                           lambda_create(parameters, parameter_count, result_type, expression_allocate(body.success)))};
                 return result;
             }
             else if (next_token.token == token_newline)
