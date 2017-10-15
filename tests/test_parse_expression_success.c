@@ -101,14 +101,16 @@ static void test_lambdas()
         *result_expression = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)));
 
-        expression *lambda_content = allocate(sizeof(*result_expression));
-        *lambda_content = expression_from_integer_literal(
+        expression *const elements = allocate_array(1, sizeof(*elements));
+        elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
+        test_successful_parse(
+            expression_from_lambda(lambda_create(
+                NULL, 0, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+            unicode_string_from_c_str("(): 1\n"
+                                      "    1"),
+            false);
 
-        test_successful_parse(expression_from_lambda(lambda_create(NULL, 0, result_expression, lambda_content)),
-                              unicode_string_from_c_str("(): 1\n"
-                                                        "    1"),
-                              false);
         expression_deallocate(result_expression);
     }
 

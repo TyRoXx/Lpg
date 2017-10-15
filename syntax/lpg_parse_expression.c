@@ -307,7 +307,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
         rich_token const head = peek(parser);
         if (head.token == token_right_parenthesis)
         {
-            expression *result_type = allocate(sizeof(*result_type));
+            expression *result_type = NULL;
             pop(parser);
             bool has_type = (peek(parser).token == token_colon);
             if (has_type)
@@ -322,16 +322,12 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                     pop(parser);
                 }
                 expression_parser_result const type = parse_returnable(parser, indentation, false, false);
-                *result_type = type.success;
+                result_type = expression_allocate(type.success);
                 if (!type.is_success)
                 {
+                    expression_deallocate(result_type);
                     return expression_parser_result_failure;
                 }
-                //                return type;
-            }
-            else
-            {
-                result_type = NULL;
             }
             rich_token next_token = peek(parser);
             if (next_token.token == token_space && !has_type)
@@ -345,6 +341,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                 expression_parser_result const result = {
                     1, expression_from_lambda(
                            lambda_create(parameters, parameter_count, result_type, expression_allocate(body.success)))};
+
                 return result;
             }
             else if (next_token.token == token_newline)
@@ -358,7 +355,13 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
             }
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->user);
+
             clean_up_parameters(parameters, parameter_count);
+            if (result_type != NULL)
+            {
+                expression_deallocate(result_type);
+            }
+
             return expression_parser_result_failure;
         }
         if (parameter_count >= 1)
