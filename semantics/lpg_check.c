@@ -865,6 +865,36 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         true, destination, result_type, optional_value_create(function_pointer), false);
 }
 
+typedef struct argument_evaluation_result
+{
+    success_indicator ok;
+    optional_value compile_time_value;
+    register_id where;
+} argument_evaluation_result;
+
+static argument_evaluation_result evaluate_argument(function_checking_state *const state,
+                                                    instruction_sequence *const function,
+                                                    expression const argument_tree, type const callee_type,
+                                                    size_t const parameter_id, type_inference const inferring)
+{
+    evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree);
+    if (!argument.has_value)
+    {
+        argument_evaluation_result const result = {failure, optional_value_empty, 0};
+        return result;
+    }
+    if (!function_parameter_accepts_type(
+            callee_type, parameter_id, argument.type_, inferring, state->program->functions))
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_type_mismatch, expression_source_begin(argument_tree)), state->user);
+        argument_evaluation_result const result = {failure, optional_value_empty, 0};
+        return result;
+    }
+    argument_evaluation_result const result = {success, argument.compile_time_value, argument.where};
+    return result;
+}
+
 static evaluate_expression_result evaluate_call_expression(function_checking_state *state,
                                                            instruction_sequence *function, call call)
 {
@@ -920,8 +950,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 state->user);
             break;
         }
-        evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree);
-        if (!argument.has_value)
+        argument_evaluation_result const result =
+            evaluate_argument(state, function, argument_tree, callee.type_, i, inferring);
+        if (result.ok != success)
         {
             restore(previous_code);
             deallocate(compile_time_arguments);
@@ -929,25 +960,15 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             type_inference_free(inferring);
             return evaluate_expression_result_empty;
         }
-        if (!function_parameter_accepts_type(callee.type_, i, argument.type_, inferring, state->program->functions))
+        if (result.compile_time_value.is_set)
         {
-            restore(previous_code);
-            state->on_error(semantic_error_create(semantic_error_type_mismatch, expression_source_begin(argument_tree)),
-                            state->user);
-            deallocate(compile_time_arguments);
-            deallocate(arguments);
-            type_inference_free(inferring);
-            return evaluate_expression_result_empty;
-        }
-        if (argument.compile_time_value.is_set)
-        {
-            compile_time_arguments[i] = argument.compile_time_value.value_;
+            compile_time_arguments[i] = result.compile_time_value.value_;
         }
         else
         {
             all_compile_time_arguments = false;
         }
-        arguments[i] = argument.where;
+        arguments[i] = result.where;
     }
     if (call.arguments.length < expected_arguments)
     {
