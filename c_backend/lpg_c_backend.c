@@ -1513,46 +1513,45 @@ success_indicator generate_c(checked_program const program, enumeration const *c
 
     if (standard_library.using_unit)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_unit.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_unit.h>\n"), fail);
     }
     if (standard_library.using_assert)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_assert.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_assert.h>\n"), fail);
     }
     if (standard_library.using_string_ref)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_string.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_string.h>\n"), fail);
     }
     if (standard_library.using_stdio)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdio.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdio.h>\n"), fail);
     }
     if (standard_library.using_read)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_read.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_read.h>\n"), fail);
     }
     if (standard_library.using_stdint)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdint.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdint.h>\n"), fail);
     }
     if (standard_library.using_integer)
     {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_integer.h>\n"), fail_2);
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_integer.h>\n"), fail);
     }
 
     for (size_t i = 0; i < definitions.count; ++i)
     {
         LPG_TRY_GOTO(
             stream_writer_write_unicode_view(c_output, unicode_view_from_string(definitions.elements[i].definition)),
-            fail_2);
+            fail);
     }
 
-    LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined.data, program_defined.used), fail_2);
+    LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined.data, program_defined.used), fail);
     type_definitions_free(definitions);
     memory_writer_free(&program_defined);
     return success;
 
-fail_2:
 fail:
     type_definitions_free(definitions);
     memory_writer_free(&program_defined);
