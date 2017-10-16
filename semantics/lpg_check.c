@@ -244,19 +244,17 @@ static bool check_parameter_type(type const from, type const into, type_inferenc
     return is_implicitly_convertible(from, into);
 }
 
-static bool function_parameter_accepts_type(type const function, size_t const parameter, type const argument,
-                                            type_inference const inferring, checked_function const *const all_functions)
+static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions)
 {
-    switch (function.kind)
+    switch (callee.kind)
     {
     case type_kind_lambda:
-        ASSUME(parameter < all_functions[function.lambda.lambda].signature->parameters.length);
-        return check_parameter_type(
-            argument, all_functions[function.lambda.lambda].signature->parameters.elements[parameter], inferring);
+        ASSUME(parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
+        return all_functions[callee.lambda.lambda].signature->parameters.elements[parameter];
 
     case type_kind_function_pointer:
-        ASSUME(parameter < function.function_pointer_->parameters.length);
-        return check_parameter_type(argument, function.function_pointer_->parameters.elements[parameter], inferring);
+        ASSUME(parameter < callee.function_pointer_->parameters.length);
+        return callee.function_pointer_->parameters.elements[parameter];
 
     case type_kind_structure:
     case type_kind_unit:
@@ -271,9 +269,7 @@ static bool function_parameter_accepts_type(type const function, size_t const pa
 
     case type_kind_enum_constructor:
         ASSUME(parameter == 0);
-        return check_parameter_type(
-            argument, function.enum_constructor->enumeration->elements[function.enum_constructor->which].state,
-            inferring);
+        return callee.enum_constructor->enumeration->elements[callee.enum_constructor->which].state;
     }
     LPG_UNREACHABLE();
 }
@@ -883,8 +879,8 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
         argument_evaluation_result const result = {failure, optional_value_empty, 0};
         return result;
     }
-    if (!function_parameter_accepts_type(
-            callee_type, parameter_id, argument.type_, inferring, state->program->functions))
+    if (!check_parameter_type(
+            argument.type_, get_parameter_type(callee_type, parameter_id, state->program->functions), inferring))
     {
         state->on_error(
             semantic_error_create(semantic_error_type_mismatch, expression_source_begin(argument_tree)), state->user);
