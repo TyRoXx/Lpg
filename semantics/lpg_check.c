@@ -863,11 +863,14 @@ static implementation const *find_implementation(interface const in, type const 
     return NULL;
 }
 
-static conversion_result convert_to_interface(register_id const original, type const from, interface const to)
+static conversion_result convert_to_interface(function_checking_state *const state, register_id const original,
+                                              type const from, source_location const original_source,
+                                              interface const to)
 {
     implementation const *const impl = find_implementation(to, from);
     if (!impl)
     {
+        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
         conversion_result const result = {failure, original, optional_value_empty};
         return result;
     }
@@ -910,7 +913,7 @@ static conversion_result convert(function_checking_state *const state, register_
     }
 
     case type_kind_interface:
-        return convert_to_interface(original, from, *to.interface_);
+        return convert_to_interface(state, original, from, original_source, *to.interface_);
     }
     LPG_UNREACHABLE();
 }

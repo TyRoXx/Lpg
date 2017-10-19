@@ -820,6 +820,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     switch (input.type)
     {
     case type_kind_interface:
+    case instruction_erase_type:
         LPG_TO_DO();
 
     case instruction_call:

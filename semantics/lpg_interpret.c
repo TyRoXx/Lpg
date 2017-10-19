@@ -41,6 +41,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         switch (element.type)
         {
         case instruction_get_method:
+        case instruction_erase_type:
             LPG_TO_DO();
 
         case instruction_call:

@@ -56,6 +56,7 @@ void print_instruction(instruction const printed)
     switch (printed.type)
     {
     case instruction_get_method:
+    case instruction_erase_type:
         LPG_TO_DO();
 
     case instruction_call:

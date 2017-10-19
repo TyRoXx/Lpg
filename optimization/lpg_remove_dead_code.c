@@ -69,6 +69,10 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
                 registers_read_from[current_instruction.lambda_with_captures.captures[j]] = true;
             }
             break;
+
+        case instruction_erase_type:
+            registers_read_from[current_instruction.erase_type.self] = true;
+            break;
         }
     }
 }
@@ -150,6 +154,10 @@ static bool change_register_ids(instruction *const where, register_id const *con
             ASSERT(update_register_id(where->lambda_with_captures.captures + j, new_register_ids));
         }
         return update_register_id(&where->lambda_with_captures.into, new_register_ids);
+
+    case instruction_erase_type:
+        ASSERT(update_register_id(&where->erase_type.self, new_register_ids));
+        return update_register_id(&where->erase_type.into, new_register_ids);
     }
     LPG_UNREACHABLE();
 }

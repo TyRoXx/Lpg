@@ -435,6 +435,9 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_lambda_with_captures:
         return generate_lambda_with_captures(state, generated.lambda_with_captures, javascript_output);
+
+    case instruction_erase_type:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

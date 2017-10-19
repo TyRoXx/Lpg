@@ -144,6 +144,17 @@ bool get_method_instruction_equals(get_method_instruction const left, get_method
            (left.into == right.into);
 }
 
+erase_type_instruction erase_type_instruction_create(register_id self, register_id into)
+{
+    erase_type_instruction const result = {self, into};
+    return result;
+}
+
+bool erase_type_instruction_equals(erase_type_instruction const left, erase_type_instruction const right)
+{
+    return (left.self == right.self) && (left.into == right.into);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -189,6 +200,14 @@ instruction instruction_create_get_method(get_method_instruction const argument)
     instruction result;
     result.type = instruction_get_method;
     result.get_method = argument;
+    return result;
+}
+
+instruction instruction_create_erase_type(erase_type_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_erase_type;
+    result.erase_type = argument;
     return result;
 }
 
@@ -294,6 +313,9 @@ void instruction_free(instruction const *value)
     case instruction_lambda_with_captures:
         lambda_with_captures_instruction_free(value->lambda_with_captures);
         break;
+
+    case instruction_erase_type:
+        break;
     }
 }
 
@@ -367,6 +389,9 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_lambda_with_captures:
         return lambda_with_captures_instruction_equals(left.lambda_with_captures, right.lambda_with_captures);
+
+    case instruction_erase_type:
+        return erase_type_instruction_equals(left.erase_type, right.erase_type);
     }
     LPG_UNREACHABLE();
 }

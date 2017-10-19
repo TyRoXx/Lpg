@@ -28,6 +28,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         case instruction_global:
         case instruction_read_struct:
         case instruction_break:
+        case instruction_erase_type:
             break;
 
         case instruction_literal:
@@ -167,6 +168,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
     switch (original.type)
     {
     case instruction_get_method:
+    case instruction_erase_type:
         LPG_TO_DO();
 
     case instruction_call:

@@ -21,7 +21,8 @@ typedef enum instruction_type
     instruction_match,
     instruction_get_captures,
     instruction_lambda_with_captures,
-    instruction_get_method
+    instruction_get_method,
+    instruction_erase_type
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -122,6 +123,15 @@ get_method_instruction get_method_instruction_create(interface const *interface_
                                                      register_id into);
 bool get_method_instruction_equals(get_method_instruction const left, get_method_instruction const right);
 
+typedef struct erase_type_instruction
+{
+    register_id self;
+    register_id into;
+} erase_type_instruction;
+
+erase_type_instruction erase_type_instruction_create(register_id self, register_id into);
+bool erase_type_instruction_equals(erase_type_instruction const left, erase_type_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -138,6 +148,7 @@ struct instruction
         register_id captures;
         lambda_with_captures_instruction lambda_with_captures;
         get_method_instruction get_method;
+        erase_type_instruction erase_type;
     };
 };
 
@@ -163,6 +174,7 @@ instruction instruction_create_match(match_instruction argument);
 instruction instruction_create_get_captures(register_id const into);
 instruction instruction_create_lambda_with_captures(lambda_with_captures_instruction const argument);
 instruction instruction_create_get_method(get_method_instruction const argument);
+instruction instruction_create_erase_type(erase_type_instruction const argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);
