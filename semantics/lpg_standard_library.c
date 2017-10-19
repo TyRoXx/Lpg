@@ -131,6 +131,16 @@ value integer_to_string_impl(value const *const inferred, value const *const arg
     return value_from_string_ref(unicode_view_create(buffer_begin, index_length));
 }
 
+static value print_string_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+                               void *environment)
+{
+    (void)inferred;
+    (void)gc;
+    (void)environment;
+    value const self = arguments[0];
+    return self;
+}
+
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
@@ -223,7 +233,12 @@ standard_library_description describe_standard_library(void)
         method_description *const methods = allocate_array(1, sizeof(*methods));
         methods[0] = method_description_create(
             unicode_string_from_c_str("print"), tuple_type_create(NULL, 0), type_from_string_ref());
-        stable->printable = interface_create(methods, 1, NULL, 0);
+        implementation_entry *const implementations = allocate_array(1, sizeof(*implementations));
+        function_pointer_value *const impl_methods = allocate_array(1, sizeof(*impl_methods));
+        impl_methods[0] = function_pointer_value_from_external(print_string_impl, NULL);
+        implementations[0] =
+            implementation_entry_create(type_from_string_ref(), implementation_create(impl_methods, 1));
+        stable->printable = interface_create(methods, 1, implementations, 1);
     }
 
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));

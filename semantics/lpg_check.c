@@ -863,7 +863,8 @@ static implementation const *find_implementation(interface const in, type const 
     return NULL;
 }
 
-static conversion_result convert_to_interface(function_checking_state *const state, register_id const original,
+static conversion_result convert_to_interface(function_checking_state *const state,
+                                              instruction_sequence *const function, register_id const original,
                                               type const from, source_location const original_source,
                                               interface const to)
 {
@@ -874,10 +875,14 @@ static conversion_result convert_to_interface(function_checking_state *const sta
         conversion_result const result = {failure, original, optional_value_empty};
         return result;
     }
-    LPG_TO_DO();
+    register_id const converted = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(original, converted)));
+    conversion_result const result = {success, converted, optional_value_empty};
+    return result;
 }
 
-static conversion_result convert(function_checking_state *const state, register_id const original, type const from,
+static conversion_result convert(function_checking_state *const state, instruction_sequence *const function,
+                                 register_id const original, type const from,
                                  optional_value const original_compile_time_value,
                                  source_location const original_source, type const to)
 {
@@ -913,7 +918,7 @@ static conversion_result convert(function_checking_state *const state, register_
     }
 
     case type_kind_interface:
-        return convert_to_interface(state, original, from, original_source, *to.interface_);
+        return convert_to_interface(state, function, original, from, original_source, *to.interface_);
     }
     LPG_UNREACHABLE();
 }
@@ -936,9 +941,10 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
         argument_evaluation_result const result = {failure, optional_value_empty, 0};
         return result;
     }
-    conversion_result const converted = convert(
-        state, argument.where, argument.type_, argument.compile_time_value, expression_source_begin(argument_tree),
-        get_parameter_type(callee_type, parameter_id, state->program->functions));
+    conversion_result const converted =
+        convert(state, function, argument.where, argument.type_, argument.compile_time_value,
+                expression_source_begin(argument_tree),
+                get_parameter_type(callee_type, parameter_id, state->program->functions));
     argument_evaluation_result const result = {converted.ok, converted.compile_time_value, converted.where};
     return result;
 }

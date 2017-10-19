@@ -126,14 +126,21 @@ struct enum_constructor_type
 
 typedef struct implementation
 {
-    function_id *methods;
+    struct function_pointer_value *methods;
+    size_t method_count;
 } implementation;
+
+implementation implementation_create(struct function_pointer_value *methods, size_t method_count);
+void implementation_free(implementation const value);
 
 struct implementation_entry
 {
     type self;
     implementation target;
 };
+
+implementation_entry implementation_entry_create(type self, implementation target);
+void implementation_entry_free(implementation_entry const value);
 
 struct enumeration_element
 {

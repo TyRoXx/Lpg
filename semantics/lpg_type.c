@@ -77,6 +77,14 @@ void interface_free(interface const value)
     {
         deallocate(value.methods);
     }
+    for (size_t i = 0; i < value.implementation_count; ++i)
+    {
+        implementation_entry_free(value.implementations[i]);
+    }
+    if (value.implementations)
+    {
+        deallocate(value.implementations);
+    }
 }
 
 integer_range integer_range_create(integer minimum, integer maximum)
@@ -109,6 +117,31 @@ void method_description_free(method_description const value)
     {
         deallocate(value.parameters.elements);
     }
+}
+
+implementation implementation_create(struct function_pointer_value *methods, size_t method_count)
+{
+    implementation const result = {methods, method_count};
+    return result;
+}
+
+void implementation_free(implementation const value)
+{
+    if (value.methods)
+    {
+        deallocate(value.methods);
+    }
+}
+
+implementation_entry implementation_entry_create(type self, implementation target)
+{
+    implementation_entry const result = {self, target};
+    return result;
+}
+
+void implementation_entry_free(implementation_entry const value)
+{
+    implementation_free(value.target);
 }
 
 enumeration_element enumeration_element_create(unicode_string name, type state)
