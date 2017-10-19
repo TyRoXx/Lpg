@@ -223,7 +223,7 @@ standard_library_description describe_standard_library(void)
         method_description *const methods = allocate_array(1, sizeof(*methods));
         methods[0] = method_description_create(
             unicode_string_from_c_str("print"), tuple_type_create(NULL, 0), type_from_string_ref());
-        stable->printable = interface_create(methods, 1);
+        stable->printable = interface_create(methods, 1, NULL, 0);
     }
 
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));

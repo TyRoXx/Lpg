@@ -41,14 +41,18 @@ tuple_type tuple_type_create(type *elements, size_t length);
 bool tuple_type_equals(tuple_type const left, tuple_type const right);
 
 typedef struct method_description method_description;
+typedef struct implementation_entry implementation_entry;
 
 typedef struct interface
 {
     method_description *methods;
     function_id method_count;
+    implementation_entry *implementations;
+    size_t implementation_count;
 } interface;
 
-interface interface_create(method_description *methods, function_id method_count);
+interface interface_create(method_description *methods, function_id method_count, implementation_entry *implementations,
+                           size_t implementation_count);
 void interface_free(interface const value);
 
 typedef struct integer_range
@@ -118,6 +122,17 @@ struct enum_constructor_type
 {
     enumeration const *enumeration;
     enum_element_id which;
+};
+
+typedef struct implementation
+{
+    function_id *methods;
+} implementation;
+
+struct implementation_entry
+{
+    type self;
+    implementation target;
 };
 
 struct enumeration_element

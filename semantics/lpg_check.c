@@ -851,6 +851,29 @@ typedef struct conversion_result
     optional_value compile_time_value;
 } conversion_result;
 
+static implementation const *find_implementation(interface const in, type const self)
+{
+    for (size_t i = 0; i < in.implementation_count; ++i)
+    {
+        if (type_equals(in.implementations[i].self, self))
+        {
+            return &in.implementations[i].target;
+        }
+    }
+    return NULL;
+}
+
+static conversion_result convert_to_interface(register_id const original, type const from, interface const to)
+{
+    implementation const *const impl = find_implementation(to, from);
+    if (!impl)
+    {
+        conversion_result const result = {failure, original, optional_value_empty};
+        return result;
+    }
+    LPG_TO_DO();
+}
+
 static conversion_result convert(function_checking_state *const state, register_id const original, type const from,
                                  optional_value const original_compile_time_value,
                                  source_location const original_source, type const to)
@@ -887,7 +910,7 @@ static conversion_result convert(function_checking_state *const state, register_
     }
 
     case type_kind_interface:
-        LPG_TO_DO();
+        return convert_to_interface(original, from, *to.interface_);
     }
     LPG_UNREACHABLE();
 }
