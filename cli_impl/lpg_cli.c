@@ -114,6 +114,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Unknown binary operator";
     case parse_error_expected_parameter_list:
         return "Expected parameter list";
+    case parse_error_expected_for:
+        return "Expected context-sensitive keyword 'for'";
     }
     LPG_UNREACHABLE();
 }

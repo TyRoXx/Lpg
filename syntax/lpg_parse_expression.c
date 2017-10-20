@@ -948,6 +948,59 @@ static expression_parser_result parse_returnable(expression_parser *const parser
     }
 }
 
+static expression_parser_result parse_impl(expression_parser *const parser, size_t const indentation)
+{
+    {
+        rich_token const space = peek(parser);
+        pop(parser);
+        if (space.token != token_space)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+        }
+    }
+
+    expression_parser_result const implemented_interface = parse_expression(parser, indentation, false);
+    if (!implemented_interface.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+
+    {
+        rich_token const space = peek(parser);
+        pop(parser);
+        if (space.token != token_space)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+        }
+    }
+
+    {
+        rich_token const for_ = peek(parser);
+        pop(parser);
+        if ((for_.token != token_identifier) || !unicode_view_equals_c_str(for_.content, "for"))
+        {
+            parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->user);
+        }
+    }
+
+    {
+        rich_token const space = peek(parser);
+        pop(parser);
+        if (space.token != token_space)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+        }
+    }
+
+    expression_parser_result const self = parse_expression(parser, indentation, false);
+    if (!self.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+
+    LPG_TO_DO();
+}
+
 expression_parser_result parse_expression(expression_parser *const parser, size_t const indentation,
                                           bool const may_be_statement)
 {
@@ -1070,7 +1123,8 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
         }
         if (head.token == token_impl)
         {
-            LPG_TO_DO();
+            pop(parser);
+            return parse_impl(parser, indentation);
         }
     }
     return parse_returnable(parser, indentation, true);
