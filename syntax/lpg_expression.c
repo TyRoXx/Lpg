@@ -185,6 +185,64 @@ bool interface_expression_equals(interface_expression const left, interface_expr
     return true;
 }
 
+impl_expression_method impl_expression_method_create(identifier_expression name, function_header_tree header,
+                                                     sequence body)
+{
+    impl_expression_method const result = {name, header, body};
+    return result;
+}
+
+void impl_expression_method_free(impl_expression_method value)
+{
+    identifier_expression_free(&value.name);
+    function_header_tree_free(value.header);
+    sequence_free(&value.body);
+}
+
+bool impl_expression_method_equals(impl_expression_method const left, impl_expression_method const right)
+{
+    return identifier_expression_equals(left.name, right.name) &&
+           function_header_tree_equals(left.header, right.header) && sequence_equals(left.body, right.body);
+}
+
+impl_expression impl_expression_create(expression *interface, expression *self, impl_expression_method *methods,
+                                       size_t method_count)
+{
+    impl_expression const result = {interface, self, methods, method_count};
+    return result;
+}
+
+void impl_expression_free(impl_expression value)
+{
+    expression_deallocate(value.interface);
+    expression_deallocate(value.self);
+    for (size_t i = 0; i < value.method_count; ++i)
+    {
+        impl_expression_method_free(value.methods[i]);
+    }
+    if (value.methods)
+    {
+        deallocate(value.methods);
+    }
+}
+
+bool impl_expression_equals(impl_expression const left, impl_expression const right)
+{
+    if (!expression_equals(left.interface, right.interface) || !expression_equals(left.self, right.self) ||
+        (left.method_count != right.method_count))
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.method_count; ++i)
+    {
+        if (!impl_expression_method_equals(left.methods[i], right.methods[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 sequence sequence_create(expression *elements, size_t length)
 {
     sequence const result = {elements, length};
@@ -307,6 +365,14 @@ expression expression_from_match(match value)
     expression result;
     result.type = expression_type_match;
     result.match = value;
+    return result;
+}
+
+expression expression_from_impl(impl_expression value)
+{
+    expression result;
+    result.type = expression_type_impl;
+    result.impl = value;
     return result;
 }
 

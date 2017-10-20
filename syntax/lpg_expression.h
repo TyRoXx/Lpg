@@ -188,6 +188,31 @@ interface_expression interface_expression_create(source_location source, interfa
 void interface_expression_free(interface_expression value);
 bool interface_expression_equals(interface_expression const left, interface_expression const right);
 
+typedef struct impl_expression_method
+{
+    identifier_expression name;
+    function_header_tree header;
+    sequence body;
+} impl_expression_method;
+
+impl_expression_method impl_expression_method_create(identifier_expression name, function_header_tree header,
+                                                     sequence body);
+void impl_expression_method_free(impl_expression_method value);
+bool impl_expression_method_equals(impl_expression_method const left, impl_expression_method const right);
+
+typedef struct impl_expression
+{
+    expression *interface;
+    expression *self;
+    impl_expression_method *methods;
+    size_t method_count;
+} impl_expression;
+
+impl_expression impl_expression_create(expression *interface, expression *self, impl_expression_method *methods,
+                                       size_t method_count);
+void impl_expression_free(impl_expression value);
+bool impl_expression_equals(impl_expression const left, impl_expression const right);
+
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
@@ -203,6 +228,7 @@ expression expression_from_sequence(sequence value);
 expression expression_from_access_structure(access_structure value);
 expression expression_from_declare(declare value);
 expression expression_from_match(match value);
+expression expression_from_impl(impl_expression value);
 source_location expression_source_begin(expression const value);
 
 identifier_expression identifier_expression_create(unicode_string value, source_location source);
@@ -250,6 +276,7 @@ struct expression
         tuple tuple;
         comment_expression comment;
         interface_expression interface;
+        impl_expression impl;
 
         /*for monostate expressions like break:*/
         source_location source;

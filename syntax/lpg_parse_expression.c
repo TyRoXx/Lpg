@@ -998,7 +998,83 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         return expression_parser_result_failure;
     }
 
-    LPG_TO_DO();
+    impl_expression_method *methods = NULL;
+    size_t method_count = 0;
+    bool is_success = true;
+    for (;;)
+    {
+        size_t const method_indentation = (indentation + 1);
+
+        {
+            rich_token const newline = peek_at(parser, 0);
+            if (newline.token != token_newline)
+            {
+                break;
+            }
+        }
+        {
+            rich_token const indent = peek_at(parser, 1);
+            if (!is_same_indentation_level(indent, method_indentation))
+            {
+                break;
+            }
+        }
+        pop_n(parser, 2);
+        rich_token const name = peek(parser);
+        if (name.token != token_identifier)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            is_success = false;
+            break;
+        }
+        pop(parser);
+
+        {
+            rich_token const left_parenthesis = peek(parser);
+            if (left_parenthesis.token != token_left_parenthesis)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where), parser->user);
+                is_success = false;
+                break;
+            }
+            pop(parser);
+        }
+
+        function_header_parse_result const header_parsed = parse_function_header(parser, method_indentation);
+        if (!header_parsed.is_success)
+        {
+            is_success = false;
+            break;
+        }
+
+        {
+            rich_token const new_line = peek(parser);
+            if (new_line.token != token_newline)
+            {
+                parser->on_error(parse_error_create(parse_error_expected_newline, new_line.where), parser->user);
+                is_success = false;
+                break;
+            }
+            pop(parser);
+        }
+
+        sequence const body = parse_sequence(parser, method_indentation + 1);
+
+        methods = reallocate_array(methods, (method_count + 1), sizeof(*methods));
+        methods[method_count] = impl_expression_method_create(
+            identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header, body);
+        ++method_count;
+    }
+    impl_expression const impl = impl_expression_create(
+        expression_allocate(implemented_interface.success), expression_allocate(self.success), methods, method_count);
+    if (is_success)
+    {
+        expression_parser_result const result = {true, expression_from_impl(impl)};
+        return result;
+    }
+    impl_expression_free(impl);
+    return expression_parser_result_failure;
 }
 
 expression_parser_result parse_expression(expression_parser *const parser, size_t const indentation,
