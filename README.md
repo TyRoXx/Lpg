@@ -9,104 +9,30 @@
 
 # Lpg
 1. [Usage](#Usage)
-    1. [Syntax](#Syntax)
-        1. [Types](#Types)
-        1. [Variables and constants](#Variables-and-constants)
-        1. [Functions](#Functions)
-        1. [Match](#Match)
-        1. [Loops](#Loops)
-        1. [Tuple](#Tuple)
+    1. [Compiletime Optimization](#Optimization)
+        1. [Unused Variables](#Removing_unused_concepts)
     1. [Running LPG files](#Compilation)
 1. [Development](#Development)
     1. [Build and run on Ubuntu](#Build-and-run-on-Ubuntu)
     1. [Build and run on Windows](#Build-and-run-on-Windows)
 
 ## Usage
+For a general introduction, have a look at the file `documentation/Standard_Libary.md`
+
 Just write a `.lpg` file and run it. If you want to have syntax highlighting, there is a Visual Studio Code Plugin for this (see VS Code Package Manager) and a Notepad++ syntax file in this repository.
 
-### Syntax
+### Optimizations
+There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:
 
-#### Types
-
-| Type           | Explanation                                      | Example values                    |
-|----------------|--------------------------------------------------|-----------------------------------|
-| unit           | A nothing like type "void"                       | `unit_value`                      |
-| type           | A type of a variable / constant                  | `unit`, `boolean`, `int(0, 0)`    |
-| boolean        | A logical value (either true or false)           | `boolean.true` or `boolean.false` |
-| int(low, high) | A whole number within a certain range            | `int(0, 100)` or `int(33, 100)`   |
-| string-ref     | A reference to a string that is a string literal | `"Hello"` or `"\n"`               |
-| *no syntax yet (inferred from initializer)*    | Contains a fixed number of elements | `{"Hello"}` or `{}` or `{boolean.true, 123, {}}`               |
-
-#### Variables and constants
-* Variables
-
-**Currently there all variables are constants.**
-
-* Constants
-
-You can declare a constant with `let a = 10`. This will implicitly set the type of the constant to be an integer. If you want to have a specific type of constant use `let a : int(0, 0) = 0`. This creates a constant with a type of integer with the range between 0 and 0.
-
-#### Functions
-Functions can be implemented like this
+#### Removing unused concepts
+If you declare a constant, a variable or a that is never used and just assigned, LPG will notice this and remove the variable completely from the syntax tree. This also holds true for arguments passed to a function.
 ```lpg
-()
-    print("Hello World")
-    return 1
-```
-This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
-```lpg
-let print_twice = (message : string-ref)
-    print(message)
-    print(message)
+let f = ()
+    let a : int(1, 2) = 2
+    return "Hello"
 ```
 
-If the **functions just consists of a return statement**, you can also abbreviate it like that:
-```lpg
-let xor = (left : boolean, right : boolean) and(or(left, right), not(and(left, right))) 
-```
-
-There is no possibility of defining the return type of a function. This will be determined implicitly.
-
-**Calling a function** is as easy as writing the function name and then the parameters (if there are any).
-```lpg
-xor(boolean.true, boolean.false)
-``` 
-
-#### Match
-The match expression works similar to the switch statement in other languages.
-Currently it only supports stateless enumerations, for example `boolean`.
-
-```lpg
-let a = boolean.true
-let result = match a
-    case boolean.false:
-        print("nope")
-        1
-    case boolean.true:
-        print("it works")
-        2
-assert(integer-equals(2, result))
-```
-
-`match` does not support `break` or fall-through yet.
-The last expression in a `case` is returned as the result of the `match` expression.
-The result can be `unit` if you don't want to return anything.
-
-#### Loops
-You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
-```lpg
-loop
-    print("Hello World")
-```
-
-You can combine this with the `match`-statement in order to break out of a loop in a controlled manner.
-
-#### Tuple
-Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
-```lpg
-let tuple = {10, boolean.true, "Hello", () boolean}
-```
-The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string-ref "Hello"`.
+This will be compiled to nothing as the function `f` itself was never used.
 
 ### Compilation
 In order to compile and run an `.lpg` file you need to build the whole project and run the following command in the terminal:
