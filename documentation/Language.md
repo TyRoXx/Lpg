@@ -1,4 +1,4 @@
-# Standard Library
+# Language overview
 
 1. Types and syntax
     1. [Variables and constants](#Variables-and-constants)
@@ -8,7 +8,7 @@
 1. Structures
     1. [Match](#Match)
     1. [Loops](#Loops)
-1. Functions
+1. [Standard Library Functions](#Standard-library-functions)
 
 ## Types
 
@@ -108,8 +108,18 @@ You can create a loop with the simple loop key word. By default all loops will r
 loop
     print("Hello World")
 ```
+If you don't want to have an infinite loop then you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
+```lpg
+loop
+    let still-running = match f()
+        case boolean.false:
+            break
+        case boolean.true:
+            print("I'm still running")
+print("Done")
+``` 
 
-## Functions
+## Standard library functions
 The standard library also includes some functions to work with the types.
 | Name              | Inputs                 | Explanation                                          | Output     |
 |-------------------|------------------------|------------------------------------------------------|------------|
