@@ -9,30 +9,29 @@ void expression_deallocate(expression *this)
     deallocate(this);
 }
 
-lambda lambda_create(parameter *parameters, size_t parameter_count, expression *return_type, expression *result)
+function_header_tree function_header_tree_create(parameter *parameters, size_t parameter_count, expression *return_type)
 {
-    lambda const returning = {parameters, parameter_count, return_type, result};
-    return returning;
+    function_header_tree const result = {parameters, parameter_count, return_type};
+    return result;
 }
 
-void lambda_free(lambda const *this)
+void function_header_tree_free(function_header_tree value)
 {
-    LPG_FOR(size_t, i, this->parameter_count)
+    LPG_FOR(size_t, i, value.parameter_count)
     {
-        parameter_free(this->parameters + i);
+        parameter_free(value.parameters + i);
     }
-    if (this->parameters)
+    if (value.parameters)
     {
-        deallocate(this->parameters);
+        deallocate(value.parameters);
     }
-    if (this->return_type != NULL)
+    if (value.return_type != NULL)
     {
-        expression_deallocate(this->return_type);
+        expression_deallocate(value.return_type);
     }
-    expression_deallocate(this->result);
 }
 
-bool lambda_equals(lambda const left, lambda const right)
+bool function_header_tree_equals(function_header_tree const left, function_header_tree const right)
 {
     if (left.parameter_count != right.parameter_count)
     {
@@ -45,7 +44,24 @@ bool lambda_equals(lambda const left, lambda const right)
             return false;
         }
     }
-    return expression_equals(left.result, right.result);
+    return true;
+}
+
+lambda lambda_create(function_header_tree header, expression *result)
+{
+    lambda const returning = {header, result};
+    return returning;
+}
+
+void lambda_free(lambda const *this)
+{
+    function_header_tree_free(this->header);
+    expression_deallocate(this->result);
+}
+
+bool lambda_equals(lambda const left, lambda const right)
+{
+    return function_header_tree_equals(left.header, right.header) && expression_equals(left.result, right.result);
 }
 
 call call_create(expression *callee, tuple arguments, source_location closing_parenthesis)
@@ -110,6 +126,63 @@ void not_free(LPG_NON_NULL(not const *value))
 {
     expression_free(value->expr);
     deallocate(value->expr);
+}
+
+interface_expression_method interface_expression_method_create(identifier_expression name, function_header_tree header)
+{
+    interface_expression_method const result = {name, header};
+    return result;
+}
+
+void interface_expression_method_free(interface_expression_method value)
+{
+    identifier_expression_free(&value.name);
+    function_header_tree_free(value.header);
+}
+
+bool interface_expression_method_equals(interface_expression_method const left, interface_expression_method const right)
+{
+    return identifier_expression_equals(left.name, right.name) &&
+           function_header_tree_equals(left.header, right.header);
+}
+
+interface_expression interface_expression_create(source_location source, interface_expression_method *methods,
+                                                 size_t method_count)
+{
+    interface_expression const result = {source, methods, method_count};
+    return result;
+}
+
+void interface_expression_free(interface_expression value)
+{
+    for (size_t i = 0; i < value.method_count; ++i)
+    {
+        interface_expression_method_free(value.methods[i]);
+    }
+    if (value.methods)
+    {
+        deallocate(value.methods);
+    }
+}
+
+bool interface_expression_equals(interface_expression const left, interface_expression const right)
+{
+    if (left.method_count != right.method_count)
+    {
+        return false;
+    }
+    if (!source_location_equals(left.source, right.source))
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.method_count; ++i)
+    {
+        if (!interface_expression_method_equals(left.methods[i], right.methods[i]))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 sequence sequence_create(expression *elements, size_t length)
@@ -241,6 +314,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_interface:
+        return value.interface.source;
+
     case expression_type_lambda:
         LPG_TO_DO();
 
@@ -292,6 +368,9 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_comment:
         return value.comment.source;
+
+    case expression_type_impl:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -434,6 +513,14 @@ expression expression_from_break(source_location source)
     return result;
 }
 
+expression expression_from_interface(interface_expression value)
+{
+    expression result;
+    result.type = expression_type_interface;
+    result.interface = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -502,9 +589,17 @@ void expression_free(expression const *this)
     case expression_type_comment:
         comment_expression_free(&this->comment);
         break;
+
     case expression_type_binary:
         binary_operator_expression_free(&this->binary);
         break;
+
+    case expression_type_interface:
+        interface_expression_free(this->interface);
+        break;
+
+    case expression_type_impl:
+        LPG_TO_DO();
     }
 }
 
@@ -571,6 +666,12 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_interface:
+        return interface_expression_equals(left->interface, right->interface);
+
+    case expression_type_impl:
+        LPG_TO_DO();
+
     case expression_type_lambda:
         return lambda_equals(left->lambda, right->lambda);
 

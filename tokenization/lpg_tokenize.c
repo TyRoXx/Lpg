@@ -260,6 +260,14 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     {
         return make_success(token_let, content.length);
     }
+    if (unicode_view_equals_c_str(content, "interface"))
+    {
+        return make_success(token_interface, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "impl"))
+    {
+        return make_success(token_impl, content.length);
+    }
     return make_success(token_identifier, i);
 }
 

@@ -33,7 +33,9 @@ typedef enum token_type
     token_equals,
     token_greater_than,
     token_greater_than_or_equals,
-    token_not_equals
+    token_not_equals,
+    token_interface,
+    token_impl
 } token_type;
 
 typedef enum tokenize_status

@@ -78,6 +78,43 @@ void test_parse_expression_success(void)
                               integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 1)))))),
                           unicode_string_from_c_str("!1"), true);
 
+    test_successful_parse(expression_from_interface(interface_expression_create(source_location_create(0, 0), NULL, 0)),
+                          unicode_string_from_c_str("interface"), false);
+
+    {
+        interface_expression_method *const methods = allocate_array(1, sizeof(*methods));
+        methods[0] = interface_expression_method_create(
+            identifier_expression_create(unicode_string_from_c_str("method"), source_location_create(1, 4)),
+            function_header_tree_create(
+                NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
+                             unicode_string_from_c_str("return-type"), source_location_create(1, 14))))));
+        test_successful_parse(
+            expression_from_interface(interface_expression_create(source_location_create(0, 0), methods, 1)),
+            unicode_string_from_c_str("interface\n"
+                                      "    method(): return-type"),
+            false);
+    }
+
+    {
+        interface_expression_method *const methods = allocate_array(2, sizeof(*methods));
+        methods[0] = interface_expression_method_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 4)),
+            function_header_tree_create(
+                NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
+                             unicode_string_from_c_str("c"), source_location_create(1, 9))))));
+        methods[1] = interface_expression_method_create(
+            identifier_expression_create(unicode_string_from_c_str("b"), source_location_create(2, 4)),
+            function_header_tree_create(
+                NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
+                             unicode_string_from_c_str("d"), source_location_create(2, 9))))));
+        test_successful_parse(
+            expression_from_interface(interface_expression_create(source_location_create(0, 0), methods, 2)),
+            unicode_string_from_c_str("interface\n"
+                                      "    a(): c\n"
+                                      "    b(): d"),
+            false);
+    }
+
     test_function_calls();
     test_comment();
     test_loops();
@@ -90,11 +127,11 @@ void test_parse_expression_success(void)
 
 static void test_lambdas()
 {
-    test_successful_parse(
-        expression_from_lambda(lambda_create(
-            NULL, 0, NULL, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                               integer_create(0, 1), source_location_create(0, 3)))))),
-        unicode_string_from_c_str("() 1"), false);
+    test_successful_parse(expression_from_lambda(lambda_create(
+                              function_header_tree_create(NULL, 0, NULL),
+                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                  integer_create(0, 1), source_location_create(0, 3)))))),
+                          unicode_string_from_c_str("() 1"), false);
 
     {
         expression *result_expression = allocate(sizeof(*result_expression));
@@ -104,34 +141,34 @@ static void test_lambdas()
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
-        test_successful_parse(
-            expression_from_lambda(lambda_create(
-                NULL, 0, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
-            unicode_string_from_c_str("(): 1\n"
-                                      "    1"),
-            false);
+        test_successful_parse(expression_from_lambda(lambda_create(
+                                  function_header_tree_create(NULL, 0, NULL),
+                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                              unicode_string_from_c_str("(): 1\n"
+                                                        "    1"),
+                              false);
 
         expression_deallocate(result_expression);
     }
 
-    test_successful_parse(
-        expression_from_lambda(lambda_create(
-            NULL, 0, NULL,
-            expression_allocate(expression_from_lambda(lambda_create(
-                NULL, 0, NULL, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 1), source_location_create(0, 6))))))))),
-        unicode_string_from_c_str("() () 1"), false);
+    test_successful_parse(expression_from_lambda(lambda_create(
+                              function_header_tree_create(NULL, 0, NULL),
+                              expression_allocate(expression_from_lambda(lambda_create(
+                                  function_header_tree_create(NULL, 0, NULL),
+                                  expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                      integer_create(0, 1), source_location_create(0, 6))))))))),
+                          unicode_string_from_c_str("() () 1"), false);
 
     {
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
-        test_successful_parse(
-            expression_from_lambda(lambda_create(
-                NULL, 0, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
-            unicode_string_from_c_str("()\n"
-                                      "    1"),
-            false);
+        test_successful_parse(expression_from_lambda(lambda_create(
+                                  function_header_tree_create(NULL, 0, NULL),
+                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                              unicode_string_from_c_str("()\n"
+                                                        "    1"),
+                              false);
     }
 
     {
@@ -143,12 +180,12 @@ static void test_lambdas()
             parameter_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 1)),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("type"), source_location_create(0, 4)))));
-        test_successful_parse(
-            expression_from_lambda(lambda_create(
-                parameters, 1, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
-            unicode_string_from_c_str("(a: type)\n"
-                                      "    1"),
-            false);
+        test_successful_parse(expression_from_lambda(lambda_create(
+                                  function_header_tree_create(parameters, 1, NULL),
+                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                              unicode_string_from_c_str("(a: type)\n"
+                                                        "    1"),
+                              false);
     }
 
     {
@@ -164,12 +201,12 @@ static void test_lambdas()
             parameter_create(identifier_expression_create(unicode_string_from_c_str("c"), source_location_create(0, 7)),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("d"), source_location_create(0, 10)))));
-        test_successful_parse(
-            expression_from_lambda(lambda_create(
-                parameters, 2, NULL, expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
-            unicode_string_from_c_str("(a: b, c: d)\n"
-                                      "    1"),
-            false);
+        test_successful_parse(expression_from_lambda(lambda_create(
+                                  function_header_tree_create(parameters, 2, NULL),
+                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))))),
+                              unicode_string_from_c_str("(a: b, c: d)\n"
+                                                        "    1"),
+                              false);
     }
 }
 

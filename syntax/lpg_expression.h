@@ -9,15 +9,25 @@ typedef struct parameter parameter;
 
 void expression_deallocate(expression *this);
 
-typedef struct lambda
+typedef struct function_header_tree
 {
     parameter *parameters;
     size_t parameter_count;
     expression *return_type;
+} function_header_tree;
+
+function_header_tree function_header_tree_create(parameter *parameters, size_t parameter_count,
+                                                 expression *return_type);
+void function_header_tree_free(function_header_tree value);
+bool function_header_tree_equals(function_header_tree const left, function_header_tree const right);
+
+typedef struct lambda
+{
+    function_header_tree header;
     expression *result;
 } lambda;
 
-lambda lambda_create(parameter *parameters, size_t parameter_count, expression *return_type, expression *result);
+lambda lambda_create(function_header_tree header, expression *result);
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 
@@ -38,7 +48,9 @@ typedef enum expression_type
     expression_type_sequence,
     expression_type_declare,
     expression_type_tuple,
-    expression_type_comment
+    expression_type_comment,
+    expression_type_interface,
+    expression_type_impl
 } expression_type;
 
 typedef struct tuple
@@ -153,6 +165,29 @@ typedef struct declare
     expression *initializer;
 } declare;
 
+typedef struct interface_expression_method
+{
+    identifier_expression name;
+    function_header_tree header;
+} interface_expression_method;
+
+interface_expression_method interface_expression_method_create(identifier_expression name, function_header_tree header);
+void interface_expression_method_free(interface_expression_method value);
+bool interface_expression_method_equals(interface_expression_method const left,
+                                        interface_expression_method const right);
+
+typedef struct interface_expression
+{
+    source_location source;
+    interface_expression_method *methods;
+    size_t method_count;
+} interface_expression;
+
+interface_expression interface_expression_create(source_location source, interface_expression_method *methods,
+                                                 size_t method_count);
+void interface_expression_free(interface_expression value);
+bool interface_expression_equals(interface_expression const left, interface_expression const right);
+
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
@@ -214,6 +249,7 @@ struct expression
         declare declare;
         tuple tuple;
         comment_expression comment;
+        interface_expression interface;
 
         /*for monostate expressions like break:*/
         source_location source;
@@ -231,6 +267,7 @@ expression expression_from_call(call value);
 expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_tuple(tuple value);
 expression expression_from_break(source_location source);
+expression expression_from_interface(interface_expression value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

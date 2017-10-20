@@ -84,6 +84,11 @@ static void pop(expression_parser *parser)
     pop_n(parser, 1);
 }
 
+static bool is_same_indentation_level(rich_token const found, size_t const expected)
+{
+    return (found.token == token_indentation) && (found.content.length == (expected * spaces_for_indentation));
+}
+
 static sequence parse_sequence(expression_parser *parser, size_t indentation)
 {
     expression *elements = NULL;
@@ -95,8 +100,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         {
             break;
         }
-        if ((indentation == 0) || ((indentation_token.token == token_indentation) &&
-                                   (indentation_token.content.length == (indentation * spaces_for_indentation))))
+        if ((indentation == 0) || is_same_indentation_level(indentation_token, indentation))
         {
             if (indentation > 0)
             {
@@ -130,7 +134,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 }
 
 static expression_parser_result const expression_parser_result_failure = {
-    0, {expression_type_lambda, {{NULL, 0, NULL, NULL}}}};
+    0, {expression_type_lambda, {{{NULL, 0, NULL}, NULL}}}};
 
 static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
                                             source_location const opening_brace);
@@ -299,71 +303,81 @@ static void clean_up_parameters(parameter *const parameters, size_t parameter_co
     }
 }
 
-static expression_parser_result parse_lambda(expression_parser *const parser, size_t const indentation)
+static expression_parser_result parse_lambda_body(expression_parser *const parser, size_t const indentation,
+                                                  function_header_tree const header)
+{
+    rich_token next_token = peek(parser);
+    if (next_token.token == token_space && !header.return_type)
+    {
+        pop(parser);
+        expression_parser_result const body = parse_expression(parser, indentation, false);
+        if (!body.is_success)
+        {
+            return expression_parser_result_failure;
+        }
+        expression_parser_result const result = {
+            1, expression_from_lambda(lambda_create(header, expression_allocate(body.success)))};
+
+        return result;
+    }
+    else if (next_token.token == token_newline)
+    {
+        pop(parser);
+        sequence const body = parse_sequence(parser, (indentation + 1));
+        expression_parser_result const result = {
+            1, expression_from_lambda(lambda_create(header, expression_allocate(expression_from_sequence(body))))};
+        return result;
+    }
+    pop(parser);
+    parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->user);
+
+    clean_up_parameters(header.parameters, header.parameter_count);
+    if (header.return_type != NULL)
+    {
+        expression_deallocate(header.return_type);
+    }
+
+    return expression_parser_result_failure;
+}
+
+typedef struct function_header_parse_result
+{
+    bool is_success;
+    function_header_tree header;
+} function_header_parse_result;
+
+static function_header_parse_result const function_header_parse_result_failure = {false, {NULL, 0, NULL}};
+
+static function_header_parse_result parse_function_header(expression_parser *const parser, size_t const indentation)
 {
     parameter *parameters = NULL;
     size_t parameter_count = 0;
+    expression *result_type = NULL;
     for (;;)
     {
         rich_token const head = peek(parser);
         if (head.token == token_right_parenthesis)
         {
-            expression *result_type = NULL;
             pop(parser);
-            bool has_type = (peek(parser).token == token_colon);
-            if (has_type)
+            if ((peek(parser).token == token_colon))
             {
                 pop(parser);
                 if (peek(parser).token != token_space)
                 {
-                    return expression_parser_result_failure;
+                    LPG_TO_DO();
                 }
                 else
                 {
                     pop(parser);
                 }
                 expression_parser_result const type = parse_returnable(parser, indentation, false);
-                result_type = expression_allocate(type.success);
                 if (!type.is_success)
                 {
-                    expression_deallocate(result_type);
-                    return expression_parser_result_failure;
+                    return function_header_parse_result_failure;
                 }
+                result_type = expression_allocate(type.success);
             }
-            rich_token next_token = peek(parser);
-            if (next_token.token == token_space && !has_type)
-            {
-                pop(parser);
-                expression_parser_result const body = parse_expression(parser, indentation, false);
-                if (!body.is_success)
-                {
-                    return expression_parser_result_failure;
-                }
-                expression_parser_result const result = {
-                    1, expression_from_lambda(
-                           lambda_create(parameters, parameter_count, result_type, expression_allocate(body.success)))};
-
-                return result;
-            }
-            else if (next_token.token == token_newline)
-            {
-                pop(parser);
-                sequence const body = parse_sequence(parser, (indentation + 1));
-                expression_parser_result const result = {
-                    1, expression_from_lambda(lambda_create(parameters, parameter_count, result_type,
-                                                            expression_allocate(expression_from_sequence(body))))};
-                return result;
-            }
-            pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->user);
-
-            clean_up_parameters(parameters, parameter_count);
-            if (result_type != NULL)
-            {
-                expression_deallocate(result_type);
-            }
-
-            return expression_parser_result_failure;
+            break;
         }
         if (parameter_count >= 1)
         {
@@ -379,7 +393,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                 {
                     parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
                     clean_up_parameters(parameters, parameter_count);
-                    return expression_parser_result_failure;
+                    return function_header_parse_result_failure;
                 }
             }
             else
@@ -387,7 +401,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                 pop(parser);
                 parser->on_error(parse_error_create(parse_error_expected_comma, head.where), parser->user);
                 clean_up_parameters(parameters, parameter_count);
-                return expression_parser_result_failure;
+                return function_header_parse_result_failure;
             }
         }
 
@@ -397,7 +411,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
         {
             parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
             clean_up_parameters(parameters, parameter_count);
-            return expression_parser_result_failure;
+            return function_header_parse_result_failure;
         }
 
         {
@@ -407,7 +421,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
             {
                 parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->user);
                 clean_up_parameters(parameters, parameter_count);
-                return expression_parser_result_failure;
+                return function_header_parse_result_failure;
             }
         }
 
@@ -418,7 +432,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
             {
                 parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
                 clean_up_parameters(parameters, parameter_count);
-                return expression_parser_result_failure;
+                return function_header_parse_result_failure;
             }
         }
 
@@ -426,7 +440,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
         if (!parsed_type.is_success)
         {
             clean_up_parameters(parameters, parameter_count);
-            return expression_parser_result_failure;
+            return function_header_parse_result_failure;
         }
 
         parameters = reallocate_array(parameters, (parameter_count + 1), sizeof(*parameters));
@@ -435,6 +449,85 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
                              expression_allocate(parsed_type.success));
         ++parameter_count;
     }
+    function_header_parse_result const result = {
+        true, function_header_tree_create(parameters, parameter_count, result_type)};
+    return result;
+}
+
+static expression_parser_result parse_lambda(expression_parser *const parser, size_t const indentation)
+{
+    function_header_parse_result const parsed_header = parse_function_header(parser, indentation);
+    if (!parsed_header.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+    return parse_lambda_body(parser, indentation, parsed_header.header);
+}
+
+static expression_parser_result parse_interface(expression_parser *const parser, size_t const indentation,
+                                                source_location const begin)
+{
+    interface_expression_method *methods = NULL;
+    size_t method_count = 0;
+    bool is_success = true;
+    for (;;)
+    {
+        {
+            rich_token const newline = peek_at(parser, 0);
+            if (newline.token != token_newline)
+            {
+                break;
+            }
+        }
+        {
+            rich_token const indent = peek_at(parser, 1);
+            if (!is_same_indentation_level(indent, indentation))
+            {
+                break;
+            }
+        }
+        pop_n(parser, 2);
+        rich_token const name = peek(parser);
+        if (name.token != token_identifier)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            is_success = false;
+            break;
+        }
+        pop(parser);
+
+        {
+            rich_token const left_parenthesis = peek(parser);
+            if (left_parenthesis.token != token_left_parenthesis)
+            {
+                parser->on_error(
+                    parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where), parser->user);
+                is_success = false;
+                break;
+            }
+            pop(parser);
+        }
+
+        function_header_parse_result const header_parsed = parse_function_header(parser, indentation);
+        if (!header_parsed.is_success)
+        {
+            is_success = false;
+            break;
+        }
+
+        methods = reallocate_array(methods, (method_count + 1), sizeof(*methods));
+        methods[method_count] = interface_expression_method_create(
+            identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header);
+        ++method_count;
+    }
+    interface_expression const parsed = interface_expression_create(begin, methods, method_count);
+    if (is_success)
+    {
+        expression_parser_result const result = {true, expression_from_interface(parsed)};
+        return result;
+    }
+    interface_expression_free(parsed);
+    return expression_parser_result_failure;
 }
 
 static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
@@ -557,7 +650,14 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             expression const expr = expression_from_not(not_expression_create(success));
             expression_parser_result const result1 = {1, expr};
             return result1;
-        };
+        }
+
+        case token_interface:
+            pop(parser);
+            return parse_interface(parser, indentation + 1, head.where);
+
+        case token_impl:
+            LPG_TO_DO();
         }
     }
 }
@@ -967,6 +1067,10 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                     (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success) : NULL),
                     expression_allocate(initial_value.success)))};
             return result;
+        }
+        if (head.token == token_impl)
+        {
+            LPG_TO_DO();
         }
     }
     return parse_returnable(parser, indentation, true);

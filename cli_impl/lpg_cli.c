@@ -112,6 +112,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected return type";
     case parse_error_unknown_binary_operator:
         return "Unknown binary operator";
+    case parse_error_expected_parameter_list:
+        return "Expected parameter list";
     }
     LPG_UNREACHABLE();
 }

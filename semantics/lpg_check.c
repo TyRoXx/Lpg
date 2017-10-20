@@ -758,12 +758,12 @@ static evaluate_expression_result make_compile_time_unit(void)
 static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
                                                   instruction_sequence *const function, lambda const evaluated)
 {
-    type *const parameter_types = allocate_array(evaluated.parameter_count, sizeof(*parameter_types));
-    unicode_string *const parameter_names = allocate_array(evaluated.parameter_count, sizeof(*parameter_names));
-    for (size_t i = 0; i < evaluated.parameter_count; ++i)
+    type *const parameter_types = allocate_array(evaluated.header.parameter_count, sizeof(*parameter_types));
+    unicode_string *const parameter_names = allocate_array(evaluated.header.parameter_count, sizeof(*parameter_names));
+    for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         instruction_checkpoint const before = make_checkpoint(&state->used_registers, function);
-        parameter const this_parameter = evaluated.parameters[i];
+        parameter const this_parameter = evaluated.header.parameters[i];
         evaluate_expression_result const parameter_type = evaluate_expression(state, function, *this_parameter.type);
         if (!parameter_type.compile_time_value.is_set)
         {
@@ -790,8 +790,8 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     }
     check_function_result const checked =
         check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
-                       parameter_types, parameter_names, evaluated.parameter_count);
-    for (size_t i = 0; i < evaluated.parameter_count; ++i)
+                       parameter_types, parameter_names, evaluated.header.parameter_count);
+    for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(parameter_names + i);
     }
@@ -804,7 +804,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
 
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = parameter_types;
-    checked.function.signature->parameters.length = evaluated.parameter_count;
+    checked.function.signature->parameters.length = evaluated.header.parameter_count;
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
@@ -1392,6 +1392,10 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
 {
     switch (element.type)
     {
+    case expression_type_interface:
+    case expression_type_impl:
+        LPG_TO_DO();
+
     case expression_type_lambda:
         return evaluate_lambda(state, function, element.lambda);
 

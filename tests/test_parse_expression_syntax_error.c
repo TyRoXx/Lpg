@@ -56,6 +56,47 @@ void test_parse_expression_syntax_error(void)
                                                     "999999999999999"));
     }
 
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_identifier, source_location_create(1, 4))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"
+                                                                                              "    1"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_parameter_list, source_location_create(1, 5))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"
+                                                                                              "    a "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_identifier, source_location_create(1, 6))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"
+                                                                                              "    a("));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"
+                                                                                              "    a():"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"
+                                                                                              "    a(): unit\n"
+                                                                                              "    b():"));
+    }
+
     test_tokenizer_error();
     test_unnamed_function();
     test_function();

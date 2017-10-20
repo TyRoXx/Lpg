@@ -46,30 +46,37 @@ static success_indicator save_tuple_elements(stream_writer const to, tuple const
     return success;
 }
 
+static success_indicator save_function_header(stream_writer const to, function_header_tree const header,
+                                              whitespace_state const whitespace)
+{
+    LPG_TRY(stream_writer_write_string(to, "("));
+    LPG_FOR(size_t, i, header.parameter_count)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(to, ", "));
+        }
+        parameter const *param = header.parameters + i;
+        LPG_TRY(stream_writer_write_bytes(to, param->name.value.data, param->name.value.length));
+        LPG_TRY(stream_writer_write_string(to, ": "));
+        LPG_TRY(save_expression(to, param->type, whitespace));
+    }
+    LPG_TRY(stream_writer_write_string(to, ")"));
+    if (header.return_type != NULL)
+    {
+        LPG_TRY(stream_writer_write_string(to, ": "));
+        LPG_TRY(save_expression(to, header.return_type, whitespace));
+    }
+    return success;
+}
+
 success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
     {
     case expression_type_lambda:
         LPG_TRY(space_here(to, &whitespace));
-        LPG_TRY(stream_writer_write_string(to, "("));
-        LPG_FOR(size_t, i, value->lambda.parameter_count)
-        {
-            if (i > 0)
-            {
-                LPG_TRY(stream_writer_write_string(to, ", "));
-            }
-            parameter const *param = value->lambda.parameters + i;
-            LPG_TRY(stream_writer_write_bytes(to, param->name.value.data, param->name.value.length));
-            LPG_TRY(stream_writer_write_string(to, ": "));
-            LPG_TRY(save_expression(to, param->type, whitespace));
-        }
-        LPG_TRY(stream_writer_write_string(to, ")"));
-        if (value->lambda.return_type != NULL)
-        {
-            LPG_TRY(stream_writer_write_string(to, ": "));
-            LPG_TRY(save_expression(to, value->lambda.return_type, whitespace));
-        }
+        LPG_TRY(save_function_header(to, value->lambda.header, whitespace));
         LPG_TRY(save_expression(to, value->lambda.result, add_space_or_newline(whitespace)));
         return success;
 
@@ -234,6 +241,22 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(stream_writer_write_string(to, " "));
         return save_expression(to, value->binary.right, whitespace);
     }
+
+    case expression_type_impl:
+        LPG_TO_DO();
+
+    case expression_type_interface:
+        LPG_TRY(stream_writer_write_string(to, "interface"));
+        whitespace_state in_interface = go_deeper(whitespace, 1);
+        for (size_t i = 0; i < value->interface.method_count; ++i)
+        {
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+            LPG_TRY(indent(to, in_interface));
+            LPG_TRY(
+                stream_writer_write_unicode_view(to, unicode_view_from_string(value->interface.methods[i].name.value)));
+            LPG_TRY(save_function_header(to, value->interface.methods[i].header, whitespace));
+        }
+        return success;
     }
     LPG_UNREACHABLE();
 }

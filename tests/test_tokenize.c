@@ -77,6 +77,8 @@ void test_tokenize(void)
     test_single_token(token_return, 6, "return");
     test_single_token(token_match, 5, "match");
     test_single_token(token_let, 3, "let");
+    test_single_token(token_interface, 9, "interface");
+    test_single_token(token_impl, 4, "impl");
     test_single_token(token_string, 2, "\"\"");
     test_single_token(token_string, 3, "\"a\"");
     test_single_token(token_string, 5, "\"abc\"");
