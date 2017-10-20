@@ -1470,6 +1470,40 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
 
+static evaluate_expression_result evaluate_impl(function_checking_state *state, instruction_sequence *const function,
+                                                impl_expression const element)
+{
+    instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, function);
+    evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, *element.interface);
+    if (!interface_evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!interface_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (interface_evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    evaluate_expression_result const self_evaluated = evaluate_expression(state, function, *element.self);
+    if (!self_evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!self_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (self_evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    restore(previous_code);
+    return make_unit(&state->used_registers, function);
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
                                                       expression const element)
 {
@@ -1479,7 +1513,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         return evaluate_interface(state, function, element.interface);
 
     case expression_type_impl:
-        LPG_TO_DO();
+        return evaluate_impl(state, function, element.impl);
 
     case expression_type_lambda:
         return evaluate_lambda(state, function, element.lambda);

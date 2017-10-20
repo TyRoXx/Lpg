@@ -665,7 +665,8 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_impl:
-        LPG_TO_DO();
+        impl_expression_free(this->impl);
+        break;
     }
 }
 
