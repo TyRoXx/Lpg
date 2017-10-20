@@ -42,7 +42,7 @@ static unicode_view find_whole_line(unicode_view const source, line_number const
                     break;
                 }
             }
-            if (*i == '\r')
+            else if (*i == '\r')
             {
                 {
                     char const *const newline = i + 1;
