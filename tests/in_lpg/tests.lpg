@@ -1,15 +1,17 @@
 assert(boolean.true)
 
-/*let printable2 = interface
+let printable2 = interface
     print(): string-ref
-
-impl printable2 for string-ref
-    print()
-        self
 
 let f = (a: printable2)
     let print = a.print
     let s = print()
     s
+
+/*
+impl printable2 for string-ref
+    print()
+        self
+
 assert(string-equals("", f("")))
 assert(string-equals("a", f("a")))*/

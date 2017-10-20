@@ -755,15 +755,30 @@ static evaluate_expression_result make_compile_time_unit(void)
     return result;
 }
 
-static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
-                                                  instruction_sequence *const function, lambda const evaluated)
+typedef struct evaluated_function_header
 {
-    type *const parameter_types = allocate_array(evaluated.header.parameter_count, sizeof(*parameter_types));
-    unicode_string *const parameter_names = allocate_array(evaluated.header.parameter_count, sizeof(*parameter_names));
-    for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
+    type *parameter_types;
+    unicode_string *parameter_names;
+    type *return_type;
+} evaluated_function_header;
+
+static evaluated_function_header evaluated_function_header_create(type *parameter_types,
+                                                                  unicode_string *parameter_names, type *return_type)
+{
+    evaluated_function_header const result = {parameter_types, parameter_names, return_type};
+    return result;
+}
+
+static evaluated_function_header evaluate_function_header(function_checking_state *const state,
+                                                          instruction_sequence *const function,
+                                                          function_header_tree const header)
+{
+    type *const parameter_types = allocate_array(header.parameter_count, sizeof(*parameter_types));
+    unicode_string *const parameter_names = allocate_array(header.parameter_count, sizeof(*parameter_names));
+    for (size_t i = 0; i < header.parameter_count; ++i)
     {
         instruction_checkpoint const before = make_checkpoint(&state->used_registers, function);
-        parameter const this_parameter = evaluated.header.parameters[i];
+        parameter const this_parameter = header.parameters[i];
         evaluate_expression_result const parameter_type = evaluate_expression(state, function, *this_parameter.type);
         if (!parameter_type.compile_time_value.is_set)
         {
@@ -777,6 +792,34 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         parameter_names[i] = unicode_view_copy(unicode_view_from_string(this_parameter.name.value));
         restore(before);
     }
+    type *return_type = NULL;
+    if (header.return_type)
+    {
+        instruction_checkpoint const original = make_checkpoint(&state->used_registers, function);
+        evaluate_expression_result const return_type_result = evaluate_expression(state, function, *header.return_type);
+        restore(original);
+        if (!return_type_result.has_value)
+        {
+            LPG_TO_DO();
+        }
+        return_type = garbage_collector_allocate(&state->program->memory, sizeof(*return_type));
+        if (!return_type_result.compile_time_value.is_set)
+        {
+            LPG_TO_DO();
+        }
+        if (return_type_result.compile_time_value.value_.kind != value_kind_type)
+        {
+            LPG_TO_DO();
+        }
+        *return_type = return_type_result.compile_time_value.value_.type_;
+    }
+    return evaluated_function_header_create(parameter_types, parameter_names, return_type);
+}
+
+static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
+                                                  instruction_sequence *const function, lambda const evaluated)
+{
+    evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     function_id const this_lambda_id = state->program->function_count;
     ++(state->program->function_count);
     state->program->functions =
@@ -790,20 +833,20 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     }
     check_function_result const checked =
         check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
-                       parameter_types, parameter_names, evaluated.header.parameter_count);
+                       header.parameter_types, header.parameter_names, evaluated.header.parameter_count);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
-        unicode_string_free(parameter_names + i);
+        unicode_string_free(header.parameter_names + i);
     }
-    deallocate(parameter_names);
+    deallocate(header.parameter_names);
     if (!checked.success)
     {
-        deallocate(parameter_types);
+        deallocate(header.parameter_types);
         return evaluate_expression_result_empty;
     }
 
     ASSUME(checked.function.signature->parameters.length == 0);
-    checked.function.signature->parameters.elements = parameter_types;
+    checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = evaluated.header.parameter_count;
 
     checked_function_free(&state->program->functions[this_lambda_id]);
@@ -1387,12 +1430,54 @@ evaluate_expression_result evaluate_tuple_expression(function_checking_state *st
         true, result_register, type_from_tuple_type(tuple_type_for_result), optional_value_empty, false);
 }
 
+static void destroy_interface(void *const self)
+{
+    interface *const freed = self;
+    interface_free(*freed);
+}
+
+static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
+                                                     interface_expression const element)
+{
+    method_description *const methods = allocate_array(element.method_count, sizeof(*methods));
+    for (size_t i = 0; i < element.method_count; ++i)
+    {
+        interface_expression_method const method = element.methods[i];
+        evaluated_function_header const header = evaluate_function_header(state, function, method.header);
+        if (!header.return_type)
+        {
+            LPG_TO_DO();
+        }
+        for (size_t i = 0; i < method.header.parameter_count; ++i)
+        {
+            unicode_string_free(header.parameter_names + i);
+        }
+        if (header.parameter_names)
+        {
+            deallocate(header.parameter_names);
+        }
+        methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
+                                               tuple_type_create(header.parameter_types, method.header.parameter_count),
+                                               *header.return_type);
+    }
+    interface *const checked_interface = garbage_collector_allocate_with_destructor(
+        &state->program->memory, sizeof(*checked_interface), destroy_interface);
+    *checked_interface =
+        interface_create(methods, /*TODO avoid truncation safely*/ (function_id)element.method_count, NULL, 0);
+    register_id const into = allocate_register(&state->used_registers);
+    value const result = value_from_type(type_from_interface(checked_interface));
+    add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
+    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
                                                       expression const element)
 {
     switch (element.type)
     {
     case expression_type_interface:
+        return evaluate_interface(state, function, element.interface);
+
     case expression_type_impl:
         LPG_TO_DO();
 

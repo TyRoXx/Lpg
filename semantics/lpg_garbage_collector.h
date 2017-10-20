@@ -2,9 +2,12 @@
 #include <stddef.h>
 #include <lpg_non_null.h>
 
+typedef void (*garbage_collector_destructor)(void *);
+
 typedef struct memory_allocation
 {
     struct memory_allocation *next;
+    garbage_collector_destructor destructor;
     char payload[
 #ifdef _MSC_VER
         1
@@ -18,6 +21,9 @@ typedef struct garbage_collector
 } garbage_collector;
 
 void *garbage_collector_allocate(LPG_NON_NULL(garbage_collector *const gc), size_t const bytes);
+
+void *garbage_collector_allocate_with_destructor(LPG_NON_NULL(garbage_collector *const gc), size_t const bytes,
+                                                 garbage_collector_destructor const destructor);
 
 void *garbage_collector_allocate_array(LPG_NON_NULL(garbage_collector *const gc), size_t const length,
                                        size_t const element);
