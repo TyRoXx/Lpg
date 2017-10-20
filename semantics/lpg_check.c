@@ -1448,9 +1448,9 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         {
             LPG_TO_DO();
         }
-        for (size_t i = 0; i < method.header.parameter_count; ++i)
+        for (size_t j = 0; j < method.header.parameter_count; ++j)
         {
-            unicode_string_free(header.parameter_names + i);
+            unicode_string_free(header.parameter_names + j);
         }
         if (header.parameter_names)
         {
