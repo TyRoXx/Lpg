@@ -3,7 +3,7 @@
 #include "lpg_stream_writer.h"
 #include "lpg_assert.h"
 
-void *garbage_collector_allocate(garbage_collector *const gc, size_t const bytes)
+void *garbage_collector_allocate(LPG_NON_NULL(garbage_collector *const gc), size_t const bytes)
 {
     return garbage_collector_allocate_with_destructor(gc, bytes, NULL);
 }
@@ -18,7 +18,8 @@ void *garbage_collector_allocate_with_destructor(LPG_NON_NULL(garbage_collector 
     return &allocation->payload;
 }
 
-void *garbage_collector_allocate_array(garbage_collector *const gc, size_t const length, size_t const element)
+void *garbage_collector_allocate_array(LPG_NON_NULL(garbage_collector *const gc), size_t const length,
+                                       size_t const element)
 {
     optional_size const bytes = size_multiply(length, element);
     ASSERT(bytes.state == optional_set);
