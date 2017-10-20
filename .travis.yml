@@ -52,15 +52,14 @@ script:
  - CC=$MYCC cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_GCOV=$COVERAGE -DLPG_WITH_UB_SANITIZER=$UB_SANITIZER -DLPG_WITH_MEMORY_SANITIZER=$MEMORY_SANITIZER -DLPG_WITH_ADDRESS_SANITIZER=$ADDRESS_SANITIZER -DLPG_WITH_THREAD_SANITIZER=$THREAD_SANITIZER || exit 1
  - cmake -LA . || exit 1
  - cmake --build . -- -j2 || exit 1
- - cd tests
  - export UBSAN_OPTIONS=print_stacktrace=1
  - export MSAN_OPTIONS=poison_in_dtor=1
  - export ASAN_OPTIONS=check_initialization_order=1
  - if [ "$TRAVIS_OS_NAME" == "osx" ] || [ "$UB_SANITIZER" == "ON" ] || [ "$MEMORY_SANITIZER" == "ON" ] || [ "$ADDRESS_SANITIZER" == "ON" ] || [ "$THREAD_SANITIZER" == "ON" ]; then
-     LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ ./tests || exit 1;
+     LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ ./tests/tests || exit 1;
      LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ ./cli/lpg ../tests/in_lpg/tests.lpg || exit 1;
    else
-     valgrind --error-exitcode=42 --leak-check=full ./tests || exit 1;
+     valgrind --error-exitcode=42 --leak-check=full ./tests/tests || exit 1;
      valgrind --error-exitcode=42 --leak-check=full ./cli/lpg ../tests/in_lpg/tests.lpg || exit 1;
    fi
  - cd ..
