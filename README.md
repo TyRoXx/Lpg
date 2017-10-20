@@ -35,6 +35,7 @@ Just write a `.lpg` file and run it. If you want to have syntax highlighting, th
 | boolean        | A logical value (either true or false)           | `boolean.true` or `boolean.false` |
 | int(low, high) | A whole number within a certain range            | `int(0, 100)` or `int(33, 100)`   |
 | string-ref     | A reference to a string that is a string literal | `"Hello"` or `"\n"`               |
+| *no syntax yet (inferred from initializer)*    | Contains a fixed number of elements | `{"Hello"}` or `{}` or `{boolean.true, 123, {}}`               |
 
 #### Variables and constants
 * Variables
