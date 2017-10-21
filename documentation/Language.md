@@ -28,7 +28,7 @@
 
 * Constants
 
-You can declare a constant with `let a = 10`. This will implicitly set the type of the constant to be an integer. If you want to have a specific type of constant use `let a : int(0, 0) = 0`. This creates a constant with a type of integer with the range between 0 and 0.
+You can declare a constant with `let a = 10`. This will implicitly set the type of the constant to be an integer. If you want to have a specific type of constant use `let a: int(0, 0) = 0`. This creates a constant with a type of integer with the range between 0 and 0.
 
 ### Function Syntax
 Functions can be implemented like this
@@ -39,14 +39,14 @@ Functions can be implemented like this
 ```
 This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
-let print_twice = (message : string-ref)
+let print_twice = (message: string-ref)
     print(message)
     print(message)
 ```
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
 ```lpg
-let xor = (left : boolean, right : boolean) and(or(left, right), not(and(left, right)))
+let xor = (left: boolean, right: boolean) and(or(left, right), not(and(left, right)))
 ```
 
 There is no possibility of defining the return type of a function. This will be determined implicitly.
@@ -69,7 +69,7 @@ The type of the variable is then automatically derived. In order to access an el
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
 ```lpg
 let make-percent = interface
-    percent() : integer(0, 100)
+    percent(): integer(0, 100)
 ```
 And this is how you implement this:
 **TO DO**
