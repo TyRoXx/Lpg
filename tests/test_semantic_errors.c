@@ -43,6 +43,20 @@ void test_semantic_errors(void)
     test_loops(&std_library);
 
     {
+        sequence root = parse("xor(boolean.true, boolean.false)\n"
+                              "let xor = (left: boolean, right: boolean) assert(boolean.false)\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 0))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        REQUIRE(checked.functions[0].body.length == 2);
+        checked_program_free(&checked);
+    }
+
+    {
         sequence root = parse("let s = boolean.true\n"
                               "match s\n"
                               "    case boolean.false: s\n"
