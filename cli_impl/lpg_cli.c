@@ -5,7 +5,6 @@
 #include "lpg_cli.h"
 #include "lpg_check.h"
 #include "lpg_find_next_token.h"
-#include "lpg_assert.h"
 #include "lpg_interpret.h"
 #include "lpg_allocate.h"
 #include "lpg_read_file.h"
@@ -32,18 +31,9 @@ static unicode_view find_whole_line(unicode_view const source, line_number const
             /*the location cannot be beyond the end of the file*/
             ASSUME(i != end_of_file);
 
-            if (*i == '\n')
+            if (*i == '\r' || *i == '\n')
             {
-                ++i;
-                ++current_line;
-                if (current_line == found_line)
-                {
-                    begin_of_line = i;
-                    break;
-                }
-            }
-            else if (*i == '\r')
-            {
+                if (*i == '\r')
                 {
                     char const *const newline = i + 1;
                     if ((newline != end_of_file) && (*newline == '\n'))
