@@ -113,13 +113,13 @@ bool lambda_with_captures_instruction_equals(lambda_with_captures_instruction co
 
 typedef struct get_method_instruction
 {
-    interface const *interface_;
+    interface *interface_;
     register_id from;
     function_id method;
     register_id into;
 } get_method_instruction;
 
-get_method_instruction get_method_instruction_create(interface const *interface_, register_id from, function_id method,
+get_method_instruction get_method_instruction_create(interface *interface_, register_id from, function_id method,
                                                      register_id into);
 bool get_method_instruction_equals(get_method_instruction const left, get_method_instruction const right);
 

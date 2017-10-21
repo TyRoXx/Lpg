@@ -1,27 +1,25 @@
 #pragma once
 #include "lpg_structure_member.h"
 
-value not_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
+value not_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value concat_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
-                  void *environment);
+value concat_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value and_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
+value and_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value or_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
+value or_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value string_equals_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+value string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
                          void *environment);
 
-value int_impl(value const *const inferred, value const *arguments, garbage_collector *const gc, void *environment);
+value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value integer_equals_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+value integer_equals_impl(function_call_arguments const arguments, struct value const *const captures,
                           void *environment);
 
-value integer_less_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
-                        void *environment);
+value integer_less_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value integer_to_string_impl(value const *const inferred, value const *const arguments, garbage_collector *const gc,
+value integer_to_string_impl(function_call_arguments const arguments, struct value const *const captures,
                              void *environment);
 
 typedef struct standard_library_stable

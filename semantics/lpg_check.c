@@ -1115,9 +1115,10 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                         globals[i] = value_from_unit();
                     }
                 }
-                compile_time_result =
-                    call_function(callee.compile_time_value.value_.function_pointer, complete_inferred_values,
-                                  compile_time_arguments, globals, &state->program->memory, state->program->functions);
+                compile_time_result = call_function(
+                    callee.compile_time_value.value_.function_pointer,
+                    function_call_arguments_create(complete_inferred_values, compile_time_arguments, globals,
+                                                   &state->program->memory, state->program->functions));
                 deallocate(globals);
                 break;
             }

@@ -13,11 +13,26 @@ typedef struct implementation_ref
 
 implementation_ref implementation_ref_create(interface const *target, size_t implementation_index);
 bool implementation_ref_equals(implementation_ref const left, implementation_ref const right);
+implementation *implementation_ref_resolve(implementation_ref const ref);
 
 typedef struct enumeration enumeration;
 
-typedef struct value external_function(struct value const *, struct value const *, LPG_NON_NULL(garbage_collector *),
-                                       void *);
+typedef struct function_call_arguments
+{
+    struct value const *const inferred;
+    struct value *const arguments;
+    struct value const *globals;
+    garbage_collector *const gc;
+    checked_function const *const all_functions;
+} function_call_arguments;
+
+function_call_arguments function_call_arguments_create(struct value const *const inferred,
+                                                       struct value *const arguments, struct value const *globals,
+                                                       LPG_NON_NULL(garbage_collector *const gc),
+                                                       LPG_NON_NULL(checked_function const *const all_functions));
+
+typedef struct value external_function(function_call_arguments const arguments, struct value const *const captures,
+                                       void *environment);
 
 typedef struct function_pointer_value
 {
@@ -29,7 +44,8 @@ typedef struct function_pointer_value
 } function_pointer_value;
 
 function_pointer_value function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
-                                                            void *environment);
+                                                            void *environment, struct value *const captures,
+                                                            size_t const capture_count);
 function_pointer_value function_pointer_value_from_internal(function_id const code, struct value *const captures,
                                                             size_t const capture_count);
 bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right);

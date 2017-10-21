@@ -12,9 +12,26 @@ bool implementation_ref_equals(implementation_ref const left, implementation_ref
     return (left.target == right.target) && (left.implementation_index == right.implementation_index);
 }
 
-function_pointer_value function_pointer_value_from_external(external_function *external, void *environment)
+implementation *implementation_ref_resolve(implementation_ref const ref)
 {
-    function_pointer_value const result = {0, external, environment, NULL, 0};
+    return &ref.target->implementations[ref.implementation_index].target;
+}
+
+function_call_arguments function_call_arguments_create(value const *const inferred, value *const arguments,
+                                                       value const *globals, garbage_collector *const gc,
+                                                       checked_function const *const all_functions)
+{
+    ASSUME(globals);
+    ASSUME(gc);
+    ASSUME(all_functions);
+    function_call_arguments const result = {inferred, arguments, globals, gc, all_functions};
+    return result;
+}
+
+function_pointer_value function_pointer_value_from_external(external_function *external, void *environment,
+                                                            struct value *const captures, size_t const capture_count)
+{
+    function_pointer_value const result = {0, external, environment, captures, capture_count};
     return result;
 }
 

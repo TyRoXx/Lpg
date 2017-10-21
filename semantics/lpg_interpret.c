@@ -3,6 +3,7 @@
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
 #include "lpg_instruction.h"
+#include <string.h>
 
 static optional_value call_interpreted_function(checked_function const callee, value *const arguments,
                                                 value const *globals, value const *const captures,
@@ -16,19 +17,51 @@ typedef enum run_sequence_result
     run_sequence_result_unavailable_at_this_time
 } run_sequence_result;
 
-optional_value call_function(function_pointer_value const callee, value const *const inferred, value *const arguments,
-                             value const *globals, garbage_collector *const gc,
-                             checked_function const *const all_functions)
+optional_value call_function(function_pointer_value const callee, function_call_arguments const arguments)
 {
-    ASSUME(globals);
-    ASSUME(gc);
-    ASSUME(all_functions);
+    ASSUME(arguments.globals);
+    ASSUME(arguments.gc);
+    ASSUME(arguments.all_functions);
     if (callee.external)
     {
-        return optional_value_create(callee.external(inferred, arguments, gc, callee.external_environment));
+        return optional_value_create(callee.external(arguments, callee.captures, callee.external_environment));
     }
-    return call_interpreted_function(
-        all_functions[callee.code], arguments, globals, callee.captures, gc, all_functions);
+    return call_interpreted_function(arguments.all_functions[callee.code], arguments.arguments, arguments.globals,
+                                     callee.captures, arguments.gc, arguments.all_functions);
+}
+
+static value invoke_method(function_call_arguments const arguments, value const *const captures, void *environment)
+{
+    (void)environment;
+    ASSUME(captures);
+    value const from = captures[0];
+    ASSUME(from.kind == value_kind_type_erased);
+    implementation *const impl = implementation_ref_resolve(from.type_erased.impl);
+    ASSUME(impl);
+    value const method = captures[1];
+    ASSUME(method.kind == value_kind_integer);
+    ASSUME(integer_less(method.integer_, integer_create(0, impl->method_count)));
+    value const method_parameter_count = captures[2];
+    ASSUME(method.kind == value_kind_integer);
+    function_pointer_value const *const function = &impl->methods[method.integer_.low];
+    ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
+    size_t const actual_parameter_count = (size_t)method_parameter_count.integer_.low + 1;
+    value *const method_arguments = allocate_array(actual_parameter_count, sizeof(*method_arguments));
+    if (method_parameter_count.integer_.low > 0)
+    {
+        memcpy(method_arguments, arguments.arguments,
+               /*TODO check for overflow*/ ((size_t)method_parameter_count.integer_.low * sizeof(*method_arguments)));
+    }
+    method_arguments[actual_parameter_count - 1] = *from.type_erased.self;
+    optional_value const result =
+        call_function(*function, function_call_arguments_create(
+                                     NULL, method_arguments, arguments.globals, arguments.gc, arguments.all_functions));
+    deallocate(method_arguments);
+    if (!result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    return result.value_;
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value const *globals, value *registers,
@@ -41,7 +74,19 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         switch (element.type)
         {
         case instruction_get_method:
-            LPG_TO_DO();
+        {
+            size_t const capture_count = 3;
+            value *const pseudo_captures =
+                garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_captures));
+            pseudo_captures[0] = registers[element.get_method.from];
+            pseudo_captures[1] = value_from_integer(integer_create(0, element.get_method.method));
+            ASSUME(element.get_method.method < element.get_method.interface_->method_count);
+            pseudo_captures[2] = value_from_integer(
+                integer_create(0, element.get_method.interface_->methods[element.get_method.method].parameters.length));
+            registers[element.get_method.into] = value_from_function_pointer(
+                function_pointer_value_from_external(invoke_method, NULL, pseudo_captures, capture_count));
+            break;
+        }
 
         case instruction_erase_type:
         {
@@ -69,7 +114,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             case value_kind_function_pointer:
             {
                 optional_value const result =
-                    call_function(callee.function_pointer, NULL, arguments, globals, gc, all_functions);
+                    call_function(callee.function_pointer,
+                                  function_call_arguments_create(NULL, arguments, globals, gc, all_functions));
                 deallocate(arguments);
                 if (!result.is_set)
                 {

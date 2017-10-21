@@ -223,12 +223,10 @@ static void handle_semantic_error(semantic_error const error, void *user)
     print_source_location_hint(context->source, context->diagnostics, error.where);
 }
 
-static value print(value const *const inferred, value const *const arguments, garbage_collector *const gc,
-                   void *environment)
+static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
-    (void)inferred;
-    (void)gc;
-    unicode_view const text = arguments[0].string_ref;
+    (void)captures;
+    unicode_view const text = arguments.arguments[0].string_ref;
     stream_writer *const destination = environment;
     ASSERT(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
     return value_from_unit();
@@ -301,7 +299,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     {
         globals_values[i] = value_from_unit();
     }
-    globals_values[2] = value_from_function_pointer(function_pointer_value_from_external(print, &print_destination));
+    globals_values[2] =
+        value_from_function_pointer(function_pointer_value_from_external(print, &print_destination, NULL, 0));
 
     optional_sequence const root = parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)

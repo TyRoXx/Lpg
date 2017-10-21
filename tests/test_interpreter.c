@@ -37,34 +37,28 @@ typedef struct test_environment
 
 static void test_captures(const standard_library_description *std_library);
 
-static value print(value const *const inferred, value const *const arguments, garbage_collector *const gc,
-                   void *environment)
+static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
-    (void)inferred;
-    (void)gc;
-    unicode_view const text = arguments[0].string_ref;
+    (void)captures;
+    unicode_view const text = arguments.arguments[0].string_ref;
     test_environment *const actual_environment = environment;
     stream_writer *destination = &actual_environment->print_destination;
     REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
     return value_from_unit();
 }
 
-static value assert_impl(value const *const inferred, value const *arguments, garbage_collector *const gc,
-                         void *environment)
+static value assert_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
+    (void)captures;
     (void)environment;
-    (void)inferred;
-    (void)gc;
-    enum_element_id const argument = arguments[0].enum_element.which;
+    enum_element_id const argument = arguments.arguments[0].enum_element.which;
     REQUIRE(argument == 1);
     return value_from_unit();
 }
 
-static value read_impl(value const *const inferred, value const *arguments, garbage_collector *const gc,
-                       void *environment)
+static value read_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
-    (void)inferred;
-    (void)gc;
+    (void)captures;
     (void)arguments;
     test_environment *const actual_environment = environment;
     unicode_view const result = actual_environment->read_input;
@@ -159,26 +153,27 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
         value const globals_values[] = {
             /*type*/ value_from_unit(),
             /*string-ref*/ value_from_unit(),
-            /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment)),
+            /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment, NULL, 0)),
             /*boolean*/ value_from_unit(),
-            /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL)),
-            /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL)),
-            /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL)),
-            /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL)),
-            /*concat*/ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL)),
+            /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL, NULL, 0)),
+            /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL, NULL, 0)),
+            /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL, NULL, 0)),
+            /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL, NULL, 0)),
+            /*concat*/ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL, NULL, 0)),
             /*string-equals*/ value_from_function_pointer(
-                function_pointer_value_from_external(string_equals_impl, NULL)),
-            /*read*/ value_from_function_pointer(function_pointer_value_from_external(read_impl, &environment)),
-            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment)),
+                function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0)),
+            /*read*/ value_from_function_pointer(
+                function_pointer_value_from_external(read_impl, &environment, NULL, 0)),
+            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment, NULL, 0)),
             /*integer-equals*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_equals_impl, &environment)),
+                function_pointer_value_from_external(integer_equals_impl, &environment, NULL, 0)),
             /*unit*/ value_from_unit(),
             /*unit_value*/ value_from_unit(),
             /*option*/ value_from_unit(),
             /*integer-less*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_less_impl, &environment)),
+                function_pointer_value_from_external(integer_less_impl, &environment, NULL, 0)),
             /*integer-to-string*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_to_string_impl, &environment)),
+                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0)),
             /*printable*/ value_from_unit()};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         sequence_free(&root);
