@@ -232,7 +232,7 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {instruction_create_literal(literal_instruction_create(
             0, value_from_integer(integer_create(0, 123)), make_integer_constant_type(integer_create(0, 123))))};
-        checked_program const expected = {{NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature =
@@ -268,7 +268,7 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(
                 2, value_from_enum_element(1, NULL), type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_call(call_instruction_create(1, arguments, 1, 3))};
-        checked_program const expected = {{NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature =
@@ -302,7 +302,7 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {instruction_create_literal(literal_instruction_create(
             1, value_from_integer(integer_create(0, 123)), make_integer_constant_type(integer_create(0, 123))))};
-        checked_program const expected = {{NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature =
@@ -338,7 +338,7 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit()))};
         instruction const expected_lambda[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 3, 1))};
-        checked_program const expected = {{NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature =
@@ -371,7 +371,7 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(
                 1, value_from_enum_element(1, NULL), type_from_enumeration(&std_library->stable->boolean))),
             instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit()))};
-        checked_program const expected = {{NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature =

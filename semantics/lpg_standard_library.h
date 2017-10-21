@@ -38,12 +38,11 @@ typedef struct standard_library_stable
     function_pointer integer_equals;
     function_pointer integer_less;
     function_pointer integer_to_string;
-    interface printable;
 } standard_library_stable;
 
 enum
 {
-    standard_library_element_count = 19
+    standard_library_element_count = 18
 };
 
 typedef struct standard_library_description

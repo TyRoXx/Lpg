@@ -12,5 +12,13 @@ void checked_program_free(checked_program const *program)
     {
         deallocate(program->functions);
     }
+    for (size_t i = 0; i < program->interface_count; ++i)
+    {
+        interface_free(program->interfaces[i]);
+    }
+    if (program->interfaces)
+    {
+        deallocate(program->interfaces);
+    }
     garbage_collector_free(program->memory);
 }

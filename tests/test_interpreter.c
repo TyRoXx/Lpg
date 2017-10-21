@@ -173,8 +173,7 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
             /*integer-less*/ value_from_function_pointer(
                 function_pointer_value_from_external(integer_less_impl, &environment, NULL, 0)),
             /*integer-to-string*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0)),
-            /*printable*/ value_from_unit()};
+                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         sequence_free(&root);
         garbage_collector gc = {NULL};
@@ -332,7 +331,9 @@ void test_interpreter(void)
                   "assert(not(integer-less(big, small)))\n",
                   "", "", std_library.globals);
 
-    expect_output("let f = (printed: printable)\n"
+    expect_output("let printable = interface\n"
+                  "    print(): string-ref\n"
+                  "let f = (printed: printable)\n"
                   "    let method = printed.print\n"
                   "    let string = method()\n"
                   "    print(string)\n",

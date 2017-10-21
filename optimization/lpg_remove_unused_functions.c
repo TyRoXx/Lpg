@@ -112,6 +112,21 @@ static function_pointer *clone_function_pointer(function_pointer const original,
     return result;
 }
 
+static value adapt_value(value const from, garbage_collector *const clone_gc,
+                         function_id const *const new_function_ids);
+
+static function_pointer_value clone_function_pointer_value(function_pointer_value const original,
+                                                           garbage_collector *const clone_gc,
+                                                           function_id const *const new_function_ids)
+{
+    value *const captures = garbage_collector_allocate_array(clone_gc, original.capture_count, sizeof(*captures));
+    for (size_t i = 0; i < original.capture_count; ++i)
+    {
+        captures[i] = adapt_value(original.captures[i], clone_gc, new_function_ids);
+    }
+    return function_pointer_value_from_internal(new_function_ids[original.code], captures, original.capture_count);
+}
+
 static value adapt_value(value const from, garbage_collector *const clone_gc, function_id const *const new_function_ids)
 {
     switch (from.kind)
@@ -130,16 +145,8 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     }
 
     case value_kind_function_pointer:
-    {
-        value *const captures =
-            garbage_collector_allocate_array(clone_gc, from.function_pointer.capture_count, sizeof(*captures));
-        for (size_t i = 0; i < from.function_pointer.capture_count; ++i)
-        {
-            captures[i] = adapt_value(from.function_pointer.captures[i], clone_gc, new_function_ids);
-        }
-        return value_from_function_pointer(function_pointer_value_from_internal(
-            new_function_ids[from.function_pointer.code], captures, from.function_pointer.capture_count));
-    }
+        return value_from_function_pointer(
+            clone_function_pointer_value(from.function_pointer, clone_gc, new_function_ids));
 
     case value_kind_flat_object:
     case value_kind_type:
@@ -285,6 +292,63 @@ static checked_function keep_function(checked_function const original, garbage_c
     return result;
 }
 
+static tuple_type clone_tuple_type(tuple_type const original, garbage_collector *const gc)
+{
+    type *const elements = allocate_array(original.length, sizeof(*elements));
+    for (size_t i = 0; i < original.length; ++i)
+    {
+        elements[i] = type_clone(original.elements[i], gc);
+    }
+    return tuple_type_create(elements, original.length);
+}
+
+static method_description clone_method_description(method_description const original, garbage_collector *const gc)
+{
+    return method_description_create(unicode_view_copy(unicode_view_from_string(original.name)),
+                                     clone_tuple_type(original.parameters, gc), type_clone(original.result, gc));
+}
+
+static implementation_entry clone_implementation_entry(implementation_entry const original, garbage_collector *const gc,
+                                                       function_id const *const new_function_ids)
+{
+    function_pointer_value *const methods =
+        garbage_collector_allocate_array(gc, original.target.method_count, sizeof(*methods));
+    for (size_t i = 0; i < original.target.method_count; ++i)
+    {
+        methods[i] = clone_function_pointer_value(original.target.methods[i], gc, new_function_ids);
+    }
+    return implementation_entry_create(
+        type_clone(original.self, gc), implementation_create(methods, original.target.method_count));
+}
+
+static interface clone_interface(interface const original, garbage_collector *const gc,
+                                 function_id const *const new_function_ids)
+{
+    method_description *const methods = allocate_array(original.method_count, sizeof(*methods));
+    for (interface_id i = 0; i < original.method_count; ++i)
+    {
+        methods[i] = clone_method_description(original.methods[i], gc);
+    }
+    implementation_entry *const implementations =
+        allocate_array(original.implementation_count, sizeof(*implementations));
+    for (interface_id i = 0; i < original.implementation_count; ++i)
+    {
+        implementations[i] = clone_implementation_entry(original.implementations[i], gc, new_function_ids);
+    }
+    return interface_create(methods, original.method_count, implementations, original.implementation_count);
+}
+
+static interface *clone_interfaces(interface *const interfaces, const interface_id interface_count,
+                                   garbage_collector *const gc, function_id const *const new_function_ids)
+{
+    interface *const result = allocate_array(interface_count, sizeof(*result));
+    for (interface_id i = 0; i < interface_count; ++i)
+    {
+        result[i] = clone_interface(interfaces[i], gc, new_function_ids);
+    }
+    return result;
+}
+
 checked_program remove_unused_functions(checked_program const from)
 {
     bool *const used_functions = allocate_array(from.function_count, sizeof(*used_functions));
@@ -305,8 +369,12 @@ checked_program remove_unused_functions(checked_program const from)
         }
     }
     function_id const new_function_count = next_new_function_id;
-    checked_program result = {
-        {NULL}, allocate_array(new_function_count, sizeof(*result.functions)), new_function_count};
+    checked_program result = {NULL,
+                              from.interface_count,
+                              {NULL},
+                              allocate_array(new_function_count, sizeof(*result.functions)),
+                              new_function_count};
+    result.interfaces = clone_interfaces(from.interfaces, from.interface_count, &result.memory, new_function_ids);
     for (function_id i = 0; i < from.function_count; ++i)
     {
         if (!used_functions[i])
@@ -318,5 +386,6 @@ checked_program remove_unused_functions(checked_program const from)
     }
     deallocate(used_functions);
     deallocate(new_function_ids);
+    ASSUME(from.interface_count == result.interface_count);
     return result;
 }

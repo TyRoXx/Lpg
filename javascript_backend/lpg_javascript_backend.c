@@ -125,7 +125,15 @@ typedef struct function_generation
 {
     register_type *registers;
     checked_function const *all_functions;
+    interface const *all_interfaces;
 } function_generation;
+
+static function_generation function_generation_create(register_type *registers, checked_function const *all_functions,
+                                                      interface const *all_interfaces)
+{
+    function_generation const result = {registers, all_functions, all_interfaces};
+    return result;
+}
 
 static success_indicator write_register(function_generation *const state, register_id const which,
                                         stream_writer const javascript_output)
@@ -372,7 +380,7 @@ static success_indicator generate_get_method(function_generation *const state, g
 {
     LPG_TRY(write_register(state, generated.into, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, "function ("));
-    struct method_description const method = generated.interface_->methods[generated.method];
+    struct method_description const method = state->all_interfaces[generated.interface_].methods[generated.method];
     for (register_id i = 0; i < method.parameters.length; ++i)
     {
         if (i > 0)
@@ -457,9 +465,11 @@ static success_indicator generate_sequence(function_generation *const state, ins
 
 static success_indicator generate_function_body(checked_function const function,
                                                 checked_function const *const all_functions,
+                                                interface const *const all_interfaces,
                                                 stream_writer const javascript_output)
 {
-    function_generation state = {allocate_array(function.number_of_registers, sizeof(*state.registers)), all_functions};
+    function_generation state = function_generation_create(
+        allocate_array(function.number_of_registers, sizeof(*state.registers)), all_functions, all_interfaces);
     for (register_id i = 0; i < function.number_of_registers; ++i)
     {
         state.registers[i] = register_type_none;
@@ -474,7 +484,7 @@ static success_indicator generate_function_body(checked_function const function,
 
 static success_indicator define_function(function_id const id, checked_function const function,
                                          checked_function const *const all_functions,
-                                         stream_writer const javascript_output)
+                                         interface const *const all_interfaces, stream_writer const javascript_output)
 {
     LPG_TRY(generate_function_name(id, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, " = function ("));
@@ -505,7 +515,7 @@ static success_indicator define_function(function_id const id, checked_function 
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ")\n"));
     LPG_TRY(stream_writer_write_string(javascript_output, "{\n"));
-    LPG_TRY(generate_function_body(function, all_functions, javascript_output));
+    LPG_TRY(generate_function_body(function, all_functions, all_interfaces, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, "};\n"));
     return success;
 }
@@ -535,10 +545,10 @@ success_indicator generate_javascript(checked_program const program, stream_writ
     }
     for (function_id i = 1; i < program.function_count; ++i)
     {
-        LPG_TRY(define_function(i, program.functions[i], program.functions, javascript_output));
+        LPG_TRY(define_function(i, program.functions[i], program.functions, program.interfaces, javascript_output));
     }
     ASSUME(program.functions[0].signature->parameters.length == 0);
-    LPG_TRY(generate_function_body(program.functions[0], program.functions, javascript_output));
+    LPG_TRY(generate_function_body(program.functions[0], program.functions, program.interfaces, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, "})();\n"));
     return success;
 }

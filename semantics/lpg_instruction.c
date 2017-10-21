@@ -131,7 +131,7 @@ bool lambda_with_captures_instruction_equals(lambda_with_captures_instruction co
     return true;
 }
 
-get_method_instruction get_method_instruction_create(interface *interface_, register_id from, function_id method,
+get_method_instruction get_method_instruction_create(interface_id interface_, register_id from, function_id method,
                                                      register_id into)
 {
     get_method_instruction const result = {interface_, from, method, into};

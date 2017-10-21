@@ -19,12 +19,13 @@ implementation *implementation_ref_resolve(implementation_ref const ref)
 
 function_call_arguments function_call_arguments_create(value const *const inferred, value *const arguments,
                                                        value const *globals, garbage_collector *const gc,
-                                                       checked_function const *const all_functions)
+                                                       checked_function const *const all_functions,
+                                                       LPG_NON_NULL(interface const *all_interfaces))
 {
     ASSUME(globals);
     ASSUME(gc);
     ASSUME(all_functions);
-    function_call_arguments const result = {inferred, arguments, globals, gc, all_functions};
+    function_call_arguments const result = {inferred, arguments, globals, gc, all_functions, all_interfaces};
     return result;
 }
 

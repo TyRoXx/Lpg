@@ -318,7 +318,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
 
 static read_structure_element_result read_interface_element_at(function_checking_state *state,
                                                                instruction_sequence *function, register_id const from,
-                                                               LPG_NON_NULL(interface *const from_type),
+                                                               interface_id const from_type,
                                                                function_id const method_index, register_id const result)
 {
     add_instruction(
@@ -326,19 +326,20 @@ static read_structure_element_result read_interface_element_at(function_checking
     function_pointer *const method_object = garbage_collector_allocate(&state->program->memory, sizeof(*method_object));
     type *const captures = garbage_collector_allocate_array(&state->program->memory, 1, sizeof(*captures));
     captures[0] = type_from_interface(from_type);
-    method_description const method = from_type->methods[method_index];
+    method_description const method = state->program->interfaces[from_type].methods[method_index];
     *method_object = function_pointer_create(method.result, method.parameters, tuple_type_create(captures, 1));
     return read_structure_element_result_create(true, type_from_function_pointer(method_object), optional_value_empty);
 }
 
 static read_structure_element_result
 read_interface_element(function_checking_state *state, instruction_sequence *function, register_id const from,
-                       LPG_NON_NULL(interface *const from_type), unicode_view const element_name,
+                       interface_id const from_type, unicode_view const element_name,
                        source_location const element_source, register_id const result)
 {
-    for (function_id i = 0; i < from_type->method_count; ++i)
+    interface *const from_interface = state->program->interfaces + from_type;
+    for (function_id i = 0; i < from_interface->method_count; ++i)
     {
-        if (unicode_view_equals(unicode_view_from_string(from_type->methods[i].name), element_name))
+        if (unicode_view_equals(unicode_view_from_string(from_interface->methods[i].name), element_name))
         {
             return read_interface_element_at(state, function, from, from_type, i, result);
         }
@@ -915,9 +916,9 @@ static implementation_ref find_implementation(interface const *const in, type co
 static conversion_result convert_to_interface(function_checking_state *const state,
                                               instruction_sequence *const function, register_id const original,
                                               type const from, source_location const original_source,
-                                              interface const *const to)
+                                              interface_id const to)
 {
-    implementation_ref const impl = find_implementation(to, from);
+    implementation_ref const impl = find_implementation(state->program->interfaces + to, from);
     if (!impl.target)
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
@@ -1115,10 +1116,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                         globals[i] = value_from_unit();
                     }
                 }
-                compile_time_result = call_function(
-                    callee.compile_time_value.value_.function_pointer,
-                    function_call_arguments_create(complete_inferred_values, compile_time_arguments, globals,
-                                                   &state->program->memory, state->program->functions));
+                compile_time_result =
+                    call_function(callee.compile_time_value.value_.function_pointer,
+                                  function_call_arguments_create(
+                                      complete_inferred_values, compile_time_arguments, globals,
+                                      &state->program->memory, state->program->functions, state->program->interfaces));
                 deallocate(globals);
                 break;
             }
@@ -1438,12 +1440,6 @@ evaluate_expression_result evaluate_tuple_expression(function_checking_state *st
         true, result_register, type_from_tuple_type(tuple_type_for_result), optional_value_empty, false);
 }
 
-static void destroy_interface(void *const self)
-{
-    interface *const freed = self;
-    interface_free(*freed);
-}
-
 static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
                                                      interface_expression const element)
 {
@@ -1468,12 +1464,14 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
                                                tuple_type_create(header.parameter_types, method.header.parameter_count),
                                                *header.return_type);
     }
-    interface *const checked_interface = garbage_collector_allocate_with_destructor(
-        &state->program->memory, sizeof(*checked_interface), destroy_interface);
-    *checked_interface =
+    interface_id const id = state->program->interface_count;
+    state->program->interfaces =
+        reallocate_array(state->program->interfaces, (id + 1), sizeof(*state->program->interfaces));
+    state->program->interfaces[id] =
         interface_create(methods, /*TODO avoid truncation safely*/ (function_id)element.method_count, NULL, 0);
+    state->program->interface_count += 1;
     register_id const into = allocate_register(&state->used_registers);
-    value const result = value_from_type(type_from_interface(checked_interface));
+    value const result = value_from_type(type_from_interface(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
@@ -1549,7 +1547,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     {
         LPG_TO_DO();
     }
-    interface *const target_interface = interface_evaluated.compile_time_value.value_.type_.interface_;
+    interface *const target_interface =
+        state->program->interfaces + interface_evaluated.compile_time_value.value_.type_.interface_;
 
     evaluate_expression_result const self_evaluated = evaluate_expression(state, function, *element.self);
     if (!self_evaluated.has_value)
@@ -1790,7 +1789,7 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
-    checked_program program = {{NULL}, allocate_array(1, sizeof(*program.functions)), 1};
+    checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
     check_function_result const checked =
         check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0);
     if (checked.success)

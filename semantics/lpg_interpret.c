@@ -8,7 +8,8 @@
 static optional_value call_interpreted_function(checked_function const callee, value *const arguments,
                                                 value const *globals, value const *const captures,
                                                 garbage_collector *const gc,
-                                                checked_function const *const all_functions);
+                                                checked_function const *const all_functions,
+                                                interface const *const all_interfaces);
 
 typedef enum run_sequence_result
 {
@@ -27,7 +28,7 @@ optional_value call_function(function_pointer_value const callee, function_call_
         return optional_value_create(callee.external(arguments, callee.captures, callee.external_environment));
     }
     return call_interpreted_function(arguments.all_functions[callee.code], arguments.arguments, arguments.globals,
-                                     callee.captures, arguments.gc, arguments.all_functions);
+                                     callee.captures, arguments.gc, arguments.all_functions, arguments.all_interfaces);
 }
 
 static value invoke_method(function_call_arguments const arguments, value const *const captures, void *environment)
@@ -54,8 +55,8 @@ static value invoke_method(function_call_arguments const arguments, value const 
     }
     method_arguments[actual_parameter_count - 1] = *from.type_erased.self;
     optional_value const result =
-        call_function(*function, function_call_arguments_create(
-                                     NULL, method_arguments, arguments.globals, arguments.gc, arguments.all_functions));
+        call_function(*function, function_call_arguments_create(NULL, method_arguments, arguments.globals, arguments.gc,
+                                                                arguments.all_functions, arguments.all_interfaces));
     deallocate(method_arguments);
     if (!result.is_set)
     {
@@ -66,7 +67,8 @@ static value invoke_method(function_call_arguments const arguments, value const 
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value const *globals, value *registers,
                                         value const *const captures, garbage_collector *const gc,
-                                        checked_function const *const all_functions)
+                                        checked_function const *const all_functions,
+                                        interface const *const all_interfaces)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
@@ -80,9 +82,10 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_captures));
             pseudo_captures[0] = registers[element.get_method.from];
             pseudo_captures[1] = value_from_integer(integer_create(0, element.get_method.method));
-            ASSUME(element.get_method.method < element.get_method.interface_->method_count);
-            pseudo_captures[2] = value_from_integer(
-                integer_create(0, element.get_method.interface_->methods[element.get_method.method].parameters.length));
+            interface const *const interface_ = &all_interfaces[element.get_method.interface_];
+            ASSUME(element.get_method.method < interface_->method_count);
+            pseudo_captures[2] =
+                value_from_integer(integer_create(0, interface_->methods[element.get_method.method].parameters.length));
             registers[element.get_method.into] = value_from_function_pointer(
                 function_pointer_value_from_external(invoke_method, NULL, pseudo_captures, capture_count));
             break;
@@ -113,9 +116,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             {
             case value_kind_function_pointer:
             {
-                optional_value const result =
-                    call_function(callee.function_pointer,
-                                  function_call_arguments_create(NULL, arguments, globals, gc, all_functions));
+                optional_value const result = call_function(
+                    callee.function_pointer,
+                    function_call_arguments_create(NULL, arguments, globals, gc, all_functions, all_interfaces));
                 deallocate(arguments);
                 if (!result.is_set)
                 {
@@ -144,7 +147,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             bool is_running = true;
             while (is_running)
             {
-                switch (run_sequence(element.loop, globals, registers, captures, gc, all_functions))
+                switch (run_sequence(element.loop, globals, registers, captures, gc, all_functions, all_interfaces))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -209,7 +212,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 match_instruction_case *const this_case = element.match.cases + j;
                 if (value_equals(key, registers[this_case->key]))
                 {
-                    switch (run_sequence(this_case->action, globals, registers, captures, gc, all_functions))
+                    switch (run_sequence(
+                        this_case->action, globals, registers, captures, gc, all_functions, all_interfaces))
                     {
                     case run_sequence_result_break:
                         return run_sequence_result_break;
@@ -252,7 +256,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 static optional_value call_interpreted_function(checked_function const callee, value *const arguments,
                                                 value const *globals, value const *const captures,
                                                 garbage_collector *const gc,
-                                                checked_function const *const all_functions)
+                                                checked_function const *const all_functions,
+                                                interface const *const all_interfaces)
 {
     /*there has to be at least one register for the return value, even if it is
      * unit*/
@@ -265,7 +270,7 @@ static optional_value call_interpreted_function(checked_function const callee, v
     {
         registers[i] = arguments[i];
     }
-    switch (run_sequence(callee.body, globals, registers, captures, gc, all_functions))
+    switch (run_sequence(callee.body, globals, registers, captures, gc, all_functions, all_interfaces))
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
@@ -286,5 +291,5 @@ static optional_value call_interpreted_function(checked_function const callee, v
 void interpret(checked_program const program, value const *globals, garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
-    call_interpreted_function(entry_point, NULL, globals, NULL, gc, program.functions);
+    call_interpreted_function(entry_point, NULL, globals, NULL, gc, program.functions, program.interfaces);
 }

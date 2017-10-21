@@ -219,7 +219,9 @@ void test_c_backend(void)
                            "assert(string-equals(\"123\", tuple.0))\n",
                            std_library, "25_tuple_ownership.c");
 
-    check_generated_c_code("let f = (printed: printable)\n"
+    check_generated_c_code("let printable = interface\n"
+                           "    print(): string-ref\n"
+                           "let f = (printed: printable)\n"
                            "    let method = printed.print\n"
                            "    let string = method()\n"
                            "    print(string)\n",
