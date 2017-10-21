@@ -35,7 +35,7 @@ Functions can be implemented like this
 ```lpg
 ()
     print("Hello World")
-    return 1
+    1
 ```
 This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
