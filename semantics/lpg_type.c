@@ -247,7 +247,7 @@ type type_from_lambda(lambda_type const lambda)
     return result;
 }
 
-type type_from_interface(interface const *value)
+type type_from_interface(interface *value)
 {
     type result;
     result.kind = type_kind_interface;

@@ -104,7 +104,7 @@ struct type
         size_t inferred;
         enum_constructor_type *enum_constructor;
         lambda_type lambda;
-        interface const *interface_;
+        interface *interface_;
     };
 };
 
@@ -171,7 +171,7 @@ type type_from_integer_range(integer_range value);
 type type_from_inferred(size_t const inferred);
 type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type type_from_lambda(lambda_type const lambda);
-type type_from_interface(LPG_NON_NULL(interface const *value));
+type type_from_interface(LPG_NON_NULL(interface *value));
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

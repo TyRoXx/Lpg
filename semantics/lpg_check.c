@@ -318,7 +318,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
 
 static read_structure_element_result read_interface_element_at(function_checking_state *state,
                                                                instruction_sequence *function, register_id const from,
-                                                               LPG_NON_NULL(interface const *const from_type),
+                                                               LPG_NON_NULL(interface *const from_type),
                                                                function_id const method_index, register_id const result)
 {
     add_instruction(
@@ -333,7 +333,7 @@ static read_structure_element_result read_interface_element_at(function_checking
 
 static read_structure_element_result
 read_interface_element(function_checking_state *state, instruction_sequence *function, register_id const from,
-                       LPG_NON_NULL(interface const *const from_type), unicode_view const element_name,
+                       LPG_NON_NULL(interface *const from_type), unicode_view const element_name,
                        source_location const element_source, register_id const result)
 {
     for (function_id i = 0; i < from_type->method_count; ++i)
@@ -816,10 +816,8 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
     return evaluated_function_header_create(parameter_types, parameter_names, return_type);
 }
 
-static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
-                                                  instruction_sequence *const function, lambda const evaluated)
+static function_id reserve_function_id(function_checking_state *const state)
 {
-    evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     function_id const this_lambda_id = state->program->function_count;
     ++(state->program->function_count);
     state->program->functions =
@@ -831,6 +829,14 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         state->program->functions[this_lambda_id] =
             checked_function_create(0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
+    return this_lambda_id;
+}
+
+static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
+                                                  instruction_sequence *const function, lambda const evaluated)
+{
+    evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
+    function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked =
         check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
                        header.parameter_types, header.parameter_names, evaluated.header.parameter_count);
@@ -1470,10 +1476,60 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
 
+static function_pointer_value evaluate_method_definition(function_checking_state *state,
+                                                         instruction_sequence *const function,
+                                                         impl_expression_method const method, type const self)
+{
+    evaluated_function_header header = evaluate_function_header(state, function, method.header);
+    size_t const actual_parameter_count = (method.header.parameter_count + 1);
+    header.parameter_types =
+        reallocate_array(header.parameter_types, actual_parameter_count, sizeof(*header.parameter_types));
+    header.parameter_types[method.header.parameter_count] = self;
+    header.parameter_names =
+        reallocate_array(header.parameter_names, actual_parameter_count, sizeof(*header.parameter_names));
+    header.parameter_names[method.header.parameter_count] = unicode_string_from_c_str("self");
+
+    function_id const this_lambda_id = reserve_function_id(state);
+    check_function_result const checked =
+        check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
+                       state->program, header.parameter_types, header.parameter_names, actual_parameter_count);
+    for (size_t i = 0; i < actual_parameter_count; ++i)
+    {
+        unicode_string_free(header.parameter_names + i);
+    }
+    deallocate(header.parameter_names);
+    if (!checked.success)
+    {
+        deallocate(header.parameter_types);
+        LPG_TO_DO();
+    }
+
+    ASSUME(checked.function.signature->parameters.length == 0);
+    checked.function.signature->parameters.elements = header.parameter_types;
+    checked.function.signature->parameters.length = actual_parameter_count;
+
+    checked_function_free(&state->program->functions[this_lambda_id]);
+    state->program->functions[this_lambda_id] = checked.function;
+    if (checked.captures)
+    {
+        LPG_TO_DO();
+    }
+    return function_pointer_value_from_internal(this_lambda_id, NULL, 0);
+}
+
+static void add_implementation(interface *const to, implementation_entry const added)
+{
+    size_t const new_impl_count = to->implementation_count + 1;
+    to->implementations = reallocate_array(to->implementations, new_impl_count, sizeof(*to->implementations));
+    to->implementations[to->implementation_count] = added;
+    to->implementation_count = new_impl_count;
+}
+
 static evaluate_expression_result evaluate_impl(function_checking_state *state, instruction_sequence *const function,
                                                 impl_expression const element)
 {
     instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, function);
+
     evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, *element.interface);
     if (!interface_evaluated.has_value)
     {
@@ -1487,6 +1543,12 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     {
         LPG_TO_DO();
     }
+    if (interface_evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
+    {
+        LPG_TO_DO();
+    }
+    interface *const target_interface = interface_evaluated.compile_time_value.value_.type_.interface_;
+
     evaluate_expression_result const self_evaluated = evaluate_expression(state, function, *element.self);
     if (!self_evaluated.has_value)
     {
@@ -1500,7 +1562,17 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     {
         LPG_TO_DO();
     }
+    type const self = self_evaluated.compile_time_value.value_.type_;
+
     restore(previous_code);
+    function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));
+    for (size_t i = 0; i < element.method_count; ++i)
+    {
+        methods[i] = evaluate_method_definition(state, function, element.methods[i], self);
+    }
+    /*TODO: check for duplicate implementations for the same self*/
+    add_implementation(
+        target_interface, implementation_entry_create(self, implementation_create(methods, element.method_count)));
     return make_unit(&state->used_registers, function);
 }
 
