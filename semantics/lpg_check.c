@@ -900,32 +900,32 @@ typedef struct conversion_result
     optional_value compile_time_value;
 } conversion_result;
 
-static implementation const *find_implementation(interface const in, type const self)
+static implementation_ref find_implementation(interface const *const in, type const self)
 {
-    for (size_t i = 0; i < in.implementation_count; ++i)
+    for (size_t i = 0; i < in->implementation_count; ++i)
     {
-        if (type_equals(in.implementations[i].self, self))
+        if (type_equals(in->implementations[i].self, self))
         {
-            return &in.implementations[i].target;
+            return implementation_ref_create(in, i);
         }
     }
-    return NULL;
+    return implementation_ref_create(NULL, 0);
 }
 
 static conversion_result convert_to_interface(function_checking_state *const state,
                                               instruction_sequence *const function, register_id const original,
                                               type const from, source_location const original_source,
-                                              interface const to)
+                                              interface const *const to)
 {
-    implementation const *const impl = find_implementation(to, from);
-    if (!impl)
+    implementation_ref const impl = find_implementation(to, from);
+    if (!impl.target)
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
         conversion_result const result = {failure, original, optional_value_empty};
         return result;
     }
     register_id const converted = allocate_register(&state->used_registers);
-    add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(original, converted)));
+    add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(original, converted, impl)));
     conversion_result const result = {success, converted, optional_value_empty};
     return result;
 }
@@ -967,7 +967,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
 
     case type_kind_interface:
-        return convert_to_interface(state, function, original, from, original_source, *to.interface_);
+        return convert_to_interface(state, function, original, from, original_source, to.interface_);
     }
     LPG_UNREACHABLE();
 }
@@ -1122,6 +1122,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 break;
             }
 
+            case value_kind_type_erased:
             case value_kind_integer:
             case value_kind_string:
             case value_kind_flat_object:

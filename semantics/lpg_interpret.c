@@ -41,8 +41,16 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         switch (element.type)
         {
         case instruction_get_method:
-        case instruction_erase_type:
             LPG_TO_DO();
+
+        case instruction_erase_type:
+        {
+            value *const self = garbage_collector_allocate(gc, sizeof(*self));
+            *self = registers[element.erase_type.self];
+            registers[element.erase_type.into] =
+                value_from_type_erased(type_erased_value_create(element.erase_type.impl, self));
+            break;
+        }
 
         case instruction_call:
         {
@@ -71,6 +79,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 break;
             }
 
+            case value_kind_type_erased:
             case value_kind_integer:
             case value_kind_string:
             case value_kind_flat_object:

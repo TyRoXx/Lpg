@@ -306,7 +306,7 @@ static void clean_up_parameters(parameter *const parameters, size_t parameter_co
 static expression_parser_result parse_lambda_body(expression_parser *const parser, size_t const indentation,
                                                   function_header_tree const header)
 {
-    rich_token next_token = peek(parser);
+    rich_token const next_token = peek(parser);
     if (next_token.token == token_space && !header.return_type)
     {
         pop(parser);

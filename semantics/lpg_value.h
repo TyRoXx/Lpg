@@ -5,6 +5,15 @@
 #include "lpg_garbage_collector.h"
 #include "lpg_function_id.h"
 
+typedef struct implementation_ref
+{
+    interface const *target;
+    size_t implementation_index;
+} implementation_ref;
+
+implementation_ref implementation_ref_create(interface const *target, size_t implementation_index);
+bool implementation_ref_equals(implementation_ref const left, implementation_ref const right);
+
 typedef struct enumeration enumeration;
 
 typedef struct value external_function(struct value const *, struct value const *, LPG_NON_NULL(garbage_collector *),
@@ -35,7 +44,8 @@ typedef enum value_kind
     value_kind_enum_element,
     value_kind_unit,
     value_kind_tuple,
-    value_kind_enum_constructor
+    value_kind_enum_constructor,
+    value_kind_type_erased
 } value_kind;
 
 typedef struct value_tuple
@@ -54,6 +64,14 @@ typedef struct enum_element_value
     struct value *state;
 } enum_element_value;
 
+typedef struct type_erased_value
+{
+    implementation_ref impl;
+    struct value *self;
+} type_erased_value;
+
+type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL(struct value *self));
+
 typedef struct value
 {
     value_kind kind;
@@ -66,6 +84,7 @@ typedef struct value
         type type_;
         enum_element_value enum_element;
         value_tuple tuple_;
+        type_erased_value type_erased;
     };
 } value;
 
@@ -78,6 +97,7 @@ value value_from_enum_element(enum_element_id const element, value *const state)
 value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
+value value_from_type_erased(type_erased_value content);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);

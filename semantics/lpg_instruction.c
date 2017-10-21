@@ -144,15 +144,15 @@ bool get_method_instruction_equals(get_method_instruction const left, get_method
            (left.into == right.into);
 }
 
-erase_type_instruction erase_type_instruction_create(register_id self, register_id into)
+erase_type_instruction erase_type_instruction_create(register_id self, register_id into, implementation_ref impl)
 {
-    erase_type_instruction const result = {self, into};
+    erase_type_instruction const result = {self, into, impl};
     return result;
 }
 
 bool erase_type_instruction_equals(erase_type_instruction const left, erase_type_instruction const right)
 {
-    return (left.self == right.self) && (left.into == right.into);
+    return (left.self == right.self) && (left.into == right.into) && implementation_ref_equals(left.impl, right.impl);
 }
 
 instruction instruction_create_tuple(tuple_instruction argument)

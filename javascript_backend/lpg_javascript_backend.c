@@ -67,6 +67,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_type_erased:
+        LPG_TO_DO();
+
     case value_kind_integer:
         if (integer_less(integer_create(0, UINT32_MAX), generated.integer_))
         {

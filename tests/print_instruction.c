@@ -7,6 +7,12 @@ void print_value(value const printed)
 {
     switch (printed.kind)
     {
+    case value_kind_type_erased:
+        printf("type erased (impl: ?, self: ");
+        print_value(*printed.type_erased.self);
+        printf(")");
+        break;
+
     case value_kind_integer:
     {
         char buffer[64];

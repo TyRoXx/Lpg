@@ -34,6 +34,9 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         case instruction_literal:
             switch (current_instruction.literal.value_.kind)
             {
+            case value_kind_type_erased:
+                LPG_TO_DO();
+
             case value_kind_integer:
             case value_kind_string:
                 break;
@@ -113,6 +116,9 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 {
     switch (from.kind)
     {
+    case value_kind_type_erased:
+        LPG_TO_DO();
+
     case value_kind_integer:
         return from;
 

@@ -127,9 +127,10 @@ typedef struct erase_type_instruction
 {
     register_id self;
     register_id into;
+    implementation_ref impl;
 } erase_type_instruction;
 
-erase_type_instruction erase_type_instruction_create(register_id self, register_id into);
+erase_type_instruction erase_type_instruction_create(register_id self, register_id into, implementation_ref impl);
 bool erase_type_instruction_equals(erase_type_instruction const left, erase_type_instruction const right);
 
 struct instruction

@@ -488,6 +488,9 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
+        case value_kind_type_erased:
+            LPG_TO_DO();
+
         case value_kind_integer:
         {
             integer const value = state->registers[from].literal.integer_;
@@ -673,6 +676,9 @@ static success_indicator generate_c_str(c_backend_state *state, checked_function
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
+        case value_kind_type_erased:
+            LPG_TO_DO();
+
         case value_kind_integer:
             LPG_UNREACHABLE();
 
@@ -722,6 +728,9 @@ static success_indicator generate_string_length(c_backend_state *state, checked_
     case register_meaning_literal:
         switch (state->registers[from].literal.kind)
         {
+        case value_kind_type_erased:
+            LPG_TO_DO();
+
         case value_kind_string:
         {
             char buffer[40];

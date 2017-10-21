@@ -1,6 +1,17 @@
 #include "lpg_value.h"
 #include "lpg_assert.h"
 
+implementation_ref implementation_ref_create(interface const *target, size_t implementation_index)
+{
+    implementation_ref const result = {target, implementation_index};
+    return result;
+}
+
+bool implementation_ref_equals(implementation_ref const left, implementation_ref const right)
+{
+    return (left.target == right.target) && (left.implementation_index == right.implementation_index);
+}
+
 function_pointer_value function_pointer_value_from_external(external_function *external, void *environment)
 {
     function_pointer_value const result = {0, external, environment, NULL, 0};
@@ -49,6 +60,13 @@ bool function_pointer_value_equals(function_pointer_value const left, function_p
 value_tuple value_tuple_create(struct value *elements, size_t element_count)
 {
     value_tuple const result = {elements, element_count};
+    return result;
+}
+
+type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL(struct value *self))
+{
+    ASSUME(impl.target);
+    type_erased_value const result = {impl, self};
     return result;
 }
 
@@ -125,6 +143,14 @@ value value_from_enum_constructor(void)
     return result;
 }
 
+value value_from_type_erased(type_erased_value content)
+{
+    value result;
+    result.kind = value_kind_type_erased;
+    result.type_erased = content;
+    return result;
+}
+
 bool value_equals(value const left, value const right)
 {
     if (left.kind != right.kind)
@@ -133,6 +159,9 @@ bool value_equals(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_type_erased:
+        LPG_TO_DO();
+
     case value_kind_integer:
         return integer_equal(left.integer_, right.integer_);
 
@@ -190,6 +219,9 @@ bool value_less_than(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_type_erased:
+        LPG_TO_DO();
+
     case value_kind_integer:
         return integer_less(left.integer_, right.integer_);
 
