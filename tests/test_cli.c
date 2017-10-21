@@ -151,4 +151,10 @@ void test_cli(void)
                               "print(a)\n"
                               "      ^\n",
                               "");
+    expect_output_with_source("xor(boolean.true, boolean.false)\n"
+                              "let xor = (left: boolean, right: boolean) assert(boolean.false)\n",
+                              true, "Unknown structure element or global identifier in line 1:\n"
+                                    "xor(boolean.true, boolean.false)\n"
+                                    "^\n",
+                              "");
 }
