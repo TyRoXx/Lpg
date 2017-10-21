@@ -270,18 +270,24 @@ source_location expression_source_begin(expression const value)
         return value.source;
 
     case expression_type_sequence:
-        if(value.sequence.length > 0){
+        if (value.sequence.length > 0)
+        {
             return expression_source_begin(value.sequence.elements[0]);
-        }else{
+        }
+        else
+        {
             LPG_TO_DO();
         }
     case expression_type_declare:
         return value.declare.name.source;
 
     case expression_type_tuple:
-        if(value.tuple.length > 0){
+        if (value.tuple.length > 0)
+        {
             return expression_source_begin(value.tuple.elements[0]);
-        }else{
+        }
+        else
+        {
             LPG_TO_DO();
         }
 
