@@ -30,7 +30,7 @@ for root, dirs, files in os.walk(root_dir):
         if fi.endswith('md'):
             code += process_file(os.path.join(root, fi))
 
-code_file = open('code.lpg', 'w')
+code_file = open('documentation.lpg', 'w')
 for code_block in code:
     code_file.write(code_block + '\n// Next block\n')
 
