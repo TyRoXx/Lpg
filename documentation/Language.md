@@ -67,7 +67,7 @@ The type of the variable is then automatically derived. In order to access an el
 
 ### Interfaces
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
-```lpg
+```
 let make-percent = interface
     percent(): integer(0, 100)
 ```
@@ -75,7 +75,7 @@ And this is how you implement this:
 **TO DO**
 
 And this is how you use it:
-```lpg
+```
 let print-percent(something: make-percent)
     print(integer-to-string(make-percent.percent))
 ```
