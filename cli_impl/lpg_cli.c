@@ -230,15 +230,51 @@ static value print(value const *const inferred, value const *const arguments, ga
     return value_from_unit();
 }
 
+static compiler_flags parse_compiler_flags(int const argument_count, char **const arguments, bool *const valid)
+{
+    compiler_flags result = {false};
+    for (int i = 2; i < argument_count; ++i)
+    {
+        unicode_view possible_flag = unicode_view_from_c_str(arguments[i]);
+        if (unicode_view_equals(possible_flag, unicode_view_from_c_str("--compile-only")))
+        {
+            result.compile_only = true;
+        }
+        else
+        {
+            *valid = false;
+        }
+    }
+    return result;
+}
+
+static compiler_arguments parse_compiler_arguments(int const argument_count, char **const arguments)
+{
+    compiler_arguments result = {false, "", {false}};
+    if (argument_count < 2)
+    {
+        result.valid = false;
+        return result;
+    }
+
+    bool valid = true;
+    result.file_name = arguments[1];
+    result.flags = parse_compiler_flags(argument_count, arguments, &valid);
+    result.valid = valid;
+    return result;
+}
+
 bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, stream_writer print_destination)
 {
-    if (argc < 2)
+    compiler_arguments arguments = parse_compiler_arguments(argc, argv);
+
+    if (!arguments.valid)
     {
         ASSERT(success == stream_writer_write_string(diagnostics, "Arguments: filename\n"));
         return true;
     }
 
-    blob_or_error const source_or_error = read_file(argv[1]);
+    blob_or_error const source_or_error = read_file(arguments.file_name);
     if (source_or_error.error)
     {
         ASSERT(success == stream_writer_write_string(diagnostics, source_or_error.error));
@@ -274,7 +310,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
     checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &context);
     sequence_free(&root.value);
-    if (!context.has_error)
+    if (!context.has_error && !arguments.flags.compile_only)
     {
         garbage_collector gc = {NULL};
         interpret(checked, globals_values, &gc);

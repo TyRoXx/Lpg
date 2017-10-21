@@ -48,8 +48,8 @@ static void expect_output(int argc, char **argv, bool const expected_exit_code, 
 {
     memory_writer diagnostics = {NULL, 0, 0};
     memory_writer print_output = {NULL, 0, 0};
-    REQUIRE(expected_exit_code ==
-            run_cli(argc, argv, memory_writer_erase(&diagnostics), memory_writer_erase(&print_output)));
+    bool real_error_code = run_cli(argc, argv, memory_writer_erase(&diagnostics), memory_writer_erase(&print_output));
+    REQUIRE(expected_exit_code == real_error_code);
     REQUIRE(memory_writer_equals(diagnostics, expected_diagnostics));
     REQUIRE(memory_writer_equals(print_output, expected_print_output));
     memory_writer_free(&print_output);
@@ -67,6 +67,25 @@ static void expect_output_with_source(char const *const source, bool const expec
     unicode_string_free(&name);
 }
 
+static void expect_output_with_source_flags(char const *const source, char **const flags, const size_t flag_count,
+                                            bool const expected_exit_code, char const *const expected_diagnostics,
+                                            char const *const expected_print_output)
+{
+    unicode_string name = write_file(source);
+    size_t new_size = 2 + flag_count;
+    char **arguments = allocate_array(new_size, sizeof(arguments));
+    arguments[0] = "lpg";
+    arguments[1] = unicode_string_c_str(&name);
+    for (size_t i = 2; i < new_size; ++i)
+    {
+        arguments[i] = flags[i - 2];
+    }
+    expect_output((int)new_size, arguments, expected_exit_code, expected_diagnostics, expected_print_output);
+    REQUIRE(0 == remove(unicode_string_c_str(&name)));
+    unicode_string_free(&name);
+    deallocate(arguments);
+}
+
 void test_cli(void)
 {
     {
@@ -77,6 +96,22 @@ void test_cli(void)
         char *arguments[] = {"lpg", "not-found"};
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n", "");
     }
+
+    expect_output_with_source("print(\"Hello World\")\n", false, "", "Hello World");
+    {
+        char *flags[] = {"--compile-only"};
+        expect_output_with_source_flags("print(\"Hello World\")\n", flags, 1, false, "", "");
+    }
+
+    {
+        char *flags[] = {"--compile-only"};
+        expect_output_with_source_flags("print(\"Hello World)\n", flags, 1, true,
+                                        "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected expression "
+                                        "in line 1:\nprint(\"Hello World)\n                   ^\nExpected expression "
+                                        "in line 2:\n\n^\nExpected arguments in line 2:\n\n^\n",
+                                        "");
+    }
+
     expect_output_with_source("print(\"\")\n"
                               "print(a)\n"
                               "let v = ?",
