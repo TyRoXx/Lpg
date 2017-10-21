@@ -50,10 +50,10 @@ script:
  - mkdir build
  - cd build
  - CC=$MYCC cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_GCOV=$COVERAGE -DLPG_WITH_UB_SANITIZER=$UB_SANITIZER -DLPG_WITH_MEMORY_SANITIZER=$MEMORY_SANITIZER -DLPG_WITH_ADDRESS_SANITIZER=$ADDRESS_SANITIZER -DLPG_WITH_THREAD_SANITIZER=$THREAD_SANITIZER || exit 1
- - echo "travis_fold:start:BUILDING cmake commands"
+ - echo "Building the project travis_fold:start:cmake"
  - cmake -LA . || exit 1
  - cmake --build . -- -j2 || exit 1
- - echo "travis_fold:end:BUILDING Done building cmake"
+ - echo "travis_fold:end:cmake"
  - export UBSAN_OPTIONS=print_stacktrace=1
  - export MSAN_OPTIONS=poison_in_dtor=1
  - export ASAN_OPTIONS=check_initialization_order=1
