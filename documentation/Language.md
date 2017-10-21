@@ -86,9 +86,9 @@ let print-percent(something: make-percent)
 The match expression works similar to the switch statement in other languages.
 Currently it only supports stateless enumerations, for example `boolean`.
 
-```lpg
+```
 let a = boolean.true
-let result = match a
+let result : int(1, 2) = match a
     case boolean.false:
         print("nope")
         1
@@ -109,9 +109,9 @@ loop
     print("Hello World")
 ```
 If you don't want to have an infinite loop then you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
-```lpg
+```
 loop
-    let still-running = match f()
+    let still-running : unit = match f()
         case boolean.false:
             break
         case boolean.true:
