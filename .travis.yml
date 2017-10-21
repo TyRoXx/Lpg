@@ -67,7 +67,7 @@ script:
  - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
  - cd ..
  - if [ $COVERAGE == "YES" ]; then
-     echo "Code coverage travis_fold:start:codecov"
+     echo "Code coverage travis_fold:start:codecov";
      curl -s https://codecov.io/bash > codecov.sh || exit 1;
      chmod +x codecov.sh || exit 1;
      ls -l;
