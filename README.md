@@ -29,7 +29,7 @@ If you declare a constant, a variable or a that is never used and just assigned,
 ```lpg
 let f = ()
     let a : int(1, 2) = 2
-    return "Hello"
+    "Hello"
 ```
 
 This will be compiled to nothing as the function `f` itself was never used.
