@@ -19,7 +19,7 @@ h()
 assert(type-of(h) == function(unit, unit))
 assert(type-of((a: boolean) unit) == function(boolean, unit))
 
-let tuple = (1, "abc", unit, boolean)
+let tuple = {1, "abc", unit, boolean}
 assert(tuple.size == 4)
 assert(tuple.0 == 1)
 assert(tuple.1 == "abc")
@@ -44,7 +44,7 @@ let boolean = enum
     false
     true
 
-let option = enum(T: type)
+let option = enum<T: type>
     none
     some(T)
 
@@ -60,7 +60,7 @@ let y = option.some(123)
 assert(x != y)
 
 //unsolved problem: Implicit conversion from option(T) to option(U) if T converts to U?
-let z : option(int(0, 999)) = option.some(123)
+let z : option<int(0, 999)> = option.some(123)
 
 let make-counter = ()
     mutable count : int(0, 9999) = 0
@@ -75,7 +75,7 @@ mutable c = make-counter()
 assert(c())
 assert(c())
 
-let counter = interface(number: type)
+let counter = interface<number: type>
     mutable increment(): boolean
     count(): number
 
@@ -114,7 +114,7 @@ enum option<T: type>
     none
     some(T)
 
-let print-option (printed: option<let T>): unit
+let print-option = (printed: option<let T>): unit
     match printed
         case option.none
             print("none")
@@ -128,7 +128,7 @@ struct pair<First: type, Second: type>
     second: Second
 
     to-tuple = ()
-        return (first, second)
+        return {first, second}
 
 let p = pair{1, 2}
 
