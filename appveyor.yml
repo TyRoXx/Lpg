@@ -21,9 +21,6 @@ environment:
   - GENERATOR: "Visual Studio 12"
     BUILD_TYPE: Release
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-  - GENERATOR: "Visual Studio 11"
-    BUILD_TYPE: Release
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
 
 before_build:
   - mkdir build
