@@ -901,16 +901,16 @@ typedef struct conversion_result
     optional_value compile_time_value;
 } conversion_result;
 
-static implementation_ref find_implementation(interface const *const in, type const self)
+static optional_size find_implementation(interface const *const in, type const self)
 {
     for (size_t i = 0; i < in->implementation_count; ++i)
     {
         if (type_equals(in->implementations[i].self, self))
         {
-            return implementation_ref_create(in, i);
+            return make_optional_size(i);
         }
     }
-    return implementation_ref_create(NULL, 0);
+    return optional_size_empty;
 }
 
 static conversion_result convert_to_interface(function_checking_state *const state,
@@ -918,15 +918,16 @@ static conversion_result convert_to_interface(function_checking_state *const sta
                                               type const from, source_location const original_source,
                                               interface_id const to)
 {
-    implementation_ref const impl = find_implementation(state->program->interfaces + to, from);
-    if (!impl.target)
+    optional_size const impl = find_implementation(state->program->interfaces + to, from);
+    if (impl.state == optional_empty)
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
         conversion_result const result = {failure, original, optional_value_empty};
         return result;
     }
     register_id const converted = allocate_register(&state->used_registers);
-    add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(original, converted, impl)));
+    add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(
+                                  original, converted, implementation_ref_create(to, impl.value_if_set))));
     conversion_result const result = {success, converted, optional_value_empty};
     return result;
 }

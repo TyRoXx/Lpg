@@ -16,6 +16,16 @@ impl printable2 for unit
     print()
         "unit"
 
-/*
+impl printable2 for int(0, 0)
+    print()
+        "0"
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+
 assert(string-equals("", f("")))
-assert(string-equals("a", f("a")))*/
+assert(string-equals("a", f("a")))
+assert(string-equals("unit", f(unit_value)))
+assert(string-equals("0", f(0)))
+assert(string-equals("1", f(1)))

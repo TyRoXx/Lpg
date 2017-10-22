@@ -7,13 +7,13 @@
 
 typedef struct implementation_ref
 {
-    interface const *target;
+    interface_id target;
     size_t implementation_index;
 } implementation_ref;
 
-implementation_ref implementation_ref_create(interface const *target, size_t implementation_index);
+implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index);
 bool implementation_ref_equals(implementation_ref const left, implementation_ref const right);
-implementation *implementation_ref_resolve(implementation_ref const ref);
+implementation *implementation_ref_resolve(interface const *const interfaces, implementation_ref const ref);
 
 typedef struct enumeration enumeration;
 

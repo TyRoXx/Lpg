@@ -1,7 +1,7 @@
 #include "lpg_value.h"
 #include "lpg_assert.h"
 
-implementation_ref implementation_ref_create(interface const *target, size_t implementation_index)
+implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index)
 {
     implementation_ref const result = {target, implementation_index};
     return result;
@@ -12,9 +12,9 @@ bool implementation_ref_equals(implementation_ref const left, implementation_ref
     return (left.target == right.target) && (left.implementation_index == right.implementation_index);
 }
 
-implementation *implementation_ref_resolve(implementation_ref const ref)
+implementation *implementation_ref_resolve(interface const *const interfaces, implementation_ref const ref)
 {
-    return &ref.target->implementations[ref.implementation_index].target;
+    return &interfaces[ref.target].implementations[ref.implementation_index].target;
 }
 
 function_call_arguments function_call_arguments_create(value const *const inferred, value *const arguments,
@@ -83,7 +83,6 @@ value_tuple value_tuple_create(struct value *elements, size_t element_count)
 
 type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL(struct value *self))
 {
-    ASSUME(impl.target);
     type_erased_value const result = {impl, self};
     return result;
 }

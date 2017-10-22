@@ -391,14 +391,38 @@ static success_indicator generate_get_method(function_generation *const state, g
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
     LPG_TRY(generate_register_name(generated.from, javascript_output));
-    LPG_TRY(stream_writer_write_string(javascript_output, ".call_method("));
+    LPG_TRY(stream_writer_write_string(javascript_output, ".call_method_"));
     LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, generated.method)));
+    LPG_TRY(stream_writer_write_string(javascript_output, "("));
     for (register_id i = 0; i < method.parameters.length; ++i)
     {
         LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         LPG_TRY(generate_argument_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));
+    return success;
+}
+
+static success_indicator generate_implementation_name(interface_id const interface_, size_t const implementation_index,
+                                                      stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "impl_"));
+    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, interface_)));
+    LPG_TRY(stream_writer_write_string(javascript_output, "_"));
+    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, implementation_index)));
+    return success;
+}
+
+static success_indicator generate_erase_type(function_generation *const state, erase_type_instruction const generated,
+                                             stream_writer const javascript_output)
+{
+    LPG_TRY(write_register(state, generated.into, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "new "));
+    LPG_TRY(
+        generate_implementation_name(generated.impl.target, generated.impl.implementation_index, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "("));
+    LPG_TRY(generate_register_name(generated.self, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, ");\n"));
     return success;
 }
 
@@ -448,7 +472,7 @@ static success_indicator generate_instruction(function_generation *const state, 
         return generate_lambda_with_captures(state, generated.lambda_with_captures, javascript_output);
 
     case instruction_erase_type:
-        LPG_TO_DO();
+        return generate_erase_type(state, generated.erase_type, javascript_output);
     }
     LPG_UNREACHABLE();
 }
@@ -482,6 +506,24 @@ static success_indicator generate_function_body(checked_function const function,
     return result;
 }
 
+static success_indicator generate_argument_list(size_t const length, stream_writer const javascript_output)
+{
+    bool comma = false;
+    for (register_id i = 0; i < length; ++i)
+    {
+        if (comma)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        else
+        {
+            comma = true;
+        }
+        LPG_TRY(generate_argument_name(i, javascript_output));
+    }
+    return success;
+}
+
 static success_indicator define_function(function_id const id, checked_function const function,
                                          checked_function const *const all_functions,
                                          interface const *const all_interfaces, stream_writer const javascript_output)
@@ -501,22 +543,63 @@ static success_indicator define_function(function_id const id, checked_function 
         }
         LPG_TRY(generate_capture_name(i, javascript_output));
     }
-    for (register_id i = 0; i < function.signature->parameters.length; ++i)
+    if (function.signature->parameters.length > 0)
     {
         if (comma)
         {
             LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         }
-        else
-        {
-            comma = true;
-        }
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_argument_list(function.signature->parameters.length, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ")\n"));
     LPG_TRY(stream_writer_write_string(javascript_output, "{\n"));
     LPG_TRY(generate_function_body(function, all_functions, all_interfaces, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, "};\n"));
+    return success;
+}
+
+static success_indicator define_implementation(LPG_NON_NULL(interface const *const implemented_interface),
+                                               interface_id const implemented_id, size_t const implementation_index,
+                                               implementation const defined, stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "var "));
+    LPG_TRY(generate_implementation_name(implemented_id, implementation_index, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, " = function (self) {\n"));
+    LPG_TRY(stream_writer_write_string(javascript_output, "    this.self = self;\n"));
+    LPG_TRY(stream_writer_write_string(javascript_output, "};\n"));
+
+    for (size_t i = 0; i < defined.method_count; ++i)
+    {
+        function_pointer_value const current_method = defined.methods[i];
+        size_t const parameter_count = implemented_interface->methods[i].parameters.length;
+        ASSUME(!current_method.external);
+        LPG_TRY(generate_implementation_name(implemented_id, implementation_index, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, ".prototype.call_method_"));
+        LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, i)));
+        LPG_TRY(stream_writer_write_string(javascript_output, " = function ("));
+        LPG_TRY(generate_argument_list(parameter_count, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, ") {\n"));
+        LPG_TRY(stream_writer_write_string(javascript_output, "    return "));
+        LPG_TRY(generate_function_name(current_method.code, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, "("));
+        LPG_TRY(generate_argument_list(parameter_count, javascript_output));
+        if (parameter_count > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        LPG_TRY(stream_writer_write_string(javascript_output, "this.self);\n"));
+        LPG_TRY(stream_writer_write_string(javascript_output, "};\n"));
+    }
+    return success;
+}
+
+static success_indicator define_interface(interface_id const id, interface const defined,
+                                          stream_writer const javascript_output)
+{
+    for (size_t i = 0; i < defined.implementation_count; ++i)
+    {
+        LPG_TRY(define_implementation(&defined, id, i, defined.implementations[i].target, javascript_output));
+    }
     return success;
 }
 
@@ -539,6 +622,10 @@ success_indicator generate_javascript(checked_program const program, stream_writ
         "var and = function (left, right) { return ((left === 1.0) && (right === 1.0)) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         javascript_output, "var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"));
+    for (interface_id i = 0; i < program.interface_count; ++i)
+    {
+        LPG_TRY(define_interface(i, program.interfaces[i], javascript_output));
+    }
     for (function_id i = 1; i < program.function_count; ++i)
     {
         LPG_TRY(declare_function(i, javascript_output));

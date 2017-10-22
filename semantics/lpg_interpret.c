@@ -37,7 +37,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
     ASSUME(captures);
     value const from = captures[0];
     ASSUME(from.kind == value_kind_type_erased);
-    implementation *const impl = implementation_ref_resolve(from.type_erased.impl);
+    implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
     ASSUME(impl);
     value const method = captures[1];
     ASSUME(method.kind == value_kind_integer);
