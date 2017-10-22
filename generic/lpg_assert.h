@@ -38,14 +38,15 @@
 #define LPG_UNREACHABLE() abort()
 #endif
 
-#define LPG_TO_DO()                                                                                                    \
-    do                                                                                                                 \
-    {                                                                                                                  \
-        fprintf(stderr,                                                                                                \
-                "Encountered LPG_TO_DO() at %s:%u. You tried to use a feature that has not been implemented yet.\n",   \
-                __FILE__, __LINE__);                                                                                   \
-        abort();                                                                                                       \
-    } while ((void)0, 0)
+#ifdef _MSC_VER
+#define LPG_NO_RETURN __declspec(noreturn)
+#else
+#define LPG_NO_RETURN __attribute__((noreturn))
+#endif
+
+LPG_NO_RETURN void lpg_to_do(char const *const file, size_t const line);
+
+#define LPG_TO_DO() lpg_to_do(__FILE__, __LINE__)
 
 #define LPG_STATIC_ASSERT_IMPL3(X, L)                                                                                  \
     enum                                                                                                               \
