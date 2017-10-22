@@ -21,13 +21,7 @@ environment:
   - GENERATOR: "Visual Studio 12"
     BUILD_TYPE: Release
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-  - GENERATOR: "Visual Studio 10"
-    BUILD_TYPE: Release
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-  - GENERATOR: "Visual Studio 9"
-    BUILD_TYPE: Release
-    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
-  - GENERATOR: "Visual Studio 8"
+  - GENERATOR: "Visual Studio 11"
     BUILD_TYPE: Release
     APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
 
