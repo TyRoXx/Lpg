@@ -11,18 +11,25 @@ environment:
   matrix:
   - GENERATOR: "Visual Studio 14"
     BUILD_TYPE: Debug
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
   - GENERATOR: "Visual Studio 14"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2015
   - GENERATOR: "Visual Studio 15"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
   - GENERATOR: "Visual Studio 12"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
   - GENERATOR: "Visual Studio 10"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
   - GENERATOR: "Visual Studio 9"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
   - GENERATOR: "Visual Studio 8"
     BUILD_TYPE: Release
+    APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2013
 
 before_build:
   - mkdir build
