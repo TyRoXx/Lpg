@@ -24,11 +24,19 @@ impl printable2 for int(1, 1)
     print()
         "1"
 
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+
 assert(string-equals("", f("")))
 assert(string-equals("a", f("a")))
 assert(string-equals("unit", f(unit_value)))
 assert(string-equals("0", f(0)))
 assert(string-equals("1", f(1)))
+assert(string-equals("true", f(boolean.true)))
+assert(string-equals("false", f(boolean.false)))
 
 let a : printable2 = "abc"
 assert(string-equals("abc", a.print()))
