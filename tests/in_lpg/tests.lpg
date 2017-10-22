@@ -12,6 +12,10 @@ impl printable2 for string-ref
     print()
         self
 
+impl printable2 for unit
+    print()
+        "unit"
+
 /*
 assert(string-equals("", f("")))
 assert(string-equals("a", f("a")))*/
