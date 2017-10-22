@@ -121,6 +121,7 @@ print("Done")
 
 ## Standard library functions
 The standard library also includes some functions to work with the types.
+
 | Name              | Inputs                 | Explanation                                          | Output     |
 |-------------------|------------------------|------------------------------------------------------|------------|
 | assert            | boolean                | Ends the program if the input is `boolean.false`     | unit       |
