@@ -964,7 +964,20 @@ static conversion_result convert(function_checking_state *const state, instructi
 
     case type_kind_integer_range:
     {
-        conversion_result const result = {success, original, original_compile_time_value};
+        if (from.kind != type_kind_integer_range)
+        {
+            state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+            conversion_result const result = {failure, original, optional_value_empty};
+            return result;
+        }
+        if (integer_less_or_equals(to.integer_range_.minimum, from.integer_range_.minimum) &&
+            integer_less_or_equals(from.integer_range_.maximum, to.integer_range_.maximum))
+        {
+            conversion_result const result = {success, original, original_compile_time_value};
+            return result;
+        }
+        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+        conversion_result const result = {failure, original, optional_value_empty};
         return result;
     }
 
@@ -1711,6 +1724,10 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
                               initializer.where, initializer.compile_time_value.value_, initializer.type_)));
         }
 
+        register_id final_where = initializer.where;
+        type final_type = initializer.type_;
+        optional_value final_compile_time_value = initializer.compile_time_value;
+
         if (element.declare.optional_type)
         {
             instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, function);
@@ -1725,12 +1742,19 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
                                                           expression_source_begin(*element.declare.optional_type)),
                                     state->user);
                 }
-                else if (!is_implicitly_convertible(initializer.type_, declared_type.compile_time_value.value_.type_))
+                else
                 {
-                    state->on_error(semantic_error_create(semantic_error_type_mismatch,
-                                                          expression_source_begin(*element.declare.initializer)),
-                                    state->user);
-                    return make_compile_time_unit();
+                    conversion_result const converted =
+                        convert(state, function, initializer.where, initializer.type_, initializer.compile_time_value,
+                                expression_source_begin(*element.declare.initializer),
+                                declared_type.compile_time_value.value_.type_);
+                    if (converted.ok == failure)
+                    {
+                        return make_compile_time_unit();
+                    }
+                    final_where = converted.where;
+                    final_type = declared_type.compile_time_value.value_.type_;
+                    final_compile_time_value = converted.compile_time_value;
                 }
             }
         }
@@ -1746,9 +1770,9 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
             add_local_variable(
                 &state->local_variables,
                 local_variable_create(unicode_view_copy(unicode_view_from_string(element.declare.name.value)),
-                                      initializer.type_, initializer.compile_time_value, initializer.where));
+                                      final_type, final_compile_time_value, final_where));
             define_register_debug_name(
-                state, initializer.where, unicode_view_copy(unicode_view_from_string(element.declare.name.value)));
+                state, final_where, unicode_view_copy(unicode_view_from_string(element.declare.name.value)));
         }
         evaluate_expression_result const result = {
             false, 0, type_from_unit(), optional_value_create(value_from_unit()), false};
