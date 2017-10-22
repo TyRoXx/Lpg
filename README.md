@@ -17,7 +17,7 @@
     1. [Build and run on Windows](#Build-and-run-on-Windows)
 
 ## Usage
-For a general introduction, have a look at the file `documentation/Standard_Libary.md`
+For a general introduction, have a look at the file `documentation/Language.md`
 
 Just write a `.lpg` file and run it. If you want to have syntax highlighting, there is a Visual Studio Code Plugin for this (see VS Code Package Manager) and a Notepad++ syntax file in this repository.
 
