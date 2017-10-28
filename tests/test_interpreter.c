@@ -35,8 +35,6 @@ typedef struct test_environment
     unicode_view read_input;
 } test_environment;
 
-static void test_captures(const standard_library_description *std_library);
-
 static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
     (void)captures;
@@ -244,8 +242,9 @@ void test_interpreter(void)
 {
     standard_library_description const std_library = describe_standard_library();
 
+    run_file("tests.lpg", std_library.globals);
+
     expect_no_output("", "", std_library.globals);
-    expect_no_output("print(\"\")", "", std_library.globals);
     expect_output("let a : int(0, 10) = 2\n"
                   "print(integer-to-string(a))",
                   "", "2", std_library.globals);
@@ -263,53 +262,10 @@ void test_interpreter(void)
                   "    print(v)\n"
                   "    break",
                   "", "Hello, world!", std_library.globals);
-    expect_no_output("assert(!boolean.false)", "", std_library.globals);
-    expect_no_output("assert(boolean.true)", "", std_library.globals);
-    expect_no_output("assert(not(boolean.false))", "", std_library.globals);
-    expect_no_output("assert(and(boolean.true, boolean.true))", "", std_library.globals);
-    expect_no_output("assert(or(boolean.true, boolean.true))", "", std_library.globals);
-    expect_no_output("assert(or(boolean.false, boolean.true))", "", std_library.globals);
-    expect_no_output("assert(or(boolean.true, boolean.false))", "", std_library.globals);
-    expect_no_output("let v = boolean.true\nassert(v)", "", std_library.globals);
-    expect_no_output("let v = boolean.false\nassert(not(v))", "", std_library.globals);
-    expect_no_output("let v = not(boolean.false)\nassert(v)", "", std_library.globals);
-    expect_no_output("let v = 123\n", "", std_library.globals);
     expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "", "123456", std_library.globals);
-    expect_no_output("assert(string-equals(\"\", \"\"))\n", "", std_library.globals);
-    expect_no_output("assert(string-equals(\"aaa\", \"aaa\"))\n", "", std_library.globals);
-    expect_no_output("assert(string-equals(concat(\"aa\", \"a\"), \"aaa\"))\n", "", std_library.globals);
-    expect_no_output("assert(string-equals(concat(\"aa\", read()), \"aaa\"))\n", "a", std_library.globals);
-    expect_no_output("assert(not(string-equals(\"a\", \"\")))\n", "", std_library.globals);
-    expect_no_output("assert(not(string-equals(\"a\", \"b\")))\n", "", std_library.globals);
-    expect_no_output("assert(string-equals(read(), \"\"))\n", "", std_library.globals);
-    expect_no_output("assert(string-equals(read(), \"aaa\"))\n", "aaa", std_library.globals);
-    expect_no_output("let f = () boolean.true\n"
-                     "assert(f())\n",
-                     "", std_library.globals);
     expect_output("let f = () print(\"hello\")\n"
                   "f()\n",
                   "", "hello", std_library.globals);
-    expect_no_output("let xor = (a: boolean, b: boolean)\n"
-                     "    or(and(a, not(b)), and(not(a), b))\n"
-                     "assert(xor(boolean.true, boolean.false))\n"
-                     "assert(xor(boolean.false, boolean.true))\n"
-                     "assert(not(xor(boolean.true, boolean.true)))\n"
-                     "assert(not(xor(boolean.false, boolean.false)))\n",
-                     "", std_library.globals);
-    expect_no_output("let f = (arg: int(0, 1000))\n"
-                     "    let force-runtime-evaluation = read()\n"
-                     "    option.some(arg)\n"
-                     "f(123)\n",
-                     "", std_library.globals);
-    expect_no_output("let s = {}\n"
-                     "let t = {unit}\n"
-                     "let u = {1, 2, 3, 4, 5, 6}\n"
-                     "let v = {123, \"abc\"}\n"
-                     "assert(integer-equals(123, v.0))\n"
-                     "assert(string-equals(\"abc\", v.1))\n"
-                     "let w = {{{{123}}}}\n"
-                     "assert(integer-equals(123, w.0.0.0.0))\n",
-                     "", std_library.globals);
 
     /*first case fits*/
     expect_output("assert(match boolean.true\n"
@@ -329,34 +285,10 @@ void test_interpreter(void)
                   ")\n",
                   "", "jup", std_library.globals);
 
-    /* Integer less and greater than */
-    expect_no_output("let small = 20\n"
-                     "let big = 100\n"
-                     "assert(integer-less(small, big))\n"
-                     "assert(not(integer-less(big, small)))\n",
-                     "", std_library.globals);
-
-    expect_no_output("let printable = interface\n"
-                     "    print(): string-ref\n"
-                     "let f = (printed: printable)\n"
-                     "    let method = printed.print\n"
-                     "    let string = method()\n"
-                     "    print(string)\n",
-                     "", std_library.globals);
-
-    test_captures(&std_library);
-
-    run_file("tests.lpg", std_library.globals);
-
-    standard_library_description_free(&std_library);
-}
-
-static void test_captures(const standard_library_description *std_library)
-{
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
                   "f()\n",
-                  "", "hallo", (*std_library).globals);
+                  "", "hallo", std_library.globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
@@ -365,7 +297,7 @@ static void test_captures(const standard_library_description *std_library)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yy", (*std_library).globals);
+                  "", "yy", std_library.globals);
 
     /*re-capture a captured runtime variable*/
     expect_output("let m = read()\n"
@@ -374,7 +306,7 @@ static void test_captures(const standard_library_description *std_library)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "y", "yy", (*std_library).globals);
+                  "y", "yy", std_library.globals);
 
     /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
@@ -386,26 +318,14 @@ static void test_captures(const standard_library_description *std_library)
                   "        print(n)\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yzzy", (*std_library).globals);
-
-    /*use a captured variable in a compile-time context*/
-    expect_no_output("let m = boolean\n"
-                     "let f = ()\n"
-                     "    let a : m = boolean.true\n"
-                     "    a\n"
-                     "assert(f())\n",
-                     "", (*std_library).globals);
-
-    /*capture an argument*/
-    expect_no_output("let f = (a: boolean)\n"
-                     "    () a\n"
-                     "assert(f(boolean.true)())\n",
-                     "", (*std_library).globals);
+                  "", "yzzy", std_library.globals);
 
     expect_output("let f = (a: string-ref, b: boolean)\n"
                   "    assert(string-equals(\"abc\", a))\n"
                   "    assert(not(b))\n"
                   "    print(a)\n"
                   "f(\"abc\", boolean.false)\n",
-                  "", "abc", (*std_library).globals);
+                  "", "abc", std_library.globals);
+
+    standard_library_description_free(&std_library);
 }
