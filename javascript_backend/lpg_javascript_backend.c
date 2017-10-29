@@ -219,6 +219,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 14:
             return stream_writer_write_string(javascript_output, "undefined");
 
+        case 18:
+            return stream_writer_write_string(javascript_output, "side_effect");
+
         default:
             LPG_TO_DO();
         }
@@ -622,6 +625,7 @@ success_indicator generate_javascript(checked_program const program, stream_writ
         "var and = function (left, right) { return ((left === 1.0) && (right === 1.0)) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         javascript_output, "var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"));
+    LPG_TRY(stream_writer_write_string(javascript_output, "var side_effect = function () {};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], javascript_output));

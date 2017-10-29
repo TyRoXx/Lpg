@@ -171,7 +171,9 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
             /*integer-less*/ value_from_function_pointer(
                 function_pointer_value_from_external(integer_less_impl, &environment, NULL, 0)),
             /*integer-to-string*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0))};
+                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0)),
+            /*side-effect*/ value_from_function_pointer(
+                function_pointer_value_from_external(side_effect_impl, &environment, NULL, 0))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         sequence_free(&root);
         garbage_collector gc = {NULL};

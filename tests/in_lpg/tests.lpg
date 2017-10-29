@@ -112,3 +112,5 @@ assert(string-equals("false", f(boolean.false)))
 
 let a : printable2 = "abc"
 assert(string-equals("abc", a.print()))
+
+side-effect()
