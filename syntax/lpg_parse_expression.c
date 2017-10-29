@@ -998,6 +998,16 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         return expression_parser_result_failure;
     }
 
+    {
+        rich_token const newline = peek_at(parser, 0);
+        pop(parser);
+        if (newline.token != token_newline)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->user);
+            return expression_parser_result_failure;
+        }
+    }
+
     impl_expression_method *methods = NULL;
     size_t method_count = 0;
     bool is_success = true;
@@ -1006,20 +1016,13 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         size_t const method_indentation = (indentation + 1);
 
         {
-            rich_token const newline = peek_at(parser, 0);
-            if (newline.token != token_newline)
-            {
-                break;
-            }
-        }
-        {
-            rich_token const indent = peek_at(parser, 1);
+            rich_token const indent = peek_at(parser, 0);
             if (!is_same_indentation_level(indent, method_indentation))
             {
                 break;
             }
         }
-        pop_n(parser, 2);
+        pop_n(parser, 1);
         rich_token const name = peek(parser);
         if (name.token != token_identifier)
         {

@@ -5,10 +5,11 @@
 #include "lpg_assert.h"
 
 static void mark_function(bool *used_functions, checked_function const *const all_functions,
-                          function_id const marked_function);
+                          interface const *const all_interfaces, function_id const marked_function);
 
 static void mark_used_functions_in_sequence(instruction_sequence const sequence, bool *used_functions,
-                                            checked_function const *const all_functions)
+                                            checked_function const *const all_functions,
+                                            interface const *const all_interfaces)
 {
     for (size_t j = 0; j < sequence.length; ++j)
     {
@@ -16,13 +17,14 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         switch (current_instruction.type)
         {
         case instruction_get_method:
-            LPG_TO_DO();
+            mark_function(used_functions, all_functions, all_interfaces, current_instruction.get_method.method);
+            break;
 
         case instruction_call:
             break;
 
         case instruction_loop:
-            mark_used_functions_in_sequence(current_instruction.loop, used_functions, all_functions);
+            mark_used_functions_in_sequence(current_instruction.loop, used_functions, all_functions, all_interfaces);
             break;
 
         case instruction_global:
@@ -44,7 +46,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             case value_kind_function_pointer:
             {
                 function_id const referenced = current_instruction.literal.value_.function_pointer.code;
-                mark_function(used_functions, all_functions, referenced);
+                mark_function(used_functions, all_functions, all_interfaces, referenced);
                 break;
             }
 
@@ -66,7 +68,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             for (size_t k = 0; k < current_instruction.match.count; ++k)
             {
                 mark_used_functions_in_sequence(
-                    current_instruction.match.cases[k].action, used_functions, all_functions);
+                    current_instruction.match.cases[k].action, used_functions, all_functions, all_interfaces);
             }
             break;
 
@@ -74,14 +76,15 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             break;
 
         case instruction_lambda_with_captures:
-            mark_function(used_functions, all_functions, current_instruction.lambda_with_captures.lambda);
+            mark_function(
+                used_functions, all_functions, all_interfaces, current_instruction.lambda_with_captures.lambda);
             break;
         }
     }
 }
 
 static void mark_function(bool *used_functions, checked_function const *const all_functions,
-                          function_id const marked_function)
+                          interface const *const all_interfaces, function_id const marked_function)
 {
     if (used_functions[marked_function])
     {
@@ -89,7 +92,7 @@ static void mark_function(bool *used_functions, checked_function const *const al
     }
     used_functions[marked_function] = true;
     instruction_sequence const sequence = all_functions[marked_function].body;
-    mark_used_functions_in_sequence(sequence, used_functions, all_functions);
+    mark_used_functions_in_sequence(sequence, used_functions, all_functions, all_interfaces);
 }
 
 static function_pointer *clone_function_pointer(function_pointer const original, garbage_collector *const clone_gc)
@@ -181,8 +184,13 @@ static instruction clone_instruction(instruction const original, garbage_collect
     switch (original.type)
     {
     case instruction_get_method:
+        return instruction_create_get_method(
+            get_method_instruction_create(original.get_method.interface_, original.get_method.from,
+                                          original.get_method.method, original.get_method.into));
+
     case instruction_erase_type:
-        LPG_TO_DO();
+        return instruction_create_erase_type(erase_type_instruction_create(
+            original.erase_type.self, original.erase_type.into, original.erase_type.impl));
 
     case instruction_call:
     {
@@ -311,8 +319,7 @@ static method_description clone_method_description(method_description const orig
 static implementation_entry clone_implementation_entry(implementation_entry const original, garbage_collector *const gc,
                                                        function_id const *const new_function_ids)
 {
-    function_pointer_value *const methods =
-        garbage_collector_allocate_array(gc, original.target.method_count, sizeof(*methods));
+    function_pointer_value *const methods = allocate_array(original.target.method_count, sizeof(*methods));
     for (size_t i = 0; i < original.target.method_count; ++i)
     {
         methods[i] = clone_function_pointer_value(original.target.methods[i], gc, new_function_ids);
@@ -353,7 +360,20 @@ checked_program remove_unused_functions(checked_program const from)
 {
     bool *const used_functions = allocate_array(from.function_count, sizeof(*used_functions));
     memset(used_functions, 0, sizeof(*used_functions) * from.function_count);
-    mark_function(used_functions, from.functions, 0);
+    mark_function(used_functions, from.functions, from.interfaces, 0);
+
+    for (interface_id i = 0; i < from.interface_count; ++i)
+    {
+        for (size_t k = 0; k < from.interfaces[i].implementation_count; ++k)
+        {
+            implementation const impl = from.interfaces[i].implementations[k].target;
+            for (function_id m = 0; m < impl.method_count; ++m)
+            {
+                mark_function(used_functions, from.functions, from.interfaces, impl.methods[m].code);
+            }
+        }
+    }
+
     function_id *const new_function_ids = allocate_array(from.function_count, sizeof(*new_function_ids));
     function_id next_new_function_id = 0;
     for (function_id i = 0; i < from.function_count; ++i)

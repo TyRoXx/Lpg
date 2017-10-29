@@ -104,6 +104,17 @@ lambda_type lambda_type_create(function_id const lambda)
     return result;
 }
 
+method_pointer_type method_pointer_type_create(interface_id interface_, size_t method_index)
+{
+    method_pointer_type const result = {interface_, method_index};
+    return result;
+}
+
+bool method_pointer_type_equals(method_pointer_type const left, method_pointer_type const right)
+{
+    return (left.interface_ == right.interface_) && (left.method_index == right.method_index);
+}
+
 method_description method_description_create(unicode_string name, tuple_type parameters, type result)
 {
     method_description const returning = {name, parameters, result};
@@ -255,6 +266,14 @@ type type_from_interface(interface_id const value)
     return result;
 }
 
+type type_from_method_pointer(method_pointer_type const value)
+{
+    type result;
+    result.kind = type_kind_method_pointer;
+    result.method_pointer = value;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -270,8 +289,15 @@ bool type_equals(type const left, type const right)
     }
     switch (left.kind)
     {
+    case type_kind_method_pointer:
+        return method_pointer_type_equals(left.method_pointer, right.method_pointer);
+
     case type_kind_structure:
+        LPG_TO_DO();
+
     case type_kind_interface:
+        return (left.interface_ == right.interface_);
+
     case type_kind_lambda:
     case type_kind_inferred:
     case type_kind_enum_constructor:
@@ -302,8 +328,11 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     switch (original.kind)
     {
     case type_kind_structure:
-    case type_kind_interface:
+    case type_kind_method_pointer:
         LPG_TO_DO();
+
+    case type_kind_interface:
+        return original;
 
     case type_kind_lambda:
         return type_from_lambda(original.lambda);

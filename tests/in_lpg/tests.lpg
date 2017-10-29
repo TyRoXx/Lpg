@@ -88,6 +88,7 @@ assert(f6(boolean.true)())
 
 let printable2 = interface
     print(): string-ref
+    other-method(): unit
 
 let f = (a: printable2)
     let print = a.print
@@ -97,24 +98,34 @@ let f = (a: printable2)
 impl printable2 for string-ref
     print()
         self
+    other-method()
+        unit_value
 
 impl printable2 for unit
     print()
         "unit"
+    other-method()
+        unit_value
 
 impl printable2 for int(0, 0)
     print()
         "0"
+    other-method()
+        unit_value
 
 impl printable2 for int(1, 1)
     print()
         "1"
+    other-method()
+        unit_value
 
 impl printable2 for boolean
     print()
         match self
             case boolean.true: "true"
             case boolean.false: "false"
+    other-method()
+        unit_value
 
 assert(string-equals("", f("")))
 assert(string-equals("a", f("a")))

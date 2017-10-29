@@ -78,7 +78,8 @@ typedef enum type_kind
     type_kind_inferred,
     type_kind_enum_constructor,
     type_kind_lambda,
-    type_kind_interface
+    type_kind_interface,
+    type_kind_method_pointer
 } type_kind;
 
 typedef struct function_pointer function_pointer;
@@ -91,6 +92,15 @@ typedef struct lambda_type
 } lambda_type;
 
 lambda_type lambda_type_create(function_id const lambda);
+
+typedef struct method_pointer_type
+{
+    interface_id interface_;
+    size_t method_index;
+} method_pointer_type;
+
+method_pointer_type method_pointer_type_create(interface_id interface_, size_t method_index);
+bool method_pointer_type_equals(method_pointer_type const left, method_pointer_type const right);
 
 struct type
 {
@@ -106,6 +116,7 @@ struct type
         enum_constructor_type *enum_constructor;
         lambda_type lambda;
         interface_id interface_;
+        method_pointer_type method_pointer;
     };
 };
 
@@ -173,6 +184,7 @@ type type_from_inferred(size_t const inferred);
 type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type type_from_lambda(lambda_type const lambda);
 type type_from_interface(interface_id const value);
+type type_from_method_pointer(method_pointer_type const value);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

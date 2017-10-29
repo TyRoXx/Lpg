@@ -221,10 +221,12 @@ void test_c_backend(void)
 
     check_generated_c_code("let printable = interface\n"
                            "    print(): string-ref\n"
+                           "impl printable for string-ref\n"
+                           "    print()\n"
+                           "        side-effect()\n"
+                           "        self\n"
                            "let f = (printed: printable)\n"
-                           "    let method = printed.print\n"
-                           "    let string = method()\n"
-                           "    print(string)\n",
+                           "    side-effect()\n",
                            std_library, "26_interface.c");
 
     standard_library_description_free(&std_library);

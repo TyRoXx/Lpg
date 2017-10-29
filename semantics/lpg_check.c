@@ -144,6 +144,9 @@ static type get_return_type(type const callee, checked_function const *const all
 {
     switch (callee.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->result;
 
@@ -186,6 +189,9 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     switch (flat_from.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_type:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -231,6 +237,9 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
 {
     switch (callee.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         ASSUME(parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
         return all_functions[callee.lambda.lambda].signature->parameters.elements[parameter];
@@ -362,6 +371,9 @@ static read_structure_element_result read_element(function_checking_state *state
     type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_structure:
         return read_structure_element(state, function, actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
@@ -403,6 +415,9 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
+        case type_kind_method_pointer:
+            LPG_TO_DO();
+
         case type_kind_string_ref:
         case type_kind_unit:
         case type_kind_type:
@@ -461,6 +476,9 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
@@ -599,6 +617,9 @@ static size_t find_lower_bound_for_inferred_values(type const root)
 {
     switch (root.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_lambda:
@@ -944,6 +965,9 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -1026,6 +1050,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         /*needs to be initialized to avoid compiler warnings due to the missing default case in the switch statement below*/ 0;
     switch (callee.type_.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         inferred_value_count = count_inferred_values(*state->program->functions[callee.type_.lambda.lambda].signature);
         break;
@@ -1191,6 +1218,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
+        case type_kind_method_pointer:
+            LPG_TO_DO();
+
         case type_kind_lambda:
         case type_kind_function_pointer:
             add_instruction(function, instruction_create_call(call_instruction_create(
@@ -1263,6 +1293,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
     switch (key.type_.kind)
     {
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+
     case type_kind_enumeration:
         if (key.type_.enum_->size != (*element).match.number_of_cases)
         {
