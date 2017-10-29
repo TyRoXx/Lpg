@@ -110,12 +110,10 @@ value integer_to_string_impl(function_call_arguments const arguments, struct val
 
     integer const left = arguments.arguments[0].integer_;
     const unsigned int printing_base = 10;
-    const size_t buffer_max_size = integer_string_max_length(printing_base);
-
-    const size_t bytes = sizeof(char) * buffer_max_size;
-    char *buffer = garbage_collector_allocate(arguments.gc, bytes);
+    const size_t buffer_max_size = 20;
+    char *buffer = garbage_collector_allocate(arguments.gc, buffer_max_size);
     char *buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
-    size_t const index_length = (size_t)((buffer + bytes) - buffer_begin);
+    size_t const index_length = (size_t)((buffer + buffer_max_size) - buffer_begin);
 
     return value_from_string_ref(unicode_view_create(buffer_begin, index_length));
 }

@@ -247,9 +247,6 @@ void test_interpreter(void)
     run_file("tests.lpg", std_library.globals);
 
     expect_no_output("", "", std_library.globals);
-    expect_output("let a : int(0, 10) = 2\n"
-                  "print(integer-to-string(a))",
-                  "", "2", std_library.globals);
 
     expect_output("let a : int(0, 10) = 10\n"
                   "print(integer-to-string(a))",

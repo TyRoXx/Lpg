@@ -53,6 +53,20 @@ let big = 100
 assert(integer-less(small, big))
 assert(not(integer-less(big, small)))
 
+// test integer-to-string
+// compile-time evaluation:
+assert(string-equals("0", integer-to-string(0)))
+assert(string-equals("2", integer-to-string(2)))
+assert(string-equals("2147483647", integer-to-string(2147483647)))
+
+//run-time evaluation:
+let test-integer-to-string = (input: int(0, 2147483647))
+    side-effect()
+    integer-to-string(input)
+assert(string-equals("0", test-integer-to-string(0)))
+assert(string-equals("2", test-integer-to-string(2)))
+assert(string-equals("2147483647", test-integer-to-string(2147483647)))
+
 let printable = interface
     print(): string-ref
 let f4 = (printed: printable)
@@ -110,7 +124,7 @@ assert(string-equals("1", f(1)))
 assert(string-equals("true", f(boolean.true)))
 assert(string-equals("false", f(boolean.false)))
 
-let a : printable2 = "abc"
-assert(string-equals("abc", a.print()))
+let a2 : printable2 = "abc"
+assert(string-equals("abc", a2.print()))
 
 side-effect()

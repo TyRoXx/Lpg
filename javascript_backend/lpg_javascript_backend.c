@@ -219,6 +219,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 14:
             return stream_writer_write_string(javascript_output, "undefined");
 
+        case 17:
+            return stream_writer_write_string(javascript_output, "integer_to_string");
+
         case 18:
             return stream_writer_write_string(javascript_output, "side_effect");
 
@@ -626,6 +629,8 @@ success_indicator generate_javascript(checked_program const program, stream_writ
     LPG_TRY(stream_writer_write_string(
         javascript_output, "var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"));
     LPG_TRY(stream_writer_write_string(javascript_output, "var side_effect = function () {};\n"));
+    LPG_TRY(stream_writer_write_string(
+        javascript_output, "var integer_to_string = function (input) { return \"\" + input; };\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], javascript_output));

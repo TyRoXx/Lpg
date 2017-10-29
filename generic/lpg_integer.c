@@ -228,10 +228,3 @@ char *integer_format(integer const value, char const *digits, unsigned base, cha
     }
     return buffer + next_digit;
 }
-
-size_t integer_string_max_length(unsigned int base)
-{
-    ASSUME(base >= 2);
-    unsigned int const length_base2 = sizeof(integer) * 8;
-    return (size_t)ceil(log(length_base2) / log(base));
-}
