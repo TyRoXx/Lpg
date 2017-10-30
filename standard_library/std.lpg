@@ -1,0 +1,37 @@
+let and = (left: boolean, right: boolean)
+    match left
+        case boolean.true:
+            match right
+                case boolean.true: boolean.true
+                case boolean.false: boolean.false
+        case boolean.false: boolean.false
+
+let or = (left: boolean, right: boolean)
+    match left
+        case boolean.true: boolean.true
+        case boolean.false: right
+
+let not = (input: boolean)
+    match input
+        case boolean.true: boolean.false
+        case boolean.false: boolean.true
+
+/*let type = type-of(type-of(0))
+
+let string-ref = type-of("")
+
+let boolean = enum
+    false
+    true
+
+let unit = type-of(unit_value)*/
+
+[
+    and = and
+    or = or
+    not = not
+    /*type = type
+    string-ref = string-ref
+    boolean = boolean
+    unit = unit*/
+]
