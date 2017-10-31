@@ -32,7 +32,6 @@ static void expect_no_errors(semantic_error const error, void *user)
 typedef struct test_environment
 {
     stream_writer print_destination;
-    unicode_view read_input;
 } test_environment;
 
 static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -52,16 +51,6 @@ static value assert_impl(function_call_arguments const arguments, struct value c
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
     REQUIRE(argument == 1);
     return value_from_unit();
-}
-
-static value read_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
-{
-    (void)captures;
-    (void)arguments;
-    test_environment *const actual_environment = environment;
-    unicode_view const result = actual_environment->read_input;
-    actual_environment->read_input = unicode_view_create(NULL, 0);
-    return value_from_string_ref(result);
 }
 
 static duk_ret_t javascript_print(duk_context *const duktape)
@@ -139,15 +128,14 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     FAIL();
 }
 
-static void expect_output_impl(unicode_view const source, char const *input, char const *output,
-                               structure const global_object)
+static void expect_output_impl(unicode_view const source, char const *output, structure const global_object)
 {
     sequence const root = parse(source);
     checked_program const checked = check(root, global_object, expect_no_errors, NULL);
 
     {
         memory_writer print_buffer = {NULL, 0, 0};
-        test_environment environment = {memory_writer_erase(&print_buffer), unicode_view_from_c_str(input)};
+        test_environment environment = {memory_writer_erase(&print_buffer)};
         value const globals_values[] = {
             /*type*/ value_from_unit(),
             /*string-ref*/ value_from_unit(),
@@ -160,8 +148,7 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
             /*concat*/ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL, NULL, 0)),
             /*string-equals*/ value_from_function_pointer(
                 function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0)),
-            /*read*/ value_from_function_pointer(
-                function_pointer_value_from_external(read_impl, &environment, NULL, 0)),
+            /*removed*/ value_from_unit(),
             /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment, NULL, 0)),
             /*integer-equals*/ value_from_function_pointer(
                 function_pointer_value_from_external(integer_equals_impl, &environment, NULL, 0)),
@@ -200,12 +187,6 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
         duk_push_c_function(duktape, javascript_assert, 1);
         duk_put_global_string(duktape, "assert");
 
-        unicode_view read_input = unicode_view_from_c_str(input);
-        duk_push_c_function(duktape, javascript_read, 0);
-        duk_push_pointer(duktape, &read_input);
-        duk_put_prop_string(duktape, -2, DUK_HIDDEN_SYMBOL("input"));
-        duk_put_global_string(duktape, "read");
-
         duk_eval_lstring(duktape, generated.data, generated.used);
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
@@ -217,14 +198,14 @@ static void expect_output_impl(unicode_view const source, char const *input, cha
     checked_program_free(&checked);
 }
 
-static void expect_output(char const *source, char const *input, char const *output, structure const global_object)
+static void expect_output(char const *source, char const *output, structure const global_object)
 {
-    expect_output_impl(unicode_view_from_c_str(source), input, output, global_object);
+    expect_output_impl(unicode_view_from_c_str(source), output, global_object);
 }
 
-static void expect_no_output(char const *source, char const *input, structure const global_object)
+static void expect_no_output(char const *source, structure const global_object)
 {
-    expect_output_impl(unicode_view_from_c_str(source), input, "", global_object);
+    expect_output_impl(unicode_view_from_c_str(source), "", global_object);
 }
 
 static void run_file(char const *const source_file, structure const global_object)
@@ -236,7 +217,7 @@ static void run_file(char const *const source_file, structure const global_objec
     unicode_string_free(&full_expected_file_path);
     REQUIRE(!expected_or_error.error);
     unicode_string const expected = unicode_string_validate(expected_or_error.success);
-    expect_output_impl(unicode_view_from_string(expected), "", "", global_object);
+    expect_output_impl(unicode_view_from_string(expected), "", global_object);
     unicode_string_free(&expected);
 }
 
@@ -246,25 +227,25 @@ void test_interpreter(void)
 
     run_file("tests.lpg", std_library.globals);
 
-    expect_no_output("", "", std_library.globals);
+    expect_no_output("", std_library.globals);
 
     expect_output("let a : int(0, 10) = 10\n"
                   "print(integer-to-string(a))",
-                  "", "10", std_library.globals);
-    expect_output("print(\"Hello, world!\")", "", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, world!\")\n", "", "Hello, world!", std_library.globals);
-    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, world!\")\r\n", "", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, \")\nprint(\"world!\")", "", "Hello, world!", std_library.globals);
+                  "10", std_library.globals);
+    expect_output("print(\"Hello, world!\")", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, world!\")\n", "Hello, world!", std_library.globals);
+    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, world!\")\r\n", "Hello, world!", std_library.globals);
+    expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!", std_library.globals);
     expect_output("loop\n"
                   "    let v = \"Hello, world!\"\n"
                   "    print(v)\n"
                   "    break",
-                  "", "Hello, world!", std_library.globals);
-    expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "", "123456", std_library.globals);
+                  "Hello, world!", std_library.globals);
+    expect_output("let s = concat(\"123\", \"456\")\nprint(s)\n", "123456", std_library.globals);
     expect_output("let f = () print(\"hello\")\n"
                   "f()\n",
-                  "", "hello", std_library.globals);
+                  "hello", std_library.globals);
 
     /*first case fits*/
     expect_output("assert(match boolean.true\n"
@@ -273,7 +254,7 @@ void test_interpreter(void)
                   "        boolean.true\n"
                   "    case boolean.false: boolean.false\n"
                   ")\n",
-                  "", "jup", std_library.globals);
+                  "jup", std_library.globals);
 
     /*second case fits*/
     expect_output("assert(match boolean.true\n"
@@ -282,12 +263,12 @@ void test_interpreter(void)
                   "        print(\"jup\")\n"
                   "        boolean.true\n"
                   ")\n",
-                  "", "jup", std_library.globals);
+                  "jup", std_library.globals);
 
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
                   "f()\n",
-                  "", "hallo", std_library.globals);
+                  "hallo", std_library.globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
@@ -296,16 +277,19 @@ void test_interpreter(void)
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yy", std_library.globals);
+                  "yy", std_library.globals);
 
     /*re-capture a captured runtime variable*/
-    expect_output("let m = read()\n"
+    expect_output("let read = ()\n"
+                  "    side-effect()\n"
+                  "    \"y\"\n"
+                  "let m = read()\n"
                   "let f = ()\n"
                   "    print(m)\n"
                   "    ()\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "y", "yy", std_library.globals);
+                  "yy", std_library.globals);
 
     /*capture multiple variables*/
     expect_output("let m = \"y\"\n"
@@ -317,14 +301,14 @@ void test_interpreter(void)
                   "        print(n)\n"
                   "        print(m)\n"
                   "f()()\n",
-                  "", "yzzy", std_library.globals);
+                  "yzzy", std_library.globals);
 
     expect_output("let f = (a: string-ref, b: boolean)\n"
                   "    assert(string-equals(\"abc\", a))\n"
                   "    assert(not(b))\n"
                   "    print(a)\n"
                   "f(\"abc\", boolean.false)\n",
-                  "", "abc", std_library.globals);
+                  "abc", std_library.globals);
 
     standard_library_description_free(&std_library);
 }

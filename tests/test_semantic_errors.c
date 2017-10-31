@@ -169,7 +169,7 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("read()\n"
+        sequence root = parse("side-effect()\n"
                               "h()");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(1, 0))};
@@ -179,7 +179,7 @@ void test_semantic_errors(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
+            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
@@ -208,7 +208,7 @@ void test_semantic_errors(void)
         instruction_sequence_free(&expected_body);
     }
     {
-        sequence root = parse("let v : read() = boolean.true\n");
+        sequence root = parse("let v : side-effect() = boolean.true\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 8))};
         expected_errors expected = {errors, 1};
@@ -238,7 +238,7 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("let v : boolean = read()\n");
+        sequence root = parse("let v : boolean = side-effect()\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 18))};
         expected_errors expected = {errors, 1};
@@ -247,7 +247,7 @@ void test_semantic_errors(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
+            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
@@ -568,7 +568,7 @@ static void test_assert(const standard_library_description *std_library)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("assert(read())");
+        sequence root = parse("assert(side-effect())");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = {errors, 1};

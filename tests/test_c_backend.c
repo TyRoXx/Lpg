@@ -103,13 +103,6 @@ void test_c_backend(void)
                            "print(s)\n",
                            std_library, "4_concat_compile_time.c");
 
-    check_generated_c_code("print(read())\n", std_library, "5_read.c");
-
-    check_generated_c_code("loop\n"
-                           "    break\n"
-                           "    print(read())\n",
-                           std_library, "6_loop_read.c");
-
     check_generated_c_code("loop\n"
                            "    break\n"
                            "    assert(boolean.false)\n",
@@ -117,9 +110,17 @@ void test_c_backend(void)
 
     check_generated_c_code("assert(boolean.true)\n", std_library, "8_assert_true.c");
 
-    check_generated_c_code("assert(string-equals(read(), \"\"))\n", std_library, "9_string_equals.c");
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"\"\n"
+                           "assert(string-equals(read(), \"\"))\n",
+                           std_library, "9_string_equals.c");
 
-    check_generated_c_code("print(concat(\"a\", read()))\n", std_library, "10_concat.c");
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"b\"\n"
+                           "print(concat(\"a\", read()))\n",
+                           std_library, "10_concat.c");
 
     check_generated_c_code("let f = ()\n"
                            "    print(\"\")\n"
@@ -146,7 +147,9 @@ void test_c_backend(void)
                            "assert(not(xor(boolean.false, boolean.false)))\n",
                            std_library, "14_lambda_parameters.c");
 
-    check_generated_c_code("let s = () read()\n"
+    check_generated_c_code("let s = ()\n"
+                           "    side-effect()\n"
+                           "    \"abc\"\n"
                            "print(s())\n",
                            std_library, "15_return_string.c");
 
@@ -154,11 +157,17 @@ void test_c_backend(void)
                            "s(\"a\")\n",
                            std_library, "16_pass_string.c");
 
-    check_generated_c_code("let s = (a: string-ref) print(a)\n"
-                           "s(read())\n",
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"b\"\n"
+                           "let s = (a: string-ref) print(a)\n"
+                           "s(concat(read(), \"c\"))\n",
                            std_library, "17_pass_owning_string.c");
 
-    check_generated_c_code("let s = (a: string-ref) a\n"
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"b\"\n"
+                           "let s = (a: string-ref) a\n"
                            "let t = s(concat(read(), \"\"))\n"
                            "assert(string-equals(\"\", t))\n",
                            std_library, "18_move_string.c");
@@ -181,7 +190,10 @@ void test_c_backend(void)
                            "assert(string-equals(r(\"a\"), \"a\"))\n",
                            std_library, "20_return_lambda.c");
 
-    check_generated_c_code("assert(match string-equals(read(), \"a\")\n"
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"a\"\n"
+                           "assert(match string-equals(read(), \"a\")\n"
                            "    case boolean.false: boolean.true\n"
                            "    case boolean.true: boolean.false\n"
                            ")\n",
@@ -212,6 +224,9 @@ void test_c_backend(void)
                            std_library, "24_lambda_capture_owning.c");
 
     check_generated_c_code("let construct = ()\n"
+                           "    let read = ()\n"
+                           "        side-effect()\n"
+                           "        \"\"\n"
                            "    print(\"\")\n"
                            "    let result = concat(read(), \"123\")\n"
                            "    {result, result}\n"

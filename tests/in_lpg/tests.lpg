@@ -34,7 +34,7 @@ assert(not(xor(boolean.true, boolean.true)))
 assert(not(xor(boolean.false, boolean.false)))
 
 let f3 = (arg: int(0, 1000))
-    let force-runtime-evaluation = read()
+    side-effect()
     option.some(arg)
 f3(123)
 

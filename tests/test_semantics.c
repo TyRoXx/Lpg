@@ -141,14 +141,14 @@ void test_semantics(void)
     standard_library_description const std_library = describe_standard_library();
 
     {
-        char const *const sources[] = {"read()\n", "read()", "/*comment*/\n"
-                                                             "read()\n",
+        char const *const sources[] = {"side-effect()\n", "side-effect()", "/*comment*/\n"
+                                                                           "side-effect()\n",
                                        "//comment\n"
-                                       "read()\n"};
+                                       "side-effect()\n"};
         LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
         {
             instruction const expected_body_elements[] = {
-                instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
+                instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
                 instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
             check_single_wellformed_function(sources[i], std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
         }
@@ -171,7 +171,7 @@ void test_semantics(void)
         match_instruction_case *const cases = allocate_array(2, sizeof(*cases));
 
         instruction const case_0[] = {instruction_create_global(2),
-                                      instruction_create_read_struct(read_struct_instruction_create(2, 10, 3)),
+                                      instruction_create_read_struct(read_struct_instruction_create(2, 18, 3)),
                                       instruction_create_call(call_instruction_create(3, NULL, 0, 4))};
 
         cases[0] = match_instruction_case_create(1, instruction_sequence_create(LPG_COPY_ARRAY(case_0)), 0);
@@ -190,7 +190,7 @@ void test_semantics(void)
         check_single_wellformed_function("let s = boolean.true\n"
                                          "match s\n"
                                          "    case boolean.true:\n"
-                                         "        read()\n"
+                                         "        side-effect()\n"
                                          "        s\n"
                                          "    case boolean.false: s\n",
                                          std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
@@ -446,29 +446,29 @@ static void test_loops(const standard_library_description *std_library)
 {
     {
         instruction const loop_body[] = {instruction_create_global(0),
-                                         instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
+                                         instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
                                          instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] =
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
-                                         "    read()",
+                                         "    side-effect()",
                                          (*std_library).globals, expected_body_elements, 2);
     }
     {
         instruction const loop_body[] = {instruction_create_global(0),
-                                         instruction_create_read_struct(read_struct_instruction_create(0, 10, 1)),
+                                         instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
                                          instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
                                          instruction_create_global(3),
-                                         instruction_create_read_struct(read_struct_instruction_create(3, 10, 4)),
+                                         instruction_create_read_struct(read_struct_instruction_create(3, 18, 4)),
                                          instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
         instruction const expected_body_elements[] = {
             instruction_create_loop(instruction_sequence_create(LPG_COPY_ARRAY(loop_body))),
             instruction_create_literal(literal_instruction_create(6, value_from_unit(), type_from_unit()))};
         check_single_wellformed_function("loop\n"
-                                         "    read()\n"
-                                         "    read()",
+                                         "    side-effect()\n"
+                                         "    side-effect()",
                                          (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {

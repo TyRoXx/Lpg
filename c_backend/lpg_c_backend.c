@@ -7,7 +7,6 @@
 typedef struct standard_library_usage
 {
     bool using_string_ref;
-    bool using_read;
     bool using_stdio;
     bool using_assert;
     bool using_unit;
@@ -29,7 +28,6 @@ typedef enum register_meaning
     register_meaning_assert,
     register_meaning_string_equals,
     register_meaning_integer_equals,
-    register_meaning_read,
     register_meaning_or,
     register_meaning_and,
     register_meaning_not,
@@ -587,7 +585,6 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
 
     case register_meaning_global:
     case register_meaning_print:
-    case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_concat:
@@ -755,7 +752,6 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
         }
 
     case register_meaning_print:
-    case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
@@ -790,7 +786,6 @@ static success_indicator generate_c_str(c_backend_state *state, checked_function
         return stream_writer_write_string(c_output, ".data");
 
     case register_meaning_print:
-    case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
@@ -843,7 +838,6 @@ static success_indicator generate_string_length(c_backend_state *state, checked_
         return stream_writer_write_string(c_output, ".length");
 
     case register_meaning_print:
-    case register_meaning_read:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
@@ -1011,17 +1005,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ", 1, "));
             LPG_TRY(generate_string_length(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", stdout);\n"));
-            return success;
-
-        case register_meaning_read:
-            state->standard_library.using_stdio = true;
-            standard_library_usage_use_string_ref(&state->standard_library);
-            state->standard_library.using_read = true;
-            ASSERT(input.call.argument_count == 0);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_string_ref());
-            LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
-            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = read_impl();\n"));
             return success;
 
         case register_meaning_assert:
@@ -1272,10 +1255,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 set_register_meaning(state, input.read_struct.into, register_meaning_string_equals);
                 return success;
 
-            case 10:
-                set_register_meaning(state, input.read_struct.into, register_meaning_read);
-                return success;
-
             case 12:
                 set_register_meaning(state, input.read_struct.into, register_meaning_integer_equals);
                 return success;
@@ -1339,7 +1318,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         }
 
         case register_meaning_print:
-        case register_meaning_read:
         case register_meaning_assert:
         case register_meaning_string_equals:
         case register_meaning_integer_equals:
@@ -1673,7 +1651,7 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0};
 
@@ -1737,10 +1715,6 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     if (standard_library.using_stdio)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdio.h>\n"), fail);
-    }
-    if (standard_library.using_read)
-    {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_read.h>\n"), fail);
     }
     if (standard_library.using_stdint)
     {

@@ -1,12 +1,11 @@
 #include <lpg_std_unit.h>
 #include <lpg_std_string.h>
 #include <stdio.h>
-#include <lpg_std_read.h>
 static string_ref lambda_1(void);
 static string_ref lambda_1(void)
 {
-    string_ref const r_2 = read_impl();
-    return r_2;
+    /*side effect*/
+    return string_literal("abc", 3);
 }
 int main(void)
 {

@@ -1,21 +1,25 @@
 #include <lpg_std_assert.h>
 #include <lpg_std_string.h>
-#include <stdio.h>
-#include <lpg_std_read.h>
+static string_ref lambda_1(void);
+static string_ref lambda_1(void)
+{
+    /*side effect*/
+    return string_literal("a", 1);
+}
 int main(void)
 {
-    string_ref const r_6 = read_impl();
-    bool const r_8 = string_ref_equals(r_6, string_literal("a", 1));
-    size_t r_13;
-    if (0 == r_8)
+    string_ref const r_5 = lambda_1();
+    bool const r_7 = string_ref_equals(r_5, string_literal("a", 1));
+    size_t r_12;
+    if (0 == r_7)
     {
-        r_13 = 1;
+        r_12 = 1;
     }
     else
     {
-        r_13 = 0;
+        r_12 = 0;
     }
-    unit const r_14 = assert_impl(r_13);
-    string_ref_free(&r_6);
+    unit const r_13 = assert_impl(r_12);
+    string_ref_free(&r_5);
     return 0;
 }

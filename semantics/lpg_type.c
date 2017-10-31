@@ -299,6 +299,8 @@ bool type_equals(type const left, type const right)
         return (left.interface_ == right.interface_);
 
     case type_kind_lambda:
+        return (left.lambda.lambda == right.lambda.lambda);
+
     case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();

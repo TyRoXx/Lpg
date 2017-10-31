@@ -13,7 +13,6 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->not_);
     function_pointer_free(&stable->concat);
     function_pointer_free(&stable->string_equals);
-    function_pointer_free(&stable->read);
     function_pointer_free(&stable->int_);
     function_pointer_free(&stable->integer_equals);
     function_pointer_free(&stable->integer_less);
@@ -211,8 +210,6 @@ standard_library_description describe_standard_library(void)
         stable->integer_to_string = function_pointer_create(
             type_from_string_ref(), tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
     }
-    stable->read =
-        function_pointer_create(type_from_string_ref(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
 
     stable->side_effect =
         function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
@@ -256,8 +253,7 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0))));
 
-    globals[10] = structure_member_create(
-        type_from_function_pointer(&stable->read), unicode_string_from_c_str("read"), optional_value_empty);
+    globals[10] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed"), optional_value_empty);
 
     globals[11] = structure_member_create(type_from_function_pointer(&stable->int_), unicode_string_from_c_str("int"),
                                           optional_value_create(value_from_function_pointer(

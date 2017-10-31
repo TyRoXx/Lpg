@@ -35,7 +35,6 @@ typedef struct standard_library_stable
     function_pointer not_;
     function_pointer concat;
     function_pointer string_equals;
-    function_pointer read;
     function_pointer int_;
     function_pointer integer_equals;
     function_pointer integer_less;
