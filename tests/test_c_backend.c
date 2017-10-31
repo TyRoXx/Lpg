@@ -166,7 +166,7 @@ void test_c_backend(void)
 
     check_generated_c_code("let read = ()\n"
                            "    side-effect()\n"
-                           "    \"b\"\n"
+                           "    \"\"\n"
                            "let s = (a: string-ref) a\n"
                            "let t = s(concat(read(), \"\"))\n"
                            "assert(string-equals(\"\", t))\n",
@@ -192,7 +192,7 @@ void test_c_backend(void)
 
     check_generated_c_code("let read = ()\n"
                            "    side-effect()\n"
-                           "    \"a\"\n"
+                           "    \"b\"\n"
                            "assert(match string-equals(read(), \"a\")\n"
                            "    case boolean.false: boolean.true\n"
                            "    case boolean.true: boolean.false\n"

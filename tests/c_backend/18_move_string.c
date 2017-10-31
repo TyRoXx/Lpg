@@ -5,7 +5,7 @@ static string_ref lambda_2(string_ref const a_0);
 static string_ref lambda_1(void)
 {
     /*side effect*/
-    return string_literal("b", 1);
+    return string_literal("", 0);
 }
 static string_ref lambda_2(string_ref const a_0)
 {

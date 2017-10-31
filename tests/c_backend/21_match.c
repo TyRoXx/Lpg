@@ -4,7 +4,7 @@ static string_ref lambda_1(void);
 static string_ref lambda_1(void)
 {
     /*side effect*/
-    return string_literal("a", 1);
+    return string_literal("b", 1);
 }
 int main(void)
 {
