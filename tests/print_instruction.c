@@ -73,7 +73,9 @@ void print_instruction(instruction const printed)
         }
         printf("\n");
         return;
-
+    case instruction_return:
+        printf("return %u", printed.return_.return_register);
+        return;
     case instruction_loop:
         printf("loop\n");
         for (size_t i = 0; i < printed.loop.length; ++i)

@@ -24,6 +24,8 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             /*never remove function calls because they might have side effects*/
             registers_read_from[current_instruction.call.result] = true;
             break;
+        case instruction_return:
+            LPG_TO_DO();
 
         case instruction_loop:
             find_used_registers(current_instruction.loop, registers_read_from);
@@ -106,6 +108,8 @@ static bool change_register_ids(instruction *const where, register_id const *con
         ASSERT(update_register_id(&where->call.result, new_register_ids));
         /*never remove function calls because they might have side effects*/
         return true;
+    case instruction_return:
+        LPG_TO_DO();
 
     case instruction_loop:
         change_register_ids_in_sequence(&where->loop, new_register_ids);

@@ -20,6 +20,9 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             mark_function(used_functions, all_functions, all_interfaces, current_instruction.get_method.method);
             break;
 
+        case instruction_return:
+            LPG_TO_DO();
+
         case instruction_call:
             break;
 
@@ -192,6 +195,8 @@ static instruction clone_instruction(instruction const original, garbage_collect
     case instruction_erase_type:
         return instruction_create_erase_type(erase_type_instruction_create(
             original.erase_type.self, original.erase_type.into, original.erase_type.impl));
+    case instruction_return:
+        LPG_TO_DO();
 
     case instruction_call:
     {

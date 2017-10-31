@@ -49,6 +49,12 @@ bool call_instruction_equals(call_instruction const left, call_instruction const
     return true;
 }
 
+return_instruction return_instruction_create(register_id result_register)
+{
+    return_instruction const result = {result_register};
+    return result;
+}
+
 read_struct_instruction read_struct_instruction_create(register_id from_object, struct_member_id member,
                                                        register_id into)
 {
@@ -230,6 +236,14 @@ instruction instruction_create_call(call_instruction argument)
     return result;
 }
 
+instruction instruction_create_return(return_instruction argument)
+{
+    instruction result;
+    result.type = instruction_return;
+    result.return_ = argument;
+    return result;
+}
+
 instruction instruction_create_global(register_id into)
 {
     instruction result;
@@ -286,6 +300,7 @@ void instruction_free(instruction const *value)
     case instruction_read_struct:
     case instruction_break:
     case instruction_literal:
+    case instruction_return:
         break;
 
     case instruction_tuple:
@@ -332,6 +347,9 @@ bool instruction_equals(instruction const left, instruction const right)
 
     case instruction_call:
         return call_instruction_equals(left.call, right.call);
+
+    case instruction_return:
+        return left.return_.return_register == right.return_.return_register;
 
     case instruction_loop:
         return instruction_sequence_equals(&left.loop, &right.loop);

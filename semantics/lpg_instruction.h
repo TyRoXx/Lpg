@@ -22,7 +22,8 @@ typedef enum instruction_type
     instruction_get_captures,
     instruction_lambda_with_captures,
     instruction_get_method,
-    instruction_erase_type
+    instruction_erase_type,
+    instruction_return
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -48,6 +49,13 @@ call_instruction call_instruction_create(register_id callee, register_id *argume
                                          register_id result);
 void call_instruction_free(LPG_NON_NULL(call_instruction const *value));
 bool call_instruction_equals(call_instruction const left, call_instruction const right);
+
+typedef struct return_instruction
+{
+    register_id return_register;
+} return_instruction;
+
+return_instruction return_instruction_create(register_id return_register);
 
 typedef struct read_struct_instruction
 {
@@ -140,6 +148,7 @@ struct instruction
     {
         instruction_sequence loop;
         call_instruction call;
+        return_instruction return_;
         register_id global_into;
         read_struct_instruction read_struct;
         literal_instruction literal;
@@ -164,6 +173,7 @@ match_instruction_case match_instruction_case_create(register_id key, instructio
 void match_instruction_case_free(match_instruction_case freed);
 
 instruction instruction_create_call(call_instruction argument);
+instruction instruction_create_return(return_instruction argument);
 instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
