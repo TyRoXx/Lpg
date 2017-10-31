@@ -973,7 +973,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     }
 
     case instruction_return:
-        LPG_TRY(stream_writer_write_string(c_output, "return "));
+        LPG_TO_DO();
 
     case instruction_call:
         LPG_TRY(indent(indentation, c_output));
