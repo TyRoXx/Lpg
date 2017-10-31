@@ -37,6 +37,8 @@ Functions can be implemented like this
     print("Hello World")
     1
 ```
+If a line just consists of one value that is not assigned to anything and it is the last line of the function, then it is **the return value** of the function. On the other hand you can also be more specific and use the return keyword. Which ensures no matter where that this is the return value of the function and execution of everything after that is stopped.
+ 
 This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
 let print_twice = (message: string-ref)
