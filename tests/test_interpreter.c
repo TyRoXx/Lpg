@@ -81,16 +81,6 @@ static duk_ret_t javascript_assert(duk_context *const duktape)
     return 0;
 }
 
-static duk_ret_t javascript_read(duk_context *const duktape)
-{
-    duk_push_current_function(duktape);
-    duk_get_prop_string(duktape, -1, DUK_HIDDEN_SYMBOL("input"));
-    unicode_view *const read_input = duk_get_pointer(duktape, -1);
-    duk_push_lstring(duktape, read_input->begin, read_input->length);
-    read_input->length = 0;
-    return 1;
-}
-
 static void *duktape_allocate(void *udata, duk_size_t size)
 {
     (void)udata;

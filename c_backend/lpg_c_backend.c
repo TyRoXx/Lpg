@@ -377,13 +377,10 @@ generate_interface_vtable_definition(interface_id const generated, standard_libr
         LPG_TRY(generate_type(method.result, standard_library, definitions, all_functions, all_interfaces, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " (*"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(method.name)));
-        LPG_TRY(stream_writer_write_string(c_output, ")("));
+        LPG_TRY(stream_writer_write_string(c_output, ")(void *"));
         for (size_t k = 0; k < method.parameters.length; ++k)
         {
-            if (k > 0)
-            {
-                LPG_TRY(stream_writer_write_string(c_output, ", "));
-            }
+            LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_type(
                 method.parameters.elements[k], standard_library, definitions, all_functions, all_interfaces, c_output));
         }
@@ -1567,10 +1564,29 @@ static success_indicator generate_function_body(checked_function const current_f
         state.registers[j].meaning = register_meaning_nothing;
         state.registers[j].ownership = register_resource_ownership_owns;
     }
+
+    register_id next_free_register = 0;
+    if (current_function.signature->self.is_set)
+    {
+        set_register_argument(
+            &state, next_free_register, register_resource_ownership_borrows, current_function.signature->self.value);
+        LPG_TRY(stream_writer_write_string(c_output, "    "));
+        LPG_TRY(generate_type(current_function.signature->self.value, standard_library, definitions, all_functions,
+                              all_interfaces, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " const "));
+        LPG_TRY(generate_register_name(next_free_register, &current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = *("));
+        LPG_TRY(generate_type(current_function.signature->self.value, standard_library, definitions, all_functions,
+                              all_interfaces, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " const *)self;\n"));
+        ++next_free_register;
+    }
+
     for (register_id i = 0; i < current_function.signature->parameters.length; ++i)
     {
         type const parameter = current_function.signature->parameters.elements[i];
-        set_register_argument(&state, i, register_resource_ownership_borrows, parameter);
+        set_register_argument(&state, next_free_register, register_resource_ownership_borrows, parameter);
+        ++next_free_register;
     }
     LPG_TRY(generate_sequence(&state, all_functions, all_interfaces, &current_function, current_function.return_value,
                               current_function.body, 1, c_output));
@@ -1620,7 +1636,7 @@ static success_indicator generate_function_declaration(function_id const id, fun
         LPG_TRY(stream_writer_write_string(program_defined_writer, "void *const self"));
         add_comma = true;
     }
-    if (signature.captures.length > 0)
+    else if (signature.captures.length > 0)
     {
         add_comma = true;
         LPG_TRY(generate_type(type_from_tuple_type(signature.captures), standard_library, definitions, all_functions,

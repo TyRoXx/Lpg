@@ -5,9 +5,9 @@
 #include "lpg_instruction.h"
 #include <string.h>
 
-static optional_value call_interpreted_function(checked_function const callee, value *const arguments,
-                                                value const *globals, value const *const captures,
-                                                garbage_collector *const gc,
+static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
+                                                value *const arguments, value const *globals,
+                                                value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
                                                 interface const *const all_interfaces);
 
@@ -27,8 +27,9 @@ optional_value call_function(function_pointer_value const callee, function_call_
     {
         return optional_value_create(callee.external(arguments, callee.captures, callee.external_environment));
     }
-    return call_interpreted_function(arguments.all_functions[callee.code], arguments.arguments, arguments.globals,
-                                     callee.captures, arguments.gc, arguments.all_functions, arguments.all_interfaces);
+    return call_interpreted_function(arguments.all_functions[callee.code], arguments.self, arguments.arguments,
+                                     arguments.globals, callee.captures, arguments.gc, arguments.all_functions,
+                                     arguments.all_interfaces);
 }
 
 static value invoke_method(function_call_arguments const arguments, value const *const captures, void *environment)
@@ -46,18 +47,11 @@ static value invoke_method(function_call_arguments const arguments, value const 
     ASSUME(method.kind == value_kind_integer);
     function_pointer_value const *const function = &impl->methods[method.integer_.low];
     ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
-    size_t const actual_parameter_count = (size_t)method_parameter_count.integer_.low + 1;
-    value *const method_arguments = allocate_array(actual_parameter_count, sizeof(*method_arguments));
-    if (method_parameter_count.integer_.low > 0)
-    {
-        memcpy(method_arguments, arguments.arguments,
-               /*TODO check for overflow*/ ((size_t)method_parameter_count.integer_.low * sizeof(*method_arguments)));
-    }
-    method_arguments[actual_parameter_count - 1] = *from.type_erased.self;
+    ASSUME(!arguments.self.is_set);
     optional_value const result =
-        call_function(*function, function_call_arguments_create(NULL, method_arguments, arguments.globals, arguments.gc,
+        call_function(*function, function_call_arguments_create(NULL, optional_value_create(*from.type_erased.self),
+                                                                arguments.arguments, arguments.globals, arguments.gc,
                                                                 arguments.all_functions, arguments.all_interfaces));
-    deallocate(method_arguments);
     if (!result.is_set)
     {
         LPG_TO_DO();
@@ -116,9 +110,10 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             {
             case value_kind_function_pointer:
             {
-                optional_value const result = call_function(
-                    callee.function_pointer,
-                    function_call_arguments_create(NULL, arguments, globals, gc, all_functions, all_interfaces));
+                optional_value const result =
+                    call_function(callee.function_pointer,
+                                  function_call_arguments_create(NULL, optional_value_empty, arguments, globals, gc,
+                                                                 all_functions, all_interfaces));
                 deallocate(arguments);
                 if (!result.is_set)
                 {
@@ -253,9 +248,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
     return run_sequence_result_continue;
 }
 
-static optional_value call_interpreted_function(checked_function const callee, value *const arguments,
-                                                value const *globals, value const *const captures,
-                                                garbage_collector *const gc,
+static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
+                                                value *const arguments, value const *globals,
+                                                value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
                                                 interface const *const all_interfaces)
 {
@@ -266,9 +261,21 @@ static optional_value call_interpreted_function(checked_function const callee, v
     ASSUME(gc);
     ASSUME(all_functions);
     value *const registers = allocate_array(callee.number_of_registers, sizeof(*registers));
+    register_id next_register = 0;
+    if (callee.signature->self.is_set)
+    {
+        ASSUME(self.is_set);
+        registers[next_register] = self.value_;
+        ++next_register;
+    }
+    else
+    {
+        ASSUME(!self.is_set);
+    }
     for (size_t i = 0; i < callee.signature->parameters.length; ++i)
     {
-        registers[i] = arguments[i];
+        registers[next_register] = arguments[i];
+        ++next_register;
     }
     switch (run_sequence(callee.body, globals, registers, captures, gc, all_functions, all_interfaces))
     {
@@ -291,5 +298,6 @@ static optional_value call_interpreted_function(checked_function const callee, v
 void interpret(checked_program const program, value const *globals, garbage_collector *const gc)
 {
     checked_function const entry_point = program.functions[0];
-    call_interpreted_function(entry_point, NULL, globals, NULL, gc, program.functions, program.interfaces);
+    call_interpreted_function(
+        entry_point, optional_value_empty, NULL, globals, NULL, gc, program.functions, program.interfaces);
 }

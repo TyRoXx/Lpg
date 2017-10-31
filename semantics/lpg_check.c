@@ -695,10 +695,20 @@ static void define_register_debug_name(function_checking_state *const state, reg
 static check_function_result check_function(function_checking_state *parent, expression const body_in,
                                             structure const global, check_error_handler *on_error, void *user,
                                             checked_program *const program, type const *const parameter_types,
-                                            unicode_string *const parameter_names, size_t const parameter_count)
+                                            unicode_string *const parameter_names, size_t const parameter_count,
+                                            optional_type const self)
 {
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     function_checking_state state = function_checking_state_create(parent, &global, on_error, user, program, &body_out);
+
+    if (self.is_set)
+    {
+        register_id const address = allocate_register(&state.used_registers);
+        add_local_variable(
+            &state.local_variables, local_variable_create(unicode_view_copy(unicode_view_from_c_str("self")),
+                                                          self.value, optional_value_empty, address));
+        define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_c_str("self")));
+    }
 
     for (size_t i = 0; i < parameter_count; ++i)
     {
@@ -861,9 +871,9 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
 {
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked =
-        check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
-                       header.parameter_types, header.parameter_names, evaluated.header.parameter_count);
+    check_function_result const checked = check_function(
+        state, *evaluated.result, *state->global, state->on_error, state->user, state->program, header.parameter_types,
+        header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty());
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1162,7 +1172,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 compile_time_result =
                     call_function(callee.compile_time_value.value_.function_pointer,
                                   function_call_arguments_create(
-                                      complete_inferred_values, compile_time_arguments, globals,
+                                      complete_inferred_values, optional_value_empty, compile_time_arguments, globals,
                                       &state->program->memory, state->program->functions, state->program->interfaces));
                 deallocate(globals);
                 break;
@@ -1529,20 +1539,12 @@ static function_pointer_value evaluate_method_definition(function_checking_state
                                                          instruction_sequence *const function,
                                                          impl_expression_method const method, type const self)
 {
-    evaluated_function_header header = evaluate_function_header(state, function, method.header);
-    size_t const actual_parameter_count = (method.header.parameter_count + 1);
-    header.parameter_types =
-        reallocate_array(header.parameter_types, actual_parameter_count, sizeof(*header.parameter_types));
-    header.parameter_types[method.header.parameter_count] = self;
-    header.parameter_names =
-        reallocate_array(header.parameter_names, actual_parameter_count, sizeof(*header.parameter_names));
-    header.parameter_names[method.header.parameter_count] = unicode_string_from_c_str("self");
-
+    evaluated_function_header const header = evaluate_function_header(state, function, method.header);
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked =
-        check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
-                       state->program, header.parameter_types, header.parameter_names, actual_parameter_count);
-    for (size_t i = 0; i < actual_parameter_count; ++i)
+    check_function_result const checked = check_function(
+        state, expression_from_sequence(method.body), *state->global, state->on_error, state->user, state->program,
+        header.parameter_types, header.parameter_names, method.header.parameter_count, optional_type_create_set(self));
+    for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
     }
@@ -1555,7 +1557,7 @@ static function_pointer_value evaluate_method_definition(function_checking_state
 
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = header.parameter_types;
-    checked.function.signature->parameters.length = actual_parameter_count;
+    checked.function.signature->parameters.length = method.header.parameter_count;
     checked.function.signature->self = optional_type_create_set(self);
 
     checked_function_free(&state->program->functions[this_lambda_id]);
@@ -1851,8 +1853,8 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
     checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
-    check_function_result const checked =
-        check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0);
+    check_function_result const checked = check_function(NULL, expression_from_sequence(root), global, on_error, user,
+                                                         &program, NULL, NULL, 0, optional_type_create_empty());
     if (checked.success)
     {
         ASSUME(checked.capture_count == 0);

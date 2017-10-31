@@ -17,18 +17,6 @@ implementation *implementation_ref_resolve(interface const *const interfaces, im
     return &interfaces[ref.target].implementations[ref.implementation_index].target;
 }
 
-function_call_arguments function_call_arguments_create(value const *const inferred, value *const arguments,
-                                                       value const *globals, garbage_collector *const gc,
-                                                       checked_function const *const all_functions,
-                                                       LPG_NON_NULL(interface const *all_interfaces))
-{
-    ASSUME(globals);
-    ASSUME(gc);
-    ASSUME(all_functions);
-    function_call_arguments const result = {inferred, arguments, globals, gc, all_functions, all_interfaces};
-    return result;
-}
-
 function_pointer_value function_pointer_value_from_external(external_function *external, void *environment,
                                                             struct value *const captures, size_t const capture_count)
 {
@@ -279,4 +267,17 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
         return value_less_than(left_value, right_value);
     }
     return left.which < right.which;
+}
+
+function_call_arguments function_call_arguments_create(value const *const inferred, optional_value const self,
+                                                       value *const arguments, value const *globals,
+                                                       garbage_collector *const gc,
+                                                       checked_function const *const all_functions,
+                                                       LPG_NON_NULL(interface const *all_interfaces))
+{
+    ASSUME(globals);
+    ASSUME(gc);
+    ASSUME(all_functions);
+    function_call_arguments const result = {inferred, self, arguments, globals, gc, all_functions, all_interfaces};
+    return result;
 }

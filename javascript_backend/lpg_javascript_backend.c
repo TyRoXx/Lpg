@@ -329,11 +329,6 @@ static success_indicator generate_match(function_generation *const state, match_
     return success;
 }
 
-static success_indicator generate_argument_name(register_id const index, stream_writer const javascript_output)
-{
-    return generate_register_name(index, javascript_output);
-}
-
 static success_indicator generate_lambda_with_captures(function_generation *const state,
                                                        lambda_with_captures_instruction const generated,
                                                        stream_writer const javascript_output)
@@ -347,7 +342,7 @@ static success_indicator generate_lambda_with_captures(function_generation *cons
         {
             LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         }
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_register_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
     LPG_TRY(generate_function_name(generated.lambda, javascript_output));
@@ -375,7 +370,7 @@ static success_indicator generate_lambda_with_captures(function_generation *cons
         {
             comma = true;
         }
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_register_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));
     return success;
@@ -393,7 +388,7 @@ static success_indicator generate_get_method(function_generation *const state, g
         {
             LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         }
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_register_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
     LPG_TRY(generate_register_name(generated.from, javascript_output));
@@ -403,7 +398,7 @@ static success_indicator generate_get_method(function_generation *const state, g
     for (register_id i = 0; i < method.parameters.length; ++i)
     {
         LPG_TRY(stream_writer_write_string(javascript_output, ", "));
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_register_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));
     return success;
@@ -525,7 +520,7 @@ static success_indicator generate_argument_list(size_t const length, stream_writ
         {
             comma = true;
         }
-        LPG_TRY(generate_argument_name(i, javascript_output));
+        LPG_TRY(generate_register_name(i, javascript_output));
     }
     return success;
 }
@@ -549,13 +544,14 @@ static success_indicator define_function(function_id const id, checked_function 
         }
         LPG_TRY(generate_capture_name(i, javascript_output));
     }
-    if (function.signature->parameters.length > 0)
+    size_t const total_parameters = (function.signature->parameters.length + function.signature->self.is_set);
+    if (total_parameters > 0)
     {
         if (comma)
         {
             LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         }
-        LPG_TRY(generate_argument_list(function.signature->parameters.length, javascript_output));
+        LPG_TRY(generate_argument_list(total_parameters, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, ")\n"));
     LPG_TRY(stream_writer_write_string(javascript_output, "{\n"));
@@ -587,13 +583,13 @@ static success_indicator define_implementation(LPG_NON_NULL(interface const *con
         LPG_TRY(stream_writer_write_string(javascript_output, ") {\n"));
         LPG_TRY(stream_writer_write_string(javascript_output, "    return "));
         LPG_TRY(generate_function_name(current_method.code, javascript_output));
-        LPG_TRY(stream_writer_write_string(javascript_output, "("));
-        LPG_TRY(generate_argument_list(parameter_count, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, "(this.self"));
         if (parameter_count > 0)
         {
             LPG_TRY(stream_writer_write_string(javascript_output, ", "));
         }
-        LPG_TRY(stream_writer_write_string(javascript_output, "this.self);\n"));
+        LPG_TRY(generate_argument_list(parameter_count, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, ");\n"));
         LPG_TRY(stream_writer_write_string(javascript_output, "};\n"));
     }
     return success;
