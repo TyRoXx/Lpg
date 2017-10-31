@@ -1031,15 +1031,23 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "*("));
-        LPG_TRY(generate_type(all_interfaces[input.erase_type.impl.target]
-                                  .implementations[input.erase_type.impl.implementation_index]
-                                  .self,
-                              &state->standard_library, state->definitions, all_functions, all_interfaces, c_output));
+        type const self_type = all_interfaces[input.erase_type.impl.target]
+                                   .implementations[input.erase_type.impl.implementation_index]
+                                   .self;
+        LPG_TRY(generate_type(
+            self_type, &state->standard_library, state->definitions, all_functions, all_interfaces, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " *)"));
         LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ".self = "));
         LPG_TRY(generate_c_read_access(state, current_function, input.erase_type.self, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+
+        memory_writer original_self = {NULL, 0, 0};
+        LPG_TRY(generate_c_read_access(
+            state, current_function, input.erase_type.self, memory_writer_erase(&original_self)));
+        LPG_TRY(generate_add_reference(
+            unicode_view_create(original_self.data, original_self.used), self_type, indentation, c_output));
+        memory_writer_free(&original_self);
         return success;
     }
 

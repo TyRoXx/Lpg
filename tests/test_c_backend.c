@@ -234,7 +234,10 @@ void test_c_backend(void)
                            "assert(string-equals(\"123\", tuple.0))\n",
                            std_library, "25_tuple_ownership.c");
 
-    check_generated_c_code("let printable = interface\n"
+    check_generated_c_code("let read = ()\n"
+                           "    side-effect()\n"
+                           "    \"b\"\n"
+                           "let printable = interface\n"
                            "    print(): string-ref\n"
                            "impl printable for string-ref\n"
                            "    print()\n"
@@ -242,7 +245,7 @@ void test_c_backend(void)
                            "        self\n"
                            "let f = (printed: printable)\n"
                            "    side-effect()\n"
-                           "f(\"\")\n",
+                           "f(concat(\"a\", read()))\n",
                            std_library, "26_interface.c");
 
     standard_library_description_free(&std_library);
