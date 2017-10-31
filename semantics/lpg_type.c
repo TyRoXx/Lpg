@@ -115,6 +115,27 @@ bool method_pointer_type_equals(method_pointer_type const left, method_pointer_t
     return (left.interface_ == right.interface_) && (left.method_index == right.method_index);
 }
 
+optional_type optional_type_create_set(type const value)
+{
+    optional_type const result = {true, value};
+    return result;
+}
+
+optional_type optional_type_create_empty(void)
+{
+    optional_type const result = {false, type_from_unit()};
+    return result;
+}
+
+bool optional_type_equals(optional_type const left, optional_type const right)
+{
+    if (left.is_set && right.is_set)
+    {
+        return type_equals(left.value, right.value);
+    }
+    return (left.is_set == right.is_set);
+}
+
 method_description method_description_create(unicode_string name, tuple_type parameters, type result)
 {
     method_description const returning = {name, parameters, result};
@@ -166,9 +187,9 @@ void enumeration_element_free(enumeration_element const *value)
     unicode_string_free(&value->name);
 }
 
-function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures)
+function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures, optional_type self)
 {
-    function_pointer const returning = {result, parameters, captures};
+    function_pointer const returning = {result, parameters, captures, self};
     return returning;
 }
 
@@ -178,7 +199,8 @@ bool function_pointer_equals(function_pointer const left, function_pointer const
     {
         return false;
     }
-    return tuple_type_equals(left.parameters, right.parameters) && tuple_type_equals(left.captures, right.captures);
+    return tuple_type_equals(left.parameters, right.parameters) && tuple_type_equals(left.captures, right.captures) &&
+           optional_type_equals(left.self, right.self);
 }
 
 type type_from_function_pointer(function_pointer const *value)
@@ -350,7 +372,8 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         }
         *copy = function_pointer_create(type_clone(original.function_pointer_->result, clone_gc),
                                         tuple_type_create(arguments, original.function_pointer_->parameters.length),
-                                        tuple_type_create(NULL, 0));
+                                        tuple_type_create(NULL, 0),
+                                        optional_type_clone(original.function_pointer_->self, clone_gc));
         return type_from_function_pointer(copy);
     }
 
@@ -386,6 +409,15 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
+}
+
+optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc)
+{
+    if (!original.is_set)
+    {
+        return original;
+    }
+    return optional_type_create_set(type_clone(original.value, clone_gc));
 }
 
 void function_pointer_free(function_pointer const *value)

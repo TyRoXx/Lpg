@@ -145,74 +145,76 @@ standard_library_description describe_standard_library(void)
         stable->option = enumeration_create(elements, 2);
     }
 
-    stable->print = function_pointer_create(
-        type_from_unit(), tuple_type_create(type_allocate(type_from_string_ref()), 1), tuple_type_create(NULL, 0));
-    stable->assert_ = function_pointer_create(
-        type_from_unit(), tuple_type_create(type_allocate(boolean), 1), tuple_type_create(NULL, 0));
+    stable->print =
+        function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(type_from_string_ref()), 1),
+                                tuple_type_create(NULL, 0), optional_type_create_empty());
+    stable->assert_ = function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(boolean), 1),
+                                              tuple_type_create(NULL, 0), optional_type_create_empty());
     {
         type *const and_parameters = allocate_array(2, sizeof(*and_parameters));
         and_parameters[0] = boolean;
         and_parameters[1] = boolean;
-        stable->and_ =
-            function_pointer_create(boolean, tuple_type_create(and_parameters, 2), tuple_type_create(NULL, 0));
+        stable->and_ = function_pointer_create(
+            boolean, tuple_type_create(and_parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const or_parameters = allocate_array(2, sizeof(*or_parameters));
         or_parameters[0] = boolean;
         or_parameters[1] = boolean;
-        stable->or_ = function_pointer_create(boolean, tuple_type_create(or_parameters, 2), tuple_type_create(NULL, 0));
+        stable->or_ = function_pointer_create(
+            boolean, tuple_type_create(or_parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const not_parameters = allocate_array(1, sizeof(*not_parameters));
         not_parameters[0] = boolean;
-        stable->not_ =
-            function_pointer_create(boolean, tuple_type_create(not_parameters, 1), tuple_type_create(NULL, 0));
+        stable->not_ = function_pointer_create(
+            boolean, tuple_type_create(not_parameters, 1), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = type_from_string_ref();
         parameters[1] = type_from_string_ref();
-        stable->concat = function_pointer_create(
-            type_from_string_ref(), tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
+        stable->concat = function_pointer_create(type_from_string_ref(), tuple_type_create(parameters, 2),
+                                                 tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = type_from_string_ref();
         parameters[1] = type_from_string_ref();
-        stable->string_equals =
-            function_pointer_create(boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
+        stable->string_equals = function_pointer_create(
+            boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
         parameters[1] = parameters[0];
-        stable->int_ =
-            function_pointer_create(type_from_type(), tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
+        stable->int_ = function_pointer_create(type_from_type(), tuple_type_create(parameters, 2),
+                                               tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
         parameters[1] = parameters[0];
-        stable->integer_equals =
-            function_pointer_create(boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
+        stable->integer_equals = function_pointer_create(
+            boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
         parameters[1] = parameters[0];
-        stable->integer_less =
-            function_pointer_create(boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0));
+        stable->integer_less = function_pointer_create(
+            boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
 
-        stable->integer_to_string = function_pointer_create(
-            type_from_string_ref(), tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
+        stable->integer_to_string = function_pointer_create(type_from_string_ref(), tuple_type_create(parameters, 1),
+                                                            tuple_type_create(NULL, 0), optional_type_create_empty());
     }
 
-    stable->side_effect =
-        function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+    stable->side_effect = function_pointer_create(
+        type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
 
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));
     globals[0] = structure_member_create(

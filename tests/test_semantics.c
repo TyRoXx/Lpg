@@ -235,8 +235,8 @@ static void test_functions(const standard_library_description *std_library)
         checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] =
@@ -246,7 +246,7 @@ static void test_functions(const standard_library_description *std_library)
         {
             *signature_lambda = function_pointer_create(
                 type_from_integer_range(integer_range_create(integer_create(0, 123), integer_create(0, 123))),
-                tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+                tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
                 0, signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
@@ -271,8 +271,8 @@ static void test_functions(const standard_library_description *std_library)
         checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] =
@@ -280,8 +280,8 @@ static void test_functions(const standard_library_description *std_library)
                                         LPG_COPY_ARRAY(register_debug_names));
         }
         {
-            *signature_lambda =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature_lambda = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {unicode_string_from_c_str(""), unicode_string_from_c_str(""),
                                                            unicode_string_from_c_str(""),
                                                            unicode_string_from_c_str("")};
@@ -305,8 +305,8 @@ static void test_functions(const standard_library_description *std_library)
         checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
             expected.functions[0] =
@@ -318,7 +318,7 @@ static void test_functions(const standard_library_description *std_library)
             parameters[0] = type_from_enumeration(&(*std_library).stable->boolean);
             *signature_lambda = function_pointer_create(
                 type_from_integer_range(integer_range_create(integer_create(0, 123), integer_create(0, 123))),
-                tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
+                tuple_type_create(parameters, 1), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("a"), unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
@@ -341,8 +341,8 @@ static void test_functions(const standard_library_description *std_library)
         checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str("v"), unicode_string_from_c_str("")};
             expected.functions[0] =
@@ -350,8 +350,8 @@ static void test_functions(const standard_library_description *std_library)
                                         LPG_COPY_ARRAY(register_debug_names));
         }
         {
-            *signature_lambda =
-                function_pointer_create(type_from_type(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature_lambda = function_pointer_create(
+                type_from_type(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str(""), unicode_string_from_c_str("")};
             expected.functions[1] = checked_function_create(
@@ -374,8 +374,8 @@ static void test_functions(const standard_library_description *std_library)
         checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
-            *signature =
-                function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str("v"), unicode_string_from_c_str("")};
             expected.functions[0] =
@@ -385,8 +385,8 @@ static void test_functions(const standard_library_description *std_library)
         {
             type *const parameters = allocate_array(1, sizeof(*parameters));
             parameters[0] = type_from_type();
-            *signature_lambda =
-                function_pointer_create(type_from_type(), tuple_type_create(parameters, 1), tuple_type_create(NULL, 0));
+            *signature_lambda = function_pointer_create(type_from_type(), tuple_type_create(parameters, 1),
+                                                        tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {unicode_string_from_c_str("a")};
             expected.functions[1] = checked_function_create(
                 0, signature_lambda, instruction_sequence_create(NULL, 0), LPG_COPY_ARRAY(register_debug_names));

@@ -1615,6 +1615,11 @@ static success_indicator generate_function_declaration(function_id const id, fun
     LPG_TRY(generate_function_name(id, program_defined_writer));
     LPG_TRY(stream_writer_write_string(program_defined_writer, "("));
     bool add_comma = false;
+    if (signature.self.is_set)
+    {
+        LPG_TRY(stream_writer_write_string(program_defined_writer, "void *const self"));
+        add_comma = true;
+    }
     if (signature.captures.length > 0)
     {
         add_comma = true;

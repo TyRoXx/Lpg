@@ -120,6 +120,16 @@ struct type
     };
 };
 
+typedef struct optional_type
+{
+    bool is_set;
+    type value;
+} optional_type;
+
+optional_type optional_type_create_set(type const value);
+optional_type optional_type_create_empty(void);
+bool optional_type_equals(optional_type const left, optional_type const right);
+
 struct method_description
 {
     unicode_string name;
@@ -168,9 +178,10 @@ struct function_pointer
     type result;
     tuple_type parameters;
     tuple_type captures;
+    optional_type self;
 };
 
-function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures);
+function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures, optional_type self);
 bool function_pointer_equals(function_pointer const left, function_pointer const right);
 
 type type_from_function_pointer(function_pointer const *value);
@@ -188,5 +199,6 @@ type type_from_method_pointer(method_pointer_type const value);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);
+optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc);
 
 void function_pointer_free(LPG_NON_NULL(function_pointer const *value));

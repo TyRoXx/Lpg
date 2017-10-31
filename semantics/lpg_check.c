@@ -336,7 +336,8 @@ static read_structure_element_result read_interface_element_at(function_checking
     type *const captures = garbage_collector_allocate_array(&state->program->memory, 1, sizeof(*captures));
     captures[0] = type_from_interface(from_type);
     method_description const method = state->program->interfaces[from_type].methods[method_index];
-    *method_object = function_pointer_create(method.result, method.parameters, tuple_type_create(captures, 1));
+    *method_object = function_pointer_create(
+        method.result, method.parameters, tuple_type_create(captures, 1), optional_type_create_empty());
     return read_structure_element_result_create(true, type_from_function_pointer(method_object), optional_value_empty);
 }
 
@@ -753,8 +754,9 @@ static check_function_result check_function(function_checking_state *parent, exp
     }
 
     function_pointer *const signature = allocate(sizeof(*signature));
-    *signature = function_pointer_create(
-        body_evaluated.type_, tuple_type_create(NULL, 0), tuple_type_create(capture_types, state.capture_count));
+    *signature =
+        function_pointer_create(body_evaluated.type_, tuple_type_create(NULL, 0),
+                                tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
 
     if (state.register_debug_name_count < state.used_registers)
     {
@@ -846,8 +848,8 @@ static function_id reserve_function_id(function_checking_state *const state)
         reallocate_array(state->program->functions, state->program->function_count, sizeof(*state->program->functions));
     {
         function_pointer *const dummy_signature = allocate(sizeof(*dummy_signature));
-        *dummy_signature =
-            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+        *dummy_signature = function_pointer_create(
+            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
         state->program->functions[this_lambda_id] =
             checked_function_create(0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
@@ -1554,6 +1556,7 @@ static function_pointer_value evaluate_method_definition(function_checking_state
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = actual_parameter_count;
+    checked.function.signature->self = optional_type_create_set(self);
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
@@ -1858,8 +1861,8 @@ checked_program check(sequence const root, structure const global, check_error_h
     else
     {
         function_pointer *const dummy_signature = allocate(sizeof(*dummy_signature));
-        *dummy_signature =
-            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0));
+        *dummy_signature = function_pointer_create(
+            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
         program.functions[0] =
             checked_function_create(0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }

@@ -103,7 +103,8 @@ static function_pointer *clone_function_pointer(function_pointer const original,
         tuple_type_create(allocate_array(original.parameters.length, sizeof(*result->parameters.elements)),
                           original.parameters.length),
         tuple_type_create(
-            allocate_array(original.captures.length, sizeof(*result->captures.elements)), original.captures.length));
+            allocate_array(original.captures.length, sizeof(*result->captures.elements)), original.captures.length),
+        optional_type_clone(original.self, clone_gc));
     for (size_t i = 0; i < original.parameters.length; ++i)
     {
         result->parameters.elements[i] = type_clone(original.parameters.elements[i], clone_gc);
