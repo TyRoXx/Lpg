@@ -25,6 +25,7 @@ static type_definition_0 lambda_1(void)
 static string_ref lambda_2(void)
 {
     /*side effect*/
+    unit const r_2 = unit_impl;
     return string_literal("", 0);
 }
 int main(void)

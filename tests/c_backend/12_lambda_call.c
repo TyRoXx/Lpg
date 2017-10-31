@@ -1,3 +1,4 @@
+#include <lpg_std_unit.h>
 #include <lpg_std_assert.h>
 static unit lambda_1(void);
 static unit lambda_1(void)

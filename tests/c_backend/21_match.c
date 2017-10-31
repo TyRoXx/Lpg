@@ -4,6 +4,7 @@ static string_ref lambda_1(void);
 static string_ref lambda_1(void)
 {
     /*side effect*/
+    unit const r_2 = unit_impl;
     return string_literal("b", 1);
 }
 int main(void)

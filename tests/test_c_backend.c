@@ -241,7 +241,8 @@ void test_c_backend(void)
                            "        side-effect()\n"
                            "        self\n"
                            "let f = (printed: printable)\n"
-                           "    side-effect()\n",
+                           "    side-effect()\n"
+                           "f(\"\")\n",
                            std_library, "26_interface.c");
 
     standard_library_description_free(&std_library);

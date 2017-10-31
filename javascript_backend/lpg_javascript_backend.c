@@ -87,8 +87,7 @@ static success_indicator generate_value(value const generated, type const type_o
         LPG_TO_DO();
 
     case value_kind_type:
-        /*TODO support types at runtime*/
-        return stream_writer_write_string(javascript_output, "\"type (TODO)\"");
+        return stream_writer_write_string(javascript_output, "/*TODO type*/ undefined");
 
     case value_kind_enum_element:
         return generate_enum_element(generated.enum_element, javascript_output);

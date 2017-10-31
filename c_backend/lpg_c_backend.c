@@ -12,6 +12,7 @@ typedef struct standard_library_usage
     bool using_unit;
     bool using_stdint;
     bool using_integer;
+    bool using_stddef;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -369,6 +370,10 @@ generate_interface_vtable_definition(interface_id const generated, standard_libr
     LPG_TRY(stream_writer_write_string(c_output, "\n"));
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "void (*_add_reference)(void *, ptrdiff_t);\n"));
+    standard_library->using_stddef = true;
+
     interface const our_interface = all_interfaces[generated];
     for (function_id i = 0; i < our_interface.method_count; ++i)
     {
@@ -433,23 +438,68 @@ static success_indicator generate_interface_impl_name(implementation_ref const g
     return success;
 }
 
-static success_indicator generate_interface_impl_definition(implementation_ref const generated,
-                                                            interface const *const all_interfaces,
-                                                            stream_writer const c_output)
+static success_indicator generate_interface_impl_add_reference(implementation_ref const generated,
+                                                               stream_writer const c_output)
 {
+    LPG_TRY(stream_writer_write_string(c_output, "add_reference_"));
+    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.implementation_index)));
+    LPG_TRY(stream_writer_write_string(c_output, "_for_"));
+    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.target)));
+    return success;
+}
+
+static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
+                                       type const what, checked_function const *const all_functions,
+                                       size_t const indentation, stream_writer const c_output);
+
+static success_indicator
+generate_interface_impl_definition(implementation_ref const generated, type_definitions *const definitions,
+                                   checked_function const *const all_functions, interface const *const all_interfaces,
+                                   standard_library_usage *const standard_library, stream_writer const c_output)
+{
+    implementation_entry const impl = all_interfaces[generated.target].implementations[generated.implementation_index];
+
+    LPG_TRY(stream_writer_write_string(c_output, "static void "));
+    LPG_TRY(generate_interface_impl_add_reference(generated, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "(void *const self, ptrdiff_t const difference)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(
+        stream_writer_write_string(c_output, "size_t *const counter = (size_t *)((char *)self - sizeof(*counter));\n"));
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "*counter = (size_t)((ptrdiff_t)*counter + difference);\n"));
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "if (*counter == 0)\n"));
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    {
+        memory_writer freed = {NULL, 0, 0};
+        stream_writer freed_writer = memory_writer_erase(&freed);
+        LPG_TRY(stream_writer_write_string(freed_writer, "(*("));
+        LPG_TRY(generate_type(impl.self, standard_library, definitions, all_functions, all_interfaces, freed_writer));
+        LPG_TRY(stream_writer_write_string(freed_writer, " *)self)"));
+        LPG_TRY(generate_free(
+            standard_library, unicode_view_create(freed.data, freed.used), impl.self, all_functions, 2, c_output));
+        memory_writer_free(&freed);
+    }
+    LPG_TRY(indent(2, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "free(counter);\n"));
+
+    LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+
+    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
     LPG_TRY(stream_writer_write_string(c_output, "static "));
     LPG_TRY(generate_interface_vtable_name(generated.target, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const "));
     LPG_TRY(generate_interface_impl_name(generated, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " = {"));
-    implementation const impl = all_interfaces[generated.target].implementations[generated.implementation_index].target;
-    for (function_id i = 0; i < impl.method_count; ++i)
+    LPG_TRY(generate_interface_impl_add_reference(generated, c_output));
+    for (function_id i = 0; i < impl.target.method_count; ++i)
     {
-        if (i > 0)
-        {
-            LPG_TRY(stream_writer_write_string(c_output, ", "));
-        }
-        LPG_TRY(generate_function_name(impl.methods[i].code, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ", "));
+        LPG_TRY(generate_function_name(impl.target.methods[i].code, c_output));
     }
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     return success;
@@ -489,6 +539,7 @@ static success_indicator generate_type(type const generated, standard_library_us
             generated, standard_library, definitions, all_functions, all_interfaces, c_output);
 
     case type_kind_unit:
+        standard_library->using_unit = true;
         return stream_writer_write_string(c_output, "unit");
 
     case type_kind_string_ref:
@@ -958,7 +1009,37 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         set_register_variable(state, input.erase_type.into, register_resource_ownership_owns,
                               type_from_interface(input.erase_type.impl.target));
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "TODO erase type;\n"));
+        LPG_TRY(generate_interface_reference_name(input.erase_type.impl.target, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " "));
+        LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = {&"));
+        LPG_TRY(generate_interface_impl_name(input.erase_type.impl, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ", malloc(sizeof(size_t) + sizeof("));
+        LPG_TRY(generate_c_read_access(state, current_function, input.erase_type.self, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "))};\n"));
+
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "*(size_t *)"));
+        LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ".self = 1;\n"));
+
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ".self = (char *)"));
+        LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ".self + sizeof(size_t);\n"));
+
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "*("));
+        LPG_TRY(generate_type(all_interfaces[input.erase_type.impl.target]
+                                  .implementations[input.erase_type.impl.implementation_index]
+                                  .self,
+                              &state->standard_library, state->definitions, all_functions, all_interfaces, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " *)"));
+        LPG_TRY(generate_register_name(input.erase_type.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ".self = "));
+        LPG_TRY(generate_c_read_access(state, current_function, input.erase_type.self, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
         return success;
     }
 
@@ -968,8 +1049,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             state, input.get_method.into, register_resource_ownership_owns,
             type_from_method_pointer(method_pointer_type_create(input.get_method.interface_, input.get_method.method)));
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "TODO get_method;\n"));
-        return success;
+        LPG_TO_DO();
     }
 
     case instruction_return:
@@ -989,6 +1069,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_side_effect:
             set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_unit());
             LPG_TRY(stream_writer_write_string(c_output, "/*side effect*/\n"));
+            LPG_TRY(indent(indentation, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
             return success;
 
         case register_meaning_print:
@@ -1430,25 +1514,26 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_free(c_backend_state *state, unicode_view const freed, type const what,
-                                       checked_function const *const all_functions,
-                                       checked_function const *const current_function,
-                                       register_id const current_function_result, size_t const indentation,
-                                       stream_writer const c_output)
+static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
+                                       type const what, checked_function const *const all_functions,
+                                       size_t const indentation, stream_writer const c_output)
 {
     switch (what.kind)
     {
     case type_kind_method_pointer:
-        return generate_free(state, freed, type_from_interface(what.method_pointer.interface_), all_functions,
-                             current_function, current_function_result, indentation, c_output);
+        return generate_free(standard_library, freed, type_from_interface(what.method_pointer.interface_),
+                             all_functions, indentation, c_output);
 
     case type_kind_interface:
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "/*TODO free interface instance*/\n"));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
+        LPG_TRY(stream_writer_write_string(c_output, ".vtable->_add_reference("));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
+        LPG_TRY(stream_writer_write_string(c_output, ".self, -1);\n"));
         return success;
 
     case type_kind_string_ref:
-        state->standard_library.using_string_ref = true;
+        standard_library->using_string_ref = true;
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
@@ -1466,8 +1551,8 @@ static success_indicator generate_free(c_backend_state *state, unicode_view cons
             LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), freed));
             LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
             LPG_TRY(generate_tuple_element_name(i, memory_writer_erase(&name_buffer)));
-            LPG_TRY(generate_free(state, memory_writer_content(name_buffer), what.tuple_.elements[i], all_functions,
-                                  current_function, current_function_result, indentation, c_output));
+            LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), what.tuple_.elements[i],
+                                  all_functions, indentation, c_output));
             memory_writer_free(&name_buffer);
         }
         return success;
@@ -1485,8 +1570,8 @@ static success_indicator generate_free(c_backend_state *state, unicode_view cons
     case type_kind_lambda:
     {
         checked_function const lambda_function = all_functions[what.lambda.lambda];
-        LPG_TRY(generate_free(state, freed, type_from_tuple_type(lambda_function.signature->captures), all_functions,
-                              current_function, current_function_result, indentation, c_output));
+        LPG_TRY(generate_free(standard_library, freed, type_from_tuple_type(lambda_function.signature->captures),
+                              all_functions, indentation, c_output));
         return success;
     }
     }
@@ -1496,8 +1581,7 @@ static success_indicator generate_free(c_backend_state *state, unicode_view cons
 static success_indicator generate_free_register(c_backend_state *state, register_id const which,
                                                 checked_function const *const all_functions,
                                                 checked_function const *const current_function,
-                                                register_id const current_function_result, size_t const indentation,
-                                                stream_writer const c_output)
+                                                size_t const indentation, stream_writer const c_output)
 {
     switch (state->registers[which].ownership)
     {
@@ -1506,8 +1590,8 @@ static success_indicator generate_free_register(c_backend_state *state, register
         memory_writer name_buffer = {NULL, 0, 0};
         LPG_TRY(generate_register_name(which, current_function, memory_writer_erase(&name_buffer)));
         success_indicator const result =
-            generate_free(state, memory_writer_content(name_buffer), state->registers[which].type_of, all_functions,
-                          current_function, current_function_result, indentation, c_output);
+            generate_free(&state->standard_library, memory_writer_content(name_buffer), state->registers[which].type_of,
+                          all_functions, indentation, c_output);
         memory_writer_free(&name_buffer);
         return result;
     }
@@ -1538,8 +1622,7 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
         {
             continue;
         }
-        LPG_TRY(generate_free_register(
-            state, which, all_functions, current_function, current_function_result, indentation, c_output));
+        LPG_TRY(generate_free_register(state, which, all_functions, current_function, indentation, c_output));
     }
     state->active_register_count = previously_active_registers;
     return success;
@@ -1675,7 +1758,7 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0};
 
@@ -1701,9 +1784,10 @@ success_indicator generate_c(checked_program const program, enumeration const *c
         interface const interface_ = program.interfaces[i];
         for (size_t k = 0; k < interface_.implementation_count; ++k)
         {
-            LPG_TRY_GOTO(generate_interface_impl_definition(
-                             implementation_ref_create(i, k), program.interfaces, program_defined_writer),
-                         fail);
+            LPG_TRY_GOTO(
+                generate_interface_impl_definition(implementation_ref_create(i, k), &definitions, program.functions,
+                                                   program.interfaces, &standard_library, program_defined_writer),
+                fail);
         }
     }
 
@@ -1747,6 +1831,10 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     if (standard_library.using_integer)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_integer.h>\n"), fail);
+    }
+    if (standard_library.using_stddef)
+    {
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stddef.h>\n"), fail);
     }
 
     for (size_t i = 0; i < definitions.count; ++i)
