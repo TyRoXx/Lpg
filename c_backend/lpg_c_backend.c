@@ -972,6 +972,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         return success;
     }
 
+    case instruction_return:
+        LPG_TO_DO();
+
     case instruction_call:
         LPG_TRY(indent(indentation, c_output));
         switch (state->registers[input.call.callee].meaning)

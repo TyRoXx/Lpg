@@ -325,6 +325,10 @@ static read_structure_element_result read_tuple_element(function_checking_state 
 static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
                                                       expression const element);
 
+static evaluate_expression_result evaluate_return_expression(function_checking_state *pState,
+                                                             instruction_sequence *pSequence,
+                                                             const expression *pExpression);
+
 static read_structure_element_result read_interface_element_at(function_checking_state *state,
                                                                instruction_sequence *function, register_id const from,
                                                                interface_id const from_type,
@@ -1712,7 +1716,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
     }
 
     case expression_type_return:
-        LPG_TO_DO();
+        return evaluate_return_expression(state, function, &element);
 
     case expression_type_loop:
     {
@@ -1821,6 +1825,16 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         return evaluate_tuple_expression(state, function, &element);
     }
     LPG_UNREACHABLE();
+}
+
+static evaluate_expression_result
+evaluate_return_expression(function_checking_state *state, instruction_sequence *sequence, const expression *expression)
+{
+    const evaluate_expression_result result = evaluate_expression(state, sequence, *expression->return_);
+
+    instruction return_instruction = instruction_create_return(return_instruction_create(result.where));
+    add_instruction(sequence, return_instruction);
+    return result;
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,

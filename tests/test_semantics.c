@@ -261,6 +261,41 @@ static void test_functions(const standard_library_description *std_library)
                 0, value_from_function_pointer(function_pointer_value_from_internal(1, NULL, 0)),
                 type_from_function_pointer(signature_lambda))),
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
+        literal_instruction literal = literal_instruction_create(
+            0, value_from_integer(integer_create(0, 123)), make_integer_constant_type(integer_create(0, 123)));
+        instruction const expected_lambda[] = {
+            instruction_create_literal(literal), instruction_create_return(return_instruction_create(literal.into))};
+        checked_program const expected = {NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2};
+        {
+            function_pointer *const signature = allocate(sizeof(*signature));
+            *signature = function_pointer_create(
+                type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
+            unicode_string const register_debug_names[] = {
+                unicode_string_from_c_str("f"), unicode_string_from_c_str("")};
+            expected.functions[0] =
+                checked_function_create(1, signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
+                                        LPG_COPY_ARRAY(register_debug_names));
+        }
+        {
+            *signature_lambda = function_pointer_create(
+                type_from_integer_range(integer_range_create(integer_create(0, 123), integer_create(0, 123))),
+                tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
+            unicode_string const register_debug_names[] = {unicode_string_from_c_str("")};
+            expected.functions[1] = checked_function_create(
+                0, signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
+                LPG_COPY_ARRAY(register_debug_names));
+        }
+        check_wellformed_program("let f = ()\n"
+                                 "    return 123",
+                                 (*std_library).globals, expected);
+    }
+    {
+        function_pointer *const signature_lambda = allocate(sizeof(*signature_lambda));
+        instruction const expected_main[] = {
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_function_pointer(function_pointer_value_from_internal(1, NULL, 0)),
+                type_from_function_pointer(signature_lambda))),
+            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
         register_id *const arguments = allocate_array(1, sizeof(*arguments));
         arguments[0] = 2;
         instruction const expected_lambda[] = {

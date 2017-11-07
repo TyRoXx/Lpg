@@ -137,6 +137,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             break;
         }
 
+        case instruction_return:
+            return run_sequence_result_break;
+
         case instruction_loop:
         {
             bool is_running = true;
