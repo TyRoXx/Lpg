@@ -1600,7 +1600,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     if (!checked.success)
     {
         deallocate(header.parameter_types);
-        LPG_TO_DO();
+        return method_evaluation_result_failure;
     }
 
     ASSUME(checked.function.signature->parameters.length == 0);
