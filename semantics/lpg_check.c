@@ -1630,40 +1630,28 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
 {
     instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, function);
 
-    evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, *element.interface);
+    compile_time_type_expression_result const interface_evaluated =
+        expect_compile_time_type(state, function, *element.interface);
     if (!interface_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
-    if (!interface_evaluated.compile_time_value.is_set)
+    if (interface_evaluated.compile_time_value.kind != type_kind_interface)
     {
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_expected_interface, expression_source_begin(*element.interface)),
+            state->user);
+        return evaluate_expression_result_empty;
     }
-    if (interface_evaluated.compile_time_value.value_.kind != value_kind_type)
-    {
-        LPG_TO_DO();
-    }
-    if (interface_evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
-    {
-        LPG_TO_DO();
-    }
-    interface *const target_interface =
-        state->program->interfaces + interface_evaluated.compile_time_value.value_.type_.interface_;
+    interface *const target_interface = state->program->interfaces + interface_evaluated.compile_time_value.interface_;
 
-    evaluate_expression_result const self_evaluated = evaluate_expression(state, function, *element.self);
+    compile_time_type_expression_result const self_evaluated = expect_compile_time_type(state, function, *element.self);
     if (!self_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
-    if (!self_evaluated.compile_time_value.is_set)
-    {
-        LPG_TO_DO();
-    }
-    if (self_evaluated.compile_time_value.value_.kind != value_kind_type)
-    {
-        LPG_TO_DO();
-    }
-    type const self = self_evaluated.compile_time_value.value_.type_;
+
+    type const self = self_evaluated.compile_time_value;
 
     restore(previous_code);
     function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));

@@ -204,6 +204,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_duplicate_match_case:
         return "Match case already exists";
+
+    case semantic_error_expected_interface:
+        return "Expected interface";
     }
     LPG_UNREACHABLE();
 }
