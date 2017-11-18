@@ -106,6 +106,7 @@ static capture capture_create(variable_address const from, type const what)
 typedef struct function_checking_state
 {
     struct function_checking_state *parent;
+    bool may_capture_runtime_variables;
     capture *captures;
     capture_index capture_count;
     register_id used_registers;
@@ -120,13 +121,15 @@ typedef struct function_checking_state
     instruction_sequence *body;
 } function_checking_state;
 
-static function_checking_state function_checking_state_create(function_checking_state *parent, structure const *global,
-                                                              check_error_handler *on_error, void *user,
-                                                              checked_program *const program,
+static function_checking_state function_checking_state_create(function_checking_state *parent,
+                                                              bool may_capture_runtime_variables,
+                                                              structure const *global, check_error_handler *on_error,
+                                                              void *user, checked_program *const program,
                                                               instruction_sequence *const body)
 {
     function_checking_state const result = {
-        parent, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program, body};
+        parent, may_capture_runtime_variables, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program,
+        body};
     return result;
 }
 
@@ -514,10 +517,17 @@ static capture_index require_capture(LPG_NON_NULL(function_checking_state *const
     return result;
 }
 
+typedef enum read_local_variable_status
+{
+    read_local_variable_status_ok,
+    read_local_variable_status_unknown,
+    read_local_variable_status_forbidden
+} read_local_variable_status;
+
 typedef struct read_local_variable_result
 {
-    /*if exists, the other members are set*/
-    bool exists;
+    /*if status is ok, the other members are set*/
+    read_local_variable_status status;
     variable_address where;
     type what;
     optional_value compile_time_value;
@@ -527,15 +537,25 @@ typedef struct read_local_variable_result
 static read_local_variable_result read_local_variable_result_create(variable_address where, type what,
                                                                     optional_value compile_time_value, bool is_pure)
 {
-    read_local_variable_result const result = {true, where, what, compile_time_value, is_pure};
+    read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
     return result;
 }
 
-static read_local_variable_result const read_local_variable_result_empty = {
-    false, {{false, 0}, 0}, {type_kind_unit, {NULL}}, {false, {value_kind_unit, {0}}}, false};
+static read_local_variable_result const read_local_variable_result_unknown = {read_local_variable_status_unknown,
+                                                                              {{false, 0}, 0},
+                                                                              {type_kind_unit, {NULL}},
+                                                                              {false, {value_kind_unit, {0}}},
+                                                                              false};
+
+static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
+                                                                                {{false, 0}, 0},
+                                                                                {type_kind_unit, {NULL}},
+                                                                                {false, {value_kind_unit, {0}}},
+                                                                                false};
 
 static read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                                      unicode_view const name)
+                                                      instruction_sequence *const sequence, unicode_view const name,
+                                                      source_location const original_reference_location)
 {
     LPG_FOR(size_t, i, state->local_variables.count)
     {
@@ -548,12 +568,33 @@ static read_local_variable_result read_local_variable(LPG_NON_NULL(function_chec
     }
     if (!state->parent)
     {
-        return read_local_variable_result_empty;
+        return read_local_variable_result_unknown;
     }
-    read_local_variable_result const outer_variable = read_local_variable(state->parent, name);
-    if (!outer_variable.exists)
+    read_local_variable_result const outer_variable =
+        read_local_variable(state->parent, NULL, name, original_reference_location);
+    switch (outer_variable.status)
     {
+    case read_local_variable_status_ok:
+        break;
+
+    case read_local_variable_status_forbidden:
+    case read_local_variable_status_unknown:
         return outer_variable;
+    }
+    if (outer_variable.compile_time_value.is_set && sequence)
+    {
+        register_id const where = allocate_register(&state->used_registers);
+        add_instruction(sequence, instruction_create_literal(literal_instruction_create(
+                                      where, outer_variable.compile_time_value.value_, outer_variable.what)));
+        return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
+                                                 outer_variable.compile_time_value, outer_variable.is_pure);
+    }
+    if (!state->may_capture_runtime_variables)
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_cannot_capture_runtime_variable, original_reference_location),
+            state->user);
+        return read_local_variable_result_forbidden;
     }
     capture_index const existing_capture = require_capture(state, outer_variable.where, outer_variable.what);
     return read_local_variable_result_create(variable_address_from_capture(existing_capture), outer_variable.what,
@@ -566,9 +607,10 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
 {
     instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, to);
 
-    read_local_variable_result const local = read_local_variable(state, name);
-    if (local.exists)
+    read_local_variable_result const local = read_local_variable(state, to, name, where);
+    switch (local.status)
     {
+    case read_local_variable_status_ok:
         if (local.where.captured_in_current_lambda.has_value)
         {
             register_id const captures = allocate_register(&state->used_registers);
@@ -581,6 +623,12 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         }
         return evaluate_expression_result_create(
             true, local.where.local_address, local.what, local.compile_time_value, local.is_pure);
+
+    case read_local_variable_status_unknown:
+        break;
+
+    case read_local_variable_status_forbidden:
+        return evaluate_expression_result_empty;
     }
 
     register_id const global = allocate_register(&state->used_registers);
@@ -686,10 +734,11 @@ static check_function_result check_function(function_checking_state *parent, exp
                                             structure const global, check_error_handler *on_error, void *user,
                                             checked_program *const program, type const *const parameter_types,
                                             unicode_string *const parameter_names, size_t const parameter_count,
-                                            optional_type const self)
+                                            optional_type const self, bool const may_capture_runtime_variables)
 {
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
-    function_checking_state state = function_checking_state_create(parent, &global, on_error, user, program, &body_out);
+    function_checking_state state = function_checking_state_create(
+        parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out);
 
     if (self.is_set)
     {
@@ -905,7 +954,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked = check_function(
         state, *evaluated.result, *state->global, state->on_error, state->user, state->program, header.parameter_types,
-        header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty());
+        header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty(), true);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1589,9 +1638,10 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         return method_evaluation_result_failure;
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked = check_function(
-        state, expression_from_sequence(method.body), *state->global, state->on_error, state->user, state->program,
-        header.parameter_types, header.parameter_names, method.header.parameter_count, optional_type_create_set(self));
+    check_function_result const checked =
+        check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
+                       state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
+                       optional_type_create_set(self), false);
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1602,7 +1652,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         deallocate(header.parameter_types);
         return method_evaluation_result_failure;
     }
-
+    ASSUME(!checked.captures);
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = method.header.parameter_count;
@@ -1610,10 +1660,6 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
-    if (checked.captures)
-    {
-        LPG_TO_DO();
-    }
     return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
@@ -1916,7 +1962,7 @@ checked_program check(sequence const root, structure const global, check_error_h
 {
     checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
     check_function_result const checked = check_function(NULL, expression_from_sequence(root), global, on_error, user,
-                                                         &program, NULL, NULL, 0, optional_type_create_empty());
+                                                         &program, NULL, NULL, 0, optional_type_create_empty(), true);
     if (checked.success)
     {
         ASSUME(checked.capture_count == 0);

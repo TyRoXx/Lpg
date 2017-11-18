@@ -210,6 +210,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_duplicate_impl:
         return "Duplicate impl of an interface for the same self";
+
+    case semantic_error_cannot_capture_runtime_variable:
+        return "Cannot capture runtime variable in an impl method";
     }
     LPG_UNREACHABLE();
 }
