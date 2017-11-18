@@ -207,6 +207,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_expected_interface:
         return "Expected interface";
+
+    case semantic_error_duplicate_impl:
+        return "Duplicate impl of an interface for the same self";
     }
     LPG_UNREACHABLE();
 }

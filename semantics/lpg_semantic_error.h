@@ -13,7 +13,8 @@ typedef enum semantic_error_type
     semantic_error_declaration_with_existing_name,
     semantic_error_missing_match_case,
     semantic_error_duplicate_match_case,
-    semantic_error_expected_interface
+    semantic_error_expected_interface,
+    semantic_error_duplicate_impl
 } semantic_error_type;
 
 typedef struct semantic_error

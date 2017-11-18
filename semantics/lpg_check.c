@@ -1665,7 +1665,17 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
         }
         methods[i] = method.success;
     }
-    /*TODO: check for duplicate implementations for the same self*/
+    for (size_t i = 0; i < target_interface->implementation_count; ++i)
+    {
+        if (type_equals(self, target_interface->implementations[i].self))
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_duplicate_impl, expression_source_begin(*element.self)),
+                state->user);
+            deallocate(methods);
+            return evaluate_expression_result_empty;
+        }
+    }
     add_implementation(
         target_interface, implementation_entry_create(self, implementation_create(methods, element.method_count)));
     return make_unit(&state->used_registers, function);
