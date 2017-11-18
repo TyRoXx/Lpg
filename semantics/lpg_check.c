@@ -793,6 +793,38 @@ static evaluate_expression_result make_compile_time_unit(void)
     return result;
 }
 
+typedef struct compile_time_type_expression_result
+{
+    bool has_value;
+    register_id where;
+    type compile_time_value;
+} compile_time_type_expression_result;
+
+static compile_time_type_expression_result compile_time_type_expression_result_create(bool has_value, register_id where,
+                                                                                      type compile_time_value)
+{
+    compile_time_type_expression_result const result = {has_value, where, compile_time_value};
+    return result;
+}
+
+static compile_time_type_expression_result
+expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
+{
+    evaluate_expression_result const result = evaluate_expression(state, function, element);
+    if (result.has_value)
+    {
+        if (!result.compile_time_value.is_set || (result.compile_time_value.value_.kind != value_kind_type))
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(element)),
+                state->user);
+            return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
+        }
+    }
+    return compile_time_type_expression_result_create(
+        result.has_value, result.where, result.compile_time_value.value_.type_);
+}
+
 typedef struct evaluated_function_header
 {
     bool is_success;
@@ -810,6 +842,17 @@ static evaluated_function_header evaluated_function_header_create(type *paramete
 
 static evaluated_function_header const evaluated_function_header_failure = {false, NULL, NULL, NULL};
 
+static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
+                                              size_t const parameter_count)
+{
+    for (size_t i = 0; i < parameter_count; ++i)
+    {
+        unicode_string_free(parameter_names + i);
+    }
+    deallocate(parameter_names);
+    deallocate(parameter_types);
+}
+
 static evaluated_function_header evaluate_function_header(function_checking_state *const state,
                                                           instruction_sequence *const function,
                                                           function_header_tree const header)
@@ -820,16 +863,14 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
     {
         instruction_checkpoint const before = make_checkpoint(&state->used_registers, function);
         parameter const this_parameter = header.parameters[i];
-        evaluate_expression_result const parameter_type = evaluate_expression(state, function, *this_parameter.type);
-        if (!parameter_type.compile_time_value.is_set)
+        compile_time_type_expression_result const parameter_type =
+            expect_compile_time_type(state, function, *this_parameter.type);
+        if (!parameter_type.has_value)
         {
-            LPG_TO_DO();
+            evaluate_function_header_clean_up(parameter_types, parameter_names, i);
+            return evaluated_function_header_failure;
         }
-        if (parameter_type.compile_time_value.value_.kind != value_kind_type)
-        {
-            LPG_TO_DO();
-        }
-        parameter_types[i] = parameter_type.compile_time_value.value_.type_;
+        parameter_types[i] = parameter_type.compile_time_value;
         parameter_names[i] = unicode_view_copy(unicode_view_from_string(this_parameter.name.value));
         restore(before);
     }
@@ -837,28 +878,16 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
     if (header.return_type)
     {
         instruction_checkpoint const original = make_checkpoint(&state->used_registers, function);
-        evaluate_expression_result const return_type_result = evaluate_expression(state, function, *header.return_type);
+        compile_time_type_expression_result const return_type_result =
+            expect_compile_time_type(state, function, *header.return_type);
         restore(original);
         if (!return_type_result.has_value)
         {
-            for (size_t i = 0; i < header.parameter_count; ++i)
-            {
-                unicode_string_free(parameter_names + i);
-            }
-            deallocate(parameter_names);
-            deallocate(parameter_types);
+            evaluate_function_header_clean_up(parameter_types, parameter_names, header.parameter_count);
             return evaluated_function_header_failure;
         }
         return_type = garbage_collector_allocate(&state->program->memory, sizeof(*return_type));
-        if (!return_type_result.compile_time_value.is_set)
-        {
-            LPG_TO_DO();
-        }
-        if (return_type_result.compile_time_value.value_.kind != value_kind_type)
-        {
-            LPG_TO_DO();
-        }
-        *return_type = return_type_result.compile_time_value.value_.type_;
+        *return_type = return_type_result.compile_time_value;
     }
     return evaluated_function_header_create(parameter_types, parameter_names, return_type);
 }
