@@ -1630,11 +1630,25 @@ static method_evaluation_result method_evaluation_result_create(function_pointer
 
 static method_evaluation_result evaluate_method_definition(function_checking_state *state,
                                                            instruction_sequence *const function,
-                                                           impl_expression_method const method, type const self)
+                                                           impl_expression_method const method, type const self,
+                                                           type const declared_result_type)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, method.header);
     if (!header.is_success)
     {
+        return method_evaluation_result_failure;
+    }
+    if (header.return_type && !is_implicitly_convertible(*header.return_type, declared_result_type))
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*method.header.return_type)),
+            state->user);
+        for (size_t i = 0; i < method.header.parameter_count; ++i)
+        {
+            unicode_string_free(header.parameter_names + i);
+        }
+        deallocate(header.parameter_names);
+        deallocate(header.parameter_types);
         return method_evaluation_result_failure;
     }
     function_id const this_lambda_id = reserve_function_id(state);
@@ -1703,7 +1717,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));
     for (size_t i = 0; i < element.method_count; ++i)
     {
-        method_evaluation_result const method = evaluate_method_definition(state, function, element.methods[i], self);
+        method_evaluation_result const method =
+            evaluate_method_definition(state, function, element.methods[i], self, target_interface->methods[i].result);
         if (!method.is_success)
         {
             deallocate(methods);
