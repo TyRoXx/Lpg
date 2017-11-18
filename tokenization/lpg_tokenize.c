@@ -181,6 +181,30 @@ tokenize_result tokenize(char const *input, size_t length)
         tokenize_result const result = {tokenize_invalid, token_string, decoding_result.length};
         return result;
     }
+
+    case '\'':
+    {
+        tokenize_result result = {tokenize_invalid, token_string, length};
+        if (length == 1)
+        {
+            return result;
+        }
+
+        size_t string_length = 1;
+        while (input[string_length] != '\'' && string_length <= length)
+        {
+            string_length++;
+        }
+        if (input[string_length] == '\'')
+        {
+            return make_success(token_string, string_length + 1);
+        }
+        else
+        {
+            result.length = string_length;
+            return result;
+        }
+    }
     default:
     {
         tokenize_result const result = {tokenize_invalid, token_space, 1};
