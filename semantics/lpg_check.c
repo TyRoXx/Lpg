@@ -914,7 +914,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     if (!header.is_success)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked = check_function(
