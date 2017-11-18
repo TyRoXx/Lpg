@@ -1707,7 +1707,13 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         }
         else
         {
-            literal = unicode_view_from_string(element.string.value);
+            const size_t length = element.string.value.length;
+            char *const copy = garbage_collector_allocate(&state->program->memory, length);
+            if (length > 0)
+            {
+                memcpy(copy, element.string.value.data, length);
+            }
+            literal = unicode_view_create(copy, length);
         }
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       result, value_from_string_ref(literal), type_from_string_ref())));
