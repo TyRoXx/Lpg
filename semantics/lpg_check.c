@@ -795,6 +795,7 @@ static evaluate_expression_result make_compile_time_unit(void)
 
 typedef struct evaluated_function_header
 {
+    bool is_success;
     type *parameter_types;
     unicode_string *parameter_names;
     type *return_type;
@@ -803,9 +804,11 @@ typedef struct evaluated_function_header
 static evaluated_function_header evaluated_function_header_create(type *parameter_types,
                                                                   unicode_string *parameter_names, type *return_type)
 {
-    evaluated_function_header const result = {parameter_types, parameter_names, return_type};
+    evaluated_function_header const result = {true, parameter_types, parameter_names, return_type};
     return result;
 }
+
+static evaluated_function_header const evaluated_function_header_failure = {false, NULL, NULL, NULL};
 
 static evaluated_function_header evaluate_function_header(function_checking_state *const state,
                                                           instruction_sequence *const function,
@@ -838,7 +841,13 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
         restore(original);
         if (!return_type_result.has_value)
         {
-            LPG_TO_DO();
+            for (size_t i = 0; i < header.parameter_count; ++i)
+            {
+                unicode_string_free(parameter_names + i);
+            }
+            deallocate(parameter_names);
+            deallocate(parameter_types);
+            return evaluated_function_header_failure;
         }
         return_type = garbage_collector_allocate(&state->program->memory, sizeof(*return_type));
         if (!return_type_result.compile_time_value.is_set)
@@ -874,6 +883,10 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
                                                   instruction_sequence *const function, lambda const evaluated)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
+    if (!header.is_success)
+    {
+        LPG_TO_DO();
+    }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked = check_function(
         state, *evaluated.result, *state->global, state->on_error, state->user, state->program, header.parameter_types,
@@ -1511,6 +1524,15 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     {
         interface_expression_method const method = element.methods[i];
         evaluated_function_header const header = evaluate_function_header(state, function, method.header);
+        if (!header.is_success)
+        {
+            for (size_t k = 0; k < i; ++k)
+            {
+                method_description_free(methods[k]);
+            }
+            deallocate(methods);
+            return evaluate_expression_result_empty;
+        }
         if (!header.return_type)
         {
             LPG_TO_DO();
@@ -1544,6 +1566,10 @@ static function_pointer_value evaluate_method_definition(function_checking_state
                                                          impl_expression_method const method, type const self)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, method.header);
+    if (!header.is_success)
+    {
+        LPG_TO_DO();
+    }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked = check_function(
         state, expression_from_sequence(method.body), *state->global, state->on_error, state->user, state->program,
