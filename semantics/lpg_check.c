@@ -1562,10 +1562,7 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
             deallocate(methods);
             return evaluate_expression_result_empty;
         }
-        if (!header.return_type)
-        {
-            LPG_TO_DO();
-        }
+        ASSUME(header.return_type);
         for (size_t j = 0; j < method.header.parameter_count; ++j)
         {
             unicode_string_free(header.parameter_names + j);
@@ -1590,14 +1587,28 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
 
-static function_pointer_value evaluate_method_definition(function_checking_state *state,
-                                                         instruction_sequence *const function,
-                                                         impl_expression_method const method, type const self)
+typedef struct method_evaluation_result
+{
+    bool is_success;
+    function_pointer_value success;
+} method_evaluation_result;
+
+static method_evaluation_result const method_evaluation_result_failure = {false, {0, NULL, NULL, NULL, 0}};
+
+static method_evaluation_result method_evaluation_result_create(function_pointer_value success)
+{
+    method_evaluation_result const result = {true, success};
+    return result;
+}
+
+static method_evaluation_result evaluate_method_definition(function_checking_state *state,
+                                                           instruction_sequence *const function,
+                                                           impl_expression_method const method, type const self)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, method.header);
     if (!header.is_success)
     {
-        LPG_TO_DO();
+        return method_evaluation_result_failure;
     }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked = check_function(
@@ -1625,7 +1636,7 @@ static function_pointer_value evaluate_method_definition(function_checking_state
     {
         LPG_TO_DO();
     }
-    return function_pointer_value_from_internal(this_lambda_id, NULL, 0);
+    return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
 static void add_implementation(interface *const to, implementation_entry const added)
@@ -1680,7 +1691,13 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));
     for (size_t i = 0; i < element.method_count; ++i)
     {
-        methods[i] = evaluate_method_definition(state, function, element.methods[i], self);
+        method_evaluation_result const method = evaluate_method_definition(state, function, element.methods[i], self);
+        if (!method.is_success)
+        {
+            deallocate(methods);
+            return evaluate_expression_result_empty;
+        }
+        methods[i] = method.success;
     }
     /*TODO: check for duplicate implementations for the same self*/
     add_implementation(
