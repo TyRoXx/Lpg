@@ -184,7 +184,7 @@ tokenize_result tokenize(char const *input, size_t length)
 
     case '\'':
     {
-        tokenize_result result = {tokenize_invalid, token_string, length};
+        tokenize_result result = {tokenize_invalid, token_raw_string, length};
         if (length == 1)
         {
             return result;
@@ -197,7 +197,7 @@ tokenize_result tokenize(char const *input, size_t length)
         }
         if (input[string_length] == '\'')
         {
-            return make_success(token_string, string_length + 1);
+            return make_success(token_raw_string, string_length + 1);
         }
         else
         {

@@ -635,6 +635,15 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
                 1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
             return result;
         }
+
+        case token_raw_string:
+        {
+            pop(parser);
+            expression_parser_result const result = {
+                1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
+            return result;
+        }
+
         case token_not:
         {
             pop(parser);
