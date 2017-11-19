@@ -792,7 +792,16 @@ static check_function_result check_function(function_checking_state *parent, exp
         switch (converted.ok)
         {
         case failure:
-            LPG_TO_DO();
+            for (size_t i = 0; i < state.register_debug_name_count; ++i)
+            {
+                unicode_string_free(state.register_debug_names + i);
+            }
+            if (state.register_debug_names)
+            {
+                deallocate(state.register_debug_names);
+            }
+            instruction_sequence_free(&body_out);
+            return check_function_result_empty;
 
         case success:
             break;
