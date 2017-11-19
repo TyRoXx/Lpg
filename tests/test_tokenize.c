@@ -86,6 +86,7 @@ void test_tokenize(void)
     test_single_token(token_string, 5, "\"abc\"");
     test_single_token(token_string, 6, "\"a\\nc\"");
     test_single_token(token_raw_string, 2, "''");
+    test_single_token(token_raw_string, 2, "'' ");
     test_single_token(token_raw_string, 5, "'abc'");
     test_single_token(token_raw_string, 6, "'a\\nc'");
     test_single_token(token_raw_string, 5, "'a\nc'");

@@ -190,12 +190,15 @@ tokenize_result tokenize(char const *input, size_t length)
             return result;
         }
 
-        size_t string_length = 1;
-        while ((string_length < length) && (input[string_length] != '\''))
+        size_t string_length;
+        for (string_length = 1; string_length < length; ++string_length)
         {
-            string_length++;
+            if (input[string_length] == '\'')
+            {
+                break;
+            }
         }
-        if ((string_length == (length - 1)) && (input[length - 1] == '\''))
+        if ((string_length < length) && input[string_length] == '\'')
         {
             return make_success(token_raw_string, string_length + 1);
         }

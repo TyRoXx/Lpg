@@ -1708,13 +1708,12 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         else
         {
             const size_t length = element.string.value.length;
-            char *const copy = garbage_collector_allocate(&state->program->memory, length);
-            if (length > 0)
-            {
-                memcpy(copy, element.string.value.data, length);
-            }
-            literal = unicode_view_create(copy, length);
+            char *const copy = garbage_collector_allocate(&state->program->memory, length - 2);
+            ASSUME(length >= 2);
+            memcpy(copy, element.string.value.data + 1, length - 2);
+            literal = unicode_view_create(copy, length - 2);
         }
+
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       result, value_from_string_ref(literal), type_from_string_ref())));
         type const string_type = {type_kind_string_ref, {NULL}};

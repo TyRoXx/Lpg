@@ -139,3 +139,8 @@ let a2 : printable2 = "abc"
 assert(string-equals("abc", a2.print()))
 
 side-effect()
+
+let raw_literal1 : string-ref = 'tst'
+assert(string-equals(raw_literal1, "tst"))
+let raw_literal2 : string-ref = 'Hello\nWorld'
+assert(string-equals(raw_literal2, "Hello\\nWorld"))
