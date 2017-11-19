@@ -1681,7 +1681,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     check_function_result const checked =
         check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
-                       optional_type_create_set(self), false, header.return_type);
+                       optional_type_create_set(self), false, optional_type_create_set(declared_result_type));
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);

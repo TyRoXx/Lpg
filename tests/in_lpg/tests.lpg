@@ -139,3 +139,10 @@ let a2 : printable2 = "abc"
 assert(string-equals("abc", a2.print()))
 
 side-effect()
+
+let test-interface = interface
+    method(): printable2
+
+impl test-interface for unit
+    method()
+        "test"
