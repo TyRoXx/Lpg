@@ -917,7 +917,7 @@ evaluated_function_header_create(type *parameter_types, unicode_string *paramete
 }
 
 static evaluated_function_header const evaluated_function_header_failure = {
-    false, NULL, NULL, {false, {type_kind_unit, NULL}}};
+    false, NULL, NULL, {false, {type_kind_unit, {NULL}}}};
 
 static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
                                               size_t const parameter_count)
