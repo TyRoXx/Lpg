@@ -529,7 +529,8 @@ void test_semantic_errors(void)
                               "    f(): unit\n"
                               "impl i for unit\n"
                               "    f(): unit\n"
-                              "        a\n");
+                              "        a\n"
+                              "        unit_value\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(4, 8))};
         expected_errors expected = {errors, 1};

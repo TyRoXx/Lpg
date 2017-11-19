@@ -96,9 +96,9 @@ let f = (a: printable2)
     s
 
 impl printable2 for string-ref
-    print()
+    print(): string-ref
         self
-    other-method()
+    other-method(): unit
         unit_value
 
 impl printable2 for unit

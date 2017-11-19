@@ -730,11 +730,24 @@ static void define_register_debug_name(function_checking_state *const state, reg
     state->register_debug_names[which] = name;
 }
 
+typedef struct conversion_result
+{
+    success_indicator ok;
+    register_id where;
+    optional_value compile_time_value;
+} conversion_result;
+
+static conversion_result convert(function_checking_state *const state, instruction_sequence *const function,
+                                 register_id const original, type const from,
+                                 optional_value const original_compile_time_value,
+                                 source_location const original_source, type const to);
+
 static check_function_result check_function(function_checking_state *parent, expression const body_in,
                                             structure const global, check_error_handler *on_error, void *user,
                                             checked_program *const program, type const *const parameter_types,
                                             unicode_string *const parameter_names, size_t const parameter_count,
-                                            optional_type const self, bool const may_capture_runtime_variables)
+                                            optional_type const self, bool const may_capture_runtime_variables,
+                                            optional_type const explicit_return_type)
 {
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     function_checking_state state = function_checking_state_create(
@@ -771,28 +784,47 @@ static check_function_result check_function(function_checking_state *parent, exp
     }
 
     register_id return_value;
-    if (body_evaluated.has_value)
+    if (explicit_return_type.is_set)
     {
-        return_value = body_evaluated.where;
-    }
-    else if (body_evaluated.compile_time_value.is_set)
-    {
-        return_value = allocate_register(&state.used_registers);
-        add_instruction(&body_out, instruction_create_literal(literal_instruction_create(
-                                       return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
+        conversion_result const converted =
+            convert(&state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
+                    expression_source_begin(body_in), explicit_return_type.value);
+        switch (converted.ok)
+        {
+        case failure:
+            LPG_TO_DO();
+
+        case success:
+            break;
+        }
+        return_value = converted.where;
     }
     else
     {
-        for (size_t i = 0; i < state.register_debug_name_count; ++i)
+        if (body_evaluated.has_value)
         {
-            unicode_string_free(state.register_debug_names + i);
+            return_value = body_evaluated.where;
         }
-        if (state.register_debug_names)
+        else if (body_evaluated.compile_time_value.is_set)
         {
-            deallocate(state.register_debug_names);
+            return_value = allocate_register(&state.used_registers);
+            add_instruction(
+                &body_out, instruction_create_literal(literal_instruction_create(
+                               return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
         }
-        instruction_sequence_free(&body_out);
-        return check_function_result_empty;
+        else
+        {
+            for (size_t i = 0; i < state.register_debug_name_count; ++i)
+            {
+                unicode_string_free(state.register_debug_names + i);
+            }
+            if (state.register_debug_names)
+            {
+                deallocate(state.register_debug_names);
+            }
+            instruction_sequence_free(&body_out);
+            return check_function_result_empty;
+        }
     }
 
     type *const capture_types =
@@ -865,17 +897,18 @@ typedef struct evaluated_function_header
     bool is_success;
     type *parameter_types;
     unicode_string *parameter_names;
-    type *return_type;
+    optional_type return_type;
 } evaluated_function_header;
 
-static evaluated_function_header evaluated_function_header_create(type *parameter_types,
-                                                                  unicode_string *parameter_names, type *return_type)
+static evaluated_function_header
+evaluated_function_header_create(type *parameter_types, unicode_string *parameter_names, optional_type return_type)
 {
     evaluated_function_header const result = {true, parameter_types, parameter_names, return_type};
     return result;
 }
 
-static evaluated_function_header const evaluated_function_header_failure = {false, NULL, NULL, NULL};
+static evaluated_function_header const evaluated_function_header_failure = {
+    false, NULL, NULL, {false, {type_kind_unit, NULL}}};
 
 static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
                                               size_t const parameter_count)
@@ -909,7 +942,7 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
         parameter_names[i] = unicode_view_copy(unicode_view_from_string(this_parameter.name.value));
         restore(before);
     }
-    type *return_type = NULL;
+    optional_type return_type = optional_type_create_empty();
     if (header.return_type)
     {
         instruction_checkpoint const original = make_checkpoint(&state->used_registers, function);
@@ -921,8 +954,7 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
             evaluate_function_header_clean_up(parameter_types, parameter_names, header.parameter_count);
             return evaluated_function_header_failure;
         }
-        return_type = garbage_collector_allocate(&state->program->memory, sizeof(*return_type));
-        *return_type = return_type_result.compile_time_value;
+        return_type = optional_type_create_set(return_type_result.compile_time_value);
     }
     return evaluated_function_header_create(parameter_types, parameter_names, return_type);
 }
@@ -952,9 +984,10 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         return evaluate_expression_result_empty;
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked = check_function(
-        state, *evaluated.result, *state->global, state->on_error, state->user, state->program, header.parameter_types,
-        header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty(), true);
+    check_function_result const checked =
+        check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
+                       header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
+                       optional_type_create_empty(), true, header.return_type);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1007,13 +1040,6 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     return evaluate_expression_result_create(
         true, destination, result_type, optional_value_create(function_pointer), false);
 }
-
-typedef struct conversion_result
-{
-    success_indicator ok;
-    register_id where;
-    optional_value compile_time_value;
-} conversion_result;
 
 static optional_size find_implementation(interface const *const in, type const self)
 {
@@ -1589,7 +1615,7 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
             deallocate(methods);
             return evaluate_expression_result_empty;
         }
-        ASSUME(header.return_type);
+        ASSUME(header.return_type.is_set);
         for (size_t j = 0; j < method.header.parameter_count; ++j)
         {
             unicode_string_free(header.parameter_names + j);
@@ -1600,7 +1626,7 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         }
         methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
                                                tuple_type_create(header.parameter_types, method.header.parameter_count),
-                                               *header.return_type);
+                                               header.return_type.value);
     }
     interface_id const id = state->program->interface_count;
     state->program->interfaces =
@@ -1638,7 +1664,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     {
         return method_evaluation_result_failure;
     }
-    if (header.return_type && !is_implicitly_convertible(*header.return_type, declared_result_type))
+    if (header.return_type.is_set && !is_implicitly_convertible(header.return_type.value, declared_result_type))
     {
         state->on_error(
             semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*method.header.return_type)),
@@ -1655,7 +1681,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     check_function_result const checked =
         check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
-                       optional_type_create_set(self), false);
+                       optional_type_create_set(self), false, header.return_type);
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1976,8 +2002,9 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
     checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
-    check_function_result const checked = check_function(NULL, expression_from_sequence(root), global, on_error, user,
-                                                         &program, NULL, NULL, 0, optional_type_create_empty(), true);
+    check_function_result const checked =
+        check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
+                       optional_type_create_empty(), true, optional_type_create_empty());
     if (checked.success)
     {
         ASSUME(checked.capture_count == 0);
