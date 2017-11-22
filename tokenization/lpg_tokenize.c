@@ -1,3 +1,4 @@
+#include <string.h>
 #include "lpg_tokenize.h"
 #include "lpg_assert.h"
 #include "lpg_identifier.h"
@@ -28,22 +29,27 @@ static bool is_new_line(char c)
     return c == '\n' || c == '\r';
 }
 
+static bool is_bracket(char c)
+{
+    return strchr("(){}", c) != NULL;
+}
+
 static int can_follow_integer(char c)
 {
     ASSUME(!is_digit(c));
+
     if (is_identifier_middle(c))
     {
         return 0;
     }
+    else if (is_bracket(c) || is_new_line(c))
+    {
+        return 1;
+    }
+
     switch (c)
     {
     case ' ':
-    case '\n':
-    case '\r':
-    case '(':
-    case ')':
-    case '{':
-    case '}':
     case '=':
     case ':':
     case ',':
@@ -175,9 +181,39 @@ tokenize_result tokenize(char const *input, size_t length)
         tokenize_result const result = {tokenize_invalid, token_string, decoding_result.length};
         return result;
     }
+
+    case '\'':
+    {
+        tokenize_result result = {tokenize_invalid, token_raw_string, length};
+        if (length == 1)
+        {
+            return result;
+        }
+
+        size_t string_length;
+        for (string_length = 1; string_length < length; ++string_length)
+        {
+            if (input[string_length] == '\'')
+            {
+                break;
+            }
+        }
+        if ((string_length < length) && input[string_length] == '\'')
+        {
+            return make_success(token_raw_string, string_length + 1);
+        }
+        else
+        {
+            result.length = string_length;
+            return result;
+        }
     }
-    tokenize_result const result = {tokenize_invalid, token_space, 1};
-    return result;
+    default:
+    {
+        tokenize_result const result = {tokenize_invalid, token_space, 1};
+        return result;
+    }
+    }
 }
 
 static tokenize_result tokenize_not(const char *input, size_t length)
@@ -303,6 +339,7 @@ static tokenize_result tokenize_equal_signs(const char *input, size_t length)
         return make_success(token_fat_arrow, 2);
     case '=':
         return make_success(token_equals, 2);
+    default:
+        return make_success(token_assign, 1);
     }
-    return make_success(token_assign, 1);
 }

@@ -27,6 +27,7 @@ typedef enum token_type
     token_break,
     token_let,
     token_string,
+    token_raw_string,
     token_not,
     token_less_than,
     token_less_than_or_equals,

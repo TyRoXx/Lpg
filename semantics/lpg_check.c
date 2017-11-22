@@ -1835,16 +1835,29 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
     case expression_type_string:
     {
         register_id const result = allocate_register(&state->used_registers);
-        memory_writer decoded = {NULL, 0, 0};
-        stream_writer const decoded_writer = memory_writer_erase(&decoded);
-        decode_string_literal(unicode_view_from_string(element.string.value), decoded_writer);
-        char *const copy = garbage_collector_allocate(&state->program->memory, decoded.used);
-        if (decoded.used > 0)
+        unicode_view literal;
+        if (element.string.value.data[0] == '"')
         {
-            memcpy(copy, decoded.data, decoded.used);
+            memory_writer decoded = {NULL, 0, 0};
+            stream_writer const decoded_writer = memory_writer_erase(&decoded);
+            decode_string_literal(unicode_view_from_string(element.string.value), decoded_writer);
+            char *const copy = garbage_collector_allocate(&state->program->memory, decoded.used);
+            if (decoded.used > 0)
+            {
+                memcpy(copy, decoded.data, decoded.used);
+            }
+            literal = unicode_view_create(copy, decoded.used);
+            memory_writer_free(&decoded);
         }
-        unicode_view const literal = unicode_view_create(copy, decoded.used);
-        memory_writer_free(&decoded);
+        else
+        {
+            const size_t length = element.string.value.length;
+            char *const copy = garbage_collector_allocate(&state->program->memory, length - 2);
+            ASSUME(length >= 2);
+            memcpy(copy, element.string.value.data + 1, length - 2);
+            literal = unicode_view_create(copy, length - 2);
+        }
+
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       result, value_from_string_ref(literal), type_from_string_ref())));
         type const string_type = {type_kind_string_ref, {NULL}};
