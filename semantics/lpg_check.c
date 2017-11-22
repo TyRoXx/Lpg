@@ -106,6 +106,7 @@ static capture capture_create(variable_address const from, type const what)
 typedef struct function_checking_state
 {
     struct function_checking_state *parent;
+    bool may_capture_runtime_variables;
     capture *captures;
     capture_index capture_count;
     register_id used_registers;
@@ -120,13 +121,15 @@ typedef struct function_checking_state
     instruction_sequence *body;
 } function_checking_state;
 
-static function_checking_state function_checking_state_create(function_checking_state *parent, structure const *global,
-                                                              check_error_handler *on_error, void *user,
-                                                              checked_program *const program,
+static function_checking_state function_checking_state_create(function_checking_state *parent,
+                                                              bool may_capture_runtime_variables,
+                                                              structure const *global, check_error_handler *on_error,
+                                                              void *user, checked_program *const program,
                                                               instruction_sequence *const body)
 {
     function_checking_state const result = {
-        parent, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program, body};
+        parent, may_capture_runtime_variables, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program,
+        body};
     return result;
 }
 
@@ -144,9 +147,6 @@ static type get_return_type(type const callee, checked_function const *const all
 {
     switch (callee.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->result;
 
@@ -162,6 +162,7 @@ static type get_return_type(type const callee, checked_function const *const all
     case type_kind_integer_range:
     case type_kind_inferred:
     case type_kind_interface:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -189,9 +190,6 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     switch (flat_from.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_type:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -223,6 +221,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
         return integer_less_or_equals(flat_into.integer_range_.minimum, flat_from.integer_range_.minimum) &&
                integer_less_or_equals(flat_from.integer_range_.maximum, flat_into.integer_range_.maximum);
 
+    case type_kind_method_pointer:
     case type_kind_lambda:
     case type_kind_structure:
     case type_kind_inferred:
@@ -237,9 +236,6 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
 {
     switch (callee.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         ASSUME(parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
         return all_functions[callee.lambda.lambda].signature->parameters.elements[parameter];
@@ -257,6 +253,7 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
     case type_kind_integer_range:
     case type_kind_inferred:
     case type_kind_interface:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -376,14 +373,12 @@ static read_structure_element_result read_element(function_checking_state *state
     type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_structure:
         return read_structure_element(state, function, actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_inferred:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_interface:
@@ -420,9 +415,6 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
-        case type_kind_method_pointer:
-            LPG_TO_DO();
-
         case type_kind_string_ref:
         case type_kind_unit:
         case type_kind_type:
@@ -437,6 +429,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_inferred:
         case type_kind_enum_constructor:
         case type_kind_interface:
+        case type_kind_method_pointer:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -481,15 +474,13 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->parameters.length;
 
+    case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -526,10 +517,17 @@ static capture_index require_capture(LPG_NON_NULL(function_checking_state *const
     return result;
 }
 
+typedef enum read_local_variable_status
+{
+    read_local_variable_status_ok,
+    read_local_variable_status_unknown,
+    read_local_variable_status_forbidden
+} read_local_variable_status;
+
 typedef struct read_local_variable_result
 {
-    /*if exists, the other members are set*/
-    bool exists;
+    /*if status is ok, the other members are set*/
+    read_local_variable_status status;
     variable_address where;
     type what;
     optional_value compile_time_value;
@@ -539,15 +537,25 @@ typedef struct read_local_variable_result
 static read_local_variable_result read_local_variable_result_create(variable_address where, type what,
                                                                     optional_value compile_time_value, bool is_pure)
 {
-    read_local_variable_result const result = {true, where, what, compile_time_value, is_pure};
+    read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
     return result;
 }
 
-static read_local_variable_result const read_local_variable_result_empty = {
-    false, {{false, 0}, 0}, {type_kind_unit, {NULL}}, {false, {value_kind_unit, {0}}}, false};
+static read_local_variable_result const read_local_variable_result_unknown = {read_local_variable_status_unknown,
+                                                                              {{false, 0}, 0},
+                                                                              {type_kind_unit, {NULL}},
+                                                                              {false, {value_kind_unit, {0}}},
+                                                                              false};
+
+static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
+                                                                                {{false, 0}, 0},
+                                                                                {type_kind_unit, {NULL}},
+                                                                                {false, {value_kind_unit, {0}}},
+                                                                                false};
 
 static read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                                      unicode_view const name)
+                                                      instruction_sequence *const sequence, unicode_view const name,
+                                                      source_location const original_reference_location)
 {
     LPG_FOR(size_t, i, state->local_variables.count)
     {
@@ -560,12 +568,33 @@ static read_local_variable_result read_local_variable(LPG_NON_NULL(function_chec
     }
     if (!state->parent)
     {
-        return read_local_variable_result_empty;
+        return read_local_variable_result_unknown;
     }
-    read_local_variable_result const outer_variable = read_local_variable(state->parent, name);
-    if (!outer_variable.exists)
+    read_local_variable_result const outer_variable =
+        read_local_variable(state->parent, NULL, name, original_reference_location);
+    switch (outer_variable.status)
     {
+    case read_local_variable_status_ok:
+        break;
+
+    case read_local_variable_status_forbidden:
+    case read_local_variable_status_unknown:
         return outer_variable;
+    }
+    if (outer_variable.compile_time_value.is_set && sequence)
+    {
+        register_id const where = allocate_register(&state->used_registers);
+        add_instruction(sequence, instruction_create_literal(literal_instruction_create(
+                                      where, outer_variable.compile_time_value.value_, outer_variable.what)));
+        return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
+                                                 outer_variable.compile_time_value, outer_variable.is_pure);
+    }
+    if (!state->may_capture_runtime_variables)
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_cannot_capture_runtime_variable, original_reference_location),
+            state->user);
+        return read_local_variable_result_forbidden;
     }
     capture_index const existing_capture = require_capture(state, outer_variable.where, outer_variable.what);
     return read_local_variable_result_create(variable_address_from_capture(existing_capture), outer_variable.what,
@@ -578,9 +607,10 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
 {
     instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, to);
 
-    read_local_variable_result const local = read_local_variable(state, name);
-    if (local.exists)
+    read_local_variable_result const local = read_local_variable(state, to, name, where);
+    switch (local.status)
     {
+    case read_local_variable_status_ok:
         if (local.where.captured_in_current_lambda.has_value)
         {
             register_id const captures = allocate_register(&state->used_registers);
@@ -593,6 +623,12 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         }
         return evaluate_expression_result_create(
             true, local.where.local_address, local.what, local.compile_time_value, local.is_pure);
+
+    case read_local_variable_status_unknown:
+        break;
+
+    case read_local_variable_status_forbidden:
+        return evaluate_expression_result_empty;
     }
 
     register_id const global = allocate_register(&state->used_registers);
@@ -623,8 +659,6 @@ static size_t find_lower_bound_for_inferred_values(type const root)
     switch (root.kind)
     {
     case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_lambda:
@@ -696,14 +730,28 @@ static void define_register_debug_name(function_checking_state *const state, reg
     state->register_debug_names[which] = name;
 }
 
+typedef struct conversion_result
+{
+    success_indicator ok;
+    register_id where;
+    optional_value compile_time_value;
+} conversion_result;
+
+static conversion_result convert(function_checking_state *const state, instruction_sequence *const function,
+                                 register_id const original, type const from,
+                                 optional_value const original_compile_time_value,
+                                 source_location const original_source, type const to);
+
 static check_function_result check_function(function_checking_state *parent, expression const body_in,
                                             structure const global, check_error_handler *on_error, void *user,
                                             checked_program *const program, type const *const parameter_types,
                                             unicode_string *const parameter_names, size_t const parameter_count,
-                                            optional_type const self)
+                                            optional_type const self, bool const may_capture_runtime_variables,
+                                            optional_type const explicit_return_type)
 {
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
-    function_checking_state state = function_checking_state_create(parent, &global, on_error, user, program, &body_out);
+    function_checking_state state = function_checking_state_create(
+        parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out);
 
     if (self.is_set)
     {
@@ -736,28 +784,56 @@ static check_function_result check_function(function_checking_state *parent, exp
     }
 
     register_id return_value;
-    if (body_evaluated.has_value)
+    if (explicit_return_type.is_set)
     {
-        return_value = body_evaluated.where;
-    }
-    else if (body_evaluated.compile_time_value.is_set)
-    {
-        return_value = allocate_register(&state.used_registers);
-        add_instruction(&body_out, instruction_create_literal(literal_instruction_create(
-                                       return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
+        conversion_result const converted =
+            convert(&state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
+                    expression_source_begin(body_in), explicit_return_type.value);
+        switch (converted.ok)
+        {
+        case failure:
+            for (size_t i = 0; i < state.register_debug_name_count; ++i)
+            {
+                unicode_string_free(state.register_debug_names + i);
+            }
+            if (state.register_debug_names)
+            {
+                deallocate(state.register_debug_names);
+            }
+            instruction_sequence_free(&body_out);
+            return check_function_result_empty;
+
+        case success:
+            break;
+        }
+        return_value = converted.where;
     }
     else
     {
-        for (size_t i = 0; i < state.register_debug_name_count; ++i)
+        if (body_evaluated.has_value)
         {
-            unicode_string_free(state.register_debug_names + i);
+            return_value = body_evaluated.where;
         }
-        if (state.register_debug_names)
+        else if (body_evaluated.compile_time_value.is_set)
         {
-            deallocate(state.register_debug_names);
+            return_value = allocate_register(&state.used_registers);
+            add_instruction(
+                &body_out, instruction_create_literal(literal_instruction_create(
+                               return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
         }
-        instruction_sequence_free(&body_out);
-        return check_function_result_empty;
+        else
+        {
+            for (size_t i = 0; i < state.register_debug_name_count; ++i)
+            {
+                unicode_string_free(state.register_debug_names + i);
+            }
+            if (state.register_debug_names)
+            {
+                deallocate(state.register_debug_names);
+            }
+            instruction_sequence_free(&body_out);
+            return check_function_result_empty;
+        }
     }
 
     type *const capture_types =
@@ -793,18 +869,65 @@ static evaluate_expression_result make_compile_time_unit(void)
     return result;
 }
 
+typedef struct compile_time_type_expression_result
+{
+    bool has_value;
+    register_id where;
+    type compile_time_value;
+} compile_time_type_expression_result;
+
+static compile_time_type_expression_result compile_time_type_expression_result_create(bool has_value, register_id where,
+                                                                                      type compile_time_value)
+{
+    compile_time_type_expression_result const result = {has_value, where, compile_time_value};
+    return result;
+}
+
+static compile_time_type_expression_result
+expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
+{
+    evaluate_expression_result const result = evaluate_expression(state, function, element);
+    if (result.has_value)
+    {
+        if (!result.compile_time_value.is_set || (result.compile_time_value.value_.kind != value_kind_type))
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(element)),
+                state->user);
+            return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
+        }
+    }
+    return compile_time_type_expression_result_create(
+        result.has_value, result.where, result.compile_time_value.value_.type_);
+}
+
 typedef struct evaluated_function_header
 {
+    bool is_success;
     type *parameter_types;
     unicode_string *parameter_names;
-    type *return_type;
+    optional_type return_type;
 } evaluated_function_header;
 
-static evaluated_function_header evaluated_function_header_create(type *parameter_types,
-                                                                  unicode_string *parameter_names, type *return_type)
+static evaluated_function_header
+evaluated_function_header_create(type *parameter_types, unicode_string *parameter_names, optional_type return_type)
 {
-    evaluated_function_header const result = {parameter_types, parameter_names, return_type};
+    evaluated_function_header const result = {true, parameter_types, parameter_names, return_type};
     return result;
+}
+
+static evaluated_function_header const evaluated_function_header_failure = {
+    false, NULL, NULL, {false, {type_kind_unit, {NULL}}}};
+
+static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
+                                              size_t const parameter_count)
+{
+    for (size_t i = 0; i < parameter_count; ++i)
+    {
+        unicode_string_free(parameter_names + i);
+    }
+    deallocate(parameter_names);
+    deallocate(parameter_types);
 }
 
 static evaluated_function_header evaluate_function_header(function_checking_state *const state,
@@ -817,39 +940,30 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
     {
         instruction_checkpoint const before = make_checkpoint(&state->used_registers, function);
         parameter const this_parameter = header.parameters[i];
-        evaluate_expression_result const parameter_type = evaluate_expression(state, function, *this_parameter.type);
-        if (!parameter_type.compile_time_value.is_set)
+        compile_time_type_expression_result const parameter_type =
+            expect_compile_time_type(state, function, *this_parameter.type);
+        if (!parameter_type.has_value)
         {
-            LPG_TO_DO();
+            evaluate_function_header_clean_up(parameter_types, parameter_names, i);
+            return evaluated_function_header_failure;
         }
-        if (parameter_type.compile_time_value.value_.kind != value_kind_type)
-        {
-            LPG_TO_DO();
-        }
-        parameter_types[i] = parameter_type.compile_time_value.value_.type_;
+        parameter_types[i] = parameter_type.compile_time_value;
         parameter_names[i] = unicode_view_copy(unicode_view_from_string(this_parameter.name.value));
         restore(before);
     }
-    type *return_type = NULL;
+    optional_type return_type = optional_type_create_empty();
     if (header.return_type)
     {
         instruction_checkpoint const original = make_checkpoint(&state->used_registers, function);
-        evaluate_expression_result const return_type_result = evaluate_expression(state, function, *header.return_type);
+        compile_time_type_expression_result const return_type_result =
+            expect_compile_time_type(state, function, *header.return_type);
         restore(original);
         if (!return_type_result.has_value)
         {
-            LPG_TO_DO();
+            evaluate_function_header_clean_up(parameter_types, parameter_names, header.parameter_count);
+            return evaluated_function_header_failure;
         }
-        return_type = garbage_collector_allocate(&state->program->memory, sizeof(*return_type));
-        if (!return_type_result.compile_time_value.is_set)
-        {
-            LPG_TO_DO();
-        }
-        if (return_type_result.compile_time_value.value_.kind != value_kind_type)
-        {
-            LPG_TO_DO();
-        }
-        *return_type = return_type_result.compile_time_value.value_.type_;
+        return_type = optional_type_create_set(return_type_result.compile_time_value);
     }
     return evaluated_function_header_create(parameter_types, parameter_names, return_type);
 }
@@ -874,10 +988,15 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
                                                   instruction_sequence *const function, lambda const evaluated)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
+    if (!header.is_success)
+    {
+        return evaluate_expression_result_empty;
+    }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked = check_function(
-        state, *evaluated.result, *state->global, state->on_error, state->user, state->program, header.parameter_types,
-        header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty());
+    check_function_result const checked =
+        check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
+                       header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
+                       optional_type_create_empty(), true, header.return_type);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -931,13 +1050,6 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         true, destination, result_type, optional_value_create(function_pointer), false);
 }
 
-typedef struct conversion_result
-{
-    success_indicator ok;
-    register_id where;
-    optional_value compile_time_value;
-} conversion_result;
-
 static optional_size find_implementation(interface const *const in, type const self)
 {
     for (size_t i = 0; i < in->implementation_count; ++i)
@@ -981,9 +1093,6 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -999,6 +1108,7 @@ static conversion_result convert(function_checking_state *const state, instructi
         return result;
     }
 
+    case type_kind_method_pointer:
     case type_kind_tuple:
         LPG_TO_DO();
 
@@ -1066,9 +1176,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         /*needs to be initialized to avoid compiler warnings due to the missing default case in the switch statement below*/ 0;
     switch (callee.type_.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         inferred_value_count = count_inferred_values(*state->program->functions[callee.type_.lambda.lambda].signature);
         break;
@@ -1077,6 +1184,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         inferred_value_count = count_inferred_values(*callee.type_.function_pointer_);
         break;
 
+    case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_unit:
     case type_kind_string_ref:
@@ -1234,9 +1342,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
-        case type_kind_method_pointer:
-            LPG_TO_DO();
-
         case type_kind_lambda:
         case type_kind_function_pointer:
             add_instruction(function, instruction_create_call(call_instruction_create(
@@ -1260,6 +1365,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             deallocate(arguments);
             break;
 
+        case type_kind_method_pointer:
         case type_kind_interface:
             LPG_TO_DO();
         }
@@ -1309,9 +1415,6 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
     switch (key.type_.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_enumeration:
         if (key.type_.enum_->size != (*element).match.number_of_cases)
         {
@@ -1322,6 +1425,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         }
         break;
 
+    case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
@@ -1511,10 +1615,16 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     {
         interface_expression_method const method = element.methods[i];
         evaluated_function_header const header = evaluate_function_header(state, function, method.header);
-        if (!header.return_type)
+        if (!header.is_success)
         {
-            LPG_TO_DO();
+            for (size_t k = 0; k < i; ++k)
+            {
+                method_description_free(methods[k]);
+            }
+            deallocate(methods);
+            return evaluate_expression_result_empty;
         }
+        ASSUME(header.return_type.is_set);
         for (size_t j = 0; j < method.header.parameter_count; ++j)
         {
             unicode_string_free(header.parameter_names + j);
@@ -1525,7 +1635,7 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         }
         methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
                                                tuple_type_create(header.parameter_types, method.header.parameter_count),
-                                               *header.return_type);
+                                               header.return_type.value);
     }
     interface_id const id = state->program->interface_count;
     state->program->interfaces =
@@ -1539,15 +1649,48 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
 
-static function_pointer_value evaluate_method_definition(function_checking_state *state,
-                                                         instruction_sequence *const function,
-                                                         impl_expression_method const method, type const self)
+typedef struct method_evaluation_result
+{
+    bool is_success;
+    function_pointer_value success;
+} method_evaluation_result;
+
+static method_evaluation_result const method_evaluation_result_failure = {false, {0, NULL, NULL, NULL, 0}};
+
+static method_evaluation_result method_evaluation_result_create(function_pointer_value success)
+{
+    method_evaluation_result const result = {true, success};
+    return result;
+}
+
+static method_evaluation_result evaluate_method_definition(function_checking_state *state,
+                                                           instruction_sequence *const function,
+                                                           impl_expression_method const method, type const self,
+                                                           type const declared_result_type)
 {
     evaluated_function_header const header = evaluate_function_header(state, function, method.header);
+    if (!header.is_success)
+    {
+        return method_evaluation_result_failure;
+    }
+    if (header.return_type.is_set && !is_implicitly_convertible(header.return_type.value, declared_result_type))
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*method.header.return_type)),
+            state->user);
+        for (size_t i = 0; i < method.header.parameter_count; ++i)
+        {
+            unicode_string_free(header.parameter_names + i);
+        }
+        deallocate(header.parameter_names);
+        deallocate(header.parameter_types);
+        return method_evaluation_result_failure;
+    }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked = check_function(
-        state, expression_from_sequence(method.body), *state->global, state->on_error, state->user, state->program,
-        header.parameter_types, header.parameter_names, method.header.parameter_count, optional_type_create_set(self));
+    check_function_result const checked =
+        check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
+                       state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
+                       optional_type_create_set(self), false, optional_type_create_set(declared_result_type));
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1556,9 +1699,9 @@ static function_pointer_value evaluate_method_definition(function_checking_state
     if (!checked.success)
     {
         deallocate(header.parameter_types);
-        LPG_TO_DO();
+        return method_evaluation_result_failure;
     }
-
+    ASSUME(!checked.captures);
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = method.header.parameter_count;
@@ -1566,11 +1709,7 @@ static function_pointer_value evaluate_method_definition(function_checking_state
 
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
-    if (checked.captures)
-    {
-        LPG_TO_DO();
-    }
-    return function_pointer_value_from_internal(this_lambda_id, NULL, 0);
+    return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
 static void add_implementation(interface *const to, implementation_entry const added)
@@ -1586,48 +1725,53 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
 {
     instruction_checkpoint const previous_code = make_checkpoint(&state->used_registers, function);
 
-    evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, *element.interface);
+    compile_time_type_expression_result const interface_evaluated =
+        expect_compile_time_type(state, function, *element.interface);
     if (!interface_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
-    if (!interface_evaluated.compile_time_value.is_set)
+    if (interface_evaluated.compile_time_value.kind != type_kind_interface)
     {
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_expected_interface, expression_source_begin(*element.interface)),
+            state->user);
+        return evaluate_expression_result_empty;
     }
-    if (interface_evaluated.compile_time_value.value_.kind != value_kind_type)
-    {
-        LPG_TO_DO();
-    }
-    if (interface_evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
-    {
-        LPG_TO_DO();
-    }
-    interface *const target_interface =
-        state->program->interfaces + interface_evaluated.compile_time_value.value_.type_.interface_;
+    interface *const target_interface = state->program->interfaces + interface_evaluated.compile_time_value.interface_;
 
-    evaluate_expression_result const self_evaluated = evaluate_expression(state, function, *element.self);
+    compile_time_type_expression_result const self_evaluated = expect_compile_time_type(state, function, *element.self);
     if (!self_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
-    if (!self_evaluated.compile_time_value.is_set)
-    {
-        LPG_TO_DO();
-    }
-    if (self_evaluated.compile_time_value.value_.kind != value_kind_type)
-    {
-        LPG_TO_DO();
-    }
-    type const self = self_evaluated.compile_time_value.value_.type_;
+
+    type const self = self_evaluated.compile_time_value;
 
     restore(previous_code);
     function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));
     for (size_t i = 0; i < element.method_count; ++i)
     {
-        methods[i] = evaluate_method_definition(state, function, element.methods[i], self);
+        method_evaluation_result const method =
+            evaluate_method_definition(state, function, element.methods[i], self, target_interface->methods[i].result);
+        if (!method.is_success)
+        {
+            deallocate(methods);
+            return evaluate_expression_result_empty;
+        }
+        methods[i] = method.success;
     }
-    /*TODO: check for duplicate implementations for the same self*/
+    for (size_t i = 0; i < target_interface->implementation_count; ++i)
+    {
+        if (type_equals(self, target_interface->implementations[i].self))
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_duplicate_impl, expression_source_begin(*element.self)),
+                state->user);
+            deallocate(methods);
+            return evaluate_expression_result_empty;
+        }
+    }
     add_implementation(
         target_interface, implementation_entry_create(self, implementation_create(methods, element.method_count)));
     return make_unit(&state->used_registers, function);
@@ -1880,8 +2024,9 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
     checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
-    check_function_result const checked = check_function(NULL, expression_from_sequence(root), global, on_error, user,
-                                                         &program, NULL, NULL, 0, optional_type_create_empty());
+    check_function_result const checked =
+        check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
+                       optional_type_create_empty(), true, optional_type_create_empty());
     if (checked.success)
     {
         ASSUME(checked.capture_count == 0);

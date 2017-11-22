@@ -96,9 +96,9 @@ let f = (a: printable2)
     s
 
 impl printable2 for string-ref
-    print()
+    print(): string-ref
         self
-    other-method()
+    other-method(): unit
         unit_value
 
 impl printable2 for unit
@@ -144,3 +144,11 @@ let raw_literal1 : string-ref = 'tst'
 assert(string-equals(raw_literal1, "tst"))
 let raw_literal2 : string-ref = 'Hello\nWorld'
 assert(string-equals(raw_literal2, "Hello\\nWorld"))
+
+let test-interface = interface
+    method(): printable2
+
+impl test-interface for unit
+    method()
+        "test"
+

@@ -449,6 +449,18 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("let v = (a: 1) 2\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 12))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("let i = interface\n"
                               "let f = (a: i)\n"
                               "f(1)");
@@ -471,6 +483,167 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): error\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 9))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): side-effect()\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 9))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for unit\n"
+                              "    f(): 1\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(3, 9))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for unit\n"
+                              "    f(): unit\n"
+                              "        a\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(4, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("impl string-ref for unit\n"
+                              "    f(): unit\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_interface, source_location_create(0, 5))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("impl 1 for unit\n"
+                              "    f(): unit\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 5))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for 1\n"
+                              "    f(): unit\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(2, 11))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for unit\n"
+                              "    f(): unit\n"
+                              "        unit_value\n"
+                              "impl i for unit\n"
+                              "    f(): unit\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_impl, source_location_create(5, 11))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 3);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "let runtime-value = side-effect()\n"
+                              "impl i for unit\n"
+                              "    f(): unit\n"
+                              "        let captured = runtime-value\n"
+                              "        unit_value\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_cannot_capture_runtime_variable, source_location_create(5, 23))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for unit\n"
+                              "    f(): string-ref\n"
+                              "        \"\"\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 9))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "impl i for unit\n"
+                              "    f(): unit\n"
+                              "        \"\"\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(4, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     test_let_assignments(&std_library);
