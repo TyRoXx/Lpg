@@ -734,6 +734,7 @@ typedef struct conversion_result
 {
     success_indicator ok;
     register_id where;
+    type result_type;
     optional_value compile_time_value;
 } conversion_result;
 
@@ -784,6 +785,7 @@ static check_function_result check_function(function_checking_state *parent, exp
     }
 
     register_id return_value;
+    type return_type = body_evaluated.type_;
     if (explicit_return_type.is_set)
     {
         conversion_result const converted =
@@ -804,6 +806,7 @@ static check_function_result check_function(function_checking_state *parent, exp
             return check_function_result_empty;
 
         case success:
+            return_type = converted.result_type;
             break;
         }
         return_value = converted.where;
@@ -845,7 +848,7 @@ static check_function_result check_function(function_checking_state *parent, exp
 
     function_pointer *const signature = allocate(sizeof(*signature));
     *signature =
-        function_pointer_create(body_evaluated.type_, tuple_type_create(NULL, 0),
+        function_pointer_create(return_type, tuple_type_create(NULL, 0),
                                 tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
 
     if (state.register_debug_name_count < state.used_registers)
@@ -1071,13 +1074,13 @@ static conversion_result convert_to_interface(function_checking_state *const sta
     if (impl.state == optional_empty)
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, optional_value_empty};
+        conversion_result const result = {failure, original, from, optional_value_empty};
         return result;
     }
     register_id const converted = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(
                                   original, converted, implementation_ref_create(to, impl.value_if_set))));
-    conversion_result const result = {success, converted, optional_value_empty};
+    conversion_result const result = {success, converted, type_from_interface(to), optional_value_empty};
     return result;
 }
 
@@ -1088,7 +1091,7 @@ static conversion_result convert(function_checking_state *const state, instructi
 {
     if (type_equals(from, to))
     {
-        conversion_result const result = {success, original, original_compile_time_value};
+        conversion_result const result = {success, original, to, original_compile_time_value};
         return result;
     }
     switch (to.kind)
@@ -1104,7 +1107,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     case type_kind_type:
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, optional_value_empty};
+        conversion_result const result = {failure, original, from, optional_value_empty};
         return result;
     }
 
@@ -1117,17 +1120,17 @@ static conversion_result convert(function_checking_state *const state, instructi
         if (from.kind != type_kind_integer_range)
         {
             state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-            conversion_result const result = {failure, original, optional_value_empty};
+            conversion_result const result = {failure, original, from, optional_value_empty};
             return result;
         }
         if (integer_less_or_equals(to.integer_range_.minimum, from.integer_range_.minimum) &&
             integer_less_or_equals(from.integer_range_.maximum, to.integer_range_.maximum))
         {
-            conversion_result const result = {success, original, original_compile_time_value};
+            conversion_result const result = {success, original, to, original_compile_time_value};
             return result;
         }
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, optional_value_empty};
+        conversion_result const result = {failure, original, from, optional_value_empty};
         return result;
     }
 

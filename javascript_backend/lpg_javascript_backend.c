@@ -62,13 +62,33 @@ static success_indicator generate_enum_constructor(enum_constructor_type const c
     return success;
 }
 
+static success_indicator generate_implementation_name(interface_id const interface_, size_t const implementation_index,
+                                                      stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "impl_"));
+    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, interface_)));
+    LPG_TRY(stream_writer_write_string(javascript_output, "_"));
+    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, implementation_index)));
+    return success;
+}
+
 static success_indicator generate_value(value const generated, type const type_of,
-                                        stream_writer const javascript_output)
+                                        interface const *const all_interfaces, stream_writer const javascript_output)
 {
     switch (generated.kind)
     {
     case value_kind_type_erased:
-        LPG_TO_DO();
+        LPG_TRY(stream_writer_write_string(javascript_output, "new "));
+        LPG_TRY(generate_implementation_name(
+            generated.type_erased.impl.target, generated.type_erased.impl.implementation_index, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, "("));
+        LPG_TRY(generate_value(*generated.type_erased.self,
+                               all_interfaces[generated.type_erased.impl.target]
+                                   .implementations[generated.type_erased.impl.implementation_index]
+                                   .self,
+                               all_interfaces, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, ")"));
+        return success;
 
     case value_kind_integer:
         if (integer_less(integer_create(0, UINT32_MAX), generated.integer_))
@@ -144,10 +164,10 @@ static success_indicator write_register(function_generation *const state, regist
 }
 
 static success_indicator generate_literal(function_generation *const state, literal_instruction const generated,
-                                          stream_writer const javascript_output)
+                                          interface const *const all_interfaces, stream_writer const javascript_output)
 {
     LPG_TRY(write_register(state, generated.into, javascript_output));
-    LPG_TRY(generate_value(generated.value_, generated.type_of, javascript_output));
+    LPG_TRY(generate_value(generated.value_, generated.type_of, all_interfaces, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return success;
 }
@@ -403,16 +423,6 @@ static success_indicator generate_get_method(function_generation *const state, g
     return success;
 }
 
-static success_indicator generate_implementation_name(interface_id const interface_, size_t const implementation_index,
-                                                      stream_writer const javascript_output)
-{
-    LPG_TRY(stream_writer_write_string(javascript_output, "impl_"));
-    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, interface_)));
-    LPG_TRY(stream_writer_write_string(javascript_output, "_"));
-    LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, implementation_index)));
-    return success;
-}
-
 static success_indicator generate_erase_type(function_generation *const state, erase_type_instruction const generated,
                                              stream_writer const javascript_output)
 {
@@ -454,7 +464,7 @@ static success_indicator generate_instruction(function_generation *const state, 
         return stream_writer_write_string(javascript_output, "break;\n");
 
     case instruction_literal:
-        return generate_literal(state, generated.literal, javascript_output);
+        return generate_literal(state, generated.literal, state->all_interfaces, javascript_output);
 
     case instruction_tuple:
         return generate_tuple(state, generated.tuple_, javascript_output);

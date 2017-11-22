@@ -127,6 +127,14 @@ impl printable2 for boolean
     other-method()
         unit_value
 
+let explicit-return-type = (): int(1, 1)
+    1
+assert(integer-equals(1, explicit-return-type()))
+
+let convert-on-return = (): printable2
+    "aa"
+assert(string-equals("aa", convert-on-return().print()))
+
 assert(string-equals("", f("")))
 assert(string-equals("a", f("a")))
 assert(string-equals("unit", f(unit_value)))
