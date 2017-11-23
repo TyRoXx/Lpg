@@ -216,10 +216,10 @@ void test_interpreter(void)
     standard_library_description const std_library = describe_standard_library();
 
     {
-        char const *const test_files[] = {"boolean.lpg",   "integer-less.lpg",       "integer-to-string.lpg",
-                                          "interface.lpg", "lambda-capture.lpg",     "lambda-return-type.lpg",
-                                          "option.lpg",    "raw-string-literal.lpg", "string-equals.lpg",
-                                          "tuple.lpg",     "unit_value.lpg"};
+        char const *const test_files[] = {"boolean.lpg",       "integer-less.lpg",   "integer-to-string.lpg",
+                                          "interface.lpg",     "lambda-capture.lpg", "lambda-return-type.lpg",
+                                          "match-enum.lpg",    "option.lpg",         "raw-string-literal.lpg",
+                                          "string-equals.lpg", "tuple.lpg",          "unit_value.lpg"};
         for (size_t i = 0; i < LPG_ARRAY_SIZE(test_files); ++i)
         {
             run_file(test_files[i], std_library.globals);
@@ -242,24 +242,6 @@ void test_interpreter(void)
     expect_output("let f = () print(\"hello\")\n"
                   "f()\n",
                   "hello", std_library.globals);
-
-    /*first case fits*/
-    expect_output("assert(match boolean.true\n"
-                  "    case boolean.true:\n"
-                  "        print(\"jup\")\n"
-                  "        boolean.true\n"
-                  "    case boolean.false: boolean.false\n"
-                  ")\n",
-                  "jup", std_library.globals);
-
-    /*second case fits*/
-    expect_output("assert(match boolean.true\n"
-                  "    case boolean.false: boolean.false\n"
-                  "    case boolean.true:\n"
-                  "        print(\"jup\")\n"
-                  "        boolean.true\n"
-                  ")\n",
-                  "jup", std_library.globals);
 
     expect_output("let m = \"hallo\"\n"
                   "let f = () print(m)\n"
