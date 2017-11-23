@@ -1,0 +1,4 @@
+let runtime-unit = ()
+    side-effect()
+    unit_value
+let u : unit = runtime-unit()
