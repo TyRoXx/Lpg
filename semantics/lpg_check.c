@@ -1197,7 +1197,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_integer_range:
     case type_kind_inferred:
     case type_kind_interface:
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_not_callable, expression_source_begin(*call.callee)), state->user);
+        return make_compile_time_unit();
 
     case type_kind_enum_constructor:
         inferred_value_count = 0;

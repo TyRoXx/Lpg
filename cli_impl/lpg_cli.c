@@ -213,6 +213,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_cannot_capture_runtime_variable:
         return "Cannot capture runtime variable in an impl method";
+
+    case semantic_error_not_callable:
+        return "This value cannot be called like a function";
     }
     LPG_UNREACHABLE();
 }
