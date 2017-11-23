@@ -134,6 +134,6 @@ function_call_arguments function_call_arguments_create(value const *const inferr
                                                        value *const arguments, value const *globals,
                                                        LPG_NON_NULL(garbage_collector *const gc),
                                                        LPG_NON_NULL(checked_function const *const all_functions),
-                                                       LPG_NON_NULL(interface const *all_interfaces));
+                                                       interface const *all_interfaces);
 
 type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments));

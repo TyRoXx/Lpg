@@ -278,7 +278,7 @@ function_call_arguments function_call_arguments_create(value const *const inferr
                                                        value *const arguments, value const *globals,
                                                        garbage_collector *const gc,
                                                        checked_function const *const all_functions,
-                                                       LPG_NON_NULL(interface const *all_interfaces))
+                                                       interface const *all_interfaces)
 {
     ASSUME(globals);
     ASSUME(gc);
