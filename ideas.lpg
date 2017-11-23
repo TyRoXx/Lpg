@@ -1,44 +1,9 @@
-let f = () print("Hello, world!\n")
-f()
-
-let g = ()
-    f()
-    f()
-
 assert(type-of("") == string-ref)
-
-let print-twice = (message: string-ref)
-    print(message)
-    print(message)
-
-print-twice("woo")
-
-let h = () print-twice("a")
-h()
-
 assert(type-of(h) == function(unit, unit))
 assert(type-of((a: boolean) unit) == function(boolean, unit))
 
 let tuple = {1, "abc", unit, boolean}
 assert(tuple.size == 4)
-assert(tuple.0 == 1)
-assert(tuple.1 == "abc")
-assert(tuple.2 == unit)
-let b : tuple.3 = (tuple.3 == boolean)
-assert(b)
-
-let stream-writer = interface
-    write(written: string-ref): unit
-
-let instance = new stream-writer
-    write(written: string-ref)
-        print(written)
-
-let other-interface = interface
-    write(written: string-ref): unit
-
-//unsolved problem: Every declared type should be a new type
-assert(stream-writer != other-interface)
 
 let boolean = enum
     false
@@ -47,8 +12,6 @@ let boolean = enum
 let option = enum<T: type>
     none
     some(T)
-
-assert(boolean != option)
 
 //no T argument necessary in this case:
 let x = option.none
