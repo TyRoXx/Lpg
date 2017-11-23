@@ -1,0 +1,5 @@
+assert(string-equals("", ""))
+assert(string-equals("aaa", "aaa"))
+assert(string-equals(concat("aa", "a"), "aaa"))
+assert(not(string-equals("a", "")))
+assert(not(string-equals("a", "b")))

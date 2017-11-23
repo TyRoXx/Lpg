@@ -1,0 +1,5 @@
+assert(string-equals('', ""))
+assert(string-equals('"', "\""))
+assert(string-equals('\', "\\"))
+assert(string-equals('tst', "tst"))
+assert(string-equals('Hello\nWorld', "Hello\\nWorld"))

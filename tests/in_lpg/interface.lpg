@@ -1,0 +1,65 @@
+let printable = interface
+    print(): string-ref
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+    print(string)
+
+let printable2 = interface
+    print(): string-ref
+    other-method(): unit
+
+let f = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for string-ref
+    print(): string-ref
+        self
+    other-method(): unit
+        unit_value
+
+impl printable2 for unit
+    print()
+        "unit"
+    other-method()
+        unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other-method()
+        unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other-method()
+        unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    other-method()
+        unit_value
+
+assert(string-equals("", f("")))
+assert(string-equals("a", f("a")))
+assert(string-equals("unit", f(unit_value)))
+assert(string-equals("0", f(0)))
+assert(string-equals("1", f(1)))
+assert(string-equals("true", f(boolean.true)))
+assert(string-equals("false", f(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string-equals("abc", a2.print()))
+
+let test-interface = interface
+    method(): printable2
+
+impl test-interface for unit
+    method()
+        "test"

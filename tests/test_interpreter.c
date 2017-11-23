@@ -215,7 +215,16 @@ void test_interpreter(void)
 {
     standard_library_description const std_library = describe_standard_library();
 
-    run_file("tests.lpg", std_library.globals);
+    {
+        char const *const test_files[] = {"boolean.lpg",   "integer-less.lpg",       "integer-to-string.lpg",
+                                          "interface.lpg", "lambda-capture.lpg",     "lambda-return-type.lpg",
+                                          "option.lpg",    "raw-string-literal.lpg", "string-equals.lpg",
+                                          "tuple.lpg"};
+        for (size_t i = 0; i < LPG_ARRAY_SIZE(test_files); ++i)
+        {
+            run_file(test_files[i], std_library.globals);
+        }
+    }
 
     expect_no_output("", std_library.globals);
 

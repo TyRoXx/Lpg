@@ -1,0 +1,11 @@
+/*use a captured variable in a compile-time context*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+assert(f5())
+
+/*capture an argument*/
+let f6 = (a: boolean)
+    () a
+assert(f6(boolean.true)())

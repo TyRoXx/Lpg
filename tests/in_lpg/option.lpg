@@ -1,0 +1,4 @@
+let f3 = (arg: int(0, 1000))
+    side-effect()
+    option.some(arg)
+f3(123)

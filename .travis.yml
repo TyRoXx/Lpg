@@ -71,7 +71,7 @@ script:
      cli/lpg ../tests/in_lpg/tests.lpg || exit 1;
    else
      valgrind --error-exitcode=42 --leak-check=full ./tests/tests || exit 1;
-     valgrind --error-exitcode=42 --leak-check=full ./cli/lpg ../tests/in_lpg/tests.lpg || exit 1;
+     valgrind --error-exitcode=42 --leak-check=full ./cli/lpg ../tests/in_lpg/interface.lpg || exit 1;
    fi
  - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
  - cd ..

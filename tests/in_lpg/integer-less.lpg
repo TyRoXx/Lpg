@@ -1,0 +1,5 @@
+/* Integer less and greater than */
+let small = 20
+let big = 100
+assert(integer-less(small, big))
+assert(not(integer-less(big, small)))

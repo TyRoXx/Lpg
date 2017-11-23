@@ -1,0 +1,26 @@
+assert(!boolean.false)
+assert(boolean.true)
+assert(not(boolean.false))
+assert(and(boolean.true, boolean.true))
+assert(or(boolean.true, boolean.true))
+assert(or(boolean.false, boolean.true))
+assert(or(boolean.true, boolean.false))
+
+let v = boolean.true
+assert(v)
+
+let v2 = boolean.false
+assert(not(v2))
+
+let v3 = not(boolean.false)
+assert(v3)
+
+let f2 = () boolean.true
+assert(f2())
+
+let xor = (a: boolean, b: boolean)
+    or(and(a, not(b)), and(not(a), b))
+assert(xor(boolean.true, boolean.false))
+assert(xor(boolean.false, boolean.true))
+assert(not(xor(boolean.true, boolean.true)))
+assert(not(xor(boolean.false, boolean.false)))
