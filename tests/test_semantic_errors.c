@@ -256,6 +256,17 @@ void test_semantic_errors(void)
         instruction_sequence_free(&expected_body);
     }
     {
+        sequence root = parse("let v : int(0, 1) = side-effect()\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 20))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("let v = {}.0\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
