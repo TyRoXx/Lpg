@@ -254,7 +254,7 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
     case type_kind_inferred:
     case type_kind_interface:
     case type_kind_method_pointer:
-        LPG_TO_DO();
+        LPG_UNREACHABLE();
 
     case type_kind_enum_constructor:
         ASSUME(parameter == 0);
