@@ -34,7 +34,15 @@ void unicode_string_free(unicode_string const *s)
 
 bool unicode_string_equals(unicode_string const left, unicode_string const right)
 {
-    return (left.length == right.length) && !memcmp(left.data, right.data, left.length);
+    if (left.length != right.length)
+    {
+        return false;
+    }
+    if (left.length == 0)
+    {
+        return true;
+    }
+    return !memcmp(left.data, right.data, left.length);
 }
 
 char *unicode_string_c_str(unicode_string *value)
