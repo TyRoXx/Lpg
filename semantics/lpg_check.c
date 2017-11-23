@@ -419,6 +419,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_unit:
         case type_kind_type:
         case type_kind_integer_range:
+        case type_kind_interface:
             state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
             return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
 
@@ -428,7 +429,6 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_lambda:
         case type_kind_inferred:
         case type_kind_enum_constructor:
-        case type_kind_interface:
         case type_kind_method_pointer:
             LPG_TO_DO();
 

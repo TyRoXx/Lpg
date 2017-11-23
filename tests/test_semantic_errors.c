@@ -474,6 +474,30 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let i = interface\n"
+                              "let f = (a: i) a.unknown()\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 17))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
+                              "i.unknown()\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 2))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = interface\n"
                               "let f = (a: i)\n"
                               "f(1)");
         semantic_error const errors[] = {
