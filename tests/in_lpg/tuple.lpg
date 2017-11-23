@@ -6,3 +6,9 @@ assert(integer-equals(123, v5.0))
 assert(string-equals("abc", v5.1))
 let w = {{{{123}}}}
 assert(integer-equals(123, w.0.0.0.0))
+
+let runtime-tuple = ()
+    side-effect()
+    {123, "test"}
+assert(integer-equals(123, runtime-tuple().0))
+assert(string-equals("test", runtime-tuple().1))
