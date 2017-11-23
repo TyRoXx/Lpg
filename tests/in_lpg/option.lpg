@@ -1,4 +1,8 @@
-let f3 = (arg: int(0, 1000))
+let runtime = (arg: int(0, 1000))
     side-effect()
     option.some(arg)
-f3(123)
+runtime(123)
+
+let compile-time = (arg: int(0, 1000))
+    option.some(arg)
+compile-time(123)

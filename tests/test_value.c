@@ -24,7 +24,11 @@ void test_value(void)
         REQUIRE(!value_equals(
             value_from_tuple(value_tuple_create(&first, 1)), value_from_tuple(value_tuple_create(&second, 1))));
     }
-    REQUIRE(!value_equals(value_from_enum_element(0, NULL), value_from_enum_element(1, NULL)));
+    REQUIRE(!value_equals(
+        value_from_enum_element(0, type_from_unit(), NULL), value_from_enum_element(1, type_from_unit(), NULL)));
+    REQUIRE(!value_equals(
+        value_from_enum_element(0, type_from_unit(), NULL),
+        value_from_enum_element(0, type_from_integer_range(integer_range_create(integer_max(), integer_max())), NULL)));
 
     test_integer_comparison();
 }

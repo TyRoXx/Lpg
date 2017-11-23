@@ -116,12 +116,13 @@ value value_from_type(type const type_)
     return result;
 }
 
-value value_from_enum_element(enum_element_id const element, value *const state)
+value value_from_enum_element(enum_element_id const element, type const state_type, value *const state)
 {
     value result;
     result.kind = value_kind_enum_element;
     result.enum_element.which = element;
     result.enum_element.state = state;
+    result.enum_element.state_type = state_type;
     return result;
 }
 
@@ -185,6 +186,10 @@ bool value_equals(value const left, value const right)
     case value_kind_enum_element:
     {
         if (left.enum_element.which != right.enum_element.which)
+        {
+            return false;
+        }
+        if (!type_equals(left.enum_element.state_type, right.enum_element.state_type))
         {
             return false;
         }
@@ -280,4 +285,12 @@ function_call_arguments function_call_arguments_create(value const *const inferr
     ASSUME(all_functions);
     function_call_arguments const result = {inferred, self, arguments, globals, gc, all_functions, all_interfaces};
     return result;
+}
+
+type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments))
+{
+    value const boolean = arguments->globals[3];
+    ASSUME(boolean.kind == value_kind_type);
+    ASSUME(boolean.type_.kind == type_kind_enumeration);
+    return boolean.type_;
 }

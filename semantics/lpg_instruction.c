@@ -79,15 +79,17 @@ bool literal_instruction_equals(literal_instruction const left, literal_instruct
            type_equals(left.type_of, right.type_of);
 }
 
-enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state)
+enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state,
+                                                             type state_type)
 {
-    enum_construct_instruction const result = {into, which, state};
+    enum_construct_instruction const result = {into, which, state, state_type};
     return result;
 }
 
 bool enum_construct_instruction_equals(enum_construct_instruction const left, enum_construct_instruction const right)
 {
-    return (left.into == right.into) && (left.which == right.which) && (left.state == right.state);
+    return (left.into == right.into) && (left.which == right.which) && (left.state == right.state) &&
+           type_equals(left.state_type, right.state_type);
 }
 
 match_instruction match_instruction_create(register_id key, match_instruction_case *cases, size_t count,

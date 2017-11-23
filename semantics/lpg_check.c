@@ -443,7 +443,7 @@ static read_structure_element_result read_element(function_checking_state *state
                 {
                     if (enum_->elements[i].state.kind == type_kind_unit)
                     {
-                        value const literal = value_from_enum_element(i, NULL);
+                        value const literal = value_from_enum_element(i, enum_->elements[i].state, NULL);
                         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                       result, literal, type_from_enumeration(enum_))));
                         return read_structure_element_result_create(
@@ -1308,8 +1308,10 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 value *const enum_state = garbage_collector_allocate(&state->program->memory, sizeof(*enum_state));
                 ASSUME(expected_arguments == 1);
                 *enum_state = compile_time_arguments[0];
-                compile_time_result =
-                    optional_value_create(value_from_enum_element(callee.type_.enum_constructor->which, enum_state));
+                compile_time_result = optional_value_create(value_from_enum_element(
+                    callee.type_.enum_constructor->which,
+                    callee.type_.enum_constructor->enumeration->elements[callee.type_.enum_constructor->which].state,
+                    enum_state));
                 break;
             }
             }
@@ -1363,8 +1365,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
         case type_kind_enum_constructor:
             ASSUME(call.arguments.length == 1);
-            add_instruction(function, instruction_create_enum_construct(enum_construct_instruction_create(
-                                          result, callee.type_.enum_constructor->which, arguments[0])));
+            add_instruction(
+                function,
+                instruction_create_enum_construct(enum_construct_instruction_create(
+                    result, callee.type_.enum_constructor->which, arguments[0],
+                    callee.type_.enum_constructor->enumeration->elements[callee.type_.enum_constructor->which].state)));
             deallocate(arguments);
             break;
 

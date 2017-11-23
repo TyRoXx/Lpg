@@ -66,6 +66,8 @@ typedef struct enum_element_value
 
     /*NULL means unit*/
     struct value *state;
+
+    type state_type;
 } enum_element_value;
 
 typedef struct type_erased_value
@@ -97,7 +99,7 @@ value value_from_function_pointer(function_pointer_value function_pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
 value value_from_type(type const type_);
-value value_from_enum_element(enum_element_id const element, value *const state);
+value value_from_enum_element(enum_element_id const element, type const state_type, value *const state);
 value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
@@ -133,3 +135,5 @@ function_call_arguments function_call_arguments_create(value const *const inferr
                                                        LPG_NON_NULL(garbage_collector *const gc),
                                                        LPG_NON_NULL(checked_function const *const all_functions),
                                                        LPG_NON_NULL(interface const *all_interfaces));
+
+type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments));

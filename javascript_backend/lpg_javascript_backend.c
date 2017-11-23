@@ -44,11 +44,20 @@ static success_indicator encode_string_literal(unicode_view const content, strea
     return success;
 }
 
-static success_indicator generate_enum_element(enum_element_value const element, stream_writer const javascript_output)
+static success_indicator generate_value(value const generated, type const type_of,
+                                        interface const *const all_interfaces, stream_writer const javascript_output);
+
+static success_indicator generate_enum_element(enum_element_value const element, interface const *const all_interfaces,
+                                               stream_writer const javascript_output)
 {
     if (element.state)
     {
-        LPG_TO_DO();
+        LPG_TRY(stream_writer_write_string(javascript_output, "["));
+        LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, element.which)));
+        LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        LPG_TRY(generate_value(*element.state, element.state_type, all_interfaces, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, "]"));
+        return success;
     }
     return stream_writer_write_integer(javascript_output, integer_create(0, element.which));
 }
@@ -110,7 +119,7 @@ static success_indicator generate_value(value const generated, type const type_o
         return stream_writer_write_string(javascript_output, "/*TODO type*/ undefined");
 
     case value_kind_enum_element:
-        return generate_enum_element(generated.enum_element, javascript_output);
+        return generate_enum_element(generated.enum_element, all_interfaces, javascript_output);
 
     case value_kind_unit:
         return stream_writer_write_string(javascript_output, "undefined");

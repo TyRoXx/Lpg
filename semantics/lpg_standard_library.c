@@ -26,7 +26,7 @@ value not_impl(function_call_arguments const arguments, struct value const *cons
     (void)environment;
     (void)captures;
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
-    return value_from_enum_element(!argument, NULL);
+    return value_from_enum_element(!argument, get_boolean(&arguments), NULL);
 }
 
 value concat_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -48,7 +48,7 @@ value and_impl(function_call_arguments const arguments, struct value const *cons
     (void)captures;
     enum_element_id const left = arguments.arguments[0].enum_element.which;
     enum_element_id const right = arguments.arguments[1].enum_element.which;
-    return value_from_enum_element(left && right, NULL);
+    return value_from_enum_element(left && right, get_boolean(&arguments), NULL);
 }
 
 value or_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -57,7 +57,7 @@ value or_impl(function_call_arguments const arguments, struct value const *const
     (void)captures;
     enum_element_id const left = arguments.arguments[0].enum_element.which;
     enum_element_id const right = arguments.arguments[1].enum_element.which;
-    return value_from_enum_element(left || right, NULL);
+    return value_from_enum_element(left || right, get_boolean(&arguments), NULL);
 }
 
 value string_equals_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -66,7 +66,7 @@ value string_equals_impl(function_call_arguments const arguments, struct value c
     (void)captures;
     unicode_view const left = arguments.arguments[0].string_ref;
     unicode_view const right = arguments.arguments[1].string_ref;
-    return value_from_enum_element(unicode_view_equals(left, right), NULL);
+    return value_from_enum_element(unicode_view_equals(left, right), get_boolean(&arguments), NULL);
 }
 
 value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -89,7 +89,7 @@ value integer_equals_impl(function_call_arguments const arguments, struct value 
     (void)captures;
     integer const left = arguments.arguments[0].integer_;
     integer const right = arguments.arguments[1].integer_;
-    return value_from_enum_element(integer_equal(left, right), NULL);
+    return value_from_enum_element(integer_equal(left, right), get_boolean(&arguments), NULL);
 }
 
 value integer_less_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -98,7 +98,7 @@ value integer_less_impl(function_call_arguments const arguments, struct value co
     (void)captures;
     integer const left = arguments.arguments[0].integer_;
     integer const right = arguments.arguments[1].integer_;
-    return value_from_enum_element(integer_less(left, right), NULL);
+    return value_from_enum_element(integer_less(left, right), get_boolean(&arguments), NULL);
 }
 
 value integer_to_string_impl(function_call_arguments const arguments, struct value const *const captures,

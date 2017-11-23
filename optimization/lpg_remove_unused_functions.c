@@ -166,7 +166,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         {
             *state = adapt_value(*from.enum_element.state, clone_gc, new_function_ids);
         }
-        return value_from_enum_element(from.enum_element.which, state);
+        return value_from_enum_element(from.enum_element.which, from.enum_element.state_type, state);
     }
 
     case value_kind_unit:

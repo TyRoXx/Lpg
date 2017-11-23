@@ -3,6 +3,54 @@
 #include "lpg_instruction.h"
 #include <stdio.h>
 
+static void print_integer(integer const value)
+{
+    char buffer[64];
+    buffer[sizeof(buffer) - 1] = '\0';
+    char *const formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
+    printf("%s", formatted);
+}
+
+static void print_type(type const printed)
+{
+    switch (printed.kind)
+    {
+    case type_kind_structure:
+    case type_kind_function_pointer:
+        LPG_TO_DO();
+
+    case type_kind_unit:
+        printf("unit");
+        break;
+
+    case type_kind_string_ref:
+        LPG_TO_DO();
+
+    case type_kind_enumeration:
+        printf("enum ?");
+        break;
+
+    case type_kind_tuple:
+    case type_kind_type:
+        LPG_TO_DO();
+
+    case type_kind_integer_range:
+        printf("integer(");
+        print_integer(printed.integer_range_.minimum);
+        printf(", ");
+        print_integer(printed.integer_range_.maximum);
+        printf(")");
+        break;
+
+    case type_kind_inferred:
+    case type_kind_enum_constructor:
+    case type_kind_lambda:
+    case type_kind_interface:
+    case type_kind_method_pointer:
+        LPG_TO_DO();
+    }
+}
+
 void print_value(value const printed)
 {
     switch (printed.kind)
@@ -14,13 +62,9 @@ void print_value(value const printed)
         break;
 
     case value_kind_integer:
-    {
-        char buffer[64];
-        buffer[sizeof(buffer) - 1] = '\0';
-        char *const formatted = integer_format(printed.integer_, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
-        printf("integer %s", formatted);
+        printf("integer ");
+        print_integer(printed.integer_);
         break;
-    }
 
     case value_kind_string:
         printf("string ?");
@@ -35,12 +79,14 @@ void print_value(value const printed)
         break;
 
     case value_kind_type:
-        printf("type ?");
+        print_type(printed.type_);
         break;
 
     case value_kind_enum_element:
         printf("enum element # %u, state = (", printed.enum_element.which);
         print_value(printed.enum_element.state ? *printed.enum_element.state : value_from_unit());
+        printf(", ");
+        print_type(printed.enum_element.state_type);
         printf(")");
         break;
 
@@ -73,9 +119,11 @@ void print_instruction(instruction const printed)
         }
         printf("\n");
         return;
+
     case instruction_return:
         printf("return %u", printed.return_.return_register);
         return;
+
     case instruction_loop:
         printf("loop\n");
         for (size_t i = 0; i < printed.loop.length; ++i)

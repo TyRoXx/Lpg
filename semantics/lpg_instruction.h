@@ -83,10 +83,11 @@ typedef struct enum_construct_instruction
     register_id into;
     enum_element_id which;
     register_id state;
+    type state_type;
 } enum_construct_instruction;
 
-enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which,
-                                                             register_id state);
+enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state,
+                                                             type state_type);
 bool enum_construct_instruction_equals(enum_construct_instruction const left, enum_construct_instruction const right);
 
 typedef struct match_instruction_case match_instruction_case;

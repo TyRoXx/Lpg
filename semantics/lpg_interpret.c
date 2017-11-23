@@ -198,7 +198,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         {
             value *const state = garbage_collector_allocate(gc, sizeof(*state));
             *state = registers[element.enum_construct.state];
-            registers[element.enum_construct.into] = value_from_enum_element(element.enum_construct.which, state);
+            registers[element.enum_construct.into] =
+                value_from_enum_element(element.enum_construct.which, element.enum_construct.state_type, state);
             break;
         }
 

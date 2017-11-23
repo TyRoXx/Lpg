@@ -130,7 +130,7 @@ static void expect_output_impl(unicode_view const source, char const *output, st
             /*type*/ value_from_unit(),
             /*string-ref*/ value_from_unit(),
             /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment, NULL, 0)),
-            /*boolean*/ value_from_unit(),
+            /*boolean*/ global_object.members[3].compile_time_value.value_,
             /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL, NULL, 0)),
             /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL, NULL, 0)),
             /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL, NULL, 0)),
