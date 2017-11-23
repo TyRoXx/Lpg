@@ -228,9 +228,6 @@ void test_interpreter(void)
 
     expect_no_output("", std_library.globals);
 
-    expect_output("let a : int(0, 10) = 10\n"
-                  "print(integer-to-string(a))",
-                  "10", std_library.globals);
     expect_output("print(\"Hello, world!\")", "Hello, world!", std_library.globals);
     expect_output("print(\"Hello, world!\")\n", "Hello, world!", std_library.globals);
     expect_output("let v = \"Hello, world!\"\nprint(v)\n", "Hello, world!", std_library.globals);
