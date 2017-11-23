@@ -1,5 +1,14 @@
-/* Integer less and greater than */
-let small = 20
-let big = 100
-assert(integer-less(small, big))
-assert(not(integer-less(big, small)))
+assert(integer-less(20, 100))
+assert(not(integer-less(100, 20)))
+assert(integer-less(0, 1))
+assert(not(integer-less(1, 0)))
+assert(not(integer-less(1, 1)))
+assert(not(integer-less(0, 0)))
+assert(not(integer-less(10000, 10000)))
+
+let runtime-zero = ()
+    side-effect()
+    0
+assert(integer-less(runtime-zero(), 1))
+assert(not(integer-less(runtime-zero(), runtime-zero())))
+assert(not(integer-less(1, runtime-zero())))

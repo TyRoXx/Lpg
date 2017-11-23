@@ -238,6 +238,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 14:
             return stream_writer_write_string(javascript_output, "undefined");
 
+        case 16:
+            return stream_writer_write_string(javascript_output, "integer_less");
+
         case 17:
             return stream_writer_write_string(javascript_output, "integer_to_string");
 
@@ -625,6 +628,8 @@ success_indicator generate_javascript(checked_program const program, stream_writ
         javascript_output, "var string_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         javascript_output, "var integer_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"));
+    LPG_TRY(stream_writer_write_string(
+        javascript_output, "var integer_less = function (left, right) { return (left < right) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         javascript_output, "var concat = function (left, right) { return (left + right); };\n"));
     LPG_TRY(stream_writer_write_string(
