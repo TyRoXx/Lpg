@@ -9,7 +9,13 @@ let printable2 = interface
     print(): string-ref
     other-method(): unit
 
-let f = (a: printable2)
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side-effect()
     let print = a.print
     let s = print()
     s
@@ -46,13 +52,21 @@ impl printable2 for boolean
     other-method()
         unit_value
 
-assert(string-equals("", f("")))
-assert(string-equals("a", f("a")))
-assert(string-equals("unit", f(unit_value)))
-assert(string-equals("0", f(0)))
-assert(string-equals("1", f(1)))
-assert(string-equals("true", f(boolean.true)))
-assert(string-equals("false", f(boolean.false)))
+assert(string-equals("", pure("")))
+assert(string-equals("a", pure("a")))
+assert(string-equals("unit", pure(unit_value)))
+assert(string-equals("0", pure(0)))
+assert(string-equals("1", pure(1)))
+assert(string-equals("true", pure(boolean.true)))
+assert(string-equals("false", pure(boolean.false)))
+
+assert(string-equals("", runtime("")))
+assert(string-equals("a", runtime("a")))
+assert(string-equals("unit", runtime(unit_value)))
+assert(string-equals("0", runtime(0)))
+assert(string-equals("1", runtime(1)))
+assert(string-equals("true", runtime(boolean.true)))
+assert(string-equals("false", runtime(boolean.false)))
 
 let a2 : printable2 = "abc"
 assert(string-equals("abc", a2.print()))
