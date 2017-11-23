@@ -5,7 +5,7 @@
 unicode_string unicode_string_from_range(char const *data, size_t length)
 {
     unicode_string const result = {allocate_array(length, sizeof(*data)), length};
-    if (result.data)
+    if (result.data && (length > 0))
     {
         memcpy(result.data, data, length * sizeof(*data));
     }
