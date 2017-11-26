@@ -1,3 +1,4 @@
+#include <lpg_std_unit.h>
 #include <lpg_std_assert.h>
 #include <lpg_std_string.h>
 static string_ref lambda_1(void);
