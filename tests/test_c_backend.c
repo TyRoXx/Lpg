@@ -242,10 +242,9 @@ void test_c_backend(void)
                            "        self\n"
                            "let f = (printed: printable)\n"
                            "    side-effect()\n"
-                           // TODO
-                           // "    printed.print()\n"
-                           // "assert(string-equals(\"a\", f(\"a\")))\n"
-                           ,
+                           "    printed.print()\n"
+                           "assert(string-equals(\"a\", f(\"a\")))\n"
+                           "assert(string-equals(\"a\", f(f(\"a\"))))\n",
                            std_library, "26_interface.c");
 
     check_generated_c_code("let f = ()\n"

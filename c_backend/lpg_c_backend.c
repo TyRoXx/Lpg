@@ -1051,22 +1051,68 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(generate_c_read_access(state, current_function, input.erase_type.self, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
 
-        memory_writer original_self = {NULL, 0, 0};
-        LPG_TRY(generate_c_read_access(
-            state, current_function, input.erase_type.self, memory_writer_erase(&original_self)));
-        LPG_TRY(generate_add_reference(
-            unicode_view_create(original_self.data, original_self.used), self_type, indentation, c_output));
-        memory_writer_free(&original_self);
+        switch (state->registers[input.erase_type.self].meaning)
+        {
+        case register_meaning_argument:
+        case register_meaning_variable:
+        case register_meaning_capture:
+        {
+            memory_writer original_self = {NULL, 0, 0};
+            LPG_TRY(generate_c_read_access(
+                state, current_function, input.erase_type.self, memory_writer_erase(&original_self)));
+            LPG_TRY(generate_add_reference(
+                unicode_view_create(original_self.data, original_self.used), self_type, indentation, c_output));
+            memory_writer_free(&original_self);
+            break;
+        }
+
+        case register_meaning_nothing:
+            break;
+        case register_meaning_global:
+            break;
+        case register_meaning_print:
+            break;
+        case register_meaning_assert:
+            break;
+        case register_meaning_string_equals:
+            break;
+        case register_meaning_integer_equals:
+            break;
+        case register_meaning_integer_less:
+            break;
+        case register_meaning_integer_to_string:
+            break;
+        case register_meaning_or:
+            break;
+        case register_meaning_and:
+            break;
+        case register_meaning_not:
+            break;
+        case register_meaning_concat:
+            break;
+        case register_meaning_literal:
+            break;
+        case register_meaning_captures:
+            break;
+        case register_meaning_side_effect:
+            break;
+        }
         return success;
     }
 
     case instruction_get_method:
     {
         set_register_variable(
-            state, input.get_method.into, register_resource_ownership_owns,
+            state, input.get_method.into, register_resource_ownership_borrows,
             type_from_method_pointer(method_pointer_type_create(input.get_method.interface_, input.get_method.method)));
         LPG_TRY(indent(indentation, c_output));
-        LPG_TO_DO();
+        LPG_TRY(generate_interface_reference_name(input.get_method.interface_, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " "));
+        LPG_TRY(generate_register_name(input.get_method.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = "));
+        LPG_TRY(generate_c_read_access(state, current_function, input.get_method.from, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+        return success;
     }
 
     case instruction_return:
@@ -1191,10 +1237,31 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             switch (callee_type.kind)
             {
             case type_kind_method_pointer:
-                result_type = all_interfaces[callee_type.method_pointer.interface_]
-                                  .methods[callee_type.method_pointer.method_index]
-                                  .result;
-                break;
+            {
+                method_description const called_method = all_interfaces[callee_type.method_pointer.interface_]
+                                                             .methods[callee_type.method_pointer.method_index];
+                set_register_function_variable(state, input.call.result,
+                                               find_register_resource_ownership(called_method.result),
+                                               called_method.result);
+                LPG_TRY(generate_type(called_method.result, &state->standard_library, state->definitions,
+                                      state->all_functions, state->all_interfaces, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " const "));
+                LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ".vtable->"));
+                LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(called_method.name)));
+                LPG_TRY(stream_writer_write_string(c_output, "("));
+                LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ".self"));
+                for (size_t i = 0; i < input.call.argument_count; ++i)
+                {
+                    LPG_TRY(stream_writer_write_string(c_output, ", "));
+                    LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[i], c_output));
+                }
+                LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+                return success;
+            }
 
             case type_kind_interface:
                 LPG_TO_DO();
