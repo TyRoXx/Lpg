@@ -216,6 +216,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_not_callable:
         return "This value cannot be called like a function";
+
+    case semantic_error_duplicate_method_name:
+        return "Duplicate method name in the same interface";
     }
     LPG_UNREACHABLE();
 }

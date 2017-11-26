@@ -16,7 +16,8 @@ typedef enum semantic_error_type
     semantic_error_expected_interface,
     semantic_error_duplicate_impl,
     semantic_error_cannot_capture_runtime_variable,
-    semantic_error_not_callable
+    semantic_error_not_callable,
+    semantic_error_duplicate_method_name
 } semantic_error_type;
 
 typedef struct semantic_error

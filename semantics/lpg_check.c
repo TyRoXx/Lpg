@@ -1640,6 +1640,15 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         {
             deallocate(header.parameter_names);
         }
+        for (size_t k = 0; k < i; ++k)
+        {
+            if (unicode_view_equals(
+                    unicode_view_from_string(methods[k].name), unicode_view_from_string(method.name.value)))
+            {
+                state->on_error(
+                    semantic_error_create(semantic_error_duplicate_method_name, method.name.source), state->user);
+            }
+        }
         methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
                                                tuple_type_create(header.parameter_types, method.header.parameter_count),
                                                header.return_type.value);

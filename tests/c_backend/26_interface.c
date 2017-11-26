@@ -39,7 +39,6 @@ static string_ref lambda_2(interface_reference_0 const printed_0)
     unit const r_3 = unit_impl;
     interface_reference_0 r_4 = printed_0;
     string_ref const r_5 = r_4.vtable->print(r_4.self);
-    r_4.vtable->_add_reference(r_4.self, -1);
     return r_5;
 }
 int main(void)

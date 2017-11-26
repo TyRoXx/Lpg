@@ -707,6 +707,19 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("let i = interface\n"
+                              "    f(): unit\n"
+                              "    f(): unit\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_method_name, source_location_create(2, 4))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("let v = {}()\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_not_callable, source_location_create(0, 8))};
