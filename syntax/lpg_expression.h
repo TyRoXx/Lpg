@@ -50,6 +50,7 @@ typedef enum expression_type
     expression_type_tuple,
     expression_type_comment,
     expression_type_interface,
+    expression_type_struct,
     expression_type_impl
 } expression_type;
 
@@ -188,6 +189,20 @@ interface_expression interface_expression_create(source_location source, interfa
 void interface_expression_free(interface_expression value);
 bool interface_expression_equals(interface_expression const left, interface_expression const right);
 
+typedef struct struct_expression_element struct_expression_element;
+
+typedef struct struct_expression
+{
+    source_location source;
+    struct_expression_element *elements;
+    size_t element_count;
+} struct_expression;
+
+struct_expression struct_expression_create(source_location source, struct_expression_element *elements,
+                                           size_t element_count);
+void struct_expression_free(LPG_NON_NULL(struct_expression const *const value));
+bool struct_expression_equals(struct_expression const left, struct_expression const right);
+
 typedef struct impl_expression_method
 {
     identifier_expression name;
@@ -276,12 +291,23 @@ struct expression
         tuple tuple;
         comment_expression comment;
         interface_expression interface;
+        struct_expression struct_;
         impl_expression impl;
 
         /*for monostate expressions like break:*/
         source_location source;
     };
 };
+
+struct struct_expression_element
+{
+    identifier_expression name;
+    expression type;
+};
+
+struct_expression_element struct_expression_element_create(identifier_expression name, expression type);
+void struct_expression_element_free(LPG_NON_NULL(struct_expression_element const *const value));
+bool struct_expression_element_equals(struct_expression_element const left, struct_expression_element const right);
 
 expression expression_from_integer_literal(integer_literal_expression value);
 void call_free(LPG_NON_NULL(call const *this));
@@ -295,6 +321,7 @@ expression expression_from_identifier(identifier_expression identifier);
 expression expression_from_tuple(tuple value);
 expression expression_from_break(source_location source);
 expression expression_from_interface(interface_expression value);
+expression expression_from_struct(struct_expression value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

@@ -1990,6 +1990,9 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
 
     case expression_type_tuple:
         return evaluate_tuple_expression(state, function, &element);
+
+    case expression_type_struct:
+        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

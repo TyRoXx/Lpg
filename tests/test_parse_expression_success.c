@@ -115,6 +115,40 @@ void test_parse_expression_success(void)
             false);
     }
 
+    test_successful_parse(expression_from_struct(struct_expression_create(source_location_create(0, 0), NULL, 0)),
+                          unicode_string_from_c_str("struct"), false);
+
+    {
+        struct_expression_element *const elements = allocate_array(1, sizeof(*elements));
+        elements[0] = struct_expression_element_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 4)),
+            expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("c"), source_location_create(1, 7))));
+        test_successful_parse(
+            expression_from_struct(struct_expression_create(source_location_create(0, 0), elements, 1)),
+            unicode_string_from_c_str("struct\n"
+                                      "    a: c"),
+            false);
+    }
+
+    {
+        struct_expression_element *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = struct_expression_element_create(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 4)),
+            expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("c"), source_location_create(1, 7))));
+        elements[1] = struct_expression_element_create(
+            identifier_expression_create(unicode_string_from_c_str("b"), source_location_create(2, 4)),
+            expression_from_identifier(
+                identifier_expression_create(unicode_string_from_c_str("d"), source_location_create(2, 7))));
+        test_successful_parse(
+            expression_from_struct(struct_expression_create(source_location_create(0, 0), elements, 2)),
+            unicode_string_from_c_str("struct\n"
+                                      "    a: c\n"
+                                      "    b: d"),
+            false);
+    }
+
     test_function_calls();
     test_comment();
     test_loops();

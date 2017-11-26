@@ -36,6 +36,7 @@ typedef enum token_type
     token_greater_than_or_equals,
     token_not_equals,
     token_interface,
+    token_struct,
     token_impl
 } token_type;
 

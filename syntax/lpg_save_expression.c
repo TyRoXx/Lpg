@@ -245,7 +245,24 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_impl:
         LPG_TO_DO();
 
+    case expression_type_struct:
+    {
+        LPG_TRY(stream_writer_write_string(to, "struct"));
+        whitespace_state in_struct = go_deeper(whitespace, 1);
+        for (size_t i = 0; i < value->struct_.element_count; ++i)
+        {
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+            LPG_TRY(indent(to, in_struct));
+            LPG_TRY(
+                stream_writer_write_unicode_view(to, unicode_view_from_string(value->struct_.elements[i].name.value)));
+            LPG_TRY(stream_writer_write_string(to, ": "));
+            LPG_TRY(save_expression(to, &value->struct_.elements[i].type, whitespace));
+        }
+        return success;
+    }
+
     case expression_type_interface:
+    {
         LPG_TRY(stream_writer_write_string(to, "interface"));
         whitespace_state in_interface = go_deeper(whitespace, 1);
         for (size_t i = 0; i < value->interface.method_count; ++i)
@@ -257,6 +274,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(save_function_header(to, value->interface.methods[i].header, whitespace));
         }
         return success;
+    }
     }
     LPG_UNREACHABLE();
 }

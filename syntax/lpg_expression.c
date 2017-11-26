@@ -185,6 +185,45 @@ bool interface_expression_equals(interface_expression const left, interface_expr
     return true;
 }
 
+struct_expression struct_expression_create(source_location source, struct_expression_element *elements,
+                                           size_t element_count)
+{
+    struct_expression const result = {source, elements, element_count};
+    return result;
+}
+
+void struct_expression_free(struct_expression const *const value)
+{
+    for (size_t i = 0; i < value->element_count; ++i)
+    {
+        struct_expression_element_free(&value->elements[i]);
+    }
+    if (value->elements)
+    {
+        deallocate(value->elements);
+    }
+}
+
+bool struct_expression_equals(struct_expression const left, struct_expression const right)
+{
+    if (!source_location_equals(left.source, right.source))
+    {
+        return false;
+    }
+    if (left.element_count != right.element_count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.element_count; ++i)
+    {
+        if (!struct_expression_element_equals(left.elements[i], right.elements[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 impl_expression_method impl_expression_method_create(identifier_expression name, function_header_tree header,
                                                      sequence body)
 {
@@ -420,6 +459,7 @@ source_location expression_source_begin(expression const value)
         {
             LPG_TO_DO();
         }
+
     case expression_type_declare:
         return value.declare.name.source;
 
@@ -437,6 +477,9 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_impl:
         LPG_TO_DO();
+
+    case expression_type_struct:
+        return value.struct_.source;
     }
     LPG_UNREACHABLE();
 }
@@ -488,6 +531,23 @@ integer_literal_expression integer_literal_expression_create(integer value, sour
 bool integer_literal_expression_equals(integer_literal_expression const left, integer_literal_expression const right)
 {
     return integer_equal(left.value, right.value) && source_location_equals(left.source, right.source);
+}
+
+struct_expression_element struct_expression_element_create(identifier_expression name, expression type)
+{
+    struct_expression_element const result = {name, type};
+    return result;
+}
+
+void struct_expression_element_free(struct_expression_element const *const value)
+{
+    identifier_expression_free(&value->name);
+    expression_free(&value->type);
+}
+
+bool struct_expression_element_equals(struct_expression_element const left, struct_expression_element const right)
+{
+    return identifier_expression_equals(left.name, right.name) && expression_equals(&left.type, &right.type);
 }
 
 expression expression_from_integer_literal(integer_literal_expression value)
@@ -587,6 +647,14 @@ expression expression_from_interface(interface_expression value)
     return result;
 }
 
+expression expression_from_struct(struct_expression value)
+{
+    expression result;
+    result.type = expression_type_struct;
+    result.struct_ = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -666,6 +734,10 @@ void expression_free(expression const *this)
 
     case expression_type_impl:
         impl_expression_free(this->impl);
+        break;
+
+    case expression_type_struct:
+        struct_expression_free(&this->struct_);
         break;
     }
 }
@@ -776,6 +848,7 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_string:
         LPG_TO_DO();
+
     case expression_type_not:
         return expression_equals(left->not.expr, right->not.expr);
 
@@ -804,6 +877,9 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_comment:
         return comment_equals(left->comment, right->comment);
+
+    case expression_type_struct:
+        return struct_expression_equals(left->struct_, right->struct_);
     }
     LPG_UNREACHABLE();
 }

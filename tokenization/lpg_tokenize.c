@@ -165,6 +165,7 @@ tokenize_result tokenize(char const *input, size_t length)
 
     case '<':
         return tokenize_less_than(input, length);
+
     case '>':
         return tokenize_less_greater(input, length);
 
@@ -300,6 +301,10 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     if (unicode_view_equals_c_str(content, "interface"))
     {
         return make_success(token_interface, content.length);
+    }
+    if (unicode_view_equals_c_str(content, "struct"))
+    {
+        return make_success(token_struct, content.length);
     }
     if (unicode_view_equals_c_str(content, "impl"))
     {
