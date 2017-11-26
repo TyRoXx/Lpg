@@ -227,6 +227,7 @@ void test_interpreter(void)
                                           "option.lpg",
                                           "raw-string-literal.lpg",
                                           "string-equals.lpg",
+                                          "struct.lpg",
                                           "tuple.lpg",
                                           "unit_value.lpg"};
         for (size_t i = 0; i < LPG_ARRAY_SIZE(test_files); ++i)

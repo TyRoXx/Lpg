@@ -38,7 +38,7 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 }
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
-    false, 0, {type_kind_type, {NULL}}, {false, {value_kind_integer, {NULL}}}, false};
+    false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false};
 
 typedef struct optional_capture_index
 {
@@ -374,7 +374,7 @@ static read_structure_element_result read_element(function_checking_state *state
     switch (actual_type->kind)
     {
     case type_kind_structure:
-        return read_structure_element(state, function, actual_type->structure_, object.where,
+        return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_inferred:
@@ -541,15 +541,12 @@ static read_local_variable_result read_local_variable_result_create(variable_add
     return result;
 }
 
-static read_local_variable_result const read_local_variable_result_unknown = {read_local_variable_status_unknown,
-                                                                              {{false, 0}, 0},
-                                                                              {type_kind_unit, {NULL}},
-                                                                              {false, {value_kind_unit, {0}}},
-                                                                              false};
+static read_local_variable_result const read_local_variable_result_unknown = {
+    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
 
 static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
                                                                                 {{false, 0}, 0},
-                                                                                {type_kind_unit, {NULL}},
+                                                                                {type_kind_unit, {0}},
                                                                                 {false, {value_kind_unit, {0}}},
                                                                                 false};
 
@@ -646,7 +643,7 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
 
 static evaluate_expression_result make_unit(register_id *const used_registers, instruction_sequence *output)
 {
-    type const unit_type = {type_kind_unit, {NULL}};
+    type const unit_type = {type_kind_unit, {0}};
     evaluate_expression_result const final_result = evaluate_expression_result_create(
         true, allocate_register(used_registers), unit_type, optional_value_create(value_from_unit()), true);
     add_instruction(output, instruction_create_literal(
@@ -920,7 +917,7 @@ evaluated_function_header_create(type *parameter_types, unicode_string *paramete
 }
 
 static evaluated_function_header const evaluated_function_header_failure = {
-    false, NULL, NULL, {false, {type_kind_unit, {NULL}}}};
+    false, NULL, NULL, {false, {type_kind_unit, {0}}}};
 
 static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
                                               size_t const parameter_count)
@@ -1659,6 +1656,41 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
 }
 
+static evaluate_expression_result evaluate_struct(function_checking_state *state, instruction_sequence *function,
+                                                  struct_expression const structure)
+{
+    structure_member *elements = allocate_array(structure.element_count, sizeof(*elements));
+    for (size_t i = 0; i < structure.element_count; ++i)
+    {
+        struct_expression_element const element = structure.elements[i];
+        evaluate_expression_result const element_type_evaluated = evaluate_expression(state, function, element.type);
+        if (!element_type_evaluated.has_value)
+        {
+            LPG_TO_DO();
+        }
+        if (!element_type_evaluated.compile_time_value.is_set)
+        {
+            LPG_TO_DO();
+        }
+        if (element_type_evaluated.compile_time_value.value_.kind != value_kind_type)
+        {
+            LPG_TO_DO();
+        }
+        elements[i] = structure_member_create(element_type_evaluated.compile_time_value.value_.type_,
+                                              unicode_view_copy(unicode_view_from_string(element.name.value)),
+                                              optional_value_empty);
+    }
+    struct_id const id = state->program->struct_count;
+    state->program->structs = reallocate_array(state->program->structs, (id + 1), sizeof(*state->program->structs));
+    state->program->structs[id] =
+        structure_create(elements, /*TODO avoid truncation safely*/ (struct_id)structure.element_count);
+    state->program->struct_count += 1;
+    register_id const into = allocate_register(&state->used_registers);
+    value const result = value_from_type(type_from_struct(id));
+    add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
+    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false);
+}
+
 typedef struct method_evaluation_result
 {
     bool is_success;
@@ -1870,7 +1902,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
 
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       result, value_from_string_ref(literal), type_from_string_ref())));
-        type const string_type = {type_kind_string_ref, {NULL}};
+        type const string_type = {type_kind_string_ref, {0}};
         return evaluate_expression_result_create(
             true, result, string_type, optional_value_create(value_from_string_ref(literal)), true);
     }
@@ -1992,7 +2024,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
         return evaluate_tuple_expression(state, function, &element);
 
     case expression_type_struct:
-        LPG_TO_DO();
+        return evaluate_struct(state, function, element.struct_);
     }
     LPG_UNREACHABLE();
 }
@@ -2036,7 +2068,7 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
-    checked_program program = {NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
+    checked_program program = {NULL, 0, NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
     check_function_result const checked =
         check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
                        optional_type_create_empty(), true, optional_type_create_empty());

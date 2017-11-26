@@ -20,5 +20,13 @@ void checked_program_free(checked_program const *program)
     {
         deallocate(program->interfaces);
     }
+    for (size_t i = 0; i < program->struct_count; ++i)
+    {
+        structure_free(program->structs + i);
+    }
+    if (program->structs)
+    {
+        deallocate(program->structs);
+    }
     garbage_collector_free(program->memory);
 }

@@ -17,7 +17,10 @@ void structure_free(structure const *value)
     {
         struct_member_free(value->members + i);
     }
-    deallocate(value->members);
+    if (value->members)
+    {
+        deallocate(value->members);
+    }
 }
 
 enumeration enumeration_create(enumeration_element *elements, enum_element_id size)
@@ -293,6 +296,14 @@ type type_from_method_pointer(method_pointer_type const value)
     type result;
     result.kind = type_kind_method_pointer;
     result.method_pointer = value;
+    return result;
+}
+
+type type_from_struct(struct_id const value)
+{
+    type result;
+    result.kind = type_kind_structure;
+    result.structure_ = value;
     return result;
 }
 

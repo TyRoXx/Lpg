@@ -1,0 +1,11 @@
+let s = struct
+
+let t = struct
+    a: boolean
+
+let u = struct
+    a: t
+    b: string-ref
+
+let f = (arg: u): boolean
+    arg.a.a

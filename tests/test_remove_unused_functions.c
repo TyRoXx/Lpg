@@ -10,8 +10,13 @@ void test_remove_unused_functions(void)
 {
     standard_library_description const std_library = describe_standard_library();
     function_id const original_function_count = 3;
-    checked_program original = {
-        NULL, 0, {NULL}, allocate_array(original_function_count, sizeof(*original.functions)), original_function_count};
+    checked_program original = {NULL,
+                                0,
+                                NULL,
+                                0,
+                                {NULL},
+                                allocate_array(original_function_count, sizeof(*original.functions)),
+                                original_function_count};
 
     for (function_id i = 0; i < original.function_count; ++i)
     {

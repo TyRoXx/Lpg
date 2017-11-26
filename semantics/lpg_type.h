@@ -7,6 +7,7 @@
 #include "lpg_garbage_collector.h"
 #include "lpg_function_id.h"
 #include "lpg_interface_id.h"
+#include "lpg_struct_id.h"
 
 typedef struct structure_member structure_member;
 
@@ -107,7 +108,7 @@ struct type
     type_kind kind;
     union
     {
-        structure const *structure_;
+        struct_id structure_;
         function_pointer const *function_pointer_;
         enumeration const *enum_;
         tuple_type tuple_;
@@ -196,6 +197,7 @@ type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constru
 type type_from_lambda(lambda_type const lambda);
 type type_from_interface(interface_id const value);
 type type_from_method_pointer(method_pointer_type const value);
+type type_from_struct(struct_id const value);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

@@ -397,6 +397,8 @@ checked_program remove_unused_functions(checked_program const from)
     function_id const new_function_count = next_new_function_id;
     checked_program result = {NULL,
                               from.interface_count,
+                              NULL,
+                              from.struct_count,
                               {NULL},
                               allocate_array(new_function_count, sizeof(*result.functions)),
                               new_function_count};
@@ -409,6 +411,10 @@ checked_program remove_unused_functions(checked_program const from)
         }
         checked_function *const new_function = result.functions + new_function_ids[i];
         *new_function = keep_function(from.functions[i], &result.memory, new_function_ids);
+    }
+    if (from.struct_count > 0)
+    {
+        LPG_TO_DO();
     }
     deallocate(used_functions);
     deallocate(new_function_ids);

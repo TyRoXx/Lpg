@@ -522,6 +522,10 @@ static success_indicator generate_function_body(checked_function const function,
     {
         state.registers[i] = register_type_none;
     }
+    for (register_id i = 0; i < function.signature->parameters.length; ++i)
+    {
+        state.registers[i] = register_type_variable;
+    }
     success_indicator const result = generate_sequence(&state, function.body, javascript_output);
     deallocate(state.registers);
     LPG_TRY(stream_writer_write_string(javascript_output, "return "));
