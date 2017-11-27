@@ -227,6 +227,7 @@ void test_interpreter(void)
     {
         char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
+                                          "integer-equals.lpg",
                                           "integer-less.lpg",
                                           "integer-to-string.lpg",
                                           "interface.lpg",

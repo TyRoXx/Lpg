@@ -139,12 +139,6 @@ static register_resource_ownership find_register_resource_ownership(type const v
 {
     switch (variable.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
-    case type_kind_interface:
-        LPG_TO_DO();
-
     case type_kind_enumeration:
         /*TODO: support owning, stateful enums*/
         return register_resource_ownership_owns;
@@ -160,6 +154,8 @@ static register_resource_ownership find_register_resource_ownership(type const v
     case type_kind_structure:
     case type_kind_type:
     case type_kind_enum_constructor:
+    case type_kind_method_pointer:
+    case type_kind_interface:
         LPG_TO_DO();
 
     case type_kind_string_ref:
