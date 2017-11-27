@@ -241,10 +241,12 @@ bool value_less_than(value const left, value const right)
     case value_kind_enum_element:
         return enum_less_than(left.enum_element, right.enum_element);
 
+    case value_kind_unit:
+        return false;
+
     case value_kind_function_pointer:
     case value_kind_flat_object:
     case value_kind_type:
-    case value_kind_unit:
     case value_kind_tuple:
     case value_kind_enum_constructor:
         LPG_TO_DO();
