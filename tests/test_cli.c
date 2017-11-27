@@ -98,9 +98,15 @@ void test_cli(void)
     }
 
     expect_output_with_source("print(\"Hello World\")\n", false, "", "Hello World");
+
     {
         char *flags[] = {"--compile-only"};
         expect_output_with_source_flags("print(\"Hello World\")\n", flags, 1, false, "", "");
+    }
+
+    {
+        char *flags[] = {"--unknown-flag"};
+        expect_output_with_source_flags("", flags, 1, true, "Arguments: filename\n", "");
     }
 
     {
