@@ -186,8 +186,7 @@ static void expect_output_impl(unicode_view const source, char const *output, st
         memory_writer_free(&print_buffer);
     }
 
-    /* TODO
-    {
+    /*{
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_c(checked, global_object.members[3].compile_time_value.value_.type_.enum_,
                                       memory_writer_erase(&generated)));

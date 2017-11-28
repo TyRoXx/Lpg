@@ -2,6 +2,7 @@
 #include <lpg_std_assert.h>
 #include <lpg_std_string.h>
 #include <stddef.h>
+typedef string_ref (*type_definition_0)(interface_reference_0);
 typedef struct interface_vtable_0
 {
     void (*_add_reference)(void *, ptrdiff_t);
@@ -43,17 +44,24 @@ static string_ref lambda_2(interface_reference_0 const printed_0)
 }
 int main(void)
 {
-    interface_reference_0 r_7 = {&interface_impl_0_for_0, malloc(sizeof(size_t) + sizeof(string_literal("a", 1)))};
+    type_definition_0 const f_0 = lambda_2;
+    string_ref const r_5 = string_literal("a", 1);
+    string_ref const r_6 = string_literal("a", 1);
+    interface_reference_0 r_7 = {&interface_impl_0_for_0, malloc(sizeof(size_t) + sizeof(r_6))};
     *(size_t *)r_7.self = 1;
     r_7.self = (char *)r_7.self + sizeof(size_t);
-    *(string_ref *)r_7.self = string_literal("a", 1);
+    *(string_ref *)r_7.self = r_6;
+    string_ref_add_reference(&r_6);
     string_ref const r_8 = lambda_2(r_7);
-    bool const r_9 = string_ref_equals(string_literal("a", 1), r_8);
+    bool const r_9 = string_ref_equals(r_5, r_8);
     unit const r_10 = assert_impl(r_9);
-    interface_reference_0 r_17 = {&interface_impl_0_for_0, malloc(sizeof(size_t) + sizeof(string_literal("a", 1)))};
+    string_ref const r_15 = string_literal("a", 1);
+    string_ref const r_16 = string_literal("a", 1);
+    interface_reference_0 r_17 = {&interface_impl_0_for_0, malloc(sizeof(size_t) + sizeof(r_16))};
     *(size_t *)r_17.self = 1;
     r_17.self = (char *)r_17.self + sizeof(size_t);
-    *(string_ref *)r_17.self = string_literal("a", 1);
+    *(string_ref *)r_17.self = r_16;
+    string_ref_add_reference(&r_16);
     string_ref const r_18 = lambda_2(r_17);
     interface_reference_0 r_19 = {&interface_impl_0_for_0, malloc(sizeof(size_t) + sizeof(r_18))};
     *(size_t *)r_19.self = 1;
@@ -61,7 +69,7 @@ int main(void)
     *(string_ref *)r_19.self = r_18;
     string_ref_add_reference(&r_18);
     string_ref const r_20 = lambda_2(r_19);
-    bool const r_21 = string_ref_equals(string_literal("a", 1), r_20);
+    bool const r_21 = string_ref_equals(r_15, r_20);
     unit const r_22 = assert_impl(r_21);
     r_7.vtable->_add_reference(r_7.self, -1);
     string_ref_free(&r_8);
