@@ -3,6 +3,7 @@
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
 #include <string.h>
+#include "lpg_structure_member.h"
 
 typedef struct standard_library_usage
 {
@@ -38,7 +39,8 @@ typedef enum register_meaning
     register_meaning_argument,
     register_meaning_captures,
     register_meaning_capture,
-    register_meaning_side_effect
+    register_meaning_side_effect,
+    register_meaning_unit
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -51,7 +53,7 @@ typedef struct register_state
 {
     register_meaning meaning;
     register_resource_ownership ownership;
-    type type_of;
+    optional_type type_of;
     union
     {
         value literal;
@@ -101,6 +103,7 @@ typedef struct c_backend_state
     interface const *all_interfaces;
     type_definitions *definitions;
     enumeration const *boolean;
+    structure const *all_structs;
 } c_backend_state;
 
 static void active_register(c_backend_state *const state, register_id const id)
@@ -115,21 +118,25 @@ static void active_register(c_backend_state *const state, register_id const id)
     ++(state->active_register_count);
 }
 
-static void set_register_meaning(c_backend_state *const state, register_id const id, register_meaning const meaning)
+static void set_register_meaning(c_backend_state *const state, register_id const id, optional_type const type_of,
+                                 register_meaning const meaning)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     ASSERT(meaning != register_meaning_nothing);
     ASSERT(meaning != register_meaning_variable);
     state->registers[id].meaning = meaning;
     state->registers[id].ownership = register_resource_ownership_borrows;
+    state->registers[id].type_of = type_of;
     active_register(state, id);
 }
 
-static void set_register_to_capture(c_backend_state *const state, register_id const id, capture_index const capture)
+static void set_register_to_capture(c_backend_state *const state, register_id const id, capture_index const capture,
+                                    type const type_of)
 {
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_capture;
     state->registers[id].capture = capture;
+    state->registers[id].type_of = optional_type_create_set(type_of);
     active_register(state, id);
 }
 
@@ -173,7 +180,7 @@ static void set_register_variable(c_backend_state *const state, register_id cons
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
-    state->registers[id].type_of = type_of;
+    state->registers[id].type_of = optional_type_create_set(type_of);
     active_register(state, id);
 }
 
@@ -183,7 +190,7 @@ static void set_register_function_variable(c_backend_state *const state, registe
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_variable;
     state->registers[id].ownership = ownership;
-    state->registers[id].type_of = type_of;
+    state->registers[id].type_of = optional_type_create_set(type_of);
     active_register(state, id);
 }
 
@@ -193,7 +200,7 @@ static void set_register_argument(c_backend_state *const state, register_id cons
     ASSERT(state->registers[id].meaning == register_meaning_nothing);
     state->registers[id].meaning = register_meaning_argument;
     state->registers[id].ownership = ownership;
-    state->registers[id].type_of = type_of;
+    state->registers[id].type_of = optional_type_create_set(type_of);
     active_register(state, id);
 }
 
@@ -390,6 +397,12 @@ static success_indicator generate_interface_reference_name(interface_id const ge
     return stream_writer_write_integer(c_output, integer_create(0, generated));
 }
 
+static success_indicator generate_struct_name(struct_id const generated, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "struct_"));
+    return stream_writer_write_integer(c_output, integer_create(0, generated));
+}
+
 static success_indicator generate_interface_reference_definition(interface_id const generated,
                                                                  stream_writer const c_output)
 {
@@ -433,11 +446,13 @@ static success_indicator generate_interface_impl_add_reference(implementation_re
 
 static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
                                        type const what, checked_function const *const all_functions,
-                                       size_t const indentation, stream_writer const c_output);
+                                       structure const *const all_structures, size_t const indentation,
+                                       stream_writer const c_output);
 
 static success_indicator
 generate_interface_impl_definition(implementation_ref const generated, type_definitions *const definitions,
                                    checked_function const *const all_functions, interface const *const all_interfaces,
+                                   structure const *const all_structures,
                                    standard_library_usage *const standard_library, stream_writer const c_output)
 {
     implementation_entry const impl = all_interfaces[generated.target].implementations[generated.implementation_index];
@@ -462,8 +477,8 @@ generate_interface_impl_definition(implementation_ref const generated, type_defi
         LPG_TRY(stream_writer_write_string(freed_writer, "(*("));
         LPG_TRY(generate_type(impl.self, standard_library, definitions, all_functions, all_interfaces, freed_writer));
         LPG_TRY(stream_writer_write_string(freed_writer, " *)self)"));
-        LPG_TRY(generate_free(
-            standard_library, unicode_view_create(freed.data, freed.used), impl.self, all_functions, 2, c_output));
+        LPG_TRY(generate_free(standard_library, unicode_view_create(freed.data, freed.used), impl.self, all_functions,
+                              all_structures, 2, c_output));
         memory_writer_free(&freed);
     }
     LPG_TRY(indent(2, c_output));
@@ -485,6 +500,31 @@ generate_interface_impl_definition(implementation_ref const generated, type_defi
         LPG_TRY(generate_function_name(impl.target.methods[i].code, c_output));
     }
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
+    return success;
+}
+
+static success_indicator generate_struct_definition(struct_id const id, structure const generated,
+                                                    standard_library_usage *const standard_library,
+                                                    type_definitions *const definitions,
+                                                    checked_function const *const all_functions,
+                                                    interface const *const all_interfaces, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
+    LPG_TRY(generate_struct_name(id, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    for (struct_member_id i = 0; i < generated.count; ++i)
+    {
+        structure_member const member = generated.members[i];
+        LPG_TRY(indent(1, c_output));
+        LPG_TRY(generate_type(member.what, standard_library, definitions, all_functions, all_interfaces, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " "));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(member.name)));
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    }
+    LPG_TRY(stream_writer_write_string(c_output, "} "));
+    LPG_TRY(generate_struct_name(id, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     return success;
 }
 
@@ -586,18 +626,18 @@ static success_indicator generate_type(type const generated, standard_library_us
     }
 
     case type_kind_integer_range:
-        if (integer_less(generated.integer_range_.maximum, integer_create(1, 0)))
-        {
-            standard_library->using_stdint = true;
-            return stream_writer_write_string(c_output, "uint64_t");
-        }
-        LPG_TO_DO();
+        standard_library->using_stdint = true;
+        return stream_writer_write_string(c_output, "uint64_t");
 
     case type_kind_type:
+        return stream_writer_write_string(c_output, "void *");
+
     case type_kind_inferred:
     case type_kind_enum_constructor:
-    case type_kind_structure:
         LPG_TO_DO();
+
+    case type_kind_structure:
+        return generate_struct_name(generated.structure_, c_output);
     }
     LPG_UNREACHABLE();
 }
@@ -636,6 +676,10 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
         LPG_TRY(stream_writer_write_string(c_output, "captures->"));
         LPG_TRY(generate_tuple_element_name(state->registers[from].capture, c_output));
         return success;
+
+    case register_meaning_unit:
+        state->standard_library.using_unit = true;
+        return stream_writer_write_string(c_output, "unit_impl");
     }
     LPG_UNREACHABLE();
 }
@@ -677,6 +721,7 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     case type_kind_enumeration:
     case type_kind_unit:
     case type_kind_integer_range:
+    case type_kind_type:
         return success;
 
     case type_kind_tuple:
@@ -690,7 +735,6 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     case type_kind_function_pointer:
     case type_kind_method_pointer:
     case type_kind_interface:
-    case type_kind_type:
     case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
@@ -729,8 +773,9 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
             return success;
 
         case register_resource_ownership_borrows:
+            ASSUME(state->registers[from].type_of.is_set);
             return generate_add_reference_to_register(
-                current_function, from, state->registers[from].type_of, indentation, all_functions, c_output);
+                current_function, from, state->registers[from].type_of.value, indentation, all_functions, c_output);
         }
 
     case register_meaning_print:
@@ -749,6 +794,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_global:
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
+    case register_meaning_unit:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -759,10 +805,10 @@ static success_indicator generate_c_str(c_backend_state *state, checked_function
 {
     switch (state->registers[from].meaning)
     {
-    case register_meaning_capture:
     case register_meaning_captures:
         LPG_TO_DO();
 
+    case register_meaning_capture:
     case register_meaning_variable:
     case register_meaning_argument:
         LPG_TRY(generate_c_read_access(state, current_function, from, c_output));
@@ -781,6 +827,7 @@ static success_indicator generate_c_str(c_backend_state *state, checked_function
     case register_meaning_side_effect:
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
+    case register_meaning_unit:
         LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();
@@ -791,12 +838,12 @@ static success_indicator generate_string_length(c_backend_state *state, checked_
 {
     switch (state->registers[from].meaning)
     {
-    case register_meaning_capture:
     case register_meaning_captures:
         LPG_TO_DO();
 
     case register_meaning_argument:
     case register_meaning_variable:
+    case register_meaning_capture:
         LPG_TRY(generate_c_read_access(state, current_function, from, c_output));
         return stream_writer_write_string(c_output, ".length");
 
@@ -813,6 +860,7 @@ static success_indicator generate_string_length(c_backend_state *state, checked_
     case register_meaning_side_effect:
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
+    case register_meaning_unit:
         LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();
@@ -824,15 +872,6 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
                                            register_id const current_function_result,
                                            instruction_sequence const sequence, size_t const indentation,
                                            stream_writer const c_output);
-
-static function_pointer signature_of(LPG_NON_NULL(c_backend_state *const state), function_pointer_value const pointer)
-{
-    if (pointer.external)
-    {
-        LPG_TO_DO();
-    }
-    return *state->all_functions[pointer.code].signature;
-}
 
 static type find_boolean(c_backend_state const *state)
 {
@@ -972,6 +1011,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_concat:
         case register_meaning_captures:
         case register_meaning_side_effect:
+        case register_meaning_unit:
             break;
         }
         LPG_TRY(generate_erase_type(state, input.erase_type.into, input.erase_type.impl,
@@ -1005,6 +1045,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         {
         case register_meaning_nothing:
         case register_meaning_global:
+        case register_meaning_unit:
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
@@ -1114,7 +1155,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_variable:
         {
             type result_type = type_from_unit();
-            type const callee_type = state->registers[input.call.callee].type_of;
+            ASSUME(state->registers[input.call.callee].type_of.is_set);
+            type const callee_type = state->registers[input.call.callee].type_of.value;
             switch (callee_type.kind)
             {
             case type_kind_method_pointer:
@@ -1164,8 +1206,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
             case type_kind_lambda:
             {
+                ASSUME(state->registers[input.call.callee].type_of.is_set);
                 function_pointer const callee_signature =
-                    *all_functions[state->registers[input.call.callee].type_of.lambda.lambda].signature;
+                    *all_functions[state->registers[input.call.callee].type_of.value.lambda.lambda].signature;
                 result_type = callee_signature.result;
                 set_register_function_variable(
                     state, input.call.result, find_register_resource_ownership(result_type), result_type);
@@ -1174,7 +1217,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, " const "));
                 LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
-                LPG_TRY(generate_function_name(state->registers[input.call.callee].type_of.lambda.lambda, c_output));
+                LPG_TRY(
+                    generate_function_name(state->registers[input.call.callee].type_of.value.lambda.lambda, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, "("));
                 bool comma = false;
                 if (callee_signature.captures.length > 0)
@@ -1272,7 +1316,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         return success;
 
     case instruction_global:
-        set_register_meaning(state, input.global_into, register_meaning_global);
+        set_register_meaning(
+            state, input.global_into, optional_type_create_set(type_from_struct(0)), register_meaning_global);
         return success;
 
     case instruction_read_struct:
@@ -1285,42 +1330,52 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
-        case register_meaning_argument:
+        case register_meaning_unit:
             LPG_TO_DO();
 
         case register_meaning_global:
             switch (input.read_struct.member)
             {
             case 2:
-                set_register_meaning(state, input.read_struct.into, register_meaning_print);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_print);
                 return success;
 
             case 4:
-                set_register_meaning(state, input.read_struct.into, register_meaning_assert);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_assert);
                 return success;
 
             case 5:
-                set_register_meaning(state, input.read_struct.into, register_meaning_and);
+                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_and);
                 return success;
 
             case 6:
-                set_register_meaning(state, input.read_struct.into, register_meaning_or);
+                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_or);
                 return success;
 
             case 7:
-                set_register_meaning(state, input.read_struct.into, register_meaning_not);
+                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_not);
                 return success;
 
             case 8:
-                set_register_meaning(state, input.read_struct.into, register_meaning_concat);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_concat);
                 return success;
 
             case 9:
-                set_register_meaning(state, input.read_struct.into, register_meaning_string_equals);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_string_equals);
                 return success;
 
             case 12:
-                set_register_meaning(state, input.read_struct.into, register_meaning_integer_equals);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_equals);
+                return success;
+
+            case 13:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_unit);
                 return success;
 
             case 14:
@@ -1333,15 +1388,18 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 return success;
 
             case 16:
-                set_register_meaning(state, input.read_struct.into, register_meaning_integer_less);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_less);
                 return success;
 
             case 17:
-                set_register_meaning(state, input.read_struct.into, register_meaning_integer_to_string);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_to_string);
                 return success;
 
             case 18:
-                set_register_meaning(state, input.read_struct.into, register_meaning_side_effect);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_side_effect);
                 return success;
 
             default:
@@ -1350,8 +1408,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             }
 
         case register_meaning_variable:
+        case register_meaning_argument:
         {
-            type const object_type = state->registers[input.read_struct.from_object].type_of;
+            ASSUME(state->registers[input.read_struct.from_object].type_of.is_set);
+            type const object_type = state->registers[input.read_struct.from_object].type_of.value;
             switch (object_type.kind)
             {
             case type_kind_method_pointer:
@@ -1361,6 +1421,23 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TO_DO();
 
             case type_kind_structure:
+            {
+                structure const struct_ = state->all_structs[object_type.structure_];
+                structure_member const member = struct_.members[input.read_struct.member];
+                set_register_variable(state, input.read_struct.into, register_resource_ownership_borrows, member.what);
+                LPG_TRY(indent(indentation, c_output));
+                LPG_TRY(generate_type(member.what, &state->standard_library, state->definitions, state->all_functions,
+                                      state->all_interfaces, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " const "));
+                LPG_TRY(generate_register_name(input.read_struct.into, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_register_name(input.read_struct.from_object, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, "."));
+                LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(member.name)));
+                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+                return success;
+            }
+
             case type_kind_lambda:
                 LPG_TO_DO();
 
@@ -1405,8 +1482,14 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_UNREACHABLE();
 
         case register_meaning_captures:
-            set_register_to_capture(state, input.read_struct.into, input.read_struct.member);
+        {
+            optional_type const capture_tuple = state->registers[input.read_struct.from_object].type_of;
+            ASSUME(capture_tuple.is_set);
+            ASSUME(capture_tuple.value.kind == type_kind_tuple);
+            set_register_to_capture(state, input.read_struct.into, input.read_struct.member,
+                                    capture_tuple.value.tuple_.elements[input.read_struct.member]);
             return success;
+        }
         }
 
     case instruction_break:
@@ -1568,7 +1651,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     }
 
     case instruction_get_captures:
-        set_register_meaning(state, input.captures, register_meaning_captures);
+        set_register_meaning(state, input.captures,
+                             optional_type_create_set(type_from_tuple_type(current_function->signature->captures)),
+                             register_meaning_captures);
         return success;
 
     case instruction_lambda_with_captures:
@@ -1600,13 +1685,14 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
 static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
                                        type const what, checked_function const *const all_functions,
-                                       size_t const indentation, stream_writer const c_output)
+                                       structure const *const all_structures, size_t const indentation,
+                                       stream_writer const c_output)
 {
     switch (what.kind)
     {
     case type_kind_method_pointer:
         return generate_free(standard_library, freed, type_from_interface(what.method_pointer.interface_),
-                             all_functions, indentation, c_output);
+                             all_functions, all_structures, indentation, c_output);
 
     case type_kind_interface:
         LPG_TRY(indent(indentation, c_output));
@@ -1625,8 +1711,21 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         return success;
 
     case type_kind_structure:
-    case type_kind_function_pointer:
-        LPG_TO_DO();
+    {
+        structure const struct_ = all_structures[what.structure_];
+        for (struct_member_id i = 0; i < struct_.count; ++i)
+        {
+            memory_writer name_buffer = {NULL, 0, 0};
+            LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), freed));
+            LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
+            LPG_TRY(stream_writer_write_unicode_view(
+                memory_writer_erase(&name_buffer), unicode_view_from_string(struct_.members[i].name)));
+            LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), struct_.members[i].what,
+                                  all_functions, all_structures, indentation, c_output));
+            memory_writer_free(&name_buffer);
+        }
+        return success;
+    }
 
     case type_kind_tuple:
         for (struct_member_id i = 0; i < what.tuple_.length; ++i)
@@ -1636,16 +1735,17 @@ static success_indicator generate_free(standard_library_usage *const standard_li
             LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
             LPG_TRY(generate_tuple_element_name(i, memory_writer_erase(&name_buffer)));
             LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), what.tuple_.elements[i],
-                                  all_functions, indentation, c_output));
+                                  all_functions, all_structures, indentation, c_output));
             memory_writer_free(&name_buffer);
         }
         return success;
 
-    case type_kind_type:
     case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
 
+    case type_kind_function_pointer:
+    case type_kind_type:
     case type_kind_unit:
     case type_kind_enumeration:
     case type_kind_integer_range:
@@ -1655,7 +1755,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     {
         checked_function const lambda_function = all_functions[what.lambda.lambda];
         LPG_TRY(generate_free(standard_library, freed, type_from_tuple_type(lambda_function.signature->captures),
-                              all_functions, indentation, c_output));
+                              all_functions, all_structures, indentation, c_output));
         return success;
     }
     }
@@ -1664,6 +1764,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
 
 static success_indicator generate_free_register(c_backend_state *state, register_id const which,
                                                 checked_function const *const all_functions,
+                                                structure const *const all_structures,
                                                 checked_function const *const current_function,
                                                 size_t const indentation, stream_writer const c_output)
 {
@@ -1671,11 +1772,12 @@ static success_indicator generate_free_register(c_backend_state *state, register
     {
     case register_resource_ownership_owns:
     {
+        ASSUME(state->registers[which].type_of.is_set);
         memory_writer name_buffer = {NULL, 0, 0};
         LPG_TRY(generate_register_name(which, current_function, memory_writer_erase(&name_buffer)));
         success_indicator const result =
-            generate_free(&state->standard_library, memory_writer_content(name_buffer), state->registers[which].type_of,
-                          all_functions, indentation, c_output);
+            generate_free(&state->standard_library, memory_writer_content(name_buffer),
+                          state->registers[which].type_of.value, all_functions, all_structures, indentation, c_output);
         memory_writer_free(&name_buffer);
         return result;
     }
@@ -1706,18 +1808,18 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
         {
             continue;
         }
-        LPG_TRY(generate_free_register(state, which, all_functions, current_function, indentation, c_output));
+        LPG_TRY(generate_free_register(
+            state, which, all_functions, state->all_structs, current_function, indentation, c_output));
     }
     state->active_register_count = previously_active_registers;
     return success;
 }
 
-static success_indicator generate_function_body(checked_function const current_function,
-                                                checked_function const *const all_functions,
-                                                interface const *const all_interfaces, stream_writer const c_output,
-                                                standard_library_usage *standard_library,
-                                                type_definitions *const definitions, bool const return_0,
-                                                enumeration const *const boolean)
+static success_indicator
+generate_function_body(checked_function const current_function, checked_function const *const all_functions,
+                       interface const *const all_interfaces, structure const *const all_structures,
+                       stream_writer const c_output, standard_library_usage *standard_library,
+                       type_definitions *const definitions, bool const return_0, enumeration const *const boolean)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
@@ -1728,7 +1830,8 @@ static success_indicator generate_function_body(checked_function const current_f
                              all_functions,
                              all_interfaces,
                              definitions,
-                             boolean};
+                             boolean,
+                             all_structures};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;
@@ -1868,11 +1971,18 @@ success_indicator generate_c(checked_program const program, enumeration const *c
         interface const interface_ = program.interfaces[i];
         for (size_t k = 0; k < interface_.implementation_count; ++k)
         {
-            LPG_TRY_GOTO(
-                generate_interface_impl_definition(implementation_ref_create(i, k), &definitions, program.functions,
-                                                   program.interfaces, &standard_library, program_defined_writer),
-                fail);
+            LPG_TRY_GOTO(generate_interface_impl_definition(implementation_ref_create(i, k), &definitions,
+                                                            program.functions, program.interfaces, program.structs,
+                                                            &standard_library, program_defined_writer),
+                         fail);
         }
+    }
+
+    for (struct_id i = 0; i < program.struct_count; ++i)
+    {
+        LPG_TRY_GOTO(generate_struct_definition(i, program.structs[i], &standard_library, &definitions,
+                                                program.functions, program.interfaces, program_defined_writer),
+                     fail);
     }
 
     for (function_id i = 1; i < program.function_count; ++i)
@@ -1882,13 +1992,13 @@ success_indicator generate_c(checked_program const program, enumeration const *c
                                                    program.functions, program.interfaces, program_defined_writer),
                      fail);
         LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "\n"), fail);
-        LPG_TRY_GOTO(generate_function_body(current_function, program.functions, program.interfaces,
+        LPG_TRY_GOTO(generate_function_body(current_function, program.functions, program.interfaces, program.structs,
                                             program_defined_writer, &standard_library, &definitions, false, boolean),
                      fail);
     }
 
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "int main(void)\n"), fail);
-    LPG_TRY_GOTO(generate_function_body(program.functions[0], program.functions, program.interfaces,
+    LPG_TRY_GOTO(generate_function_body(program.functions[0], program.functions, program.interfaces, program.structs,
                                         program_defined_writer, &standard_library, &definitions, true, boolean),
                  fail);
 

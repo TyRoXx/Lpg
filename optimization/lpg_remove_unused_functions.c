@@ -3,6 +3,7 @@
 #include "lpg_allocate.h"
 #include <string.h>
 #include "lpg_assert.h"
+#include "lpg_structure_member.h"
 
 static void mark_function(bool *used_functions, checked_function const *const all_functions,
                           interface const *const all_interfaces, function_id const marked_function);
@@ -156,8 +157,10 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
             clone_function_pointer_value(from.function_pointer, clone_gc, new_function_ids));
 
     case value_kind_flat_object:
-    case value_kind_type:
         LPG_TO_DO();
+
+    case value_kind_type:
+        return value_from_type(type_clone(from.type_, clone_gc));
 
     case value_kind_enum_element:
     {
@@ -177,6 +180,16 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
+}
+
+static optional_value clone_optional_value(optional_value const original, garbage_collector *const clone_gc,
+                                           function_id const *const new_function_ids)
+{
+    if (original.is_set)
+    {
+        return optional_value_create(adapt_value(original.value_, clone_gc, new_function_ids));
+    }
+    return original;
 }
 
 static instruction_sequence clone_sequence(instruction_sequence const original, garbage_collector *const clone_gc,
@@ -362,6 +375,31 @@ static interface *clone_interfaces(interface *const interfaces, const interface_
     return result;
 }
 
+static structure clone_structure(structure const original, garbage_collector *const gc,
+                                 function_id const *const new_function_ids)
+{
+    structure_member *const members = allocate_array(original.count, sizeof(*members));
+    for (size_t i = 0; i < original.count; ++i)
+    {
+        members[i] =
+            structure_member_create(type_clone(original.members[i].what, gc),
+                                    unicode_view_copy(unicode_view_from_string(original.members[i].name)),
+                                    clone_optional_value(original.members[i].compile_time_value, gc, new_function_ids));
+    }
+    return structure_create(members, original.count);
+}
+
+static structure *clone_structures(structure const *const structures, struct_id const structure_count,
+                                   garbage_collector *const gc, function_id const *const new_function_ids)
+{
+    structure *const result = allocate_array(structure_count, sizeof(*result));
+    for (interface_id i = 0; i < structure_count; ++i)
+    {
+        result[i] = clone_structure(structures[i], gc, new_function_ids);
+    }
+    return result;
+}
+
 checked_program remove_unused_functions(checked_program const from)
 {
     bool *const used_functions = allocate_array(from.function_count, sizeof(*used_functions));
@@ -403,6 +441,7 @@ checked_program remove_unused_functions(checked_program const from)
                               allocate_array(new_function_count, sizeof(*result.functions)),
                               new_function_count};
     result.interfaces = clone_interfaces(from.interfaces, from.interface_count, &result.memory, new_function_ids);
+    result.structs = clone_structures(from.structs, from.struct_count, &result.memory, new_function_ids);
     for (function_id i = 0; i < from.function_count; ++i)
     {
         if (!used_functions[i])
@@ -411,10 +450,6 @@ checked_program remove_unused_functions(checked_program const from)
         }
         checked_function *const new_function = result.functions + new_function_ids[i];
         *new_function = keep_function(from.functions[i], &result.memory, new_function_ids);
-    }
-    if (from.struct_count > 0)
-    {
-        LPG_TO_DO();
     }
     deallocate(used_functions);
     deallocate(new_function_ids);

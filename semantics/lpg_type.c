@@ -362,13 +362,6 @@ type type_clone(type const original, garbage_collector *const clone_gc)
 {
     switch (original.kind)
     {
-    case type_kind_structure:
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
-    case type_kind_interface:
-        return original;
-
     case type_kind_lambda:
         return type_from_lambda(original.lambda);
 
@@ -389,12 +382,11 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     }
 
     case type_kind_unit:
-        return original;
-
     case type_kind_string_ref:
-        return original;
-
     case type_kind_enumeration:
+    case type_kind_interface:
+    case type_kind_integer_range:
+    case type_kind_inferred:
         return original;
 
     case type_kind_tuple:
@@ -408,15 +400,11 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     }
 
     case type_kind_type:
-        LPG_TO_DO();
-
-    case type_kind_integer_range:
-        return original;
-
-    case type_kind_inferred:
-        return original;
+        return type_from_type();
 
     case type_kind_enum_constructor:
+    case type_kind_structure:
+    case type_kind_method_pointer:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();

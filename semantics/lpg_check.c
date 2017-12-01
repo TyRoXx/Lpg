@@ -2075,9 +2075,23 @@ static evaluate_expression_result check_sequence(function_checking_state *const 
         final_result.has_value, final_result.where, final_result.type_, final_result.compile_time_value, is_pure);
 }
 
+static structure clone_structure(structure const original)
+{
+    structure_member *const members = allocate_array(original.count, sizeof(*members));
+    for (size_t i = 0; i < original.count; ++i)
+    {
+        members[i] = structure_member_create(original.members[i].what,
+                                             unicode_view_copy(unicode_view_from_string(original.members[i].name)),
+                                             original.members[i].compile_time_value);
+    }
+    return structure_create(members, original.count);
+}
+
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, void *user)
 {
-    checked_program program = {NULL, 0, NULL, 0, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
+    structure *const structures = allocate_array(1, sizeof(*structures));
+    structures[0] = clone_structure(global);
+    checked_program program = {NULL, 0, structures, 1, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
     check_function_result const checked =
         check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
                        optional_type_create_empty(), true, optional_type_create_empty());
