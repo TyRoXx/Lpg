@@ -1329,6 +1329,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
+        ASSUME(state->registers[input.call.callee].type_of.is_set);
+        ASSUME(state->registers[input.call.callee].type_of.value.kind == type_kind_function_pointer);
         LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "("));
         for (size_t i = 0; i < input.call.argument_count; ++i)
@@ -1700,8 +1702,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
     case instruction_lambda_with_captures:
     {
-        type const function_type =
-            type_from_function_pointer(all_functions[input.lambda_with_captures.lambda].signature);
+        type const function_type = type_from_lambda(lambda_type_create(input.lambda_with_captures.lambda));
         set_register_variable(state, input.lambda_with_captures.into, register_resource_ownership_owns, function_type);
         tuple_type const captures = all_functions[input.lambda_with_captures.lambda].signature->captures;
         for (size_t i = 0; i < captures.length; ++i)

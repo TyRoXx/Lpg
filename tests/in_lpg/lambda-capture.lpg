@@ -1,9 +1,26 @@
+
 /*use a captured variable in a compile-time context*/
 let m = boolean
 let f5 = ()
     let a : m = boolean.true
     a
 assert(f5())
+
+/*use a runtime variable in a runtime context*/
+let f = ()
+    side-effect()
+    23
+let c = f()
+let g = ()
+    assert(integer-equals(c, 23))
+g()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side-effect()
+    assert(integer-equals(b, 23))
+h()
 
 /*capture an argument*/
 let f6 = (a: boolean)

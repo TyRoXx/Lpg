@@ -341,6 +341,7 @@ void test_interpreter(void)
                                           "interface.lpg",
                                           "lambda-capture.lpg",
                                           "lambda-return-type.lpg",
+                                          "loop.lpg",
                                           "match-enum.lpg",
                                           "option.lpg",
                                           "raw-string-literal.lpg",
@@ -355,25 +356,6 @@ void test_interpreter(void)
     }
 
     expect_no_output("", std_library.globals);
-
-    expect_output("print(\"Hello, world!\")", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, world!\")\n", "Hello, world!", std_library.globals);
-    expect_output("let v = \"Hello, world!\"\nprint(v)\n", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, world!\")\r\n", "Hello, world!", std_library.globals);
-    expect_output("print(\"Hello, \")\nprint(\"world!\")", "Hello, world!", std_library.globals);
-    expect_output("loop\n"
-                  "    let v = \"Hello, world!\"\n"
-                  "    print(v)\n"
-                  "    break",
-                  "Hello, world!", std_library.globals);
-    expect_output("let f = () print(\"hello\")\n"
-                  "f()\n",
-                  "hello", std_library.globals);
-
-    expect_output("let m = \"hallo\"\n"
-                  "let f = () print(m)\n"
-                  "f()\n",
-                  "hallo", std_library.globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
