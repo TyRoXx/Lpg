@@ -27,6 +27,6 @@ static string_ref integer_to_string(uint64_t const value)
 #ifdef _MSC_VER
          sizeof(buffer),
 #endif
-         "%llu", value);
+         "%llu", (unsigned long long)value);
     return string_ref_concat(string_literal("", 0), string_literal(buffer, (size_t)formatted_length));
 }
