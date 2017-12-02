@@ -1601,8 +1601,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TO_DO();
 
         case value_kind_type:
-            /*Types don't exist at runtime (yet?). No code should reference this register, so we don't need a variable
-             * for it in C.*/
+            state->standard_library.using_unit = true;
+            LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+            LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
             return success;
 
         case value_kind_enum_constructor:
