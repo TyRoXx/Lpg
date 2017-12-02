@@ -310,11 +310,6 @@ static void expect_output(char const *source, char const *output, structure cons
     expect_output_impl(unicode_view_from_c_str(""), unicode_view_from_c_str(source), output, global_object);
 }
 
-static void expect_no_output(char const *source, structure const global_object)
-{
-    expect_output_impl(unicode_view_from_c_str(""), unicode_view_from_c_str(source), "", global_object);
-}
-
 static void run_file(char const *const source_file, structure const global_object)
 {
     unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
@@ -335,6 +330,7 @@ void test_interpreter(void)
     {
         char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
+                                          "empty.lpg",
                                           "integer-equals.lpg",
                                           "integer-less.lpg",
                                           "integer-to-string.lpg",
@@ -354,8 +350,6 @@ void test_interpreter(void)
             run_file(test_files[i], std_library.globals);
         }
     }
-
-    expect_no_output("", std_library.globals);
 
     /*re-capture a captured constant*/
     expect_output("let m = \"y\"\n"
