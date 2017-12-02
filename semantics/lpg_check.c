@@ -1,6 +1,5 @@
 #include "lpg_check.h"
 #include "lpg_for.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
 #include "lpg_value.h"
 #include "lpg_instruction.h"
@@ -131,13 +130,6 @@ static function_checking_state function_checking_state_create(function_checking_
         parent, may_capture_runtime_variables, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program,
         body};
     return result;
-}
-
-static register_id allocate_register(register_id *const used_registers)
-{
-    register_id const id = *used_registers;
-    ++(*used_registers);
-    return id;
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,

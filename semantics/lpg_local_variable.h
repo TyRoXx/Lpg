@@ -1,5 +1,5 @@
 #pragma once
-#include "lpg_register_id.h"
+#include "lpg_register.h"
 #include "lpg_value.h"
 
 typedef struct local_variable
