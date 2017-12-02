@@ -10,13 +10,6 @@
 #include "lpg_local_variable.h"
 #include "lpg_instruction_checkpoint.h"
 
-static void add_instruction(instruction_sequence *to, instruction const added)
-{
-    to->elements = reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
-    to->elements[to->length] = added;
-    ++(to->length);
-}
-
 struct function_checking_state;
 
 typedef struct evaluate_expression_result

@@ -1,7 +1,5 @@
 #include "lpg_checked_function.h"
 #include "lpg_allocate.h"
-#include "lpg_instruction.h"
-#include "lpg_assert.h"
 
 checked_function checked_function_create(register_id return_value, function_pointer *signature,
                                          instruction_sequence body, unicode_string *register_debug_names,
