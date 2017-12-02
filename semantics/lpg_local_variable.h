@@ -39,8 +39,22 @@ typedef struct read_local_variable_result
     bool is_pure;
 } read_local_variable_result;
 
+static read_local_variable_result const read_local_variable_result_unknown = {
+    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
+
+static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
+                                                                                {{false, 0}, 0},
+                                                                                {type_kind_unit, {0}},
+                                                                                {false, {value_kind_unit, {0}}},
+                                                                                false};
+
 read_local_variable_result read_local_variable_result_create(variable_address where, type what,
                                                              optional_value compile_time_value, bool is_pure);
+
+struct function_checking_state;
+read_local_variable_result read_local_variable(LPG_NON_NULL(struct function_checking_state *const state),
+                                               instruction_sequence *const sequence, unicode_view const name,
+                                               source_location const original_reference_location);
 
 void add_local_variable(local_variable_container *to, local_variable variable);
 

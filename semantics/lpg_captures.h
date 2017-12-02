@@ -32,3 +32,7 @@ capture capture_create(variable_address const from, type const what);
 variable_address variable_address_from_capture(capture_index const captured);
 
 bool variable_address_equals(variable_address const left, variable_address const right);
+
+struct function_checking_state;
+capture_index require_capture(LPG_NON_NULL(struct function_checking_state *const state),
+                              variable_address const captured, type const what);
