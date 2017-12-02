@@ -24,6 +24,7 @@
 #include "test_semantic_errors.h"
 #include "test_value.h"
 #include "test_type.h"
+#include "test_path.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
@@ -32,6 +33,7 @@
 int main(void)
 {
     static void (*tests[])(void) = {test_blob,
+                                    test_path,
                                     test_integer,
                                     test_allocator,
                                     test_unicode_string,

@@ -1,5 +1,9 @@
 #pragma once
 #include "lpg_unicode_view.h"
+#include "lpg_create_process.h"
 
-unicode_view path_remove_leaf(unicode_view const full);
-unicode_string path_combine(unicode_view const *begin, size_t count);
+unicode_view path_remove_leaf(unicode_view const full) LPG_USE_RESULT;
+unicode_string path_combine(unicode_view const *begin, size_t count) LPG_USE_RESULT;
+unicode_string get_current_executable_path(void) LPG_USE_RESULT;
+bool file_exists(unicode_view const path) LPG_USE_RESULT;
+success_indicator create_directory(unicode_view const path) LPG_USE_RESULT;

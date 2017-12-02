@@ -1,3 +1,9 @@
+find_program(CMAKE_EXECUTABLE cmake)
+if(NOT CMAKE_EXECUTABLE)
+	message(FATAL_ERROR "Could not find CMake")
+endif()
+add_definitions(-DLPG_CMAKE_EXECUTABLE="${CMAKE_EXECUTABLE}")
+
 include_directories(../syntax)
 include_directories(../generic)
 include_directories(../tokenization)

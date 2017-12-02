@@ -87,7 +87,6 @@ endif()
 
 if(MSVC)
 	target_compile_options(duktape PUBLIC /DDUK_USE_DATE_NOW_WINDOWS)
-	message(${MSVC_VERSION})
 	if(MSVC_VERSION LESS 1911)
 		add_definitions(/D_WIN32_WINNT_WINTHRESHOLD=0)
 		add_definitions(/WX)

@@ -1,6 +1,7 @@
 #include "lpg_unicode_view.h"
 #include <string.h>
 #include "lpg_assert.h"
+#include "lpg_allocate.h"
 
 unicode_view unicode_view_create(char const *begin, size_t length)
 {
@@ -85,4 +86,12 @@ optional_size unicode_view_find(unicode_view haystack, const char needle)
         }
     }
     return optional_size_empty;
+}
+
+unicode_string unicode_view_zero_terminate(unicode_view original)
+{
+    unicode_string const result = {allocate_array(original.length + 1, sizeof(*result.data)), original.length};
+    memcpy(result.data, original.begin, result.length);
+    result.data[result.length] = '\0';
+    return result;
 }

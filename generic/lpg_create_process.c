@@ -1,41 +1,9 @@
 #include "lpg_create_process.h"
 #include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_win32.h"
 
 #ifdef _WIN32
-typedef struct win32_string
-{
-    WCHAR *c_str;
-    size_t size;
-} win32_string;
-
-static void win32_string_free(win32_string const freed)
-{
-    if (freed.c_str)
-    {
-        deallocate(freed.c_str);
-    }
-}
-
-static win32_string to_win32_path(unicode_view const original)
-{
-    ASSERT(original.length <= (size_t)INT_MAX);
-    int const output_size = MultiByteToWideChar(CP_UTF8, 0, original.begin, (int)original.length, NULL, 0);
-    ASSERT((original.length == 0) || (output_size != 0));
-    win32_string const result = {allocate_array(((size_t)output_size) + 1, sizeof(*result.c_str)), (size_t)output_size};
-    ASSERT(MultiByteToWideChar(CP_UTF8, 0, original.begin, (int)original.length, result.c_str, (int)result.size) ==
-           output_size);
-    for (int i = 0; i < output_size; ++i)
-    {
-        if (result.c_str[i] == L'/')
-        {
-            result.c_str[i] = L'\\';
-        }
-    }
-    result.c_str[result.size] = L'\0';
-    return result;
-}
-
 static win32_string build_command_line(unicode_view const executable, unicode_view const *const arguments,
                                        size_t const argument_count)
 {
@@ -61,6 +29,13 @@ static win32_string build_command_line(unicode_view const executable, unicode_vi
     size_t destination = 1;
     destination += (size_t)MultiByteToWideChar(CP_UTF8, 0, executable.begin, (int)executable.length,
                                                result.c_str + destination, (int)(result.size - destination));
+    for (size_t i = 1; i < destination; ++i)
+    {
+        if (result.c_str[i] == L'/')
+        {
+            result.c_str[i] = L'\\';
+        }
+    }
     result.c_str[destination] = L'"';
     destination += 1;
     for (size_t i = 0; i < argument_count; ++i)
@@ -74,7 +49,40 @@ static win32_string build_command_line(unicode_view const executable, unicode_vi
     result.c_str[result.size] = L'\0';
     return result;
 }
+#else
+#include <unistd.h>
+#include <sys/prctl.h>
+#include <signal.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #endif
+
+file_handle get_standard_input()
+{
+#ifdef _WIN32
+    return GetStdHandle(STD_INPUT_HANDLE);
+#else
+    return STDIN_FILENO;
+#endif
+}
+
+file_handle get_standard_output()
+{
+#ifdef _WIN32
+    return GetStdHandle(STD_OUTPUT_HANDLE);
+#else
+    return STDOUT_FILENO;
+#endif
+}
+
+file_handle get_standard_error()
+{
+#ifdef _WIN32
+    return GetStdHandle(STD_ERROR_HANDLE);
+#else
+    return STDERR_FILENO;
+#endif
+}
 
 create_process_result create_process_result_create(success_indicator success, child_process created)
 {
@@ -113,14 +121,107 @@ create_process_result create_process(unicode_view const executable, unicode_view
     child_process const created = {INVALID_HANDLE_VALUE};
     return create_process_result_create(failure, created);
 #else
-    (void)executable;
-    (void)arguments;
-    (void)argument_count;
-    (void)current_path;
-    (void)input;
-    (void)output;
-    (void)error;
-    child_process const created = {-1};
-    return create_process_result_create(failure, created);
+    pid_t const forked = fork();
+    if (forked < 0)
+    {
+        child_process const created = {-1};
+        return create_process_result_create(failure, created);
+    }
+    if (forked == 0)
+    {
+        if (dup2(output, STDOUT_FILENO) < 0)
+        {
+            exit(1);
+        }
+        if (dup2(error, STDERR_FILENO) < 0)
+        {
+            exit(1);
+        }
+        if (dup2(input, STDIN_FILENO) < 0)
+        {
+            exit(1);
+        }
+
+        {
+            unicode_string const current_path_zero_terminated = unicode_view_zero_terminate(current_path);
+            if (chdir(current_path_zero_terminated.data) < 0)
+            {
+                exit(1);
+            }
+        }
+
+        // close inherited file descriptors
+        long max_fd = sysconf(_SC_OPEN_MAX);
+        for (int i = 3; i < max_fd; ++i)
+        {
+            close(i); // ignore errors because we will close many non-file-descriptors
+        }
+
+#ifdef __linux__
+        // kill the child when the parent exits
+        if (prctl(PR_SET_PDEATHSIG, SIGHUP) < 0)
+        {
+            exit(1);
+        }
+#endif
+
+        char **const exec_arguments = allocate_array(argument_count + 2, sizeof(*exec_arguments));
+        unicode_string const executable_zero_terminated = unicode_view_zero_terminate(executable);
+        exec_arguments[0] = executable_zero_terminated.data;
+        for (size_t i = 0; i < argument_count; ++i)
+        {
+            unicode_string const argument_zero_terminated = unicode_view_zero_terminate(arguments[i]);
+            exec_arguments[1 + i] = argument_zero_terminated.data;
+        }
+        exec_arguments[argument_count + 1] = NULL;
+        execvp(executable_zero_terminated.data, exec_arguments);
+        LPG_UNREACHABLE();
+    }
+    else
+    {
+        child_process const created = {forked};
+        return create_process_result_create(success, created);
+    }
+#endif
+}
+
+int wait_for_process_exit(child_process const process)
+{
+#ifdef _WIN32
+    WaitForSingleObject(process.handle, INFINITE);
+    DWORD exit_code = 1;
+    if (!GetExitCodeProcess(process.handle, &exit_code))
+    {
+        LPG_TO_DO();
+    }
+    CloseHandle(process.handle);
+    return (int)exit_code;
+#else
+    int status = 0;
+    int const rc = waitpid(process.pid, &status, 0);
+    if (rc == -1)
+    {
+        return -1;
+    }
+    if (WIFEXITED(status))
+    {
+        return WEXITSTATUS(status);
+    }
+    else if (WIFSIGNALED(status))
+    {
+        return -1;
+    }
+    else if (WIFSTOPPED(status))
+    {
+        return -1;
+    }
+    else if (WIFCONTINUED(status))
+    {
+        return -1;
+    }
+    else
+    {
+        LPG_UNREACHABLE();
+    }
 #endif
 }

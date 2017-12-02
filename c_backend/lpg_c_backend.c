@@ -70,7 +70,6 @@ typedef struct type_definition
 
 static void type_definition_free(type_definition const definition)
 {
-
     unicode_string_free(&definition.definition);
     unicode_string_free(&definition.name);
 }
@@ -231,13 +230,29 @@ static success_indicator generate_integer(integer const value, stream_writer con
     return success;
 }
 
+static success_indicator escape_identifier(unicode_view const original, stream_writer const c_output)
+{
+    for (size_t i = 0; i < original.length; ++i)
+    {
+        if (original.begin[i] == '-')
+        {
+            LPG_TRY(stream_writer_write_string(c_output, "_"));
+        }
+        else
+        {
+            LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(original.begin + i, 1)));
+        }
+    }
+    return success;
+}
+
 static success_indicator generate_register_name(register_id const id, checked_function const *const current_function,
                                                 stream_writer const c_output)
 {
     unicode_view const original_name = unicode_view_from_string(current_function->register_debug_names[id]);
     if (original_name.length > 0)
     {
-        LPG_TRY(stream_writer_write_unicode_view(c_output, original_name));
+        LPG_TRY(escape_identifier(original_name, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "_"));
     }
     else
@@ -371,7 +386,7 @@ generate_interface_vtable_definition(interface_id const generated, standard_libr
         method_description const method = our_interface.methods[i];
         LPG_TRY(generate_type(method.result, standard_library, definitions, all_functions, all_interfaces, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " (*"));
-        LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(method.name)));
+        LPG_TRY(escape_identifier(unicode_view_from_string(method.name), c_output));
         LPG_TRY(stream_writer_write_string(c_output, ")(void *"));
         for (size_t k = 0; k < method.parameters.length; ++k)
         {
@@ -412,6 +427,7 @@ static success_indicator generate_interface_reference_definition(interface_id co
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
     LPG_TRY(indent(1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "struct "));
     LPG_TRY(generate_interface_vtable_name(generated, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const *vtable;\n"));
 
@@ -503,28 +519,49 @@ generate_interface_impl_definition(implementation_ref const generated, type_defi
     return success;
 }
 
+static success_indicator generate_struct_member_name(unicode_view const name, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "e_"));
+    for (size_t i = 0; i < name.length; ++i)
+    {
+        if (name.begin[i] == '-')
+        {
+            LPG_TRY(stream_writer_write_string(c_output, "_"));
+        }
+        else
+        {
+            LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(name.begin + i, 1)));
+        }
+    }
+    return success;
+}
+
 static success_indicator generate_struct_definition(struct_id const id, structure const generated,
                                                     standard_library_usage *const standard_library,
                                                     type_definitions *const definitions,
                                                     checked_function const *const all_functions,
                                                     interface const *const all_interfaces, stream_writer const c_output)
 {
-    LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
+    LPG_TRY(stream_writer_write_string(c_output, "struct "));
     LPG_TRY(generate_struct_name(id, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "\n"));
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    if (generated.count == 0)
+    {
+        standard_library->using_unit = true;
+        LPG_TRY(indent(1, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "unit dummy;\n"));
+    }
     for (struct_member_id i = 0; i < generated.count; ++i)
     {
         structure_member const member = generated.members[i];
         LPG_TRY(indent(1, c_output));
         LPG_TRY(generate_type(member.what, standard_library, definitions, all_functions, all_interfaces, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " "));
-        LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(member.name)));
+        LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     }
-    LPG_TRY(stream_writer_write_string(c_output, "} "));
-    LPG_TRY(generate_struct_name(id, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     return success;
 }
 
@@ -630,7 +667,8 @@ static success_indicator generate_type(type const generated, standard_library_us
         return stream_writer_write_string(c_output, "uint64_t");
 
     case type_kind_type:
-        return stream_writer_write_string(c_output, "void *");
+        standard_library->using_unit = true;
+        return stream_writer_write_string(c_output, "unit");
 
     case type_kind_inferred:
     case type_kind_enum_constructor:
@@ -1173,7 +1211,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
                 LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ".vtable->"));
-                LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(called_method.name)));
+                LPG_TRY(escape_identifier(unicode_view_from_string(called_method.name), c_output));
                 LPG_TRY(stream_writer_write_string(c_output, "("));
                 LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ".self"));
@@ -1433,7 +1471,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
                 LPG_TRY(generate_register_name(input.read_struct.from_object, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, "."));
-                LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_from_string(member.name)));
+                LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
                 return success;
             }
@@ -1598,6 +1636,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     case instruction_enum_construct:
         set_register_variable(
             state, input.enum_construct.into, register_resource_ownership_borrows, type_from_unit() /*TODO*/);
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
+        LPG_TRY(generate_register_name(input.enum_construct.into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = 0;\n"));
         return success;
 
     case instruction_match:
@@ -1718,8 +1760,8 @@ static success_indicator generate_free(standard_library_usage *const standard_li
             memory_writer name_buffer = {NULL, 0, 0};
             LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), freed));
             LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
-            LPG_TRY(stream_writer_write_unicode_view(
-                memory_writer_erase(&name_buffer), unicode_view_from_string(struct_.members[i].name)));
+            LPG_TRY(generate_struct_member_name(
+                unicode_view_from_string(struct_.members[i].name), memory_writer_erase(&name_buffer)));
             LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), struct_.members[i].what,
                                   all_functions, all_structures, indentation, c_output));
             memory_writer_free(&name_buffer);
@@ -1954,7 +1996,6 @@ success_indicator generate_c(checked_program const program, enumeration const *c
         LPG_TRY_GOTO(generate_interface_vtable_definition(i, &standard_library, &definitions, program.functions,
                                                           program.interfaces, program_defined_writer),
                      fail);
-        LPG_TRY_GOTO(generate_interface_reference_definition(i, program_defined_writer), fail);
     }
 
     for (function_id i = 1; i < program.function_count; ++i)
@@ -2029,6 +2070,20 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     if (standard_library.using_stddef)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stddef.h>\n"), fail);
+    }
+
+    for (interface_id i = 0; i < program.interface_count; ++i)
+    {
+        LPG_TRY_GOTO(generate_interface_reference_definition(i, c_output), fail);
+    }
+
+    for (struct_id i = 0; i < program.struct_count; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
+        LPG_TRY_GOTO(generate_struct_name(i, c_output), fail);
+        LPG_TRY(stream_writer_write_string(c_output, " "));
+        LPG_TRY_GOTO(generate_struct_name(i, c_output), fail);
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     }
 
     for (size_t i = 0; i < definitions.count; ++i)

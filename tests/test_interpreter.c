@@ -119,7 +119,112 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     FAIL();
 }
 
-static void expect_output_impl(unicode_view const source, char const *output, structure const global_object)
+static success_indicator write_file(unicode_view const path, unicode_view const content)
+{
+    unicode_string const path_zero_terminated = unicode_view_zero_terminate(path);
+    FILE *file;
+#ifdef _MSC_VER
+    fopen_s(&file, path_zero_terminated.data, "wb");
+#else
+    file = fopen(path_zero_terminated.data, "wb");
+#endif
+    unicode_string_free(&path_zero_terminated);
+    if (!file)
+    {
+        return failure;
+    }
+    if (fwrite(content.begin, 1, content.length, file) != content.length)
+    {
+        fclose(file);
+        return failure;
+    }
+    fclose(file);
+    return success;
+}
+
+static void run_c_test(unicode_view const test_name, unicode_view const c_source)
+{
+    ASSUME(test_name.length > 0);
+    unicode_string const executable_path = get_current_executable_path();
+    unicode_view const executable_dir = path_remove_leaf(unicode_view_from_string(executable_path));
+    unicode_view tests_dir = executable_dir;
+#ifdef _MSC_VER
+    tests_dir = path_remove_leaf(tests_dir);
+#endif
+    unicode_view const c_test_dir_pieces[] = {tests_dir, unicode_view_from_c_str("in_lpg"), test_name};
+    unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
+    REQUIRE(success == create_directory(unicode_view_from_string(c_test_dir)));
+    {
+        unicode_view const source_pieces[] = {
+            unicode_view_from_string(c_test_dir), unicode_view_from_c_str("generated_test.c")};
+        unicode_string const source_file = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+        REQUIRE(success == write_file(unicode_view_from_string(source_file), c_source));
+        unicode_string_free(&source_file);
+    }
+    {
+        unicode_view const cmakelists_pieces[] = {
+            unicode_view_from_string(c_test_dir), unicode_view_from_c_str("CMakeLists.txt")};
+        unicode_string const cmakelists = path_combine(cmakelists_pieces, LPG_ARRAY_SIZE(cmakelists_pieces));
+        memory_writer cmakelists_content = {NULL, 0, 0};
+        stream_writer writer = memory_writer_erase(&cmakelists_content);
+        REQUIRE(success == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
+                                                              "project(generated_test_solution)\n"));
+        REQUIRE(success == stream_writer_write_string(writer, "include_directories("));
+        {
+            unicode_view const pieces[] = {path_remove_leaf(path_remove_leaf(unicode_view_from_c_str(__FILE__))),
+                                           unicode_view_from_c_str("c_backend"),
+                                           unicode_view_from_c_str("environment")};
+            unicode_string const include_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
+            REQUIRE(success == stream_writer_write_unicode_view(writer, unicode_view_from_string(include_path)));
+            unicode_string_free(&include_path);
+        }
+        REQUIRE(success == stream_writer_write_string(writer, ")\n"));
+        REQUIRE(success == stream_writer_write_string(writer, "add_executable(generated_test generated_test.c)\n"));
+        REQUIRE(success == write_file(unicode_view_from_string(cmakelists),
+                                      unicode_view_create(cmakelists_content.data, cmakelists_content.used)));
+        memory_writer_free(&cmakelists_content);
+        unicode_string_free(&cmakelists);
+    }
+    {
+        unicode_view const cmake_arguments[] = {unicode_view_from_c_str(".")};
+        create_process_result const cmake_process = create_process(
+            unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments, LPG_ARRAY_SIZE(cmake_arguments),
+            unicode_view_from_string(c_test_dir), get_standard_input(), get_standard_output(), get_standard_error());
+        REQUIRE(cmake_process.success == success);
+        REQUIRE(0 == wait_for_process_exit(cmake_process.created));
+    }
+    {
+        unicode_view const cmake_arguments[] = {unicode_view_from_c_str("--build"), unicode_view_from_c_str(".")};
+        create_process_result const cmake_process = create_process(
+            unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments, LPG_ARRAY_SIZE(cmake_arguments),
+            unicode_view_from_string(c_test_dir), get_standard_input(), get_standard_output(), get_standard_error());
+        REQUIRE(cmake_process.success == success);
+        REQUIRE(0 == wait_for_process_exit(cmake_process.created));
+    }
+    {
+        unicode_view const pieces[] = {unicode_view_from_string(c_test_dir),
+#ifdef _MSC_VER
+                                       unicode_view_from_c_str("Debug"),
+#endif
+                                       unicode_view_from_c_str("generated_test"
+#ifdef _WIN32
+                                                               ".exe"
+#endif
+                                                               )};
+        unicode_string const test_executable = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
+        create_process_result const process =
+            create_process(unicode_view_from_string(test_executable), NULL, 0, unicode_view_from_string(c_test_dir),
+                           get_standard_input(), get_standard_output(), get_standard_error());
+        unicode_string_free(&test_executable);
+        REQUIRE(process.success == success);
+        REQUIRE(0 == wait_for_process_exit(process.created));
+    }
+    unicode_string_free(&executable_path);
+    unicode_string_free(&c_test_dir);
+}
+
+static void expect_output_impl(unicode_view const test_name, unicode_view const source, char const *output,
+                               structure const global_object)
 {
     sequence const root = parse(source);
     checked_program const checked = check(root, global_object, expect_no_errors, NULL);
@@ -190,6 +295,10 @@ static void expect_output_impl(unicode_view const source, char const *output, st
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_c(checked, global_object.members[3].compile_time_value.value_.type_.enum_,
                                       memory_writer_erase(&generated)));
+        if (test_name.length > 0)
+        {
+            run_c_test(test_name, unicode_view_create(generated.data, generated.used));
+        }
         memory_writer_free(&generated);
     }
 
@@ -198,12 +307,12 @@ static void expect_output_impl(unicode_view const source, char const *output, st
 
 static void expect_output(char const *source, char const *output, structure const global_object)
 {
-    expect_output_impl(unicode_view_from_c_str(source), output, global_object);
+    expect_output_impl(unicode_view_from_c_str(""), unicode_view_from_c_str(source), output, global_object);
 }
 
 static void expect_no_output(char const *source, structure const global_object)
 {
-    expect_output_impl(unicode_view_from_c_str(source), "", global_object);
+    expect_output_impl(unicode_view_from_c_str(""), unicode_view_from_c_str(source), "", global_object);
 }
 
 static void run_file(char const *const source_file, structure const global_object)
@@ -215,7 +324,7 @@ static void run_file(char const *const source_file, structure const global_objec
     unicode_string_free(&full_expected_file_path);
     REQUIRE(!expected_or_error.error);
     unicode_string const expected = unicode_string_validate(expected_or_error.success);
-    expect_output_impl(unicode_view_from_string(expected), "", global_object);
+    expect_output_impl(unicode_view_from_c_str(source_file), unicode_view_from_string(expected), "", global_object);
     unicode_string_free(&expected);
 }
 

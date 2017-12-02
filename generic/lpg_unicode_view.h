@@ -17,3 +17,4 @@ bool unicode_view_less(unicode_view const left, unicode_view const right) LPG_US
 unicode_string unicode_view_copy(unicode_view value) LPG_USE_RESULT;
 unicode_view unicode_view_cut(unicode_view const whole, size_t const begin, size_t const end) LPG_USE_RESULT;
 optional_size unicode_view_find(unicode_view haystack, const char needle) LPG_USE_RESULT;
+unicode_string unicode_view_zero_terminate(unicode_view original) LPG_USE_RESULT;
