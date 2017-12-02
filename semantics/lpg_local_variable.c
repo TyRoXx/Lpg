@@ -32,3 +32,10 @@ bool local_variable_name_exists(local_variable_container const variables, unicod
     }
     return false;
 }
+
+read_local_variable_result read_local_variable_result_create(variable_address where, type what,
+                                                             optional_value compile_time_value, bool is_pure)
+{
+    read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
+    return result;
+}

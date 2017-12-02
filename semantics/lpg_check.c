@@ -39,14 +39,6 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false};
 
-typedef struct optional_capture_index
-{
-    bool has_value;
-    capture_index value;
-} optional_capture_index;
-
-static optional_capture_index const optional_capture_index_empty = {false, 0};
-
 static bool optional_capture_index_equals(optional_capture_index const left, optional_capture_index const right)
 {
     if (left.has_value)
@@ -63,14 +55,6 @@ static bool optional_capture_index_equals(optional_capture_index const left, opt
     }
     return true;
 }
-
-typedef struct variable_address
-{
-    optional_capture_index captured_in_current_lambda;
-
-    /*set if captured_in_current_lambda is empty:*/
-    register_id local_address;
-} variable_address;
 
 static variable_address variable_address_from_local(register_id const local)
 {
@@ -163,6 +147,14 @@ static type get_return_type(type const callee, checked_function const *const all
     LPG_UNREACHABLE();
 }
 
+static read_local_variable_result const read_local_variable_result_unknown = {
+    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
+
+static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
+                                                                                {{false, 0}, 0},
+                                                                                {type_kind_unit, {0}},
+                                                                                {false, {value_kind_unit, {0}}},
+                                                                                false};
 typedef struct type_inference
 {
     optional_value *values;
@@ -508,39 +500,6 @@ static capture_index require_capture(LPG_NON_NULL(function_checking_state *const
     ++(state->capture_count);
     return result;
 }
-
-typedef enum read_local_variable_status
-{
-    read_local_variable_status_ok,
-    read_local_variable_status_unknown,
-    read_local_variable_status_forbidden
-} read_local_variable_status;
-
-typedef struct read_local_variable_result
-{
-    /*if status is ok, the other members are set*/
-    read_local_variable_status status;
-    variable_address where;
-    type what;
-    optional_value compile_time_value;
-    bool is_pure;
-} read_local_variable_result;
-
-static read_local_variable_result read_local_variable_result_create(variable_address where, type what,
-                                                                    optional_value compile_time_value, bool is_pure)
-{
-    read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
-    return result;
-}
-
-static read_local_variable_result const read_local_variable_result_unknown = {
-    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
-
-static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
-                                                                                {{false, 0}, 0},
-                                                                                {type_kind_unit, {0}},
-                                                                                {false, {value_kind_unit, {0}}},
-                                                                                false};
 
 static read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
                                                       instruction_sequence *const sequence, unicode_view const name,
