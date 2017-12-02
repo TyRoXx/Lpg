@@ -51,10 +51,12 @@ static win32_string build_command_line(unicode_view const executable, unicode_vi
 }
 #else
 #include <unistd.h>
-#include <sys/prctl.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#endif
+#ifdef __linux__
+#include <sys/prctl.h>
 #endif
 
 file_handle get_standard_input()
