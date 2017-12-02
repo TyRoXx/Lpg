@@ -1,7 +1,5 @@
 #include "print_instruction.h"
-#include "lpg_assert.h"
 #include "lpg_instruction.h"
-#include <stdio.h>
 
 static void print_integer(integer const value)
 {
