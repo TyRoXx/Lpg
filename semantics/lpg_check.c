@@ -39,53 +39,6 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false};
 
-static bool optional_capture_index_equals(optional_capture_index const left, optional_capture_index const right)
-{
-    if (left.has_value)
-    {
-        if (right.has_value)
-        {
-            return (left.value == right.value);
-        }
-        return false;
-    }
-    if (right.has_value)
-    {
-        return false;
-    }
-    return true;
-}
-
-static variable_address variable_address_from_local(register_id const local)
-{
-    variable_address const result = {optional_capture_index_empty, local};
-    return result;
-}
-
-static variable_address variable_address_from_capture(capture_index const captured)
-{
-    variable_address const result = {{true, captured}, 0};
-    return result;
-}
-
-static bool variable_address_equals(variable_address const left, variable_address const right)
-{
-    return optional_capture_index_equals(left.captured_in_current_lambda, right.captured_in_current_lambda) &&
-           (left.local_address == right.local_address);
-}
-
-typedef struct capture
-{
-    variable_address from;
-    type what;
-} capture;
-
-static capture capture_create(variable_address const from, type const what)
-{
-    capture const result = {from, what};
-    return result;
-}
-
 typedef struct function_checking_state
 {
     struct function_checking_state *parent;

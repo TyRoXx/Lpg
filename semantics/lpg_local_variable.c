@@ -39,3 +39,9 @@ read_local_variable_result read_local_variable_result_create(variable_address wh
     read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
     return result;
 }
+
+variable_address variable_address_from_local(register_id const local)
+{
+    variable_address const result = {optional_capture_index_empty, local};
+    return result;
+}

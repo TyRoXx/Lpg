@@ -1,6 +1,7 @@
 #pragma once
 #include "lpg_register.h"
 #include "lpg_value.h"
+#include "lpg_captures.h"
 
 typedef struct local_variable
 {
@@ -28,22 +29,6 @@ typedef enum read_local_variable_status
     read_local_variable_status_forbidden
 } read_local_variable_status;
 
-typedef struct optional_capture_index
-{
-    bool has_value;
-    capture_index value;
-} optional_capture_index;
-
-static optional_capture_index const optional_capture_index_empty = {false, 0};
-
-typedef struct variable_address
-{
-    optional_capture_index captured_in_current_lambda;
-
-    /*set if captured_in_current_lambda is empty:*/
-    register_id local_address;
-} variable_address;
-
 typedef struct read_local_variable_result
 {
     /*if status is ok, the other members are set*/
@@ -60,3 +45,5 @@ read_local_variable_result read_local_variable_result_create(variable_address wh
 void add_local_variable(local_variable_container *to, local_variable variable);
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name);
+
+variable_address variable_address_from_local(register_id const local);
