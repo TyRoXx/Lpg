@@ -26,3 +26,10 @@ h()
 let f6 = (a: boolean)
     () a
 assert(f6(boolean.true)())
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string-equals(y, integer-to-string(x))
+assert(t())

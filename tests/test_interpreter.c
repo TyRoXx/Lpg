@@ -352,18 +352,6 @@ void test_interpreter(void)
         }
     }
 
-    /*capture multiple variables*/
-    expect_output("let m = \"y\"\n"
-                  "let f = ()\n"
-                  "    let n = \"z\"\n"
-                  "    print(m)\n"
-                  "    print(n)\n"
-                  "    ()\n"
-                  "        print(n)\n"
-                  "        print(m)\n"
-                  "f()()\n",
-                  "yzzy", std_library.globals);
-
     expect_output("let f = (a: string-ref, b: boolean)\n"
                   "    assert(string-equals(\"abc\", a))\n"
                   "    assert(not(b))\n"

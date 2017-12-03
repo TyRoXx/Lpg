@@ -125,7 +125,22 @@ static success_indicator generate_value(value const generated, type const type_o
         return stream_writer_write_string(javascript_output, "undefined");
 
     case value_kind_tuple:
-        LPG_TO_DO();
+    {
+        LPG_TRY(stream_writer_write_string(javascript_output, "["));
+        ASSUME(type_of.kind == type_kind_tuple);
+        ASSUME(generated.tuple_.element_count == type_of.tuple_.length);
+        for (size_t i = 0; i < generated.tuple_.element_count; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+            }
+            LPG_TRY(generate_value(
+                generated.tuple_.elements[i], type_of.tuple_.elements[i], all_interfaces, javascript_output));
+        }
+        LPG_TRY(stream_writer_write_string(javascript_output, "]"));
+        return success;
+    }
 
     case value_kind_enum_constructor:
         return generate_enum_constructor(*type_of.enum_constructor, javascript_output);

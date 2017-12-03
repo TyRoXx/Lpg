@@ -1011,6 +1011,92 @@ static success_indicator generate_erase_type(c_backend_state *state, register_id
     return success;
 }
 
+static success_indicator generate_value(value const generated, type const type_of, c_backend_state *state,
+                                        stream_writer const c_output)
+{
+    switch (generated.kind)
+    {
+    case value_kind_integer:
+    {
+        if (integer_less(generated.integer_, integer_create(1, 0)))
+        {
+            char buffer[40];
+            char *formatted = integer_format(generated.integer_, lower_case_digits, 10, buffer, sizeof(buffer));
+            LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+            return success;
+        }
+        LPG_TO_DO();
+    }
+
+    case value_kind_string:
+        state->standard_library.using_string_ref = true;
+        LPG_TRY(stream_writer_write_string(c_output, "string_literal("));
+        LPG_TRY(encode_string_literal(generated.string_ref, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ", "));
+        {
+            char buffer[40];
+            char *formatted = integer_format(
+                integer_create(0, generated.string_ref.length), lower_case_digits, 10, buffer, sizeof(buffer));
+            LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+        }
+        LPG_TRY(stream_writer_write_string(c_output, ")"));
+        return success;
+
+    case value_kind_function_pointer:
+    {
+        if (generated.function_pointer.external)
+        {
+            LPG_TO_DO();
+        }
+        LPG_TRY(generate_function_name(generated.function_pointer.code, c_output));
+        return success;
+    }
+
+    case value_kind_tuple:
+        ASSUME(type_of.kind == type_kind_tuple);
+        ASSUME(generated.tuple_.element_count == type_of.tuple_.length);
+        LPG_TRY(stream_writer_write_string(c_output, "{"));
+        for (size_t i = 0; i < generated.tuple_.element_count; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", "));
+            }
+            LPG_TRY(generate_value(generated.tuple_.elements[i], type_of.tuple_.elements[i], state, c_output));
+        }
+        LPG_TRY(stream_writer_write_string(c_output, "}"));
+        return success;
+
+    case value_kind_type_erased:
+    case value_kind_flat_object:
+        LPG_TO_DO();
+
+    case value_kind_type:
+        state->standard_library.using_unit = true;
+        LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
+        return success;
+
+    case value_kind_enum_constructor:
+        /*TODO?*/
+        return success;
+
+    case value_kind_enum_element:
+    {
+        char buffer[64];
+        char const *const formatted = integer_format(
+            integer_create(0, generated.enum_element.which), lower_case_digits, 10, buffer, sizeof(buffer));
+        LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+        return success;
+    }
+
+    case value_kind_unit:
+        state->standard_library.using_unit = true;
+        LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
+        return success;
+    }
+    LPG_UNREACHABLE();
+}
+
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const all_functions,
                                               interface const *const all_interfaces,
                                               checked_function const *const current_function,
@@ -1544,38 +1630,20 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         switch (input.literal.value_.kind)
         {
         case value_kind_integer:
-        {
             LPG_TRY(stream_writer_write_string(c_output, "uint64_t const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
-            integer const value = input.literal.value_.integer_;
-            if (integer_less(value, integer_create(1, 0)))
-            {
-                char buffer[40];
-                char *formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer));
-                LPG_TRY(
-                    stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-                return success;
-            }
-            LPG_TO_DO();
-        }
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            return success;
 
         case value_kind_string:
             state->standard_library.using_string_ref = true;
             LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = string_literal("));
-            LPG_TRY(encode_string_literal(input.literal.value_.string_ref, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ", "));
-            {
-                char buffer[40];
-                char *formatted = integer_format(integer_create(0, input.literal.value_.string_ref.length),
-                                                 lower_case_digits, 10, buffer, sizeof(buffer));
-                LPG_TRY(
-                    stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-            }
-            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            LPG_TRY(stream_writer_write_string(c_output, " = "));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
 
         case value_kind_function_pointer:
@@ -1590,13 +1658,25 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
-            LPG_TRY(generate_function_name(input.literal.value_.function_pointer.code, c_output));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
         }
 
-        case value_kind_type_erased:
         case value_kind_tuple:
+            ASSUME(input.literal.type_of.kind == type_kind_tuple);
+            ASSUME(input.literal.value_.tuple_.element_count == input.literal.type_of.tuple_.length);
+            LPG_TRY(indent(indentation, c_output));
+            LPG_TRY(generate_type(input.literal.type_of, &state->standard_library, state->definitions,
+                                  state->all_functions, state->all_interfaces, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " const "));
+            LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = "));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            return success;
+
+        case value_kind_type_erased:
         case value_kind_flat_object:
             LPG_TO_DO();
 
@@ -1604,7 +1684,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             state->standard_library.using_unit = true;
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
+            LPG_TRY(stream_writer_write_string(c_output, " = "));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
 
         case value_kind_enum_constructor:
@@ -1616,10 +1698,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
-            char buffer[64];
-            char const *const formatted = integer_format(integer_create(0, input.literal.value_.enum_element.which),
-                                                         lower_case_digits, 10, buffer, sizeof(buffer));
-            LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
         }
@@ -1628,7 +1707,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             state->standard_library.using_unit = true;
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
+            LPG_TRY(stream_writer_write_string(c_output, " = "));
+            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
         }
         return success;

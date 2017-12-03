@@ -31,3 +31,12 @@ let f6 = (a: boolean)
     ()
         () a
 assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    let u = ()
+        {integer-to-string(x), y}
+    string-equals(u().0, u().1)
+assert(t())
