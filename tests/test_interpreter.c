@@ -147,7 +147,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         stream_writer writer = memory_writer_erase(&cmakelists_content);
         REQUIRE(success == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
                                                               "project(generated_test_solution)\n"));
-        REQUIRE(success == stream_writer_write_string(writer, "include_directories("));
+        REQUIRE(success == stream_writer_write_string(writer, "include_directories(\""));
         {
             unicode_view const pieces[] = {path_remove_leaf(path_remove_leaf(unicode_view_from_c_str(__FILE__))),
                                            unicode_view_from_c_str("c_backend"),
@@ -156,7 +156,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
             REQUIRE(success == stream_writer_write_unicode_view(writer, unicode_view_from_string(include_path)));
             unicode_string_free(&include_path);
         }
-        REQUIRE(success == stream_writer_write_string(writer, ")\n"));
+        REQUIRE(success == stream_writer_write_string(writer, "\")\n"));
         REQUIRE(success == stream_writer_write_string(writer, "add_executable(generated_test generated_test.c)\n"));
         REQUIRE(success == write_file(unicode_view_from_string(cmakelists),
                                       unicode_view_create(cmakelists_content.data, cmakelists_content.used)));
