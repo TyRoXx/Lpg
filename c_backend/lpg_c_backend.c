@@ -137,40 +137,6 @@ static void set_register_to_capture(c_backend_state *const state, register_id co
     active_register(state, id);
 }
 
-static register_resource_ownership find_register_resource_ownership(type const variable)
-{
-    switch (variable.kind)
-    {
-    case type_kind_enumeration:
-        /*TODO: support owning, stateful enums*/
-        return register_resource_ownership_owns;
-
-    case type_kind_tuple:
-    case type_kind_function_pointer:
-        return register_resource_ownership_owns;
-
-    case type_kind_integer_range:
-        return register_resource_ownership_owns;
-
-    case type_kind_inferred:
-    case type_kind_structure:
-    case type_kind_type:
-    case type_kind_enum_constructor:
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
-    case type_kind_string_ref:
-    case type_kind_unit:
-    case type_kind_interface:
-        return register_resource_ownership_owns;
-
-    case type_kind_lambda:
-        /*TODO*/
-        return register_resource_ownership_owns;
-    }
-    LPG_UNREACHABLE();
-}
-
 static void set_register_variable(c_backend_state *const state, register_id const id,
                                   register_resource_ownership ownership, type const type_of)
 {
@@ -1200,9 +1166,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             {
                 method_description const called_method = all_interfaces[callee_type.method_pointer.interface_]
                                                              .methods[callee_type.method_pointer.method_index];
-                set_register_function_variable(state, input.call.result,
-                                               find_register_resource_ownership(called_method.result),
-                                               called_method.result);
+                set_register_function_variable(
+                    state, input.call.result, register_resource_ownership_owns, called_method.result);
                 LPG_TRY(generate_type(called_method.result, &state->standard_library, state->definitions,
                                       state->all_functions, state->all_interfaces, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " const "));
@@ -1247,8 +1212,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 function_pointer const callee_signature =
                     *all_functions[state->registers[input.call.callee].type_of.value.lambda.lambda].signature;
                 result_type = callee_signature.result;
-                set_register_function_variable(
-                    state, input.call.result, find_register_resource_ownership(result_type), result_type);
+                set_register_function_variable(state, input.call.result, register_resource_ownership_owns, result_type);
                 LPG_TRY(generate_type(result_type, &state->standard_library, state->definitions, state->all_functions,
                                       state->all_interfaces, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " const "));
@@ -1280,8 +1244,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 return success;
             }
             }
-            set_register_function_variable(
-                state, input.call.result, find_register_resource_ownership(result_type), result_type);
+            set_register_function_variable(state, input.call.result, register_resource_ownership_owns, result_type);
             LPG_TRY(generate_type(result_type, &state->standard_library, state->definitions, state->all_functions,
                                   state->all_interfaces, c_output));
             break;
@@ -1636,8 +1599,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
     case instruction_match:
     {
-        set_register_variable(state, input.match.result, find_register_resource_ownership(input.match.result_type),
-                              input.match.result_type);
+        set_register_variable(state, input.match.result, register_resource_ownership_owns, input.match.result_type);
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(generate_type(input.match.result_type, &state->standard_library, state->definitions,
                               state->all_functions, state->all_interfaces, c_output));
