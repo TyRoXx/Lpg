@@ -96,7 +96,7 @@ unicode_string get_current_executable_path(void)
     WideCharToMultiByte(CP_UTF8, 0, buffer, length, result.data, (int)result.length, NULL, NULL);
     ASSERT(GetLastError() == 0);
     return result;
-#else
+#elif defined(__linux__)
     char buffer[1024];
     ssize_t const rc = readlink("/proc/self/exe", buffer, sizeof(buffer));
     if (rc < 0)
@@ -104,6 +104,14 @@ unicode_string get_current_executable_path(void)
         LPG_TO_DO();
     }
     return unicode_string_from_range(buffer, (size_t)rc);
+#else
+    char buffer[256];
+    uint32_t length = sizeof(buffer);
+    if (_NSGetExecutablePath(buffer, &length) != 0)
+    {
+        LPG_TO_DO();
+    }
+    return unicode_string_from_range(buffer, length);
 #endif
 }
 
