@@ -305,11 +305,6 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     checked_program_free(&checked);
 }
 
-static void expect_output(char const *source, char const *output, structure const global_object)
-{
-    expect_output_impl(unicode_view_from_c_str(""), unicode_view_from_c_str(source), output, global_object);
-}
-
 static void run_file(char const *const source_file, structure const global_object)
 {
     unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
@@ -352,13 +347,6 @@ void test_interpreter(void)
             run_file(test_files[i], std_library.globals);
         }
     }
-
-    expect_output("let f = (a: string-ref, b: boolean)\n"
-                  "    assert(string-equals(\"abc\", a))\n"
-                  "    assert(not(b))\n"
-                  "    print(a)\n"
-                  "f(\"abc\", boolean.false)\n",
-                  "abc", std_library.globals);
 
     standard_library_description_free(&std_library);
 }
