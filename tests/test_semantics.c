@@ -82,7 +82,6 @@ static void check_wellformed_program(char const *const source, structure const n
 }
 
 static void test_loops(const standard_library_description *std_library);
-static void test_printing(const standard_library_description *std_library);
 static void test_assert(const standard_library_description *std_library);
 static void test_let_assignments(const standard_library_description *std_library);
 static void test_functions(const standard_library_description *std_library);
@@ -154,7 +153,6 @@ void test_semantics(void)
         }
     }
     test_loops(&std_library);
-    test_printing(&std_library);
 
     {
         value state = value_from_integer(integer_create(0, 123));
@@ -455,32 +453,6 @@ static void test_functions(const standard_library_description *std_library)
         check_single_wellformed_function("let t = {boolean.false, boolean.true}\n"
                                          "let u = t.1\n",
                                          (*std_library).globals, LPG_COPY_ARRAY(expected_main_function));
-    }
-}
-
-static void test_printing(const standard_library_description *std_library)
-{
-    {
-        register_id *const arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = 2;
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 2, 1)),
-            instruction_create_literal(literal_instruction_create(
-                2, value_from_string_ref(unicode_view_from_c_str("hello, world!")), type_from_string_ref())),
-            instruction_create_call(call_instruction_create(1, arguments, 1, 3))};
-        check_single_wellformed_function(
-            "print(\"hello, world!\")", (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
-    }
-    {
-        register_id *const arguments = allocate_array(1, sizeof(*arguments));
-        arguments[0] = 2;
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 2, 1)),
-            instruction_create_literal(literal_instruction_create(
-                2, value_from_string_ref(unicode_view_from_c_str("hello, world!")), type_from_string_ref())),
-            instruction_create_call(call_instruction_create(1, arguments, 1, 3))};
-        check_single_wellformed_function(
-            "print(concat(\"hello, \", \"world!\"))", (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
     }
 }
 

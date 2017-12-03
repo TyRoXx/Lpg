@@ -3,7 +3,6 @@ let printable = interface
 let f4 = (printed: printable)
     let method = printed.print
     let string = method()
-    print(string)
 
 let printable2 = interface
     print(): string-ref

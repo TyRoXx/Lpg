@@ -238,15 +238,6 @@ static void handle_semantic_error(semantic_error const error, void *user)
     print_source_location_hint(context->source, context->diagnostics, error.where);
 }
 
-static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
-{
-    (void)captures;
-    unicode_view const text = arguments.arguments[0].string_ref;
-    stream_writer *const destination = environment;
-    ASSERT(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
-    return value_from_unit();
-}
-
 static compiler_flags parse_compiler_flags(int const argument_count, char **const arguments, bool *const valid)
 {
     compiler_flags result = {false};
@@ -281,7 +272,7 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
-bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, stream_writer print_destination)
+bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
 {
     compiler_arguments arguments = parse_compiler_arguments(argc, argv);
 
@@ -314,8 +305,6 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     {
         globals_values[i] = value_from_unit();
     }
-    globals_values[2] =
-        value_from_function_pointer(function_pointer_value_from_external(print, &print_destination, NULL, 0));
 
     optional_sequence const root = parse(unicode_view_from_string(source), diagnostics);
     if (!root.has_value)

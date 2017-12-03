@@ -22,6 +22,5 @@ static stream_writer make_file_writer(LPG_NON_NULL(FILE *const file))
 int main(int const argc, char **const argv)
 {
     stream_writer const diagnostics = make_file_writer(stderr);
-    stream_writer const print_destination = make_file_writer(stdout);
-    return run_cli(argc, argv, diagnostics, print_destination);
+    return run_cli(argc, argv, diagnostics);
 }

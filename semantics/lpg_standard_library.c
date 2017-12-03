@@ -6,7 +6,6 @@
 static void standard_library_stable_free(standard_library_stable *stable)
 {
     enumeration_free(&stable->boolean);
-    function_pointer_free(&stable->print);
     function_pointer_free(&stable->assert_);
     function_pointer_free(&stable->and_);
     function_pointer_free(&stable->or_);
@@ -145,9 +144,6 @@ standard_library_description describe_standard_library(void)
         stable->option = enumeration_create(elements, 2);
     }
 
-    stable->print =
-        function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(type_from_string_ref()), 1),
-                                tuple_type_create(NULL, 0), optional_type_create_empty());
     stable->assert_ = function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(boolean), 1),
                                               tuple_type_create(NULL, 0), optional_type_create_empty());
     {
@@ -223,8 +219,7 @@ standard_library_description describe_standard_library(void)
     globals[1] = structure_member_create(type_from_type(), unicode_string_from_c_str("string-ref"),
                                          optional_value_create(value_from_type(type_from_string_ref())));
 
-    globals[2] = structure_member_create(
-        type_from_function_pointer(&stable->print), unicode_string_from_c_str("print"), optional_value_empty);
+    globals[2] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed2"), optional_value_empty);
 
     globals[3] =
         structure_member_create(type_from_type(), unicode_string_from_c_str("boolean"),

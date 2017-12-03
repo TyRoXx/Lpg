@@ -51,19 +51,6 @@ void test_c_backend(void)
 
     check_generated_c_code("", std_library);
 
-    check_generated_c_code("print(\"Hello, world!\")\n", std_library);
-
-    check_generated_c_code("print(\"Hello, \")\nprint(\"world!\\n\")\n", std_library);
-
-    check_generated_c_code("loop\n"
-                           "    print(\"Hello, world!\")\n"
-                           "    break\n",
-                           std_library);
-
-    check_generated_c_code("let s = concat(\"123\", \"456\")\n"
-                           "print(s)\n",
-                           std_library);
-
     check_generated_c_code("loop\n"
                            "    break\n"
                            "    assert(boolean.false)\n",
@@ -77,52 +64,8 @@ void test_c_backend(void)
                            "assert(string-equals(read(), \"\"))\n",
                            std_library);
 
-    check_generated_c_code("let read = ()\n"
-                           "    side-effect()\n"
-                           "    \"b\"\n"
-                           "print(concat(\"a\", read()))\n",
-                           std_library);
-
-    check_generated_c_code("let f = ()\n"
-                           "    print(\"\")\n"
-                           "    boolean.true\n"
-                           "assert(f())\n",
-                           std_library);
-
     check_generated_c_code("let f = () assert(boolean.true)\n"
                            "f()\n",
-                           std_library);
-
-    check_generated_c_code("let id = (a: boolean)\n"
-                           "    print(\"\")\n"
-                           "    a\n"
-                           "assert(id(boolean.true))\n",
-                           std_library);
-
-    check_generated_c_code("let xor = (a: boolean, b: boolean)\n"
-                           "    print(\"\")\n"
-                           "    or(and(a, not(b)), and(not(a), b))\n"
-                           "assert(xor(boolean.true, boolean.false))\n"
-                           "assert(xor(boolean.false, boolean.true))\n"
-                           "assert(not(xor(boolean.true, boolean.true)))\n"
-                           "assert(not(xor(boolean.false, boolean.false)))\n",
-                           std_library);
-
-    check_generated_c_code("let s = ()\n"
-                           "    side-effect()\n"
-                           "    \"abc\"\n"
-                           "print(s())\n",
-                           std_library);
-
-    check_generated_c_code("let s = (a: string-ref) print(a)\n"
-                           "s(\"a\")\n",
-                           std_library);
-
-    check_generated_c_code("let read = ()\n"
-                           "    side-effect()\n"
-                           "    \"b\"\n"
-                           "let s = (a: string-ref) print(a)\n"
-                           "s(concat(read(), \"c\"))\n",
                            std_library);
 
     check_generated_c_code("let read = ()\n"
@@ -133,24 +76,6 @@ void test_c_backend(void)
                            "assert(string-equals(\"\", t))\n",
                            std_library);
 
-    check_generated_c_code("let s = (a: int(0, 3))\n"
-                           "    print(\"\")\n"
-                           "    a\n"
-                           "let i = s(2)\n"
-                           "assert(integer-equals(i, 2))\n",
-                           std_library);
-
-    check_generated_c_code("let s = ()\n"
-                           "    print(\"\")\n"
-                           "    (a: string-ref)\n"
-                           "        print(\"\")\n"
-                           "        a\n"
-                           "let t = () (a: unit) \"a\"\n"
-                           "let u = () (a: unit, b: unit) unit_value\n"
-                           "let r = s()\n"
-                           "assert(string-equals(r(\"a\"), \"a\"))\n",
-                           std_library);
-
     check_generated_c_code("let read = ()\n"
                            "    side-effect()\n"
                            "    \"b\"\n"
@@ -158,41 +83,6 @@ void test_c_backend(void)
                            "    case boolean.false: boolean.true\n"
                            "    case boolean.true: boolean.false\n"
                            ")\n",
-                           std_library);
-
-    check_generated_c_code("let f = ()\n"
-                           "    print(\"\")\n"
-                           "    boolean.true\n"
-                           "assert({boolean.false, f(), {}}.1)\n",
-                           std_library);
-
-    check_generated_c_code("let f = (a: boolean)\n"
-                           "    print(\"\")\n"
-                           "    ()\n"
-                           "        print(\"\")\n"
-                           "        a\n"
-                           "assert(f(boolean.true)())\n",
-                           std_library);
-
-    check_generated_c_code("let outer = (a: string-ref)\n"
-                           "    print(\"\")\n"
-                           "    ()\n"
-                           "        print(\"\")\n"
-                           "        a\n"
-                           "let inner = outer(\"a\")\n"
-                           "let result = inner()\n"
-                           "assert(string-equals(\"a\", result))\n",
-                           std_library);
-
-    check_generated_c_code("let construct = ()\n"
-                           "    let read = ()\n"
-                           "        side-effect()\n"
-                           "        \"\"\n"
-                           "    print(\"\")\n"
-                           "    let result = concat(read(), \"123\")\n"
-                           "    {result, result}\n"
-                           "let tuple = construct()\n"
-                           "assert(string-equals(\"123\", tuple.0))\n",
                            std_library);
 
     check_generated_c_code("let printable = interface\n"

@@ -28,7 +28,6 @@ typedef struct standard_library_stable
 {
     enumeration boolean;
     enumeration option;
-    function_pointer print;
     function_pointer assert_;
     function_pointer and_;
     function_pointer or_;

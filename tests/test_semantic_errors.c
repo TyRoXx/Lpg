@@ -351,9 +351,9 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
-        sequence root = parse("let v = print.a\n");
+        sequence root = parse("let v = assert.a\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 14))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 15))};
         expected_errors expected = {errors, 1};
         checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);

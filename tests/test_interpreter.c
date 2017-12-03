@@ -30,21 +30,6 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
-typedef struct test_environment
-{
-    stream_writer print_destination;
-} test_environment;
-
-static value print(function_call_arguments const arguments, struct value const *const captures, void *environment)
-{
-    (void)captures;
-    unicode_view const text = arguments.arguments[0].string_ref;
-    test_environment *const actual_environment = environment;
-    stream_writer *destination = &actual_environment->print_destination;
-    REQUIRE(stream_writer_write_bytes(*destination, text.begin, text.length) == success);
-    return value_from_unit();
-}
-
 static value assert_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
     (void)captures;
@@ -52,15 +37,6 @@ static value assert_impl(function_call_arguments const arguments, struct value c
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
     REQUIRE(argument == 1);
     return value_from_unit();
-}
-
-static duk_ret_t javascript_print(duk_context *const duktape)
-{
-    duk_push_current_function(duktape);
-    duk_get_prop_string(duktape, -1, DUK_HIDDEN_SYMBOL("print-buffer"));
-    memory_writer *const print_buffer = duk_get_pointer(duktape, -1);
-    REQUIRE(success == stream_writer_write_string(memory_writer_erase(print_buffer), duk_get_string(duktape, 0)));
-    return 0;
 }
 
 static bool from_javascript_bool(double const value)
@@ -223,19 +199,16 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
     unicode_string_free(&c_test_dir);
 }
 
-static void expect_output_impl(unicode_view const test_name, unicode_view const source, char const *output,
-                               structure const global_object)
+static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
 {
     sequence const root = parse(source);
     checked_program const checked = check(root, global_object, expect_no_errors, NULL);
 
     {
-        memory_writer print_buffer = {NULL, 0, 0};
-        test_environment environment = {memory_writer_erase(&print_buffer)};
         value const globals_values[] = {
             /*type*/ value_from_unit(),
             /*string-ref*/ value_from_unit(),
-            /*print*/ value_from_function_pointer(function_pointer_value_from_external(print, &environment, NULL, 0)),
+            /*removed2*/ value_from_unit(),
             /*boolean*/ global_object.members[3].compile_time_value.value_,
             /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL, NULL, 0)),
             /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL, NULL, 0)),
@@ -245,40 +218,31 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
             /*string-equals*/ value_from_function_pointer(
                 function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0)),
             /*removed*/ value_from_unit(),
-            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, &environment, NULL, 0)),
+            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, 0)),
             /*integer-equals*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_equals_impl, &environment, NULL, 0)),
+                function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0)),
             /*unit*/ value_from_unit(),
             /*unit_value*/ value_from_unit(),
             /*option*/ value_from_unit(),
             /*integer-less*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_less_impl, &environment, NULL, 0)),
+                function_pointer_value_from_external(integer_less_impl, NULL, NULL, 0)),
             /*integer-to-string*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_to_string_impl, &environment, NULL, 0)),
+                function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, 0)),
             /*side-effect*/ value_from_function_pointer(
-                function_pointer_value_from_external(side_effect_impl, &environment, NULL, 0))};
+                function_pointer_value_from_external(side_effect_impl, NULL, NULL, 0))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         sequence_free(&root);
         garbage_collector gc = {NULL};
         interpret(checked, globals_values, &gc);
         garbage_collector_free(gc);
-
-        REQUIRE(memory_writer_equals(print_buffer, output));
-        memory_writer_free(&print_buffer);
     }
 
     {
-        memory_writer print_buffer = {NULL, 0, 0};
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_javascript(checked, memory_writer_erase(&generated)));
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
-
-        duk_push_c_function(duktape, javascript_print, 1);
-        duk_push_pointer(duktape, &print_buffer);
-        duk_put_prop_string(duktape, -2, DUK_HIDDEN_SYMBOL("print-buffer"));
-        duk_put_global_string(duktape, "print");
 
         duk_push_c_function(duktape, javascript_assert, 1);
         duk_put_global_string(duktape, "assert");
@@ -286,9 +250,6 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         duk_eval_lstring(duktape, generated.data, generated.used);
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
-
-        REQUIRE(memory_writer_equals(print_buffer, output));
-        memory_writer_free(&print_buffer);
     }
 
     {
@@ -314,7 +275,7 @@ static void run_file(char const *const source_file, structure const global_objec
     unicode_string_free(&full_expected_file_path);
     REQUIRE(!expected_or_error.error);
     unicode_string const expected = unicode_string_validate(expected_or_error.success);
-    expect_output_impl(unicode_view_from_c_str(source_file), unicode_view_from_string(expected), "", global_object);
+    expect_output_impl(unicode_view_from_c_str(source_file), unicode_view_from_string(expected), global_object);
     unicode_string_free(&expected);
 }
 
