@@ -34,16 +34,15 @@ You can declare a constant with `let a = 10`. This will implicitly set the type 
 Functions can be implemented like this
 ```lpg
 ()
-    print("Hello World")
+    assert(boolean.true)
     1
 ```
 If a line just consists of one value that is not assigned to anything and it is the last line of the function, then it is **the return value** of the function. On the other hand you can also be more specific and use the return keyword. Which ensures no matter where that this is the return value of the function and execution of everything after that is stopped.
- 
-This is an **anonymous function** which prints "Hello World" to the screen and returns 1 to the caller. If you want to give the function a name, you have to save this in a constant. Like so:
+
+If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
-let print_twice = (message: string-ref)
-    print(message)
-    print(message)
+let duplicate = (message: string-ref)
+    {message, message}
 ```
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
@@ -79,7 +78,7 @@ And this is how you implement this:
 And this is how you use it:
 ```
 let print-percent(something: make-percent)
-    print(integer-to-string(make-percent.percent))
+    integer-to-string(make-percent.percent)
 ```
 
 ## Structures
@@ -92,10 +91,8 @@ Currently it only supports stateless enumerations, for example `boolean`.
 let a = boolean.true
 let result : int(1, 2) = match a
     case boolean.false:
-        print("nope")
         1
     case boolean.true:
-        print("it works")
         2
 assert(integer-equals(2, result))
 ```
@@ -108,7 +105,7 @@ The result can be `unit` if you don't want to return anything.
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
 ```lpg
 loop
-    print("Hello World")
+    assert(boolean.true)
 ```
 If you don't want to have an infinite loop then you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
 ```
@@ -117,7 +114,7 @@ loop
         case boolean.false:
             break
         case boolean.true:
-            print("I'm still running")
+            unit
 print("Done")
 ``` 
 
@@ -127,7 +124,6 @@ The standard library also includes some functions to work with the types.
 | Name              | Inputs                 | Explanation                                          | Output     |
 |-------------------|------------------------|------------------------------------------------------|------------|
 | assert            | boolean                | Ends the program if the input is `boolean.false`     | unit       |
-| print             | string-ref             | Prints a string to the screen                        | unit       |
 | and               | boolean, boolean       | Implementation of logical and                        | boolean    |
 | or                | boolean, boolean       | Implementation of logical or                         | boolean    |
 | not               | boolean                | Flips the value of the boolean                       | boolean    |
