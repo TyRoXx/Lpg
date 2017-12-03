@@ -1,7 +1,6 @@
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
 #include "lpg_for.h"
-#include "lpg_assert.h"
 
 tuple_instruction tuple_instruction_create(register_id *elements, size_t element_count, register_id result,
                                            tuple_type result_type)
@@ -414,4 +413,11 @@ bool instruction_equals(instruction const left, instruction const right)
         return erase_type_instruction_equals(left.erase_type, right.erase_type);
     }
     LPG_UNREACHABLE();
+}
+
+void add_instruction(instruction_sequence *to, instruction const added)
+{
+    to->elements = reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
+    to->elements[to->length] = added;
+    ++(to->length);
 }

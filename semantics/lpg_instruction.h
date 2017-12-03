@@ -1,5 +1,5 @@
 #pragma once
-#include "lpg_register_id.h"
+#include "lpg_register.h"
 #include "lpg_struct_member_id.h"
 #include "lpg_instruction_sequence.h"
 #include "lpg_integer.h"
@@ -190,3 +190,4 @@ instruction instruction_create_erase_type(erase_type_instruction const argument)
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);
+void add_instruction(instruction_sequence *to, instruction const added);
