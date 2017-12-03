@@ -8,6 +8,41 @@
 static void mark_function(bool *used_functions, checked_function const *const all_functions,
                           interface const *const all_interfaces, function_id const marked_function);
 
+static void mark_value(value const root, bool *used_functions, checked_function const *const all_functions,
+                       interface const *const all_interfaces)
+{
+    switch (root.kind)
+    {
+    case value_kind_type_erased:
+        LPG_TO_DO();
+
+    case value_kind_integer:
+    case value_kind_string:
+        break;
+
+    case value_kind_function_pointer:
+    {
+        function_id const referenced = root.function_pointer.code;
+        mark_function(used_functions, all_functions, all_interfaces, referenced);
+        break;
+    }
+
+    case value_kind_flat_object:
+    case value_kind_type:
+    case value_kind_enum_element:
+    case value_kind_unit:
+    case value_kind_enum_constructor:
+        break;
+
+    case value_kind_tuple:
+        for (size_t i = 0; i < root.tuple_.element_count; ++i)
+        {
+            mark_value(root.tuple_.elements[i], used_functions, all_functions, all_interfaces);
+        }
+        break;
+    }
+}
+
 static void mark_used_functions_in_sequence(instruction_sequence const sequence, bool *used_functions,
                                             checked_function const *const all_functions,
                                             interface const *const all_interfaces)
@@ -38,32 +73,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             break;
 
         case instruction_literal:
-            switch (current_instruction.literal.value_.kind)
-            {
-            case value_kind_type_erased:
-                LPG_TO_DO();
-
-            case value_kind_integer:
-            case value_kind_string:
-                break;
-
-            case value_kind_function_pointer:
-            {
-                function_id const referenced = current_instruction.literal.value_.function_pointer.code;
-                mark_function(used_functions, all_functions, all_interfaces, referenced);
-                break;
-            }
-
-            case value_kind_flat_object:
-            case value_kind_type:
-            case value_kind_enum_element:
-            case value_kind_unit:
-            case value_kind_enum_constructor:
-                break;
-
-            case value_kind_tuple:
-                LPG_TO_DO();
-            }
+            mark_value(current_instruction.literal.value_, used_functions, all_functions, all_interfaces);
             break;
 
         case instruction_tuple:
@@ -166,7 +176,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 
     case value_kind_enum_element:
     {
-        value *const state = from.enum_element.state ? allocate(sizeof(*state)) : NULL;
+        value *const state = from.enum_element.state ? garbage_collector_allocate(clone_gc, sizeof(*state)) : NULL;
         if (state)
         {
             *state = adapt_value(*from.enum_element.state, clone_gc, new_function_ids);
@@ -178,8 +188,18 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         return from;
 
     case value_kind_tuple:
+    {
+        value *const elements =
+            garbage_collector_allocate_array(clone_gc, from.tuple_.element_count, sizeof(*elements));
+        for (size_t i = 0; i < from.tuple_.element_count; ++i)
+        {
+            elements[i] = adapt_value(from.tuple_.elements[i], clone_gc, new_function_ids);
+        }
+        return value_from_tuple(value_tuple_create(elements, from.tuple_.element_count));
+    }
+
     case value_kind_enum_constructor:
-        LPG_TO_DO();
+        return value_from_enum_constructor();
     }
     LPG_UNREACHABLE();
 }
@@ -235,6 +255,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
         return original;
 
     case instruction_read_struct:
+        ASSUME(original.read_struct.from_object != ~(register_id)0);
         return original;
 
     case instruction_break:

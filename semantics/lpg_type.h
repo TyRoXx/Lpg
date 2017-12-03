@@ -147,6 +147,8 @@ struct enum_constructor_type
     enum_element_id which;
 };
 
+enum_constructor_type enum_constructor_type_create(enumeration const *enumeration, enum_element_id which);
+
 typedef struct implementation
 {
     struct function_pointer_value *methods;

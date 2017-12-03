@@ -4,6 +4,8 @@
 #include "lpg_allocate.h"
 #include <string.h>
 
+static register_id const no_register = ~(register_id)0;
+
 static void find_used_registers(instruction_sequence const from, bool *const registers_read_from)
 {
     for (size_t i = 0; i < from.length; ++i)
@@ -24,6 +26,7 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             /*never remove function calls because they might have side effects*/
             registers_read_from[current_instruction.call.result] = true;
             break;
+
         case instruction_return:
             LPG_TO_DO();
 
@@ -35,6 +38,7 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_read_struct:
+            ASSUME(current_instruction.read_struct.from_object != no_register);
             registers_read_from[current_instruction.read_struct.from_object] = true;
             break;
 
@@ -59,6 +63,7 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             {
                 registers_read_from[current_instruction.match.cases[j].key] = true;
                 registers_read_from[current_instruction.match.cases[j].value] = true;
+                find_used_registers(current_instruction.match.cases[j].action, registers_read_from);
             }
             break;
 
@@ -79,13 +84,15 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
     }
 }
 
-static register_id const no_register = ~(register_id)0;
-
 static bool update_register_id(register_id *const updated, register_id const *const new_register_ids)
 {
     ASSUME(*updated != no_register);
+    if (new_register_ids[*updated] == no_register)
+    {
+        return false;
+    }
     *updated = new_register_ids[*updated];
-    return (*updated != no_register);
+    return true;
 }
 
 static void change_register_ids_in_sequence(instruction_sequence *const sequence,
@@ -108,6 +115,7 @@ static bool change_register_ids(instruction *const where, register_id const *con
         ASSERT(update_register_id(&where->call.result, new_register_ids));
         /*never remove function calls because they might have side effects*/
         return true;
+
     case instruction_return:
         LPG_TO_DO();
 
@@ -199,6 +207,11 @@ static removed_something remove_one_layer_of_dead_code_from_function(checked_fun
     for (size_t i = 0; i < from->signature->parameters.length; ++i)
     {
         registers_read_from[i] = true;
+    }
+    if (from->signature->self.is_set)
+    {
+        ASSUME(from->signature->parameters.length < from->number_of_registers);
+        registers_read_from[from->signature->parameters.length] = true;
     }
     find_used_registers(from->body, registers_read_from);
     register_id *const new_register_ids = allocate_array(from->number_of_registers, sizeof(*new_register_ids));

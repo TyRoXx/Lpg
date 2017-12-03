@@ -13,6 +13,8 @@
 #include "lpg_read_file.h"
 #include "path.h"
 #include "lpg_c_backend.h"
+#include "lpg_remove_dead_code.h"
+#include "lpg_remove_unused_functions.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -199,11 +201,9 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
     unicode_string_free(&c_test_dir);
 }
 
-static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
+static void test_all_backends(unicode_view const test_name, checked_program const program,
+                              structure const global_object)
 {
-    sequence const root = parse(source);
-    checked_program const checked = check(root, global_object, expect_no_errors, NULL);
-
     {
         value const globals_values[] = {
             /*type*/ value_from_unit(),
@@ -231,15 +231,14 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
             /*side-effect*/ value_from_function_pointer(
                 function_pointer_value_from_external(side_effect_impl, NULL, NULL, 0))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
-        sequence_free(&root);
         garbage_collector gc = {NULL};
-        interpret(checked, globals_values, &gc);
+        interpret(program, globals_values, &gc);
         garbage_collector_free(gc);
     }
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_javascript(checked, memory_writer_erase(&generated)));
+        REQUIRE(success == generate_javascript(program, memory_writer_erase(&generated)));
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
@@ -254,7 +253,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_c(checked, global_object.members[3].compile_time_value.value_.type_.enum_,
+        REQUIRE(success == generate_c(program, global_object.members[3].compile_time_value.value_.type_.enum_,
                                       memory_writer_erase(&generated)));
         if (test_name.length > 0)
         {
@@ -262,7 +261,20 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         }
         memory_writer_free(&generated);
     }
+}
 
+static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
+{
+    sequence const root = parse(source);
+    checked_program const checked = check(root, global_object, expect_no_errors, NULL);
+    sequence_free(&root);
+    test_all_backends(test_name, checked, global_object);
+    {
+        checked_program optimized = remove_unused_functions(checked);
+        remove_dead_code(&optimized);
+        test_all_backends(test_name, optimized, global_object);
+        checked_program_free(&optimized);
+    }
     checked_program_free(&checked);
 }
 

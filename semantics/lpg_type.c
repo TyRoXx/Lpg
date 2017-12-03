@@ -154,6 +154,12 @@ void method_description_free(method_description const value)
     }
 }
 
+enum_constructor_type enum_constructor_type_create(enumeration const *enumeration, enum_element_id which)
+{
+    enum_constructor_type const result = {enumeration, which};
+    return result;
+}
+
 implementation implementation_create(struct function_pointer_value *methods, size_t method_count)
 {
     implementation const result = {methods, method_count};
@@ -403,7 +409,16 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         return type_from_type();
 
     case type_kind_enum_constructor:
+    {
+        enum_constructor_type *const enum_constructor = garbage_collector_allocate(clone_gc, sizeof(*enum_constructor));
+        *enum_constructor =
+            enum_constructor_type_create(original.enum_constructor->enumeration, original.enum_constructor->which);
+        return type_from_enum_constructor(enum_constructor);
+    }
+
     case type_kind_structure:
+        return type_from_struct(original.structure_);
+
     case type_kind_method_pointer:
         LPG_TO_DO();
     }
