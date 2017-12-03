@@ -189,7 +189,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             {
                 values[j] = registers[*(element.tuple_.elements + j)];
             }
-            value_tuple.tuple_.elements = values;
+            value_tuple.tuple_ = value_tuple_create(values, element.tuple_.element_count);
             registers[element.tuple_.result] = value_tuple;
             break;
         }
