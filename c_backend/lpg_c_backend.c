@@ -8,7 +8,6 @@
 typedef struct standard_library_usage
 {
     bool using_string_ref;
-    bool using_stdio;
     bool using_assert;
     bool using_unit;
     bool using_stdint;
@@ -26,7 +25,6 @@ typedef enum register_meaning
     register_meaning_nothing,
     register_meaning_global,
     register_meaning_variable,
-    register_meaning_print,
     register_meaning_assert,
     register_meaning_string_equals,
     register_meaning_integer_equals,
@@ -693,7 +691,6 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
         return generate_register_name(from, current_function, c_output);
 
     case register_meaning_global:
-    case register_meaning_print:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_concat:
@@ -816,7 +813,6 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
                 current_function, from, state->registers[from].type_of.value, indentation, all_functions, c_output);
         }
 
-    case register_meaning_print:
     case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_integer_equals:
@@ -834,72 +830,6 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_to_string:
     case register_meaning_unit:
         LPG_TO_DO();
-    }
-    LPG_UNREACHABLE();
-}
-
-static success_indicator generate_c_str(c_backend_state *state, checked_function const *const current_function,
-                                        register_id const from, stream_writer const c_output)
-{
-    switch (state->registers[from].meaning)
-    {
-    case register_meaning_captures:
-        LPG_TO_DO();
-
-    case register_meaning_capture:
-    case register_meaning_variable:
-    case register_meaning_argument:
-        LPG_TRY(generate_c_read_access(state, current_function, from, c_output));
-        return stream_writer_write_string(c_output, ".data");
-
-    case register_meaning_print:
-    case register_meaning_assert:
-    case register_meaning_string_equals:
-    case register_meaning_integer_equals:
-    case register_meaning_concat:
-    case register_meaning_nothing:
-    case register_meaning_global:
-    case register_meaning_and:
-    case register_meaning_not:
-    case register_meaning_or:
-    case register_meaning_side_effect:
-    case register_meaning_integer_less:
-    case register_meaning_integer_to_string:
-    case register_meaning_unit:
-        LPG_UNREACHABLE();
-    }
-    LPG_UNREACHABLE();
-}
-
-static success_indicator generate_string_length(c_backend_state *state, checked_function const *const current_function,
-                                                register_id const from, stream_writer const c_output)
-{
-    switch (state->registers[from].meaning)
-    {
-    case register_meaning_captures:
-        LPG_TO_DO();
-
-    case register_meaning_argument:
-    case register_meaning_variable:
-    case register_meaning_capture:
-        LPG_TRY(generate_c_read_access(state, current_function, from, c_output));
-        return stream_writer_write_string(c_output, ".length");
-
-    case register_meaning_print:
-    case register_meaning_assert:
-    case register_meaning_string_equals:
-    case register_meaning_integer_equals:
-    case register_meaning_concat:
-    case register_meaning_nothing:
-    case register_meaning_global:
-    case register_meaning_and:
-    case register_meaning_not:
-    case register_meaning_or:
-    case register_meaning_side_effect:
-    case register_meaning_integer_less:
-    case register_meaning_integer_to_string:
-    case register_meaning_unit:
-        LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();
 }
@@ -1123,7 +1053,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_nothing:
         case register_meaning_global:
-        case register_meaning_print:
         case register_meaning_assert:
         case register_meaning_string_equals:
         case register_meaning_integer_equals:
@@ -1183,22 +1112,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-            return success;
-
-        case register_meaning_print:
-            state->standard_library.using_stdio = true;
-            state->standard_library.using_unit = true;
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_unit());
-            LPG_TRY(stream_writer_write_string(c_output, "unit const "));
-            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-            LPG_TRY(indent(indentation, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, "fwrite("));
-            ASSERT(input.call.argument_count == 1);
-            LPG_TRY(generate_c_str(state, current_function, input.call.arguments[0], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ", 1, "));
-            LPG_TRY(generate_string_length(state, current_function, input.call.arguments[0], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ", stdout);\n"));
             return success;
 
         case register_meaning_assert:
@@ -1462,11 +1375,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_global:
             switch (input.read_struct.member)
             {
-            case 2:
-                set_register_meaning(
-                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_print);
-                return success;
-
             case 4:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_assert);
@@ -1597,7 +1505,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_UNREACHABLE();
         }
 
-        case register_meaning_print:
         case register_meaning_assert:
         case register_meaning_string_equals:
         case register_meaning_integer_equals:
@@ -2138,10 +2045,6 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     if (standard_library.using_string_ref)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_string.h>\n"), fail);
-    }
-    if (standard_library.using_stdio)
-    {
-        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdio.h>\n"), fail);
     }
     if (standard_library.using_stdint)
     {
