@@ -1978,7 +1978,7 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0};
 
