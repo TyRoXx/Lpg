@@ -58,9 +58,11 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             case value_kind_type:
             case value_kind_enum_element:
             case value_kind_unit:
-            case value_kind_tuple:
             case value_kind_enum_constructor:
                 break;
+
+            case value_kind_tuple:
+                LPG_TO_DO();
             }
             break;
 
