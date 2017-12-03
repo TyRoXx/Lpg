@@ -118,13 +118,13 @@ unicode_string get_current_executable_path(void)
 #endif
 }
 
-bool file_exists(unicode_view const path)
+bool directory_exists(unicode_view const path)
 {
 #ifdef _WIN32
     win32_string const path_argument = to_win32_path(path);
     DWORD const attributes = GetFileAttributesW(path_argument.c_str);
     win32_string_free(path_argument);
-    return (attributes != INVALID_FILE_ATTRIBUTES && (attributes & FILE_ATTRIBUTE_DIRECTORY));
+    return (attributes != INVALID_FILE_ATTRIBUTES) && (attributes & FILE_ATTRIBUTE_DIRECTORY);
 #else
     unicode_string const zero_terminated_path = unicode_view_zero_terminate(path);
     struct stat buffer;
@@ -138,9 +138,29 @@ bool file_exists(unicode_view const path)
 #endif
 }
 
+bool file_exists(unicode_view const path)
+{
+#ifdef _WIN32
+    win32_string const path_argument = to_win32_path(path);
+    DWORD const attributes = GetFileAttributesW(path_argument.c_str);
+    win32_string_free(path_argument);
+    return (attributes != INVALID_FILE_ATTRIBUTES);
+#else
+    unicode_string const zero_terminated_path = unicode_view_zero_terminate(path);
+    struct stat buffer;
+    if (stat(zero_terminated_path.data, &buffer) < 0)
+    {
+        unicode_string_free(&zero_terminated_path);
+        return false;
+    }
+    unicode_string_free(&zero_terminated_path);
+    return S_ISREG(buffer.st_mode);
+#endif
+}
+
 success_indicator create_directory(unicode_view const path)
 {
-    if (file_exists(path))
+    if (directory_exists(path))
     {
         return success;
     }

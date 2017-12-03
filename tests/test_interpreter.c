@@ -120,6 +120,19 @@ static success_indicator write_file(unicode_view const path, unicode_view const 
     return success;
 }
 
+static void write_file_if_necessary(unicode_view const path, unicode_view const content)
+{
+    unicode_string const source_file_zero_terminated = unicode_view_zero_terminate(path);
+    blob_or_error const existing = read_file(source_file_zero_terminated.data);
+    if ((existing.error != NULL) ||
+        !unicode_view_equals(unicode_view_create(existing.success.data, existing.success.length), content))
+    {
+        REQUIRE(success == write_file(path, content));
+    }
+    blob_free(&existing.success);
+    unicode_string_free(&source_file_zero_terminated);
+}
+
 static void run_c_test(unicode_view const test_name, unicode_view const c_source)
 {
     ASSUME(test_name.length > 0);
@@ -136,7 +149,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_view const source_pieces[] = {
             unicode_view_from_string(c_test_dir), unicode_view_from_c_str("generated_test.c")};
         unicode_string const source_file = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
-        REQUIRE(success == write_file(unicode_view_from_string(source_file), c_source));
+        write_file_if_necessary(unicode_view_from_string(source_file), c_source);
         unicode_string_free(&source_file);
     }
     {
@@ -158,19 +171,29 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         }
         REQUIRE(success == stream_writer_write_string(writer, "\")\n"));
         REQUIRE(success == stream_writer_write_string(writer, "add_executable(generated_test generated_test.c)\n"));
-        REQUIRE(success == write_file(unicode_view_from_string(cmakelists),
-                                      unicode_view_create(cmakelists_content.data, cmakelists_content.used)));
+        write_file_if_necessary(unicode_view_from_string(cmakelists),
+                                unicode_view_create(cmakelists_content.data, cmakelists_content.used));
         memory_writer_free(&cmakelists_content);
         unicode_string_free(&cmakelists);
     }
+
     {
-        unicode_view const cmake_arguments[] = {unicode_view_from_c_str(".")};
-        create_process_result const cmake_process = create_process(
-            unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments, LPG_ARRAY_SIZE(cmake_arguments),
-            unicode_view_from_string(c_test_dir), get_standard_input(), get_standard_output(), get_standard_error());
-        REQUIRE(cmake_process.success == success);
-        REQUIRE(0 == wait_for_process_exit(cmake_process.created));
+        unicode_view const cmakecache_pieces[] = {
+            unicode_view_from_string(c_test_dir), unicode_view_from_c_str("CMakeCache.txt")};
+        unicode_string const cmakecache = path_combine(cmakecache_pieces, LPG_ARRAY_SIZE(cmakecache_pieces));
+        if (!file_exists(unicode_view_from_string(cmakecache)))
+        {
+            unicode_view const cmake_arguments[] = {unicode_view_from_c_str(".")};
+            create_process_result const cmake_process =
+                create_process(unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments,
+                               LPG_ARRAY_SIZE(cmake_arguments), unicode_view_from_string(c_test_dir),
+                               get_standard_input(), get_standard_output(), get_standard_error());
+            REQUIRE(cmake_process.success == success);
+            REQUIRE(0 == wait_for_process_exit(cmake_process.created));
+        }
+        unicode_string_free(&cmakecache);
     }
+
     {
         unicode_view const cmake_arguments[] = {unicode_view_from_c_str("--build"), unicode_view_from_c_str(".")};
         create_process_result const cmake_process = create_process(
@@ -255,10 +278,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         memory_writer generated = {NULL, 0, 0};
         REQUIRE(success == generate_c(program, global_object.members[3].compile_time_value.value_.type_.enum_,
                                       memory_writer_erase(&generated)));
-        if (test_name.length > 0)
-        {
-            run_c_test(test_name, unicode_view_create(generated.data, generated.used));
-        }
+        run_c_test(test_name, unicode_view_create(generated.data, generated.used));
         memory_writer_free(&generated);
     }
 }
@@ -272,7 +292,15 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     {
         checked_program optimized = remove_unused_functions(checked);
         remove_dead_code(&optimized);
-        test_all_backends(test_name, optimized, global_object);
+        memory_writer optimized_test_name = {NULL, 0, 0};
+        {
+            stream_writer const writer = memory_writer_erase(&optimized_test_name);
+            REQUIRE(success == stream_writer_write_unicode_view(writer, test_name));
+            REQUIRE(success == stream_writer_write_string(writer, "+optimized"));
+        }
+        test_all_backends(
+            unicode_view_create(optimized_test_name.data, optimized_test_name.used), optimized, global_object);
+        memory_writer_free(&optimized_test_name);
         checked_program_free(&optimized);
     }
     checked_program_free(&checked);
