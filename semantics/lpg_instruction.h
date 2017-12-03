@@ -190,3 +190,4 @@ instruction instruction_create_erase_type(erase_type_instruction const argument)
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);
+void add_instruction(instruction_sequence *to, instruction const added);

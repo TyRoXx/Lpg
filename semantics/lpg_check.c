@@ -9,15 +9,7 @@
 #include <string.h>
 #include "lpg_local_variable.h"
 #include "lpg_instruction_checkpoint.h"
-
-static void add_instruction(instruction_sequence *to, instruction const added)
-{
-    to->elements = reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
-    to->elements[to->length] = added;
-    ++(to->length);
-}
-
-struct function_checking_state;
+#include "function_checking_state.h"
 
 typedef struct evaluate_expression_result
 {
@@ -38,71 +30,6 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false};
-
-static bool optional_capture_index_equals(optional_capture_index const left, optional_capture_index const right)
-{
-    if (left.has_value)
-    {
-        if (right.has_value)
-        {
-            return (left.value == right.value);
-        }
-        return false;
-    }
-    if (right.has_value)
-    {
-        return false;
-    }
-    return true;
-}
-
-static variable_address variable_address_from_local(register_id const local)
-{
-    variable_address const result = {optional_capture_index_empty, local};
-    return result;
-}
-
-static variable_address variable_address_from_capture(capture_index const captured)
-{
-    variable_address const result = {{true, captured}, 0};
-    return result;
-}
-
-static bool variable_address_equals(variable_address const left, variable_address const right)
-{
-    return optional_capture_index_equals(left.captured_in_current_lambda, right.captured_in_current_lambda) &&
-           (left.local_address == right.local_address);
-}
-
-typedef struct capture
-{
-    variable_address from;
-    type what;
-} capture;
-
-static capture capture_create(variable_address const from, type const what)
-{
-    capture const result = {from, what};
-    return result;
-}
-
-typedef struct function_checking_state
-{
-    struct function_checking_state *parent;
-    bool may_capture_runtime_variables;
-    capture *captures;
-    capture_index capture_count;
-    register_id used_registers;
-    unicode_string *register_debug_names;
-    register_id register_debug_name_count;
-    bool is_in_loop;
-    structure const *global;
-    check_error_handler *on_error;
-    local_variable_container local_variables;
-    void *user;
-    checked_program *program;
-    instruction_sequence *body;
-} function_checking_state;
 
 static function_checking_state function_checking_state_create(function_checking_state *parent,
                                                               bool may_capture_runtime_variables,
@@ -147,14 +74,6 @@ static type get_return_type(type const callee, checked_function const *const all
     LPG_UNREACHABLE();
 }
 
-static read_local_variable_result const read_local_variable_result_unknown = {
-    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
-
-static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
-                                                                                {{false, 0}, 0},
-                                                                                {type_kind_unit, {0}},
-                                                                                {false, {value_kind_unit, {0}}},
-                                                                                false};
 typedef struct type_inference
 {
     optional_value *values;
@@ -482,71 +401,6 @@ static size_t expected_call_argument_count(const type callee, checked_function c
                type_kind_unit;
     }
     LPG_UNREACHABLE();
-}
-
-static capture_index require_capture(LPG_NON_NULL(function_checking_state *const state),
-                                     variable_address const captured, type const what)
-{
-    for (capture_index i = 0; i < state->capture_count; ++i)
-    {
-        if (variable_address_equals(state->captures[i].from, captured))
-        {
-            return i;
-        }
-    }
-    capture_index const result = state->capture_count;
-    state->captures = reallocate_array(state->captures, (state->capture_count + 1), sizeof(*state->captures));
-    state->captures[state->capture_count] = capture_create(captured, what);
-    ++(state->capture_count);
-    return result;
-}
-
-static read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                                      instruction_sequence *const sequence, unicode_view const name,
-                                                      source_location const original_reference_location)
-{
-    LPG_FOR(size_t, i, state->local_variables.count)
-    {
-        local_variable const *const variable = state->local_variables.elements + i;
-        if (unicode_view_equals(unicode_view_from_string(variable->name), name))
-        {
-            return read_local_variable_result_create(
-                variable_address_from_local(variable->where), variable->type_, variable->compile_time_value, true);
-        }
-    }
-    if (!state->parent)
-    {
-        return read_local_variable_result_unknown;
-    }
-    read_local_variable_result const outer_variable =
-        read_local_variable(state->parent, NULL, name, original_reference_location);
-    switch (outer_variable.status)
-    {
-    case read_local_variable_status_ok:
-        break;
-
-    case read_local_variable_status_forbidden:
-    case read_local_variable_status_unknown:
-        return outer_variable;
-    }
-    if (outer_variable.compile_time_value.is_set && sequence)
-    {
-        register_id const where = allocate_register(&state->used_registers);
-        add_instruction(sequence, instruction_create_literal(literal_instruction_create(
-                                      where, outer_variable.compile_time_value.value_, outer_variable.what)));
-        return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
-                                                 outer_variable.compile_time_value, outer_variable.is_pure);
-    }
-    if (!state->may_capture_runtime_variables)
-    {
-        state->on_error(
-            semantic_error_create(semantic_error_cannot_capture_runtime_variable, original_reference_location),
-            state->user);
-        return read_local_variable_result_forbidden;
-    }
-    capture_index const existing_capture = require_capture(state, outer_variable.where, outer_variable.what);
-    return read_local_variable_result_create(variable_address_from_capture(existing_capture), outer_variable.what,
-                                             outer_variable.compile_time_value, outer_variable.is_pure);
 }
 
 static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_state *const state),
