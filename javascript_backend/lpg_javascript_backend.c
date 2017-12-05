@@ -229,9 +229,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 0:
             return stream_writer_write_string(javascript_output, "undefined");
 
-        case 2:
-            return stream_writer_write_string(javascript_output, "print");
-
         case 4:
             return stream_writer_write_string(javascript_output, "assert");
 
