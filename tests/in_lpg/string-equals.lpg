@@ -1,10 +1,11 @@
-let runtime-string = ()
+let runtime-string = (a: string-ref)
     side-effect()
-    ""
+    a
 
 assert(string-equals("", ""))
 assert(string-equals("aaa", "aaa"))
 assert(string-equals(concat("aa", "a"), "aaa"))
 assert(not(string-equals("a", "")))
 assert(not(string-equals("a", "b")))
-assert(string-equals("", runtime-string()))
+assert(string-equals("", runtime-string("")))
+assert(string-equals("\n", runtime-string("\n")))

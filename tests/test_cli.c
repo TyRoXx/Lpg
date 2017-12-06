@@ -96,6 +96,8 @@ void test_cli(void)
         expect_output_with_source_flags("assert(boolean.true)\n", flags, 1, false, "");
     }
 
+    expect_output_with_source_flags("assert(boolean.true)\n", NULL, 0, false, "");
+
     {
         char *flags[] = {"--unknown-flag"};
         expect_output_with_source_flags("", flags, 1, true, "Arguments: filename\n");

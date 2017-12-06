@@ -14,6 +14,7 @@
 #include "test_parse_expression_success.h"
 #include "test_parse_expression_syntax_error.h"
 #include "test_expression.h"
+#include "test_instruction.h"
 #include "test_semantics.h"
 #include "test_interpreter.h"
 #include "test_cli.h"
@@ -40,6 +41,7 @@ int main(void)
                                     test_unicode_view,
                                     test_decode_string_literal,
                                     test_arithmetic,
+                                    test_instruction,
                                     test_stream_writer,
                                     test_identifier,
                                     test_expression,

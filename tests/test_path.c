@@ -6,7 +6,10 @@
 void test_path(void)
 {
     REQUIRE(unicode_view_equals_c_str(path_remove_leaf(unicode_view_from_c_str("")), ""));
+    REQUIRE(unicode_view_equals_c_str(path_remove_leaf(unicode_view_from_c_str("a")), ""));
+    REQUIRE(unicode_view_equals_c_str(path_remove_leaf(unicode_view_from_c_str("/")), "/"));
     REQUIRE(unicode_view_equals_c_str(path_remove_leaf(unicode_view_from_c_str("/home/test")), "/home"));
+    REQUIRE(unicode_view_equals_c_str(path_remove_leaf(unicode_view_from_c_str("/home/test/")), "/home"));
     REQUIRE(unicode_view_equals_c_str(path_remove_leaf(path_remove_leaf(unicode_view_from_c_str("/home/test"))), "/"));
     {
         unicode_view const pieces[] = {unicode_view_from_c_str("a")};
