@@ -1582,7 +1582,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
         }
-        return success;
+        LPG_UNREACHABLE();
 
     case instruction_tuple:
         return generate_tuple_variable(state, current_function, input.tuple_.result_type, input.tuple_.elements,

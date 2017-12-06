@@ -302,14 +302,14 @@ void instruction_free(instruction const *value)
     case instruction_break:
     case instruction_literal:
     case instruction_return:
+    case instruction_get_captures:
+    case instruction_enum_construct:
+    case instruction_erase_type:
         break;
 
     case instruction_tuple:
         deallocate(value->tuple_.elements);
         deallocate(value->tuple_.result_type.elements);
-        break;
-
-    case instruction_enum_construct:
         break;
 
     case instruction_match:
@@ -323,14 +323,8 @@ void instruction_free(instruction const *value)
         }
         break;
 
-    case instruction_get_captures:
-        break;
-
     case instruction_lambda_with_captures:
         lambda_with_captures_instruction_free(value->lambda_with_captures);
-        break;
-
-    case instruction_erase_type:
         break;
     }
 }

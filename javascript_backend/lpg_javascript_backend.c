@@ -247,9 +247,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 9:
             return stream_writer_write_string(javascript_output, "string_equals");
 
-        case 10:
-            return stream_writer_write_string(javascript_output, "read");
-
         case 12:
             return stream_writer_write_string(javascript_output, "integer_equals");
 

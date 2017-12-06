@@ -1,4 +1,3 @@
-
 /*use a captured variable in a compile-time context*/
 let m = boolean
 let f5 = ()
