@@ -230,6 +230,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
     case instruction_erase_type:
         return instruction_create_erase_type(erase_type_instruction_create(
             original.erase_type.self, original.erase_type.into, original.erase_type.impl));
+
     case instruction_return:
         LPG_TO_DO();
 

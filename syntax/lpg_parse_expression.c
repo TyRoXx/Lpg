@@ -320,7 +320,7 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
 
         return result;
     }
-    else if (next_token.token == token_newline)
+    if (next_token.token == token_newline)
     {
         pop(parser);
         sequence const body = parse_sequence(parser, (indentation + 1));
@@ -746,7 +746,9 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             return parse_struct(parser, indentation + 1, head.where);
 
         case token_impl:
-            LPG_TO_DO();
+            pop(parser);
+            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->user);
+            return expression_parser_result_failure;
         }
     }
 }
@@ -1057,9 +1059,11 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
     {
         rich_token const space = peek(parser);
         pop(parser);
-        if (space.token != token_space)
+        if (space.token != token_space || space.content.length != 1)
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            expression_free(&implemented_interface.success);
+            return expression_parser_result_failure;
         }
     }
 
@@ -1069,6 +1073,8 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if ((for_.token != token_identifier) || !unicode_view_equals_c_str(for_.content, "for"))
         {
             parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->user);
+            expression_free(&implemented_interface.success);
+            return expression_parser_result_failure;
         }
     }
 
@@ -1078,12 +1084,15 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if (space.token != token_space)
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            expression_free(&implemented_interface.success);
+            return expression_parser_result_failure;
         }
     }
 
     expression_parser_result const self = parse_expression(parser, indentation, false);
     if (!self.is_success)
     {
+        expression_free(&implemented_interface.success);
         return expression_parser_result_failure;
     }
 
@@ -1093,6 +1102,8 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if (newline.token != token_newline)
         {
             parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->user);
+            expression_free(&implemented_interface.success);
+            expression_free(&self.success);
             return expression_parser_result_failure;
         }
     }

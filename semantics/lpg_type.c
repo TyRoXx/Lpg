@@ -331,15 +331,13 @@ bool type_equals(type const left, type const right)
     case type_kind_method_pointer:
         return method_pointer_type_equals(left.method_pointer, right.method_pointer);
 
-    case type_kind_structure:
-        LPG_TO_DO();
-
     case type_kind_interface:
         return (left.interface_ == right.interface_);
 
     case type_kind_lambda:
         return (left.lambda.lambda == right.lambda.lambda);
 
+    case type_kind_structure:
     case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
