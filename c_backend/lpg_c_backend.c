@@ -535,9 +535,6 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
-    case type_kind_method_pointer:
-        LPG_TO_DO();
-
     case type_kind_interface:
         return generate_interface_reference_name(generated.interface_, c_output);
 
@@ -636,6 +633,7 @@ static success_indicator generate_type(type const generated, standard_library_us
 
     case type_kind_inferred:
     case type_kind_enum_constructor:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_structure:
@@ -1413,9 +1411,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             switch (object_type.kind)
             {
             case type_kind_method_pointer:
-                LPG_TO_DO();
-
             case type_kind_interface:
+            case type_kind_lambda:
                 LPG_TO_DO();
 
             case type_kind_structure:
@@ -1435,9 +1432,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
                 return success;
             }
-
-            case type_kind_lambda:
-                LPG_TO_DO();
 
             case type_kind_tuple:
             {

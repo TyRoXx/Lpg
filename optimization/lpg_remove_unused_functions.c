@@ -59,25 +59,22 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         case instruction_return:
             LPG_TO_DO();
 
-        case instruction_call:
-            break;
-
         case instruction_loop:
             mark_used_functions_in_sequence(current_instruction.loop, used_functions, all_functions, all_interfaces);
             break;
 
+        case instruction_call:
         case instruction_global:
         case instruction_read_struct:
         case instruction_break:
         case instruction_erase_type:
+        case instruction_tuple:
+        case instruction_enum_construct:
+        case instruction_get_captures:
             break;
 
         case instruction_literal:
             mark_value(current_instruction.literal.value_, used_functions, all_functions, all_interfaces);
-            break;
-
-        case instruction_tuple:
-        case instruction_enum_construct:
             break;
 
         case instruction_match:
@@ -86,9 +83,6 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
                 mark_used_functions_in_sequence(
                     current_instruction.match.cases[k].action, used_functions, all_functions, all_interfaces);
             }
-            break;
-
-        case instruction_get_captures:
             break;
 
         case instruction_lambda_with_captures:
