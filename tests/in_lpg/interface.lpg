@@ -71,8 +71,13 @@ let a2 : printable2 = "abc"
 assert(string-equals("abc", a2.print()))
 
 let test-interface = interface
-    method(): printable2
+    method(a: boolean, b: boolean): printable2
 
 impl test-interface for unit
-    method()
+    method(a: boolean, b: boolean)
+        assert(a)
+        assert(not(b))
         "test"
+
+let g : test-interface = unit_value
+assert(string-equals("test", g.method(boolean.true, boolean.false).print()))

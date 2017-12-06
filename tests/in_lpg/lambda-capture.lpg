@@ -32,3 +32,9 @@ let y = "2"
 let t = ()
     string-equals(y, integer-to-string(x))
 assert(t())
+
+/*function with multiple parameters captures something*/
+let z = (a: boolean, d: boolean)
+    side-effect()
+    and(a, and(d, integer-equals(c, 23)))
+assert(z(boolean.true, boolean.true))

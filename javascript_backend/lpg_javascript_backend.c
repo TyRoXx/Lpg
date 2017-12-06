@@ -437,7 +437,10 @@ static success_indicator generate_get_method(function_generation *const state, g
     LPG_TRY(stream_writer_write_string(javascript_output, "("));
     for (register_id i = 0; i < method.parameters.length; ++i)
     {
-        LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
         LPG_TRY(generate_register_name(i, javascript_output));
     }
     LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));

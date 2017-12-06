@@ -1928,7 +1928,7 @@ static success_indicator generate_function_declaration(function_id const id, fun
         LPG_TRY(generate_type(signature.parameters.elements[j], standard_library, definitions, all_functions,
                               all_interfaces, program_defined_writer));
         LPG_TRY(stream_writer_write_string(program_defined_writer, " const "));
-        LPG_TRY(generate_register_name(j, all_functions + id, program_defined_writer));
+        LPG_TRY(generate_register_name(signature.self.is_set + j, all_functions + id, program_defined_writer));
     }
     LPG_TRY(stream_writer_write_string(program_defined_writer, ")"));
     return success;
