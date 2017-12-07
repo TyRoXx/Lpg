@@ -129,7 +129,6 @@ The standard library also includes some functions to work with the types.
 | not               | boolean                | Flips the value of the boolean                       | boolean    |
 | concat            | string-ref, string-ref | Returns the two strings together                     | string-ref |
 | string-eqauls     | string-ref, string-ref | Returns if two strings are equal                     | boolean    |
-| read              | (none)                 | Read input from the user                             | string-ref |
 | integer-equals    | integer, integer       | Returns if two integers are equals                   | boolean    |
 | integer-less      | integer, integer       | Returns if the first integer is less than the second | boolean    |
 | integer-to-string | integer                | Turns an integer to a string                         | string-ref |
