@@ -49,7 +49,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
     ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
     ASSUME(!arguments.self.is_set);
     optional_value const result =
-        call_function(*function, function_call_arguments_create(NULL, optional_value_create(*from.type_erased.self),
+        call_function(*function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
                                                                 arguments.arguments, arguments.globals, arguments.gc,
                                                                 arguments.all_functions, arguments.all_interfaces));
     if (!result.is_set)
@@ -110,10 +110,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             {
             case value_kind_function_pointer:
             {
-                optional_value const result =
-                    call_function(callee.function_pointer,
-                                  function_call_arguments_create(NULL, optional_value_empty, arguments, globals, gc,
-                                                                 all_functions, all_interfaces));
+                optional_value const result = call_function(
+                    callee.function_pointer, function_call_arguments_create(optional_value_empty, arguments, globals,
+                                                                            gc, all_functions, all_interfaces));
                 deallocate(arguments);
                 if (!result.is_set)
                 {

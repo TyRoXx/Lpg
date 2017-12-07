@@ -76,7 +76,6 @@ typedef enum type_kind
     type_kind_tuple,
     type_kind_type,
     type_kind_integer_range,
-    type_kind_inferred,
     type_kind_enum_constructor,
     type_kind_lambda,
     type_kind_interface,
@@ -194,7 +193,6 @@ type type_from_enumeration(LPG_NON_NULL(enumeration const *value));
 type type_from_tuple_type(tuple_type const value);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);
-type type_from_inferred(size_t const inferred);
 type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor));
 type type_from_lambda(lambda_type const lambda);
 type type_from_interface(interface_id const value);

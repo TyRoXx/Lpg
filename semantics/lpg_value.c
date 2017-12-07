@@ -276,16 +276,15 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
     return left.which < right.which;
 }
 
-function_call_arguments function_call_arguments_create(value const *const inferred, optional_value const self,
-                                                       value *const arguments, value const *globals,
-                                                       garbage_collector *const gc,
+function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
+                                                       value const *globals, garbage_collector *const gc,
                                                        checked_function const *const all_functions,
                                                        interface const *all_interfaces)
 {
     ASSUME(globals);
     ASSUME(gc);
     ASSUME(all_functions);
-    function_call_arguments const result = {inferred, self, arguments, globals, gc, all_functions, all_interfaces};
+    function_call_arguments const result = {self, arguments, globals, gc, all_functions, all_interfaces};
     return result;
 }
 

@@ -63,7 +63,6 @@ static type get_return_type(type const callee, checked_function const *const all
     case type_kind_enumeration:
     case type_kind_type:
     case type_kind_integer_range:
-    case type_kind_inferred:
     case type_kind_interface:
     case type_kind_method_pointer:
         LPG_TO_DO();
@@ -72,17 +71,6 @@ static type get_return_type(type const callee, checked_function const *const all
         return type_from_enumeration(callee.enum_constructor->enumeration);
     }
     LPG_UNREACHABLE();
-}
-
-typedef struct type_inference
-{
-    optional_value *values;
-    size_t count;
-} type_inference;
-
-static void type_inference_free(type_inference const value)
-{
-    deallocate(value.values);
 }
 
 bool is_implicitly_convertible(type const flat_from, type const flat_into)
@@ -127,7 +115,6 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_method_pointer:
     case type_kind_lambda:
     case type_kind_structure:
-    case type_kind_inferred:
     case type_kind_enum_constructor:
     case type_kind_interface:
         LPG_TO_DO();
@@ -154,7 +141,6 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_integer_range:
-    case type_kind_inferred:
     case type_kind_interface:
     case type_kind_method_pointer:
         LPG_UNREACHABLE();
@@ -280,7 +266,6 @@ static read_structure_element_result read_element(function_checking_state *state
         return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
 
-    case type_kind_inferred:
     case type_kind_method_pointer:
         LPG_TO_DO();
 
@@ -330,7 +315,6 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_function_pointer:
         case type_kind_tuple:
         case type_kind_lambda:
-        case type_kind_inferred:
         case type_kind_enum_constructor:
         case type_kind_method_pointer:
             LPG_TO_DO();
@@ -391,7 +375,6 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_integer_range:
-    case type_kind_inferred:
     case type_kind_interface:
         LPG_TO_DO();
 
@@ -454,46 +437,6 @@ static evaluate_expression_result make_unit(register_id *const used_registers, i
     add_instruction(output, instruction_create_literal(
                                 literal_instruction_create(final_result.where, value_from_unit(), type_from_unit())));
     return final_result;
-}
-
-static size_t find_lower_bound_for_inferred_values(type const root)
-{
-    switch (root.kind)
-    {
-    case type_kind_method_pointer:
-    case type_kind_structure:
-    case type_kind_function_pointer:
-    case type_kind_lambda:
-    case type_kind_tuple:
-    case type_kind_enum_constructor:
-        LPG_TO_DO();
-
-    case type_kind_interface:
-    case type_kind_unit:
-    case type_kind_string_ref:
-    case type_kind_enumeration:
-    case type_kind_type:
-    case type_kind_integer_range:
-        return 0;
-
-    case type_kind_inferred:
-        return (root.inferred + 1);
-    }
-    LPG_UNREACHABLE();
-}
-
-static size_t count_inferred_values(function_pointer const signature)
-{
-    size_t count = 0;
-    for (size_t i = 0; i < signature.parameters.length; ++i)
-    {
-        size_t const new_count = find_lower_bound_for_inferred_values(signature.parameters.elements[i]);
-        if (new_count > count)
-        {
-            count = new_count;
-        }
-    }
-    return count;
 }
 
 typedef struct check_function_result
@@ -901,7 +844,6 @@ static conversion_result convert(function_checking_state *const state, instructi
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
-    case type_kind_inferred:
     case type_kind_lambda:
     case type_kind_string_ref:
     case type_kind_unit:
@@ -977,16 +919,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     {
         return make_compile_time_unit();
     }
-    size_t inferred_value_count =
-        /*needs to be initialized to avoid compiler warnings due to the missing default case in the switch statement below*/ 0;
+
     switch (callee.type_.kind)
     {
     case type_kind_lambda:
-        inferred_value_count = count_inferred_values(*state->program->functions[callee.type_.lambda.lambda].signature);
-        break;
-
     case type_kind_function_pointer:
-        inferred_value_count = count_inferred_values(*callee.type_.function_pointer_);
+    case type_kind_enum_constructor:
         break;
 
     case type_kind_method_pointer:
@@ -997,25 +935,15 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_integer_range:
-    case type_kind_inferred:
     case type_kind_interface:
         state->on_error(
             semantic_error_create(semantic_error_not_callable, expression_source_begin(*call.callee)), state->user);
         return make_compile_time_unit();
-
-    case type_kind_enum_constructor:
-        inferred_value_count = 0;
-        break;
     }
     size_t const expected_arguments = expected_call_argument_count(callee.type_, state->program->functions);
     register_id *const arguments = allocate_array(expected_arguments, sizeof(*arguments));
     value *const compile_time_arguments = allocate_array(expected_arguments, sizeof(*compile_time_arguments));
     bool all_compile_time_arguments = true;
-    type_inference inferring = {allocate_array(inferred_value_count, sizeof(*inferring.values)), inferred_value_count};
-    for (size_t i = 0; i < inferred_value_count; ++i)
-    {
-        inferring.values[i].is_set = false;
-    }
     LPG_FOR(size_t, i, call.arguments.length)
     {
         expression const argument_tree = call.arguments.elements[i];
@@ -1032,7 +960,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             restore(previous_code);
             deallocate(compile_time_arguments);
             deallocate(arguments);
-            type_inference_free(inferring);
             return evaluate_expression_result_empty;
         }
         if (result.compile_time_value.is_set)
@@ -1050,7 +977,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         deallocate(compile_time_arguments);
         restore(previous_code);
         deallocate(arguments);
-        type_inference_free(inferring);
         state->on_error(semantic_error_create(semantic_error_missing_argument, call.closing_parenthesis), state->user);
         return evaluate_expression_result_empty;
     }
@@ -1059,15 +985,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     optional_value compile_time_result = {false, value_from_unit()};
     if (callee.compile_time_value.is_set && all_compile_time_arguments)
     {
-        value *const complete_inferred_values = allocate_array(inferred_value_count, sizeof(*complete_inferred_values));
-        for (size_t i = 0; i < inferred_value_count; ++i)
-        {
-            if (!inferring.values[i].is_set)
-            {
-                LPG_TO_DO();
-            }
-            complete_inferred_values[i] = inferring.values[i].value_;
-        }
         {
             switch (callee.compile_time_value.value_.kind)
             {
@@ -1090,9 +1007,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 }
                 compile_time_result =
                     call_function(callee.compile_time_value.value_.function_pointer,
-                                  function_call_arguments_create(
-                                      complete_inferred_values, optional_value_empty, compile_time_arguments, globals,
-                                      &state->program->memory, state->program->functions, state->program->interfaces));
+                                  function_call_arguments_create(optional_value_empty, compile_time_arguments, globals,
+                                                                 &state->program->memory, state->program->functions,
+                                                                 state->program->interfaces));
                 deallocate(globals);
                 break;
             }
@@ -1120,7 +1037,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             }
             }
         }
-        deallocate(complete_inferred_values);
         if (compile_time_result.is_set)
         {
             deallocate(arguments);
@@ -1145,9 +1061,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
     if (!compile_time_result.is_set)
     {
-        /*TODO: type inference for runtime-evaluated functions
-         * ("templates")*/
-        ASSERT(inferred_value_count == 0);
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
@@ -1164,7 +1077,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         case type_kind_tuple:
         case type_kind_type:
         case type_kind_integer_range:
-        case type_kind_inferred:
             LPG_UNREACHABLE();
 
         case type_kind_enum_constructor:
@@ -1183,7 +1095,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         }
     }
 
-    type_inference_free(inferring);
     deallocate(compile_time_arguments);
     return evaluate_expression_result_create(true, result, return_type, compile_time_result, false);
 }
@@ -1246,7 +1157,6 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_integer_range:
-    case type_kind_inferred:
     case type_kind_enum_constructor:
     case type_kind_interface:
         LPG_TO_DO();

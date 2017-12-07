@@ -121,7 +121,6 @@ static optional_value const optional_value_empty = {false, {value_kind_integer, 
 
 typedef struct function_call_arguments
 {
-    value const *const inferred;
     optional_value const self;
     value *const arguments;
     value const *globals;
@@ -130,9 +129,8 @@ typedef struct function_call_arguments
     interface const *all_interfaces;
 } function_call_arguments;
 
-function_call_arguments function_call_arguments_create(value const *const inferred, optional_value const self,
-                                                       value *const arguments, value const *globals,
-                                                       LPG_NON_NULL(garbage_collector *const gc),
+function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
+                                                       value const *globals, LPG_NON_NULL(garbage_collector *const gc),
                                                        LPG_NON_NULL(checked_function const *const all_functions),
                                                        interface const *all_interfaces);
 

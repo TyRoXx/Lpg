@@ -265,14 +265,6 @@ type type_from_integer_range(integer_range value)
     return result;
 }
 
-type type_from_inferred(size_t const inferred)
-{
-    type result;
-    result.kind = type_kind_inferred;
-    result.inferred = inferred;
-    return result;
-}
-
 type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constructor))
 {
     type result;
@@ -338,7 +330,6 @@ bool type_equals(type const left, type const right)
         return (left.lambda.lambda == right.lambda.lambda);
 
     case type_kind_structure:
-    case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
 
@@ -390,7 +381,6 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     case type_kind_enumeration:
     case type_kind_interface:
     case type_kind_integer_range:
-    case type_kind_inferred:
         return original;
 
     case type_kind_tuple:

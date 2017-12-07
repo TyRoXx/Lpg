@@ -13,24 +13,13 @@ static void print_type(type const printed)
 {
     switch (printed.kind)
     {
-    case type_kind_structure:
-    case type_kind_function_pointer:
-        LPG_TO_DO();
-
     case type_kind_unit:
         printf("unit");
         break;
 
-    case type_kind_string_ref:
-        LPG_TO_DO();
-
     case type_kind_enumeration:
         printf("enum ?");
         break;
-
-    case type_kind_tuple:
-    case type_kind_type:
-        LPG_TO_DO();
 
     case type_kind_integer_range:
         printf("integer(");
@@ -40,7 +29,11 @@ static void print_type(type const printed)
         printf(")");
         break;
 
-    case type_kind_inferred:
+    case type_kind_structure:
+    case type_kind_function_pointer:
+    case type_kind_string_ref:
+    case type_kind_tuple:
+    case type_kind_type:
     case type_kind_enum_constructor:
     case type_kind_lambda:
     case type_kind_interface:
@@ -107,6 +100,9 @@ void print_instruction(instruction const printed)
     {
     case instruction_get_method:
     case instruction_erase_type:
+    case instruction_enum_construct:
+    case instruction_get_captures:
+    case instruction_lambda_with_captures:
         LPG_TO_DO();
 
     case instruction_call:
@@ -154,9 +150,6 @@ void print_instruction(instruction const printed)
         printf("tuple with length %zu\n", printed.tuple_.element_count);
         return;
 
-    case instruction_enum_construct:
-        LPG_TO_DO();
-
     case instruction_match:
         printf("match %u, result %u\n", printed.match.key, printed.match.result);
         for (size_t i = 0; i < printed.match.count; ++i)
@@ -166,12 +159,6 @@ void print_instruction(instruction const printed)
             printf("return %u }\n", printed.match.cases[i].value);
         }
         return;
-
-    case instruction_get_captures:
-        LPG_TO_DO();
-
-    case instruction_lambda_with_captures:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

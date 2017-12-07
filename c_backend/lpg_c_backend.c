@@ -632,7 +632,6 @@ static success_indicator generate_type(type const generated, standard_library_us
         standard_library->using_unit = true;
         return stream_writer_write_string(c_output, "unit");
 
-    case type_kind_inferred:
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
         LPG_TO_DO();
@@ -747,7 +746,6 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     case type_kind_structure:
     case type_kind_method_pointer:
     case type_kind_interface:
-    case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }
@@ -1213,7 +1211,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_tuple:
             case type_kind_type:
             case type_kind_integer_range:
-            case type_kind_inferred:
             case type_kind_enum_constructor:
                 LPG_TO_DO();
 
@@ -1469,7 +1466,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_enumeration:
             case type_kind_type:
             case type_kind_integer_range:
-            case type_kind_inferred:
             case type_kind_enum_constructor:
                 LPG_UNREACHABLE();
             }
@@ -1742,7 +1738,6 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         }
         return success;
 
-    case type_kind_inferred:
     case type_kind_enum_constructor:
         LPG_TO_DO();
 
