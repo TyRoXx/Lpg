@@ -422,9 +422,6 @@ source_location expression_source_begin(expression const value)
     case expression_type_interface:
         return value.interface.source;
 
-    case expression_type_lambda:
-        LPG_TO_DO();
-
     case expression_type_call:
         return expression_source_begin(*value.call.callee);
 
@@ -443,8 +440,10 @@ source_location expression_source_begin(expression const value)
     case expression_type_identifier:
         return value.identifier.source;
 
+    case expression_type_lambda:
     case expression_type_return:
     case expression_type_loop:
+    case expression_type_impl:
         LPG_TO_DO();
 
     case expression_type_break:
@@ -474,9 +473,6 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_comment:
         return value.comment.source;
-
-    case expression_type_impl:
-        LPG_TO_DO();
 
     case expression_type_struct:
         return value.struct_.source;
@@ -808,9 +804,6 @@ bool expression_equals(expression const *left, expression const *right)
     case expression_type_interface:
         return interface_expression_equals(left->interface, right->interface);
 
-    case expression_type_impl:
-        LPG_TO_DO();
-
     case expression_type_lambda:
         return lambda_equals(left->lambda, right->lambda);
 
@@ -835,7 +828,9 @@ bool expression_equals(expression const *left, expression const *right)
     case expression_type_integer_literal:
         return integer_literal_expression_equals(left->integer_literal, right->integer_literal);
 
+    case expression_type_impl:
     case expression_type_access_structure:
+    case expression_type_string:
         LPG_TO_DO();
 
     case expression_type_match:
@@ -845,9 +840,6 @@ bool expression_equals(expression const *left, expression const *right)
         return expression_equals(left->binary.left, right->binary.left) &&
                expression_equals(left->binary.right, right->binary.right) &&
                left->binary.comparator == right->binary.comparator;
-
-    case expression_type_string:
-        LPG_TO_DO();
 
     case expression_type_not:
         return expression_equals(left->not.expr, right->not.expr);

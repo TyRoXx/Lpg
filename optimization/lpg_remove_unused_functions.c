@@ -145,9 +145,6 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 {
     switch (from.kind)
     {
-    case value_kind_type_erased:
-        LPG_TO_DO();
-
     case value_kind_integer:
         return from;
 
@@ -162,6 +159,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         return value_from_function_pointer(
             clone_function_pointer_value(from.function_pointer, clone_gc, new_function_ids));
 
+    case value_kind_type_erased:
     case value_kind_flat_object:
         LPG_TO_DO();
 
