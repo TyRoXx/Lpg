@@ -38,3 +38,8 @@ let z = (a: boolean, d: boolean)
     side-effect()
     and(a, and(d, integer-equals(c, 23)))
 assert(z(boolean.true, boolean.true))
+
+/*capture the same variable twice*/
+let capture-twice = ()
+    integer-equals(c, c)
+assert(capture-twice())
