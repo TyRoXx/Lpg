@@ -15,6 +15,7 @@
 #include "lpg_c_backend.h"
 #include "lpg_remove_dead_code.h"
 #include "lpg_remove_unused_functions.h"
+#include "lpg_save_expression.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -286,6 +287,16 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
 {
     sequence const root = parse(source);
+
+    {
+        memory_writer buffer = {NULL, 0, 0};
+        whitespace_state const whitespace = {0, false};
+        REQUIRE(success == save_sequence(memory_writer_erase(&buffer), root, whitespace));
+        sequence const reparsed = parse(unicode_view_create(buffer.data, buffer.used));
+        sequence_free(&reparsed);
+        memory_writer_free(&buffer);
+    }
+
     checked_program const checked = check(root, global_object, expect_no_errors, NULL);
     sequence_free(&root);
     test_all_backends(test_name, checked, global_object);

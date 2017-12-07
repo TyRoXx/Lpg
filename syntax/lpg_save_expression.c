@@ -70,6 +70,21 @@ static success_indicator save_function_header(stream_writer const to, function_h
     return success;
 }
 
+success_indicator save_sequence(stream_writer const to, sequence const value, whitespace_state whitespace)
+{
+    LPG_FOR(size_t, i, value.length)
+    {
+        /*we break the line here, so the space should not be generated
+        * before the sequence element:*/
+        whitespace.pending_space = 0;
+
+        LPG_TRY(stream_writer_write_string(to, "\n"));
+        LPG_TRY(indent(to, whitespace));
+        LPG_TRY(save_expression(to, value.elements + i, whitespace));
+    }
+    return success;
+}
+
 success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
@@ -100,6 +115,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 
     case expression_type_access_structure:
     {
+        LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(save_expression(to, value->access_structure.object, whitespace));
         LPG_TRY(stream_writer_write_string(to, "."));
         expression const member = expression_from_identifier(value->access_structure.member);
@@ -167,17 +183,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_sequence:
     {
         whitespace_state in_sequence = go_deeper(whitespace, 1);
-        LPG_FOR(size_t, i, value->sequence.length)
-        {
-            /*we break the line here, so the space should not be generated
-             * before the sequence element:*/
-            in_sequence.pending_space = 0;
-
-            LPG_TRY(stream_writer_write_string(to, "\n"));
-            LPG_TRY(indent(to, in_sequence));
-            LPG_TRY(save_expression(to, value->sequence.elements + i, in_sequence));
-        }
-        return success;
+        return save_sequence(to, value->sequence, in_sequence);
     }
 
     case expression_type_declare:
@@ -220,18 +226,23 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         case less_than:
             operator= "<";
             break;
+
         case less_than_or_equals:
             operator= "<=";
             break;
+
         case equals:
             operator= "==";
             break;
+
         case greater_than:
             operator= ">";
             break;
+
         case greater_than_or_equals:
             operator= ">=";
             break;
+
         case not_equals:
             operator= "!=";
             break;
@@ -243,7 +254,29 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     }
 
     case expression_type_impl:
-        LPG_TO_DO();
+    {
+        LPG_TRY(stream_writer_write_string(to, "impl "));
+        LPG_TRY(save_expression(to, value->impl.interface, whitespace));
+        LPG_TRY(stream_writer_write_string(to, " for "));
+        LPG_TRY(save_expression(to, value->impl.self, whitespace));
+        whitespace_state in_impl = go_deeper(whitespace, 1);
+        for (size_t i = 0; i < value->impl.method_count; ++i)
+        {
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+            LPG_TRY(indent(to, in_impl));
+            impl_expression_method const method = value->impl.methods[i];
+            {
+                expression const name = expression_from_identifier(method.name);
+                LPG_TRY(save_expression(to, &name, in_impl));
+            }
+            LPG_TRY(save_function_header(to, method.header, in_impl));
+            {
+                expression const body = expression_from_sequence(method.body);
+                LPG_TRY(save_expression(to, &body, in_impl));
+            }
+        }
+        return success;
+    }
 
     case expression_type_struct:
     {
