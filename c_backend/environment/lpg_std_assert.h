@@ -2,7 +2,7 @@
 #include "lpg_std_unit.h"
 #include <stdlib.h>
 #include <stdbool.h>
-static unit assert_impl(bool const condition)
+static unit assert_impl(size_t const condition)
 {
     if (!condition)
     {

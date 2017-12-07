@@ -13,6 +13,7 @@ typedef struct standard_library_usage
     bool using_stdint;
     bool using_integer;
     bool using_stddef;
+    bool using_boolean;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -655,17 +656,29 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
         return generate_register_name(from, current_function, c_output);
 
     case register_meaning_global:
-    case register_meaning_assert:
     case register_meaning_string_equals:
     case register_meaning_concat:
-    case register_meaning_and:
-    case register_meaning_not:
-    case register_meaning_or:
     case register_meaning_captures:
     case register_meaning_integer_less:
     case register_meaning_side_effect:
     case register_meaning_integer_to_string:
         LPG_TO_DO();
+
+    case register_meaning_and:
+        state->standard_library.using_boolean = true;
+        return stream_writer_write_string(c_output, "and_impl");
+
+    case register_meaning_or:
+        state->standard_library.using_boolean = true;
+        return stream_writer_write_string(c_output, "or_impl");
+
+    case register_meaning_not:
+        state->standard_library.using_boolean = true;
+        return stream_writer_write_string(c_output, "not_impl");
+
+    case register_meaning_assert:
+        state->standard_library.using_assert = true;
+        return stream_writer_write_string(c_output, "assert_impl");
 
     case register_meaning_integer_equals:
         state->standard_library.using_integer = true;
@@ -721,6 +734,7 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     case type_kind_unit:
     case type_kind_integer_range:
     case type_kind_type:
+    case type_kind_function_pointer:
         return success;
 
     case type_kind_tuple:
@@ -731,7 +745,6 @@ static success_indicator generate_add_reference(unicode_view const value, type c
             value, all_functions[what.lambda.lambda].signature->captures, indentation, all_functions, c_output);
 
     case type_kind_structure:
-    case type_kind_function_pointer:
     case type_kind_method_pointer:
     case type_kind_interface:
     case type_kind_inferred:
@@ -782,16 +795,16 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_equals:
     case register_meaning_concat:
     case register_meaning_side_effect:
-        return success;
-
     case register_meaning_and:
     case register_meaning_not:
     case register_meaning_or:
+    case register_meaning_integer_less:
+    case register_meaning_integer_to_string:
+        return success;
+
     case register_meaning_captures:
     case register_meaning_nothing:
     case register_meaning_global:
-    case register_meaning_integer_less:
-    case register_meaning_integer_to_string:
     case register_meaning_unit:
         LPG_TO_DO();
     }
@@ -1934,7 +1947,7 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0};
 
@@ -1942,6 +1955,13 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     {
         LPG_TRY_GOTO(generate_interface_vtable_definition(i, &standard_library, &definitions, program.functions,
                                                           program.interfaces, program_defined_writer),
+                     fail);
+    }
+
+    for (struct_id i = 0; i < program.struct_count; ++i)
+    {
+        LPG_TRY_GOTO(generate_struct_definition(i, program.structs[i], &standard_library, &definitions,
+                                                program.functions, program.interfaces, program_defined_writer),
                      fail);
     }
 
@@ -1964,13 +1984,6 @@ success_indicator generate_c(checked_program const program, enumeration const *c
                                                             &standard_library, program_defined_writer),
                          fail);
         }
-    }
-
-    for (struct_id i = 0; i < program.struct_count; ++i)
-    {
-        LPG_TRY_GOTO(generate_struct_definition(i, program.structs[i], &standard_library, &definitions,
-                                                program.functions, program.interfaces, program_defined_writer),
-                     fail);
     }
 
     for (function_id i = 1; i < program.function_count; ++i)
@@ -2009,6 +2022,10 @@ success_indicator generate_c(checked_program const program, enumeration const *c
     if (standard_library.using_integer)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_integer.h>\n"), fail);
+    }
+    if (standard_library.using_boolean)
+    {
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_boolean.h>\n"), fail);
     }
     if (standard_library.using_stddef)
     {

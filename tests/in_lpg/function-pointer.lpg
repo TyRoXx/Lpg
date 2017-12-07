@@ -1,0 +1,5 @@
+let f = ()
+    side-effect()
+    {and, or, not, assert, integer-equals}
+let g = f()
+assert(g.0(boolean.true, boolean.true))
