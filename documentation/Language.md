@@ -133,3 +133,16 @@ The standard library also includes some functions to work with the types.
 | integer-equals    | integer, integer       | Returns if two integers are equals                   | boolean    |
 | integer-less      | integer, integer       | Returns if the first integer is less than the second | boolean    |
 | integer-to-string | integer                | Turns an integer to a string                         | string-ref |
+
+## Optimizations
+There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:
+
+### Removing unused concepts
+If you declare a constant, a variable or a that is never used and just assigned, LPG will notice this and remove the variable completely from the syntax tree. This also holds true for arguments passed to a function.
+```lpg
+let f = ()
+    let a : int(1, 2) = 2
+    "Hello"
+```
+
+This will be compiled to nothing as the function `f` itself was never used.

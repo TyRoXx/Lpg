@@ -21,19 +21,6 @@ For a general introduction, have a look at the file `documentation/Language.md`
 
 Just write a `.lpg` file and run it. If you want to have syntax highlighting, there is a Visual Studio Code Plugin for this (see VS Code Package Manager) and a Notepad++ syntax file in this repository.
 
-### Optimizations
-There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:
-
-#### Removing unused concepts
-If you declare a constant, a variable or a that is never used and just assigned, LPG will notice this and remove the variable completely from the syntax tree. This also holds true for arguments passed to a function.
-```lpg
-let f = ()
-    let a : int(1, 2) = 2
-    "Hello"
-```
-
-This will be compiled to nothing as the function `f` itself was never used.
-
 ### Compilation
 In order to compile and run an `.lpg` file you need to build the whole project and run the following command in the terminal:
 
