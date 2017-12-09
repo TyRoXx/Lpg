@@ -7,3 +7,10 @@ loop
         case boolean.true:
             break
         case boolean.false: unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
