@@ -137,7 +137,7 @@ void print_instruction(instruction const printed)
         return;
 
     case instruction_break:
-        printf("break\n");
+        printf("break %u\n", printed.break_into);
         return;
 
     case instruction_literal:

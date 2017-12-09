@@ -173,6 +173,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         }
 
         case instruction_break:
+            registers[element.break_into] = value_from_unit();
             return run_sequence_result_break;
 
         case instruction_literal:

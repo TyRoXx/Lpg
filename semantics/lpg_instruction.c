@@ -269,10 +269,11 @@ instruction instruction_create_loop(instruction_sequence body)
     return result;
 }
 
-instruction instruction_create_break()
+instruction instruction_create_break(register_id const into)
 {
     instruction result;
     result.type = instruction_break;
+    result.break_into = into;
     return result;
 }
 
@@ -356,7 +357,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return read_struct_instruction_equals(left.read_struct, right.read_struct);
 
     case instruction_break:
-        return true;
+        return (left.break_into == right.break_into);
 
     case instruction_literal:
         return (left.literal.into == right.literal.into) && value_equals(left.literal.value_, right.literal.value_);

@@ -43,6 +43,9 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_break:
+            registers_read_from[current_instruction.break_into] = true;
+            break;
+
         case instruction_literal:
             break;
 
@@ -131,6 +134,7 @@ static bool change_register_ids(instruction *const where, register_id const *con
         return update_register_id(&where->read_struct.into, new_register_ids);
 
     case instruction_break:
+        ASSERT(update_register_id(&where->break_into, new_register_ids));
         return true;
 
     case instruction_literal:

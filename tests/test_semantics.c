@@ -486,11 +486,11 @@ static void test_loops(const standard_library_description *std_library)
                                          (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {
-        instruction const loop_body[] = {instruction_create_break()};
+        instruction const loop_body[] = {instruction_create_break(0)};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] =
-            instruction_create_literal(literal_instruction_create(0, value_from_unit(), type_from_unit()));
+            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
                                          "    break",
                                          (*std_library).globals, expected_body_elements, 2);
@@ -499,14 +499,14 @@ static void test_loops(const standard_library_description *std_library)
         instruction const loop_body[] = {instruction_create_literal(literal_instruction_create(
                                              0, value_from_enum_element(1, type_from_unit(), NULL),
                                              type_from_enumeration(&std_library->stable->boolean))),
-                                         instruction_create_break()};
+                                         instruction_create_break(1)};
         instruction *const expected_body_elements = allocate_array(3, sizeof(*expected_body_elements));
         expected_body_elements[0] = instruction_create_loop(instruction_sequence_create(LPG_COPY_ARRAY(loop_body)));
         expected_body_elements[1] = instruction_create_literal(
-            literal_instruction_create(1, value_from_enum_element(0, type_from_unit(), NULL),
+            literal_instruction_create(2, value_from_enum_element(0, type_from_unit(), NULL),
                                        type_from_enumeration(&std_library->stable->boolean)));
         expected_body_elements[2] =
-            instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit()));
+            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit()));
         check_single_wellformed_function("loop\n"
                                          "    let v = boolean.true\n"
                                          "    break\n"

@@ -160,6 +160,7 @@ struct instruction
         lambda_with_captures_instruction lambda_with_captures;
         get_method_instruction get_method;
         erase_type_instruction erase_type;
+        register_id break_into;
     };
 };
 
@@ -178,7 +179,7 @@ instruction instruction_create_return(return_instruction argument);
 instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(instruction_sequence body);
-instruction instruction_create_break(void);
+instruction instruction_create_break(register_id const into);
 instruction instruction_create_literal(literal_instruction const value);
 instruction instruction_create_tuple(tuple_instruction argument);
 instruction instruction_create_enum_construct(enum_construct_instruction argument);

@@ -70,12 +70,12 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
         read_local_variable(state->parent, NULL, name, original_reference_location);
     switch (outer_variable.status)
     {
-    case read_local_variable_status_ok:
-        break;
-
     case read_local_variable_status_forbidden:
     case read_local_variable_status_unknown:
         return outer_variable;
+
+    case read_local_variable_status_ok:
+        break;
     }
     if (outer_variable.compile_time_value.is_set && sequence)
     {

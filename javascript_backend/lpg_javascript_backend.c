@@ -486,6 +486,8 @@ static success_indicator generate_instruction(function_generation *const state, 
         return generate_read_struct(state, generated.read_struct, javascript_output);
 
     case instruction_break:
+        LPG_TRY(write_register(state, generated.break_into, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, "undefined;\n"));
         return stream_writer_write_string(javascript_output, "break;\n");
 
     case instruction_literal:

@@ -1656,9 +1656,11 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
     }
 
     case expression_type_break:
+    {
+        register_id const into = allocate_register(&state->used_registers);
         if (state->is_in_loop)
         {
-            add_instruction(function, instruction_create_break());
+            add_instruction(function, instruction_create_break(into));
         }
         else
         {
@@ -1666,7 +1668,8 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
                 semantic_error_create(semantic_error_break_outside_of_loop, expression_source_begin(element)),
                 state->user);
         }
-        return evaluate_expression_result_empty;
+        return evaluate_expression_result_create(true, into, type_from_unit(), optional_value_empty, false);
+    }
 
     case expression_type_sequence:
         return check_sequence(state, function, element.sequence);
