@@ -470,6 +470,7 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_call:
         return generate_call(state, generated.call, javascript_output);
+
     case instruction_return:
         LPG_TO_DO();
 

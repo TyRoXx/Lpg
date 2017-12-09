@@ -18,17 +18,9 @@ static bool optional_capture_index_equals(optional_capture_index const left, opt
 {
     if (left.has_value)
     {
-        if (right.has_value)
-        {
-            return (left.value == right.value);
-        }
-        return false;
+        return right.has_value && (left.value == right.value);
     }
-    if (right.has_value)
-    {
-        return false;
-    }
-    return true;
+    return !right.has_value;
 }
 
 bool variable_address_equals(variable_address const left, variable_address const right)
