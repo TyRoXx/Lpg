@@ -204,3 +204,5 @@ type type_clone(type const original, garbage_collector *const clone_gc);
 optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc);
 
 void function_pointer_free(LPG_NON_NULL(function_pointer const *value));
+
+bool is_implicitly_convertible(type const flat_from, type const flat_into);
