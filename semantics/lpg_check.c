@@ -73,55 +73,6 @@ static type get_return_type(type const callee, checked_function const *const all
     LPG_UNREACHABLE();
 }
 
-bool is_implicitly_convertible(type const flat_from, type const flat_into)
-{
-    if (flat_from.kind != flat_into.kind)
-    {
-        return false;
-    }
-    switch (flat_from.kind)
-    {
-    case type_kind_type:
-    case type_kind_unit:
-    case type_kind_string_ref:
-        return true;
-
-    case type_kind_function_pointer:
-        return type_equals(flat_from, flat_into);
-
-    case type_kind_enumeration:
-        return flat_from.enum_ == flat_into.enum_;
-
-    case type_kind_tuple:
-    {
-        if (flat_from.tuple_.length != flat_into.tuple_.length)
-        {
-            return false;
-        }
-        for (size_t i = 0; i < flat_from.tuple_.length; ++i)
-        {
-            if (!is_implicitly_convertible(flat_from.tuple_.elements[i], flat_into.tuple_.elements[i]))
-            {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    case type_kind_integer_range:
-        return integer_less_or_equals(flat_into.integer_range_.minimum, flat_from.integer_range_.minimum) &&
-               integer_less_or_equals(flat_from.integer_range_.maximum, flat_into.integer_range_.maximum);
-
-    case type_kind_method_pointer:
-    case type_kind_lambda:
-    case type_kind_structure:
-    case type_kind_enum_constructor:
-    case type_kind_interface:
-        LPG_TO_DO();
-    }
-    LPG_UNREACHABLE();
-}
-
 static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions)
 {
     switch (callee.kind)
