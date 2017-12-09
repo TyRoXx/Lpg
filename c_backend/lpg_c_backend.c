@@ -1556,6 +1556,18 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success;
 
         case value_kind_type_erased:
+        {
+            ASSUME(input.literal.type_of.kind == type_kind_interface);
+            memory_writer self = {NULL, 0, 0};
+            LPG_TRY(generate_value(
+                *input.literal.value_.type_erased.self, input.literal.type_of, state, memory_writer_erase(&self)));
+            LPG_TRY(generate_erase_type(state, input.literal.into, input.literal.value_.type_erased.impl,
+                                        unicode_view_create(self.data, self.used), false, state->all_functions,
+                                        state->all_interfaces, current_function, indentation, c_output));
+            memory_writer_free(&self);
+            return success;
+        }
+
         case value_kind_flat_object:
             LPG_TO_DO();
 

@@ -21,10 +21,20 @@ let h = ()
     assert(integer-equals(b, 23))
 h()
 
-/*capture an argument*/
-let f6 = (a: boolean)
-    () a
-assert(f6(boolean.true)())
+/*capture an argument at compile time*/
+let f6 = (a: boolean, b: boolean)
+    (c: unit, d: unit)
+        side-effect()
+        and(a, b)
+assert(f6(boolean.true, boolean.true)(unit_value, unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side-effect()
+    (c: unit, d: unit)
+        side-effect()
+        and(a, b)
+assert(f7(boolean.true, boolean.true)(unit_value, unit_value))
 
 /*capture multiple variables*/
 let x = 2

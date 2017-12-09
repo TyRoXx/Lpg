@@ -81,3 +81,8 @@ impl test-interface for unit
 
 let g : test-interface = unit_value
 assert(string-equals("test", g.method(boolean.true, boolean.false).print()))
+
+let create-impl = (): test-interface
+    unit_value
+let compile-time-impl = create-impl()
+assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))

@@ -14,7 +14,8 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     switch (root.kind)
     {
     case value_kind_type_erased:
-        LPG_TO_DO();
+        mark_value(*root.type_erased.self, used_functions, all_functions, all_interfaces);
+        break;
 
     case value_kind_function_pointer:
     {
@@ -159,6 +160,12 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
             clone_function_pointer_value(from.function_pointer, clone_gc, new_function_ids));
 
     case value_kind_type_erased:
+    {
+        value *const self = garbage_collector_allocate(clone_gc, sizeof(*self));
+        *self = adapt_value(*from.type_erased.self, clone_gc, new_function_ids);
+        return value_from_type_erased(type_erased_value_create(from.type_erased.impl, self));
+    }
+
     case value_kind_flat_object:
         LPG_TO_DO();
 

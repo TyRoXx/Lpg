@@ -45,9 +45,11 @@ static success_indicator encode_string_literal(unicode_view const content, strea
 }
 
 static success_indicator generate_value(value const generated, type const type_of,
-                                        interface const *const all_interfaces, stream_writer const javascript_output);
+                                        checked_function const *all_functions, interface const *const all_interfaces,
+                                        stream_writer const javascript_output);
 
-static success_indicator generate_enum_element(enum_element_value const element, interface const *const all_interfaces,
+static success_indicator generate_enum_element(enum_element_value const element, checked_function const *all_functions,
+                                               interface const *const all_interfaces,
                                                stream_writer const javascript_output)
 {
     if (element.state)
@@ -55,7 +57,7 @@ static success_indicator generate_enum_element(enum_element_value const element,
         LPG_TRY(stream_writer_write_string(javascript_output, "["));
         LPG_TRY(stream_writer_write_integer(javascript_output, integer_create(0, element.which)));
         LPG_TRY(stream_writer_write_string(javascript_output, ", "));
-        LPG_TRY(generate_value(*element.state, element.state_type, all_interfaces, javascript_output));
+        LPG_TRY(generate_value(*element.state, element.state_type, all_functions, all_interfaces, javascript_output));
         LPG_TRY(stream_writer_write_string(javascript_output, "]"));
         return success;
     }
@@ -81,8 +83,109 @@ static success_indicator generate_implementation_name(interface_id const interfa
     return success;
 }
 
+static success_indicator generate_capture_alias(size_t const index, stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "capture_"));
+    return stream_writer_write_integer(javascript_output, integer_create(0, index));
+}
+
+static success_indicator generate_lambda_value_from_registers(checked_function const *all_functions,
+                                                              function_id const lambda,
+                                                              register_id const *const captures,
+                                                              size_t const capture_count,
+                                                              stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "(function () { "));
+    for (register_id i = 0; i < capture_count; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(javascript_output, "var "));
+        LPG_TRY(generate_capture_alias(i, javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, " = "));
+        LPG_TRY(generate_register_name(captures[i], javascript_output));
+        LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, "return function ("));
+    checked_function const *const function = &all_functions[lambda];
+    for (register_id i = 0; i < function->signature->parameters.length; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        LPG_TRY(generate_register_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
+    LPG_TRY(generate_function_name(lambda, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "("));
+    bool comma = false;
+    for (register_id i = 0; i < capture_count; ++i)
+    {
+        if (comma)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        else
+        {
+            comma = true;
+        }
+        LPG_TRY(generate_capture_alias(i, javascript_output));
+    }
+    ASSUME(comma);
+    for (register_id i = 0; i < function->signature->parameters.length; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        LPG_TRY(generate_register_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, "); }; })()"));
+    return success;
+}
+
+static success_indicator generate_lambda_value_from_values(checked_function const *all_functions,
+                                                           interface const *const all_interfaces,
+                                                           function_id const lambda, value const *const captures,
+                                                           size_t const capture_count,
+                                                           stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "function ("));
+    checked_function const *const function = &all_functions[lambda];
+    for (register_id i = 0; i < function->signature->parameters.length; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        LPG_TRY(generate_register_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
+    LPG_TRY(generate_function_name(lambda, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "("));
+    bool comma = false;
+    for (register_id i = 0; i < capture_count; ++i)
+    {
+        if (comma)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        else
+        {
+            comma = true;
+        }
+        LPG_TRY(generate_value(
+            captures[i], function->signature->captures.elements[i], all_functions, all_interfaces, javascript_output));
+    }
+    ASSUME(comma);
+    for (register_id i = 0; i < function->signature->parameters.length; ++i)
+    {
+        LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        LPG_TRY(generate_register_name(i, javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, "); }"));
+    return success;
+}
+
 static success_indicator generate_value(value const generated, type const type_of,
-                                        interface const *const all_interfaces, stream_writer const javascript_output)
+                                        checked_function const *all_functions, interface const *const all_interfaces,
+                                        stream_writer const javascript_output)
 {
     switch (generated.kind)
     {
@@ -95,7 +198,7 @@ static success_indicator generate_value(value const generated, type const type_o
                                all_interfaces[generated.type_erased.impl.target]
                                    .implementations[generated.type_erased.impl.implementation_index]
                                    .self,
-                               all_interfaces, javascript_output));
+                               all_functions, all_interfaces, javascript_output));
         LPG_TRY(stream_writer_write_string(javascript_output, ")"));
         return success;
 
@@ -110,6 +213,13 @@ static success_indicator generate_value(value const generated, type const type_o
         return encode_string_literal(generated.string_ref, javascript_output);
 
     case value_kind_function_pointer:
+        ASSUME(!generated.function_pointer.external);
+        if (generated.function_pointer.capture_count > 0)
+        {
+            return generate_lambda_value_from_values(all_functions, all_interfaces, generated.function_pointer.code,
+                                                     generated.function_pointer.captures,
+                                                     generated.function_pointer.capture_count, javascript_output);
+        }
         return generate_function_name(generated.function_pointer.code, javascript_output);
 
     case value_kind_flat_object:
@@ -119,7 +229,7 @@ static success_indicator generate_value(value const generated, type const type_o
         return stream_writer_write_string(javascript_output, "/*TODO type*/ undefined");
 
     case value_kind_enum_element:
-        return generate_enum_element(generated.enum_element, all_interfaces, javascript_output);
+        return generate_enum_element(generated.enum_element, all_functions, all_interfaces, javascript_output);
 
     case value_kind_unit:
         return stream_writer_write_string(javascript_output, "undefined");
@@ -135,8 +245,8 @@ static success_indicator generate_value(value const generated, type const type_o
             {
                 LPG_TRY(stream_writer_write_string(javascript_output, ", "));
             }
-            LPG_TRY(generate_value(
-                generated.tuple_.elements[i], type_of.tuple_.elements[i], all_interfaces, javascript_output));
+            LPG_TRY(generate_value(generated.tuple_.elements[i], type_of.tuple_.elements[i], all_functions,
+                                   all_interfaces, javascript_output));
         }
         LPG_TRY(stream_writer_write_string(javascript_output, "]"));
         return success;
@@ -188,10 +298,11 @@ static success_indicator write_register(function_generation *const state, regist
 }
 
 static success_indicator generate_literal(function_generation *const state, literal_instruction const generated,
-                                          interface const *const all_interfaces, stream_writer const javascript_output)
+                                          checked_function const *all_functions, interface const *const all_interfaces,
+                                          stream_writer const javascript_output)
 {
     LPG_TRY(write_register(state, generated.into, javascript_output));
-    LPG_TRY(generate_value(generated.value_, generated.type_of, all_interfaces, javascript_output));
+    LPG_TRY(generate_value(generated.value_, generated.type_of, all_functions, all_interfaces, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return success;
 }
@@ -374,45 +485,9 @@ static success_indicator generate_lambda_with_captures(function_generation *cons
                                                        stream_writer const javascript_output)
 {
     LPG_TRY(write_register(state, generated.into, javascript_output));
-    LPG_TRY(stream_writer_write_string(javascript_output, "function ("));
-    checked_function const *const function = &state->all_functions[generated.lambda];
-    for (register_id i = 0; i < function->signature->parameters.length; ++i)
-    {
-        if (i > 0)
-        {
-            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
-        }
-        LPG_TRY(generate_register_name(i, javascript_output));
-    }
-    LPG_TRY(stream_writer_write_string(javascript_output, ") { return "));
-    LPG_TRY(generate_function_name(generated.lambda, javascript_output));
-    LPG_TRY(stream_writer_write_string(javascript_output, "("));
-    bool comma = false;
-    for (register_id i = 0; i < generated.capture_count; ++i)
-    {
-        if (comma)
-        {
-            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
-        }
-        else
-        {
-            comma = true;
-        }
-        LPG_TRY(generate_register_name(generated.captures[i], javascript_output));
-    }
-    for (register_id i = 0; i < function->signature->parameters.length; ++i)
-    {
-        if (comma)
-        {
-            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
-        }
-        else
-        {
-            comma = true;
-        }
-        LPG_TRY(generate_register_name(i, javascript_output));
-    }
-    LPG_TRY(stream_writer_write_string(javascript_output, "); };\n"));
+    LPG_TRY(generate_lambda_value_from_registers(
+        state->all_functions, generated.lambda, generated.captures, generated.capture_count, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return success;
 }
 
@@ -491,7 +566,8 @@ static success_indicator generate_instruction(function_generation *const state, 
         return stream_writer_write_string(javascript_output, "break;\n");
 
     case instruction_literal:
-        return generate_literal(state, generated.literal, state->all_interfaces, javascript_output);
+        return generate_literal(
+            state, generated.literal, state->all_functions, state->all_interfaces, javascript_output);
 
     case instruction_tuple:
         return generate_tuple(state, generated.tuple_, javascript_output);
