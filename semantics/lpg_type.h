@@ -65,6 +65,7 @@ typedef struct integer_range
 
 integer_range integer_range_create(integer minimum, integer maximum);
 bool integer_range_equals(integer_range const left, integer_range const right);
+integer integer_range_size(integer_range const value);
 
 typedef enum type_kind
 {

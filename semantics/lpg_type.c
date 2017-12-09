@@ -485,3 +485,10 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     LPG_UNREACHABLE();
 }
+
+integer integer_range_size(integer_range const value)
+{
+    integer range_size_zero_based = integer_subtract(value.maximum, value.minimum);
+    ASSUME(integer_add(&range_size_zero_based, integer_create(0, 1)));
+    return range_size_zero_based;
+}
