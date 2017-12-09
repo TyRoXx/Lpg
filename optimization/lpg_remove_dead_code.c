@@ -34,9 +34,6 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             find_used_registers(current_instruction.loop, registers_read_from);
             break;
 
-        case instruction_global:
-            break;
-
         case instruction_read_struct:
             ASSUME(current_instruction.read_struct.from_object != no_register);
             registers_read_from[current_instruction.read_struct.from_object] = true;
@@ -46,7 +43,9 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             registers_read_from[current_instruction.break_into] = true;
             break;
 
+        case instruction_global:
         case instruction_literal:
+        case instruction_get_captures:
             break;
 
         case instruction_tuple:
@@ -68,9 +67,6 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
                 registers_read_from[current_instruction.match.cases[j].value] = true;
                 find_used_registers(current_instruction.match.cases[j].action, registers_read_from);
             }
-            break;
-
-        case instruction_get_captures:
             break;
 
         case instruction_lambda_with_captures:

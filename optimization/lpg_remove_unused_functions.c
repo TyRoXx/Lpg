@@ -16,10 +16,6 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     case value_kind_type_erased:
         LPG_TO_DO();
 
-    case value_kind_integer:
-    case value_kind_string:
-        break;
-
     case value_kind_function_pointer:
     {
         function_id const referenced = root.function_pointer.code;
@@ -27,6 +23,8 @@ static void mark_value(value const root, bool *used_functions, checked_function 
         break;
     }
 
+    case value_kind_integer:
+    case value_kind_string:
     case value_kind_flat_object:
     case value_kind_type:
     case value_kind_enum_element:
@@ -146,6 +144,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     switch (from.kind)
     {
     case value_kind_integer:
+    case value_kind_unit:
         return from;
 
     case value_kind_string:
@@ -175,9 +174,6 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         }
         return value_from_enum_element(from.enum_element.which, from.enum_element.state_type, state);
     }
-
-    case value_kind_unit:
-        return from;
 
     case value_kind_tuple:
     {
@@ -245,13 +241,13 @@ static instruction clone_instruction(instruction const original, garbage_collect
     }
 
     case instruction_global:
+    case instruction_break:
+    case instruction_enum_construct:
+    case instruction_get_captures:
         return original;
 
     case instruction_read_struct:
         ASSUME(original.read_struct.from_object != ~(register_id)0);
-        return original;
-
-    case instruction_break:
         return original;
 
     case instruction_literal:
@@ -275,9 +271,6 @@ static instruction clone_instruction(instruction const original, garbage_collect
             tuple_instruction_create(elements, original.tuple_.element_count, original.tuple_.result, cloned_type));
     }
 
-    case instruction_enum_construct:
-        return original;
-
     case instruction_match:
     {
         match_instruction_case *const cases = allocate_array(original.match.count, sizeof(*cases));
@@ -291,9 +284,6 @@ static instruction clone_instruction(instruction const original, garbage_collect
                                                                  original.match.result,
                                                                  type_clone(original.match.result_type, clone_gc)));
     }
-
-    case instruction_get_captures:
-        return original;
 
     case instruction_lambda_with_captures:
     {
