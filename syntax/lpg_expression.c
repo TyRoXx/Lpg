@@ -44,7 +44,11 @@ bool function_header_tree_equals(function_header_tree const left, function_heade
             return false;
         }
     }
-    return true;
+    if (left.return_type && right.return_type)
+    {
+        return expression_equals(left.return_type, right.return_type);
+    }
+    return (left.return_type == right.return_type);
 }
 
 lambda lambda_create(function_header_tree header, expression *result)
