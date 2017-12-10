@@ -766,9 +766,15 @@ static success_indicator generate_add_reference(unicode_view const value, type c
         return generate_add_reference_to_tuple(
             value, all_functions[what.lambda.lambda].signature->captures, indentation, all_functions, c_output);
 
+    case type_kind_interface:
+        LPG_TRY(stream_writer_write_unicode_view(c_output, value));
+        LPG_TRY(stream_writer_write_string(c_output, ".vtable->_add_reference("));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, value));
+        LPG_TRY(stream_writer_write_string(c_output, ".self, 1);\n"));
+        return success;
+
     case type_kind_structure:
     case type_kind_method_pointer:
-    case type_kind_interface:
     case type_kind_enum_constructor:
         LPG_TO_DO();
     }

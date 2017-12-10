@@ -86,3 +86,9 @@ let create-impl = (): test-interface
     unit_value
 let compile-time-impl = create-impl()
 assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
+
+let captures-impl = ()
+    side-effect()
+    ()
+        assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
+captures-impl()()
