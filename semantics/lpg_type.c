@@ -90,18 +90,6 @@ void interface_free(interface const value)
     }
 }
 
-integer_range integer_range_create(integer minimum, integer maximum)
-{
-    ASSUME(integer_less_or_equals(minimum, maximum));
-    integer_range const result = {minimum, maximum};
-    return result;
-}
-
-bool integer_range_equals(integer_range const left, integer_range const right)
-{
-    return integer_equal(left.minimum, right.minimum) && integer_equal(left.maximum, right.maximum);
-}
-
 lambda_type lambda_type_create(function_id const lambda)
 {
     lambda_type const result = {lambda};
@@ -483,17 +471,4 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
-}
-
-integer integer_range_size(integer_range const value)
-{
-    integer range_size_zero_based = integer_subtract(value.maximum, value.minimum);
-    ASSUME(integer_add(&range_size_zero_based, integer_create(0, 1)));
-    return range_size_zero_based;
-}
-
-bool integer_range_contains(integer_range const haystack, integer_range const needle)
-{
-    return integer_less_or_equals(haystack.minimum, needle.minimum) &&
-           integer_less_or_equals(needle.maximum, haystack.maximum);
 }
