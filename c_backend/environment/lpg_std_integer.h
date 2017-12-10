@@ -4,12 +4,12 @@
 #include "lpg_std_string.h"
 #include <stdio.h>
 
-static bool integer_equals(uint64_t const left, uint64_t const right)
+static size_t integer_equals(uint64_t const left, uint64_t const right)
 {
     return (left == right);
 }
 
-static bool integer_less(uint64_t const left, uint64_t const right)
+static size_t integer_less(uint64_t const left, uint64_t const right)
 {
     return (left < right);
 }
