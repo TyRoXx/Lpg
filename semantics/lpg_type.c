@@ -92,6 +92,7 @@ void interface_free(interface const value)
 
 integer_range integer_range_create(integer minimum, integer maximum)
 {
+    ASSUME(integer_less_or_equals(minimum, maximum));
     integer_range const result = {minimum, maximum};
     return result;
 }

@@ -65,6 +65,7 @@ typedef struct type_definition
     type what;
     unicode_string name;
     unicode_string definition;
+    size_t order;
 } type_definition;
 
 static void type_definition_free(type_definition const definition)
@@ -77,6 +78,7 @@ typedef struct type_definitions
 {
     type_definition *elements;
     size_t count;
+    size_t next_order;
 } type_definitions;
 
 static void type_definitions_free(type_definitions const definitions)
@@ -89,6 +91,25 @@ static void type_definitions_free(type_definitions const definitions)
     {
         deallocate(definitions.elements);
     }
+}
+
+static size_t *type_definitions_sort_by_order(type_definitions const definitions)
+{
+    size_t *const result = allocate_array(definitions.count, sizeof(*result));
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        result[i] = ~(size_t)0;
+    }
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        ASSUME(result[definitions.elements[i].order] == ~(size_t)0);
+        result[definitions.elements[i].order] = i;
+    }
+    for (size_t i = 0; i < definitions.count; ++i)
+    {
+        ASSUME(result[i] != ~(size_t)0);
+    }
+    return result;
 }
 
 typedef struct c_backend_state
@@ -321,6 +342,7 @@ generate_c_function_pointer(type const generated, standard_library_usage *const 
     type_definition *const new_definition = definitions->elements + definition_index;
     new_definition->definition.data = definition_buffer.data;
     new_definition->definition.length = definition_buffer.used;
+    new_definition->order = definitions->next_order++;
     return stream_writer_write_unicode_view(c_output, unicode_view_from_string(name));
 }
 
@@ -621,6 +643,7 @@ static success_indicator generate_type(type const generated, standard_library_us
         type_definition *const new_definition = definitions->elements + definition_index;
         new_definition->definition.data = definition_buffer.data;
         new_definition->definition.length = definition_buffer.used;
+        new_definition->order = definitions->next_order++;
         return stream_writer_write_unicode_view(c_output, unicode_view_from_string(name));
     }
 
@@ -952,7 +975,18 @@ static success_indicator generate_value(value const generated, type const type_o
         {
             LPG_TO_DO();
         }
-        LPG_TRY(generate_function_name(generated.function_pointer.code, c_output));
+        if (generated.function_pointer.capture_count > 0)
+        {
+            LPG_TRY(generate_value(
+                value_from_tuple(
+                    value_tuple_create(generated.function_pointer.captures, generated.function_pointer.capture_count)),
+                type_from_tuple_type(state->all_functions[type_of.lambda.lambda].signature->captures), state,
+                c_output));
+        }
+        else
+        {
+            LPG_TRY(generate_function_name(generated.function_pointer.code, c_output));
+        }
         return success;
     }
 
@@ -1076,9 +1110,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_unit:
             LPG_UNREACHABLE();
 
-        case register_meaning_capture:
-            LPG_TO_DO();
-
         case register_meaning_side_effect:
             state->standard_library.using_unit = true;
             set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_unit());
@@ -1164,6 +1195,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success;
 
+        case register_meaning_capture:
         case register_meaning_variable:
         {
             type result_type = type_from_unit();
@@ -1233,7 +1265,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 if (callee_signature.captures.length > 0)
                 {
                     LPG_TRY(stream_writer_write_string(c_output, "&"));
-                    LPG_TRY(generate_register_name(input.call.callee, current_function, c_output));
+                    LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
                     comma = true;
                 }
                 for (size_t i = 0; i < input.call.argument_count; ++i)
@@ -1996,7 +2028,7 @@ success_indicator generate_c(checked_program const program, enumeration const *c
 
     standard_library_usage standard_library = {false, false, false, false, false, false, false};
 
-    type_definitions definitions = {NULL, 0};
+    type_definitions definitions = {NULL, 0, 0};
 
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
@@ -2093,11 +2125,20 @@ success_indicator generate_c(checked_program const program, enumeration const *c
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     }
 
-    for (size_t i = 0; i < definitions.count; ++i)
+    ASSUME(definitions.count == definitions.next_order);
     {
-        LPG_TRY_GOTO(
-            stream_writer_write_unicode_view(c_output, unicode_view_from_string(definitions.elements[i].definition)),
-            fail);
+        size_t *const ordered_definitions = type_definitions_sort_by_order(definitions);
+        for (size_t i = 0; i < definitions.count; ++i)
+        {
+            size_t const definition_index = ordered_definitions[i];
+            LPG_TRY_GOTO(stream_writer_write_unicode_view(
+                             c_output, unicode_view_from_string(definitions.elements[definition_index].definition)),
+                         fail);
+        }
+        if (ordered_definitions)
+        {
+            deallocate(ordered_definitions);
+        }
     }
 
     LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined.data, program_defined.used), fail);
