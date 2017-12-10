@@ -1078,6 +1078,19 @@ evaluate_expression_result evaluate_not_expression(function_checking_state *stat
     return evaluate_expression_result_empty;
 }
 
+void deallocate_cases(match_instruction_case *cases, bool *integers_handled, size_t i)
+{
+    for (size_t j = 0; j < i; ++j)
+    {
+        match_instruction_case_free(cases[j]);
+    }
+    if (cases)
+    {
+        deallocate(cases);
+    }
+    deallocate(integers_handled);
+}
+
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
                                                      const expression *element)
 {

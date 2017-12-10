@@ -473,8 +473,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
 
     case type_kind_integer_range:
-        return integer_less_or_equals(flat_into.integer_range_.minimum, flat_from.integer_range_.minimum) &&
-               integer_less_or_equals(flat_from.integer_range_.maximum, flat_into.integer_range_.maximum);
+        return integer_range_contains(flat_into.integer_range_, flat_from.integer_range_);
 
     case type_kind_method_pointer:
     case type_kind_lambda:
@@ -491,4 +490,10 @@ integer integer_range_size(integer_range const value)
     integer range_size_zero_based = integer_subtract(value.maximum, value.minimum);
     ASSUME(integer_add(&range_size_zero_based, integer_create(0, 1)));
     return range_size_zero_based;
+}
+
+bool integer_range_contains(integer_range const haystack, integer_range const needle)
+{
+    return integer_less_or_equals(haystack.minimum, needle.minimum) &&
+           integer_less_or_equals(needle.maximum, haystack.maximum);
 }
