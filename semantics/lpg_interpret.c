@@ -130,6 +130,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             case value_kind_enum_element:
             case value_kind_unit:
             case value_kind_tuple:
+                LPG_UNREACHABLE();
+
             case value_kind_enum_constructor:
                 LPG_TO_DO();
             }

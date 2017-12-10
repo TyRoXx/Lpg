@@ -827,13 +827,13 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_or:
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
+    case register_meaning_unit:
         return success;
 
-    case register_meaning_captures:
     case register_meaning_nothing:
+    case register_meaning_captures:
     case register_meaning_global:
-    case register_meaning_unit:
-        LPG_TO_DO();
+        LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();
 }
@@ -1235,13 +1235,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 return success;
             }
 
-            case type_kind_interface:
-                LPG_TO_DO();
-
             case type_kind_function_pointer:
                 result_type = callee_type.function_pointer_->result;
                 break;
 
+            case type_kind_interface:
             case type_kind_structure:
             case type_kind_unit:
             case type_kind_string_ref:
@@ -1249,6 +1247,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_tuple:
             case type_kind_type:
             case type_kind_integer_range:
+                LPG_UNREACHABLE();
+
             case type_kind_enum_constructor:
                 LPG_TO_DO();
 
@@ -1331,8 +1331,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success;
 
         case register_meaning_argument:
-        case register_meaning_captures:
             LPG_TO_DO();
+
+        case register_meaning_captures:
+            LPG_UNREACHABLE();
         }
         LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
@@ -1375,10 +1377,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_and:
         case register_meaning_not:
         case register_meaning_or:
+        case register_meaning_unit:
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
-        case register_meaning_unit:
             LPG_TO_DO();
 
         case register_meaning_global:
@@ -1458,11 +1460,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const object_type = state->registers[input.read_struct.from_object].type_of.value;
             switch (object_type.kind)
             {
-            case type_kind_method_pointer:
-            case type_kind_interface:
-            case type_kind_lambda:
-                LPG_TO_DO();
-
             case type_kind_structure:
             {
                 structure const struct_ = state->all_structs[object_type.structure_];
@@ -1498,6 +1495,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 return success;
             }
 
+            case type_kind_method_pointer:
+            case type_kind_interface:
+            case type_kind_lambda:
             case type_kind_function_pointer:
             case type_kind_unit:
             case type_kind_string_ref:
@@ -1829,8 +1829,6 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         return success;
 
     case type_kind_enum_constructor:
-        LPG_TO_DO();
-
     case type_kind_function_pointer:
     case type_kind_type:
     case type_kind_unit:
