@@ -1527,21 +1527,39 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success;
 
         case value_kind_function_pointer:
-        {
             if (input.literal.value_.function_pointer.external)
             {
                 LPG_TO_DO();
             }
-            LPG_TRY(generate_c_function_pointer(
-                type_from_function_pointer(state->all_functions[input.literal.value_.function_pointer.code].signature),
-                &state->standard_library, state->definitions, state->all_functions, state->all_interfaces, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " const "));
-            LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = "));
-            LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            if (input.literal.value_.function_pointer.capture_count > 0)
+            {
+                tuple_type const captures =
+                    all_functions[input.literal.value_.function_pointer.code].signature->captures;
+                LPG_TRY(generate_type(type_from_tuple_type(captures), &state->standard_library, state->definitions,
+                                      state->all_functions, state->all_interfaces, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " const "));
+                LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_value(
+                    value_from_tuple(value_tuple_create(input.literal.value_.function_pointer.captures,
+                                                        input.literal.value_.function_pointer.capture_count)),
+                    type_from_tuple_type(captures), state, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            }
+            else
+            {
+                LPG_TRY(generate_c_function_pointer(
+                    type_from_function_pointer(
+                        state->all_functions[input.literal.value_.function_pointer.code].signature),
+                    &state->standard_library, state->definitions, state->all_functions, state->all_interfaces,
+                    c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " const "));
+                LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            }
             return success;
-        }
 
         case value_kind_tuple:
             ASSUME(input.literal.type_of.kind == type_kind_tuple);

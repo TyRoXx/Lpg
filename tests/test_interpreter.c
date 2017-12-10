@@ -160,7 +160,11 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         memory_writer cmakelists_content = {NULL, 0, 0};
         stream_writer writer = memory_writer_erase(&cmakelists_content);
         REQUIRE(success == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
-                                                              "project(generated_test_solution)\n"));
+                                                              "project(generated_test_solution)\n"
+                                                              "if(MSVC)\n"
+                                                              "    add_definitions(/WX)\n"
+                                                              "    add_definitions(/wd4101)\n"
+                                                              "endif()\n"));
         REQUIRE(success == stream_writer_write_string(writer, "include_directories(\""));
         {
             unicode_view const pieces[] = {path_remove_leaf(path_remove_leaf(unicode_view_from_c_str(__FILE__))),
