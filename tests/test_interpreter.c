@@ -184,7 +184,8 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_string const cmakecache = path_combine(cmakecache_pieces, LPG_ARRAY_SIZE(cmakecache_pieces));
         if (!file_exists(unicode_view_from_string(cmakecache)))
         {
-            unicode_view const cmake_arguments[] = {unicode_view_from_c_str(".")};
+            unicode_view const cmake_arguments[] = {
+                unicode_view_from_c_str("-DCMAKE_BUILD_TYPE=DEBUG"), unicode_view_from_c_str(".")};
             create_process_result const cmake_process =
                 create_process(unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments,
                                LPG_ARRAY_SIZE(cmake_arguments), unicode_view_from_string(c_test_dir),
@@ -214,9 +215,18 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
 #endif
                                                                )};
         unicode_string const test_executable = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
+#ifdef __linux__
+        unicode_view const arguments[] = {unicode_view_from_c_str("--error-exitcode=42"),
+                                          unicode_view_from_c_str("--leak-check=full"),
+                                          unicode_view_from_string(test_executable)};
+        create_process_result const process = create_process(
+            unicode_view_from_c_str("/usr/bin/valgrind"), arguments, LPG_ARRAY_SIZE(arguments),
+            unicode_view_from_string(c_test_dir), get_standard_input(), get_standard_output(), get_standard_error());
+#else
         create_process_result const process =
             create_process(unicode_view_from_string(test_executable), NULL, 0, unicode_view_from_string(c_test_dir),
                            get_standard_input(), get_standard_output(), get_standard_error());
+#endif
         unicode_string_free(&test_executable);
         REQUIRE(process.success == success);
         REQUIRE(0 == wait_for_process_exit(process.created));
