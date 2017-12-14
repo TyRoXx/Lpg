@@ -74,11 +74,15 @@ success_indicator save_sequence(stream_writer const to, sequence const value, wh
 {
     LPG_FOR(size_t, i, value.length)
     {
-        /*we break the line here, so the space should not be generated
-        * before the sequence element:*/
-        whitespace.pending_space = 0;
-
-        LPG_TRY(stream_writer_write_string(to, "\n"));
+        if (whitespace.pending_space)
+        {
+            whitespace.pending_space = 0;
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+        }
+        else if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+        }
         LPG_TRY(indent(to, whitespace));
         LPG_TRY(save_expression(to, value.elements + i, whitespace));
     }
@@ -183,6 +187,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_sequence:
     {
         whitespace_state in_sequence = go_deeper(whitespace, 1);
+        in_sequence.pending_space = true;
         return save_sequence(to, value->sequence, in_sequence);
     }
 

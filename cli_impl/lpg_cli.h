@@ -5,6 +5,7 @@
 typedef struct compiler_flags
 {
     bool compile_only;
+    bool format;
 } compiler_flags;
 
 typedef struct compiler_arguments

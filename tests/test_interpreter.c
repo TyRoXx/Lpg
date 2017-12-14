@@ -5,6 +5,7 @@
 #include "handle_parse_error.h"
 #include "lpg_check.h"
 #include "lpg_standard_library.h"
+#include "lpg_write_file.h"
 #include <string.h>
 #include "duktape.h"
 #include "lpg_javascript_backend.h"
@@ -96,29 +97,6 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     (void)udata;
     fprintf(stderr, "%s\n", msg);
     FAIL();
-}
-
-static success_indicator write_file(unicode_view const path, unicode_view const content)
-{
-    unicode_string const path_zero_terminated = unicode_view_zero_terminate(path);
-    FILE *file;
-#ifdef _MSC_VER
-    fopen_s(&file, path_zero_terminated.data, "wb");
-#else
-    file = fopen(path_zero_terminated.data, "wb");
-#endif
-    unicode_string_free(&path_zero_terminated);
-    if (!file)
-    {
-        return failure;
-    }
-    if (fwrite(content.begin, 1, content.length, file) != content.length)
-    {
-        fclose(file);
-        return failure;
-    }
-    fclose(file);
-    return success;
 }
 
 static void write_file_if_necessary(unicode_view const path, unicode_view const content)

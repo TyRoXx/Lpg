@@ -9,6 +9,13 @@
 #include "lpg_allocate.h"
 #include "lpg_read_file.h"
 #include "lpg_standard_library.h"
+#include "lpg_save_expression.h"
+#include "lpg_write_file.h"
+#ifdef __linux__
+#include <fcntl.h>
+#include <errno.h>
+#endif
+#include <stdio.h>
 
 typedef struct cli_parser_user
 {
@@ -240,13 +247,17 @@ static void handle_semantic_error(semantic_error const error, void *user)
 
 static compiler_flags parse_compiler_flags(int const argument_count, char **const arguments, bool *const valid)
 {
-    compiler_flags result = {false};
+    compiler_flags result = {false, false};
     for (int i = 2; i < argument_count; ++i)
     {
-        unicode_view possible_flag = unicode_view_from_c_str(arguments[i]);
+        unicode_view const possible_flag = unicode_view_from_c_str(arguments[i]);
         if (unicode_view_equals(possible_flag, unicode_view_from_c_str("--compile-only")))
         {
             result.compile_only = true;
+        }
+        else if (unicode_view_equals(possible_flag, unicode_view_from_c_str("--format")))
+        {
+            result.format = true;
         }
         else
         {
@@ -258,7 +269,7 @@ static compiler_flags parse_compiler_flags(int const argument_count, char **cons
 
 static compiler_arguments parse_compiler_arguments(int const argument_count, char **const arguments)
 {
-    compiler_arguments result = {false, "", {false}};
+    compiler_arguments result = {false, "", {false, false}};
     if (argument_count < 2)
     {
         result.valid = false;
@@ -296,10 +307,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
         return true;
     }
 
-    standard_library_description const standard_library = describe_standard_library();
-
     value globals_values[standard_library_element_count];
-    ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
 
     for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
     {
@@ -310,10 +318,46 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
     if (!root.has_value)
     {
         sequence_free(&root.value);
-        standard_library_description_free(&standard_library);
         unicode_string_free(&source);
         return true;
     }
+
+    if (arguments.flags.format)
+    {
+        memory_writer format_buffer = {NULL, 0, 0};
+        whitespace_state const whitespace = {0, false};
+        if ((save_sequence(memory_writer_erase(&format_buffer), root.value, whitespace) != success) ||
+            (stream_writer_write_bytes(memory_writer_erase(&format_buffer), "", 1) != success))
+        {
+            memory_writer_free(&format_buffer);
+            sequence_free(&root.value);
+            unicode_string_free(&source);
+            return true;
+        }
+
+        sequence_free(&root.value);
+
+        unicode_string temporary = write_temporary_file(format_buffer.data);
+        if (rename(unicode_string_c_str(&temporary), arguments.file_name) < 0)
+        {
+            const int error = errno;
+            ASSERT(success == stream_writer_write_string(diagnostics, "Could not write formatted file: "));
+            ASSERT(success == stream_writer_write_integer(diagnostics, integer_create(0, (unsigned)error)));
+            ASSERT(success == stream_writer_write_string(diagnostics, "\n"));
+            memory_writer_free(&format_buffer);
+            unicode_string_free(&temporary);
+            unicode_string_free(&source);
+            return true;
+        }
+
+        memory_writer_free(&format_buffer);
+        unicode_string_free(&temporary);
+        unicode_string_free(&source);
+        return false;
+    }
+
+    standard_library_description const standard_library = describe_standard_library();
+    ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
     checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &context);
     sequence_free(&root.value);

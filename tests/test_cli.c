@@ -3,45 +3,13 @@
 #include "lpg_cli.h"
 #include "lpg_array_size.h"
 #include "lpg_allocate.h"
+#include "lpg_read_file.h"
+#include "lpg_write_file.h"
 #include <stdio.h>
 #include <string.h>
 #ifndef _WIN32
 #include <unistd.h>
 #endif
-
-static unicode_string write_file(char const *const content)
-{
-#ifdef _WIN32
-    char *const name =
-#ifdef _MSC_VER
-        _tempnam
-#else
-        tempnam
-#endif
-        (NULL, NULL);
-    REQUIRE(name);
-    size_t const name_length = strlen(name);
-    unicode_string const result = {allocate(name_length), name_length};
-    memcpy(result.data, name, name_length);
-    FILE *file = NULL;
-    fopen_s(&file, name, "wb");
-    REQUIRE(file);
-    REQUIRE(strlen(content) == fwrite(content, 1, strlen(content), file));
-    fclose(file);
-    free(name);
-    return result;
-#else
-    char name[] = "/tmp/XXXXXX";
-    int const file = mkstemp(name);
-    REQUIRE(file >= 0);
-    REQUIRE(write(file, content, strlen(content)) == (ssize_t)strlen(content));
-    close(file);
-    size_t const name_length = strlen(name);
-    unicode_string const result = {allocate(name_length), name_length};
-    memcpy(result.data, name, name_length);
-    return result;
-#endif
-}
 
 static void expect_output(int argc, char **argv, bool const expected_exit_code, char const *const expected_diagnostics)
 {
@@ -55,7 +23,7 @@ static void expect_output(int argc, char **argv, bool const expected_exit_code, 
 static void expect_output_with_source(char const *const source, bool const expected_exit_code,
                                       char const *const expected_diagnostics)
 {
-    unicode_string name = write_file(source);
+    unicode_string name = write_temporary_file(source);
     char *arguments[] = {"lpg", unicode_string_c_str(&name)};
     expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics);
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
@@ -65,7 +33,7 @@ static void expect_output_with_source(char const *const source, bool const expec
 static void expect_output_with_source_flags(char const *const source, char **const flags, const size_t flag_count,
                                             bool const expected_exit_code, char const *const expected_diagnostics)
 {
-    unicode_string name = write_file(source);
+    unicode_string name = write_temporary_file(source);
     size_t new_size = 2 + flag_count;
     char **arguments = allocate_array(new_size, sizeof(arguments));
     arguments[0] = "lpg";
@@ -78,6 +46,20 @@ static void expect_output_with_source_flags(char const *const source, char **con
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
     deallocate(arguments);
+}
+
+static void test_formatting_tool(char const *const source, char const *const expected_output,
+                                 bool const expected_exit_code, char const *const expected_diagnostics)
+{
+    unicode_string name = write_temporary_file(source);
+    char *arguments[] = {"lpg", unicode_string_c_str(&name), "--format"};
+    expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics);
+    blob_or_error const read = read_file(unicode_string_c_str(&name));
+    REQUIRE(!read.error);
+    REQUIRE(unicode_view_equals_c_str(unicode_view_create(read.success.data, read.success.length), expected_output));
+    blob_free(&read.success);
+    REQUIRE(0 == remove(unicode_string_c_str(&name)));
+    unicode_string_free(&name);
 }
 
 void test_cli(void)
@@ -181,4 +163,25 @@ void test_cli(void)
                               true, "Unknown structure element or global identifier in line 1:\n"
                                     "xor(boolean.true, boolean.false)\n"
                                     "^\n");
+
+    test_formatting_tool("", "", false, "");
+    test_formatting_tool("let i = 0", "let i = 0", false, "");
+    test_formatting_tool("loop\n"
+                         "    break\n"
+                         "match x\n"
+                         "    case 1: 0\n"
+                         "    case 2:\n"
+                         "        1\n"
+                         "let s = struct\n"
+                         "    i: unit",
+                         "loop\n"
+                         "    break\n"
+                         "match x\n"
+                         "    case 1: 0\n"
+                         "    case 2:\n"
+                         "        1\n"
+                         "\n"
+                         "let s = struct\n"
+                         "    i: unit",
+                         false, "");
 }
