@@ -7,15 +7,6 @@
 [![codecov](https://codecov.io/gh/mamazu/Lpg/branch/master/graph/badge.svg)](https://codecov.io/gh/mamazu/Lpg)
 [![Build Status](https://travis-ci.org/mamazu/Lpg.svg?branch=master)](https://travis-ci.org/mamazu/Lpg)
 
-# Lpg
-1. [Usage](#Usage)
-    1. [Compiletime Optimization](#Optimization)
-        1. [Unused Variables](#Removing_unused_concepts)
-    1. [Running LPG files](#Compilation)
-1. [Development](#Development)
-    1. [Build and run on Ubuntu](#Build-and-run-on-Ubuntu)
-    1. [Build and run on Windows](#Build-and-run-on-Windows)
-
 ## Usage
 For a general introduction, have a look at the file `documentation/Language.md`
 
