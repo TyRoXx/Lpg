@@ -55,23 +55,100 @@ bool integer_range_list_contains(integer_range_list const haystack, integer_rang
     return false;
 }
 
-static integer_range *integer_range_remove(integer_range from, integer_range what)
+static void remove_element_from_range_list(integer_range_list *const range_list, size_t index)
 {
-
-    (void)from;
-    (void)what;
-    return NULL;
+    ASSUME(range_list->length > 0);
+    ASSUME(index < range_list->length);
+    integer_range last_element = range_list->elements[range_list->length - 1];
+    range_list->elements[index] = last_element;
+    range_list->length--;
 }
 
-integer_range_list integer_range_list_remove(integer_range_list haystack, integer_range const needle)
+void integer_range_list_remove(integer_range_list *const haystack, integer_range const needle)
 {
-    for (size_t i = 0; i < haystack.length; ++i)
+    for (size_t i = 0; i < haystack->length; ++i)
     {
-        const integer_range *const elements = haystack.elements;
-        if (integer_range_contains(elements[i], needle))
+        const integer_range element = haystack->elements[i];
+        integer_range needle_copy = needle;
+        // Full remove
+        if (integer_range_equals(element, needle))
         {
-            integer_range_remove(elements[i], needle);
+            remove_element_from_range_list(haystack, i);
+            i--;
+        }
+        else if (integer_range_contains(element, needle))
+        {
+            bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
+            ASSUME(not_overflown);
+            needle_copy.minimum = integer_subtract(needle.minimum, integer_create(0, 1));
+            haystack->elements[i].maximum = needle_copy.minimum;
+
+            haystack->elements = reallocate(haystack->elements, haystack->length + 1);
+            haystack->elements[haystack->length] = integer_range_create(needle_copy.maximum, element.maximum);
+            haystack->length++;
+        }
+        /*
+         * NOTE: if the integer overflows when adding one then it will not be in the range anymore
+         *
+         * Remove left edge:
+         *  needle.min <= element.min
+         *  &&
+         *  needle.max >= element.min => element.min <= needle.max
+         */
+        else if (integer_less_or_equals(element.minimum, needle.maximum) &&
+                 integer_less_or_equals(needle.minimum, element.minimum))
+        {
+            bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
+            ASSUME(not_overflown);
+            haystack->elements[i].minimum = needle_copy.maximum;
+        }
+        /*
+         * NOTE: if the integer overflows when adding one then it will not be in the range anymore
+         *
+         * Remove right edge:
+         *   needle.min <= element.max
+         *   &&
+         *   needle.max >= element.max => element.max <= needle.max
+         *   
+         *   element = integer_create(20, 100), integer_create(30, 10)
+         *   needle  = integer_create( 0, 100), integer_create(20, 10)
+         */
+        else if (integer_less_or_equals(needle.minimum, element.maximum) &&
+                 integer_less_or_equals(needle.maximum, element.maximum))
+        {
+            bool not_overflown = integer_add(&needle_copy.minimum, integer_create(0, 1));
+            ASSUME(not_overflown);
+            haystack->elements[i].maximum = needle_copy.minimum;
         }
     }
-    return haystack;
+}
+
+void integer_range_list_merge(integer_range_list *const unmerged_list)
+{
+    for (size_t i = 0; i < unmerged_list->length; ++i)
+    {
+        integer_range first_part = unmerged_list->elements[i];
+        for (size_t j = i + 1; j < unmerged_list->length;)
+        {
+            integer_range second_part = unmerged_list->elements[j];
+            if (integer_equal(first_part.maximum, second_part.minimum))
+            {
+                // first part + second part
+                integer_range new_entry = integer_range_create(first_part.minimum, second_part.maximum);
+                unmerged_list->elements[i] = new_entry;
+                remove_element_from_range_list(unmerged_list, j);
+            }
+            else if (integer_equal(second_part.maximum, first_part.minimum))
+            {
+                // second part + first part
+                integer_range new_entry = integer_range_create(second_part.minimum, first_part.maximum);
+                unmerged_list->elements[i] = new_entry;
+                remove_element_from_range_list(unmerged_list, j);
+            }
+            else
+            {
+                j++;
+            }
+        }
+    }
 }
