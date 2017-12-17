@@ -3,6 +3,7 @@
 #include "test.h"
 #include "test_blob.h"
 #include "test_integer.h"
+#include "test_integer_range.h"
 #include "test_decode_string_literal.h"
 #include "test_unicode_string.h"
 #include "test_allocator.h"
@@ -36,6 +37,7 @@ int main(void)
     static void (*tests[])(void) = {test_blob,
                                     test_path,
                                     test_integer,
+                                    test_integer_range,
                                     test_allocator,
                                     test_unicode_string,
                                     test_unicode_view,

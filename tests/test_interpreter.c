@@ -341,6 +341,7 @@ void test_interpreter(void)
                                           "lambda-return-type.lpg",
                                           "loop.lpg",
                                           "match-enum.lpg",
+                                          "match-integer.lpg",
                                           "option.lpg",
                                           "raw-string-literal.lpg",
                                           "string-equals.lpg",

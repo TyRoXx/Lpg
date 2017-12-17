@@ -10,6 +10,7 @@
 #include "lpg_local_variable.h"
 #include "lpg_instruction_checkpoint.h"
 #include "function_checking_state.h"
+#include "lpg_integer_range.h"
 
 typedef struct evaluate_expression_result
 {
@@ -1078,9 +1079,9 @@ evaluate_expression_result evaluate_not_expression(function_checking_state *stat
     return evaluate_expression_result_empty;
 }
 
-void deallocate_cases(match_instruction_case *cases, bool *integers_handled, size_t i)
+static void deallocate_boolean_cases(match_instruction_case *cases, bool *cases_handled, size_t array_size)
 {
-    for (size_t j = 0; j < i; ++j)
+    for (size_t j = 0; j < array_size; ++j)
     {
         match_instruction_case_free(cases[j]);
     }
@@ -1088,7 +1089,16 @@ void deallocate_cases(match_instruction_case *cases, bool *integers_handled, siz
     {
         deallocate(cases);
     }
-    deallocate(integers_handled);
+    deallocate(cases_handled);
+}
+
+static void deallocate_integer_range_list_cases(match_instruction_case *cases, integer_range_list integer_ranges)
+{
+    for (size_t j = 0; j < integer_ranges.length; ++j)
+    {
+        match_instruction_case_free(cases[j]);
+    }
+    integer_range_list_deallocate(integer_ranges);
 }
 
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
@@ -1110,8 +1120,214 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 state->user);
             return evaluate_expression_result_empty;
         }
-        break;
 
+        {
+            match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
+            bool *const enum_elements_handled =
+                allocate_array((*element).match.number_of_cases, sizeof(*enum_elements_handled));
+            memset(enum_elements_handled, 0, (*element).match.number_of_cases * sizeof(*enum_elements_handled));
+            type result_type = type_from_unit();
+            optional_value compile_time_result = optional_value_empty;
+            for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+            {
+                match_case const case_tree = (*element).match.cases[i];
+                evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
+                if (!key_evaluated.has_value)
+                {
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    return key_evaluated;
+                }
+
+                if (!type_equals(key.type_, key_evaluated.type_))
+                {
+                    state->on_error(
+                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
+                        state->user);
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    return evaluate_expression_result_empty;
+                }
+
+                {
+                    ASSUME(key_evaluated.compile_time_value.value_.kind == value_kind_enum_element);
+                    bool *const case_handled =
+                        (enum_elements_handled + key_evaluated.compile_time_value.value_.enum_element.which);
+                    if (*case_handled)
+                    {
+                        state->on_error(semantic_error_create(semantic_error_duplicate_match_case,
+                                                              expression_source_begin(*case_tree.key)),
+                                        state->user);
+                        deallocate_boolean_cases(cases, enum_elements_handled, i);
+                        return evaluate_expression_result_empty;
+                    }
+                    *case_handled = true;
+                }
+
+                /*TODO: support runtime values as keys?*/
+                ASSERT(key_evaluated.compile_time_value.is_set);
+
+                instruction_sequence action = instruction_sequence_create(NULL, 0);
+                evaluate_expression_result const action_evaluated =
+                    evaluate_expression(state, &action, *case_tree.action);
+                if (!action_evaluated.has_value)
+                {
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    instruction_sequence_free(&action);
+                    return action_evaluated;
+                }
+
+                if (i == 0)
+                {
+                    result_type = action_evaluated.type_;
+                }
+                else if (!type_equals(result_type, action_evaluated.type_))
+                {
+                    /*TODO: support types that are not the same, but still comparable*/
+                    state->on_error(
+                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
+                        state->user);
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    instruction_sequence_free(&action);
+                    return evaluate_expression_result_empty;
+                }
+
+                if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
+                    value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
+                    action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
+                {
+                    compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
+                }
+
+                cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
+            }
+            for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+            {
+                ASSUME(enum_elements_handled[i]);
+            }
+            register_id result_register = allocate_register(&state->used_registers);
+            add_instruction(
+                function, instruction_create_match(match_instruction_create(
+                              key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+            deallocate(enum_elements_handled);
+            if (compile_time_result.is_set)
+            {
+                restore(before);
+                result_register = allocate_register(&state->used_registers);
+                add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                              result_register, compile_time_result.value_, result_type)));
+                return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
+            }
+
+            return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
+        }
+
+    case type_kind_integer_range:
+    {
+        integer expected_cases = integer_range_size(key.type_.integer_range_);
+        integer got_cases = integer_create(0, (*element).match.number_of_cases);
+        if (!integer_equal(got_cases, expected_cases))
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))),
+                state->user);
+            return evaluate_expression_result_empty;
+        }
+
+        match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
+
+        integer_range_list integer_ranges_unhandled =
+            integer_range_list_create_from_integer_range(key.type_.integer_range_);
+
+        type result_type = type_from_unit();
+        optional_value compile_time_result = optional_value_empty;
+
+        for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+        {
+            match_case const case_tree = (*element).match.cases[i];
+            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
+            if (!key_evaluated.has_value)
+            {
+                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                return key_evaluated;
+            }
+
+            if (key_evaluated.type_.kind != type_kind_integer_range)
+            {
+                state->on_error(
+                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
+                    state->user);
+                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                return evaluate_expression_result_empty;
+            }
+
+            {
+                if (integer_range_list_contains(integer_ranges_unhandled, key_evaluated.type_.integer_range_))
+                {
+                    integer_range_list_remove(&integer_ranges_unhandled, key_evaluated.type_.integer_range_);
+                }
+                else
+                {
+                    state->on_error(semantic_error_create(
+                                        semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
+                                    state->user);
+                    deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                    return evaluate_expression_result_empty;
+                }
+            }
+
+            /*TODO: support runtime values as keys?*/
+            ASSERT(key_evaluated.compile_time_value.is_set);
+
+            instruction_sequence action = instruction_sequence_create(NULL, 0);
+            evaluate_expression_result const action_evaluated = evaluate_expression(state, &action, *case_tree.action);
+            if (!action_evaluated.has_value)
+            {
+                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                instruction_sequence_free(&action);
+                return action_evaluated;
+            }
+
+            if (i == 0)
+            {
+                result_type = action_evaluated.type_;
+            }
+            else if (!type_equals(result_type, action_evaluated.type_))
+            {
+                /*TODO: support types that are not the same, but still comparable*/
+                state->on_error(
+                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
+                    state->user);
+                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                instruction_sequence_free(&action);
+                return evaluate_expression_result_empty;
+            }
+
+            if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
+                value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
+                action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
+            {
+                compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
+            }
+
+            cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
+        }
+
+        ASSUME(integer_ranges_unhandled.length == 0);
+        register_id result_register = allocate_register(&state->used_registers);
+        add_instruction(
+            function, instruction_create_match(match_instruction_create(
+                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+        deallocate(integer_ranges_unhandled.elements);
+        if (compile_time_result.is_set)
+        {
+            restore(before);
+            result_register = allocate_register(&state->used_registers);
+            add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                          result_register, compile_time_result.value_, result_type)));
+            return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
+        }
+
+        return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
+    }
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
@@ -1120,146 +1336,11 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_type:
-    case type_kind_integer_range:
     case type_kind_enum_constructor:
     case type_kind_interface:
         LPG_TO_DO();
     }
-    match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
-    bool *const enum_elements_handled =
-        allocate_array((*element).match.number_of_cases, sizeof(*enum_elements_handled));
-    memset(enum_elements_handled, 0, (*element).match.number_of_cases * sizeof(*enum_elements_handled));
-    type result_type = type_from_unit();
-    optional_value compile_time_result = optional_value_empty;
-    for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
-    {
-        match_case const case_tree = (*element).match.cases[i];
-        evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
-        if (!key_evaluated.has_value)
-        {
-            for (size_t j = 0; j < i; ++j)
-            {
-                match_instruction_case_free(cases[j]);
-            }
-            if (cases)
-            {
-                deallocate(cases);
-            }
-            deallocate(enum_elements_handled);
-            return key_evaluated;
-        }
-
-        if (!type_equals(key.type_, key_evaluated.type_))
-        {
-            state->on_error(
-                semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
-                state->user);
-            for (size_t j = 0; j < i; ++j)
-            {
-                match_instruction_case_free(cases[j]);
-            }
-            if (cases)
-            {
-                deallocate(cases);
-            }
-            deallocate(enum_elements_handled);
-            return evaluate_expression_result_empty;
-        }
-
-        {
-            ASSUME(key_evaluated.compile_time_value.value_.kind == value_kind_enum_element);
-            bool *const case_handled =
-                (enum_elements_handled + key_evaluated.compile_time_value.value_.enum_element.which);
-            if (*case_handled)
-            {
-                state->on_error(
-                    semantic_error_create(semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
-                    state->user);
-                for (size_t j = 0; j < i; ++j)
-                {
-                    match_instruction_case_free(cases[j]);
-                }
-                if (cases)
-                {
-                    deallocate(cases);
-                }
-                deallocate(enum_elements_handled);
-                return evaluate_expression_result_empty;
-            }
-            *case_handled = true;
-        }
-
-        /*TODO: support runtime values as keys?*/
-        ASSERT(key_evaluated.compile_time_value.is_set);
-
-        instruction_sequence action = instruction_sequence_create(NULL, 0);
-        evaluate_expression_result const action_evaluated = evaluate_expression(state, &action, *case_tree.action);
-        if (!action_evaluated.has_value)
-        {
-            for (size_t j = 0; j < i; ++j)
-            {
-                match_instruction_case_free(cases[j]);
-            }
-            if (cases)
-            {
-                deallocate(cases);
-            }
-            instruction_sequence_free(&action);
-            deallocate(enum_elements_handled);
-            return action_evaluated;
-        }
-
-        if (i == 0)
-        {
-            result_type = action_evaluated.type_;
-        }
-        else if (!type_equals(result_type, action_evaluated.type_))
-        {
-            /*TODO: support types that are not the same, but still
-             * comparable*/
-            for (size_t j = 0; j < i; ++j)
-            {
-                match_instruction_case_free(cases[j]);
-            }
-            if (cases)
-            {
-                deallocate(cases);
-            }
-            instruction_sequence_free(&action);
-            state->on_error(
-                semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
-                state->user);
-            deallocate(enum_elements_handled);
-            return evaluate_expression_result_empty;
-        }
-
-        if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
-            value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
-            action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
-        {
-            compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
-        }
-
-        cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
-    }
-    for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
-    {
-        ASSUME(enum_elements_handled[i]);
-    }
-    register_id result_register = allocate_register(&state->used_registers);
-    add_instruction(function, instruction_create_match(match_instruction_create(
-                                  key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-    deallocate(enum_elements_handled);
-    if (compile_time_result.is_set)
-    {
-        restore(before);
-        result_register = allocate_register(&state->used_registers);
-        add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                      result_register, compile_time_result.value_, result_type)));
-        return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
-    }
-
-    return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
+    LPG_UNREACHABLE();
 }
 
 typedef struct evaluate_arguments_result
