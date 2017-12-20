@@ -43,6 +43,12 @@ bool integer_range_contains(integer_range const haystack, integer_range const ne
            integer_less_or_equals(needle.maximum, haystack.maximum);
 }
 
+bool integer_range_contains_integer(const integer_range haystack, integer const needle)
+{
+    // haystack.min <= needle && needle <= haystack.max
+    return integer_less_or_equals(haystack.minimum, needle) && integer_less_or_equals(needle, haystack.maximum);
+}
+
 bool integer_range_list_contains(integer_range_list const haystack, integer_range const needle)
 {
     for (size_t i = 0; i < haystack.length; ++i)
@@ -76,26 +82,13 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
             remove_element_from_range_list(haystack, i);
             i--;
         }
-        else if (integer_range_contains(element, needle))
-        {
-            bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
-            ASSUME(not_overflown);
-            needle_copy.minimum = integer_subtract(needle.minimum, integer_create(0, 1));
-            haystack->elements[i].maximum = needle_copy.minimum;
-
-            haystack->elements = reallocate(haystack->elements, haystack->length + 1);
-            haystack->elements[haystack->length] = integer_range_create(needle_copy.maximum, element.maximum);
-            haystack->length++;
-        }
         /*
          * NOTE: if the integer overflows when adding one then it will not be in the range anymore
          *
          * Remove left edge:
-         *  needle.min <= element.min
-         *  &&
-         *  needle.max >= element.min => element.min <= needle.max
+         *  needle.max inside element && needle.min <= element.min
          */
-        else if (integer_less_or_equals(element.minimum, needle.maximum) &&
+        else if (integer_range_contains_integer(element, needle.maximum) &&
                  integer_less_or_equals(needle.minimum, element.minimum))
         {
             bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
@@ -106,19 +99,25 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
          * NOTE: if the integer overflows when adding one then it will not be in the range anymore
          *
          * Remove right edge:
-         *   needle.min <= element.max
-         *   &&
-         *   needle.max >= element.max => element.max <= needle.max
-         *   
-         *   element = integer_create(20, 100), integer_create(30, 10)
-         *   needle  = integer_create( 0, 100), integer_create(20, 10)
+         *   needle.min inside element && needle.max >= element.max
          */
-        else if (integer_less_or_equals(needle.minimum, element.maximum) &&
-                 integer_less_or_equals(needle.maximum, element.maximum))
+        else if (integer_range_contains_integer(element, needle.minimum) &&
+                 integer_less_or_equals(element.maximum, needle.maximum))
         {
             bool not_overflown = integer_add(&needle_copy.minimum, integer_create(0, 1));
             ASSUME(not_overflown);
             haystack->elements[i].maximum = needle_copy.minimum;
+        }
+        else if (integer_range_contains(element, needle))
+        {
+            bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
+            ASSUME(not_overflown);
+            needle_copy.minimum = integer_subtract(needle.minimum, integer_create(0, 1));
+            haystack->elements[i].maximum = needle_copy.minimum;
+
+            haystack->elements = reallocate(haystack->elements, haystack->length + 1);
+            haystack->elements[haystack->length] = integer_range_create(needle_copy.maximum, element.maximum);
+            haystack->length++;
         }
     }
 }

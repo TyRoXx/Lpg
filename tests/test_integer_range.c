@@ -280,6 +280,82 @@ static void test_integer_range_list_merge(void)
 
 void test_integer_range_remove(void)
 {
+    // Test remove entire element
+    {
+        integer_range const range = integer_range_create(integer_create(0, 0), integer_create(0, 2));
+
+        integer_range_list list = integer_range_list_create_from_integer_range(range);
+
+        integer_range_list_remove(&list, range);
+
+        REQUIRE(list.length == 0);
+
+        integer_range_list_deallocate(list);
+    }
+
+    // Test remove left part
+    {
+        integer const lower_bound = integer_create(0, 10);
+        integer const upper_bound = integer_create(0, 20);
+
+        integer_range const range = integer_range_create(lower_bound, upper_bound);
+        integer_range_list list = integer_range_list_create_from_integer_range(range);
+
+        integer_range const left_edge = integer_range_create(lower_bound, integer_create(0, 15));
+
+        integer_range_list_remove(&list, left_edge);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], integer_range_create(integer_create(0, 16), upper_bound)));
+
+        integer_range_list_deallocate(list);
+    }
+
+    // Test remove right part
+    {
+        integer const lower_bound = integer_create(0, 10);
+        integer const upper_bound = integer_create(0, 20);
+
+        integer_range const range = integer_range_create(lower_bound, upper_bound);
+        integer_range_list list = integer_range_list_create_from_integer_range(range);
+
+        integer_range const left_edge = integer_range_create(integer_create(0, 15), upper_bound);
+
+        integer_range_list_remove(&list, left_edge);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], integer_range_create(lower_bound, integer_create(0, 16))));
+
+        integer_range_list_deallocate(list);
+    }
+
+    // Test remove with integer not in range
+    {
+        integer const lower_bound = integer_create(0, 20);
+        integer const upper_bound = integer_create(0, 30);
+
+        integer_range const range = integer_range_create(lower_bound, upper_bound);
+        integer_range_list list = integer_range_list_create_from_integer_range(range);
+
+        // Left
+        integer_range left = integer_range_create(integer_create(0, 5), integer_create(0, 10));
+
+        integer_range_list_remove(&list, left);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], range));
+
+        // Right
+        integer_range const right = integer_range_create(integer_create(0, 40), integer_create(0, 50));
+
+        integer_range_list_remove(&list, right);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], range));
+
+        integer_range_list_deallocate(list);
+    }
+
     // Test remove with element not in list
     {
         integer_range expected[] = {integer_range_create(integer_create(0, 0), integer_create(0, 100)),
@@ -304,15 +380,15 @@ void test_integer_range_remove(void)
     }
     // Test remove with element last in list exactly
     {
-        integer_range expected[] = {integer_range_create(integer_create(0, 0), integer_create(0, 100)),
-                                    integer_range_create(integer_create(0, 100), integer_create(20, 10))};
+        integer_range expected[] = {integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                    integer_range_create(integer_create(0, 20), integer_create(0, 30))};
 
         integer_range *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expected[0];
         elements[1] = expected[1];
 
         integer_range_list list = integer_range_list_create(elements, 2);
-        integer_range element_to_remove = integer_range_create(integer_create(0, 100), integer_create(20, 10));
+        integer_range element_to_remove = expected[1];
 
         integer_range_list_remove(&list, element_to_remove);
 
@@ -321,12 +397,12 @@ void test_integer_range_remove(void)
 
         integer_range_list_deallocate(list);
     }
-    // Test remove with element last in list exactly
+    // Test remove with element inside list
     {
         integer_range expected[] = {
-            integer_range_create(integer_create(0, 0), integer_create(0, 100)),
-            integer_range_create(integer_create(0, 100), integer_create(20, 10)),
-            integer_range_create(integer_create(20, 100), integer_create(30, 10)),
+            integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+            integer_range_create(integer_create(0, 20), integer_create(0, 30)),
+            integer_range_create(integer_create(0, 40), integer_create(0, 50)),
         };
 
         integer_range *elements = allocate_array(3, sizeof(*elements));
@@ -335,29 +411,13 @@ void test_integer_range_remove(void)
         elements[2] = expected[2];
 
         integer_range_list list = integer_range_list_create(elements, 3);
-        integer_range element_to_remove = integer_range_create(integer_create(0, 100), integer_create(20, 10));
+        integer_range element_to_remove = integer_range_create(integer_create(0, 20), integer_create(0, 30));
 
         integer_range_list_remove(&list, element_to_remove);
 
         REQUIRE(list.length == 2);
         REQUIRE(integer_range_equals(list.elements[0], expected[0]));
         REQUIRE(integer_range_equals(list.elements[1], expected[2]));
-
-        integer_range_list_deallocate(list);
-    }
-    // Test left remove
-    {
-        const integer_range expected = integer_range_create(integer_create(0, 101), integer_create(0, 100));
-
-        integer_range range = integer_range_create(integer_create(0, 0), integer_create(100, 100));
-        integer_range_list list = integer_range_list_create_from_integer_range(range);
-
-        const integer_range element_to_remove = integer_range_create(integer_create(0, 0), integer_create(0, 100));
-
-        integer_range_list_remove(&list, element_to_remove);
-
-        REQUIRE(list.length == 1);
-        REQUIRE(integer_range_equals(list.elements[0], expected));
 
         integer_range_list_deallocate(list);
     }
