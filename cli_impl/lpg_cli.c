@@ -16,6 +16,10 @@
 #include <errno.h>
 #endif
 #include <stdio.h>
+#include "lpg_win32.h"
+#ifdef _WIN32
+#include <Windows.h>
+#endif
 
 typedef struct cli_parser_user
 {
@@ -283,6 +287,25 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
+static bool rename_file(unicode_view const from, unicode_view const to)
+{
+#ifdef _WIN32
+    win32_string const from_zero_terminated = to_win32_path(from);
+    win32_string const to_zero_terminated = to_win32_path(to);
+    bool const result = MoveFileExW(from_zero_terminated.c_str, to_zero_terminated.c_str, MOVEFILE_REPLACE_EXISTING);
+    win32_string_free(from_zero_terminated);
+    win32_string_free(to_zero_terminated);
+    return result;
+#else
+    unicode_string from_zero_terminated = unicode_view_zero_terminate(from);
+    unicode_string to_zero_terminated = unicode_view_zero_terminate(to);
+    bool const result = (rename(from_zero_terminated.data, to_zero_terminated.data) >= 0);
+    unicode_string_free(&from_zero_terminated);
+    unicode_string_free(&to_zero_terminated);
+    return result;
+#endif
+}
+
 bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
 {
     compiler_arguments arguments = parse_compiler_arguments(argc, argv);
@@ -338,12 +361,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
         sequence_free(&root.value);
 
         unicode_string temporary = write_temporary_file(format_buffer.data);
-        if (rename(unicode_string_c_str(&temporary), arguments.file_name) < 0)
+        if (!rename_file(unicode_view_from_string(temporary), unicode_view_from_c_str(arguments.file_name)))
         {
-            const int error = errno;
-            ASSERT(success == stream_writer_write_string(diagnostics, "Could not write formatted file: "));
-            ASSERT(success == stream_writer_write_integer(diagnostics, integer_create(0, (unsigned)error)));
-            ASSERT(success == stream_writer_write_string(diagnostics, "\n"));
+            ASSERT(success == stream_writer_write_string(diagnostics, "Could not write formatted file\n"));
             memory_writer_free(&format_buffer);
             unicode_string_free(&temporary);
             unicode_string_free(&source);
