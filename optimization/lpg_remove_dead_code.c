@@ -55,6 +55,13 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             }
             break;
 
+        case instruction_instantiate_struct:
+            for (size_t j = 0; j < current_instruction.instantiate_struct.argument_count; ++j)
+            {
+                registers_read_from[current_instruction.instantiate_struct.arguments[j]] = true;
+            }
+            break;
+
         case instruction_enum_construct:
             registers_read_from[current_instruction.enum_construct.state] = true;
             break;
@@ -142,6 +149,13 @@ static bool change_register_ids(instruction *const where, register_id const *con
             ASSERT(update_register_id(where->tuple_.elements + j, new_register_ids));
         }
         return update_register_id(&where->tuple_.result, new_register_ids);
+
+    case instruction_instantiate_struct:
+        for (size_t j = 0; j < where->instantiate_struct.argument_count; ++j)
+        {
+            ASSERT(update_register_id(where->instantiate_struct.arguments + j, new_register_ids));
+        }
+        return update_register_id(&where->instantiate_struct.into, new_register_ids);
 
     case instruction_enum_construct:
         ASSERT(update_register_id(&where->enum_construct.state, new_register_ids));

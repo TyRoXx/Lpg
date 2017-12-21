@@ -900,6 +900,20 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
     }
 }
 
+static bool parse_instantiate_struct(expression_parser *parser, size_t indentation, expression *result,
+                                     source_location const opening_brace)
+{
+    expression_parser_result const arguments = parse_tuple(parser, indentation, opening_brace);
+    if (!arguments.is_success)
+    {
+        return false;
+    }
+    ASSUME(arguments.success.type == expression_type_tuple);
+    *result = expression_from_instantiate_struct(
+        instantiate_struct_expression_create(expression_allocate(*result), arguments.success.tuple));
+    return true;
+}
+
 static expression_parser_result parse_binary_operator(expression_parser *const parser, const size_t indentation,
                                                       expression left_side, binary_operator operator)
 {
@@ -950,6 +964,14 @@ static expression_parser_result parse_returnable(expression_parser *const parser
         {
             pop(parser);
             if (parse_call(parser, indentation, &result.success, maybe_operator.where))
+            {
+                continue;
+            }
+        }
+        if (maybe_operator.token == token_left_curly_brace)
+        {
+            pop(parser);
+            if (parse_instantiate_struct(parser, indentation, &result.success, maybe_operator.where))
             {
                 continue;
             }

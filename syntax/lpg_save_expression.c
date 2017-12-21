@@ -89,6 +89,14 @@ success_indicator save_sequence(stream_writer const to, sequence const value, wh
     return success;
 }
 
+static success_indicator save_tuple_expression(stream_writer const to, tuple const value, whitespace_state whitespace)
+{
+    LPG_TRY(space_here(to, &whitespace));
+    LPG_TRY(stream_writer_write_string(to, "{"));
+    LPG_TRY(save_tuple_elements(to, value, whitespace));
+    return stream_writer_write_string(to, "}");
+}
+
 success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
@@ -204,10 +212,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         return success;
 
     case expression_type_tuple:
-        LPG_TRY(space_here(to, &whitespace));
-        LPG_TRY(stream_writer_write_string(to, "{"));
-        LPG_TRY(save_tuple_elements(to, value->tuple, whitespace));
-        return stream_writer_write_string(to, "}");
+        return save_tuple_expression(to, value->tuple, whitespace);
 
     case expression_type_comment:
     {
@@ -312,6 +317,12 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(save_function_header(to, value->interface.methods[i].header, whitespace));
         }
         return success;
+    }
+
+    case expression_type_instantiate_struct:
+    {
+        LPG_TRY(save_expression(to, value->instantiate_struct.type, whitespace));
+        return save_tuple_expression(to, value->instantiate_struct.arguments, whitespace);
     }
     }
     LPG_UNREACHABLE();

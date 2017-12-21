@@ -720,21 +720,42 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
 
 static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
                                                 checked_function const *const all_functions,
-                                                stream_writer const c_output);
+                                                structure const *const all_structures, stream_writer const c_output);
 
-static success_indicator generate_add_reference_to_tuple(unicode_view const value, tuple_type const type,
-                                                         size_t const indentation,
+static success_indicator generate_add_reference_to_tuple(unicode_view const value, type const *const elements,
+                                                         size_t const element_count, size_t const indentation,
                                                          checked_function const *const all_functions,
+                                                         structure const *const all_structures,
                                                          stream_writer const c_output)
 {
-    for (struct_member_id i = 0; i < type.length; ++i)
+    for (struct_member_id i = 0; i < element_count; ++i)
     {
         memory_writer name_buffer = {NULL, 0, 0};
         LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), value));
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
         LPG_TRY(generate_tuple_element_name(i, memory_writer_erase(&name_buffer)));
         LPG_TRY(generate_add_reference(
-            memory_writer_content(name_buffer), type.elements[i], indentation, all_functions, c_output));
+            memory_writer_content(name_buffer), elements[i], indentation, all_functions, all_structures, c_output));
+        memory_writer_free(&name_buffer);
+    }
+    return success;
+}
+
+static success_indicator generate_add_reference_to_structure(unicode_view const value, structure const type_of,
+                                                             size_t const indentation,
+                                                             checked_function const *const all_functions,
+                                                             structure const *const all_structures,
+                                                             stream_writer const c_output)
+{
+    for (struct_member_id i = 0; i < type_of.count; ++i)
+    {
+        memory_writer name_buffer = {NULL, 0, 0};
+        LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), value));
+        LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
+        LPG_TRY(stream_writer_write_unicode_view(
+            memory_writer_erase(&name_buffer), unicode_view_from_string(type_of.members[i].name)));
+        LPG_TRY(generate_add_reference(memory_writer_content(name_buffer), type_of.members[i].what, indentation,
+                                       all_functions, all_structures, c_output));
         memory_writer_free(&name_buffer);
     }
     return success;
@@ -742,7 +763,7 @@ static success_indicator generate_add_reference_to_tuple(unicode_view const valu
 
 static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
                                                 checked_function const *const all_functions,
-                                                stream_writer const c_output)
+                                                structure const *const all_structures, stream_writer const c_output)
 {
     switch (what.kind)
     {
@@ -760,11 +781,15 @@ static success_indicator generate_add_reference(unicode_view const value, type c
         return success;
 
     case type_kind_tuple:
-        return generate_add_reference_to_tuple(value, what.tuple_, indentation, all_functions, c_output);
+        return generate_add_reference_to_tuple(
+            value, what.tuple_.elements, what.tuple_.length, indentation, all_functions, all_structures, c_output);
 
     case type_kind_lambda:
+    {
+        tuple_type const captures = all_functions[what.lambda.lambda].signature->captures;
         return generate_add_reference_to_tuple(
-            value, all_functions[what.lambda.lambda].signature->captures, indentation, all_functions, c_output);
+            value, captures.elements, captures.length, indentation, all_functions, all_structures, c_output);
+    }
 
     case type_kind_interface:
         LPG_TRY(stream_writer_write_unicode_view(c_output, value));
@@ -774,6 +799,11 @@ static success_indicator generate_add_reference(unicode_view const value, type c
         return success;
 
     case type_kind_structure:
+    {
+        return generate_add_reference_to_structure(
+            value, all_structures[what.structure_], indentation, all_functions, all_structures, c_output);
+    }
+
     case type_kind_method_pointer:
     case type_kind_enum_constructor:
         LPG_TO_DO();
@@ -781,16 +811,14 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_add_reference_to_register(checked_function const *const current_function,
-                                                            register_id const where, type const what,
-                                                            size_t const indentation,
-                                                            checked_function const *const all_functions,
-                                                            stream_writer const c_output)
+static success_indicator generate_add_reference_to_register(
+    checked_function const *const current_function, register_id const where, type const what, size_t const indentation,
+    checked_function const *const all_functions, structure const *const all_structures, stream_writer const c_output)
 {
     memory_writer name_buffer = {NULL, 0, 0};
     LPG_TRY(generate_register_name(where, current_function, memory_writer_erase(&name_buffer)));
-    success_indicator const result =
-        generate_add_reference(memory_writer_content(name_buffer), what, indentation, all_functions, c_output);
+    success_indicator const result = generate_add_reference(
+        memory_writer_content(name_buffer), what, indentation, all_functions, all_structures, c_output);
     memory_writer_free(&name_buffer);
     return result;
 }
@@ -799,6 +827,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
                                                                  checked_function const *const current_function,
                                                                  register_id const from, size_t const indentation,
                                                                  checked_function const *const all_functions,
+                                                                 structure const *const all_structures,
                                                                  stream_writer const c_output)
 {
     switch (state->registers[from].meaning)
@@ -813,8 +842,8 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
 
         case register_resource_ownership_borrows:
             ASSUME(state->registers[from].type_of.is_set);
-            return generate_add_reference_to_register(
-                current_function, from, state->registers[from].type_of.value, indentation, all_functions, c_output);
+            return generate_add_reference_to_register(current_function, from, state->registers[from].type_of.value,
+                                                      indentation, all_functions, all_structures, c_output);
         }
 
     case register_meaning_assert:
@@ -852,13 +881,13 @@ static type find_boolean(c_backend_state const *state)
 
 static success_indicator generate_tuple_initializer(c_backend_state *state,
                                                     checked_function const *const current_function,
-                                                    tuple_type const tuple, register_id *const elements,
+                                                    size_t const element_count, register_id *const elements,
                                                     stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{"));
-    if (tuple.length > 0)
+    if (element_count > 0)
     {
-        for (size_t i = 0; i < tuple.length; ++i)
+        for (size_t i = 0; i < element_count; ++i)
         {
             if (i > 0)
             {
@@ -884,8 +913,8 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     set_register_variable(state, result, register_resource_ownership_owns, type_from_tuple_type(tuple));
     for (size_t i = 0; i < tuple.length; ++i)
     {
-        LPG_TRY(generate_add_reference_to_register(
-            current_function, elements[i], tuple.elements[i], indentation, state->all_functions, c_output));
+        LPG_TRY(generate_add_reference_to_register(current_function, elements[i], tuple.elements[i], indentation,
+                                                   state->all_functions, state->all_structs, c_output));
     }
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(generate_type(type_from_tuple_type(tuple), &state->standard_library, state->definitions,
@@ -893,7 +922,33 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     LPG_TRY(stream_writer_write_string(c_output, " const "));
     LPG_TRY(generate_register_name(result, current_function, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " = "));
-    LPG_TRY(generate_tuple_initializer(state, current_function, tuple, elements, c_output));
+    LPG_TRY(generate_tuple_initializer(state, current_function, tuple.length, elements, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    return success;
+}
+
+static success_indicator generate_instantiate_struct(c_backend_state *state,
+                                                     checked_function const *const current_function,
+                                                     instantiate_struct_instruction const generated,
+                                                     size_t const indentation, stream_writer const c_output)
+{
+    set_register_variable(
+        state, generated.into, register_resource_ownership_owns, type_from_struct(generated.instantiated));
+    for (size_t i = 0; i < generated.argument_count; ++i)
+    {
+        register_id const argument = generated.arguments[i];
+        ASSUME(state->registers[argument].type_of.is_set);
+        LPG_TRY(generate_add_reference_to_register(current_function, argument, state->registers[argument].type_of.value,
+                                                   indentation, state->all_functions, state->all_structs, c_output));
+    }
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(generate_type(type_from_struct(generated.instantiated), &state->standard_library, state->definitions,
+                          state->all_functions, state->all_interfaces, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const "));
+    LPG_TRY(generate_register_name(generated.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " = "));
+    LPG_TRY(
+        generate_tuple_initializer(state, current_function, generated.argument_count, generated.arguments, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     return success;
 }
@@ -939,7 +994,8 @@ static success_indicator generate_erase_type(c_backend_state *state, register_id
 
     if (add_reference_to_self)
     {
-        LPG_TRY(generate_add_reference(self, self_type, indentation, state->all_functions, c_output));
+        LPG_TRY(
+            generate_add_reference(self, self_type, indentation, state->all_functions, state->all_structs, c_output));
     }
     return success;
 }
@@ -1681,6 +1737,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         return generate_tuple_variable(state, current_function, input.tuple_.result_type, input.tuple_.elements,
                                        input.tuple_.result, indentation, c_output);
 
+    case instruction_instantiate_struct:
+        return generate_instantiate_struct(state, current_function, input.instantiate_struct, indentation, c_output);
+
     case instruction_enum_construct:
         set_register_variable(
             state, input.enum_construct.into, register_resource_ownership_borrows, type_from_unit() /*TODO*/);
@@ -1754,7 +1813,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         {
             LPG_TRY(generate_add_reference_to_register(current_function, input.lambda_with_captures.captures[i],
                                                        captures.elements[i], indentation, state->all_functions,
-                                                       c_output));
+                                                       state->all_structs, c_output));
         }
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(generate_type(function_type, &state->standard_library, state->definitions, state->all_functions,
@@ -1763,7 +1822,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(generate_register_name(input.lambda_with_captures.into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_tuple_initializer(
-            state, current_function, captures, input.lambda_with_captures.captures, c_output));
+            state, current_function, captures.length, input.lambda_with_captures.captures, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
         return success;
     }
@@ -1951,8 +2010,8 @@ generate_function_body(checked_function const current_function, checked_function
 
     if (!return_0)
     {
-        LPG_TRY(generate_add_reference_for_return_value(
-            &state, &current_function, current_function.return_value, 1, state.all_functions, c_output));
+        LPG_TRY(generate_add_reference_for_return_value(&state, &current_function, current_function.return_value, 1,
+                                                        state.all_functions, state.all_structs, c_output));
     }
 
     LPG_TRY(stream_writer_write_string(c_output, "    return "));

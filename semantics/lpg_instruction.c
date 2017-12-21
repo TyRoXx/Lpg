@@ -1,6 +1,7 @@
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
 #include "lpg_for.h"
+#include <string.h>
 
 tuple_instruction tuple_instruction_create(register_id *elements, size_t element_count, register_id result,
                                            tuple_type result_type)
@@ -162,6 +163,28 @@ bool erase_type_instruction_equals(erase_type_instruction const left, erase_type
     return (left.self == right.self) && (left.into == right.into) && implementation_ref_equals(left.impl, right.impl);
 }
 
+instantiate_struct_instruction instantiate_struct_instruction_create(register_id into, struct_id instantiated,
+                                                                     register_id *arguments, size_t argument_count)
+{
+    instantiate_struct_instruction const result = {into, instantiated, arguments, argument_count};
+    return result;
+}
+
+void instantiate_struct_instruction_free(instantiate_struct_instruction const freed)
+{
+    if (freed.arguments)
+    {
+        deallocate(freed.arguments);
+    }
+}
+
+bool instantiate_struct_instruction_equals(instantiate_struct_instruction const left,
+                                           instantiate_struct_instruction const right)
+{
+    return (left.into == right.into) && (left.instantiated == right.instantiated) &&
+           !memcmp(left.arguments, right.arguments, sizeof(*left.arguments) * left.argument_count);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -215,6 +238,14 @@ instruction instruction_create_erase_type(erase_type_instruction const argument)
     instruction result;
     result.type = instruction_erase_type;
     result.erase_type = argument;
+    return result;
+}
+
+instruction instruction_create_instantiate_struct(instantiate_struct_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_instantiate_struct;
+    result.instantiate_struct = argument;
     return result;
 }
 
@@ -313,6 +344,10 @@ void instruction_free(instruction const *value)
         deallocate(value->tuple_.result_type.elements);
         break;
 
+    case instruction_instantiate_struct:
+        deallocate(value->instantiate_struct.arguments);
+        break;
+
     case instruction_match:
         for (size_t i = 0; i < value->match.count; ++i)
         {
@@ -338,6 +373,9 @@ bool instruction_equals(instruction const left, instruction const right)
     }
     switch (left.type)
     {
+    case instruction_instantiate_struct:
+        return instantiate_struct_instruction_equals(left.instantiate_struct, right.instantiate_struct);
+
     case instruction_get_method:
         LPG_TO_DO();
 

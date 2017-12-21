@@ -423,6 +423,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_instantiate_struct:
+        return expression_source_begin(*value.instantiate_struct.type);
+
     case expression_type_interface:
         return value.interface.source;
 
@@ -488,6 +491,24 @@ comment_expression comment_expression_create(unicode_string value, source_locati
 {
     comment_expression const result = {value, source};
     return result;
+}
+
+instantiate_struct_expression instantiate_struct_expression_create(expression *const type, tuple arguments)
+{
+    instantiate_struct_expression const result = {type, arguments};
+    return result;
+}
+
+void instantiate_struct_expression_free(instantiate_struct_expression const freed)
+{
+    expression_deallocate(freed.type);
+    tuple_free(&freed.arguments);
+}
+
+bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
+                                          instantiate_struct_expression const right)
+{
+    return expression_equals(left.type, right.type) && tuple_equals(&left.arguments, &right.arguments);
 }
 
 identifier_expression identifier_expression_create(unicode_string value, source_location source)
@@ -655,6 +676,14 @@ expression expression_from_struct(struct_expression value)
     return result;
 }
 
+expression expression_from_instantiate_struct(instantiate_struct_expression value)
+{
+    expression result;
+    result.type = expression_type_instantiate_struct;
+    result.instantiate_struct = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -666,6 +695,10 @@ void expression_free(expression const *this)
 {
     switch (this->type)
     {
+    case expression_type_instantiate_struct:
+        instantiate_struct_expression_free(this->instantiate_struct);
+        break;
+
     case expression_type_lambda:
         lambda_free(&this->lambda);
         break;
@@ -805,6 +838,9 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_instantiate_struct:
+        return instantiate_struct_expression_equals(left->instantiate_struct, right->instantiate_struct);
+
     case expression_type_interface:
         return interface_expression_equals(left->interface, right->interface);
 

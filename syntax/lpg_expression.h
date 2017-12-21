@@ -51,7 +51,8 @@ typedef enum expression_type
     expression_type_comment,
     expression_type_interface,
     expression_type_struct,
-    expression_type_impl
+    expression_type_impl,
+    expression_type_instantiate_struct
 } expression_type;
 
 typedef struct tuple
@@ -270,6 +271,15 @@ bool integer_literal_expression_equals(integer_literal_expression const left, in
 
 comment_expression comment_expression_create(unicode_string value, source_location source);
 
+typedef struct instantiate_struct_expression
+{
+    expression *type;
+    tuple arguments;
+} instantiate_struct_expression;
+
+instantiate_struct_expression instantiate_struct_expression_create(expression *const type, tuple arguments);
+void instantiate_struct_expression_free(instantiate_struct_expression const freed);
+
 struct expression
 {
     expression_type type;
@@ -293,9 +303,9 @@ struct expression
         interface_expression interface;
         struct_expression struct_;
         impl_expression impl;
-
         /*for monostate expressions like break:*/
         source_location source;
+        instantiate_struct_expression instantiate_struct;
     };
 };
 
@@ -322,6 +332,7 @@ expression expression_from_tuple(tuple value);
 expression expression_from_break(source_location source);
 expression expression_from_interface(interface_expression value);
 expression expression_from_struct(struct_expression value);
+expression expression_from_instantiate_struct(instantiate_struct_expression value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

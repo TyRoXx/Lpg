@@ -70,6 +70,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         case instruction_tuple:
         case instruction_enum_construct:
         case instruction_get_captures:
+        case instruction_instantiate_struct:
             break;
 
         case instruction_literal:
@@ -210,10 +211,11 @@ static optional_value clone_optional_value(optional_value const original, garbag
 }
 
 static instruction_sequence clone_sequence(instruction_sequence const original, garbage_collector *const clone_gc,
-                                           function_id const *const new_function_ids);
+                                           function_id const *const new_function_ids,
+                                           structure const *const all_structures);
 
 static instruction clone_instruction(instruction const original, garbage_collector *const clone_gc,
-                                     function_id const *const new_function_ids)
+                                     function_id const *const new_function_ids, structure const *const all_structures)
 {
     switch (original.type)
     {
@@ -242,7 +244,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
         instruction *const body = allocate_array(original.loop.length, sizeof(*body));
         for (size_t i = 0; i < original.loop.length; ++i)
         {
-            body[i] = clone_instruction(original.loop.elements[i], clone_gc, new_function_ids);
+            body[i] = clone_instruction(original.loop.elements[i], clone_gc, new_function_ids, all_structures);
         }
         return instruction_create_loop(instruction_sequence_create(body, original.loop.length));
     }
@@ -278,13 +280,27 @@ static instruction clone_instruction(instruction const original, garbage_collect
             tuple_instruction_create(elements, original.tuple_.element_count, original.tuple_.result, cloned_type));
     }
 
+    case instruction_instantiate_struct:
+    {
+        structure const instantiated = all_structures[original.instantiate_struct.instantiated];
+        ASSUME(instantiated.count == original.instantiate_struct.argument_count);
+        register_id *const elements = allocate_array(instantiated.count, sizeof(*elements));
+        if (instantiated.count > 0)
+        {
+            memcpy(elements, original.instantiate_struct.arguments, instantiated.count * sizeof(*elements));
+        }
+        return instruction_create_instantiate_struct(instantiate_struct_instruction_create(
+            original.instantiate_struct.into, original.instantiate_struct.instantiated, elements, instantiated.count));
+    }
+
     case instruction_match:
     {
         match_instruction_case *const cases = allocate_array(original.match.count, sizeof(*cases));
         for (size_t i = 0; i < original.match.count; ++i)
         {
             cases[i] = match_instruction_case_create(
-                original.match.cases[i].key, clone_sequence(original.match.cases[i].action, clone_gc, new_function_ids),
+                original.match.cases[i].key,
+                clone_sequence(original.match.cases[i].action, clone_gc, new_function_ids, all_structures),
                 original.match.cases[i].value);
         }
         return instruction_create_match(match_instruction_create(original.match.key, cases, original.match.count,
@@ -306,18 +322,19 @@ static instruction clone_instruction(instruction const original, garbage_collect
 }
 
 static instruction_sequence clone_sequence(instruction_sequence const original, garbage_collector *const clone_gc,
-                                           function_id const *const new_function_ids)
+                                           function_id const *const new_function_ids,
+                                           structure const *const all_structures)
 {
     instruction_sequence result = {allocate_array(original.length, sizeof(*result.elements)), original.length};
     for (size_t i = 0; i < result.length; ++i)
     {
-        result.elements[i] = clone_instruction(original.elements[i], clone_gc, new_function_ids);
+        result.elements[i] = clone_instruction(original.elements[i], clone_gc, new_function_ids, all_structures);
     }
     return result;
 }
 
 static checked_function keep_function(checked_function const original, garbage_collector *const new_gc,
-                                      function_id const *const new_function_ids)
+                                      function_id const *const new_function_ids, structure const *const all_structures)
 {
     unicode_string *const register_debug_names =
         (original.number_of_registers > 0) ? allocate_array(original.number_of_registers, sizeof(*register_debug_names))
@@ -326,9 +343,10 @@ static checked_function keep_function(checked_function const original, garbage_c
     {
         register_debug_names[i] = unicode_view_copy(unicode_view_from_string(original.register_debug_names[i]));
     }
-    checked_function const result = checked_function_create(
-        original.return_value, clone_function_pointer(*original.signature, new_gc),
-        clone_sequence(original.body, new_gc, new_function_ids), register_debug_names, original.number_of_registers);
+    checked_function const result =
+        checked_function_create(original.return_value, clone_function_pointer(*original.signature, new_gc),
+                                clone_sequence(original.body, new_gc, new_function_ids, all_structures),
+                                register_debug_names, original.number_of_registers);
     return result;
 }
 
@@ -462,7 +480,7 @@ checked_program remove_unused_functions(checked_program const from)
             continue;
         }
         checked_function *const new_function = result.functions + new_function_ids[i];
-        *new_function = keep_function(from.functions[i], &result.memory, new_function_ids);
+        *new_function = keep_function(from.functions[i], &result.memory, new_function_ids, result.structs);
     }
     deallocate(used_functions);
     deallocate(new_function_ids);

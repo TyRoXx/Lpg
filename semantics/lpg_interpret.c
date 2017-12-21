@@ -196,6 +196,21 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             break;
         }
 
+        case instruction_instantiate_struct:
+        {
+            value value_struct;
+            value_struct.kind = value_kind_flat_object;
+            value *values =
+                garbage_collector_allocate_array(gc, element.instantiate_struct.argument_count, sizeof(*values));
+            for (size_t j = 0; j < element.instantiate_struct.argument_count; ++j)
+            {
+                values[j] = registers[*(element.instantiate_struct.arguments + j)];
+            }
+            value_struct.flat_object = values;
+            registers[element.instantiate_struct.into] = value_struct;
+            break;
+        }
+
         case instruction_enum_construct:
         {
             value *const state = garbage_collector_allocate(gc, sizeof(*state));

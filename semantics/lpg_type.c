@@ -331,6 +331,8 @@ bool type_equals(type const left, type const right)
         return (left.lambda.lambda == right.lambda.lambda);
 
     case type_kind_structure:
+        return (left.structure_ == right.structure_);
+
     case type_kind_enum_constructor:
         LPG_TO_DO();
 

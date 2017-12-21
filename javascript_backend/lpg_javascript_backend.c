@@ -453,6 +453,24 @@ static success_indicator generate_tuple(function_generation *const state, tuple_
     return success;
 }
 
+static success_indicator generate_instantiate_struct(function_generation *const state,
+                                                     instantiate_struct_instruction const generated,
+                                                     stream_writer const javascript_output)
+{
+    LPG_TRY(write_register(state, generated.into, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, "["));
+    for (size_t i = 0; i < generated.argument_count; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(javascript_output, ", "));
+        }
+        LPG_TRY(generate_register_name(generated.arguments[i], javascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(javascript_output, "];\n"));
+    return success;
+}
+
 static success_indicator generate_match(function_generation *const state, match_instruction const generated,
                                         stream_writer const javascript_output)
 {
@@ -571,6 +589,9 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_tuple:
         return generate_tuple(state, generated.tuple_, javascript_output);
+
+    case instruction_instantiate_struct:
+        return generate_instantiate_struct(state, generated.instantiate_struct, javascript_output);
 
     case instruction_enum_construct:
         return generate_enum_construct(state, generated.enum_construct, javascript_output);

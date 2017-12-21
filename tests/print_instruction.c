@@ -98,6 +98,7 @@ void print_instruction(instruction const printed)
 {
     switch (printed.type)
     {
+    case instruction_instantiate_struct:
     case instruction_get_method:
     case instruction_erase_type:
     case instruction_enum_construct:

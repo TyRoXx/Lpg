@@ -23,7 +23,8 @@ typedef enum instruction_type
     instruction_lambda_with_captures,
     instruction_get_method,
     instruction_erase_type,
-    instruction_return
+    instruction_return,
+    instruction_instantiate_struct
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -142,6 +143,20 @@ typedef struct erase_type_instruction
 erase_type_instruction erase_type_instruction_create(register_id self, register_id into, implementation_ref impl);
 bool erase_type_instruction_equals(erase_type_instruction const left, erase_type_instruction const right);
 
+typedef struct instantiate_struct_instruction
+{
+    register_id into;
+    struct_id instantiated;
+    register_id *arguments;
+    size_t argument_count;
+} instantiate_struct_instruction;
+
+instantiate_struct_instruction instantiate_struct_instruction_create(register_id into, struct_id instantiated,
+                                                                     register_id *arguments, size_t argument_count);
+void instantiate_struct_instruction_free(instantiate_struct_instruction const freed);
+bool instantiate_struct_instruction_equals(instantiate_struct_instruction const left,
+                                           instantiate_struct_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -161,6 +176,7 @@ struct instruction
         get_method_instruction get_method;
         erase_type_instruction erase_type;
         register_id break_into;
+        instantiate_struct_instruction instantiate_struct;
     };
 };
 
@@ -188,6 +204,7 @@ instruction instruction_create_get_captures(register_id const into);
 instruction instruction_create_lambda_with_captures(lambda_with_captures_instruction const argument);
 instruction instruction_create_get_method(get_method_instruction const argument);
 instruction instruction_create_erase_type(erase_type_instruction const argument);
+instruction instruction_create_instantiate_struct(instantiate_struct_instruction const argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *value));
 bool instruction_equals(instruction const left, instruction const right);

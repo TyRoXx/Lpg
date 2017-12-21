@@ -208,8 +208,8 @@ static read_structure_element_result read_tuple_element(function_checking_state 
     return read_structure_element_result_create(true, type.elements[element_index.low], optional_value_empty);
 }
 
-static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
-                                                      expression const element);
+static evaluate_expression_result evaluate_expression(function_checking_state *const state,
+                                                      instruction_sequence *const function, expression const element);
 
 static evaluate_expression_result evaluate_return_expression(function_checking_state *pState,
                                                              instruction_sequence *pSequence,
@@ -1298,35 +1298,56 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
 }
 
-evaluate_expression_result evaluate_tuple_expression(function_checking_state *state, instruction_sequence *function,
-                                                     const expression *element)
+typedef struct evaluate_arguments_result
 {
-    register_id *registers = allocate_array((*element).tuple.length, sizeof(*registers));
+    register_id *registers;
+    tuple_type tuple_type_for_instruction;
+    tuple_type tuple_type_for_result;
+} evaluate_arguments_result;
+
+static evaluate_arguments_result evaluate_arguments(function_checking_state *const state,
+                                                    instruction_sequence *const function,
+                                                    expression const *const arguments, size_t const argument_count)
+{
+    register_id *registers = allocate_array(argument_count, sizeof(*registers));
     tuple_type const tuple_type_for_instruction = {
-        allocate_array((*element).tuple.length, sizeof(*tuple_type_for_instruction.elements)), (*element).tuple.length};
+        allocate_array(argument_count, sizeof(*tuple_type_for_instruction.elements)), argument_count};
     tuple_type const tuple_type_for_result = {
         garbage_collector_allocate_array(
-            &state->program->memory, (*element).tuple.length, sizeof(*tuple_type_for_instruction.elements)),
-        (*element).tuple.length};
-    for (size_t i = 0; i < (*element).tuple.length; ++i)
+            &state->program->memory, argument_count, sizeof(*tuple_type_for_instruction.elements)),
+        argument_count};
+    for (size_t i = 0; i < argument_count; ++i)
     {
-        evaluate_expression_result const result = evaluate_expression(state, function, (*element).tuple.elements[i]);
-        if (!result.has_value)
+        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i]);
+        if (!argument_evaluated.has_value)
         {
             deallocate(registers);
             deallocate(tuple_type_for_instruction.elements);
-            return evaluate_expression_result_empty;
+            evaluate_arguments_result const result = {NULL, tuple_type_create(NULL, 0), tuple_type_create(NULL, 0)};
+            return result;
         }
-        registers[i] = result.where;
-        tuple_type_for_instruction.elements[i] = result.type_;
-        tuple_type_for_result.elements[i] = result.type_;
+        registers[i] = argument_evaluated.where;
+        tuple_type_for_instruction.elements[i] = argument_evaluated.type_;
+        tuple_type_for_result.elements[i] = argument_evaluated.type_;
+    }
+    evaluate_arguments_result const result = {registers, tuple_type_for_instruction, tuple_type_for_result};
+    return result;
+}
+
+evaluate_expression_result evaluate_tuple_expression(function_checking_state *state, instruction_sequence *function,
+                                                     const tuple element)
+{
+    evaluate_arguments_result const arguments = evaluate_arguments(state, function, element.elements, element.length);
+    if (!arguments.registers)
+    {
+        return evaluate_expression_result_empty;
     }
     register_id const result_register = allocate_register(&state->used_registers);
-    add_instruction(function, instruction_create_tuple(tuple_instruction_create(
-                                  registers, (*element).tuple.length, result_register, tuple_type_for_instruction)));
-
+    add_instruction(
+        function, instruction_create_tuple(tuple_instruction_create(
+                      arguments.registers, element.length, result_register, arguments.tuple_type_for_instruction)));
     return evaluate_expression_result_create(
-        true, result_register, type_from_tuple_type(tuple_type_for_result), optional_value_empty, false);
+        true, result_register, type_from_tuple_type(arguments.tuple_type_for_result), optional_value_empty, false);
 }
 
 static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
@@ -1543,11 +1564,58 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     return make_unit(&state->used_registers, function);
 }
 
-static evaluate_expression_result evaluate_expression(function_checking_state *state, instruction_sequence *function,
-                                                      expression const element)
+static evaluate_expression_result evaluate_instantiate_struct(function_checking_state *const state,
+                                                              instruction_sequence *const function,
+                                                              instantiate_struct_expression const element)
+{
+    evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type);
+    if (!type_evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!type_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (type_evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    if (type_evaluated.compile_time_value.value_.type_.kind != type_kind_structure)
+    {
+        LPG_TO_DO();
+    }
+    struct_id const structure_id = type_evaluated.compile_time_value.value_.type_.structure_;
+    ASSUME(structure_id < state->program->struct_count);
+    structure const *const structure = state->program->structs + structure_id;
+    if (structure->count != element.arguments.length)
+    {
+        LPG_TO_DO();
+    }
+    evaluate_arguments_result const arguments_evaluated =
+        evaluate_arguments(state, function, element.arguments.elements, element.arguments.length);
+    if (!arguments_evaluated.registers)
+    {
+        LPG_TO_DO();
+    }
+    if (arguments_evaluated.tuple_type_for_instruction.elements)
+    {
+        deallocate(arguments_evaluated.tuple_type_for_instruction.elements);
+    }
+    register_id const into = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_instantiate_struct(instantiate_struct_instruction_create(
+                                  into, structure_id, arguments_evaluated.registers, element.arguments.length)));
+    return evaluate_expression_result_create(true, into, type_from_struct(structure_id), optional_value_empty, false);
+}
+
+static evaluate_expression_result evaluate_expression(function_checking_state *const state,
+                                                      instruction_sequence *const function, expression const element)
 {
     switch (element.type)
     {
+    case expression_type_instantiate_struct:
+        return evaluate_instantiate_struct(state, function, element.instantiate_struct);
+
     case expression_type_interface:
         return evaluate_interface(state, function, element.interface);
 
@@ -1748,7 +1816,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *s
     }
 
     case expression_type_tuple:
-        return evaluate_tuple_expression(state, function, &element);
+        return evaluate_tuple_expression(state, function, element.tuple);
 
     case expression_type_struct:
         return evaluate_struct(state, function, element.struct_);
