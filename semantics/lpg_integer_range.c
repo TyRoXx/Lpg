@@ -151,3 +151,14 @@ void integer_range_list_merge(integer_range_list *const unmerged_list)
         }
     }
 }
+
+integer integer_range_list_size(integer_range_list const list)
+{
+    integer result = integer_create(0, 0);
+    for (size_t i = 0; i < list.length; ++i)
+    {
+        bool ok = integer_add(&result, integer_range_size(list.elements[i]));
+        ASSUME(ok); // Because the range sizes can't be bigger than the integer range
+    }
+    return result;
+}

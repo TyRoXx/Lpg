@@ -27,4 +27,5 @@ void integer_range_list_deallocate(integer_range_list value);
 bool integer_range_list_contains(integer_range_list const haystack, integer_range const needle);
 void integer_range_list_merge(integer_range_list *const unmerged_list);
 void integer_range_list_remove(integer_range_list *const haystack, integer_range const needle);
+integer integer_range_list_size(integer_range_list const list);
 integer integer_range_size(integer_range const value);
