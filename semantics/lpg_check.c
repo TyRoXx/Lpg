@@ -11,6 +11,7 @@
 #include "lpg_instruction_checkpoint.h"
 #include "function_checking_state.h"
 #include "lpg_integer_range.h"
+#include "../tests/test.h"
 
 typedef struct evaluate_expression_result
 {
@@ -1223,8 +1224,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_integer_range:
     {
         integer expected_cases = integer_range_size(key.type_.integer_range_);
-        integer got_cases = integer_create(0, (*element).match.number_of_cases);
-        if (!integer_equal(got_cases, expected_cases))
+
+        if (!integer_equal(expected_cases, integer_create(0, (*element).match.number_of_cases)))
         {
             state->on_error(
                 semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))),
@@ -1266,6 +1267,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 }
                 else
                 {
+                    // TODO: Better error description
                     state->on_error(semantic_error_create(
                                         semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
                                     state->user);
@@ -1311,12 +1313,12 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
         }
 
-        ASSUME(integer_ranges_unhandled.length == 0);
+        ASSUME(integer_equal(integer_range_list_size(integer_ranges_unhandled), integer_create(0, 0)));
         register_id result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_match(match_instruction_create(
                           key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-        deallocate(integer_ranges_unhandled.elements);
+        integer_range_list_deallocate(integer_ranges_unhandled);
         if (compile_time_result.is_set)
         {
             restore(before);
