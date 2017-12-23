@@ -7,6 +7,7 @@ static void test_integer_range_contains(void);
 static void test_integer_range_list_contains(void);
 static void test_integer_range_list_merge(void);
 static void test_integer_range_remove(void);
+static void test_integer_range_list_size(void);
 
 void test_integer_range(void)
 {
@@ -16,6 +17,7 @@ void test_integer_range(void)
 
     test_integer_range_list_contains();
     test_integer_range_list_merge();
+    test_integer_range_list_size();
     test_integer_range_remove();
 }
 
@@ -419,6 +421,53 @@ void test_integer_range_remove(void)
         REQUIRE(integer_range_equals(list.elements[0], expected[0]));
         REQUIRE(integer_range_equals(list.elements[1], expected[2]));
 
+        integer_range_list_deallocate(list);
+    }
+}
+
+static void test_integer_range_list_size(void)
+{
+    // Test with an empty list
+    {
+        integer_range_list const list = integer_range_list_create(NULL, 0);
+        integer const size = integer_range_list_size(list);
+
+        REQUIRE(integer_equal(size, integer_create(0, 0)));
+    }
+
+    // Test with one integer_range
+    {
+        integer const low = integer_create(0, 10);
+        {
+            integer_range const range = integer_range_create(low, low);
+
+            integer_range_list const list = integer_range_list_create_from_integer_range(range);
+            integer const size = integer_range_list_size(list);
+
+            REQUIRE(integer_equal(size, integer_create(0, 1)));
+            integer_range_list_deallocate(list);
+        }
+        {
+            integer const high = integer_create(0, 12);
+            integer_range const range = integer_range_create(low, high);
+
+            integer_range_list const list = integer_range_list_create_from_integer_range(range);
+            integer const size = integer_range_list_size(list);
+
+            REQUIRE(integer_equal(size, integer_create(0, 3)));
+            integer_range_list_deallocate(list);
+        }
+    }
+    // Test with multiple integer_ranges
+    {
+        integer_range *const ranges = allocate_array(2, sizeof(*ranges));
+        ranges[0] = integer_range_create(integer_create(0, 10), integer_create(0, 12)); // Size = 3
+        ranges[1] = integer_range_create(integer_create(0, 20), integer_create(0, 22)); // Size = 3
+
+        integer_range_list const list = integer_range_list_create(ranges, 2);
+        integer const size = integer_range_list_size(list);
+
+        REQUIRE(integer_equal(size, integer_create(0, 6)));
         integer_range_list_deallocate(list);
     }
 }
