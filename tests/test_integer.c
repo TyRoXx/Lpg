@@ -60,6 +60,15 @@ static void test_parse_integer_overflow(char const *input)
     unicode_string_free(&input_string);
 }
 
+void test_integer_maximum_and_minimum(void)
+{
+    integer low = integer_create(0, 10);
+    integer high = integer_create(0, 20);
+
+    REQUIRE(integer_equal(integer_maximum(low, high), high));
+    REQUIRE(integer_equal(integer_minimum(low, high), low));
+}
+
 void test_integer(void)
 {
     REQUIRE(integer_less(integer_create(0, 0), integer_create(0, 1)));
@@ -212,4 +221,5 @@ void test_integer(void)
     test_parse_integer_overflow("340282366920938463463374607431768211463");
     test_parse_integer_overflow("340282366920938463463374607431768211464");
     test_parse_integer_overflow("340282366920938463463374607431768211465");
+    test_integer_maximum_and_minimum();
 }

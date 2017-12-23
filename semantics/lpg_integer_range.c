@@ -61,7 +61,7 @@ bool integer_range_list_contains(integer_range_list const haystack, integer_rang
     return false;
 }
 
-static void remove_element_from_range_list(integer_range_list *const range_list, size_t index)
+static void remove_element_from_integer_range_list(integer_range_list *const range_list, size_t index)
 {
     ASSUME(range_list->length > 0);
     ASSUME(index < range_list->length);
@@ -79,7 +79,7 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
         // Full remove
         if (integer_range_equals(element, needle))
         {
-            remove_element_from_range_list(haystack, i);
+            remove_element_from_integer_range_list(haystack, i);
             i--;
         }
         /*
@@ -126,23 +126,28 @@ void integer_range_list_merge(integer_range_list *const unmerged_list)
 {
     for (size_t i = 0; i < unmerged_list->length; ++i)
     {
-        integer_range first_part = unmerged_list->elements[i];
+        integer_range first = unmerged_list->elements[i];
         for (size_t j = i + 1; j < unmerged_list->length;)
         {
-            integer_range second_part = unmerged_list->elements[j];
-            if (integer_equal(first_part.maximum, second_part.minimum))
+            integer_range second = unmerged_list->elements[j];
+            if (integer_range_contains(first, second))
             {
-                // first part + second part
-                integer_range new_entry = integer_range_create(first_part.minimum, second_part.maximum);
-                unmerged_list->elements[i] = new_entry;
-                remove_element_from_range_list(unmerged_list, j);
+                remove_element_from_integer_range_list(unmerged_list, j);
             }
-            else if (integer_equal(second_part.maximum, first_part.minimum))
+            else if (integer_range_contains(second, first))
             {
-                // second part + first part
-                integer_range new_entry = integer_range_create(second_part.minimum, first_part.maximum);
-                unmerged_list->elements[i] = new_entry;
-                remove_element_from_range_list(unmerged_list, j);
+                remove_element_from_integer_range_list(unmerged_list, i);
+                j = i + 1;
+            }
+            else if (integer_range_contains_integer(first, second.minimum))
+            {
+                unmerged_list->elements[i].maximum = integer_maximum(first.maximum, second.maximum);
+                remove_element_from_integer_range_list(unmerged_list, j);
+            }
+            else if (integer_range_contains_integer(first, second.maximum))
+            {
+                unmerged_list->elements[i].minimum = integer_minimum(first.minimum, second.minimum);
+                remove_element_from_integer_range_list(unmerged_list, j);
             }
             else
             {

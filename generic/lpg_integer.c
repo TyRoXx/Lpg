@@ -228,3 +228,13 @@ char *integer_format(integer const value, char const *digits, unsigned base, cha
     }
     return buffer + next_digit;
 }
+
+integer integer_maximum(integer const first, integer const second)
+{
+    return integer_less_or_equals(first, second) ? second : first;
+}
+
+integer integer_minimum(integer const first, integer const second)
+{
+    return integer_less_or_equals(first, second) ? first : second;
+}
