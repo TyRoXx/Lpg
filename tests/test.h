@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)
@@ -21,7 +22,9 @@
 int lpg_check(int success);
 int lpg_print_test_summary(void);
 
-#define FAIL() LPG_ABORT()
+#define FAIL() exit(1)
+
+#define LPG_STRINGIZE(a) #a
 
 #define REQUIRE(x)                                                                                                     \
     do                                                                                                                 \
@@ -30,6 +33,7 @@ int lpg_print_test_summary(void);
         lpg_check(lpg_require_local_variable);                                                                         \
         if (!lpg_require_local_variable)                                                                               \
         {                                                                                                              \
+            fprintf(stderr, "REQUIRE(" LPG_STRINGIZE(x) ") failed\n");                                                 \
             FAIL();                                                                                                    \
         }                                                                                                              \
     } while ((void)0, 0)
