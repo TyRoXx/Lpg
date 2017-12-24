@@ -10,8 +10,6 @@
 #include "lpg_local_variable.h"
 #include "lpg_instruction_checkpoint.h"
 #include "function_checking_state.h"
-#include "lpg_integer_range.h"
-#include "../tests/test.h"
 
 typedef struct evaluate_expression_result
 {

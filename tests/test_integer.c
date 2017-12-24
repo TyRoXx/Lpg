@@ -52,7 +52,8 @@ static void test_parse_integer_success(integer expected, char const *input)
     unicode_string_free(&input_string);
 }
 
-static void test_parse_integer_overflow(char const *input) {
+static void test_parse_integer_overflow(char const *input)
+{
     integer parsed;
     unicode_string input_string = unicode_string_from_c_str(input);
     REQUIRE(!integer_parse(&parsed, unicode_view_from_string(input_string)));
@@ -106,7 +107,8 @@ static void test_integer_maximum_and_minimum(void)
     REQUIRE(integer_equal(integer_minimum(low, high), low));
 }
 
-static void test_integer_format(void) {
+static void test_integer_format(void)
+{
     for (unsigned base = 2; base <= 16; ++base)
     {
         for (unsigned value = 2; value < base; ++value)
@@ -120,14 +122,14 @@ static void test_integer_format(void) {
     {
         char buffer[39];
         char *formatted = integer_format(
-                integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 10, buffer, sizeof(buffer));
+            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 10, buffer, sizeof(buffer));
         REQUIRE(buffer == formatted);
         REQUIRE(!memcmp(buffer, "340282366920938463463374607431768211455", sizeof(buffer)));
     }
     {
         char buffer[32];
         char *formatted = integer_format(
-                integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 16, buffer, sizeof(buffer));
+            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 16, buffer, sizeof(buffer));
         REQUIRE(buffer == formatted);
         REQUIRE(!memcmp(buffer, "ffffffffffffffffffffffffffffffff", sizeof(buffer)));
     }
@@ -138,7 +140,8 @@ static void test_integer_format(void) {
     }
 }
 
-static void test_integer_less(void) {
+static void test_integer_less(void)
+{
     REQUIRE(integer_less(integer_create(0, 0), integer_create(0, 1)));
     REQUIRE(integer_less(integer_create(0, 0), integer_create(1, 1)));
     REQUIRE(integer_less(integer_create(0, 0), integer_create(111, 111)));
@@ -151,16 +154,18 @@ static void test_integer_less(void) {
     REQUIRE(!integer_less(integer_create(2, 0), integer_create(1, 0)));
 }
 
-static void test_integer_equals(void) {REQUIRE(integer_equal(integer_create(0, 0), integer_create(0, 0)));
+static void test_integer_equals(void)
+{
+    REQUIRE(integer_equal(integer_create(0, 0), integer_create(0, 0)));
     REQUIRE(integer_equal(integer_create(1, 1), integer_create(1, 1)));
     REQUIRE(!integer_equal(integer_create(1, 0), integer_create(0, 0)));
     REQUIRE(!integer_equal(integer_create(0, 1), integer_create(0, 0)));
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(1, 0)));
     REQUIRE(!integer_equal(integer_create(0, 0), integer_create(0, 1)));
-
 }
 
-static void test_integer_divide(void) {
+static void test_integer_divide(void)
+{
     {
         integer_division result = integer_divide(integer_create(0, 0), integer_create(0, 1));
         REQUIRE(integer_equal(result.quotient, integer_create(0, 0)));
@@ -193,13 +198,14 @@ static void test_integer_divide(void) {
     }
 }
 
-static void test_parse_integer(void) {
+static void test_parse_integer(void)
+{
     test_parse_integer_success(integer_create(0, 0), "0");
     test_parse_integer_success(integer_create(0, 1), "1");
     test_parse_integer_success(integer_create(0, 10), "10");
     test_parse_integer_success(integer_create(0, 42), "42");
     test_parse_integer_success(
-            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), "340282366920938463463374607431768211455");
+        integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), "340282366920938463463374607431768211455");
     test_parse_integer_overflow("340282366920938463463374607431768211456");
     test_parse_integer_overflow("340282366920938463463374607431768211457");
     test_parse_integer_overflow("340282366920938463463374607431768211458");
@@ -212,7 +218,8 @@ static void test_parse_integer(void) {
     test_parse_integer_overflow("340282366920938463463374607431768211465");
 }
 
-static void test_shift_left(void) {
+static void test_shift_left(void)
+{
     for (uint32_t i = 0; i <= 128; ++i)
     {
         test_shift_left_success(integer_create(0, 0), i, integer_create(0, 0));
@@ -232,7 +239,8 @@ static void test_shift_left(void) {
     test_shift_left_overflow(integer_create(2, 0), 63);
 }
 
-static void test_multiply(void) {
+static void test_multiply(void)
+{
     test_multiply_success(integer_create(0, 0), integer_create(0, 0), integer_create(0, 0));
     test_multiply_success(integer_create(0, 1), integer_create(0, 0), integer_create(0, 0));
     test_multiply_success(integer_create(0, 0), integer_create(0, 1), integer_create(0, 0));
@@ -247,7 +255,8 @@ static void test_multiply(void) {
     test_multiply_overflow(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), integer_create(0, 2));
 }
 
-static void test_add(void) {
+static void test_add(void)
+{
     test_add_success(integer_create(0, 0), integer_create(0, 0), integer_create(0, 0));
     test_add_success(integer_create(0, 1), integer_create(0, 0), integer_create(0, 1));
     test_add_success(integer_create(0, 0), integer_create(0, 1), integer_create(0, 1));
