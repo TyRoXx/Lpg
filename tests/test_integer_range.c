@@ -278,6 +278,38 @@ static void test_integer_range_list_merge(void)
 
         integer_range_list_deallocate(list);
     }
+
+    // Element two elements containing each other
+    {
+        integer_range *elements = allocate_array(2, sizeof(*elements));
+        elements[0] = integer_range_create(integer_create(0, 0), integer_create(0, 10));
+        elements[1] = integer_range_create(integer_create(0, 0), integer_create(0, 5));
+
+        integer_range_list list = integer_range_list_create(elements, 2);
+
+        integer_range_list_merge(&list);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], elements[0]));
+
+        integer_range_list_deallocate(list);
+    }
+
+    // Element two elements containing each other
+    {
+        integer_range *elements = allocate_array(2, sizeof(*elements));
+        elements[0] = integer_range_create(integer_create(0, 0), integer_create(0, 5));
+        elements[1] = integer_range_create(integer_create(0, 0), integer_create(0, 10));
+
+        integer_range_list list = integer_range_list_create(elements, 2);
+
+        integer_range_list_merge(&list);
+
+        REQUIRE(list.length == 1);
+        REQUIRE(integer_range_equals(list.elements[0], elements[1]));
+
+        integer_range_list_deallocate(list);
+    }
 }
 
 void test_integer_range_remove(void)
