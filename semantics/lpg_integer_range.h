@@ -1,6 +1,5 @@
 #pragma once
 
-#include <glob.h>
 #include "lpg_integer.h"
 
 typedef struct integer_range
