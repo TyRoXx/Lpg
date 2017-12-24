@@ -13,7 +13,7 @@
 
 #ifdef NDEBUG
 #ifdef _MSC_VER
-#define ASSUME(x) __assume((x))
+#define ASSUME(x) ASSERT((x))
 #else
 #define ASSUME(x)                                                                                                      \
     do                                                                                                                 \

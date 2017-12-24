@@ -14,7 +14,7 @@ typedef struct integer_range_list
     size_t length;
 } integer_range_list;
 
-integer_range integer_range_create(integer const min, integer const max);
+integer_range integer_range_create(integer const minimum, integer const maximum);
 bool integer_range_equals(integer_range const left, integer_range const right);
 bool integer_range_contains(integer_range const haystack, integer_range const needle);
 bool integer_range_contains_integer(integer_range const haystack, integer const needle);

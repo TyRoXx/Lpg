@@ -1,7 +1,7 @@
 #include <lpg_allocate.h>
 #include "lpg_integer_range.h"
 
-integer_range integer_range_create(integer minimum, integer maximum)
+integer_range integer_range_create(integer const minimum, integer const maximum)
 {
     integer_range const result = {minimum, maximum};
     return result;
