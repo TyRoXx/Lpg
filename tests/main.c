@@ -39,6 +39,7 @@ int main(void)
                                     test_integer,
                                     test_integer_range,
                                     test_allocator,
+                                    test_semantic_errors,
                                     test_unicode_string,
                                     test_unicode_view,
                                     test_decode_string_literal,
@@ -60,7 +61,6 @@ int main(void)
                                     test_value,
                                     test_remove_unused_functions,
                                     test_remove_dead_code,
-                                    test_semantic_errors,
                                     test_type};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {

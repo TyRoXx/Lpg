@@ -731,6 +731,147 @@ void test_semantic_errors(void)
         REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
+    {
+        sequence root = parse("let v = s{}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let f = ()\n"
+                              "    side-effect()\n"
+                              "    1\n"
+                              "let s = f()\n"
+                              "let v = s{}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(4, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = 1\n"
+                              "let v = s{}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let v = unit{}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_structure, source_location_create(0, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = struct\n"
+                              "    a: boolean\n"
+                              "let v = s{}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(2, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = struct\n"
+                              "    a: boolean\n"
+                              "let v = s{boolean.true, boolean.false}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(2, 8))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = struct\n"
+                              "    a: boolean\n"
+                              "let v = s{u}\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 10))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = struct\n"
+                              "    a: unit\n"
+                              "    b: u\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 7))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let s = struct\n"
+                              "    a: unit\n"
+                              "    b: 1\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(2, 7))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let f = ()\n"
+                              "    side-effect()\n"
+                              "    1\n"
+                              "let t = f()\n"
+                              "let s = struct\n"
+                              "    a: unit\n"
+                              "    b: t\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(6, 7))};
+        expected_errors expected = {errors, 1};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
     test_let_assignments(&std_library);
     standard_library_description_free(&std_library);
 }

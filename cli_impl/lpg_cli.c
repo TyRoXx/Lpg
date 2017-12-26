@@ -230,6 +230,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_duplicate_method_name:
         return "Duplicate method name in the same interface";
+
+    case semantic_error_expected_structure:
+        return "Expected structure";
     }
     LPG_UNREACHABLE();
 }

@@ -22,7 +22,11 @@
 int lpg_check(int success);
 int lpg_print_test_summary(void);
 
+#ifdef NDEBUG
 #define FAIL() exit(1)
+#else
+#define FAIL() LPG_ABORT()
+#endif
 
 #define LPG_STRINGIZE(a) #a
 

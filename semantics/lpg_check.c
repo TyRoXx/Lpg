@@ -1456,15 +1456,25 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
         evaluate_expression_result const element_type_evaluated = evaluate_expression(state, function, element.type);
         if (!element_type_evaluated.has_value)
         {
-            LPG_TO_DO();
+            for (size_t j = 0; j < i; ++j)
+            {
+                struct_member_free(elements + j);
+            }
+            deallocate(elements);
+            return make_compile_time_unit();
         }
-        if (!element_type_evaluated.compile_time_value.is_set)
+        if (!element_type_evaluated.compile_time_value.is_set ||
+            (element_type_evaluated.compile_time_value.value_.kind != value_kind_type))
         {
-            LPG_TO_DO();
-        }
-        if (element_type_evaluated.compile_time_value.value_.kind != value_kind_type)
-        {
-            LPG_TO_DO();
+            state->on_error(
+                semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(element.type)),
+                state->user);
+            for (size_t j = 0; j < i; ++j)
+            {
+                struct_member_free(elements + j);
+            }
+            deallocate(elements);
+            return make_compile_time_unit();
         }
         elements[i] = structure_member_create(element_type_evaluated.compile_time_value.value_.type_,
                                               unicode_view_copy(unicode_view_from_string(element.name.value)),
@@ -1616,32 +1626,50 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type);
     if (!type_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return type_evaluated;
     }
     if (!type_evaluated.compile_time_value.is_set)
     {
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(*element.type)),
+            state->user);
+        return make_compile_time_unit();
     }
     if (type_evaluated.compile_time_value.value_.kind != value_kind_type)
     {
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(*element.type)),
+            state->user);
+        return make_compile_time_unit();
     }
     if (type_evaluated.compile_time_value.value_.type_.kind != type_kind_structure)
     {
-        LPG_TO_DO();
+        state->on_error(
+            semantic_error_create(semantic_error_expected_structure, expression_source_begin(*element.type)),
+            state->user);
+        return make_compile_time_unit();
     }
     struct_id const structure_id = type_evaluated.compile_time_value.value_.type_.structure_;
     ASSUME(structure_id < state->program->struct_count);
     structure const *const structure = state->program->structs + structure_id;
-    if (structure->count != element.arguments.length)
+    if (element.arguments.length < structure->count)
     {
-        LPG_TO_DO();
+        state->on_error(semantic_error_create(semantic_error_missing_argument, expression_source_begin(*element.type)),
+                        state->user);
+        return make_compile_time_unit();
+    }
+    if (element.arguments.length > structure->count)
+    {
+        state->on_error(
+            semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)),
+            state->user);
+        return make_compile_time_unit();
     }
     evaluate_arguments_result const arguments_evaluated =
         evaluate_arguments(state, function, element.arguments.elements, element.arguments.length);
     if (!arguments_evaluated.registers)
     {
-        LPG_TO_DO();
+        return make_compile_time_unit();
     }
     if (arguments_evaluated.tuple_type_for_instruction.elements)
     {
