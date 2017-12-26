@@ -678,12 +678,12 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let i = interface\n"
-                              "    f(): unit\n"
+                              "    f(a: boolean): unit\n"
                               "impl i for unit\n"
-                              "    f(): string-ref\n"
+                              "    f(a: boolean): string-ref\n"
                               "        \"\"\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 9))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 19))};
         expected_errors expected = {errors, 1};
         checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
