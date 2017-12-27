@@ -108,12 +108,14 @@ typedef struct read_structure_element_result
     bool success;
     type type_;
     optional_value compile_time_value;
+    bool is_pure;
 } read_structure_element_result;
 
 static read_structure_element_result read_structure_element_result_create(bool const success, type const type_,
-                                                                          optional_value const compile_time_value)
+                                                                          optional_value const compile_time_value,
+                                                                          bool const is_pure)
 {
-    read_structure_element_result const result = {success, type_, compile_time_value};
+    read_structure_element_result const result = {success, type_, compile_time_value, is_pure};
     return result;
 }
 
@@ -129,11 +131,11 @@ static read_structure_element_result read_structure_element(function_checking_st
         {
             add_instruction(function, instruction_create_read_struct(read_struct_instruction_create(where, i, result)));
             return read_structure_element_result_create(
-                true, type->members[i].what, type->members[i].compile_time_value);
+                true, type->members[i].what, type->members[i].compile_time_value, true);
         }
     }
     state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
-    return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+    return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 }
 
 static read_structure_element_result read_tuple_element(function_checking_state *state, instruction_sequence *function,
@@ -146,17 +148,17 @@ static read_structure_element_result read_tuple_element(function_checking_state 
     if (!integer_parse(&element_index, element_name))
     {
         state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
-        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
     if (!integer_less(element_index, integer_create(0, type.length)))
     {
         state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
-        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
     ASSERT(integer_less(element_index, integer_create(0, ~(struct_member_id)0)));
     add_instruction(function, instruction_create_read_struct(
                                   read_struct_instruction_create(where, (struct_member_id)element_index.low, result)));
-    return read_structure_element_result_create(true, type.elements[element_index.low], optional_value_empty);
+    return read_structure_element_result_create(true, type.elements[element_index.low], optional_value_empty, true);
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
@@ -179,7 +181,8 @@ static read_structure_element_result read_interface_element_at(function_checking
     method_description const method = state->program->interfaces[from_type].methods[method_index];
     *method_object = function_pointer_create(
         method.result, method.parameters, tuple_type_create(captures, 1), optional_type_create_empty());
-    return read_structure_element_result_create(true, type_from_function_pointer(method_object), optional_value_empty);
+    return read_structure_element_result_create(
+        true, type_from_function_pointer(method_object), optional_value_empty, false);
 }
 
 static read_structure_element_result
@@ -196,7 +199,7 @@ read_interface_element(function_checking_state *state, instruction_sequence *fun
         }
     }
     state->on_error(semantic_error_create(semantic_error_unknown_element, element_source), state->user);
-    return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+    return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 }
 
 static read_structure_element_result read_element(function_checking_state *state, instruction_sequence *function,
@@ -207,7 +210,7 @@ static read_structure_element_result read_element(function_checking_state *state
     evaluate_expression_result const object = evaluate_expression(state, function, object_tree);
     if (!object.has_value)
     {
-        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
 
     type const *const actual_type = &object.type_;
@@ -231,12 +234,12 @@ static read_structure_element_result read_element(function_checking_state *state
     case type_kind_function_pointer:
     case type_kind_string_ref:
         state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
-        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_enumeration:
         state->on_error(
             semantic_error_create(semantic_error_no_members_on_enum_elements, element->source), state->user);
-        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_tuple:
         return read_tuple_element(state, function, actual_type->tuple_, object.where,
@@ -249,7 +252,7 @@ static read_structure_element_result read_element(function_checking_state *state
             restore(previous_code);
             state->on_error(
                 semantic_error_create(semantic_error_expected_compile_time_type, element->source), state->user);
-            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
         }
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
@@ -260,7 +263,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_integer_range:
         case type_kind_interface:
             state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
-            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
         case type_kind_structure:
         case type_kind_function_pointer:
@@ -285,7 +288,7 @@ static read_structure_element_result read_element(function_checking_state *state
                         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                       result, literal, type_from_enumeration(enum_))));
                         return read_structure_element_result_create(
-                            true, left_side_type, optional_value_create(literal));
+                            true, left_side_type, optional_value_create(literal), true);
                     }
                     value const literal = value_from_enum_constructor();
                     enum_constructor_type *const constructor_type =
@@ -295,11 +298,11 @@ static read_structure_element_result read_element(function_checking_state *state
                     constructor_type->enumeration = enum_;
                     constructor_type->which = i;
                     return read_structure_element_result_create(
-                        true, type_from_enum_constructor(constructor_type), optional_value_create(literal));
+                        true, type_from_enum_constructor(constructor_type), optional_value_create(literal), true);
                 }
             }
             state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
-            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty);
+            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
         }
         }
         LPG_UNREACHABLE();
@@ -377,7 +380,7 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         restore(previous_code);
         return evaluate_expression_result_empty;
     }
-    return evaluate_expression_result_create(true, result, element_read.type_, element_read.compile_time_value, false);
+    return evaluate_expression_result_create(true, result, element_read.type_, element_read.compile_time_value, true);
 }
 
 static evaluate_expression_result make_unit(register_id *const used_registers, instruction_sequence *output)
@@ -1091,11 +1094,16 @@ static void deallocate_boolean_cases(match_instruction_case *cases, bool *cases_
     deallocate(cases_handled);
 }
 
-static void deallocate_integer_range_list_cases(match_instruction_case *cases, integer_range_list integer_ranges)
+static void deallocate_integer_range_list_cases(match_instruction_case *cases, size_t const case_count,
+                                                integer_range_list integer_ranges)
 {
-    for (size_t j = 0; j < integer_ranges.length; ++j)
+    for (size_t j = 0; j < case_count; ++j)
     {
         match_instruction_case_free(cases[j]);
+    }
+    if (cases)
+    {
+        deallocate(cases);
     }
     integer_range_list_deallocate(integer_ranges);
 }
@@ -1221,7 +1229,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
     case type_kind_integer_range:
     {
-        integer expected_cases = integer_range_size(key.type_.integer_range_);
+        integer const expected_cases = integer_range_size(key.type_.integer_range_);
 
         if (!integer_equal(expected_cases, integer_create(0, (*element).match.number_of_cases)))
         {
@@ -1245,7 +1253,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
             if (!key_evaluated.has_value)
             {
-                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 return key_evaluated;
             }
 
@@ -1254,7 +1262,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 state->on_error(
                     semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
                     state->user);
-                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 return evaluate_expression_result_empty;
             }
 
@@ -1269,7 +1277,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     state->on_error(semantic_error_create(
                                         semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
                                     state->user);
-                    deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                    deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                     return evaluate_expression_result_empty;
                 }
             }
@@ -1281,7 +1289,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             evaluate_expression_result const action_evaluated = evaluate_expression(state, &action, *case_tree.action);
             if (!action_evaluated.has_value)
             {
-                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return action_evaluated;
             }
@@ -1296,7 +1304,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 state->on_error(
                     semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
                     state->user);
-                deallocate_integer_range_list_cases(cases, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return evaluate_expression_result_empty;
             }
@@ -1312,22 +1320,23 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         }
 
         ASSUME(integer_equal(integer_range_list_size(integer_ranges_unhandled), integer_create(0, 0)));
-        register_id result_register = allocate_register(&state->used_registers);
-        add_instruction(
-            function, instruction_create_match(match_instruction_create(
-                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-        integer_range_list_deallocate(integer_ranges_unhandled);
         if (compile_time_result.is_set)
         {
+            deallocate_integer_range_list_cases(cases, (*element).match.number_of_cases, integer_ranges_unhandled);
             restore(before);
-            result_register = allocate_register(&state->used_registers);
+            register_id const result_register = allocate_register(&state->used_registers);
             add_instruction(function, instruction_create_literal(literal_instruction_create(
                                           result_register, compile_time_result.value_, result_type)));
             return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
         }
-
+        integer_range_list_deallocate(integer_ranges_unhandled);
+        register_id const result_register = allocate_register(&state->used_registers);
+        add_instruction(
+            function, instruction_create_match(match_instruction_create(
+                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
         return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
     }
+
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
@@ -1712,7 +1721,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       where, value_from_integer(element.integer_literal.value), what)));
         return evaluate_expression_result_create(
-            true, where, what, optional_value_create(value_from_integer(element.integer_literal.value)), false);
+            true, where, what, optional_value_create(value_from_integer(element.integer_literal.value)), true);
     }
 
     case expression_type_access_structure:
