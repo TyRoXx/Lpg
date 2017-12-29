@@ -9,6 +9,7 @@
 #include "lpg_interface_id.h"
 #include "lpg_struct_id.h"
 #include "lpg_integer_range.h"
+#include "lpg_enum_id.h"
 
 typedef struct structure_member structure_member;
 
@@ -101,7 +102,7 @@ struct type
     {
         struct_id structure_;
         function_pointer const *function_pointer_;
-        enumeration const *enum_;
+        enum_id enum_;
         tuple_type tuple_;
         integer_range integer_range_;
         size_t inferred;
@@ -134,11 +135,11 @@ void method_description_free(method_description const value);
 
 struct enum_constructor_type
 {
-    enumeration const *enumeration;
+    enum_id enumeration;
     enum_element_id which;
 };
 
-enum_constructor_type enum_constructor_type_create(enumeration const *enumeration, enum_element_id which);
+enum_constructor_type enum_constructor_type_create(enum_id enumeration, enum_element_id which);
 
 typedef struct implementation
 {
@@ -181,7 +182,7 @@ bool function_pointer_equals(function_pointer const left, function_pointer const
 type type_from_function_pointer(function_pointer const *value);
 type type_from_unit(void);
 type type_from_string_ref(void);
-type type_from_enumeration(LPG_NON_NULL(enumeration const *value));
+type type_from_enumeration(enum_id const value);
 type type_from_tuple_type(tuple_type const value);
 type type_from_type(void);
 type type_from_integer_range(integer_range value);

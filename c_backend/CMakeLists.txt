@@ -1,5 +1,6 @@
 include_directories(../generic)
 include_directories(../semantics)
+include_directories(../syntax)
 file(GLOB_RECURSE sources "*.c" "*.h")
 add_library(c_backend ${sources})
 target_link_libraries(c_backend semantics generic)

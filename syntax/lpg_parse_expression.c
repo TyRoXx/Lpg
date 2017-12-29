@@ -606,6 +606,52 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
     return expression_parser_result_failure;
 }
 
+static expression_parser_result parse_enum(expression_parser *const parser, size_t const indentation,
+                                           source_location const begin)
+{
+    unicode_string *elements = NULL;
+    enum_element_id element_count = 0;
+    bool is_success = true;
+    for (;;)
+    {
+        {
+            rich_token const newline = peek_at(parser, 0);
+            if (newline.token != token_newline)
+            {
+                break;
+            }
+        }
+        {
+            rich_token const indent = peek_at(parser, 1);
+            if (!is_same_indentation_level(indent, indentation))
+            {
+                break;
+            }
+        }
+        pop_n(parser, 2);
+        rich_token const name = peek(parser);
+        if (name.token != token_identifier)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            is_success = false;
+            break;
+        }
+        pop(parser);
+
+        elements = reallocate_array(elements, (element_count + 1), sizeof(*elements));
+        elements[element_count] = unicode_view_copy(name.content);
+        ++element_count;
+    }
+    enum_expression const parsed = enum_expression_create(begin, elements, element_count);
+    if (is_success)
+    {
+        expression_parser_result const result = {true, expression_from_enum(parsed)};
+        return result;
+    }
+    enum_expression_free(parsed);
+    return expression_parser_result_failure;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
@@ -744,6 +790,10 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         case token_struct:
             pop(parser);
             return parse_struct(parser, indentation + 1, head.where);
+
+        case token_enum:
+            pop(parser);
+            return parse_enum(parser, indentation + 1, head.where);
 
         case token_impl:
             pop(parser);

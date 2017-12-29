@@ -5,7 +5,6 @@
 
 static void standard_library_stable_free(standard_library_stable *stable)
 {
-    enumeration_free(&stable->boolean);
     function_pointer_free(&stable->assert_);
     function_pointer_free(&stable->and_);
     function_pointer_free(&stable->or_);
@@ -17,7 +16,6 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->integer_less);
     function_pointer_free(&stable->integer_to_string);
     function_pointer_free(&stable->side_effect);
-    enumeration_free(&stable->option);
 }
 
 value not_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -127,22 +125,8 @@ value side_effect_impl(function_call_arguments const arguments, struct value con
 standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
-    {
-        enumeration_element *const boolean_elements = allocate_array(2, sizeof(*boolean_elements));
-        boolean_elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), type_from_unit());
-        boolean_elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), type_from_unit());
-        stable->boolean = enumeration_create(boolean_elements, 2);
-    }
-    type const boolean = type_from_enumeration(&stable->boolean);
 
-    {
-        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
-        elements[0] = enumeration_element_create(unicode_string_from_c_str("none"), type_from_unit());
-        elements[1] = enumeration_element_create(
-            unicode_string_from_c_str("some"),
-            type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())));
-        stable->option = enumeration_create(elements, 2);
-    }
+    type const boolean = type_from_enumeration(0);
 
     stable->assert_ = function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(boolean), 1),
                                               tuple_type_create(NULL, 0), optional_type_create_empty());
@@ -221,9 +205,8 @@ standard_library_description describe_standard_library(void)
 
     globals[2] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed2"), optional_value_empty);
 
-    globals[3] =
-        structure_member_create(type_from_type(), unicode_string_from_c_str("boolean"),
-                                optional_value_create(value_from_type(type_from_enumeration(&stable->boolean))));
+    globals[3] = structure_member_create(
+        type_from_type(), unicode_string_from_c_str("boolean"), optional_value_create(value_from_type(boolean)));
 
     globals[4] = structure_member_create(
         type_from_function_pointer(&stable->assert_), unicode_string_from_c_str("assert"), optional_value_empty);
@@ -267,9 +250,8 @@ standard_library_description describe_standard_library(void)
     globals[14] = structure_member_create(
         type_from_unit(), unicode_string_from_c_str("unit_value"), optional_value_create(value_from_unit()));
 
-    globals[15] =
-        structure_member_create(type_from_type(), unicode_string_from_c_str("option"),
-                                optional_value_create(value_from_type(type_from_enumeration(&stable->option))));
+    globals[15] = structure_member_create(type_from_type(), unicode_string_from_c_str("option"),
+                                          optional_value_create(value_from_type(type_from_enumeration(1))));
 
     globals[16] = structure_member_create(
         type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),

@@ -470,7 +470,9 @@ checked_program remove_unused_functions(checked_program const from)
                               from.struct_count,
                               {NULL},
                               allocate_array(new_function_count, sizeof(*result.functions)),
-                              new_function_count};
+                              new_function_count,
+                              NULL,
+                              0};
     result.interfaces = clone_interfaces(from.interfaces, from.interface_count, &result.memory, new_function_ids);
     result.structs = clone_structures(from.structs, from.struct_count, &result.memory, new_function_ids);
     for (function_id i = 0; i < from.function_count; ++i)

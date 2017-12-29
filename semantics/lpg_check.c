@@ -73,7 +73,8 @@ static type get_return_type(type const callee, checked_function const *const all
     LPG_UNREACHABLE();
 }
 
-static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions)
+static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions,
+                               enumeration const *const all_enums)
 {
     switch (callee.kind)
     {
@@ -98,7 +99,7 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
 
     case type_kind_enum_constructor:
         ASSUME(parameter == 0);
-        return callee.enum_constructor->enumeration->elements[callee.enum_constructor->which].state;
+        return all_enums[callee.enum_constructor->enumeration].elements[callee.enum_constructor->which].state;
     }
     LPG_UNREACHABLE();
 }
@@ -275,7 +276,7 @@ static read_structure_element_result read_element(function_checking_state *state
 
         case type_kind_enumeration:
         {
-            enumeration const *const enum_ = left_side_type.enum_;
+            enumeration const *const enum_ = state->program->enums + left_side_type.enum_;
             restore(previous_code);
             LPG_FOR(enum_element_id, i, enum_->size)
             {
@@ -286,7 +287,7 @@ static read_structure_element_result read_element(function_checking_state *state
                     {
                         value const literal = value_from_enum_element(i, enum_->elements[i].state, NULL);
                         add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                                      result, literal, type_from_enumeration(enum_))));
+                                                      result, literal, type_from_enumeration(left_side_type.enum_))));
                         return read_structure_element_result_create(
                             true, left_side_type, optional_value_create(literal), true);
                     }
@@ -295,7 +296,7 @@ static read_structure_element_result read_element(function_checking_state *state
                         garbage_collector_allocate(&state->program->memory, sizeof(*constructor_type));
                     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                   result, literal, type_from_enum_constructor(constructor_type))));
-                    constructor_type->enumeration = enum_;
+                    constructor_type->enumeration = left_side_type.enum_;
                     constructor_type->which = i;
                     return read_structure_element_result_create(
                         true, type_from_enum_constructor(constructor_type), optional_value_create(literal), true);
@@ -311,7 +312,8 @@ static read_structure_element_result read_element(function_checking_state *state
     LPG_UNREACHABLE();
 }
 
-static size_t expected_call_argument_count(const type callee, checked_function const *const all_functions)
+static size_t expected_call_argument_count(const type callee, checked_function const *const all_functions,
+                                           enumeration const *const all_enums)
 {
     switch (callee.kind)
     {
@@ -333,9 +335,11 @@ static size_t expected_call_argument_count(const type callee, checked_function c
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
-        ASSUME(callee.enum_constructor->which < callee.enum_constructor->enumeration->size);
-        return callee.enum_constructor->enumeration->elements[callee.enum_constructor->which].state.kind !=
-               type_kind_unit;
+    {
+        enumeration const *const enum_ = all_enums + callee.enum_constructor->enumeration;
+        ASSUME(callee.enum_constructor->which < enum_->size);
+        return enum_->elements[callee.enum_constructor->which].state.kind != type_kind_unit;
+    }
     }
     LPG_UNREACHABLE();
 }
@@ -859,7 +863,7 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
     conversion_result const converted =
         convert(state, function, argument.where, argument.type_, argument.compile_time_value,
                 expression_source_begin(argument_tree),
-                get_parameter_type(callee_type, parameter_id, state->program->functions));
+                get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums));
     argument_evaluation_result const result = {converted.ok, converted.compile_time_value, converted.where};
     return result;
 }
@@ -894,7 +898,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             semantic_error_create(semantic_error_not_callable, expression_source_begin(*call.callee)), state->user);
         return make_compile_time_unit();
     }
-    size_t const expected_arguments = expected_call_argument_count(callee.type_, state->program->functions);
+    size_t const expected_arguments =
+        expected_call_argument_count(callee.type_, state->program->functions, state->program->enums);
     register_id *const arguments = allocate_array(expected_arguments, sizeof(*arguments));
     value *const compile_time_arguments = allocate_array(expected_arguments, sizeof(*compile_time_arguments));
     bool all_compile_time_arguments = true;
@@ -983,10 +988,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 value *const enum_state = garbage_collector_allocate(&state->program->memory, sizeof(*enum_state));
                 ASSUME(expected_arguments == 1);
                 *enum_state = compile_time_arguments[0];
-                compile_time_result = optional_value_create(value_from_enum_element(
-                    callee.type_.enum_constructor->which,
-                    callee.type_.enum_constructor->enumeration->elements[callee.type_.enum_constructor->which].state,
-                    enum_state));
+                compile_time_result = optional_value_create(
+                    value_from_enum_element(callee.type_.enum_constructor->which,
+                                            state->program->enums[callee.type_.enum_constructor->enumeration]
+                                                .elements[callee.type_.enum_constructor->which]
+                                                .state,
+                                            enum_state));
                 break;
             }
             }
@@ -1035,11 +1042,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
         case type_kind_enum_constructor:
             ASSUME(call.arguments.length == 1);
-            add_instruction(
-                function,
-                instruction_create_enum_construct(enum_construct_instruction_create(
-                    result, callee.type_.enum_constructor->which, arguments[0],
-                    callee.type_.enum_constructor->enumeration->elements[callee.type_.enum_constructor->which].state)));
+            add_instruction(function, instruction_create_enum_construct(enum_construct_instruction_create(
+                                          result, callee.type_.enum_constructor->which, arguments[0],
+                                          state->program->enums[callee.type_.enum_constructor->enumeration]
+                                              .elements[callee.type_.enum_constructor->which]
+                                              .state)));
             deallocate(arguments);
             break;
 
@@ -1120,7 +1127,17 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     switch (key.type_.kind)
     {
     case type_kind_enumeration:
-        if (key.type_.enum_->size != (*element).match.number_of_cases)
+    {
+        enumeration const *const enum_ = state->program->enums + key.type_.enum_;
+        if (enum_->size == 0)
+        {
+            state->on_error(
+                semantic_error_create(semantic_error_match_unsupported, expression_source_begin((*element))),
+                state->user);
+            return evaluate_expression_result_empty;
+        }
+
+        if (enum_->size != (*element).match.number_of_cases)
         {
             state->on_error(
                 semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))),
@@ -1128,104 +1145,102 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             return evaluate_expression_result_empty;
         }
 
+        match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
+        bool *const enum_elements_handled =
+            allocate_array((*element).match.number_of_cases, sizeof(*enum_elements_handled));
+        memset(enum_elements_handled, 0, (*element).match.number_of_cases * sizeof(*enum_elements_handled));
+        type result_type = type_from_unit();
+        optional_value compile_time_result = optional_value_empty;
+        for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
         {
-            match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
-            bool *const enum_elements_handled =
-                allocate_array((*element).match.number_of_cases, sizeof(*enum_elements_handled));
-            memset(enum_elements_handled, 0, (*element).match.number_of_cases * sizeof(*enum_elements_handled));
-            type result_type = type_from_unit();
-            optional_value compile_time_result = optional_value_empty;
-            for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+            match_case const case_tree = (*element).match.cases[i];
+            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
+            if (!key_evaluated.has_value)
             {
-                match_case const case_tree = (*element).match.cases[i];
-                evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
-                if (!key_evaluated.has_value)
-                {
-                    deallocate_boolean_cases(cases, enum_elements_handled, i);
-                    return key_evaluated;
-                }
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                return key_evaluated;
+            }
 
-                if (!type_equals(key.type_, key_evaluated.type_))
+            if (!type_equals(key.type_, key_evaluated.type_))
+            {
+                state->on_error(
+                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
+                    state->user);
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                return evaluate_expression_result_empty;
+            }
+
+            {
+                ASSUME(key_evaluated.compile_time_value.value_.kind == value_kind_enum_element);
+                bool *const case_handled =
+                    (enum_elements_handled + key_evaluated.compile_time_value.value_.enum_element.which);
+                if (*case_handled)
                 {
-                    state->on_error(
-                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
-                        state->user);
+                    state->on_error(semantic_error_create(
+                                        semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
+                                    state->user);
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
-
-                {
-                    ASSUME(key_evaluated.compile_time_value.value_.kind == value_kind_enum_element);
-                    bool *const case_handled =
-                        (enum_elements_handled + key_evaluated.compile_time_value.value_.enum_element.which);
-                    if (*case_handled)
-                    {
-                        state->on_error(semantic_error_create(semantic_error_duplicate_match_case,
-                                                              expression_source_begin(*case_tree.key)),
-                                        state->user);
-                        deallocate_boolean_cases(cases, enum_elements_handled, i);
-                        return evaluate_expression_result_empty;
-                    }
-                    *case_handled = true;
-                }
-
-                /*TODO: support runtime values as keys?*/
-                ASSERT(key_evaluated.compile_time_value.is_set);
-
-                instruction_sequence action = instruction_sequence_create(NULL, 0);
-                evaluate_expression_result const action_evaluated =
-                    evaluate_expression(state, &action, *case_tree.action);
-                if (!action_evaluated.has_value)
-                {
-                    deallocate_boolean_cases(cases, enum_elements_handled, i);
-                    instruction_sequence_free(&action);
-                    return action_evaluated;
-                }
-
-                if (i == 0)
-                {
-                    result_type = action_evaluated.type_;
-                }
-                else if (!type_equals(result_type, action_evaluated.type_))
-                {
-                    /*TODO: support types that are not the same, but still comparable*/
-                    state->on_error(
-                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
-                        state->user);
-                    deallocate_boolean_cases(cases, enum_elements_handled, i);
-                    instruction_sequence_free(&action);
-                    return evaluate_expression_result_empty;
-                }
-
-                if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
-                    value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
-                    action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
-                {
-                    compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
-                }
-
-                cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
+                *case_handled = true;
             }
-            for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+
+            /*TODO: support runtime values as keys?*/
+            ASSERT(key_evaluated.compile_time_value.is_set);
+
+            instruction_sequence action = instruction_sequence_create(NULL, 0);
+            evaluate_expression_result const action_evaluated = evaluate_expression(state, &action, *case_tree.action);
+            if (!action_evaluated.has_value)
             {
-                ASSUME(enum_elements_handled[i]);
-            }
-            register_id result_register = allocate_register(&state->used_registers);
-            add_instruction(
-                function, instruction_create_match(match_instruction_create(
-                              key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-            deallocate(enum_elements_handled);
-            if (compile_time_result.is_set)
-            {
-                restore(before);
-                result_register = allocate_register(&state->used_registers);
-                add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                              result_register, compile_time_result.value_, result_type)));
-                return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                instruction_sequence_free(&action);
+                return action_evaluated;
             }
 
-            return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
+            if (i == 0)
+            {
+                result_type = action_evaluated.type_;
+            }
+            else if (!type_equals(result_type, action_evaluated.type_))
+            {
+                /*TODO: support types that are not the same, but still comparable*/
+                state->on_error(
+                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
+                    state->user);
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                instruction_sequence_free(&action);
+                return evaluate_expression_result_empty;
+            }
+
+            if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
+                value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
+                action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
+            {
+                compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
+            }
+
+            cases[i] = match_instruction_case_create(key_evaluated.where, action, action_evaluated.where);
         }
+        for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+        {
+            ASSUME(enum_elements_handled[i]);
+        }
+        register_id result_register = allocate_register(&state->used_registers);
+        add_instruction(
+            function, instruction_create_match(match_instruction_create(
+                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+        deallocate(enum_elements_handled);
+        if (compile_time_result.is_set)
+        {
+            restore(before);
+            result_register = allocate_register(&state->used_registers);
+            add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                          result_register, compile_time_result.value_, result_type)));
+            return evaluate_expression_result_create(true, result_register, result_type, compile_time_result, true);
+        }
+
+        return evaluate_expression_result_create(true, result_register, result_type, optional_value_empty, false);
+    }
 
     case type_kind_integer_range:
     {
@@ -1690,6 +1705,39 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     return evaluate_expression_result_create(true, into, type_from_struct(structure_id), optional_value_empty, false);
 }
 
+static evaluate_expression_result
+evaluate_enum_expression(function_checking_state *state, instruction_sequence *function, enum_expression const element)
+{
+    enum_id const new_enum_id = state->program->enum_count;
+    state->program->enums = reallocate_array(state->program->enums, (new_enum_id + 1), sizeof(*state->program->enums));
+    enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
+    for (size_t i = 0; i < element.element_count; ++i)
+    {
+        elements[i] = enumeration_element_create(
+            unicode_view_copy(unicode_view_from_string(element.elements[i])), type_from_unit());
+        for (size_t k = 0; k < i; ++k)
+        {
+            if (unicode_string_equals(element.elements[i], element.elements[k]))
+            {
+                state->on_error(
+                    semantic_error_create(semantic_error_duplicate_enum_element, element.begin), state->user);
+                for (size_t m = 0; m <= i; ++m)
+                {
+                    enumeration_element_free(elements + m);
+                }
+                deallocate(elements);
+                return evaluate_expression_result_empty;
+            }
+        }
+    }
+    state->program->enum_count += 1;
+    state->program->enums[new_enum_id] = enumeration_create(elements, element.element_count);
+    register_id const into = allocate_register(&state->used_registers);
+    value const literal = value_from_type(type_from_enumeration(new_enum_id));
+    add_instruction(function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(literal), true);
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element)
 {
@@ -1712,6 +1760,9 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
 
     case expression_type_binary:
         LPG_TO_DO();
+
+    case expression_type_enum:
+        return evaluate_enum_expression(state, function, element.enum_);
 
     case expression_type_integer_literal:
     {
@@ -1959,7 +2010,25 @@ checked_program check(sequence const root, structure const global, check_error_h
 {
     structure *const structures = allocate_array(1, sizeof(*structures));
     structures[0] = clone_structure(global);
-    checked_program program = {NULL, 0, structures, 1, {NULL}, allocate_array(1, sizeof(*program.functions)), 1};
+    checked_program program = {NULL,       0,
+                               structures, 1,
+                               {NULL},     allocate_array(1, sizeof(*program.functions)),
+                               1,          allocate_array(2, sizeof(*program.enums)),
+                               2};
+    {
+        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), type_from_unit());
+        elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), type_from_unit());
+        program.enums[0] = enumeration_create(elements, 2);
+    }
+    {
+        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = enumeration_element_create(unicode_string_from_c_str("none"), type_from_unit());
+        elements[1] = enumeration_element_create(
+            unicode_string_from_c_str("some"),
+            type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())));
+        program.enums[1] = enumeration_create(elements, 2);
+    }
     check_function_result const checked =
         check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
                        optional_type_create_empty(), true, optional_type_create_empty());

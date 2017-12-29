@@ -16,7 +16,9 @@ void test_remove_unused_functions(void)
                                 0,
                                 {NULL},
                                 allocate_array(original_function_count, sizeof(*original.functions)),
-                                original_function_count};
+                                original_function_count,
+                                NULL,
+                                0};
 
     for (function_id i = 0; i < original.function_count; ++i)
     {

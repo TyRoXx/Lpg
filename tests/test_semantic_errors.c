@@ -169,6 +169,34 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("let e = enum\n"
+                              "let f = (arg: e)\n"
+                              "    match arg\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_match_unsupported, source_location_create(2, 4))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let e = enum\n"
+                              "    a\n"
+                              "    a\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_enum_element, source_location_create(0, 8))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("side-effect()\n"
                               "h()");
         semantic_error const errors[] = {
@@ -199,8 +227,8 @@ void test_semantic_errors(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(0, value_from_enum_element(1, type_from_unit(), NULL),
-                                                                  type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
@@ -217,8 +245,8 @@ void test_semantic_errors(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(0, value_from_enum_element(1, type_from_unit(), NULL),
-                                                                  type_from_enumeration(&std_library.stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
@@ -1101,9 +1129,8 @@ static void test_assert(const standard_library_description *std_library)
         arguments[0] = 2;
         instruction const expected_body_elements[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 4, 1)),
-            instruction_create_literal(
-                literal_instruction_create(2, value_from_enum_element(1, type_from_unit(), NULL),
-                                           type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                2, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_call(call_instruction_create(1, arguments, 1, 3))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
@@ -1126,12 +1153,10 @@ static void test_let_assignments(const standard_library_description *std_library
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
-            instruction_create_literal(
-                literal_instruction_create(0, value_from_enum_element(1, type_from_unit(), NULL),
-                                           type_from_enumeration(&std_library->stable->boolean))),
-            instruction_create_literal(
-                literal_instruction_create(1, value_from_enum_element(1, type_from_unit(), NULL),
-                                           type_from_enumeration(&std_library->stable->boolean))),
+            instruction_create_literal(literal_instruction_create(
+                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
+            instruction_create_literal(literal_instruction_create(
+                1, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit()))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));

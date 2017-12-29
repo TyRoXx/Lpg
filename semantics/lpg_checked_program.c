@@ -28,5 +28,13 @@ void checked_program_free(checked_program const *program)
     {
         deallocate(program->structs);
     }
+    for (size_t i = 0; i < program->enum_count; ++i)
+    {
+        enumeration_free(program->enums + i);
+    }
+    if (program->enums)
+    {
+        deallocate(program->enums);
+    }
     garbage_collector_free(program->memory);
 }

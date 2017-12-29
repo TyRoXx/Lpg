@@ -1,5 +1,6 @@
 include_directories(../generic)
 include_directories(../semantics)
+include_directories(../syntax)
 file(GLOB sources "*.c" "*.h")
 add_library(optimization ${sources})
 target_compile_options(optimization PUBLIC ${LPG_COMPILE_FLAGS})

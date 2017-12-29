@@ -310,6 +310,10 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     {
         return make_success(token_impl, content.length);
     }
+    if (unicode_view_equals_c_str(content, "enum"))
+    {
+        return make_success(token_enum, content.length);
+    }
     return make_success(token_identifier, i);
 }
 

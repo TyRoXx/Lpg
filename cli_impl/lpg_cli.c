@@ -233,6 +233,12 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_expected_structure:
         return "Expected structure";
+
+    case semantic_error_duplicate_enum_element:
+        return "Duplicate enum element";
+
+    case semantic_error_match_unsupported:
+        return "Unsupported type to match";
     }
     LPG_UNREACHABLE();
 }

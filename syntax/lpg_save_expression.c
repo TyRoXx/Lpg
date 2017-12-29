@@ -304,6 +304,19 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         return success;
     }
 
+    case expression_type_enum:
+    {
+        LPG_TRY(stream_writer_write_string(to, "enum"));
+        whitespace_state in_struct = go_deeper(whitespace, 1);
+        for (size_t i = 0; i < value->enum_.element_count; ++i)
+        {
+            LPG_TRY(stream_writer_write_string(to, "\n"));
+            LPG_TRY(indent(to, in_struct));
+            LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(value->enum_.elements[i])));
+        }
+        return success;
+    }
+
     case expression_type_interface:
     {
         LPG_TRY(stream_writer_write_string(to, "interface"));

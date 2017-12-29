@@ -26,8 +26,6 @@ value side_effect_impl(function_call_arguments const arguments, struct value con
 
 typedef struct standard_library_stable
 {
-    enumeration boolean;
-    enumeration option;
     function_pointer assert_;
     function_pointer and_;
     function_pointer or_;

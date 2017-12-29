@@ -423,6 +423,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_enum:
+        return value.enum_.begin;
+
     case expression_type_instantiate_struct:
         return expression_source_begin(*value.instantiate_struct.type);
 
@@ -503,6 +506,44 @@ void instantiate_struct_expression_free(instantiate_struct_expression const free
 {
     expression_deallocate(freed.type);
     tuple_free(&freed.arguments);
+}
+
+enum_expression enum_expression_create(source_location begin, unicode_string *elements, enum_element_id element_count)
+{
+    enum_expression const result = {begin, elements, element_count};
+    return result;
+}
+
+void enum_expression_free(enum_expression const freed)
+{
+    for (size_t i = 0; i < freed.element_count; ++i)
+    {
+        unicode_string_free(freed.elements + i);
+    }
+    if (freed.elements)
+    {
+        deallocate(freed.elements);
+    }
+}
+
+bool enum_expression_equals(enum_expression const left, enum_expression const right)
+{
+    if (!source_location_equals(left.begin, right.begin))
+    {
+        return false;
+    }
+    if (left.element_count != right.element_count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.element_count; ++i)
+    {
+        if (!unicode_string_equals(left.elements[i], right.elements[i]))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
@@ -684,6 +725,14 @@ expression expression_from_instantiate_struct(instantiate_struct_expression valu
     return result;
 }
 
+expression expression_from_enum(enum_expression const value)
+{
+    expression result;
+    result.type = expression_type_enum;
+    result.enum_ = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -695,6 +744,10 @@ void expression_free(expression const *this)
 {
     switch (this->type)
     {
+    case expression_type_enum:
+        enum_expression_free(this->enum_);
+        break;
+
     case expression_type_instantiate_struct:
         instantiate_struct_expression_free(this->instantiate_struct);
         break;
@@ -838,6 +891,9 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_enum:
+        return enum_expression_equals(left->enum_, right->enum_);
+
     case expression_type_instantiate_struct:
         return instantiate_struct_expression_equals(left->instantiate_struct, right->instantiate_struct);
 

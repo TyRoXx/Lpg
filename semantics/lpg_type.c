@@ -143,7 +143,7 @@ void method_description_free(method_description const value)
     }
 }
 
-enum_constructor_type enum_constructor_type_create(enumeration const *enumeration, enum_element_id which)
+enum_constructor_type enum_constructor_type_create(enum_id enumeration, enum_element_id which)
 {
     enum_constructor_type const result = {enumeration, which};
     return result;
@@ -223,7 +223,7 @@ type type_from_string_ref(void)
     return result;
 }
 
-type type_from_enumeration(enumeration const *value)
+type type_from_enumeration(enum_id const value)
 {
     type result;
     result.kind = type_kind_enumeration;

@@ -1,5 +1,6 @@
 include_directories(../generic)
 include_directories(../semantics)
+include_directories(../syntax)
 file(GLOB_RECURSE sources "*.c" "*.h")
 add_library(javascript_backend ${sources})
 target_compile_options(javascript_backend PUBLIC ${LPG_COMPILE_FLAGS})

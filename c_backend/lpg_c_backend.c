@@ -121,7 +121,6 @@ typedef struct c_backend_state
     checked_function const *all_functions;
     interface const *all_interfaces;
     type_definitions *definitions;
-    enumeration const *boolean;
     structure const *all_structs;
 } c_backend_state;
 
@@ -874,9 +873,9 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
                                            instruction_sequence const sequence, size_t const indentation,
                                            stream_writer const c_output);
 
-static type find_boolean(c_backend_state const *state)
+static type find_boolean(void)
 {
-    return type_from_enumeration(state->boolean);
+    return type_from_enumeration(0);
 }
 
 static success_indicator generate_tuple_initializer(c_backend_state *state,
@@ -1195,7 +1194,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_string_equals:
             standard_library_usage_use_string_ref(&state->standard_library);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = string_ref_equals("));
@@ -1208,7 +1207,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_integer_equals:
             state->standard_library.using_integer = true;
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = integer_equals("));
@@ -1221,7 +1220,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_integer_less:
             state->standard_library.using_integer = true;
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = integer_less("));
@@ -1354,7 +1353,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_and:
             ASSUME(input.call.argument_count == 2);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
@@ -1366,7 +1365,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_or:
             ASSUME(input.call.argument_count == 2);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = ("));
@@ -1378,7 +1377,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_not:
             ASSUME(input.call.argument_count == 1);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean(state));
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = !"));
@@ -1959,11 +1958,12 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
     return success;
 }
 
-static success_indicator
-generate_function_body(checked_function const current_function, checked_function const *const all_functions,
-                       interface const *const all_interfaces, structure const *const all_structures,
-                       stream_writer const c_output, standard_library_usage *standard_library,
-                       type_definitions *const definitions, bool const return_0, enumeration const *const boolean)
+static success_indicator generate_function_body(checked_function const current_function,
+                                                checked_function const *const all_functions,
+                                                interface const *const all_interfaces,
+                                                structure const *const all_structures, stream_writer const c_output,
+                                                standard_library_usage *standard_library,
+                                                type_definitions *const definitions, bool const return_0)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
@@ -1974,7 +1974,6 @@ generate_function_body(checked_function const current_function, checked_function
                              all_functions,
                              all_interfaces,
                              definitions,
-                             boolean,
                              all_structures};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
@@ -2083,8 +2082,7 @@ static success_indicator generate_function_declaration(function_id const id, fun
     return success;
 }
 
-success_indicator generate_c(checked_program const program, enumeration const *const boolean,
-                             stream_writer const c_output)
+success_indicator generate_c(checked_program const program, stream_writer const c_output)
 {
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
@@ -2136,13 +2134,13 @@ success_indicator generate_c(checked_program const program, enumeration const *c
                      fail);
         LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "\n"), fail);
         LPG_TRY_GOTO(generate_function_body(current_function, program.functions, program.interfaces, program.structs,
-                                            program_defined_writer, &standard_library, &definitions, false, boolean),
+                                            program_defined_writer, &standard_library, &definitions, false),
                      fail);
     }
 
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "int main(void)\n"), fail);
     LPG_TRY_GOTO(generate_function_body(program.functions[0], program.functions, program.interfaces, program.structs,
-                                        program_defined_writer, &standard_library, &definitions, true, boolean),
+                                        program_defined_writer, &standard_library, &definitions, true),
                  fail);
 
     if (standard_library.using_unit)

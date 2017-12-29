@@ -269,8 +269,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_c(program, global_object.members[3].compile_time_value.value_.type_.enum_,
-                                      memory_writer_erase(&generated)));
+        REQUIRE(success == generate_c(program, memory_writer_erase(&generated)));
         run_c_test(test_name, unicode_view_create(generated.data, generated.used));
         memory_writer_free(&generated);
     }
@@ -330,6 +329,7 @@ void test_interpreter(void)
         char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
                                           "empty.lpg",
+                                          "enum.lpg",
                                           "function-pointer.lpg",
                                           "integer-equals.lpg",
                                           "integer-less.lpg",

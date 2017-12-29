@@ -4,6 +4,7 @@
 #include "lpg_function_id.h"
 #include "lpg_interface_id.h"
 #include "lpg_struct_id.h"
+#include "lpg_enum_id.h"
 
 typedef struct checked_program
 {
@@ -14,6 +15,8 @@ typedef struct checked_program
     garbage_collector memory;
     checked_function *functions;
     function_id function_count;
+    enumeration *enums;
+    enum_id enum_count;
 } checked_program;
 
 void checked_program_free(LPG_NON_NULL(checked_program const *program));
