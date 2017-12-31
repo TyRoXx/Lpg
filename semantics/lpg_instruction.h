@@ -82,13 +82,13 @@ bool literal_instruction_equals(literal_instruction const left, literal_instruct
 typedef struct enum_construct_instruction
 {
     register_id into;
-    enum_element_id which;
+    enum_constructor_type which;
     register_id state;
     type state_type;
 } enum_construct_instruction;
 
-enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state,
-                                                             type state_type);
+enum_construct_instruction enum_construct_instruction_create(register_id into, enum_constructor_type which,
+                                                             register_id state, type state_type);
 bool enum_construct_instruction_equals(enum_construct_instruction const left, enum_construct_instruction const right);
 
 typedef struct match_instruction_case match_instruction_case;
@@ -180,15 +180,39 @@ struct instruction
     };
 };
 
+typedef enum match_instruction_case_kind
+{
+    match_instruction_case_kind_value,
+    match_instruction_case_kind_stateful_enum
+} match_instruction_case_kind;
+
+typedef struct match_instruction_case_stateful_enum
+{
+    enum_element_id element;
+    register_id where;
+} match_instruction_case_stateful_enum;
+
+match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create(enum_element_id element,
+                                                                                 register_id where);
+
 struct match_instruction_case
 {
-    register_id key;
+    match_instruction_case_kind kind;
+    union
+    {
+        register_id key_value;
+        match_instruction_case_stateful_enum stateful_enum;
+    };
     instruction_sequence action;
     register_id value;
 };
 
-match_instruction_case match_instruction_case_create(register_id key, instruction_sequence action, register_id value);
+match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
+                                                           register_id value);
+match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
+                                                                   instruction_sequence action, register_id value);
 void match_instruction_case_free(match_instruction_case freed);
+bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right);
 
 instruction instruction_create_call(call_instruction argument);
 instruction instruction_create_return(return_instruction argument);

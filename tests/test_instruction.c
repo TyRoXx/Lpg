@@ -6,8 +6,9 @@ void test_instruction(void)
 {
     REQUIRE(literal_instruction_equals(literal_instruction_create(0, value_from_unit(), type_from_unit()),
                                        literal_instruction_create(0, value_from_unit(), type_from_unit())));
-    REQUIRE(enum_construct_instruction_equals(enum_construct_instruction_create(0, 0, 0, type_from_unit()),
-                                              enum_construct_instruction_create(0, 0, 0, type_from_unit())));
+    REQUIRE(enum_construct_instruction_equals(
+        enum_construct_instruction_create(0, enum_constructor_type_create(0, 0), 0, type_from_unit()),
+        enum_construct_instruction_create(0, enum_constructor_type_create(0, 0), 0, type_from_unit())));
     REQUIRE(lambda_with_captures_instruction_equals(lambda_with_captures_instruction_create(0, 0, NULL, 0),
                                                     lambda_with_captures_instruction_create(0, 0, NULL, 0)));
     REQUIRE(!lambda_with_captures_instruction_equals(lambda_with_captures_instruction_create(1, 0, NULL, 0),

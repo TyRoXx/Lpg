@@ -1298,9 +1298,16 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 {
                     pop(parser);
                 }
-                else
+                else if (second_space.token == token_colon)
                 {
                     parser->on_error(parse_error_create(parse_error_expected_space, second_space.where), parser->user);
+                }
+                else
+                {
+                    expression_parser_result const result = {
+                        true, expression_from_placeholder(
+                                  placeholder_expression_create(name.where, unicode_view_copy(name.content)))};
+                    return result;
                 }
             }
             expression_parser_result declared_variable_type = {

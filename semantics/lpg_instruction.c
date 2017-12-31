@@ -79,8 +79,8 @@ bool literal_instruction_equals(literal_instruction const left, literal_instruct
            type_equals(left.type_of, right.type_of);
 }
 
-enum_construct_instruction enum_construct_instruction_create(register_id into, enum_element_id which, register_id state,
-                                                             type state_type)
+enum_construct_instruction enum_construct_instruction_create(register_id into, enum_constructor_type which,
+                                                             register_id state, type state_type)
 {
     enum_construct_instruction const result = {into, which, state, state_type};
     return result;
@@ -88,8 +88,8 @@ enum_construct_instruction enum_construct_instruction_create(register_id into, e
 
 bool enum_construct_instruction_equals(enum_construct_instruction const left, enum_construct_instruction const right)
 {
-    return (left.into == right.into) && (left.which == right.which) && (left.state == right.state) &&
-           type_equals(left.state_type, right.state_type);
+    return (left.into == right.into) && enum_constructor_type_equals(left.which, right.which) &&
+           (left.state == right.state) && type_equals(left.state_type, right.state_type);
 }
 
 match_instruction match_instruction_create(register_id key, match_instruction_case *cases, size_t count,
@@ -249,15 +249,67 @@ instruction instruction_create_instantiate_struct(instantiate_struct_instruction
     return result;
 }
 
-match_instruction_case match_instruction_case_create(register_id key, instruction_sequence action, register_id value)
+match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create(enum_element_id element,
+                                                                                 register_id where)
 {
-    match_instruction_case const result = {key, action, value};
+    match_instruction_case_stateful_enum const result = {element, where};
+    return result;
+}
+
+match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
+                                                           register_id value)
+{
+    match_instruction_case result;
+    result.kind = match_instruction_case_kind_value;
+    result.key_value = key_value;
+    result.action = action;
+    result.value = value;
+    return result;
+}
+
+match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
+                                                                   instruction_sequence action, register_id value)
+{
+    match_instruction_case result;
+    result.kind = match_instruction_case_kind_stateful_enum;
+    result.stateful_enum = stateful_enum;
+    result.action = action;
+    result.value = value;
     return result;
 }
 
 void match_instruction_case_free(match_instruction_case freed)
 {
     instruction_sequence_free(&freed.action);
+}
+
+bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right)
+{
+    if (left.kind != right.kind)
+    {
+        return false;
+    }
+    switch (left.kind)
+    {
+    case match_instruction_case_kind_stateful_enum:
+        if (left.stateful_enum.element != right.stateful_enum.element)
+        {
+            return false;
+        }
+        if (left.stateful_enum.where != right.stateful_enum.where)
+        {
+            return false;
+        }
+        break;
+
+    case match_instruction_case_kind_value:
+        if (left.key_value != right.key_value)
+        {
+            return false;
+        }
+        break;
+    }
+    return instruction_sequence_equals(&left.action, &right.action) && (left.value == right.value);
 }
 
 instruction instruction_create_call(call_instruction argument)
@@ -421,15 +473,7 @@ bool instruction_equals(instruction const left, instruction const right)
         }
         for (size_t i = 0; i < left.match.count; ++i)
         {
-            if (left.match.cases[i].key != right.match.cases[i].key)
-            {
-                return false;
-            }
-            if (!instruction_sequence_equals(&left.match.cases[i].action, &right.match.cases[i].action))
-            {
-                return false;
-            }
-            if (left.match.cases[i].value != right.match.cases[i].value)
+            if (!match_instruction_case_equals(left.match.cases[i], right.match.cases[i]))
             {
                 return false;
             }

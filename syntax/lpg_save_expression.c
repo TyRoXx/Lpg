@@ -337,6 +337,10 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(save_expression(to, value->instantiate_struct.type, whitespace));
         return save_tuple_expression(to, value->instantiate_struct.arguments, whitespace);
     }
+
+    case expression_type_placeholder:
+        LPG_TRY(stream_writer_write_string(to, "let "));
+        return stream_writer_write_unicode_view(to, unicode_view_from_string(value->placeholder.name));
     }
     LPG_UNREACHABLE();
 }

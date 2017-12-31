@@ -34,6 +34,7 @@ typedef struct enumeration
 
 enumeration enumeration_create(enumeration_element *elements, enum_element_id size);
 void enumeration_free(LPG_NON_NULL(enumeration const *value));
+bool has_stateful_element(enumeration const enum_);
 
 typedef struct tuple_type
 {
@@ -140,6 +141,7 @@ struct enum_constructor_type
 };
 
 enum_constructor_type enum_constructor_type_create(enum_id enumeration, enum_element_id which);
+bool enum_constructor_type_equals(enum_constructor_type const left, enum_constructor_type const right);
 
 typedef struct implementation
 {
@@ -191,6 +193,7 @@ type type_from_lambda(lambda_type const lambda);
 type type_from_interface(interface_id const value);
 type type_from_method_pointer(method_pointer_type const value);
 type type_from_struct(struct_id const value);
+type type_from_pattern(void);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

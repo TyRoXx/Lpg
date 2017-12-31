@@ -38,6 +38,7 @@ static value assert_impl(function_call_arguments const arguments, struct value c
 {
     (void)captures;
     (void)environment;
+    ASSUME(arguments.arguments[0].kind == value_kind_enum_element);
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
     REQUIRE(argument == 1);
     return value_from_unit();
@@ -329,7 +330,8 @@ void test_interpreter(void)
         char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
                                           "empty.lpg",
-                                          "enum.lpg",
+                                          "enum-stateful.lpg",
+                                          "enum-stateless.lpg",
                                           "function-pointer.lpg",
                                           "integer-equals.lpg",
                                           "integer-less.lpg",

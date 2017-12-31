@@ -1,5 +1,6 @@
 #include "lpg_value.h"
 #include "lpg_assert.h"
+#include "lpg_allocate.h"
 
 implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index)
 {
@@ -157,6 +158,18 @@ value value_from_type_erased(type_erased_value content)
     return result;
 }
 
+value *value_allocate(value const content)
+{
+    value *const result = allocate(sizeof(*result));
+    *result = content;
+    return result;
+}
+
+value value_or_unit(value const *const maybe)
+{
+    return maybe ? *maybe : value_from_unit();
+}
+
 bool value_equals(value const left, value const right)
 {
     if (left.kind != right.kind)
@@ -166,6 +179,7 @@ bool value_equals(value const left, value const right)
     switch (left.kind)
     {
     case value_kind_type_erased:
+    case value_kind_pattern:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -230,6 +244,7 @@ bool value_less_than(value const left, value const right)
     switch (left.kind)
     {
     case value_kind_type_erased:
+    case value_kind_pattern:
         LPG_TO_DO();
 
     case value_kind_integer:

@@ -54,7 +54,8 @@ typedef enum expression_type
     expression_type_struct,
     expression_type_impl,
     expression_type_instantiate_struct,
-    expression_type_enum
+    expression_type_enum,
+    expression_type_placeholder
 } expression_type;
 
 typedef struct tuple
@@ -231,6 +232,16 @@ impl_expression impl_expression_create(expression *interface, expression *self, 
 void impl_expression_free(impl_expression value);
 bool impl_expression_equals(impl_expression const left, impl_expression const right);
 
+typedef struct placeholder_expression
+{
+    source_location where;
+    unicode_string name;
+} placeholder_expression;
+
+placeholder_expression placeholder_expression_create(source_location where, unicode_string name);
+void placeholder_expression_free(placeholder_expression const freed);
+bool placeholder_expression_equals(placeholder_expression const left, placeholder_expression const right);
+
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
@@ -320,6 +331,7 @@ struct expression
         source_location source;
         instantiate_struct_expression instantiate_struct;
         enum_expression enum_;
+        placeholder_expression placeholder;
     };
 };
 
@@ -348,6 +360,7 @@ expression expression_from_interface(interface_expression value);
 expression expression_from_struct(struct_expression value);
 expression expression_from_instantiate_struct(instantiate_struct_expression value);
 expression expression_from_enum(enum_expression const value);
+expression expression_from_placeholder(placeholder_expression const value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

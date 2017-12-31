@@ -86,10 +86,14 @@ void print_value(value const printed)
         break;
 
     case value_kind_tuple:
-        printf("tuple ");
+        printf("tuple");
         break;
 
     case value_kind_enum_constructor:
+        printf("enum_constructor");
+        break;
+
+    case value_kind_pattern:
         LPG_TO_DO();
     }
 }
@@ -155,7 +159,17 @@ void print_instruction(instruction const printed)
         printf("match %u, result %u\n", printed.match.key, printed.match.result);
         for (size_t i = 0; i < printed.match.count; ++i)
         {
-            printf("case %u {\n", printed.match.cases[i].key);
+            switch (printed.match.cases[i].kind)
+            {
+            case match_instruction_case_kind_stateful_enum:
+                printf("case %u(let %u) {\n", printed.match.cases[i].stateful_enum.element,
+                       printed.match.cases[i].stateful_enum.where);
+                break;
+
+            case match_instruction_case_kind_value:
+                printf("case %u {\n", printed.match.cases[i].key_value);
+                break;
+            }
             print_instruction_sequence(printed.match.cases[i].action);
             printf("return %u }\n", printed.match.cases[i].value);
         }

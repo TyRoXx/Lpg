@@ -28,3 +28,33 @@ void checked_function_free(checked_function const *function)
     function_pointer_free(function->signature);
     deallocate(function->signature);
 }
+
+type get_return_type(type const callee, checked_function const *const all_functions,
+                     interface const *const all_interfaces)
+{
+    switch (callee.kind)
+    {
+    case type_kind_lambda:
+        return all_functions[callee.lambda.lambda].signature->result;
+
+    case type_kind_function_pointer:
+        return callee.function_pointer_->result;
+
+    case type_kind_tuple:
+    case type_kind_structure:
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+    case type_kind_type:
+    case type_kind_integer_range:
+    case type_kind_interface:
+        LPG_TO_DO();
+
+    case type_kind_method_pointer:
+        return all_interfaces[callee.method_pointer.interface_].methods[callee.method_pointer.method_index].result;
+
+    case type_kind_enum_constructor:
+        return type_from_enumeration(callee.enum_constructor->enumeration);
+    }
+    LPG_UNREACHABLE();
+}

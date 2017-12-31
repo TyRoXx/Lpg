@@ -41,6 +41,18 @@ void enumeration_free(enumeration const *value)
     }
 }
 
+bool has_stateful_element(enumeration const enum_)
+{
+    for (size_t i = 0; i < enum_.size; ++i)
+    {
+        if (enum_.elements[i].state.kind != type_kind_unit)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 tuple_type tuple_type_create(type *elements, size_t length)
 {
     tuple_type const result = {elements, length};
@@ -147,6 +159,11 @@ enum_constructor_type enum_constructor_type_create(enum_id enumeration, enum_ele
 {
     enum_constructor_type const result = {enumeration, which};
     return result;
+}
+
+bool enum_constructor_type_equals(enum_constructor_type const left, enum_constructor_type const right)
+{
+    return (left.enumeration == right.enumeration) && (left.which == right.which);
 }
 
 implementation implementation_create(struct function_pointer_value *methods, size_t method_count)

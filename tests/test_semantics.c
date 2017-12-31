@@ -174,9 +174,9 @@ void test_semantics(void)
                                       instruction_create_read_struct(read_struct_instruction_create(2, 18, 3)),
                                       instruction_create_call(call_instruction_create(3, NULL, 0, 4))};
 
-        cases[0] = match_instruction_case_create(1, instruction_sequence_create(LPG_COPY_ARRAY(case_0)), 0);
+        cases[0] = match_instruction_case_create_value(1, instruction_sequence_create(LPG_COPY_ARRAY(case_0)), 0);
 
-        cases[1] = match_instruction_case_create(5, instruction_sequence_create(NULL, 0), 0);
+        cases[1] = match_instruction_case_create_value(5, instruction_sequence_create(NULL, 0), 0);
 
         instruction const expected_body_elements[] = {
             instruction_create_literal(literal_instruction_create(

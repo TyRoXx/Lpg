@@ -286,6 +286,22 @@ bool impl_expression_equals(impl_expression const left, impl_expression const ri
     return true;
 }
 
+placeholder_expression placeholder_expression_create(source_location where, unicode_string name)
+{
+    placeholder_expression const result = {where, name};
+    return result;
+}
+
+void placeholder_expression_free(placeholder_expression const freed)
+{
+    unicode_string_free(&freed.name);
+}
+
+bool placeholder_expression_equals(placeholder_expression const left, placeholder_expression const right)
+{
+    return source_location_equals(left.where, right.where) && unicode_string_equals(left.name, right.name);
+}
+
 sequence sequence_create(expression *elements, size_t length)
 {
     sequence const result = {elements, length};
@@ -486,6 +502,9 @@ source_location expression_source_begin(expression const value)
 
     case expression_type_struct:
         return value.struct_.source;
+
+    case expression_type_placeholder:
+        return value.placeholder.where;
     }
     LPG_UNREACHABLE();
 }
@@ -733,6 +752,14 @@ expression expression_from_enum(enum_expression const value)
     return result;
 }
 
+expression expression_from_placeholder(placeholder_expression const value)
+{
+    expression result;
+    result.type = expression_type_placeholder;
+    result.placeholder = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -792,6 +819,10 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_break:
+        break;
+
+    case expression_type_placeholder:
+        placeholder_expression_free(this->placeholder);
         break;
 
     case expression_type_sequence:
@@ -891,6 +922,9 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_placeholder:
+        return placeholder_expression_equals(left->placeholder, right->placeholder);
+
     case expression_type_enum:
         return enum_expression_equals(left->enum_, right->enum_);
 

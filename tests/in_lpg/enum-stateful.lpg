@@ -1,0 +1,23 @@
+let g = (arg: option)
+    match arg
+        case option.some(let state):
+            side-effect()
+            integer-equals(123, state)
+        case option.none:
+            side-effect()
+            boolean.false
+assert(g(option.some(123)))
+assert(not(g(option.none)))
+assert(not(g(option.some(124))))
+
+let f = (arg: option)
+    match arg
+        case option.none:
+            side-effect()
+            boolean.false
+        case option.some(let state):
+            side-effect()
+            integer-equals(123, state)
+assert(f(option.some(123)))
+assert(not(f(option.none)))
+assert(not(f(option.some(124))))

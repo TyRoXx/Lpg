@@ -33,6 +33,9 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     case value_kind_enum_constructor:
         break;
 
+    case value_kind_pattern:
+        LPG_TO_DO();
+
     case value_kind_tuple:
         for (size_t i = 0; i < root.tuple_.element_count; ++i)
         {
@@ -168,6 +171,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     }
 
     case value_kind_flat_object:
+    case value_kind_pattern:
         LPG_TO_DO();
 
     case value_kind_type:
@@ -298,10 +302,22 @@ static instruction clone_instruction(instruction const original, garbage_collect
         match_instruction_case *const cases = allocate_array(original.match.count, sizeof(*cases));
         for (size_t i = 0; i < original.match.count; ++i)
         {
-            cases[i] = match_instruction_case_create(
-                original.match.cases[i].key,
-                clone_sequence(original.match.cases[i].action, clone_gc, new_function_ids, all_structures),
-                original.match.cases[i].value);
+            switch (original.match.cases[i].kind)
+            {
+            case match_instruction_case_kind_stateful_enum:
+                cases[i] = match_instruction_case_create_stateful_enum(
+                    original.match.cases[i].stateful_enum,
+                    clone_sequence(original.match.cases[i].action, clone_gc, new_function_ids, all_structures),
+                    original.match.cases[i].value);
+                break;
+
+            case match_instruction_case_kind_value:
+                cases[i] = match_instruction_case_create_value(
+                    original.match.cases[i].key_value,
+                    clone_sequence(original.match.cases[i].action, clone_gc, new_function_ids, all_structures),
+                    original.match.cases[i].value);
+                break;
+            }
         }
         return instruction_create_match(match_instruction_create(original.match.key, cases, original.match.count,
                                                                  original.match.result,
@@ -424,9 +440,30 @@ static structure *clone_structures(structure const *const structures, struct_id 
                                    garbage_collector *const gc, function_id const *const new_function_ids)
 {
     structure *const result = allocate_array(structure_count, sizeof(*result));
-    for (interface_id i = 0; i < structure_count; ++i)
+    for (struct_id i = 0; i < structure_count; ++i)
     {
         result[i] = clone_structure(structures[i], gc, new_function_ids);
+    }
+    return result;
+}
+
+static enumeration clone_enumeration(enumeration const original, garbage_collector *const gc)
+{
+    enumeration_element *const elements = allocate_array(original.size, sizeof(*elements));
+    for (size_t i = 0; i < original.size; ++i)
+    {
+        elements[i] = enumeration_element_create(unicode_view_copy(unicode_view_from_string(original.elements[i].name)),
+                                                 type_clone(original.elements[i].state, gc));
+    }
+    return enumeration_create(elements, original.size);
+}
+
+static enumeration *clone_enums(enumeration const *const enums, struct_id const enum_count, garbage_collector *const gc)
+{
+    enumeration *const result = allocate_array(enum_count, sizeof(*result));
+    for (enum_id i = 0; i < enum_count; ++i)
+    {
+        result[i] = clone_enumeration(enums[i], gc);
     }
     return result;
 }
@@ -472,9 +509,10 @@ checked_program remove_unused_functions(checked_program const from)
                               allocate_array(new_function_count, sizeof(*result.functions)),
                               new_function_count,
                               NULL,
-                              0};
+                              from.enum_count};
     result.interfaces = clone_interfaces(from.interfaces, from.interface_count, &result.memory, new_function_ids);
     result.structs = clone_structures(from.structs, from.struct_count, &result.memory, new_function_ids);
+    result.enums = clone_enums(from.enums, from.enum_count, &result.memory);
     for (function_id i = 0; i < from.function_count; ++i)
     {
         if (!used_functions[i])

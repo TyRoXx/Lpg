@@ -49,7 +49,8 @@ typedef enum value_kind
     value_kind_unit,
     value_kind_tuple,
     value_kind_enum_constructor,
-    value_kind_type_erased
+    value_kind_type_erased,
+    value_kind_pattern
 } value_kind;
 
 typedef struct value_tuple
@@ -104,6 +105,8 @@ value value_from_integer(integer const content);
 value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
 value value_from_type_erased(type_erased_value content);
+value *value_allocate(value const content);
+value value_or_unit(value const *const maybe);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);

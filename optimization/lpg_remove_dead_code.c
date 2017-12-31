@@ -70,7 +70,15 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             registers_read_from[current_instruction.match.key] = true;
             for (size_t j = 0; j < current_instruction.match.count; ++j)
             {
-                registers_read_from[current_instruction.match.cases[j].key] = true;
+                switch (current_instruction.match.cases[j].kind)
+                {
+                case match_instruction_case_kind_stateful_enum:
+                    break;
+
+                case match_instruction_case_kind_value:
+                    registers_read_from[current_instruction.match.cases[j].key_value] = true;
+                    break;
+                }
                 registers_read_from[current_instruction.match.cases[j].value] = true;
                 find_used_registers(current_instruction.match.cases[j].action, registers_read_from);
             }
@@ -165,7 +173,16 @@ static bool change_register_ids(instruction *const where, register_id const *con
         ASSERT(update_register_id(&where->match.key, new_register_ids));
         for (size_t j = 0; j < where->match.count; ++j)
         {
-            ASSERT(update_register_id(&where->match.cases[j].key, new_register_ids));
+            switch (where->match.cases[j].kind)
+            {
+            case match_instruction_case_kind_stateful_enum:
+                update_register_id(&where->match.cases[j].stateful_enum.where, new_register_ids);
+                break;
+
+            case match_instruction_case_kind_value:
+                ASSERT(update_register_id(&where->match.cases[j].key_value, new_register_ids));
+                break;
+            }
             ASSERT(update_register_id(&where->match.cases[j].value, new_register_ids));
             change_register_ids_in_sequence(&where->match.cases[j].action, new_register_ids);
         }

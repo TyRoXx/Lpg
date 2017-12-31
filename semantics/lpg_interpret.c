@@ -130,6 +130,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             case value_kind_enum_element:
             case value_kind_unit:
             case value_kind_tuple:
+            case value_kind_pattern:
                 LPG_UNREACHABLE();
 
             case value_kind_enum_constructor:
@@ -216,7 +217,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             value *const state = garbage_collector_allocate(gc, sizeof(*state));
             *state = registers[element.enum_construct.state];
             registers[element.enum_construct.into] =
-                value_from_enum_element(element.enum_construct.which, element.enum_construct.state_type, state);
+                value_from_enum_element(element.enum_construct.which.which, element.enum_construct.state_type, state);
             break;
         }
 
@@ -226,23 +227,40 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             for (size_t j = 0; j < element.match.count; ++j)
             {
                 match_instruction_case *const this_case = element.match.cases + j;
-                if (value_equals(key, registers[this_case->key]))
+                bool matches = false;
+                switch (this_case->kind)
                 {
-                    switch (run_sequence(
-                        this_case->action, globals, registers, captures, gc, all_functions, all_interfaces))
+                case match_instruction_case_kind_stateful_enum:
+                    ASSUME(key.kind == value_kind_enum_element);
+                    matches = (key.enum_element.which == this_case->stateful_enum.element);
+                    if (matches)
                     {
-                    case run_sequence_result_break:
-                        return run_sequence_result_break;
-
-                    case run_sequence_result_continue:
-                        break;
-
-                    case run_sequence_result_unavailable_at_this_time:
-                        return run_sequence_result_unavailable_at_this_time;
+                        registers[this_case->stateful_enum.where] = value_or_unit(key.enum_element.state);
                     }
-                    registers[element.match.result] = registers[this_case->value];
+                    break;
+
+                case match_instruction_case_kind_value:
+                    matches = value_equals(registers[this_case->key_value], key);
                     break;
                 }
+                if (!matches)
+                {
+                    continue;
+                }
+                switch (
+                    run_sequence(this_case->action, globals, registers, captures, gc, all_functions, all_interfaces))
+                {
+                case run_sequence_result_break:
+                    return run_sequence_result_break;
+
+                case run_sequence_result_continue:
+                    break;
+
+                case run_sequence_result_unavailable_at_this_time:
+                    return run_sequence_result_unavailable_at_this_time;
+                }
+                registers[element.match.result] = registers[this_case->value];
+                break;
             }
             break;
         }
