@@ -1,5 +1,15 @@
+If you look at the raw file you can see which parts of the code don't compile. If a codeblock looks like this it compiles:
+```lpg
+// Something that works
+```
+and if it looks like this it does not work
+```
+// Something that does not compile
+```
+
 # Language overview
 
+1. [Hello World](#Hello-World)
 1. Types and syntax
     1. [Variables and constants](#Variables-and-constants)
     1. [Functions](#Function-Syntax)
@@ -11,6 +21,12 @@
     1. [Comments](#Comments)
 1. [Standard Library Functions](#Standard-library-functions)
 1. [Optimizations](#Optimizations)
+
+## Hello World
+The first thing in every programming language is the "Hello World"-program. This is the code you need to write in lpg.
+```
+print("Hello world")
+```
 
 ## Types
 
@@ -83,14 +99,11 @@ impl printable for string-ref
     print(): string-ref
         self
 ```
-
+3
 And this is how you use it:
 ```lpg
-let percentInterface = interface
-    percent(): int(0, 100)
-
-let print-percent = (something: percentInterface)
-    integer-to-string(make-percent.percent())
+let print-percent = (something: make-percent)
+    integer-to-string(something.percent())
 ```
 
 ### Structures
@@ -131,7 +144,7 @@ The result can be `unit` if you don't want to return anything.
 
 ### Loops
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
-```lpg
+```
 loop
     print("Hello world")
 ```
