@@ -1,12 +1,3 @@
-If you look at the raw file you can see which parts of the code don't compile. If a codeblock looks like this it compiles:
-```lpg
-// Something that works
-```
-and if it looks like this it does not work
-```
-// Something that does not compile
-```
-
 # Language overview
 
 1. [Hello World](#Hello-World)
@@ -23,10 +14,7 @@ and if it looks like this it does not work
 1. [Optimizations](#Optimizations)
 
 ## Hello World
-The first thing in every programming language is the "Hello World"-program. This is the code you need to write in lpg.
-```
-print("Hello world")
-```
+The first thing in every programming language is the "Hello World"-program. This is the code you need to write in lpg: **It does not exist yet.**
 
 ## Types
 
@@ -99,7 +87,7 @@ impl printable for string-ref
     print(): string-ref
         self
 ```
-3
+
 And this is how you use it:
 ```lpg
 let print-percent = (something: make-percent)
@@ -157,7 +145,7 @@ loop
         case boolean.true:
             unit
 print("Done")
-``` 
+```
 
 ### Comments
 There are two types of comments:
