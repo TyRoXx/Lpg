@@ -89,6 +89,33 @@ static bool is_same_indentation_level(rich_token const found, size_t const expec
     return (found.token == token_indentation) && (found.content.length == (expected * spaces_for_indentation));
 }
 
+static bool line_is_empty(expression_parser *parser)
+{
+    rich_token head;
+    size_t whitespace_token_count = 0;
+    for (;;)
+    {
+        head = peek_at(parser, whitespace_token_count);
+        if (head.status == tokenize_invalid)
+        {
+            return false;
+        }
+        if (head.content.length > 0 && (head.token == token_space || head.token == token_indentation))
+        {
+            whitespace_token_count++;
+        }
+        else
+        {
+            break;
+        }
+    }
+    if (head.token == token_newline || head.content.length == 0)
+    {
+        pop_n(parser, whitespace_token_count + 1);
+        return true;
+    }
+    return false;
+}
 static sequence parse_sequence(expression_parser *parser, size_t indentation)
 {
     expression *elements = NULL;
@@ -106,9 +133,9 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
             {
                 pop(parser);
             }
-            if ((indentation == 0) && (peek(parser).token == token_newline))
+
+            if (line_is_empty(parser))
             {
-                pop(parser);
                 continue;
             }
             expression_parser_result const element = parse_expression(parser, indentation, 1);
@@ -119,11 +146,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
                 elements[element_count] = element.success;
                 ++element_count;
             }
-            rich_token const maybe_newline = peek(parser);
-            if (maybe_newline.token == token_newline)
-            {
-                pop(parser);
-            }
+            line_is_empty(parser);
         }
         else
         {

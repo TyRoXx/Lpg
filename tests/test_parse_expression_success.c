@@ -21,6 +21,8 @@ static void test_assignments(void);
 
 static void test_lambdas(void);
 
+static void test_new_lines(void);
+
 static void test_successful_parse_impl(expression const expected, unicode_string const input, bool const is_statement)
 {
     test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
@@ -157,6 +159,21 @@ void test_parse_expression_success(void)
     test_match_cases();
     test_lambdas();
     test_tuples();
+    test_new_lines();
+}
+
+static void test_new_lines(void)
+{
+
+    unicode_string const input = unicode_string_from_c_str("  ");
+    test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
+    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+
+    sequence actual = parse_program(&parser);
+    REQUIRE(actual.length == 0);
+
+    sequence_free(&actual);
+    unicode_string_free(&input);
 }
 
 static void test_lambdas()
