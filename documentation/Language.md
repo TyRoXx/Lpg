@@ -138,10 +138,12 @@ loop
 ```
 If you don't want to have an infinite loop, you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
 ```lpg
+let a = boolean.true
 loop
-    let still-running : unit = match f()
+    let still-running = match a
         case boolean.false:
             break
+            unit
         case boolean.true:
             unit
 assert(boolean.true)
