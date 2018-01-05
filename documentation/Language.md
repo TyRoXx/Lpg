@@ -132,19 +132,19 @@ The result can be `unit` if you don't want to return anything.
 
 ### Loops
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
-```
+```lpg
 loop
-    print("Hello world")
+    assert(boolean.true)
 ```
 If you don't want to have an infinite loop, you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
-```
+```lpg
 loop
     let still-running : unit = match f()
         case boolean.false:
             break
         case boolean.true:
             unit
-print("Done")
+assert(boolean.true)
 ```
 
 ### Comments
