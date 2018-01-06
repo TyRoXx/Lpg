@@ -803,8 +803,8 @@ static success_indicator generate_add_reference_to_structure(unicode_view const 
         memory_writer name_buffer = {NULL, 0, 0};
         LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), value));
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
-        LPG_TRY(stream_writer_write_unicode_view(
-            memory_writer_erase(&name_buffer), unicode_view_from_string(type_of.members[i].name)));
+        LPG_TRY(generate_struct_member_name(
+            unicode_view_from_string(type_of.members[i].name), memory_writer_erase(&name_buffer)));
         LPG_TRY(generate_add_reference(memory_writer_content(name_buffer), type_of.members[i].what, indentation,
                                        all_functions, all_structures, c_output));
         memory_writer_free(&name_buffer);
