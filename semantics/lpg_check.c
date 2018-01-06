@@ -1853,11 +1853,33 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
     enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
     for (size_t i = 0; i < element.element_count; ++i)
     {
+        type element_state = type_from_unit();
+        if (element.elements[i].state)
+        {
+            evaluate_expression_result const state_evaluated =
+                evaluate_expression(state, function, *element.elements[i].state);
+            if (state_evaluated.has_value)
+            {
+                if (!state_evaluated.compile_time_value.is_set)
+                {
+                    LPG_TO_DO();
+                }
+                else if (state_evaluated.compile_time_value.value_.kind != value_kind_type)
+                {
+                    LPG_TO_DO();
+                }
+                else
+                {
+                    element_state = state_evaluated.compile_time_value.value_.type_;
+                }
+            }
+        }
+
         elements[i] = enumeration_element_create(
-            unicode_view_copy(unicode_view_from_string(element.elements[i])), type_from_unit());
+            unicode_view_copy(unicode_view_from_string(element.elements[i].name)), element_state);
         for (size_t k = 0; k < i; ++k)
         {
-            if (unicode_string_equals(element.elements[i], element.elements[k]))
+            if (unicode_string_equals(element.elements[i].name, element.elements[k].name))
             {
                 state->on_error(
                     semantic_error_create(semantic_error_duplicate_enum_element, element.begin), state->user);

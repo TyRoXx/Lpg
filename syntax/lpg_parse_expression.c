@@ -609,7 +609,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
 static expression_parser_result parse_enum(expression_parser *const parser, size_t const indentation,
                                            source_location const begin)
 {
-    unicode_string *elements = NULL;
+    enum_expression_element *elements = NULL;
     enum_element_id element_count = 0;
     bool is_success = true;
     for (;;)
@@ -638,8 +638,33 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
         }
         pop(parser);
 
+        expression *state = NULL;
+        rich_token const left_parenthesis = peek(parser);
+        if (left_parenthesis.token == token_left_parenthesis)
+        {
+            pop(parser);
+            expression_parser_result const maybe_state = parse_expression(parser, indentation, false);
+            if (!maybe_state.is_success)
+            {
+                is_success = false;
+                break;
+            }
+            rich_token const right_parenthesis = peek(parser);
+            if (right_parenthesis.token == token_right_parenthesis)
+            {
+                pop(parser);
+            }
+            else
+            {
+                parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, name.where), parser->user);
+                is_success = false;
+                break;
+            }
+            state = expression_allocate(maybe_state.success);
+        }
+
         elements = reallocate_array(elements, (element_count + 1), sizeof(*elements));
-        elements[element_count] = unicode_view_copy(name.content);
+        elements[element_count] = enum_expression_element_create(unicode_view_copy(name.content), state);
         ++element_count;
     }
     enum_expression const parsed = enum_expression_create(begin, elements, element_count);

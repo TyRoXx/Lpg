@@ -312,7 +312,13 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         {
             LPG_TRY(stream_writer_write_string(to, "\n"));
             LPG_TRY(indent(to, in_struct));
-            LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(value->enum_.elements[i])));
+            LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(value->enum_.elements[i].name)));
+            if (value->enum_.elements[i].state)
+            {
+                LPG_TRY(stream_writer_write_string(to, "("));
+                LPG_TRY(save_expression(to, value->enum_.elements[i].state, in_struct));
+                LPG_TRY(stream_writer_write_string(to, ")"));
+            }
         }
         return success;
     }

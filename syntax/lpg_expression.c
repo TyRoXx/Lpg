@@ -527,7 +527,40 @@ void instantiate_struct_expression_free(instantiate_struct_expression const free
     tuple_free(&freed.arguments);
 }
 
-enum_expression enum_expression_create(source_location begin, unicode_string *elements, enum_element_id element_count)
+enum_expression_element enum_expression_element_create(unicode_string name, expression *state)
+{
+    enum_expression_element const result = {name, state};
+    return result;
+}
+
+void enum_expression_element_free(enum_expression_element const freed)
+{
+    unicode_string_free(&freed.name);
+    if (freed.state)
+    {
+        expression_deallocate(freed.state);
+    }
+}
+
+bool enum_expression_element_equals(enum_expression_element const left, enum_expression_element const right)
+{
+    if (!unicode_string_equals(left.name, right.name))
+    {
+        return false;
+    }
+    if (left.state)
+    {
+        if (right.state)
+        {
+            return expression_equals(left.state, right.state);
+        }
+        return false;
+    }
+    return !right.state;
+}
+
+enum_expression enum_expression_create(source_location begin, enum_expression_element *elements,
+                                       enum_element_id element_count)
 {
     enum_expression const result = {begin, elements, element_count};
     return result;
@@ -537,7 +570,7 @@ void enum_expression_free(enum_expression const freed)
 {
     for (size_t i = 0; i < freed.element_count; ++i)
     {
-        unicode_string_free(freed.elements + i);
+        enum_expression_element_free(freed.elements[i]);
     }
     if (freed.elements)
     {
@@ -557,7 +590,7 @@ bool enum_expression_equals(enum_expression const left, enum_expression const ri
     }
     for (size_t i = 0; i < left.element_count; ++i)
     {
-        if (!unicode_string_equals(left.elements[i], right.elements[i]))
+        if (!enum_expression_element_equals(left.elements[i], right.elements[i]))
         {
             return false;
         }

@@ -293,14 +293,25 @@ typedef struct instantiate_struct_expression
 instantiate_struct_expression instantiate_struct_expression_create(expression *const type, tuple arguments);
 void instantiate_struct_expression_free(instantiate_struct_expression const freed);
 
+typedef struct enum_expression_element
+{
+    unicode_string name;
+    expression *state;
+} enum_expression_element;
+
+enum_expression_element enum_expression_element_create(unicode_string name, expression *state);
+void enum_expression_element_free(enum_expression_element const freed);
+bool enum_expression_element_equals(enum_expression_element const left, enum_expression_element const right);
+
 typedef struct enum_expression
 {
     source_location begin;
-    unicode_string *elements;
+    enum_expression_element *elements;
     enum_element_id element_count;
 } enum_expression;
 
-enum_expression enum_expression_create(source_location begin, unicode_string *elements, enum_element_id element_count);
+enum_expression enum_expression_create(source_location begin, enum_expression_element *elements,
+                                       enum_element_id element_count);
 void enum_expression_free(enum_expression const freed);
 bool enum_expression_equals(enum_expression const left, enum_expression const right);
 

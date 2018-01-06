@@ -1164,6 +1164,52 @@ static success_indicator generate_value(value const generated, type const type_o
     LPG_UNREACHABLE();
 }
 
+static success_indicator generate_free_register(c_backend_state *state, register_id const which,
+                                                checked_function const *const all_functions,
+                                                structure const *const all_structures,
+                                                checked_function const *const current_function,
+                                                size_t const indentation, stream_writer const c_output)
+{
+    switch (state->registers[which].ownership)
+    {
+    case register_resource_ownership_owns:
+    {
+        ASSUME(state->registers[which].type_of.is_set);
+        memory_writer name_buffer = {NULL, 0, 0};
+        LPG_TRY(generate_register_name(which, current_function, memory_writer_erase(&name_buffer)));
+        success_indicator const result =
+            generate_free(&state->standard_library, memory_writer_content(name_buffer),
+                          state->registers[which].type_of.value, all_functions, all_structures, indentation, c_output);
+        memory_writer_free(&name_buffer);
+        return result;
+    }
+
+    case register_resource_ownership_borrows:
+        return success;
+    }
+    LPG_UNREACHABLE();
+}
+
+static success_indicator generate_free_registers(c_backend_state *state, size_t const previously_active_registers,
+                                                 size_t const indentation,
+                                                 checked_function const *const current_function,
+                                                 register_id const current_function_result,
+                                                 stream_writer const c_output)
+{
+    for (size_t i = previously_active_registers; i < state->active_register_count; ++i)
+    {
+        register_id const which = state->active_registers[i];
+        if (which == current_function_result)
+        {
+            continue;
+        }
+        LPG_TRY(generate_free_register(
+            state, which, state->all_functions, state->all_structs, current_function, indentation, c_output));
+    }
+    state->active_register_count = previously_active_registers;
+    return success;
+}
+
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const all_functions,
                                               interface const *const all_interfaces, enumeration const *const all_enums,
                                               checked_function const *const current_function,
@@ -1812,8 +1858,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
     case instruction_enum_construct:
     {
-        set_register_variable(
-            state, input.enum_construct.into, register_resource_ownership_borrows, type_from_unit() /*TODO*/);
+        set_register_variable(state, input.enum_construct.into, register_resource_ownership_owns,
+                              type_from_enumeration(input.enum_construct.which.enumeration));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(generate_type(type_from_enumeration(input.enum_construct.which.enumeration), &state->standard_library,
                               state->definitions, state->all_functions, state->all_interfaces, state->all_enums,
@@ -1829,6 +1875,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_c_read_access(state, current_function, input.enum_construct.state, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}};\n"));
+        LPG_TRY(generate_add_reference_to_register(current_function, input.enum_construct.state,
+                                                   enum_.elements[input.enum_construct.which.which].state, indentation,
+                                                   state->all_functions, state->all_structs, c_output));
         return success;
     }
 
@@ -1887,6 +1936,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+            size_t const previous_register_count = state->active_register_count;
             switch (input.match.cases[i].kind)
             {
             case match_instruction_case_kind_stateful_enum:
@@ -1896,7 +1946,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 enumeration const enum_ = all_enums[state->registers[input.match.key].type_of.value.enum_];
                 type const state_type = enum_.elements[input.match.cases[i].stateful_enum.element].state;
                 set_register_variable(
-                    state, input.match.cases[i].stateful_enum.where, register_resource_ownership_borrows, state_type);
+                    state, input.match.cases[i].stateful_enum.where, register_resource_ownership_owns, state_type);
                 LPG_TRY(indent(indentation + 1, c_output));
                 LPG_TRY(generate_type(state_type, &state->standard_library, state->definitions, state->all_functions,
                                       state->all_interfaces, state->all_enums, c_output));
@@ -1909,6 +1959,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     unicode_view_from_string(enum_.elements[input.match.cases[i].stateful_enum.element].name),
                     c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+                LPG_TRY(generate_add_reference_to_register(current_function, input.match.cases[i].stateful_enum.where,
+                                                           state_type, indentation + 1, state->all_functions,
+                                                           state->all_structs, c_output));
+                ASSUME(state->active_register_count == (previous_register_count + 1));
                 break;
             }
 
@@ -1917,6 +1971,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             }
             LPG_TRY(generate_sequence(state, all_functions, all_interfaces, current_function, current_function_result,
                                       input.match.cases[i].action, (indentation + 1), c_output));
+
+            LPG_TRY(generate_free_registers(
+                state, previous_register_count, indentation + 1, current_function, current_function_result, c_output));
 
             LPG_TRY(indent(indentation + 1, c_output));
             LPG_TRY(generate_register_name(input.match.result, current_function, c_output));
@@ -2038,32 +2095,6 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_free_register(c_backend_state *state, register_id const which,
-                                                checked_function const *const all_functions,
-                                                structure const *const all_structures,
-                                                checked_function const *const current_function,
-                                                size_t const indentation, stream_writer const c_output)
-{
-    switch (state->registers[which].ownership)
-    {
-    case register_resource_ownership_owns:
-    {
-        ASSUME(state->registers[which].type_of.is_set);
-        memory_writer name_buffer = {NULL, 0, 0};
-        LPG_TRY(generate_register_name(which, current_function, memory_writer_erase(&name_buffer)));
-        success_indicator const result =
-            generate_free(&state->standard_library, memory_writer_content(name_buffer),
-                          state->registers[which].type_of.value, all_functions, all_structures, indentation, c_output);
-        memory_writer_free(&name_buffer);
-        return result;
-    }
-
-    case register_resource_ownership_borrows:
-        return success;
-    }
-    LPG_UNREACHABLE();
-}
-
 static success_indicator generate_sequence(c_backend_state *state, checked_function const *const all_functions,
                                            interface const *const all_interfaces,
                                            checked_function const *const current_function,
@@ -2077,18 +2108,8 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
         LPG_TRY(generate_instruction(state, all_functions, all_interfaces, state->all_enums, current_function,
                                      current_function_result, sequence.elements[i], indentation, c_output));
     }
-    for (size_t i = previously_active_registers; i < state->active_register_count; ++i)
-    {
-        register_id const which = state->active_registers[i];
-        if (which == current_function_result)
-        {
-            continue;
-        }
-        LPG_TRY(generate_free_register(
-            state, which, all_functions, state->all_structs, current_function, indentation, c_output));
-    }
-    state->active_register_count = previously_active_registers;
-    return success;
+    return generate_free_registers(
+        state, previously_active_registers, indentation, current_function, current_function_result, c_output);
 }
 
 static success_indicator generate_function_body(checked_function const current_function,
