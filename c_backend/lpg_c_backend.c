@@ -1978,6 +1978,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(generate_c_read_access(state, current_function, input.match.cases[i].value, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
 
+            LPG_TRY(generate_add_reference_to_register(current_function, input.match.result, input.match.result_type,
+                                                       indentation + 1, state->all_functions, state->all_structs,
+                                                       c_output));
+
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         }
