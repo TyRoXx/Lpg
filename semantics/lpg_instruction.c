@@ -252,6 +252,7 @@ instruction instruction_create_instantiate_struct(instantiate_struct_instruction
 match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create(enum_element_id element,
                                                                                  register_id where)
 {
+    ASSUME(where != ~(register_id)0);
     match_instruction_case_stateful_enum const result = {element, where};
     return result;
 }

@@ -73,6 +73,7 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
                 switch (current_instruction.match.cases[j].kind)
                 {
                 case match_instruction_case_kind_stateful_enum:
+                    registers_read_from[current_instruction.match.cases[j].stateful_enum.where] = true;
                     break;
 
                 case match_instruction_case_kind_value:

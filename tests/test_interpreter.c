@@ -327,10 +327,10 @@ void test_interpreter(void)
     standard_library_description const std_library = describe_standard_library();
 
     {
-        char const *const test_files[] = {"enum-stateful.lpg",
-                                          "boolean.lpg",
+        char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
                                           "empty.lpg",
+                                          "enum-stateful.lpg",
                                           "enum-stateless.lpg",
                                           "function-pointer.lpg",
                                           "integer-equals.lpg",

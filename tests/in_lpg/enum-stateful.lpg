@@ -21,3 +21,24 @@ let return-stateful-enum = ()
 assert(string-equals("abc", match return-stateful-enum()
     case single.a(let state): state
 ))
+
+let structure = struct
+    x: string-ref
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side-effect()
+        string-equals("abc", state.x)
+    case multi.c: boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)

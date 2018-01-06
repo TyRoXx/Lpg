@@ -1265,6 +1265,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 }
                 else
                 {
+                    ASSUME(placeholder_where != ~(register_id)0);
                     add_local_variable(
                         &state->local_variables,
                         local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
@@ -1351,6 +1352,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             if (maybe_pattern.is_pattern)
             {
+                ASSUME(placeholder_where != ~(register_id)0);
                 cases[i] = match_instruction_case_create_stateful_enum(
                     match_instruction_case_stateful_enum_create(
                         maybe_pattern.stateful_enum_element.which, placeholder_where),
@@ -1358,6 +1360,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             }
             else
             {
+                ASSUME(key_value != ~(register_id)0);
                 cases[i] = match_instruction_case_create_value(key_value, action, action_evaluated.where);
             }
         }

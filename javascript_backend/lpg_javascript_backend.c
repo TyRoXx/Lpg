@@ -311,6 +311,7 @@ static function_generation function_generation_create(register_info *registers, 
 static success_indicator write_register(function_generation *const state, register_id const which, type const type_of,
                                         stream_writer const javascript_output)
 {
+    ASSUME(which < state->current_function->number_of_registers);
     ASSUME(state->registers[which].kind == register_type_none);
     state->registers[which] = register_info_create(register_type_variable, type_of);
     LPG_TRY(generate_var(which, javascript_output));
