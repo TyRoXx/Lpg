@@ -164,16 +164,77 @@ void test_parse_expression_success(void)
 
 static void test_new_lines(void)
 {
+    // Empty line with just whitespace
+    {
+        unicode_string const input = unicode_string_from_c_str("  ");
+        test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
+        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
 
-    unicode_string const input = unicode_string_from_c_str("  ");
-    test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+        sequence actual = parse_program(&parser);
+        REQUIRE(actual.length == 0);
 
-    sequence actual = parse_program(&parser);
-    REQUIRE(actual.length == 0);
+        sequence_free(&actual);
+        unicode_string_free(&input);
+    }
+    // Empty line with just indentation
+    {
+        unicode_string const input = unicode_string_from_c_str("    ");
+        test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
+        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
 
-    sequence_free(&actual);
-    unicode_string_free(&input);
+        sequence actual = parse_program(&parser);
+        REQUIRE(actual.length == 0);
+
+        sequence_free(&actual);
+        unicode_string_free(&input);
+    }
+
+    // One trailing whitespace at the end
+    {
+        expression *left = allocate(sizeof(*left));
+        *left = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 200), source_location_create(0, 0)));
+
+        expression *right = allocate(sizeof(*right));
+        *right = expression_from_integer_literal(
+            integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 7)));
+
+        expression unequals_expression =
+            expression_from_binary_operator(binary_operator_expression_create(left, right, not_equals));
+
+        unicode_string const input = unicode_string_from_c_str("200 != 2 ");
+        test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
+        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+
+        sequence actual = parse_program(&parser);
+        REQUIRE(actual.length == 1);
+        REQUIRE(expression_equals(&actual.elements[0], &unequals_expression));
+
+        expression_free(&unequals_expression);
+        sequence_free(&actual);
+        unicode_string_free(&input);
+    }
+
+    // An empty line within a loop
+    {
+        unicode_string const input = unicode_string_from_c_str("loop\n"
+                                                               "    \n"
+                                                               "    break");
+        expression *elements = allocate_array(1, sizeof(*elements));
+        elements[0] = expression_from_break(source_location_create(2, 4));
+        expression loop_expression = expression_from_loop(sequence_create(elements, 1));
+
+        test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
+        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+
+        sequence actual = parse_program(&parser);
+        REQUIRE(actual.length == 1);
+        REQUIRE(expression_equals(&actual.elements[0], &loop_expression));
+
+        expression_free(&loop_expression);
+        sequence_free(&actual);
+        unicode_string_free(&input);
+    }
 }
 
 static void test_lambdas()
