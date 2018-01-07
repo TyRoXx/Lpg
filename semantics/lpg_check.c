@@ -1089,22 +1089,33 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     integer_range_list_deallocate(integer_ranges);
 }
 
+typedef enum pattern_evaluate_result_kind
+{
+    pattern_evaluate_result_kind_is_pattern,
+    pattern_evaluate_result_kind_no_pattern,
+    pattern_evaluate_result_kind_failure
+} pattern_evaluate_result_kind;
+
 typedef struct pattern_evaluate_result
 {
-    bool is_pattern;
+    pattern_evaluate_result_kind kind;
     enum_constructor_type stateful_enum_element;
     unicode_view placeholder_name;
     source_location placeholder_name_source;
 } pattern_evaluate_result;
 
 static pattern_evaluate_result const pattern_evaluate_result_no = {
-    false, {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}};
+    pattern_evaluate_result_kind_no_pattern, {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}};
+
+static pattern_evaluate_result const pattern_evaluate_result_failure = {
+    pattern_evaluate_result_kind_failure, {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}};
 
 static pattern_evaluate_result pattern_evaluate_result_create_pattern(enum_constructor_type stateful_enum_element,
                                                                       unicode_view placeholder_name,
                                                                       source_location placeholder_name_source)
 {
-    pattern_evaluate_result const result = {true, stateful_enum_element, placeholder_name, placeholder_name_source};
+    pattern_evaluate_result const result = {
+        pattern_evaluate_result_kind_is_pattern, stateful_enum_element, placeholder_name, placeholder_name_source};
     return result;
 }
 
@@ -1123,7 +1134,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
             evaluate_expression(state, function, *root.call.callee);
         if (!enum_element_evaluated.has_value)
         {
-            LPG_TO_DO();
+            return pattern_evaluate_result_failure;
         }
         if (enum_element_evaluated.type_.kind != type_kind_enum_constructor)
         {
@@ -1233,11 +1244,17 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             evaluate_expression_result action_evaluated;
             register_id placeholder_where = ~(register_id)0;
             pattern_evaluate_result const maybe_pattern = check_for_pattern(state, function, *case_tree.key);
-            if (maybe_pattern.is_pattern)
+            switch (maybe_pattern.kind)
+            {
+            case pattern_evaluate_result_kind_is_pattern:
             {
                 if (maybe_pattern.stateful_enum_element.enumeration != key.type_.enum_)
                 {
-                    LPG_TO_DO();
+                    state->on_error(
+                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
+                        state->user);
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    return evaluate_expression_result_empty;
                 }
 
                 {
@@ -1261,24 +1278,24 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     state->on_error(semantic_error_create(semantic_error_declaration_with_existing_name,
                                                           maybe_pattern.placeholder_name_source),
                                     state->user);
-                    LPG_TO_DO();
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    return evaluate_expression_result_empty;
                 }
-                else
-                {
-                    ASSUME(placeholder_where != ~(register_id)0);
-                    add_local_variable(
-                        &state->local_variables,
-                        local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
-                                              enum_->elements[maybe_pattern.stateful_enum_element.which].state,
-                                              optional_value_empty, placeholder_where));
-                    define_register_debug_name(
-                        state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
-                }
+
+                ASSUME(placeholder_where != ~(register_id)0);
+                add_local_variable(
+                    &state->local_variables,
+                    local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
+                                          enum_->elements[maybe_pattern.stateful_enum_element.which].state,
+                                          optional_value_empty, placeholder_where));
+                define_register_debug_name(state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
 
                 action_evaluated = check_sequence_finish(
                     state, &action, sequence_create(case_tree.action, 1), previous_number_of_variables);
+                break;
             }
-            else
+
+            case pattern_evaluate_result_kind_no_pattern:
             {
                 evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
                 if (!key_evaluated.has_value)
@@ -1294,6 +1311,11 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                         state->user);
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
+                }
+
+                if (key_evaluated.compile_time_value.value_.enum_element.state_type.kind != type_kind_unit)
+                {
+                    LPG_TO_DO();
                 }
 
                 {
@@ -1320,6 +1342,18 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 key_value = key_evaluated.where;
 
                 action_evaluated = evaluate_expression(state, &action, *case_tree.action);
+                break;
+            }
+
+            case pattern_evaluate_result_kind_failure:
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                return evaluate_expression_result_empty;
+
+#ifdef _MSC_VER
+            default:
+                // silence MSVC warning about uninitialized variables
+                LPG_UNREACHABLE();
+#endif
             }
 
             if (!action_evaluated.has_value)
@@ -1350,18 +1384,23 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
             }
 
-            if (maybe_pattern.is_pattern)
+            switch (maybe_pattern.kind)
             {
+            case pattern_evaluate_result_kind_is_pattern:
                 ASSUME(placeholder_where != ~(register_id)0);
                 cases[i] = match_instruction_case_create_stateful_enum(
                     match_instruction_case_stateful_enum_create(
                         maybe_pattern.stateful_enum_element.which, placeholder_where),
                     action, action_evaluated.where);
-            }
-            else
-            {
+                break;
+
+            case pattern_evaluate_result_kind_no_pattern:
                 ASSUME(key_value != ~(register_id)0);
                 cases[i] = match_instruction_case_create_value(key_value, action, action_evaluated.where);
+                break;
+
+            case pattern_evaluate_result_kind_failure:
+                LPG_UNREACHABLE();
             }
         }
         for (size_t i = 0; i < (*element).match.number_of_cases; ++i)

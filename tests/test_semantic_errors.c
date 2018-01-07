@@ -969,6 +969,80 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("match option.none\n"
+                              "    case option.some(let i): 0\n"
+                              "    case option.some(let i): 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_match_case, source_location_create(2, 9))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = 0\n"
+                              "match option.none\n"
+                              "    case option.some(let i): 0\n"
+                              "    case option.none: 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_declaration_with_existing_name, source_location_create(2, 25))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = 0\n"
+                              "match option.none\n"
+                              "    case option.some(u): 0\n"
+                              "    case option.none: 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 21))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = 0\n"
+                              "match option.none\n"
+                              "    case u(let s): 0\n"
+                              "    case option.none: 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 9))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = 0\n"
+                              "match option.none\n"
+                              "    case i(let s): 0\n"
+                              "    case option.none: 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_not_callable, source_location_create(2, 9))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 3);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("let input : int(0, 1) = 0\n"
                               "let i = match input\n"
                               "    case 0: u\n"
@@ -990,6 +1064,20 @@ void test_semantic_errors(void)
                               "    case 1: boolean.true\n");
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 12))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("match boolean.true\n"
+                              "    case option.some(let i): 0\n"
+                              "    case option.none: 0\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(1, 9))};
         expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
         checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
