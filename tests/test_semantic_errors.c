@@ -197,6 +197,50 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("let e = enum\n"
+                              "    a(u)\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 6))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 2);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let i = 0\n"
+                              "let e = enum\n"
+                              "    a\n"
+                              "    b(i)\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(3, 6))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let f = ()\n"
+                              "    side-effect()\n"
+                              "    boolean\n"
+                              "let e = enum\n"
+                              "    a(f())\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(4, 6))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("side-effect()\n"
                               "h()");
         semantic_error const errors[] = {

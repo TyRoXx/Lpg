@@ -1315,6 +1315,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
                 if (key_evaluated.compile_time_value.value_.enum_element.state_type.kind != type_kind_unit)
                 {
+                    /* https://github.com/TyRoXx/Lpg/issues/91 */
                     LPG_TO_DO();
                 }
 
@@ -1902,18 +1903,20 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                 evaluate_expression(state, function, *element.elements[i].state);
             if (state_evaluated.has_value)
             {
-                if (!state_evaluated.compile_time_value.is_set)
+                if (!state_evaluated.compile_time_value.is_set ||
+                    (state_evaluated.compile_time_value.value_.kind != value_kind_type))
                 {
-                    LPG_TO_DO();
+                    state->on_error(semantic_error_create(semantic_error_expected_compile_time_type,
+                                                          expression_source_begin(*element.elements[i].state)),
+                                    state->user);
+                    for (size_t m = 0; m < i; ++m)
+                    {
+                        enumeration_element_free(elements + m);
+                    }
+                    deallocate(elements);
+                    return evaluate_expression_result_empty;
                 }
-                else if (state_evaluated.compile_time_value.value_.kind != value_kind_type)
-                {
-                    LPG_TO_DO();
-                }
-                else
-                {
-                    element_state = state_evaluated.compile_time_value.value_.type_;
-                }
+                element_state = state_evaluated.compile_time_value.value_.type_;
             }
         }
 
