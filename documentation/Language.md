@@ -1,14 +1,20 @@
 # Language overview
 
+1. [Hello World](#Hello-World)
 1. Types and syntax
     1. [Variables and constants](#Variables-and-constants)
     1. [Functions](#Function-Syntax)
     1. [Tuple](#Tuples)
     1. [Interfaces](#Interfaces)
-1. Structures
+1. Concepts
     1. [Match](#Match)
     1. [Loops](#Loops)
+    1. [Comments](#Comments)
 1. [Standard Library Functions](#Standard-library-functions)
+1. [Optimizations](#Optimizations)
+
+## Hello World
+The first thing in every programming language is the "Hello World"-program. This is the code you need to write in lpg: **It does not exist yet.**
 
 ## Types
 
@@ -21,6 +27,7 @@
 | string-ref      | A reference to a string that is a string literal | `"Hello"` or `"\n"`                              |
 | *no syntax yet* | Contains a fixed number of elements              | `{"Hello"}` or `{}` or `{boolean.true, 123, {}}` |
 
+
 ### Variables and constants
 * Variables
 
@@ -31,7 +38,7 @@
 You can declare a constant with `let a = 10`. This will implicitly set the type of the constant to be an integer. If you want to have a specific type of constant use `let a: int(0, 0) = 0`. This creates a constant with a type of integer with the range between 0 and 0.
 
 ### Function Syntax
-Functions can be implemented like this
+Functions can be implemented like this. Currently all functions are lambda (nameless) functions:
 ```lpg
 ()
     assert(boolean.true)
@@ -57,8 +64,6 @@ There is no possibility of defining the return type of a function. This will be 
 xor(boolean.true, boolean.false)
 ```
 
-You can combine this with the `match`-statement in order to break out of a loop in a controlled manner.
-
 ### Tuples
 Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
 ```lpg
@@ -68,20 +73,44 @@ The type of the variable is then automatically derived. In order to access an el
 
 ### Interfaces
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
-```
+```lpg
 let make-percent = interface
-    percent(): integer(0, 100)
+    percent(): int(0, 100)
 ```
+
 And this is how you implement this:
-**TO DO**
+```lpg
+let printable = interface
+    print(): string-ref
+
+impl printable for string-ref
+    print(): string-ref
+        self
+```
 
 And this is how you use it:
-```
-let print-percent(something: make-percent)
-    integer-to-string(make-percent.percent)
+```lpg
+let print-percent = (something: make-percent)
+    integer-to-string(something.percent())
 ```
 
-## Structures
+### Structures
+Structures provide the tool to define your own data structures. Like so:
+```lpg
+let t : type = struct
+    a: boolean
+let t-instance : t = t{boolean.true}
+```
+
+When you want to nest a struct inside a struct, you can do this as well.
+```lpg
+let u = struct
+    a: t
+    b: string-ref
+let u-instance = u{t{boolean.true}, "abc"}
+```
+
+## Concepts
 
 ### Match
 The match expression works similar to the switch statement in other languages.
@@ -107,16 +136,30 @@ You can create a loop with the simple loop key word. By default all loops will r
 loop
     assert(boolean.true)
 ```
-If you don't want to have an infinite loop then you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
-```
+If you don't want to have an infinite loop, you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
+```lpg
+let a = boolean.true
 loop
-    let still-running : unit = match f()
+    let still-running = match a
         case boolean.false:
             break
+            unit
         case boolean.true:
             unit
-print("Done")
-``` 
+assert(boolean.true)
+```
+
+### Comments
+There are two types of comments:
+* mutli-line comment:
+```lpg
+/* Starting something 
+End something */
+```
+* single line comment:
+```lpg
+// Some comment
+```
 
 ## Standard library functions
 The standard library also includes some functions to work with the types.

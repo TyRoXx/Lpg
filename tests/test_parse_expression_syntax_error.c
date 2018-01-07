@@ -540,8 +540,7 @@ static void test_function(void)
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_invalid_token, source_location_create(1, 4)),
-            parse_error_create(parse_error_expected_expression, source_location_create(1, 5))};
+            parse_error_create(parse_error_invalid_token, source_location_create(1, 4))};
         expression expected = expression_from_declare(declare_create(
             identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
             expression_allocate(expression_from_lambda(
