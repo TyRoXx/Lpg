@@ -2,9 +2,11 @@
 
 #include "lpg_check.h"
 #include "lpg_local_variable.h"
+#include "lpg_program_check.h"
 
 typedef struct function_checking_state
 {
+    program_check *root;
     struct function_checking_state *parent;
     bool may_capture_runtime_variables;
     struct capture *captures;

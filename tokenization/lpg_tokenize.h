@@ -8,16 +8,26 @@ typedef enum token_type
     token_newline,
     token_comment,
     token_space,
+    // four spaces
     token_indentation,
     token_identifier,
+    // (
     token_left_parenthesis,
+    // )
     token_right_parenthesis,
+    // {
     token_left_curly_brace,
+    // }
     token_right_curly_brace,
+    // [
+    token_left_bracket,
+    // ]
+    token_right_bracket,
     token_comma,
     token_dot,
     token_colon,
     token_assign,
+    // =>
     token_fat_arrow,
     token_integer,
     token_match,

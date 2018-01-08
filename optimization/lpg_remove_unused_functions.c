@@ -31,6 +31,7 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     case value_kind_enum_element:
     case value_kind_unit:
     case value_kind_enum_constructor:
+    case value_kind_generic_enum:
         break;
 
     case value_kind_pattern:
@@ -173,6 +174,9 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     case value_kind_flat_object:
     case value_kind_pattern:
         LPG_TO_DO();
+
+    case value_kind_generic_enum:
+        return value_from_generic_enum(from.generic_enum);
 
     case value_kind_type:
         return value_from_type(type_clone(from.type_, clone_gc));

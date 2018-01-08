@@ -158,6 +158,14 @@ value value_from_type_erased(type_erased_value content)
     return result;
 }
 
+value value_from_generic_enum(generic_enum_id content)
+{
+    value result;
+    result.kind = value_kind_generic_enum;
+    result.generic_enum = content;
+    return result;
+}
+
 value *value_allocate(value const content)
 {
     value *const result = allocate(sizeof(*result));
@@ -180,6 +188,7 @@ bool value_equals(value const left, value const right)
     {
     case value_kind_type_erased:
     case value_kind_pattern:
+    case value_kind_generic_enum:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -245,6 +254,7 @@ bool value_less_than(value const left, value const right)
     {
     case value_kind_type_erased:
     case value_kind_pattern:
+    case value_kind_generic_enum:
         LPG_TO_DO();
 
     case value_kind_integer:

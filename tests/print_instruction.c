@@ -38,6 +38,7 @@ static void print_type(type const printed)
     case type_kind_lambda:
     case type_kind_interface:
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_TO_DO();
     }
 }
@@ -94,6 +95,7 @@ void print_value(value const printed)
         break;
 
     case value_kind_pattern:
+    case value_kind_generic_enum:
         LPG_TO_DO();
     }
 }

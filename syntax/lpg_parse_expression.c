@@ -632,6 +632,47 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
 static expression_parser_result parse_enum(expression_parser *const parser, size_t const indentation,
                                            source_location const begin)
 {
+    unicode_string *generic_parameters = NULL;
+    size_t generic_parameter_count = 0;
+
+    {
+        rich_token const maybe_bracket = peek(parser);
+        if (maybe_bracket.token == token_left_bracket)
+        {
+            pop(parser);
+            for (;;)
+            {
+                rich_token const next = peek(parser);
+                if (next.token == token_identifier)
+                {
+                    generic_parameters =
+                        reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
+                    generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
+                    ++generic_parameter_count;
+                    pop(parser);
+                    rich_token const after_parameter = peek(parser);
+                    if (after_parameter.token == token_comma)
+                    {
+                        pop(parser);
+                    }
+                    else if (after_parameter.token != token_right_bracket)
+                    {
+                        LPG_TO_DO();
+                    }
+                }
+                else if (next.token == token_right_bracket)
+                {
+                    pop(parser);
+                    break;
+                }
+                else
+                {
+                    return expression_parser_result_failure;
+                }
+            }
+        }
+    }
+
     enum_expression_element *elements = NULL;
     enum_element_id element_count = 0;
     bool is_success = true;
@@ -690,7 +731,8 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
         elements[element_count] = enum_expression_element_create(unicode_view_copy(name.content), state);
         ++element_count;
     }
-    enum_expression const parsed = enum_expression_create(begin, elements, element_count);
+    enum_expression const parsed =
+        enum_expression_create(begin, generic_parameters, generic_parameter_count, elements, element_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_enum(parsed)};
@@ -746,6 +788,8 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             return parse_tuple(parser, indentation, head.where);
         }
 
+        case token_left_bracket:
+        case token_right_bracket:
         case token_right_curly_brace:
         case token_right_parenthesis:
         case token_newline:
@@ -1012,6 +1056,73 @@ static bool parse_instantiate_struct(expression_parser *parser, size_t indentati
     return true;
 }
 
+static bool parse_generic_instantiation(expression_parser *const parser, size_t const indentation,
+                                        expression *const result)
+{
+    rich_token next = peek(parser);
+    if (next.token == token_right_bracket)
+    {
+        pop(parser);
+        LPG_TO_DO();
+    }
+
+    size_t argument_count = 0;
+    bool more_elements = true;
+    expression *arguments = allocate_array(0, sizeof(*arguments));
+    while (next.token != token_right_bracket)
+    {
+        if (next.token == token_comma)
+        {
+            more_elements = true;
+            pop(parser);
+            next = peek(parser);
+            if (next.token == token_space)
+            {
+                pop(parser);
+            }
+            else
+            {
+                for (size_t i = 0; i < argument_count; ++i)
+                {
+                    expression_free(arguments + i);
+                }
+                if (arguments)
+                {
+                    deallocate(arguments);
+                }
+                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->user);
+                LPG_TO_DO();
+            }
+        }
+        expression_parser_result const parser_result = parse_expression(parser, indentation, false);
+        if (parser_result.is_success && more_elements)
+        {
+            /*TODO: avoid O(N^2)*/
+            arguments = reallocate_array(arguments, argument_count + 1, sizeof(*arguments));
+            arguments[argument_count] = parser_result.success;
+            argument_count++;
+            more_elements = false;
+        }
+        else
+        {
+            for (size_t i = 0; i < argument_count; ++i)
+            {
+                expression_free(arguments + i);
+            }
+            if (arguments)
+            {
+                deallocate(arguments);
+            }
+            LPG_TO_DO();
+        }
+        next = peek(parser);
+    }
+    pop(parser);
+    *result = expression_from_generic_instantiation(
+        generic_instantiation_expression_create(expression_allocate(*result), arguments, argument_count));
+    return true;
+}
+
 static expression_parser_result parse_binary_operator(expression_parser *const parser, const size_t indentation,
                                                       expression left_side, binary_operator operator)
 {
@@ -1070,6 +1181,14 @@ static expression_parser_result parse_returnable(expression_parser *const parser
         {
             pop(parser);
             if (parse_instantiate_struct(parser, indentation, &result.success, maybe_operator.where))
+            {
+                continue;
+            }
+        }
+        if (maybe_operator.token == token_left_bracket)
+        {
+            pop(parser);
+            if (parse_generic_instantiation(parser, indentation, &result.success))
             {
                 continue;
             }

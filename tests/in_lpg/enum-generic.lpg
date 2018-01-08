@@ -1,0 +1,9 @@
+let single-parameter = enum[T]
+    a(T)
+
+let a = single-parameter[boolean].a(boolean.true)
+
+assert(match a
+    case single-parameter[boolean].a(let s):
+        s
+)

@@ -148,6 +148,12 @@ tokenize_result tokenize(char const *input, size_t length)
     case '}':
         return make_success(token_right_curly_brace, 1);
 
+    case '[':
+        return make_success(token_left_bracket, 1);
+
+    case ']':
+        return make_success(token_right_bracket, 1);
+
     case ':':
         return make_success(token_colon, 1);
 

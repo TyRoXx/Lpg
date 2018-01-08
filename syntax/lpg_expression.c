@@ -439,6 +439,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_generic_instantiation:
+        return expression_source_begin(*value.generic_instantiation.generic);
+
     case expression_type_enum:
         return value.enum_.begin;
 
@@ -559,10 +562,11 @@ bool enum_expression_element_equals(enum_expression_element const left, enum_exp
     return !right.state;
 }
 
-enum_expression enum_expression_create(source_location begin, enum_expression_element *elements,
-                                       enum_element_id element_count)
+enum_expression enum_expression_create(source_location const begin, unicode_string *const generic_parameters,
+                                       size_t const generic_parameter_count, enum_expression_element *const elements,
+                                       enum_element_id const element_count)
 {
-    enum_expression const result = {begin, elements, element_count};
+    enum_expression const result = {begin, generic_parameters, generic_parameter_count, elements, element_count};
     return result;
 }
 
@@ -575,6 +579,14 @@ void enum_expression_free(enum_expression const freed)
     if (freed.elements)
     {
         deallocate(freed.elements);
+    }
+    for (size_t i = 0; i < freed.generic_parameter_count; ++i)
+    {
+        unicode_string_free(&freed.generic_parameters[i]);
+    }
+    if (freed.generic_parameters)
+    {
+        deallocate(freed.generic_parameters);
     }
 }
 
@@ -591,6 +603,47 @@ bool enum_expression_equals(enum_expression const left, enum_expression const ri
     for (size_t i = 0; i < left.element_count; ++i)
     {
         if (!enum_expression_element_equals(left.elements[i], right.elements[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+generic_instantiation_expression generic_instantiation_expression_create(expression *generic, expression *arguments,
+                                                                         size_t count)
+{
+    generic_instantiation_expression const result = {generic, arguments, count};
+    return result;
+}
+
+void generic_instantiation_expression_free(generic_instantiation_expression const freed)
+{
+    expression_deallocate(freed.generic);
+    for (size_t i = 0; i < freed.count; ++i)
+    {
+        expression_free(freed.arguments + i);
+    }
+    if (freed.arguments)
+    {
+        deallocate(freed.arguments);
+    }
+}
+
+bool generic_instantiation_expression_equals(generic_instantiation_expression const left,
+                                             generic_instantiation_expression const right)
+{
+    if (!expression_equals(left.generic, right.generic))
+    {
+        return false;
+    }
+    if (left.count != right.count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.count; ++i)
+    {
+        if (!expression_equals(&left.arguments[i], &right.arguments[i]))
         {
             return false;
         }
@@ -793,6 +846,14 @@ expression expression_from_placeholder(placeholder_expression const value)
     return result;
 }
 
+expression expression_from_generic_instantiation(generic_instantiation_expression const value)
+{
+    expression result;
+    result.type = expression_type_generic_instantiation;
+    result.generic_instantiation = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -804,6 +865,10 @@ void expression_free(expression const *this)
 {
     switch (this->type)
     {
+    case expression_type_generic_instantiation:
+        generic_instantiation_expression_free(this->generic_instantiation);
+        break;
+
     case expression_type_enum:
         enum_expression_free(this->enum_);
         break;
@@ -955,6 +1020,9 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_generic_instantiation:
+        return generic_instantiation_expression_equals(left->generic_instantiation, right->generic_instantiation);
+
     case expression_type_placeholder:
         return placeholder_expression_equals(left->placeholder, right->placeholder);
 

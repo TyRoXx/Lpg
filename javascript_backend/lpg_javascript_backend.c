@@ -227,6 +227,9 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_pattern:
         LPG_TO_DO();
 
+    case value_kind_generic_enum:
+        return stream_writer_write_string(javascript_output, "/*generic enum*/ undefined");
+
     case value_kind_type:
         return stream_writer_write_string(javascript_output, "/*TODO type*/ undefined");
 
@@ -434,6 +437,7 @@ static success_indicator generate_read_struct(function_generation *const state, 
     case type_kind_lambda:
     case type_kind_interface:
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_UNREACHABLE();
     }
     LPG_TRY(generate_read_struct_value(state, generated, javascript_output));
@@ -645,6 +649,7 @@ static success_indicator generate_match(function_generation *const state, match_
     case type_kind_lambda:
     case type_kind_interface:
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();

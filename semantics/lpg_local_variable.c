@@ -17,6 +17,18 @@ void local_variable_free(local_variable const *const value)
     unicode_string_free(&value->name);
 }
 
+void local_variable_container_free(local_variable_container const freed)
+{
+    for (size_t i = 0; i < freed.count; ++i)
+    {
+        local_variable_free(freed.elements + i);
+    }
+    if (freed.elements)
+    {
+        deallocate(freed.elements);
+    }
+}
+
 void add_local_variable(local_variable_container *to, local_variable variable)
 {
     to->elements = reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));

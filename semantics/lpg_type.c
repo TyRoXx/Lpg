@@ -311,6 +311,13 @@ type type_from_struct(struct_id const value)
     return result;
 }
 
+type type_from_generic_enum()
+{
+    type result;
+    result.kind = type_kind_generic_enum;
+    return result;
+}
+
 type *type_allocate(type const value)
 {
     type *const result = allocate(sizeof(*result));
@@ -339,6 +346,7 @@ bool type_equals(type const left, type const right)
         return (left.structure_ == right.structure_);
 
     case type_kind_enum_constructor:
+    case type_kind_generic_enum:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
@@ -417,6 +425,9 @@ type type_clone(type const original, garbage_collector *const clone_gc)
 
     case type_kind_method_pointer:
         LPG_TO_DO();
+
+    case type_kind_generic_enum:
+        return type_from_generic_enum();
     }
     LPG_UNREACHABLE();
 }
@@ -453,6 +464,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_type:
     case type_kind_unit:
     case type_kind_string_ref:
+    case type_kind_generic_enum:
         return true;
 
     case type_kind_function_pointer:

@@ -330,6 +330,7 @@ void test_interpreter(void)
         char const *const test_files[] = {"boolean.lpg",
                                           "concat.lpg",
                                           "empty.lpg",
+                                          "enum-generic.lpg",
                                           "enum-stateful.lpg",
                                           "enum-stateless.lpg",
                                           "function-pointer.lpg",

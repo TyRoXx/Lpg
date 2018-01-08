@@ -708,6 +708,7 @@ static success_indicator generate_type(type const generated, standard_library_us
 
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_TO_DO();
 
     case type_kind_structure:
@@ -857,6 +858,7 @@ static success_indicator generate_add_reference(unicode_view const value, type c
 
     case type_kind_method_pointer:
     case type_kind_enum_constructor:
+    case type_kind_generic_enum:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -1121,6 +1123,7 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_type_erased:
     case value_kind_flat_object:
     case value_kind_pattern:
+    case value_kind_generic_enum:
         LPG_TO_DO();
 
     case value_kind_type:
@@ -1416,6 +1419,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_UNREACHABLE();
 
             case type_kind_enum_constructor:
+            case type_kind_generic_enum:
                 LPG_TO_DO();
 
             case type_kind_lambda:
@@ -1671,6 +1675,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_type:
             case type_kind_integer_range:
             case type_kind_enum_constructor:
+            case type_kind_generic_enum:
                 LPG_UNREACHABLE();
             }
             LPG_UNREACHABLE();
@@ -1712,6 +1717,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         ASSERT(state->registers[input.literal.into].meaning == register_meaning_nothing);
         switch (input.literal.value_.kind)
         {
+        case value_kind_generic_enum:
+            set_register_variable(
+                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            LPG_TRY(stream_writer_write_string(c_output, "/*generic enum omitted*/\n"));
+            return success;
+
         case value_kind_integer:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
@@ -2121,6 +2132,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     case type_kind_type:
     case type_kind_unit:
     case type_kind_integer_range:
+    case type_kind_generic_enum:
         return success;
 
     case type_kind_enumeration:

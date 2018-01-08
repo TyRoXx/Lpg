@@ -49,6 +49,8 @@ void test_tokenize(void)
     test_single_token(token_right_parenthesis, 1, ")");
     test_single_token(token_left_curly_brace, 1, "{");
     test_single_token(token_right_curly_brace, 1, "}");
+    test_single_token(token_left_bracket, 1, "[");
+    test_single_token(token_right_bracket, 1, "]");
     test_single_token(token_colon, 1, ":");
     test_single_token(token_colon, 1, ":a");
     test_single_token(token_colon, 1, "::");

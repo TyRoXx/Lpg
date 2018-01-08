@@ -55,7 +55,8 @@ typedef enum expression_type
     expression_type_impl,
     expression_type_instantiate_struct,
     expression_type_enum,
-    expression_type_placeholder
+    expression_type_placeholder,
+    expression_type_generic_instantiation
 } expression_type;
 
 typedef struct tuple
@@ -306,14 +307,30 @@ bool enum_expression_element_equals(enum_expression_element const left, enum_exp
 typedef struct enum_expression
 {
     source_location begin;
+    unicode_string *generic_parameters;
+    size_t generic_parameter_count;
     enum_expression_element *elements;
     enum_element_id element_count;
 } enum_expression;
 
-enum_expression enum_expression_create(source_location begin, enum_expression_element *elements,
-                                       enum_element_id element_count);
+enum_expression enum_expression_create(source_location const begin, unicode_string *const generic_parameters,
+                                       size_t const generic_parameter_count, enum_expression_element *const elements,
+                                       enum_element_id const element_count);
 void enum_expression_free(enum_expression const freed);
 bool enum_expression_equals(enum_expression const left, enum_expression const right);
+
+typedef struct generic_instantiation_expression
+{
+    expression *generic;
+    expression *arguments;
+    size_t count;
+} generic_instantiation_expression;
+
+generic_instantiation_expression generic_instantiation_expression_create(expression *generic, expression *arguments,
+                                                                         size_t count);
+void generic_instantiation_expression_free(generic_instantiation_expression const freed);
+bool generic_instantiation_expression_equals(generic_instantiation_expression const left,
+                                             generic_instantiation_expression const right);
 
 struct expression
 {
@@ -343,6 +360,7 @@ struct expression
         instantiate_struct_expression instantiate_struct;
         enum_expression enum_;
         placeholder_expression placeholder;
+        generic_instantiation_expression generic_instantiation;
     };
 };
 
@@ -372,6 +390,7 @@ expression expression_from_struct(struct_expression value);
 expression expression_from_instantiate_struct(instantiate_struct_expression value);
 expression expression_from_enum(enum_expression const value);
 expression expression_from_placeholder(placeholder_expression const value);
+expression expression_from_generic_instantiation(generic_instantiation_expression const value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

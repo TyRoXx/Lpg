@@ -73,7 +73,8 @@ typedef enum type_kind
     type_kind_enum_constructor,
     type_kind_lambda,
     type_kind_interface,
-    type_kind_method_pointer
+    type_kind_method_pointer,
+    type_kind_generic_enum
 } type_kind;
 
 typedef struct function_pointer function_pointer;
@@ -193,7 +194,7 @@ type type_from_lambda(lambda_type const lambda);
 type type_from_interface(interface_id const value);
 type type_from_method_pointer(method_pointer_type const value);
 type type_from_struct(struct_id const value);
-type type_from_pattern(void);
+type type_from_generic_enum(void);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc);

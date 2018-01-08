@@ -134,6 +134,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 LPG_UNREACHABLE();
 
             case value_kind_enum_constructor:
+            case value_kind_generic_enum:
                 LPG_TO_DO();
             }
             break;

@@ -31,15 +31,16 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false};
 
-static function_checking_state function_checking_state_create(function_checking_state *parent,
-                                                              bool may_capture_runtime_variables,
+static function_checking_state function_checking_state_create(program_check *const root,
+                                                              function_checking_state *parent,
+                                                              bool const may_capture_runtime_variables,
                                                               structure const *global, check_error_handler *on_error,
                                                               void *user, checked_program *const program,
                                                               instruction_sequence *const body)
 {
     function_checking_state const result = {
-        parent, may_capture_runtime_variables, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user, program,
-        body};
+        root,    parent, may_capture_runtime_variables, NULL, 0, 0, NULL, 0, false, global, on_error, {NULL, 0}, user,
+        program, body};
     return result;
 }
 
@@ -68,6 +69,7 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
     case type_kind_integer_range:
     case type_kind_interface:
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_UNREACHABLE();
 
     case type_kind_enum_constructor:
@@ -195,6 +197,7 @@ static read_structure_element_result read_element(function_checking_state *state
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_method_pointer:
+    case type_kind_generic_enum:
         LPG_TO_DO();
 
     case type_kind_interface:
@@ -245,6 +248,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_lambda:
         case type_kind_enum_constructor:
         case type_kind_method_pointer:
+        case type_kind_generic_enum:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -305,6 +309,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_interface:
+    case type_kind_generic_enum:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -419,16 +424,18 @@ static conversion_result convert(function_checking_state *const state, instructi
                                  optional_value const original_compile_time_value,
                                  source_location const original_source, type const to);
 
-static check_function_result check_function(function_checking_state *parent, expression const body_in,
-                                            structure const global, check_error_handler *on_error, void *user,
-                                            checked_program *const program, type const *const parameter_types,
-                                            unicode_string *const parameter_names, size_t const parameter_count,
-                                            optional_type const self, bool const may_capture_runtime_variables,
+static check_function_result check_function(program_check *const root, function_checking_state *parent,
+                                            expression const body_in, structure const global,
+                                            check_error_handler *on_error, void *user, checked_program *const program,
+                                            type const *const parameter_types, unicode_string *const parameter_names,
+                                            size_t const parameter_count, optional_type const self,
+                                            bool const may_capture_runtime_variables,
                                             optional_type const explicit_return_type)
 {
+    ASSUME(root);
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     function_checking_state state = function_checking_state_create(
-        parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out);
+        root, parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out);
 
     if (self.is_set)
     {
@@ -673,8 +680,8 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked =
-        check_function(state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
-                       header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
+        check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
+                       state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
                        optional_type_create_empty(), true, header.return_type);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
@@ -788,6 +795,7 @@ static conversion_result convert(function_checking_state *const state, instructi
 
     case type_kind_method_pointer:
     case type_kind_tuple:
+    case type_kind_generic_enum:
         LPG_TO_DO();
 
     case type_kind_integer_range:
@@ -867,6 +875,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_type:
     case type_kind_integer_range:
     case type_kind_interface:
+    case type_kind_generic_enum:
         state->on_error(
             semantic_error_create(semantic_error_not_callable, expression_source_begin(*call.callee)), state->user);
         return make_compile_time_unit();
@@ -955,6 +964,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             case value_kind_unit:
             case value_kind_tuple:
             case value_kind_pattern:
+            case value_kind_generic_enum:
                 LPG_UNREACHABLE();
 
             case value_kind_enum_constructor:
@@ -1012,6 +1022,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         case type_kind_tuple:
         case type_kind_type:
         case type_kind_integer_range:
+        case type_kind_generic_enum:
             LPG_UNREACHABLE();
 
         case type_kind_enum_constructor:
@@ -1124,6 +1135,9 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
 {
     switch (root.type)
     {
+    case expression_type_generic_instantiation:
+        LPG_TO_DO();
+
     case expression_type_call:
     {
         if ((root.call.arguments.length != 1) || (root.call.arguments.elements[0].type != expression_type_placeholder))
@@ -1545,6 +1559,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_type:
     case type_kind_enum_constructor:
     case type_kind_interface:
+    case type_kind_generic_enum:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -1736,10 +1751,10 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         return method_evaluation_result_failure;
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked =
-        check_function(state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
-                       state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
-                       optional_type_create_set(self), false, optional_type_create_set(declared_result_type));
+    check_function_result const checked = check_function(
+        state->root, state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
+        state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
+        optional_type_create_set(self), false, optional_type_create_set(declared_result_type));
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1888,9 +1903,30 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     return evaluate_expression_result_create(true, into, type_from_struct(structure_id), optional_value_empty, false);
 }
 
+static evaluate_expression_result evaluate_generic_enum_expression(function_checking_state *state,
+                                                                   instruction_sequence *function,
+                                                                   enum_expression const element)
+{
+    program_check *const root = state->root;
+    root->generic_enums =
+        reallocate_array(root->generic_enums, root->generic_enum_count + 1, sizeof(*root->generic_enums));
+    generic_enum_id const id = root->generic_enum_count;
+    root->generic_enums[id] = generic_enum_create(element);
+    root->generic_enum_count += 1;
+    register_id const into = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  into, value_from_generic_enum(id), type_from_generic_enum())));
+    return evaluate_expression_result_create(
+        true, into, type_from_generic_enum(), optional_value_create(value_from_generic_enum(id)), true);
+}
+
 static evaluate_expression_result
 evaluate_enum_expression(function_checking_state *state, instruction_sequence *function, enum_expression const element)
 {
+    if (element.generic_parameter_count > 0)
+    {
+        return evaluate_generic_enum_expression(state, function, element);
+    }
     enum_id const new_enum_id = state->program->enum_count;
     state->program->enums = reallocate_array(state->program->enums, (new_enum_id + 1), sizeof(*state->program->enums));
     enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
@@ -1945,11 +1981,151 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(literal), true);
 }
 
+static bool values_equal(value const *const first, value const *const second, size_t const count)
+{
+    for (size_t i = 0; i < count; ++i)
+    {
+        if (!value_equals(first[i], second[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+static evaluate_expression_result instantiate_generic_enum(function_checking_state *const state,
+                                                           instruction_sequence *const function,
+                                                           generic_enum_id const generic, value *const arguments,
+                                                           size_t const argument_count, type *const argument_types)
+{
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->enum_instantiation_count; ++i)
+    {
+        generic_enum_instantiation *const instantiation = root->enum_instantiations + i;
+        if (instantiation->generic != generic)
+        {
+            continue;
+        }
+        if (argument_count != instantiation->argument_count)
+        {
+            LPG_TO_DO();
+        }
+        if (!values_equal(instantiation->arguments, arguments, argument_count))
+        {
+            continue;
+        }
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        register_id const into = allocate_register(&state->used_registers);
+        value const literal = value_from_type(type_from_enumeration(instantiation->instantiated));
+        add_instruction(
+            function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+        return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(literal), true);
+    }
+    enum_expression const original = root->generic_enums[generic].tree;
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    function_checking_state enum_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions);
+    generic_enum const instantiated_enum = state->root->generic_enums[generic];
+    if (instantiated_enum.tree.generic_parameter_count != argument_count)
+    {
+        LPG_TO_DO();
+    }
+    for (size_t i = 0; i < instantiated_enum.tree.generic_parameter_count; ++i)
+    {
+        register_id const argument_register = allocate_register(&enum_checking.used_registers);
+        add_local_variable(
+            &enum_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.generic_parameters[i])),
+                argument_types[i], optional_value_create(arguments[i]), argument_register));
+    }
+    evaluate_expression_result const evaluated = evaluate_enum_expression(
+        &enum_checking, &ignored_instructions,
+        enum_expression_create(original.begin, NULL, 0, original.elements, original.element_count));
+    instruction_sequence_free(&ignored_instructions);
+    local_variable_container_free(enum_checking.local_variables);
+    if (!evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    if (evaluated.compile_time_value.value_.type_.kind != type_kind_enumeration)
+    {
+        LPG_TO_DO();
+    }
+    size_t const id = root->enum_instantiation_count;
+    root->enum_instantiations = reallocate_array(
+        root->enum_instantiations, root->enum_instantiation_count + 1, sizeof(*root->enum_instantiations));
+    root->enum_instantiations[id] = generic_enum_instantiation_create(
+        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.enum_);
+    root->enum_instantiation_count += 1;
+    if (argument_types)
+    {
+        deallocate(argument_types);
+    }
+    return evaluated;
+}
+
+static evaluate_expression_result evaluate_generic_instantiation(function_checking_state *const state,
+                                                                 instruction_sequence *const function,
+                                                                 generic_instantiation_expression const element)
+{
+    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *element.generic);
+    if (!generic_evaluated.has_value)
+    {
+        return evaluate_expression_result_empty;
+    }
+    value *const arguments = allocate_array(element.count, sizeof(*arguments));
+    type *const argument_types = allocate_array(element.count, sizeof(*argument_types));
+    for (size_t i = 0; i < element.count; ++i)
+    {
+        evaluate_expression_result const argument_evaluated =
+            evaluate_expression(state, function, element.arguments[i]);
+        if (!argument_evaluated.has_value)
+        {
+            LPG_TO_DO();
+        }
+        if (!argument_evaluated.compile_time_value.is_set)
+        {
+            LPG_TO_DO();
+        }
+        arguments[i] = argument_evaluated.compile_time_value.value_;
+        argument_types[i] = argument_evaluated.type_;
+    }
+    if (!generic_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum)
+    {
+        LPG_TO_DO();
+    }
+    return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
+                                    arguments, element.count, argument_types);
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element)
 {
     switch (element.type)
     {
+    case expression_type_generic_instantiation:
+        return evaluate_generic_instantiation(state, function, element.generic_instantiation);
+
     case expression_type_instantiate_struct:
         return evaluate_instantiate_struct(state, function, element.instantiate_struct);
 
@@ -2218,9 +2394,10 @@ checked_program check(sequence const root, structure const global, check_error_h
             type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())));
         program.enums[1] = enumeration_create(elements, 2);
     }
+    program_check check_root = {NULL, 0, NULL, 0};
     check_function_result const checked =
-        check_function(NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
-                       optional_type_create_empty(), true, optional_type_create_empty());
+        check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
+                       0, optional_type_create_empty(), true, optional_type_create_empty());
     if (checked.success)
     {
         ASSUME(checked.capture_count == 0);
@@ -2234,5 +2411,6 @@ checked_program check(sequence const root, structure const global, check_error_h
         program.functions[0] =
             checked_function_create(0, dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
+    program_check_free(check_root);
     return program;
 }

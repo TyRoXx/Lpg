@@ -22,6 +22,8 @@ typedef struct local_variable_container
     size_t count;
 } local_variable_container;
 
+void local_variable_container_free(local_variable_container const freed);
+
 typedef enum read_local_variable_status
 {
     read_local_variable_status_ok,

@@ -347,6 +347,20 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_placeholder:
         LPG_TRY(stream_writer_write_string(to, "let "));
         return stream_writer_write_unicode_view(to, unicode_view_from_string(value->placeholder.name));
+
+    case expression_type_generic_instantiation:
+        LPG_TRY(save_expression(to, value->generic_instantiation.generic, whitespace));
+        LPG_TRY(stream_writer_write_string(to, "["));
+        LPG_FOR(size_t, i, value->generic_instantiation.count)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(to, ", "));
+            }
+            LPG_TRY(save_expression(to, &value->generic_instantiation.arguments[i], whitespace));
+        }
+        LPG_TRY(stream_writer_write_string(to, "]"));
+        return success;
     }
     LPG_UNREACHABLE();
 }
