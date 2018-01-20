@@ -654,6 +654,11 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
                     if (after_parameter.token == token_comma)
                     {
                         pop(parser);
+                        rich_token const maybe_space = peek(parser);
+                        if (maybe_space.token == token_space)
+                        {
+                            pop(parser);
+                        }
                     }
                     else if (after_parameter.token != token_right_bracket)
                     {

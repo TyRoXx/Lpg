@@ -151,6 +151,47 @@ void test_parse_expression_success(void)
             false);
     }
 
+    {
+        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_string_from_c_str("a");
+        test_successful_parse(
+            expression_from_enum(enum_expression_create(source_location_create(0, 0), parameters, 1, NULL, 0)),
+            unicode_string_from_c_str("enum[a]"), false);
+    }
+
+    {
+        unicode_string *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = unicode_string_from_c_str("a");
+        parameters[1] = unicode_string_from_c_str("b");
+        test_successful_parse(
+            expression_from_enum(enum_expression_create(source_location_create(0, 0), parameters, 2, NULL, 0)),
+            unicode_string_from_c_str("enum[a, b]"), false);
+    }
+
+    {
+        expression *const arguments = allocate_array(1, sizeof(*arguments));
+        arguments[0] = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 2)));
+        test_successful_parse(expression_from_generic_instantiation(generic_instantiation_expression_create(
+                                  expression_allocate(expression_from_identifier(identifier_expression_create(
+                                      unicode_string_from_c_str("x"), source_location_create(0, 0)))),
+                                  arguments, 1)),
+                              unicode_string_from_c_str("x[a]"), false);
+    }
+
+    {
+        expression *const arguments = allocate_array(2, sizeof(*arguments));
+        arguments[0] = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 2)));
+        arguments[1] = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("b"), source_location_create(0, 5)));
+        test_successful_parse(expression_from_generic_instantiation(generic_instantiation_expression_create(
+                                  expression_allocate(expression_from_identifier(identifier_expression_create(
+                                      unicode_string_from_c_str("x"), source_location_create(0, 0)))),
+                                  arguments, 2)),
+                              unicode_string_from_c_str("x[a, b]"), false);
+    }
+
     test_function_calls();
     test_comment();
     test_loops();
