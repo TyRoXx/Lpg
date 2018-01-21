@@ -1996,7 +1996,8 @@ static bool values_equal(value const *const first, value const *const second, si
 static evaluate_expression_result instantiate_generic_enum(function_checking_state *const state,
                                                            instruction_sequence *const function,
                                                            generic_enum_id const generic, value *const arguments,
-                                                           size_t const argument_count, type *const argument_types)
+                                                           size_t const argument_count, type *const argument_types,
+                                                           source_location const where)
 {
     program_check *const root = state->root;
     for (size_t i = 0; i < root->enum_instantiation_count; ++i)
@@ -2008,7 +2009,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         }
         if (argument_count != instantiation->argument_count)
         {
-            LPG_TO_DO();
+            LPG_UNREACHABLE();
         }
         if (!values_equal(instantiation->arguments, arguments, argument_count))
         {
@@ -2033,9 +2034,31 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     function_checking_state enum_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions);
     generic_enum const instantiated_enum = state->root->generic_enums[generic];
-    if (instantiated_enum.tree.generic_parameter_count != argument_count)
+    if (argument_count < instantiated_enum.tree.generic_parameter_count)
     {
-        LPG_TO_DO();
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        state->on_error(semantic_error_create(semantic_error_missing_argument, where), state->user);
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_enum.tree.generic_parameter_count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        state->on_error(semantic_error_create(semantic_error_extraneous_argument, where), state->user);
+        return evaluate_expression_result_empty;
     }
     for (size_t i = 0; i < instantiated_enum.tree.generic_parameter_count; ++i)
     {
@@ -2115,7 +2138,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         LPG_TO_DO();
     }
     return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
-                                    arguments, element.count, argument_types);
+                                    arguments, element.count, argument_types,
+                                    expression_source_begin(*element.generic));
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,

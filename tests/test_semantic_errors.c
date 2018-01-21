@@ -241,6 +241,34 @@ void test_semantic_errors(void)
         checked_program_free(&checked);
     }
     {
+        sequence root = parse("let e = enum[A]\n"
+                              "    a\n"
+                              "let x = e[boolean, boolean]\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(2, 8))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let e = enum[A]\n"
+                              "    a\n"
+                              "let x = e[]\n");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(2, 8))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
         sequence root = parse("side-effect()\n"
                               "h()");
         semantic_error const errors[] = {

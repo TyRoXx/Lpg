@@ -1065,12 +1065,6 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
                                         expression *const result)
 {
     rich_token next = peek(parser);
-    if (next.token == token_right_bracket)
-    {
-        pop(parser);
-        LPG_TO_DO();
-    }
-
     size_t argument_count = 0;
     bool more_elements = true;
     expression *arguments = allocate_array(0, sizeof(*arguments));
