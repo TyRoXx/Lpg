@@ -2137,7 +2137,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         arguments[i] = argument_evaluated.compile_time_value.value_;
         argument_types[i] = argument_evaluated.type_;
     }
-    if (!generic_evaluated.compile_time_value.is_set)
+    if (!generic_evaluated.compile_time_value.is_set ||
+        (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum))
     {
         if (arguments)
         {
@@ -2151,10 +2152,6 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
             semantic_error_create(semantic_error_expected_generic_type, expression_source_begin(*element.generic)),
             state->user);
         return evaluate_expression_result_empty;
-    }
-    if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum)
-    {
-        LPG_TO_DO();
     }
     return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
                                     arguments, element.count, argument_types,
