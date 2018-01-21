@@ -2076,7 +2076,15 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     local_variable_container_free(enum_checking.local_variables);
     if (!evaluated.has_value)
     {
-        LPG_TO_DO();
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        return evaluate_expression_result_empty;
     }
     if (!evaluated.compile_time_value.is_set)
     {
