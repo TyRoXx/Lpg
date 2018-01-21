@@ -2139,7 +2139,18 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     }
     if (!generic_evaluated.compile_time_value.is_set)
     {
-        LPG_TO_DO();
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        state->on_error(
+            semantic_error_create(semantic_error_expected_generic_type, expression_source_begin(*element.generic)),
+            state->user);
+        return evaluate_expression_result_empty;
     }
     if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum)
     {

@@ -241,6 +241,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_match_unsupported:
         return "Unsupported type to match";
+
+    case semantic_error_expected_generic_type:
+        return "Expected generic type";
     }
     LPG_UNREACHABLE();
 }
