@@ -1954,6 +1954,15 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                 }
                 element_state = state_evaluated.compile_time_value.value_.type_;
             }
+            else
+            {
+                for (size_t m = 0; m < i; ++m)
+                {
+                    enumeration_element_free(elements + m);
+                }
+                deallocate(elements);
+                return evaluate_expression_result_empty;
+            }
         }
 
         elements[i] = enumeration_element_create(
@@ -2088,15 +2097,15 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     }
     if (!evaluated.compile_time_value.is_set)
     {
-        LPG_TO_DO();
+        LPG_UNREACHABLE();
     }
     if (evaluated.compile_time_value.value_.kind != value_kind_type)
     {
-        LPG_TO_DO();
+        LPG_UNREACHABLE();
     }
     if (evaluated.compile_time_value.value_.type_.kind != type_kind_enumeration)
     {
-        LPG_TO_DO();
+        LPG_UNREACHABLE();
     }
     size_t const id = root->enum_instantiation_count;
     root->enum_instantiations = reallocate_array(

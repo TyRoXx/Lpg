@@ -206,7 +206,7 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 2);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -270,16 +270,17 @@ void test_semantic_errors(void)
     }
     {
         sequence root = parse("let e = enum[A]\n"
-                              "    a(unknown)\n"
+                              "    a\n"
+                              "    b(unknown)\n"
                               "let x = e[boolean]\n");
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 6))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 6))};
         expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
         checked_program checked = check(root, std_library.globals, expect_errors, &expected);
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 3);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
