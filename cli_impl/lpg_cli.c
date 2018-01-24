@@ -244,6 +244,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_expected_generic_type:
         return "Expected generic type";
+
+    case semantic_error_expected_compile_time_value:
+        return "Expected compile time value";
     }
     LPG_UNREACHABLE();
 }

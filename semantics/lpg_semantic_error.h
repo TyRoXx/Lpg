@@ -21,7 +21,8 @@ typedef enum semantic_error_type
     semantic_error_expected_structure,
     semantic_error_match_unsupported,
     semantic_error_duplicate_enum_element,
-    semantic_error_expected_generic_type
+    semantic_error_expected_generic_type,
+    semantic_error_expected_compile_time_value
 } semantic_error_type;
 
 typedef struct semantic_error

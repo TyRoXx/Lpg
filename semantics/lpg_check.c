@@ -2137,11 +2137,30 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
             evaluate_expression(state, function, element.arguments[i]);
         if (!argument_evaluated.has_value)
         {
-            LPG_TO_DO();
+            if (arguments)
+            {
+                deallocate(arguments);
+            }
+            if (argument_types)
+            {
+                deallocate(argument_types);
+            }
+            return evaluate_expression_result_empty;
         }
         if (!argument_evaluated.compile_time_value.is_set)
         {
-            LPG_TO_DO();
+            if (arguments)
+            {
+                deallocate(arguments);
+            }
+            if (argument_types)
+            {
+                deallocate(argument_types);
+            }
+            state->on_error(semantic_error_create(semantic_error_expected_compile_time_value,
+                                                  expression_source_begin(element.arguments[i])),
+                            state->user);
+            return evaluate_expression_result_empty;
         }
         arguments[i] = argument_evaluated.compile_time_value.value_;
         argument_types[i] = argument_evaluated.type_;
