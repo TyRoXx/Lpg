@@ -28,3 +28,13 @@ assert(match c
     case two-parameters[boolean, string-ref].second(let s):
         string-equals("abc", s)
 )
+
+let using-global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using-global[boolean].b(boolean.true)
+    case using-global[boolean].a(let s):
+        boolean.false
+    case using-global[boolean].b(let s):
+        s
+)
