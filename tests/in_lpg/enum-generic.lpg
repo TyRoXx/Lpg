@@ -38,3 +38,15 @@ assert(match using-global[boolean].b(boolean.true)
     case using-global[boolean].b(let s):
         s
 )
+
+let local = struct
+    m: boolean
+let using-local = enum[T]
+    a(T)
+    b(local)
+assert(match using-local[boolean].b(local{boolean.true})
+    case using-local[boolean].a(let s):
+        boolean.false
+    case using-local[boolean].b(let s):
+        s.m
+)

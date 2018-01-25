@@ -3,6 +3,10 @@
 
 void program_check_free(program_check const freed)
 {
+    for (size_t i = 0; i < freed.generic_enum_count; ++i)
+    {
+        generic_enum_free(freed.generic_enums[i]);
+    }
     if (freed.generic_enums)
     {
         deallocate(freed.generic_enums);
