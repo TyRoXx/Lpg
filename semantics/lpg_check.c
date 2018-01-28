@@ -1942,17 +1942,37 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
     switch (from.type)
     {
     case expression_type_lambda:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.lambda.header.parameter_count; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, *from.lambda.header.parameters[i].type);
+        }
+        if (from.lambda.header.return_type)
+        {
+            find_generic_enum_closures_in_expression(closures, state, *from.lambda.header.return_type);
+        }
+        find_generic_enum_closures_in_expression(closures, state, *from.lambda.result);
+        break;
+
     case expression_type_call:
-        LPG_TO_DO();
+        find_generic_enum_closures_in_expression(closures, state, *from.call.callee);
+        for (size_t i = 0; i < from.call.arguments.length; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.call.arguments.elements[i]);
+        }
+        break;
+
     case expression_type_integer_literal:
-        LPG_TO_DO();
+        break;
+
     case expression_type_access_structure:
-        LPG_TO_DO();
+        find_generic_enum_closures_in_expression(closures, state, *from.access_structure.object);
+        break;
+
     case expression_type_match:
         LPG_TO_DO();
+
     case expression_type_string:
-        LPG_TO_DO();
+        break;
 
     case expression_type_identifier:
         resolve_generic_enum_closure_identifier(
@@ -1965,26 +1985,59 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         LPG_TO_DO();
     case expression_type_return:
         LPG_TO_DO();
+
     case expression_type_loop:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.loop_body.length; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.loop_body.elements[i]);
+        }
+        break;
+
     case expression_type_break:
-        LPG_TO_DO();
+        break;
+
     case expression_type_sequence:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.sequence.length; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.sequence.elements[i]);
+        }
+        break;
+
     case expression_type_declare:
-        LPG_TO_DO();
+        if (from.declare.optional_type)
+        {
+            find_generic_enum_closures_in_expression(closures, state, *from.declare.optional_type);
+        }
+        find_generic_enum_closures_in_expression(closures, state, *from.declare.initializer);
+        break;
+
     case expression_type_tuple:
         LPG_TO_DO();
+
     case expression_type_comment:
-        LPG_TO_DO();
+        break;
+
     case expression_type_interface:
         LPG_TO_DO();
+
     case expression_type_struct:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.struct_.element_count; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.struct_.elements[i].type);
+        }
+        break;
+
     case expression_type_impl:
         LPG_TO_DO();
+
     case expression_type_instantiate_struct:
-        LPG_TO_DO();
+        find_generic_enum_closures_in_expression(closures, state, *from.instantiate_struct.type);
+        for (size_t i = 0; i < from.instantiate_struct.arguments.length; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.instantiate_struct.arguments.elements[i]);
+        }
+        break;
+
     case expression_type_enum:
         LPG_TO_DO();
     case expression_type_placeholder:

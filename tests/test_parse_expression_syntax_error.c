@@ -547,7 +547,8 @@ static void test_function(void)
                 lambda_create(function_header_tree_create(
                                   NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
                                                unicode_string_from_c_str("unit"), source_location_create(0, 12))))),
-                              expression_allocate(expression_from_sequence(sequence_create(NULL, 0))))))));
+                              expression_allocate(expression_from_sequence(sequence_create(NULL, 0))),
+                              source_location_create(0, 8))))));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = (): unit\n"
                                                                                                    "    ?"));

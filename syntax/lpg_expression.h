@@ -26,9 +26,10 @@ typedef struct lambda
 {
     function_header_tree header;
     expression *result;
+    source_location source;
 } lambda;
 
-lambda lambda_create(function_header_tree header, expression *result);
+lambda lambda_create(function_header_tree header, expression *result, source_location source);
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 

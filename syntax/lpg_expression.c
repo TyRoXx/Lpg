@@ -51,9 +51,9 @@ bool function_header_tree_equals(function_header_tree const left, function_heade
     return (left.return_type == right.return_type);
 }
 
-lambda lambda_create(function_header_tree header, expression *result)
+lambda lambda_create(function_header_tree header, expression *result, source_location source)
 {
-    lambda const returning = {header, result};
+    lambda const returning = {header, result, source};
     return returning;
 }
 
@@ -65,7 +65,8 @@ void lambda_free(lambda const *this)
 
 bool lambda_equals(lambda const left, lambda const right)
 {
-    return function_header_tree_equals(left.header, right.header) && expression_equals(left.result, right.result);
+    return function_header_tree_equals(left.header, right.header) && expression_equals(left.result, right.result) &&
+           source_location_equals(left.source, right.source);
 }
 
 call call_create(expression *callee, tuple arguments, source_location closing_parenthesis)
@@ -470,6 +471,8 @@ source_location expression_source_begin(expression const value)
         return value.identifier.source;
 
     case expression_type_lambda:
+        return value.lambda.source;
+
     case expression_type_return:
     case expression_type_loop:
     case expression_type_impl:

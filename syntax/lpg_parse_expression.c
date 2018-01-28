@@ -157,7 +157,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 }
 
 static expression_parser_result const expression_parser_result_failure = {
-    0, {expression_type_lambda, {{{NULL, 0, NULL}, NULL}}}};
+    0, {expression_type_lambda, {{{NULL, 0, NULL}, NULL, {0, 0}}}}};
 
 static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
                                             source_location const opening_brace);
@@ -327,7 +327,7 @@ static void clean_up_parameters(parameter *const parameters, size_t parameter_co
 }
 
 static expression_parser_result parse_lambda_body(expression_parser *const parser, size_t const indentation,
-                                                  function_header_tree const header)
+                                                  function_header_tree const header, source_location const lambda_begin)
 {
     rich_token const next_token = peek(parser);
     if (next_token.token == token_space && !header.return_type)
@@ -339,7 +339,7 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
             return expression_parser_result_failure;
         }
         expression_parser_result const result = {
-            1, expression_from_lambda(lambda_create(header, expression_allocate(body.success)))};
+            1, expression_from_lambda(lambda_create(header, expression_allocate(body.success), lambda_begin))};
 
         return result;
     }
@@ -348,7 +348,8 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
         pop(parser);
         sequence const body = parse_sequence(parser, (indentation + 1));
         expression_parser_result const result = {
-            1, expression_from_lambda(lambda_create(header, expression_allocate(expression_from_sequence(body))))};
+            1, expression_from_lambda(
+                   lambda_create(header, expression_allocate(expression_from_sequence(body)), lambda_begin))};
         return result;
     }
     pop(parser);
@@ -477,14 +478,15 @@ static function_header_parse_result parse_function_header(expression_parser *con
     return result;
 }
 
-static expression_parser_result parse_lambda(expression_parser *const parser, size_t const indentation)
+static expression_parser_result parse_lambda(expression_parser *const parser, size_t const indentation,
+                                             source_location const lambda_begin)
 {
     function_header_parse_result const parsed_header = parse_function_header(parser, indentation);
     if (!parsed_header.is_success)
     {
         return expression_parser_result_failure;
     }
-    return parse_lambda_body(parser, indentation, parsed_header.header);
+    return parse_lambda_body(parser, indentation, parsed_header.header, lambda_begin);
 }
 
 static expression_parser_result parse_interface(expression_parser *const parser, size_t const indentation,
@@ -785,7 +787,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
 
         case token_left_parenthesis:
             pop(parser);
-            return parse_lambda(parser, indentation);
+            return parse_lambda(parser, indentation, head.where);
 
         case token_left_curly_brace:
         {
