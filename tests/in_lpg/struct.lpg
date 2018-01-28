@@ -16,3 +16,7 @@ assert(string-equals("abc", u-instance.b))
 let f = (arg: u): boolean
     arg.a.a
 assert(f(u{t{boolean.true}, ""}))
+
+let nested = struct
+    a: struct
+        b: boolean

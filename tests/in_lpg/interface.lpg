@@ -92,3 +92,7 @@ let captures-impl = ()
     ()
         assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
 captures-impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
