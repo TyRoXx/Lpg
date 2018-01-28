@@ -1919,7 +1919,8 @@ static void resolve_generic_enum_closure_identifier(generic_enum_closures *const
         {
             if (!state->local_variables.elements[i].compile_time_value.is_set)
             {
-                LPG_TO_DO();
+                state->on_error(semantic_error_create(semantic_error_expected_compile_time_type, source), state->user);
+                return;
             }
             closures->elements = reallocate_array(closures->elements, closures->count + 1, sizeof(*closures->elements));
             closures->elements[closures->count] =
