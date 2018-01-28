@@ -1969,7 +1969,13 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_match:
-        LPG_TO_DO();
+        find_generic_enum_closures_in_expression(closures, state, *from.match.input);
+        for (size_t i = 0; i < from.match.number_of_cases; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, *from.match.cases[i].key);
+            find_generic_enum_closures_in_expression(closures, state, *from.match.cases[i].action);
+        }
+        break;
 
     case expression_type_string:
         break;
@@ -2012,7 +2018,11 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_tuple:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.tuple.length; ++i)
+        {
+            find_generic_enum_closures_in_expression(closures, state, from.tuple.elements[i]);
+        }
+        break;
 
     case expression_type_comment:
         break;
@@ -2039,7 +2049,15 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_enum:
-        LPG_TO_DO();
+        for (size_t i = 0; i < from.enum_.element_count; ++i)
+        {
+            if (from.enum_.elements[i].state)
+            {
+                find_generic_enum_closures_in_expression(closures, state, *from.enum_.elements[i].state);
+            }
+        }
+        break;
+
     case expression_type_placeholder:
         LPG_TO_DO();
     case expression_type_generic_instantiation:
@@ -2087,6 +2105,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         return evaluate_generic_enum_expression(state, function, element);
     }
     enum_id const new_enum_id = state->program->enum_count;
+    state->program->enum_count += 1;
     state->program->enums = reallocate_array(state->program->enums, (new_enum_id + 1), sizeof(*state->program->enums));
     enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
     for (size_t i = 0; i < element.element_count; ++i)
@@ -2109,6 +2128,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                         enumeration_element_free(elements + m);
                     }
                     deallocate(elements);
+                    state->program->enum_count -= 1;
                     return evaluate_expression_result_empty;
                 }
                 element_state = state_evaluated.compile_time_value.value_.type_;
@@ -2120,6 +2140,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                     enumeration_element_free(elements + m);
                 }
                 deallocate(elements);
+                state->program->enum_count -= 1;
                 return evaluate_expression_result_empty;
             }
         }
@@ -2137,11 +2158,11 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                     enumeration_element_free(elements + m);
                 }
                 deallocate(elements);
+                state->program->enum_count -= 1;
                 return evaluate_expression_result_empty;
             }
         }
     }
-    state->program->enum_count += 1;
     state->program->enums[new_enum_id] = enumeration_create(elements, element.element_count);
     register_id const into = allocate_register(&state->used_registers);
     value const literal = value_from_type(type_from_enumeration(new_enum_id));

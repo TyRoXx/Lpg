@@ -47,6 +47,7 @@ let using-local = enum[T]
     c(()
         let cover-integer-literal = 3
         let cover-string-literal = "abc"
+        let cover-tuple = {local}
         let cover-struct = struct
             m: boolean
         let cover-struct-var = cover-struct{boolean.true}
@@ -54,6 +55,11 @@ let using-local = enum[T]
         //comment
         loop
             break
+        let cover-enum = enum
+            x
+        let cover-enum-var = cover-enum.x
+        match cover-enum-var
+            case cover-enum.x: unit
         local
 ())
 assert(match using-local[boolean].b(local{boolean.true})

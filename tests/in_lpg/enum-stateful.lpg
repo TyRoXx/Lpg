@@ -42,3 +42,10 @@ assert(match multi.b(structure{"abc", boolean.true})
     case multi.e: boolean.false
     case multi.f: boolean.false
 )
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested-enum = enum
+    a(enum
+        b)
+    b
+let n = nested-enum.b
