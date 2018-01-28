@@ -60,6 +60,15 @@ let using-local = enum[T]
         let cover-enum-var = cover-enum.x
         match cover-enum-var
             case cover-enum.x: unit
+        let cover-not = !boolean.true
+        let cover-interface = interface
+            m(): boolean
+        impl cover-interface for boolean
+            m(): boolean
+                self
+        let cover-instantiation = single-parameter[boolean].a(boolean.true)
+        match cover-instantiation
+            case single-parameter[boolean].a(let s): s
         local
 ())
 assert(match using-local[boolean].b(local{boolean.true})
