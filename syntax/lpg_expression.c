@@ -474,6 +474,8 @@ source_location expression_source_begin(expression const value)
         return value.lambda.source;
 
     case expression_type_return:
+        return expression_source_begin(*value.return_);
+
     case expression_type_loop:
     case expression_type_impl:
         LPG_TO_DO();

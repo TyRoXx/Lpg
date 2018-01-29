@@ -21,4 +21,5 @@ typedef struct function_checking_state
     void *user;
     checked_program *program;
     instruction_sequence *body;
+    optional_type return_type;
 } function_checking_state;

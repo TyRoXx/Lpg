@@ -1,12 +1,11 @@
 #include "lpg_checked_function.h"
 #include "lpg_allocate.h"
 
-checked_function checked_function_create(register_id return_value, function_pointer *signature,
-                                         instruction_sequence body, unicode_string *register_debug_names,
-                                         register_id number_of_registers)
+checked_function checked_function_create(function_pointer *signature, instruction_sequence body,
+                                         unicode_string *register_debug_names, register_id number_of_registers)
 {
     ASSUME((number_of_registers > 0) || (register_debug_names == NULL));
-    checked_function const result = {return_value, signature, body, register_debug_names, number_of_registers};
+    checked_function const result = {signature, body, register_debug_names, number_of_registers};
     return result;
 }
 

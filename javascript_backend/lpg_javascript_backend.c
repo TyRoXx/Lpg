@@ -713,6 +713,14 @@ static success_indicator generate_erase_type(function_generation *const state, e
     return success;
 }
 
+static success_indicator generate_return(return_instruction const generated, stream_writer const javascript_output)
+{
+    LPG_TRY(stream_writer_write_string(javascript_output, "return "));
+    LPG_TRY(generate_register_name(generated.return_register, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
+    return success;
+}
+
 static success_indicator generate_instruction(function_generation *const state, instruction const generated,
                                               stream_writer const javascript_output)
 {
@@ -725,7 +733,7 @@ static success_indicator generate_instruction(function_generation *const state, 
         return generate_call(state, generated.call, javascript_output);
 
     case instruction_return:
-        LPG_TO_DO();
+        return generate_return(generated.return_, javascript_output);
 
     case instruction_loop:
         return generate_loop(state, generated.loop, javascript_output);
@@ -808,9 +816,6 @@ static success_indicator generate_function_body(checked_function const function,
     }
     success_indicator const result = generate_sequence(&state, function.body, javascript_output);
     deallocate(state.registers);
-    LPG_TRY(stream_writer_write_string(javascript_output, "return "));
-    LPG_TRY(generate_register_name(function.return_value, javascript_output));
-    LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return result;
 }
 

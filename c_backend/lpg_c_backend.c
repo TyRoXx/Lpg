@@ -900,7 +900,6 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
 }
 
 static success_indicator generate_sequence(c_backend_state *state, checked_function const *const current_function,
-                                           register_id const current_function_result,
                                            instruction_sequence const sequence, size_t const indentation,
                                            stream_writer const c_output);
 
@@ -1184,8 +1183,8 @@ static success_indicator generate_free_registers(c_backend_state *state, size_t 
 }
 
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const current_function,
-                                              register_id const current_function_result, instruction const input,
-                                              size_t const indentation, stream_writer const c_output)
+                                              instruction const input, size_t const indentation,
+                                              stream_writer const c_output)
 {
     switch (input.type)
     {
@@ -1245,7 +1244,14 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     }
 
     case instruction_return:
-        LPG_TO_DO();
+        LPG_TRY(
+            generate_free_registers(state, 0, indentation, current_function, input.return_.return_register, c_output));
+        LPG_TRY(generate_add_reference_for_return_value(
+            state, current_function, input.return_.return_register, 1, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "    return "));
+        LPG_TRY(generate_c_read_access(state, current_function, input.return_.return_register, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+        return success;
 
     case instruction_call:
         LPG_TRY(indent(indentation, c_output));
@@ -1501,8 +1507,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-        LPG_TRY(
-            generate_sequence(state, current_function, current_function_result, input.loop, indentation + 1, c_output));
+        LPG_TRY(generate_sequence(state, current_function, input.loop, indentation + 1, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         return success;
@@ -1947,11 +1952,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case match_instruction_case_kind_value:
                 break;
             }
-            LPG_TRY(generate_sequence(state, current_function, current_function_result, input.match.cases[i].action,
-                                      (indentation + 1), c_output));
+            LPG_TRY(
+                generate_sequence(state, current_function, input.match.cases[i].action, (indentation + 1), c_output));
 
             LPG_TRY(generate_free_registers(
-                state, previous_register_count, indentation + 1, current_function, current_function_result, c_output));
+                state, previous_register_count, indentation + 1, current_function, ~(register_id)0, c_output));
 
             LPG_TRY(indent(indentation + 1, c_output));
             LPG_TRY(generate_register_name(input.match.result, current_function, c_output));
@@ -2115,24 +2120,22 @@ static success_indicator generate_free(standard_library_usage *const standard_li
 }
 
 static success_indicator generate_sequence(c_backend_state *state, checked_function const *const current_function,
-                                           register_id const current_function_result,
                                            instruction_sequence const sequence, size_t const indentation,
                                            stream_writer const c_output)
 {
     size_t const previously_active_registers = state->active_register_count;
     for (size_t i = 0; i < sequence.length; ++i)
     {
-        LPG_TRY(generate_instruction(
-            state, current_function, current_function_result, sequence.elements[i], indentation, c_output));
+        LPG_TRY(generate_instruction(state, current_function, sequence.elements[i], indentation, c_output));
     }
     return generate_free_registers(
-        state, previously_active_registers, indentation, current_function, current_function_result, c_output);
+        state, previously_active_registers, indentation, current_function, ~(register_id)0, c_output);
 }
 
 static success_indicator generate_function_body(checked_function const current_function,
                                                 checked_program const *const program, stream_writer const c_output,
                                                 standard_library_usage *standard_library,
-                                                type_definitions *const definitions, bool const return_0)
+                                                type_definitions *const definitions)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
@@ -2171,25 +2174,7 @@ static success_indicator generate_function_body(checked_function const current_f
         set_register_argument(&state, next_free_register, register_resource_ownership_borrows, parameter);
         ++next_free_register;
     }
-    LPG_TRY(generate_sequence(
-        &state, &current_function, current_function.return_value, current_function.body, 1, c_output));
-
-    if (!return_0)
-    {
-        LPG_TRY(generate_add_reference_for_return_value(
-            &state, &current_function, current_function.return_value, 1, c_output));
-    }
-
-    LPG_TRY(stream_writer_write_string(c_output, "    return "));
-    if (return_0)
-    {
-        LPG_TRY(stream_writer_write_string(c_output, "0"));
-    }
-    else
-    {
-        LPG_TRY(generate_c_read_access(&state, &current_function, current_function.return_value, c_output));
-    }
-    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    LPG_TRY(generate_sequence(&state, &current_function, current_function.body, 1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "}\n"));
     *standard_library = state.standard_library;
     deallocate(state.registers);
@@ -2308,15 +2293,32 @@ success_indicator generate_c(checked_program const program, stream_writer const 
                                                    &program, program_defined_writer),
                      fail);
         LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "\n"), fail);
-        LPG_TRY_GOTO(generate_function_body(
-                         current_function, &program, program_defined_writer, &standard_library, &definitions, false),
-                     fail);
+        LPG_TRY_GOTO(
+            generate_function_body(current_function, &program, program_defined_writer, &standard_library, &definitions),
+            fail);
     }
 
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "int main(void)\n"), fail);
-    LPG_TRY_GOTO(generate_function_body(
-                     program.functions[0], &program, program_defined_writer, &standard_library, &definitions, true),
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "static "), fail);
+    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
+                               program_defined_writer),
                  fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, " lpg_main(void)\n"), fail);
+    LPG_TRY_GOTO(
+        generate_function_body(program.functions[0], &program, program_defined_writer, &standard_library, &definitions),
+        fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "int main(void)\n"), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "{\n"), fail);
+    LPG_TRY_GOTO(indent(1, program_defined_writer), fail);
+    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
+                               program_defined_writer),
+                 fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, " const result = lpg_main();\n"), fail);
+    LPG_TRY_GOTO(generate_free(&standard_library, unicode_view_from_c_str("result"),
+                               program.functions[0].signature->result, &program, 1, program_defined_writer),
+                 fail);
+    LPG_TRY_GOTO(indent(1, program_defined_writer), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "return 0;\n"), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "}\n"), fail);
 
     if (standard_library.using_unit)
     {

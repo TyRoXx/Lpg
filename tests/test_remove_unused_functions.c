@@ -27,7 +27,6 @@ void test_remove_unused_functions(void)
             type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
         original.functions[i].body = instruction_sequence_create(NULL, 0);
         original.functions[i].number_of_registers = 0;
-        original.functions[i].return_value = 0;
     }
 
     {

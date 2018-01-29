@@ -28,7 +28,8 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_return:
-            LPG_TO_DO();
+            registers_read_from[current_instruction.return_.return_register] = true;
+            break;
 
         case instruction_loop:
             find_used_registers(current_instruction.loop, registers_read_from);
@@ -132,7 +133,8 @@ static bool change_register_ids(instruction *const where, register_id const *con
         return true;
 
     case instruction_return:
-        LPG_TO_DO();
+        ASSERT(update_register_id(&where->return_.return_register, new_register_ids));
+        return true;
 
     case instruction_loop:
         change_register_ids_in_sequence(&where->loop, new_register_ids);
@@ -235,7 +237,6 @@ static removed_something remove_one_layer_of_dead_code_from_function(checked_fun
 {
     bool *const registers_read_from = allocate_array(from->number_of_registers, sizeof(*registers_read_from));
     memset(registers_read_from, 0, from->number_of_registers * sizeof(*registers_read_from));
-    registers_read_from[from->return_value] = true;
     for (size_t i = 0; i < from->signature->parameters.length; ++i)
     {
         registers_read_from[i] = true;
@@ -268,7 +269,6 @@ static removed_something remove_one_layer_of_dead_code_from_function(checked_fun
         from->number_of_registers = next_register;
     }
     deallocate(registers_read_from);
-    update_register_id(&from->return_value, new_register_ids);
     change_register_ids_in_sequence(&from->body, new_register_ids);
     deallocate(new_register_ids);
     return result;

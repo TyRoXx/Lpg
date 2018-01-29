@@ -348,6 +348,7 @@ void test_interpreter(void)
                                           "match-integer.lpg",
                                           "option.lpg",
                                           "raw-string-literal.lpg",
+                                          "return.lpg",
                                           "string-equals.lpg",
                                           "struct.lpg",
                                           "tuple.lpg",

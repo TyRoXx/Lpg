@@ -122,7 +122,7 @@ void print_instruction(instruction const printed)
         return;
 
     case instruction_return:
-        printf("return %u", printed.return_.return_register);
+        printf("return %u\n", printed.return_.return_register);
         return;
 
     case instruction_loop:

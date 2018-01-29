@@ -1,0 +1,17 @@
+let trivial-return-explicit-type = (): boolean
+    return boolean.true
+assert(trivial-return-explicit-type())
+
+/*let trivial-return-implicit-type = ()
+    return boolean.true
+assert(trivial-return-implicit-type())
+
+let match-return = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            unit_value
+    return "b"
+assert(string-equals("a", match-return(boolean.true)))
+*/

@@ -15,6 +15,7 @@ typedef enum run_sequence_result
 {
     run_sequence_result_break,
     run_sequence_result_continue,
+    run_sequence_result_return,
     run_sequence_result_unavailable_at_this_time
 } run_sequence_result;
 
@@ -59,9 +60,9 @@ static value invoke_method(function_call_arguments const arguments, value const 
     return result.value_;
 }
 
-static run_sequence_result run_sequence(instruction_sequence const sequence, value const *globals, value *registers,
-                                        value const *const captures, garbage_collector *const gc,
-                                        checked_function const *const all_functions,
+static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
+                                        value const *globals, value *registers, value const *const captures,
+                                        garbage_collector *const gc, checked_function const *const all_functions,
                                         interface const *const all_interfaces)
 {
     LPG_FOR(size_t, i, sequence.length)
@@ -141,14 +142,16 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         }
 
         case instruction_return:
-            return run_sequence_result_break;
+            *return_value = registers[element.return_.return_register];
+            return run_sequence_result_return;
 
         case instruction_loop:
         {
             bool is_running = true;
             while (is_running)
             {
-                switch (run_sequence(element.loop, globals, registers, captures, gc, all_functions, all_interfaces))
+                switch (run_sequence(
+                    element.loop, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -159,6 +162,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
                 case run_sequence_result_unavailable_at_this_time:
                     return run_sequence_result_unavailable_at_this_time;
+
+                case run_sequence_result_return:
+                    return run_sequence_result_return;
                 }
             }
             break;
@@ -248,8 +254,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 {
                     continue;
                 }
-                switch (
-                    run_sequence(this_case->action, globals, registers, captures, gc, all_functions, all_interfaces))
+                switch (run_sequence(
+                    this_case->action, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
                 {
                 case run_sequence_result_break:
                     return run_sequence_result_break;
@@ -259,6 +265,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
                 case run_sequence_result_unavailable_at_this_time:
                     return run_sequence_result_unavailable_at_this_time;
+
+                case run_sequence_result_return:
+                    return run_sequence_result_return;
                 }
                 registers[element.match.result] = registers[this_case->value];
                 break;
@@ -317,14 +326,14 @@ static optional_value call_interpreted_function(checked_function const callee, o
         registers[next_register] = arguments[i];
         ++next_register;
     }
-    switch (run_sequence(callee.body, globals, registers, captures, gc, all_functions, all_interfaces))
+    value return_value = value_from_unit();
+    switch (run_sequence(callee.body, &return_value, globals, registers, captures, gc, all_functions, all_interfaces))
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
 
     case run_sequence_result_continue:
-        ASSUME(callee.return_value < callee.number_of_registers);
-        value const return_value = registers[callee.return_value];
+    case run_sequence_result_return:
         deallocate(registers);
         return optional_value_create(return_value);
 
