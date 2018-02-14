@@ -49,10 +49,15 @@ bool call_instruction_equals(call_instruction const left, call_instruction const
     return true;
 }
 
-return_instruction return_instruction_create(register_id result_register)
+return_instruction return_instruction_create(register_id returned_value, register_id unit_goes_into)
 {
-    return_instruction const result = {result_register};
+    return_instruction const result = {returned_value, unit_goes_into};
     return result;
+}
+
+bool return_instruction_equals(return_instruction const left, return_instruction const right)
+{
+    return (left.returned_value == right.returned_value) && (left.unit_goes_into == right.unit_goes_into);
 }
 
 read_struct_instruction read_struct_instruction_create(register_id from_object, struct_member_id member,
@@ -436,7 +441,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return call_instruction_equals(left.call, right.call);
 
     case instruction_return:
-        return left.return_.return_register == right.return_.return_register;
+        return return_instruction_equals(left.return_, right.return_);
 
     case instruction_loop:
         return instruction_sequence_equals(&left.loop, &right.loop);

@@ -716,7 +716,7 @@ static success_indicator generate_erase_type(function_generation *const state, e
 static success_indicator generate_return(return_instruction const generated, stream_writer const javascript_output)
 {
     LPG_TRY(stream_writer_write_string(javascript_output, "return "));
-    LPG_TRY(generate_register_name(generated.return_register, javascript_output));
+    LPG_TRY(generate_register_name(generated.returned_value, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return success;
 }

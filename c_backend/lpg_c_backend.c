@@ -1244,13 +1244,19 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
     }
 
     case instruction_return:
+        set_register_variable(state, input.return_.unit_goes_into, register_resource_ownership_owns, type_from_unit());
         LPG_TRY(
-            generate_free_registers(state, 0, indentation, current_function, input.return_.return_register, c_output));
+            generate_free_registers(state, 0, indentation, current_function, input.return_.returned_value, c_output));
         LPG_TRY(generate_add_reference_for_return_value(
-            state, current_function, input.return_.return_register, 1, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "    return "));
-        LPG_TRY(generate_c_read_access(state, current_function, input.return_.return_register, c_output));
+            state, current_function, input.return_.returned_value, indentation, c_output));
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "return "));
+        LPG_TRY(generate_c_read_access(state, current_function, input.return_.returned_value, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+        LPG_TRY(generate_register_name(input.return_.unit_goes_into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
         return success;
 
     case instruction_call:

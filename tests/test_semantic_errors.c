@@ -379,7 +379,7 @@ void test_semantic_errors(void)
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(3))};
+            instruction_create_return(return_instruction_create(3, 4))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -400,7 +400,7 @@ void test_semantic_errors(void)
             instruction_create_literal(literal_instruction_create(
                 0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1))};
+            instruction_create_return(return_instruction_create(1, 2))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -419,7 +419,7 @@ void test_semantic_errors(void)
             instruction_create_literal(literal_instruction_create(
                 0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1))};
+            instruction_create_return(return_instruction_create(1, 2))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -450,7 +450,7 @@ void test_semantic_errors(void)
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(3))};
+            instruction_create_return(return_instruction_create(3, 4))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -1393,7 +1393,7 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_literal(literal_instruction_create(
                 2, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_call(call_instruction_create(1, arguments, 1, 3)),
-            instruction_create_return(return_instruction_create(3))};
+            instruction_create_return(return_instruction_create(3, 4))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -1420,7 +1420,7 @@ static void test_let_assignments(const standard_library_description *std_library
             instruction_create_literal(literal_instruction_create(
                 1, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(2))};
+            instruction_create_return(return_instruction_create(2, 3))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);

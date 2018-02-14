@@ -506,16 +506,28 @@ static check_function_result check_function(program_check *const root, function_
                 return_type = converted.result_type;
                 break;
             }
-            add_instruction(&body_out, instruction_create_return(return_instruction_create(converted.where)));
+            register_id const unit_goes_into = allocate_register(&state.used_registers);
+            add_instruction(
+                &body_out, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
         }
     }
     else
     {
-        if (!body_evaluated.always_returns)
+        if (body_evaluated.always_returns)
+        {
+            if (!state.return_type.is_set)
+            {
+                LPG_TO_DO();
+            }
+            return_type = state.return_type.value;
+        }
+        else
         {
             if (body_evaluated.has_value)
             {
-                add_instruction(&body_out, instruction_create_return(return_instruction_create(body_evaluated.where)));
+                register_id const unit_goes_into = allocate_register(&state.used_registers);
+                add_instruction(&body_out, instruction_create_return(
+                                               return_instruction_create(body_evaluated.where, unit_goes_into)));
             }
             else if (body_evaluated.compile_time_value.is_set)
             {
@@ -523,7 +535,9 @@ static check_function_result check_function(program_check *const root, function_
                 add_instruction(
                     &body_out, instruction_create_literal(literal_instruction_create(
                                    return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
-                add_instruction(&body_out, instruction_create_return(return_instruction_create(return_value)));
+                register_id const unit_goes_into = allocate_register(&state.used_registers);
+                add_instruction(
+                    &body_out, instruction_create_return(return_instruction_create(return_value, unit_goes_into)));
             }
             else
             {
@@ -2695,10 +2709,11 @@ evaluate_return_expression(function_checking_state *state, instruction_sequence 
     {
         state->return_type = optional_type_create_set(result.type_);
     }
-    instruction const return_instruction = instruction_create_return(return_instruction_create(result.where));
+    register_id const unit_goes_into = allocate_register(&state->used_registers);
+    instruction const return_instruction =
+        instruction_create_return(return_instruction_create(result.where, unit_goes_into));
     add_instruction(sequence, return_instruction);
-    register_id const into = allocate_register(&state->used_registers);
-    return evaluate_expression_result_create(true, into, type_from_unit(), optional_value_empty, false, true);
+    return evaluate_expression_result_create(true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,

@@ -235,7 +235,8 @@ static instruction clone_instruction(instruction const original, garbage_collect
             original.erase_type.self, original.erase_type.into, original.erase_type.impl));
 
     case instruction_return:
-        return instruction_create_return(return_instruction_create(original.return_.return_register));
+        return instruction_create_return(
+            return_instruction_create(original.return_.returned_value, original.return_.unit_goes_into));
 
     case instruction_call:
     {

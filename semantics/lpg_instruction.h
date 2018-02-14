@@ -53,10 +53,12 @@ bool call_instruction_equals(call_instruction const left, call_instruction const
 
 typedef struct return_instruction
 {
-    register_id return_register;
+    register_id returned_value;
+    register_id unit_goes_into;
 } return_instruction;
 
-return_instruction return_instruction_create(register_id return_register);
+return_instruction return_instruction_create(register_id returned_value, register_id unit_goes_into);
+bool return_instruction_equals(return_instruction const left, return_instruction const right);
 
 typedef struct read_struct_instruction
 {

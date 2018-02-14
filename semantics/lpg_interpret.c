@@ -142,7 +142,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         }
 
         case instruction_return:
-            *return_value = registers[element.return_.return_register];
+            *return_value = registers[element.return_.returned_value];
+            registers[element.return_.unit_goes_into] = value_from_unit();
             return run_sequence_result_return;
 
         case instruction_loop:
