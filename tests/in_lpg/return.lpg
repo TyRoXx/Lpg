@@ -14,3 +14,8 @@ let match-return = (arg: boolean)
             unit_value
     return "b"
 assert(string-equals("a", match-return(boolean.true)))
+
+let loop-return = (arg: boolean)
+    loop
+        return arg
+assert(loop-return(boolean.true))

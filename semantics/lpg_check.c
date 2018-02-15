@@ -2577,12 +2577,12 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         instruction_sequence body = {NULL, 0};
         bool const previous_is_in_loop = state->is_in_loop;
         state->is_in_loop = true;
-        /*ignoring body result*/
-        check_sequence(state, &body, element.loop_body);
+        evaluate_expression_result const loop_body_result = check_sequence(state, &body, element.loop_body);
         ASSUME(state->is_in_loop);
         state->is_in_loop = previous_is_in_loop;
         add_instruction(function, instruction_create_loop(body));
-        evaluate_expression_result const loop_result = make_compile_time_unit();
+        evaluate_expression_result loop_result = make_compile_time_unit();
+        loop_result.always_returns = loop_body_result.always_returns;
         return loop_result;
     }
 
