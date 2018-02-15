@@ -6,16 +6,30 @@ let trivial-return-implicit-type = ()
     return boolean.true
 assert(trivial-return-implicit-type())
 
-let match-return = (arg: boolean)
+let match-return-explicit-type = (arg: boolean): string-ref
     match arg
         case boolean.true:
             return "a"
         case boolean.false:
             unit_value
     return "b"
-assert(string-equals("a", match-return(boolean.true)))
+assert(string-equals("a", match-return-explicit-type(boolean.true)))
 
-let loop-return = (arg: boolean)
+let match-return-implicit-type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            unit_value
+    return "b"
+assert(string-equals("a", match-return-implicit-type(boolean.true)))
+
+let loop-return-explicit-type = (arg: boolean): boolean
     loop
         return arg
-assert(loop-return(boolean.true))
+assert(loop-return-explicit-type(boolean.true))
+
+let loop-return-implicit-type = (arg: boolean)
+    loop
+        return arg
+assert(loop-return-implicit-type(boolean.true))
