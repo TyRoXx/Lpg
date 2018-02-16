@@ -49,6 +49,21 @@ bool integer_range_contains_integer(const integer_range haystack, integer const 
     return integer_less_or_equals(haystack.minimum, needle) && integer_less_or_equals(needle, haystack.maximum);
 }
 
+integer_range integer_range_combine(integer_range const left, integer_range const right)
+{
+    integer minimum = left.minimum;
+    if (integer_less(right.minimum, minimum))
+    {
+        minimum = right.minimum;
+    }
+    integer maximum = left.maximum;
+    if (integer_less(maximum, right.maximum))
+    {
+        maximum = right.maximum;
+    }
+    return integer_range_create(minimum, maximum);
+}
+
 bool integer_range_list_contains(integer_range_list const haystack, integer_range const needle)
 {
     for (size_t i = 0; i < haystack.length; ++i)

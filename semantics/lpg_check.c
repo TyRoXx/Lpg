@@ -2690,6 +2690,50 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     LPG_UNREACHABLE();
 }
 
+static optional_type combine_return_types(type const first, type const second)
+{
+    if (type_equals(first, second))
+    {
+        return optional_type_create_set(first);
+    }
+    if (first.kind != second.kind)
+    {
+        LPG_TO_DO();
+    }
+    switch (first.kind)
+    {
+    case type_kind_integer_range:
+        return optional_type_create_set(
+            type_from_integer_range(integer_range_combine(first.integer_range_, second.integer_range_)));
+
+    case type_kind_structure:
+        break;
+    case type_kind_function_pointer:
+        break;
+    case type_kind_unit:
+        break;
+    case type_kind_string_ref:
+        break;
+    case type_kind_enumeration:
+        break;
+    case type_kind_tuple:
+        break;
+    case type_kind_type:
+        break;
+    case type_kind_enum_constructor:
+        break;
+    case type_kind_lambda:
+        break;
+    case type_kind_interface:
+        break;
+    case type_kind_method_pointer:
+        break;
+    case type_kind_generic_enum:
+        break;
+    }
+    LPG_TO_DO();
+}
+
 static evaluate_expression_result
 evaluate_return_expression(function_checking_state *state, instruction_sequence *sequence, const expression *expression)
 {
@@ -2700,10 +2744,12 @@ evaluate_return_expression(function_checking_state *state, instruction_sequence 
     }
     if (state->return_type.is_set)
     {
-        if (!type_equals(result.type_, state->return_type.value))
+        optional_type const new_return_type = combine_return_types(result.type_, state->return_type.value);
+        if (!new_return_type.is_set)
         {
             LPG_TO_DO();
         }
+        state->return_type = new_return_type;
     }
     else
     {
