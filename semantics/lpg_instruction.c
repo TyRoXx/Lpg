@@ -190,6 +190,22 @@ bool instantiate_struct_instruction_equals(instantiate_struct_instruction const 
            !memcmp(left.arguments, right.arguments, sizeof(*left.arguments) * left.argument_count);
 }
 
+loop_instruction loop_instruction_create(register_id unit_goes_into, instruction_sequence body)
+{
+    loop_instruction const result = {unit_goes_into, body};
+    return result;
+}
+
+void loop_instruction_free(loop_instruction const freed)
+{
+    instruction_sequence_free(&freed.body);
+}
+
+bool loop_instruction_equals(loop_instruction const left, loop_instruction const right)
+{
+    return instruction_sequence_equals(&left.body, &right.body) && (left.unit_goes_into == right.unit_goes_into);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -350,11 +366,11 @@ instruction instruction_create_read_struct(read_struct_instruction argument)
     return result;
 }
 
-instruction instruction_create_loop(instruction_sequence body)
+instruction instruction_create_loop(loop_instruction loop)
 {
     instruction result;
     result.type = instruction_loop;
-    result.loop = body;
+    result.loop = loop;
     return result;
 }
 
@@ -383,7 +399,7 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_loop:
-        instruction_sequence_free(&value->loop);
+        loop_instruction_free(value->loop);
         break;
 
     case instruction_get_method:
@@ -444,7 +460,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return return_instruction_equals(left.return_, right.return_);
 
     case instruction_loop:
-        return instruction_sequence_equals(&left.loop, &right.loop);
+        return loop_instruction_equals(left.loop, right.loop);
 
     case instruction_global:
         return (left.global_into == right.global_into);

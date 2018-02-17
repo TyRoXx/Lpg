@@ -38,9 +38,9 @@ static void check_single_wellformed_function(char const *const source, structure
     if (!instruction_sequence_equals(&expected_body, &checked.functions[0].body))
     {
         printf("Expected instruction sequence:\n");
-        print_instruction_sequence(expected_body);
+        print_instruction_sequence(expected_body, 0);
         printf("Got instruction sequence:\n");
-        print_instruction_sequence(checked.functions[0].body);
+        print_instruction_sequence(checked.functions[0].body, 0);
         FAIL();
     }
     checked_program_free(&checked);

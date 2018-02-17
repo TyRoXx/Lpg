@@ -149,10 +149,11 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         case instruction_loop:
         {
             bool is_running = true;
+            registers[element.loop.unit_goes_into] = value_from_unit();
             while (is_running)
             {
                 switch (run_sequence(
-                    element.loop, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
+                    element.loop.body, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
                 {
                 case run_sequence_result_break:
                     is_running = false;

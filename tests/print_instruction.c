@@ -43,13 +43,13 @@ static void print_type(type const printed)
     }
 }
 
-void print_value(value const printed)
+void print_value(value const printed, size_t const indentation)
 {
     switch (printed.kind)
     {
     case value_kind_type_erased:
         printf("type erased (impl: ?, self: ");
-        print_value(*printed.type_erased.self);
+        print_value(*printed.type_erased.self, indentation);
         printf(")");
         break;
 
@@ -76,7 +76,7 @@ void print_value(value const printed)
 
     case value_kind_enum_element:
         printf("enum element # %u, state = (", printed.enum_element.which);
-        print_value(printed.enum_element.state ? *printed.enum_element.state : value_from_unit());
+        print_value(printed.enum_element.state ? *printed.enum_element.state : value_from_unit(), indentation);
         printf(", ");
         print_type(printed.enum_element.state_type);
         printf(")");
@@ -100,7 +100,7 @@ void print_value(value const printed)
     }
 }
 
-void print_instruction(instruction const printed)
+void print_instruction(instruction const printed, size_t const indentation)
 {
     switch (printed.type)
     {
@@ -126,12 +126,8 @@ void print_instruction(instruction const printed)
         return;
 
     case instruction_loop:
-        printf("loop\n");
-        for (size_t i = 0; i < printed.loop.length; ++i)
-        {
-            printf("    ");
-            print_instruction(printed.loop.elements[i]);
-        }
+        printf("loop unit into %u\n", printed.loop.unit_goes_into);
+        print_instruction_sequence(printed.loop.body, (indentation + 1));
         return;
 
     case instruction_global:
@@ -149,7 +145,7 @@ void print_instruction(instruction const printed)
 
     case instruction_literal:
         printf("literal %u ", printed.literal.into);
-        print_value(printed.literal.value_);
+        print_value(printed.literal.value_, indentation);
         printf("\n");
         return;
 
@@ -172,7 +168,7 @@ void print_instruction(instruction const printed)
                 printf("case %u {\n", printed.match.cases[i].key_value);
                 break;
             }
-            print_instruction_sequence(printed.match.cases[i].action);
+            print_instruction_sequence(printed.match.cases[i].action, (indentation + 1));
             printf("return %u }\n", printed.match.cases[i].value);
         }
         return;
@@ -180,10 +176,14 @@ void print_instruction(instruction const printed)
     LPG_UNREACHABLE();
 }
 
-void print_instruction_sequence(instruction_sequence const sequence)
+void print_instruction_sequence(instruction_sequence const sequence, size_t const indentation)
 {
     for (size_t i = 0; i < sequence.length; ++i)
     {
-        print_instruction(sequence.elements[i]);
+        for (size_t j = 0; j < indentation; ++j)
+        {
+            printf("    ");
+        }
+        print_instruction(sequence.elements[i], indentation);
     }
 }

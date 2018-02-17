@@ -159,12 +159,22 @@ void instantiate_struct_instruction_free(instantiate_struct_instruction const fr
 bool instantiate_struct_instruction_equals(instantiate_struct_instruction const left,
                                            instantiate_struct_instruction const right);
 
+typedef struct loop_instruction
+{
+    register_id unit_goes_into;
+    instruction_sequence body;
+} loop_instruction;
+
+loop_instruction loop_instruction_create(register_id unit_goes_into, instruction_sequence body);
+void loop_instruction_free(loop_instruction const freed);
+bool loop_instruction_equals(loop_instruction const left, loop_instruction const right);
+
 struct instruction
 {
     instruction_type type;
     union
     {
-        instruction_sequence loop;
+        loop_instruction loop;
         call_instruction call;
         return_instruction return_;
         register_id global_into;
@@ -220,7 +230,7 @@ instruction instruction_create_call(call_instruction argument);
 instruction instruction_create_return(return_instruction argument);
 instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
-instruction instruction_create_loop(instruction_sequence body);
+instruction instruction_create_loop(loop_instruction loop);
 instruction instruction_create_break(register_id const into);
 instruction instruction_create_literal(literal_instruction const value);
 instruction instruction_create_tuple(tuple_instruction argument);

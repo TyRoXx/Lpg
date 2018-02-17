@@ -60,7 +60,8 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
             break;
 
         case instruction_loop:
-            mark_used_functions_in_sequence(current_instruction.loop, used_functions, all_functions, all_interfaces);
+            mark_used_functions_in_sequence(
+                current_instruction.loop.body, used_functions, all_functions, all_interfaces);
             break;
 
         case instruction_call:
@@ -248,12 +249,13 @@ static instruction clone_instruction(instruction const original, garbage_collect
 
     case instruction_loop:
     {
-        instruction *const body = allocate_array(original.loop.length, sizeof(*body));
-        for (size_t i = 0; i < original.loop.length; ++i)
+        instruction *const body = allocate_array(original.loop.body.length, sizeof(*body));
+        for (size_t i = 0; i < original.loop.body.length; ++i)
         {
-            body[i] = clone_instruction(original.loop.elements[i], clone_gc, new_function_ids, all_structures);
+            body[i] = clone_instruction(original.loop.body.elements[i], clone_gc, new_function_ids, all_structures);
         }
-        return instruction_create_loop(instruction_sequence_create(body, original.loop.length));
+        return instruction_create_loop(loop_instruction_create(
+            original.loop.unit_goes_into, instruction_sequence_create(body, original.loop.body.length)));
     }
 
     case instruction_global:

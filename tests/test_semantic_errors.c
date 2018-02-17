@@ -52,7 +52,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 3);
         checked_program_free(&checked);
     }
 
@@ -68,7 +67,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -83,7 +81,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -97,7 +94,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -112,7 +108,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -125,7 +120,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -151,7 +145,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -165,7 +158,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -179,7 +171,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -221,7 +212,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -237,7 +227,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -251,7 +240,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -265,7 +253,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -280,7 +267,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -297,7 +283,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 5);
         checked_program_free(&checked);
     }
     {
@@ -312,7 +297,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -324,7 +308,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -337,7 +320,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -350,7 +332,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -377,9 +358,7 @@ void test_semantic_errors(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(3, 4))};
+            instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -396,15 +375,7 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
-            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1, 2))};
-        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v : side-effect() = boolean.true\n");
@@ -415,15 +386,7 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
-            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1, 2))};
-        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v = w\n");
@@ -446,15 +409,7 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        instruction const expected_body_elements[] = {
-            instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(3, 4))};
-        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v : int(0, 1) = side-effect()\n");
@@ -524,7 +479,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -573,7 +527,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -669,7 +622,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -681,7 +633,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -942,7 +893,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -970,7 +920,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -983,7 +932,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -995,7 +943,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1009,7 +956,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1023,7 +969,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1037,7 +982,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1051,7 +995,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1065,7 +1008,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1083,7 +1025,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 2);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1097,7 +1038,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1110,7 +1050,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1123,7 +1062,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1138,7 +1076,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1152,7 +1089,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1167,7 +1103,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1182,7 +1117,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1197,7 +1131,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1212,7 +1145,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 4);
         checked_program_free(&checked);
     }
     {
@@ -1227,7 +1159,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1242,7 +1173,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1256,7 +1186,18 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        checked_program_free(&checked);
+    }
+    {
+        sequence root = parse("let f = (): unit\n"
+                              "    return 2");
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(1, 11))};
+        expected_errors expected = {errors, LPG_ARRAY_SIZE(errors)};
+        checked_program checked = check(root, std_library.globals, expect_errors, &expected);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     test_let_assignments(&std_library);
@@ -1414,17 +1355,7 @@ static void test_let_assignments(const standard_library_description *std_library
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
-            instruction_create_literal(literal_instruction_create(
-                1, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
-            instruction_create_literal(literal_instruction_create(2, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(2, 3))};
-        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
-        REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
-        instruction_sequence_free(&expected_body);
     }
     {
         sequence root = parse("let v : int(1, 10) = 11\n");
@@ -1435,7 +1366,6 @@ static void test_let_assignments(const standard_library_description *std_library
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 3);
         checked_program_free(&checked);
     }
 }

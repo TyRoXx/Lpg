@@ -468,13 +468,17 @@ static success_indicator generate_call(function_generation *const state, call_in
 static success_indicator generate_sequence(function_generation *const state, instruction_sequence const body,
                                            stream_writer const javascript_output);
 
-static success_indicator generate_loop(function_generation *const state, instruction_sequence const generated,
+static success_indicator generate_loop(function_generation *const state, loop_instruction const generated,
                                        stream_writer const javascript_output)
 {
     LPG_TRY(stream_writer_write_string(javascript_output, "for (;;)\n"));
     LPG_TRY(stream_writer_write_string(javascript_output, "{\n"));
-    LPG_TRY(generate_sequence(state, generated, javascript_output));
+    LPG_TRY(generate_sequence(state, generated.body, javascript_output));
     LPG_TRY(stream_writer_write_string(javascript_output, "}\n"));
+    LPG_TRY(write_register(state, generated.unit_goes_into, type_from_unit(), javascript_output));
+    LPG_TRY(generate_value(
+        value_from_unit(), type_from_unit(), state->all_functions, state->all_interfaces, javascript_output));
+    LPG_TRY(stream_writer_write_string(javascript_output, ";\n"));
     return success;
 }
 

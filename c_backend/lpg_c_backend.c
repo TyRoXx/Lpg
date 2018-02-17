@@ -1513,9 +1513,15 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-        LPG_TRY(generate_sequence(state, current_function, input.loop, indentation + 1, c_output));
+        LPG_TRY(generate_sequence(state, current_function, input.loop.body, indentation + 1, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+        state->standard_library.using_unit = true;
+        set_register_variable(state, input.loop.unit_goes_into, register_resource_ownership_borrows, type_from_unit());
+        LPG_TRY(indent(indentation, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, "unit const "));
+        LPG_TRY(generate_register_name(input.loop.unit_goes_into, current_function, c_output));
+        LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
         return success;
 
     case instruction_global:

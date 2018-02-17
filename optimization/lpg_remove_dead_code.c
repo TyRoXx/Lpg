@@ -33,7 +33,8 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_loop:
-            find_used_registers(current_instruction.loop, registers_read_from);
+            registers_read_from[current_instruction.loop.unit_goes_into] = true;
+            find_used_registers(current_instruction.loop.body, registers_read_from);
             break;
 
         case instruction_read_struct:
@@ -139,8 +140,9 @@ static bool change_register_ids(instruction *const where, register_id const *con
         return true;
 
     case instruction_loop:
-        change_register_ids_in_sequence(&where->loop, new_register_ids);
-        return (where->loop.length >= 1);
+        change_register_ids_in_sequence(&where->loop.body, new_register_ids);
+        ASSERT(update_register_id(&where->loop.unit_goes_into, new_register_ids));
+        return (where->loop.body.length >= 1);
 
     case instruction_global:
         return update_register_id(&where->global_into, new_register_ids);

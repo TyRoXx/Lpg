@@ -472,85 +472,89 @@ static check_function_result check_function(program_check *const root, function_
         deallocate(state.local_variables.elements);
     }
 
-    type return_type = body_evaluated.type_;
-    if (explicit_return_type.is_set)
+    type return_type = type_from_unit();
+    if (body_evaluated.has_value)
     {
-        if (body_evaluated.always_returns)
+        return_type = body_evaluated.type_;
+        if (explicit_return_type.is_set)
         {
-            if (!state.return_type.is_set)
+            if (body_evaluated.always_returns)
             {
-                LPG_TO_DO();
-            }
-            return_type = state.return_type.value;
-        }
-        else
-        {
-            conversion_result const converted = convert(&state, &body_out, body_evaluated.where, body_evaluated.type_,
-                                                        body_evaluated.compile_time_value,
-                                                        expression_source_begin(body_in), explicit_return_type.value);
-            switch (converted.ok)
-            {
-            case failure:
-                for (size_t i = 0; i < state.register_debug_name_count; ++i)
+                if (!state.return_type.is_set)
                 {
-                    unicode_string_free(state.register_debug_names + i);
+                    LPG_TO_DO();
                 }
-                if (state.register_debug_names)
-                {
-                    deallocate(state.register_debug_names);
-                }
-                instruction_sequence_free(&body_out);
-                return check_function_result_empty;
-
-            case success:
-                return_type = converted.result_type;
-                break;
-            }
-            register_id const unit_goes_into = allocate_register(&state.used_registers);
-            add_instruction(
-                &body_out, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
-        }
-    }
-    else
-    {
-        if (body_evaluated.always_returns)
-        {
-            if (!state.return_type.is_set)
-            {
-                LPG_TO_DO();
-            }
-            return_type = state.return_type.value;
-        }
-        else
-        {
-            if (body_evaluated.has_value)
-            {
-                register_id const unit_goes_into = allocate_register(&state.used_registers);
-                add_instruction(&body_out, instruction_create_return(
-                                               return_instruction_create(body_evaluated.where, unit_goes_into)));
-            }
-            else if (body_evaluated.compile_time_value.is_set)
-            {
-                register_id const return_value = allocate_register(&state.used_registers);
-                add_instruction(
-                    &body_out, instruction_create_literal(literal_instruction_create(
-                                   return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
-                register_id const unit_goes_into = allocate_register(&state.used_registers);
-                add_instruction(
-                    &body_out, instruction_create_return(return_instruction_create(return_value, unit_goes_into)));
+                return_type = state.return_type.value;
             }
             else
             {
-                for (size_t i = 0; i < state.register_debug_name_count; ++i)
+                conversion_result const converted = convert(
+                    &state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
+                    expression_source_begin(body_in), explicit_return_type.value);
+                switch (converted.ok)
                 {
-                    unicode_string_free(state.register_debug_names + i);
+                case failure:
+                    for (size_t i = 0; i < state.register_debug_name_count; ++i)
+                    {
+                        unicode_string_free(state.register_debug_names + i);
+                    }
+                    if (state.register_debug_names)
+                    {
+                        deallocate(state.register_debug_names);
+                    }
+                    instruction_sequence_free(&body_out);
+                    return check_function_result_empty;
+
+                case success:
+                    return_type = converted.result_type;
+                    break;
                 }
-                if (state.register_debug_names)
+                register_id const unit_goes_into = allocate_register(&state.used_registers);
+                add_instruction(
+                    &body_out, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
+            }
+        }
+        else
+        {
+            if (body_evaluated.always_returns)
+            {
+                if (!state.return_type.is_set)
                 {
-                    deallocate(state.register_debug_names);
+                    LPG_TO_DO();
                 }
-                instruction_sequence_free(&body_out);
-                return check_function_result_empty;
+                return_type = state.return_type.value;
+            }
+            else
+            {
+                if (body_evaluated.has_value)
+                {
+                    register_id const unit_goes_into = allocate_register(&state.used_registers);
+                    add_instruction(&body_out, instruction_create_return(
+                                                   return_instruction_create(body_evaluated.where, unit_goes_into)));
+                }
+                else if (body_evaluated.compile_time_value.is_set)
+                {
+                    register_id const return_value = allocate_register(&state.used_registers);
+                    add_instruction(
+                        &body_out, instruction_create_literal(literal_instruction_create(
+                                       return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
+                    register_id const unit_goes_into = allocate_register(&state.used_registers);
+                    add_instruction(
+                        &body_out, instruction_create_return(return_instruction_create(return_value, unit_goes_into)));
+                }
+                else
+                {
+                    for (size_t i = 0; i < state.register_debug_name_count; ++i)
+                    {
+                        unicode_string_free(state.register_debug_names + i);
+                    }
+                    if (state.register_debug_names)
+                    {
+                        deallocate(state.register_debug_names);
+                    }
+                    instruction_sequence_free(&body_out);
+                    return check_function_result_empty;
+                }
             }
         }
     }
@@ -2580,9 +2584,14 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         evaluate_expression_result const loop_body_result = check_sequence(state, &body, element.loop_body);
         ASSUME(state->is_in_loop);
         state->is_in_loop = previous_is_in_loop;
-        add_instruction(function, instruction_create_loop(body));
-        evaluate_expression_result loop_result = make_compile_time_unit();
-        loop_result.always_returns = loop_body_result.always_returns;
+        register_id const unit_goes_into = allocate_register(&state->used_registers);
+        add_instruction(function, instruction_create_loop(loop_instruction_create(unit_goes_into, body)));
+        evaluate_expression_result const loop_result = {true,
+                                                        unit_goes_into,
+                                                        type_from_unit(),
+                                                        optional_value_create(value_from_unit()),
+                                                        true,
+                                                        loop_body_result.always_returns};
         return loop_result;
     }
 
@@ -2673,8 +2682,11 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
             define_register_debug_name(
                 state, final_where, unicode_view_copy(unicode_view_from_string(element.declare.name.value)));
         }
+        register_id const unit_goes_into = allocate_register(&state->used_registers);
+        add_instruction(function, instruction_create_literal(
+                                      literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
         evaluate_expression_result const result = {
-            false, 0, type_from_unit(), optional_value_create(value_from_unit()), false, false};
+            true, unit_goes_into, type_from_unit(), optional_value_create(value_from_unit()), false, false};
         return result;
     }
 
@@ -2698,7 +2710,7 @@ static optional_type combine_return_types(type const first, type const second)
     }
     if (first.kind != second.kind)
     {
-        LPG_TO_DO();
+        return optional_type_create_empty();
     }
     switch (first.kind)
     {
@@ -2747,7 +2759,9 @@ evaluate_return_expression(function_checking_state *state, instruction_sequence 
         optional_type const new_return_type = combine_return_types(result.type_, state->return_type.value);
         if (!new_return_type.is_set)
         {
-            LPG_TO_DO();
+            state->on_error(
+                semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*expression)), state->user);
+            return evaluate_expression_result_empty;
         }
         state->return_type = new_return_type;
     }
