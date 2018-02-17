@@ -369,12 +369,13 @@ bool type_equals(type const left, type const right)
     LPG_UNREACHABLE();
 }
 
-type type_clone(type const original, garbage_collector *const clone_gc)
+type type_clone(type const original, garbage_collector *const clone_gc, function_id const *const new_function_ids)
 {
     switch (original.kind)
     {
     case type_kind_lambda:
-        return type_from_lambda(original.lambda);
+        ASSUME(new_function_ids[original.lambda.lambda] != ~(register_id)0);
+        return type_from_lambda(lambda_type_create(new_function_ids[original.lambda.lambda]));
 
     case type_kind_function_pointer:
     {
@@ -383,12 +384,12 @@ type type_clone(type const original, garbage_collector *const clone_gc)
             clone_gc, original.function_pointer_->parameters.length, sizeof(*arguments));
         for (size_t i = 0; i < original.function_pointer_->parameters.length; ++i)
         {
-            arguments[i] = type_clone(original.function_pointer_->parameters.elements[i], clone_gc);
+            arguments[i] = type_clone(original.function_pointer_->parameters.elements[i], clone_gc, new_function_ids);
         }
-        *copy = function_pointer_create(type_clone(original.function_pointer_->result, clone_gc),
-                                        tuple_type_create(arguments, original.function_pointer_->parameters.length),
-                                        tuple_type_create(NULL, 0),
-                                        optional_type_clone(original.function_pointer_->self, clone_gc));
+        *copy = function_pointer_create(
+            type_clone(original.function_pointer_->result, clone_gc, new_function_ids),
+            tuple_type_create(arguments, original.function_pointer_->parameters.length), tuple_type_create(NULL, 0),
+            optional_type_clone(original.function_pointer_->self, clone_gc, new_function_ids));
         return type_from_function_pointer(copy);
     }
 
@@ -404,7 +405,7 @@ type type_clone(type const original, garbage_collector *const clone_gc)
         type *const elements = garbage_collector_allocate_array(clone_gc, original.tuple_.length, sizeof(*elements));
         for (size_t i = 0; i < original.tuple_.length; ++i)
         {
-            elements[i] = type_clone(original.tuple_.elements[i], clone_gc);
+            elements[i] = type_clone(original.tuple_.elements[i], clone_gc, new_function_ids);
         }
         return type_from_tuple_type(tuple_type_create(elements, original.tuple_.length));
     }
@@ -432,13 +433,14 @@ type type_clone(type const original, garbage_collector *const clone_gc)
     LPG_UNREACHABLE();
 }
 
-optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc)
+optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc,
+                                  function_id const *const new_function_ids)
 {
     if (!original.is_set)
     {
         return original;
     }
-    return optional_type_create_set(type_clone(original.value, clone_gc));
+    return optional_type_create_set(type_clone(original.value, clone_gc, new_function_ids));
 }
 
 void function_pointer_free(function_pointer const *value)

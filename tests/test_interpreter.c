@@ -289,12 +289,12 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&buffer);
     }
 
-    checked_program const checked = check(root, global_object, expect_no_errors, NULL);
+    checked_program checked = check(root, global_object, expect_no_errors, NULL);
     sequence_free(&root);
     test_all_backends(test_name, checked, global_object);
     {
-        checked_program optimized = remove_unused_functions(checked);
-        remove_dead_code(&optimized);
+        remove_dead_code(&checked);
+        checked_program const optimized = remove_unused_functions(checked);
         memory_writer optimized_test_name = {NULL, 0, 0};
         {
             stream_writer const writer = memory_writer_erase(&optimized_test_name);

@@ -5,8 +5,17 @@
 #include "lpg_assert.h"
 #include "lpg_structure_member.h"
 
-static void mark_function(bool *used_functions, checked_function const *const all_functions,
+static void mark_function(bool *const used_functions, checked_function const *const all_functions,
                           interface const *const all_interfaces, function_id const marked_function);
+
+static void mark_implementation(implementation const marked, bool *used_functions,
+                                checked_function const *const all_functions, interface const *const all_interfaces)
+{
+    for (size_t i = 0; i < marked.method_count; ++i)
+    {
+        mark_function(used_functions, all_functions, all_interfaces, marked.methods[i].code);
+    }
+}
 
 static void mark_value(value const root, bool *used_functions, checked_function const *const all_functions,
                        interface const *const all_interfaces)
@@ -14,8 +23,14 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     switch (root.kind)
     {
     case value_kind_type_erased:
+    {
+        implementation const impl = all_interfaces[root.type_erased.impl.target]
+                                        .implementations[root.type_erased.impl.implementation_index]
+                                        .target;
+        mark_implementation(impl, used_functions, all_functions, all_interfaces);
         mark_value(*root.type_erased.self, used_functions, all_functions, all_interfaces);
         break;
+    }
 
     case value_kind_function_pointer:
     {
@@ -68,7 +83,15 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         case instruction_global:
         case instruction_read_struct:
         case instruction_break:
+            break;
+
         case instruction_erase_type:
+            mark_implementation(all_interfaces[current_instruction.erase_type.impl.target]
+                                    .implementations[current_instruction.erase_type.impl.implementation_index]
+                                    .target,
+                                used_functions, all_functions, all_interfaces);
+            break;
+
         case instruction_tuple:
         case instruction_enum_construct:
         case instruction_get_captures:
@@ -96,7 +119,58 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
     }
 }
 
-static void mark_function(bool *used_functions, checked_function const *const all_functions,
+static void mark_function_pointer(bool *const used_functions, checked_function const *const all_functions,
+                                  interface const *const all_interfaces, function_pointer const marked_function);
+
+static void mark_type(bool *const used_functions, checked_function const *const all_functions,
+                      interface const *const all_interfaces, type const marked)
+{
+    switch (marked.kind)
+    {
+    case type_kind_function_pointer:
+        mark_function_pointer(used_functions, all_functions, all_interfaces, *marked.function_pointer_);
+        break;
+
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_interface:
+    case type_kind_integer_range:
+    case type_kind_enumeration:
+    case type_kind_structure:
+    case type_kind_type:
+        break;
+
+    case type_kind_tuple:
+        for (size_t i = 0; i < marked.tuple_.length; ++i)
+        {
+            mark_type(used_functions, all_functions, all_interfaces, marked.tuple_.elements[i]);
+        }
+        break;
+
+    case type_kind_enum_constructor:
+    case type_kind_method_pointer:
+    case type_kind_generic_enum:
+        LPG_TO_DO();
+
+    case type_kind_lambda:
+        mark_function(used_functions, all_functions, all_interfaces, marked.lambda.lambda);
+        break;
+    }
+}
+
+static void mark_function_pointer(bool *const used_functions, checked_function const *const all_functions,
+                                  interface const *const all_interfaces, function_pointer const marked_function)
+{
+    if (marked_function.self.is_set)
+    {
+        mark_type(used_functions, all_functions, all_interfaces, marked_function.self.value);
+    }
+    mark_type(used_functions, all_functions, all_interfaces, type_from_tuple_type(marked_function.captures));
+    mark_type(used_functions, all_functions, all_interfaces, type_from_tuple_type(marked_function.parameters));
+    mark_type(used_functions, all_functions, all_interfaces, marked_function.result);
+}
+
+static void mark_function(bool *const used_functions, checked_function const *const all_functions,
                           interface const *const all_interfaces, function_id const marked_function)
 {
     if (used_functions[marked_function])
@@ -104,27 +178,30 @@ static void mark_function(bool *used_functions, checked_function const *const al
         return;
     }
     used_functions[marked_function] = true;
-    instruction_sequence const sequence = all_functions[marked_function].body;
+    checked_function const original = all_functions[marked_function];
+    mark_function_pointer(used_functions, all_functions, all_interfaces, *original.signature);
+    instruction_sequence const sequence = original.body;
     mark_used_functions_in_sequence(sequence, used_functions, all_functions, all_interfaces);
 }
 
-static function_pointer *clone_function_pointer(function_pointer const original, garbage_collector *const clone_gc)
+static function_pointer *clone_function_pointer(function_pointer const original, garbage_collector *const clone_gc,
+                                                function_id const *const new_function_ids)
 {
     function_pointer *const result = allocate(sizeof(*result));
     *result = function_pointer_create(
-        type_clone(original.result, clone_gc),
+        type_clone(original.result, clone_gc, new_function_ids),
         tuple_type_create(allocate_array(original.parameters.length, sizeof(*result->parameters.elements)),
                           original.parameters.length),
         tuple_type_create(
             allocate_array(original.captures.length, sizeof(*result->captures.elements)), original.captures.length),
-        optional_type_clone(original.self, clone_gc));
+        optional_type_clone(original.self, clone_gc, new_function_ids));
     for (size_t i = 0; i < original.parameters.length; ++i)
     {
-        result->parameters.elements[i] = type_clone(original.parameters.elements[i], clone_gc);
+        result->parameters.elements[i] = type_clone(original.parameters.elements[i], clone_gc, new_function_ids);
     }
     for (size_t i = 0; i < original.captures.length; ++i)
     {
-        result->captures.elements[i] = type_clone(original.captures.elements[i], clone_gc);
+        result->captures.elements[i] = type_clone(original.captures.elements[i], clone_gc, new_function_ids);
     }
     return result;
 }
@@ -178,7 +255,7 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         return value_from_generic_enum(from.generic_enum);
 
     case value_kind_type:
-        return value_from_type(type_clone(from.type_, clone_gc));
+        return value_from_type(type_clone(from.type_, clone_gc, new_function_ids));
 
     case value_kind_enum_element:
     {
@@ -271,7 +348,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
     case instruction_literal:
         return instruction_create_literal(literal_instruction_create(
             original.literal.into, adapt_value(original.literal.value_, clone_gc, new_function_ids),
-            type_clone(original.literal.type_of, clone_gc)));
+            type_clone(original.literal.type_of, clone_gc, new_function_ids)));
 
     case instruction_tuple:
     {
@@ -324,9 +401,9 @@ static instruction clone_instruction(instruction const original, garbage_collect
                 break;
             }
         }
-        return instruction_create_match(match_instruction_create(original.match.key, cases, original.match.count,
-                                                                 original.match.result,
-                                                                 type_clone(original.match.result_type, clone_gc)));
+        return instruction_create_match(
+            match_instruction_create(original.match.key, cases, original.match.count, original.match.result,
+                                     type_clone(original.match.result_type, clone_gc, new_function_ids)));
     }
 
     case instruction_lambda_with_captures:
@@ -335,7 +412,7 @@ static instruction clone_instruction(instruction const original, garbage_collect
         memcpy(captures, original.lambda_with_captures.captures,
                (original.lambda_with_captures.capture_count * sizeof(*captures)));
         return instruction_create_lambda_with_captures(lambda_with_captures_instruction_create(
-            original.lambda_with_captures.into, original.lambda_with_captures.lambda, captures,
+            original.lambda_with_captures.into, new_function_ids[original.lambda_with_captures.lambda], captures,
             original.lambda_with_captures.capture_count));
     }
     }
@@ -365,26 +442,29 @@ static checked_function keep_function(checked_function const original, garbage_c
         register_debug_names[i] = unicode_view_copy(unicode_view_from_string(original.register_debug_names[i]));
     }
     checked_function const result =
-        checked_function_create(clone_function_pointer(*original.signature, new_gc),
+        checked_function_create(clone_function_pointer(*original.signature, new_gc, new_function_ids),
                                 clone_sequence(original.body, new_gc, new_function_ids, all_structures),
                                 register_debug_names, original.number_of_registers);
     return result;
 }
 
-static tuple_type clone_tuple_type(tuple_type const original, garbage_collector *const gc)
+static tuple_type clone_tuple_type(tuple_type const original, garbage_collector *const gc,
+                                   function_id const *const new_function_ids)
 {
     type *const elements = allocate_array(original.length, sizeof(*elements));
     for (size_t i = 0; i < original.length; ++i)
     {
-        elements[i] = type_clone(original.elements[i], gc);
+        elements[i] = type_clone(original.elements[i], gc, new_function_ids);
     }
     return tuple_type_create(elements, original.length);
 }
 
-static method_description clone_method_description(method_description const original, garbage_collector *const gc)
+static method_description clone_method_description(method_description const original, garbage_collector *const gc,
+                                                   function_id const *const new_function_ids)
 {
     return method_description_create(unicode_view_copy(unicode_view_from_string(original.name)),
-                                     clone_tuple_type(original.parameters, gc), type_clone(original.result, gc));
+                                     clone_tuple_type(original.parameters, gc, new_function_ids),
+                                     type_clone(original.result, gc, new_function_ids));
 }
 
 static implementation_entry clone_implementation_entry(implementation_entry const original, garbage_collector *const gc,
@@ -396,7 +476,7 @@ static implementation_entry clone_implementation_entry(implementation_entry cons
         methods[i] = clone_function_pointer_value(original.target.methods[i], gc, new_function_ids);
     }
     return implementation_entry_create(
-        type_clone(original.self, gc), implementation_create(methods, original.target.method_count));
+        type_clone(original.self, gc, new_function_ids), implementation_create(methods, original.target.method_count));
 }
 
 static interface clone_interface(interface const original, garbage_collector *const gc,
@@ -405,7 +485,7 @@ static interface clone_interface(interface const original, garbage_collector *co
     method_description *const methods = allocate_array(original.method_count, sizeof(*methods));
     for (interface_id i = 0; i < original.method_count; ++i)
     {
-        methods[i] = clone_method_description(original.methods[i], gc);
+        methods[i] = clone_method_description(original.methods[i], gc, new_function_ids);
     }
     implementation_entry *const implementations =
         allocate_array(original.implementation_count, sizeof(*implementations));
@@ -434,7 +514,7 @@ static structure clone_structure(structure const original, garbage_collector *co
     for (size_t i = 0; i < original.count; ++i)
     {
         members[i] =
-            structure_member_create(type_clone(original.members[i].what, gc),
+            structure_member_create(type_clone(original.members[i].what, gc, new_function_ids),
                                     unicode_view_copy(unicode_view_from_string(original.members[i].name)),
                                     clone_optional_value(original.members[i].compile_time_value, gc, new_function_ids));
     }
@@ -452,23 +532,25 @@ static structure *clone_structures(structure const *const structures, struct_id 
     return result;
 }
 
-static enumeration clone_enumeration(enumeration const original, garbage_collector *const gc)
+static enumeration clone_enumeration(enumeration const original, garbage_collector *const gc,
+                                     function_id const *const new_function_ids)
 {
     enumeration_element *const elements = allocate_array(original.size, sizeof(*elements));
     for (size_t i = 0; i < original.size; ++i)
     {
         elements[i] = enumeration_element_create(unicode_view_copy(unicode_view_from_string(original.elements[i].name)),
-                                                 type_clone(original.elements[i].state, gc));
+                                                 type_clone(original.elements[i].state, gc, new_function_ids));
     }
     return enumeration_create(elements, original.size);
 }
 
-static enumeration *clone_enums(enumeration const *const enums, struct_id const enum_count, garbage_collector *const gc)
+static enumeration *clone_enums(enumeration const *const enums, struct_id const enum_count, garbage_collector *const gc,
+                                function_id const *const new_function_ids)
 {
     enumeration *const result = allocate_array(enum_count, sizeof(*result));
     for (enum_id i = 0; i < enum_count; ++i)
     {
-        result[i] = clone_enumeration(enums[i], gc);
+        result[i] = clone_enumeration(enums[i], gc, new_function_ids);
     }
     return result;
 }
@@ -487,6 +569,29 @@ checked_program remove_unused_functions(checked_program const from)
             for (function_id m = 0; m < impl.method_count; ++m)
             {
                 mark_function(used_functions, from.functions, from.interfaces, impl.methods[m].code);
+            }
+        }
+    }
+
+    for (enum_id i = 0; i < from.enum_count; ++i)
+    {
+        enumeration const enum_ = from.enums[i];
+        for (enum_element_id k = 0; k < enum_.size; ++k)
+        {
+            mark_type(used_functions, from.functions, from.interfaces, enum_.elements[k].state);
+        }
+    }
+
+    for (struct_id i = 0; i < from.struct_count; ++i)
+    {
+        structure const struct_ = from.structs[i];
+        for (struct_member_id k = 0; k < struct_.count; ++k)
+        {
+            mark_type(used_functions, from.functions, from.interfaces, struct_.members[k].what);
+            if (struct_.members[k].compile_time_value.is_set)
+            {
+                mark_value(
+                    struct_.members[k].compile_time_value.value_, used_functions, from.functions, from.interfaces);
             }
         }
     }
@@ -517,7 +622,7 @@ checked_program remove_unused_functions(checked_program const from)
                               from.enum_count};
     result.interfaces = clone_interfaces(from.interfaces, from.interface_count, &result.memory, new_function_ids);
     result.structs = clone_structures(from.structs, from.struct_count, &result.memory, new_function_ids);
-    result.enums = clone_enums(from.enums, from.enum_count, &result.memory);
+    result.enums = clone_enums(from.enums, from.enum_count, &result.memory, new_function_ids);
     for (function_id i = 0; i < from.function_count; ++i)
     {
         if (!used_functions[i])

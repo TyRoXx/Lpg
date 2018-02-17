@@ -197,8 +197,9 @@ type type_from_struct(struct_id const value);
 type type_from_generic_enum(void);
 type *type_allocate(type const value);
 bool type_equals(type const left, type const right);
-type type_clone(type const original, garbage_collector *const clone_gc);
-optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc);
+type type_clone(type const original, garbage_collector *const clone_gc, function_id const *const new_function_ids);
+optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc,
+                                  function_id const *const new_function_ids);
 
 void function_pointer_free(LPG_NON_NULL(function_pointer const *value));
 
