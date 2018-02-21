@@ -33,18 +33,28 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false, false};
 
-static function_checking_state
-function_checking_state_create(program_check *const root, function_checking_state *parent,
-                               bool const may_capture_runtime_variables, structure const *global,
-                               check_error_handler *on_error, void *user, checked_program *const program,
-                               instruction_sequence *const body, optional_type const return_type)
+static function_checking_state function_checking_state_create(
+    program_check *const root, function_checking_state *parent, bool const may_capture_runtime_variables,
+    structure const *global, check_error_handler *on_error, void *user, checked_program *const program,
+    instruction_sequence *const body, optional_type const return_type, bool const has_declared_return_type)
 {
-    function_checking_state const result = {root,       parent,   may_capture_runtime_variables,
-                                            NULL,       0,        0,
-                                            NULL,       0,        false,
-                                            global,     on_error, {NULL, 0},
-                                            user,       program,  body,
-                                            return_type};
+    function_checking_state const result = {root,
+                                            parent,
+                                            may_capture_runtime_variables,
+                                            NULL,
+                                            0,
+                                            0,
+                                            NULL,
+                                            0,
+                                            false,
+                                            global,
+                                            on_error,
+                                            {NULL, 0},
+                                            user,
+                                            program,
+                                            body,
+                                            return_type,
+                                            has_declared_return_type};
     return result;
 }
 
@@ -427,7 +437,8 @@ typedef struct conversion_result
 static conversion_result convert(function_checking_state *const state, instruction_sequence *const function,
                                  register_id const original, type const from,
                                  optional_value const original_compile_time_value,
-                                 source_location const original_source, type const to);
+                                 source_location const original_source, type const to,
+                                 bool const may_widen_return_type);
 
 static check_function_result check_function(program_check *const root, function_checking_state *parent,
                                             expression const body_in, structure const global,
@@ -439,8 +450,9 @@ static check_function_result check_function(program_check *const root, function_
 {
     ASSUME(root);
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
-    function_checking_state state = function_checking_state_create(
-        root, parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out, explicit_return_type);
+    function_checking_state state =
+        function_checking_state_create(root, parent, may_capture_runtime_variables, &global, on_error, user, program,
+                                       &body_out, explicit_return_type, explicit_return_type.is_set);
 
     if (self.is_set)
     {
@@ -490,7 +502,7 @@ static check_function_result check_function(program_check *const root, function_
             {
                 conversion_result const converted = convert(
                     &state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
-                    expression_source_begin(body_in), explicit_return_type.value);
+                    expression_source_begin(body_in), explicit_return_type.value, false);
                 switch (converted.ok)
                 {
                 case failure:
@@ -507,6 +519,7 @@ static check_function_result check_function(program_check *const root, function_
 
                 case success:
                     return_type = converted.result_type;
+                    ASSUME(type_equals(explicit_return_type.value, converted.result_type));
                     break;
                 }
                 register_id const unit_goes_into = allocate_register(&state.used_registers);
@@ -807,7 +820,7 @@ static conversion_result convert_to_interface(function_checking_state *const sta
 static conversion_result convert(function_checking_state *const state, instruction_sequence *const function,
                                  register_id const original, type const from,
                                  optional_value const original_compile_time_value,
-                                 source_location const original_source, type const to)
+                                 source_location const original_source, type const to, bool const may_widen_result_type)
 {
     if (type_equals(from, to))
     {
@@ -849,6 +862,13 @@ static conversion_result convert(function_checking_state *const state, instructi
             conversion_result const result = {success, original, to, original_compile_time_value};
             return result;
         }
+        if (may_widen_result_type)
+        {
+            conversion_result const result = {success, original, type_from_integer_range(integer_range_combine(
+                                                                     from.integer_range_, to.integer_range_)),
+                                              original_compile_time_value};
+            return result;
+        }
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
         conversion_result const result = {failure, original, from, optional_value_empty};
         return result;
@@ -881,7 +901,7 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
     conversion_result const converted =
         convert(state, function, argument.where, argument.type_, argument.compile_time_value,
                 expression_source_begin(argument_tree),
-                get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums));
+                get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums), false);
     argument_evaluation_result const result = {converted.ok, converted.compile_time_value, converted.where};
     return result;
 }
@@ -2315,7 +2335,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state enum_checking =
         function_checking_state_create(state->root, NULL, false, state->global, state->on_error, state->user,
-                                       state->program, &ignored_instructions, optional_type_create_empty());
+                                       state->program, &ignored_instructions, optional_type_create_empty(), false);
     generic_enum const instantiated_enum = state->root->generic_enums[generic];
     if (argument_count < instantiated_enum.tree.generic_parameter_count)
     {
@@ -2655,7 +2675,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
                     conversion_result const converted =
                         convert(state, function, initializer.where, initializer.type_, initializer.compile_time_value,
                                 expression_source_begin(*element.declare.initializer),
-                                declared_type.compile_time_value.value_.type_);
+                                declared_type.compile_time_value.value_.type_, false);
                     if (converted.ok == failure)
                     {
                         return make_compile_time_unit();
@@ -2702,50 +2722,6 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     LPG_UNREACHABLE();
 }
 
-static optional_type combine_return_types(type const first, type const second)
-{
-    if (type_equals(first, second))
-    {
-        return optional_type_create_set(first);
-    }
-    if (first.kind != second.kind)
-    {
-        return optional_type_create_empty();
-    }
-    switch (first.kind)
-    {
-    case type_kind_integer_range:
-        return optional_type_create_set(
-            type_from_integer_range(integer_range_combine(first.integer_range_, second.integer_range_)));
-
-    case type_kind_structure:
-        break;
-    case type_kind_function_pointer:
-        break;
-    case type_kind_unit:
-        break;
-    case type_kind_string_ref:
-        break;
-    case type_kind_enumeration:
-        break;
-    case type_kind_tuple:
-        break;
-    case type_kind_type:
-        break;
-    case type_kind_enum_constructor:
-        break;
-    case type_kind_lambda:
-        break;
-    case type_kind_interface:
-        break;
-    case type_kind_method_pointer:
-        break;
-    case type_kind_generic_enum:
-        break;
-    }
-    LPG_TO_DO();
-}
-
 static evaluate_expression_result
 evaluate_return_expression(function_checking_state *state, instruction_sequence *sequence, const expression *expression)
 {
@@ -2756,14 +2732,26 @@ evaluate_return_expression(function_checking_state *state, instruction_sequence 
     }
     if (state->return_type.is_set)
     {
-        optional_type const new_return_type = combine_return_types(result.type_, state->return_type.value);
-        if (!new_return_type.is_set)
+        conversion_result const converted =
+            convert(state, sequence, result.where, result.type_, result.compile_time_value,
+                    expression_source_begin(*expression), state->return_type.value, true);
+        switch (converted.ok)
         {
-            state->on_error(
-                semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*expression)), state->user);
+        case failure:
             return evaluate_expression_result_empty;
+
+        case success:
+        {
+            state->return_type = optional_type_create_set(converted.result_type);
+            register_id const unit_goes_into = allocate_register(&state->used_registers);
+            instruction const return_instruction =
+                instruction_create_return(return_instruction_create(converted.where, unit_goes_into));
+            add_instruction(sequence, return_instruction);
+            return evaluate_expression_result_create(
+                true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
         }
-        state->return_type = new_return_type;
+        }
+        LPG_UNREACHABLE();
     }
     else
     {

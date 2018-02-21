@@ -51,3 +51,18 @@ let return-integer-explicit = (arg: boolean): int(1, 2)
             return 2
 assert(integer-equals(1, return-integer-explicit(boolean.false)))
 assert(integer-equals(2, return-integer-explicit(boolean.true)))
+
+let return-runtime-string = (arg: string-ref)
+    side-effect()
+    return concat("abc", arg)
+assert(string-equals("abcdef", return-runtime-string("def")))
+
+let test-interface = interface
+    m(): boolean
+impl test-interface for string-ref
+    m(): boolean
+        return boolean.true
+let return-interface = (arg: string-ref): test-interface
+    side-effect()
+    return arg
+assert(return-interface("abc").m())

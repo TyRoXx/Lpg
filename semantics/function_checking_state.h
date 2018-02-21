@@ -22,4 +22,5 @@ typedef struct function_checking_state
     checked_program *program;
     instruction_sequence *body;
     optional_type return_type;
+    bool has_declared_return_type;
 } function_checking_state;
