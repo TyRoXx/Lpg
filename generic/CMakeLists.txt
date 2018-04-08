@@ -8,3 +8,6 @@ endif()
 if(NOT MSVC)
 	target_link_libraries(generic m)
 endif()
+
+find_package(Threads)
+target_link_libraries(generic ${CMAKE_THREAD_LIBS_INIT})

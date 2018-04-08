@@ -17,6 +17,7 @@
 #include "lpg_remove_dead_code.h"
 #include "lpg_remove_unused_functions.h"
 #include "lpg_save_expression.h"
+#include "lpg_thread.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -322,40 +323,63 @@ static void run_file(char const *const source_file, structure const global_objec
     unicode_string_free(&expected);
 }
 
+typedef struct run_file_in_thread_state
+{
+    lpg_thread thread;
+    char const *file;
+    structure globals;
+} run_file_in_thread_state;
+
+static void run_file_in_thread(void *argument)
+{
+    run_file_in_thread_state *const cast = argument;
+    run_file(cast->file, cast->globals);
+}
+
 void test_interpreter(void)
 {
     standard_library_description const std_library = describe_standard_library();
 
     {
-        char const *const test_files[] = {"boolean.lpg",
-                                          "concat.lpg",
-                                          "empty.lpg",
-                                          "enum-generic.lpg",
-                                          "enum-stateful.lpg",
-                                          "enum-stateless.lpg",
-                                          "function-pointer.lpg",
-                                          "integer-equals.lpg",
-                                          "integer-less.lpg",
-                                          "integer-to-string.lpg",
-                                          "interface.lpg",
-                                          "lambda-capture.lpg",
-                                          "lambda-parameters.lpg",
-                                          "lambda-recapture.lpg",
-                                          "lambda-return-type.lpg",
-                                          "loop.lpg",
-                                          "match-enum-stateful.lpg",
-                                          "match-enum-stateless.lpg",
-                                          "match-integer.lpg",
-                                          "option.lpg",
-                                          "raw-string-literal.lpg",
-                                          "return.lpg",
-                                          "string-equals.lpg",
-                                          "struct.lpg",
-                                          "tuple.lpg",
-                                          "unit_value.lpg"};
-        for (size_t i = 0; i < LPG_ARRAY_SIZE(test_files); ++i)
+        static char const *const test_files[] = {"boolean.lpg",
+                                                 "concat.lpg",
+                                                 "empty.lpg",
+                                                 "enum-generic.lpg",
+                                                 "enum-stateful.lpg",
+                                                 "enum-stateless.lpg",
+                                                 "function-pointer.lpg",
+                                                 "integer-equals.lpg",
+                                                 "integer-less.lpg",
+                                                 "integer-to-string.lpg",
+                                                 "interface.lpg",
+                                                 "lambda-capture.lpg",
+                                                 "lambda-parameters.lpg",
+                                                 "lambda-recapture.lpg",
+                                                 "lambda-return-type.lpg",
+                                                 "loop.lpg",
+                                                 "match-enum-stateful.lpg",
+                                                 "match-enum-stateless.lpg",
+                                                 "match-integer.lpg",
+                                                 "option.lpg",
+                                                 "raw-string-literal.lpg",
+                                                 "return.lpg",
+                                                 "string-equals.lpg",
+                                                 "struct.lpg",
+                                                 "tuple.lpg",
+                                                 "unit_value.lpg"};
+        run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
+        for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
         {
-            run_file(test_files[i], std_library.globals);
+            run_file_in_thread_state *const state = threads + i;
+            state->file = test_files[i];
+            state->globals = std_library.globals;
+            create_thread_result const created = create_thread(run_file_in_thread, state);
+            REQUIRE(created.is_success == success);
+            state->thread = created.success;
+        }
+        for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
+        {
+            join_thread(threads[i].thread);
         }
     }
 

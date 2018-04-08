@@ -27,6 +27,7 @@
 #include "test_value.h"
 #include "test_type.h"
 #include "test_path.h"
+#include "test_thread.h"
 #include <stdio.h>
 #if LPG_WITH_VLD
 #include <vld.h>
@@ -34,7 +35,8 @@
 
 int main(void)
 {
-    static void (*tests[])(void) = {test_blob,
+    static void (*tests[])(void) = {test_thread,
+                                    test_blob,
                                     test_path,
                                     test_integer,
                                     test_integer_range,
