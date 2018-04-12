@@ -1,3 +1,6 @@
+let boolean = enum
+    false
+    true
 let and = (left: boolean, right: boolean)
     match left
         case boolean.true:
@@ -16,22 +19,17 @@ let not = (input: boolean)
         case boolean.true: boolean.false
         case boolean.false: boolean.true
 
-/*let type = type-of(type-of(0))
-
+let type = type-of(type-of(0))
 let string-ref = type-of("")
-
-let boolean = enum
-    false
-    true
-
-let unit = type-of(unit_value)*/
-
-[
-    and = and
-    or = or
-    not = not
-    /*type = type
-    string-ref = string-ref
-    boolean = boolean
-    unit = unit*/
-]
+let unit_value = ()
+()
+let unit = type-of(unit_value)
+let export = struct
+    and: type-of(and)
+    or: type-of(or)
+    type: type
+    string-ref: type
+    boolean: type
+    unit: type
+    unit_value: unit
+export{and, or, type, string-ref, boolean, unit, unit_value}
