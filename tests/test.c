@@ -1,13 +1,17 @@
 #include "test.h"
 #include <stdio.h>
+#include "lpg_atomic.h"
 
 static size_t total_checks;
 static size_t failures;
 
 int lpg_check(int success)
 {
-    ++total_checks;
-    failures += !success;
+    atomic_size_increment(&total_checks);
+    if (!success)
+    {
+        atomic_size_increment(&failures);
+    }
     return success;
 }
 
