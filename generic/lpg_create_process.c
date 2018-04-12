@@ -123,12 +123,17 @@ create_process_result create_process(unicode_view const executable, unicode_view
     child_process const created = {INVALID_HANDLE_VALUE};
     return create_process_result_create(failure, created);
 #else
-    pid_t const forked = fork();
-    if (forked < 0)
+    unicode_string const current_path_zero_terminated = unicode_view_zero_terminate(current_path);
+    char **const exec_arguments = allocate_array(argument_count + 2, sizeof(*exec_arguments));
+    unicode_string const executable_zero_terminated = unicode_view_zero_terminate(executable);
+    exec_arguments[0] = executable_zero_terminated.data;
+    for (size_t i = 0; i < argument_count; ++i)
     {
-        child_process const created = {-1};
-        return create_process_result_create(failure, created);
+        unicode_string const argument_zero_terminated = unicode_view_zero_terminate(arguments[i]);
+        exec_arguments[1 + i] = argument_zero_terminated.data;
     }
+    exec_arguments[argument_count + 1] = NULL;
+    pid_t const forked = fork();
     if (forked == 0)
     {
         if (dup2(output, STDOUT_FILENO) < 0)
@@ -144,12 +149,9 @@ create_process_result create_process(unicode_view const executable, unicode_view
             exit(1);
         }
 
+        if (chdir(current_path_zero_terminated.data) < 0)
         {
-            unicode_string const current_path_zero_terminated = unicode_view_zero_terminate(current_path);
-            if (chdir(current_path_zero_terminated.data) < 0)
-            {
-                exit(1);
-            }
+            exit(1);
         }
 
         // close inherited file descriptors
@@ -167,17 +169,19 @@ create_process_result create_process(unicode_view const executable, unicode_view
         }
 #endif
 
-        char **const exec_arguments = allocate_array(argument_count + 2, sizeof(*exec_arguments));
-        unicode_string const executable_zero_terminated = unicode_view_zero_terminate(executable);
-        exec_arguments[0] = executable_zero_terminated.data;
-        for (size_t i = 0; i < argument_count; ++i)
-        {
-            unicode_string const argument_zero_terminated = unicode_view_zero_terminate(arguments[i]);
-            exec_arguments[1 + i] = argument_zero_terminated.data;
-        }
-        exec_arguments[argument_count + 1] = NULL;
         execvp(executable_zero_terminated.data, exec_arguments);
         LPG_UNREACHABLE();
+    }
+    unicode_string_free(&current_path_zero_terminated);
+    for (size_t i = 0; i <= argument_count; ++i)
+    {
+        deallocate(exec_arguments[i]);
+    }
+    deallocate(exec_arguments);
+    if (forked < 0)
+    {
+        child_process const created = {-1};
+        return create_process_result_create(failure, created);
     }
     else
     {
