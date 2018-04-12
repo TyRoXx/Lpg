@@ -368,7 +368,7 @@ void test_interpreter(void)
                                                  "tuple.lpg",
                                                  "unit_value.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
-        size_t joined_until = 0;
+        size_t joined_until = (size_t)0 - 1;
         for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
         {
             run_file_in_thread_state *const state = threads + i;
