@@ -15,6 +15,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->integer_equals);
     function_pointer_free(&stable->integer_less);
     function_pointer_free(&stable->integer_to_string);
+    function_pointer_free(&stable->type_equals);
     function_pointer_free(&stable->side_effect);
 }
 
@@ -64,6 +65,15 @@ value string_equals_impl(function_call_arguments const arguments, struct value c
     unicode_view const left = arguments.arguments[0].string_ref;
     unicode_view const right = arguments.arguments[1].string_ref;
     return value_from_enum_element(unicode_view_equals(left, right), get_boolean(&arguments), NULL);
+}
+
+value type_equals_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
+{
+    (void)environment;
+    (void)captures;
+    type const left = arguments.arguments[0].type_;
+    type const right = arguments.arguments[1].type_;
+    return value_from_enum_element(type_equals(left, right), get_boolean(&arguments), NULL);
 }
 
 value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -196,6 +206,14 @@ standard_library_description describe_standard_library(void)
     stable->side_effect = function_pointer_create(
         type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
 
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_type();
+        parameters[1] = type_from_type();
+        stable->type_equals = function_pointer_create(
+            boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
+    }
+
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"), optional_value_create(value_from_type(type_from_type())));
@@ -203,7 +221,10 @@ standard_library_description describe_standard_library(void)
     globals[1] = structure_member_create(type_from_type(), unicode_string_from_c_str("string-ref"),
                                          optional_value_create(value_from_type(type_from_string_ref())));
 
-    globals[2] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed2"), optional_value_empty);
+    globals[2] = structure_member_create(
+        type_from_function_pointer(&stable->type_equals), unicode_string_from_c_str("type-equals"),
+        optional_value_create(
+            value_from_function_pointer(function_pointer_value_from_external(type_equals_impl, NULL, NULL, 0))));
 
     globals[3] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("boolean"), optional_value_create(value_from_type(boolean)));

@@ -37,6 +37,7 @@ typedef struct standard_library_stable
     function_pointer integer_less;
     function_pointer integer_to_string;
     function_pointer side_effect;
+    function_pointer type_equals;
 } standard_library_stable;
 
 enum

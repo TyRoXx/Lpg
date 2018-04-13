@@ -443,6 +443,9 @@ source_location expression_source_begin(expression const value)
     case expression_type_generic_instantiation:
         return expression_source_begin(*value.generic_instantiation.generic);
 
+    case expression_type_type_of:
+        return value.type_of.begin;
+
     case expression_type_enum:
         return value.enum_.begin;
 
@@ -656,6 +659,22 @@ bool generic_instantiation_expression_equals(generic_instantiation_expression co
     return true;
 }
 
+type_of_expression type_of_expression_create(source_location begin, expression *target)
+{
+    type_of_expression const result = {begin, target};
+    return result;
+}
+
+void type_of_expression_free(type_of_expression const freed)
+{
+    expression_deallocate(freed.target);
+}
+
+bool type_of_expression_equals(type_of_expression const left, type_of_expression const right)
+{
+    return source_location_equals(left.begin, right.begin) && expression_equals(left.target, right.target);
+}
+
 bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
                                           instantiate_struct_expression const right)
 {
@@ -859,6 +878,14 @@ expression expression_from_generic_instantiation(generic_instantiation_expressio
     return result;
 }
 
+expression expression_from_type_of(type_of_expression const value)
+{
+    expression result;
+    result.type = expression_type_type_of;
+    result.type_of = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -872,6 +899,10 @@ void expression_free(expression const *this)
     {
     case expression_type_generic_instantiation:
         generic_instantiation_expression_free(this->generic_instantiation);
+        break;
+
+    case expression_type_type_of:
+        type_of_expression_free(this->type_of);
         break;
 
     case expression_type_enum:
@@ -1027,6 +1058,9 @@ bool expression_equals(expression const *left, expression const *right)
     {
     case expression_type_generic_instantiation:
         return generic_instantiation_expression_equals(left->generic_instantiation, right->generic_instantiation);
+
+    case expression_type_type_of:
+        LPG_TO_DO();
 
     case expression_type_placeholder:
         return placeholder_expression_equals(left->placeholder, right->placeholder);

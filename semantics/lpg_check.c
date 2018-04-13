@@ -1239,6 +1239,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
     case expression_type_instantiate_struct:
     case expression_type_enum:
     case expression_type_placeholder:
+    case expression_type_type_of:
         return pattern_evaluate_result_no;
     }
     LPG_UNREACHABLE();
@@ -1978,6 +1979,20 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
         true, into, type_from_struct(structure_id), optional_value_empty, false, false);
 }
 
+static evaluate_expression_result evaluate_type_of(function_checking_state *const state,
+                                                   instruction_sequence *const function,
+                                                   type_of_expression const element)
+{
+    instruction_checkpoint const before = make_checkpoint(&state->used_registers, function);
+    evaluate_expression_result const target_evaluated = evaluate_expression(state, function, *element.target);
+    restore(before);
+    register_id const where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  where, value_from_type(target_evaluated.type_), type_from_type())));
+    return evaluate_expression_result_create(
+        true, where, type_from_type(), optional_value_create(value_from_type(target_evaluated.type_)), true, false);
+}
+
 typedef struct generic_enum_closures
 {
     generic_enum_closure *elements;
@@ -2046,6 +2061,9 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         find_generic_enum_closures_in_function_header(closures, state, from.lambda.header);
         find_generic_enum_closures_in_expression(closures, state, *from.lambda.result);
         break;
+
+    case expression_type_type_of:
+        LPG_TO_DO();
 
     case expression_type_call:
         find_generic_enum_closures_in_expression(closures, state, *from.call.callee);
@@ -2496,6 +2514,9 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     {
     case expression_type_generic_instantiation:
         return evaluate_generic_instantiation(state, function, element.generic_instantiation);
+
+    case expression_type_type_of:
+        return evaluate_type_of(state, function, element.type_of);
 
     case expression_type_instantiate_struct:
         return evaluate_instantiate_struct(state, function, element.instantiate_struct);

@@ -48,7 +48,8 @@ typedef enum token_type
     token_interface,
     token_struct,
     token_impl,
-    token_enum
+    token_enum,
+    token_type_of
 } token_type;
 
 typedef enum tokenize_status

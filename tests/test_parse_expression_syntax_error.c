@@ -176,6 +176,27 @@ void test_parse_expression_syntax_error(void)
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("impl i for x"));
     }
 
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_left_parenthesis, source_location_create(0, 7))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of "));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of("));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_right_parenthesis, source_location_create(0, 9))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of(0"));
+    }
+
     test_tokenizer_error();
     test_unnamed_function();
     test_function();

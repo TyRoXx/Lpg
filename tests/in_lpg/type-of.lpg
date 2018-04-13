@@ -1,0 +1,4 @@
+assert(type-equals(type-of(0), type-of(0)))
+assert(type-equals(type-of(0), int(0, 0)))
+assert(type-equals(type-of(""), string-ref))
+assert(type-equals(type-of(string-ref), type))

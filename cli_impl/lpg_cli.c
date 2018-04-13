@@ -129,6 +129,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected context-sensitive keyword 'for'";
     case parse_error_expected_right_parenthesis:
         return "Expected right parenthesis";
+    case parse_error_expected_left_parenthesis:
+        return "Expected left parenthesis";
     }
     LPG_UNREACHABLE();
 }

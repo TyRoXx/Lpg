@@ -361,6 +361,12 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         }
         LPG_TRY(stream_writer_write_string(to, "]"));
         return success;
+
+    case expression_type_type_of:
+        LPG_TRY(stream_writer_write_string(to, "type-of("));
+        LPG_TRY(save_expression(to, value->type_of.target, whitespace));
+        LPG_TRY(stream_writer_write_string(to, ")"));
+        return success;
     }
     LPG_UNREACHABLE();
 }

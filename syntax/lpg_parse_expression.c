@@ -749,6 +749,40 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
     return expression_parser_result_failure;
 }
 
+static expression_parser_result parse_type_of(expression_parser *const parser, size_t const indentation,
+                                              source_location const begin)
+{
+    {
+        rich_token const left_parenthesis = peek(parser);
+        if (left_parenthesis.token != token_left_parenthesis)
+        {
+            parser->on_error(
+                parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where), parser->user);
+            return expression_parser_result_failure;
+        }
+    }
+    pop(parser);
+    expression_parser_result const target_parsed = parse_expression(parser, indentation, false);
+    if (!target_parsed.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+    {
+        rich_token const right_parenthesis = peek(parser);
+        if (right_parenthesis.token != token_right_parenthesis)
+        {
+            parser->on_error(
+                parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where), parser->user);
+            expression_free(&target_parsed.success);
+            return expression_parser_result_failure;
+        }
+    }
+    pop(parser);
+    expression_parser_result const result = {
+        true, expression_from_type_of(type_of_expression_create(begin, expression_allocate(target_parsed.success)))};
+    return result;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
@@ -898,6 +932,10 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->user);
             return expression_parser_result_failure;
+
+        case token_type_of:
+            pop(parser);
+            return parse_type_of(parser, indentation + 1, head.where);
         }
     }
 }

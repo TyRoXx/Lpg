@@ -366,6 +366,7 @@ void test_interpreter(void)
                                                  "string-equals.lpg",
                                                  "struct.lpg",
                                                  "tuple.lpg",
+                                                 "type-of.lpg",
                                                  "unit_value.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
