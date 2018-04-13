@@ -1193,6 +1193,9 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
 {
     switch (root.type)
     {
+    case expression_type_import:
+        LPG_TO_DO();
+
     case expression_type_generic_instantiation:
         LPG_TO_DO();
 
@@ -2057,6 +2060,9 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
 {
     switch (from.type)
     {
+    case expression_type_import:
+        LPG_TO_DO();
+
     case expression_type_lambda:
         find_generic_enum_closures_in_function_header(closures, state, from.lambda.header);
         find_generic_enum_closures_in_expression(closures, state, *from.lambda.result);
@@ -2507,11 +2513,28 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                     expression_source_begin(*element.generic));
 }
 
+static evaluate_expression_result evaluate_import(function_checking_state *const state,
+                                                  instruction_sequence *const function, import_expression const element)
+{
+    if (unicode_view_equals_c_str(unicode_view_from_string(element.name.value), "std"))
+    {
+        register_id const where = allocate_register(&state->used_registers);
+        add_instruction(function, instruction_create_literal(
+                                      literal_instruction_create(where, value_from_unit(), type_from_unit())));
+        return evaluate_expression_result_create(
+            true, where, type_from_unit(), optional_value_create(value_from_unit()), true, false);
+    }
+    LPG_TO_DO();
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element)
 {
     switch (element.type)
     {
+    case expression_type_import:
+        return evaluate_import(state, function, element.import);
+
     case expression_type_generic_instantiation:
         return evaluate_generic_instantiation(state, function, element.generic_instantiation);
 

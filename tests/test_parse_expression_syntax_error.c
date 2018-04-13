@@ -197,6 +197,18 @@ void test_parse_expression_syntax_error(void)
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of(0"));
     }
 
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_space, source_location_create(0, 6))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("import"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_identifier, source_location_create(0, 7))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("import "));
+    }
+
     test_tokenizer_error();
     test_unnamed_function();
     test_function();

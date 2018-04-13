@@ -440,6 +440,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_import:
+        LPG_TO_DO();
+
     case expression_type_generic_instantiation:
         return expression_source_begin(*value.generic_instantiation.generic);
 
@@ -675,6 +678,22 @@ bool type_of_expression_equals(type_of_expression const left, type_of_expression
     return source_location_equals(left.begin, right.begin) && expression_equals(left.target, right.target);
 }
 
+import_expression import_expression_create(source_location begin, identifier_expression name)
+{
+    import_expression const result = {begin, name};
+    return result;
+}
+
+void import_expression_free(import_expression const freed)
+{
+    identifier_expression_free(&freed.name);
+}
+
+bool import_expression_equals(import_expression const left, import_expression const right)
+{
+    return source_location_equals(left.begin, right.begin) && identifier_expression_equals(left.name, right.name);
+}
+
 bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
                                           instantiate_struct_expression const right)
 {
@@ -886,6 +905,14 @@ expression expression_from_type_of(type_of_expression const value)
     return result;
 }
 
+expression expression_from_import(import_expression const value)
+{
+    expression result;
+    result.type = expression_type_import;
+    result.import = value;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -897,6 +924,10 @@ void expression_free(expression const *this)
 {
     switch (this->type)
     {
+    case expression_type_import:
+        import_expression_free(this->import);
+        break;
+
     case expression_type_generic_instantiation:
         generic_instantiation_expression_free(this->generic_instantiation);
         break;
@@ -1056,6 +1087,9 @@ bool expression_equals(expression const *left, expression const *right)
     }
     switch (left->type)
     {
+    case expression_type_import:
+        LPG_TO_DO();
+
     case expression_type_generic_instantiation:
         return generic_instantiation_expression_equals(left->generic_instantiation, right->generic_instantiation);
 

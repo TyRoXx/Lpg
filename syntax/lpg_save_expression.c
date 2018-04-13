@@ -101,6 +101,10 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 {
     switch (value->type)
     {
+    case expression_type_import:
+        LPG_TRY(stream_writer_write_string(to, "import "));
+        return stream_writer_write_unicode_view(to, unicode_view_from_string(value->import.name.value));
+
     case expression_type_lambda:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(save_function_header(to, value->lambda.header, whitespace));

@@ -58,7 +58,8 @@ typedef enum expression_type
     expression_type_enum,
     expression_type_placeholder,
     expression_type_generic_instantiation,
-    expression_type_type_of
+    expression_type_type_of,
+    expression_type_import
 } expression_type;
 
 typedef struct tuple
@@ -344,6 +345,16 @@ type_of_expression type_of_expression_create(source_location begin, expression *
 void type_of_expression_free(type_of_expression const freed);
 bool type_of_expression_equals(type_of_expression const left, type_of_expression const right);
 
+typedef struct import_expression
+{
+    source_location begin;
+    identifier_expression name;
+} import_expression;
+
+import_expression import_expression_create(source_location begin, identifier_expression name);
+void import_expression_free(import_expression const freed);
+bool import_expression_equals(import_expression const left, import_expression const right);
+
 struct expression
 {
     expression_type type;
@@ -374,6 +385,7 @@ struct expression
         placeholder_expression placeholder;
         generic_instantiation_expression generic_instantiation;
         type_of_expression type_of;
+        import_expression import;
     };
 };
 
@@ -405,6 +417,7 @@ expression expression_from_enum(enum_expression const value);
 expression expression_from_placeholder(placeholder_expression const value);
 expression expression_from_generic_instantiation(generic_instantiation_expression const value);
 expression expression_from_type_of(type_of_expression const value);
+expression expression_from_import(import_expression const value);
 expression *expression_allocate(expression value);
 void expression_free(LPG_NON_NULL(expression const *this));
 bool sequence_equals(sequence const left, sequence const right);

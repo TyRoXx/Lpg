@@ -783,6 +783,28 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
     return result;
 }
 
+static expression_parser_result parse_import(expression_parser *const parser, source_location const begin)
+{
+    rich_token const space = peek(parser);
+    if ((space.token != token_space) || (space.content.length != 1))
+    {
+        parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+        return expression_parser_result_failure;
+    }
+    pop(parser);
+    rich_token const name = peek(parser);
+    if (name.token != token_identifier)
+    {
+        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+        return expression_parser_result_failure;
+    }
+    pop(parser);
+    expression_parser_result const result = {
+        true, expression_from_import(import_expression_create(
+                  begin, identifier_expression_create(unicode_view_copy(name.content), name.where)))};
+    return result;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
@@ -935,7 +957,11 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
 
         case token_type_of:
             pop(parser);
-            return parse_type_of(parser, indentation + 1, head.where);
+            return parse_type_of(parser, indentation, head.where);
+
+        case token_import:
+            pop(parser);
+            return parse_import(parser, head.where);
         }
     }
 }

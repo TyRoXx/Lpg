@@ -363,6 +363,7 @@ void test_interpreter(void)
                                                  "option.lpg",
                                                  "raw-string-literal.lpg",
                                                  "return.lpg",
+                                                 "std.lpg",
                                                  "string-equals.lpg",
                                                  "struct.lpg",
                                                  "tuple.lpg",
