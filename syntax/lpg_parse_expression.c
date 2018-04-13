@@ -1484,6 +1484,106 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
     return expression_parser_result_failure;
 }
 
+expression_parser_result parse_let_expression(expression_parser *const parser, size_t const indentation)
+{
+    rich_token const first_space = peek(parser);
+    pop(parser);
+    if ((first_space.token != token_space) || (first_space.content.length != 1))
+    {
+        parser->on_error(parse_error_create(parse_error_expected_space, first_space.where), parser->user);
+        return expression_parser_result_failure;
+    }
+    rich_token const name = peek(parser);
+    pop(parser);
+    if (name.token != token_identifier)
+    {
+        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+        return expression_parser_result_failure;
+    }
+    {
+        rich_token const second_space = peek(parser);
+        if ((second_space.token == token_space) && (second_space.content.length == 1))
+        {
+            pop(parser);
+        }
+        else if (second_space.token == token_colon)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, second_space.where), parser->user);
+        }
+        else
+        {
+            expression_parser_result const result = {true, expression_from_placeholder(placeholder_expression_create(
+                                                               name.where, unicode_view_copy(name.content)))};
+            return result;
+        }
+    }
+    expression_parser_result declared_variable_type = {false, expression_from_break(source_location_create(0, 0))};
+    rich_token colon_or_assign = peek(parser);
+    if (colon_or_assign.token == token_colon)
+    {
+        pop(parser);
+        rich_token const third_space = peek(parser);
+        if ((third_space.token == token_space) && (third_space.content.length == 1))
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, third_space.where), parser->user);
+        }
+        declared_variable_type = parse_returnable(parser, indentation, false);
+        if (!declared_variable_type.is_success)
+        {
+            return expression_parser_result_failure;
+        }
+        rich_token const fourth_space = peek(parser);
+        if ((fourth_space.token == token_space) && (fourth_space.content.length == 1))
+        {
+            pop(parser);
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_space, fourth_space.where), parser->user);
+        }
+        colon_or_assign = peek(parser);
+    }
+    if (colon_or_assign.token != token_assign)
+    {
+        if (declared_variable_type.is_success)
+        {
+            expression_free(&declared_variable_type.success);
+        }
+        parser->on_error(
+            parse_error_create(parse_error_expected_declaration_or_assignment, colon_or_assign.where), parser->user);
+        return expression_parser_result_failure;
+    }
+    pop(parser);
+    rich_token const another_space = peek(parser);
+    if ((another_space.token == token_space) && (another_space.content.length == 1))
+    {
+        pop(parser);
+    }
+    else
+    {
+        parser->on_error(parse_error_create(parse_error_expected_space, another_space.where), parser->user);
+    }
+    expression_parser_result const initial_value = parse_returnable(parser, indentation, true);
+    if (!initial_value.is_success)
+    {
+        if (declared_variable_type.is_success)
+        {
+            expression_free(&declared_variable_type.success);
+        }
+        return expression_parser_result_failure;
+    }
+    expression_parser_result const result = {
+        true, expression_from_declare(declare_create(
+                  identifier_expression_create(unicode_view_copy(name.content), name.where),
+                  (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success) : NULL),
+                  expression_allocate(initial_value.success)))};
+    return result;
+}
+
 expression_parser_result parse_expression(expression_parser *const parser, size_t const indentation,
                                           bool const may_be_statement)
 {
@@ -1510,106 +1610,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
         if (head.token == token_let)
         {
             pop(parser);
-            rich_token const first_space = peek(parser);
-            pop(parser);
-            if ((first_space.token != token_space) || (first_space.content.length != 1))
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, first_space.where), parser->user);
-                return expression_parser_result_failure;
-            }
-            rich_token const name = peek(parser);
-            pop(parser);
-            if (name.token != token_identifier)
-            {
-                parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
-                return expression_parser_result_failure;
-            }
-            {
-                rich_token const second_space = peek(parser);
-                if ((second_space.token == token_space) && (second_space.content.length == 1))
-                {
-                    pop(parser);
-                }
-                else if (second_space.token == token_colon)
-                {
-                    parser->on_error(parse_error_create(parse_error_expected_space, second_space.where), parser->user);
-                }
-                else
-                {
-                    expression_parser_result const result = {
-                        true, expression_from_placeholder(
-                                  placeholder_expression_create(name.where, unicode_view_copy(name.content)))};
-                    return result;
-                }
-            }
-            expression_parser_result declared_variable_type = {
-                false, expression_from_break(source_location_create(0, 0))};
-            rich_token colon_or_assign = peek(parser);
-            if (colon_or_assign.token == token_colon)
-            {
-                pop(parser);
-                rich_token const third_space = peek(parser);
-                if ((third_space.token == token_space) && (third_space.content.length == 1))
-                {
-                    pop(parser);
-                }
-                else
-                {
-                    parser->on_error(parse_error_create(parse_error_expected_space, third_space.where), parser->user);
-                }
-                declared_variable_type = parse_returnable(parser, indentation, false);
-                if (!declared_variable_type.is_success)
-                {
-                    return expression_parser_result_failure;
-                }
-                rich_token const fourth_space = peek(parser);
-                if ((fourth_space.token == token_space) && (fourth_space.content.length == 1))
-                {
-                    pop(parser);
-                }
-                else
-                {
-                    parser->on_error(parse_error_create(parse_error_expected_space, fourth_space.where), parser->user);
-                }
-                colon_or_assign = peek(parser);
-            }
-            if (colon_or_assign.token != token_assign)
-            {
-                if (declared_variable_type.is_success)
-                {
-                    expression_free(&declared_variable_type.success);
-                }
-                parser->on_error(
-                    parse_error_create(parse_error_expected_declaration_or_assignment, colon_or_assign.where),
-                    parser->user);
-                return expression_parser_result_failure;
-            }
-            pop(parser);
-            rich_token const another_space = peek(parser);
-            if ((another_space.token == token_space) && (another_space.content.length == 1))
-            {
-                pop(parser);
-            }
-            else
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, another_space.where), parser->user);
-            }
-            expression_parser_result const initial_value = parse_returnable(parser, indentation, true);
-            if (!initial_value.is_success)
-            {
-                if (declared_variable_type.is_success)
-                {
-                    expression_free(&declared_variable_type.success);
-                }
-                return expression_parser_result_failure;
-            }
-            expression_parser_result const result = {
-                true,
-                expression_from_declare(declare_create(
-                    identifier_expression_create(unicode_view_copy(name.content), name.where),
-                    (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success) : NULL),
-                    expression_allocate(initial_value.success)))};
-            return result;
+            return parse_let_expression(parser, indentation);
         }
         if (head.token == token_impl)
         {

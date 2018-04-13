@@ -165,7 +165,8 @@ void test_cli(void)
                                     "^\n");
 
     test_formatting_tool("", "", false, "");
-    test_formatting_tool("let i = 0", "let i = 0", false, "");
+    // test_formatting_tool("let i= 0", "let i = 0", false, "");
+    //    test_formatting_tool("let t:int(1,2)=1", "let t : int(1, 2) = 1", false, "");
     test_formatting_tool("loop\n"
                          "    break\n"
                          "match x\n"
