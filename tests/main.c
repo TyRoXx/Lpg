@@ -1,4 +1,5 @@
 #include "lpg_allocate.h"
+#include "lpg_monotonic_clock.h"
 #include "test_save_expression.h"
 #include "test.h"
 #include "test_blob.h"
@@ -29,12 +30,14 @@
 #include "test_path.h"
 #include "test_thread.h"
 #include <stdio.h>
+#include <inttypes.h>
 #if LPG_WITH_VLD
 #include <vld.h>
 #endif
 
 int main(void)
 {
+    duration const started_at = read_monotonic_clock();
     static void (*tests[])(void) = {test_thread,
                                     test_blob,
                                     test_path,
@@ -68,6 +71,9 @@ int main(void)
     {
         tests[i]();
     }
+    duration const finished_at = read_monotonic_clock();
+    printf("Test duration: %" PRIu64 " seconds\n",
+           (absolute_duration_difference(started_at, finished_at).milliseconds / 1000u));
     printf("Dynamic allocations: %zu\n", count_total_allocations());
     if (count_active_allocations() == 0)
     {
