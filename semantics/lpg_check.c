@@ -2513,16 +2513,34 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                     expression_source_begin(*element.generic));
 }
 
+static evaluate_expression_result return_module(function_checking_state *const state,
+                                                instruction_sequence *const function, module const current_module)
+{
+    register_id const where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(
+                                  literal_instruction_create(where, current_module.content, current_module.schema)));
+    return evaluate_expression_result_create(
+        true, where, current_module.schema, optional_value_create(current_module.content), true, false);
+}
+
 static evaluate_expression_result evaluate_import(function_checking_state *const state,
                                                   instruction_sequence *const function, import_expression const element)
 {
+    for (size_t i = 0; i < state->root->module_count; ++i)
+    {
+        module const current_module = state->root->modules[i];
+        if (unicode_view_equals(
+                unicode_view_from_string(current_module.name), unicode_view_from_string(element.name.value)))
+        {
+            return return_module(state, function, current_module);
+        }
+    }
     if (unicode_view_equals_c_str(unicode_view_from_string(element.name.value), "std"))
     {
-        register_id const where = allocate_register(&state->used_registers);
-        add_instruction(function, instruction_create_literal(
-                                      literal_instruction_create(where, value_from_unit(), type_from_unit())));
-        return evaluate_expression_result_create(
-            true, where, type_from_unit(), optional_value_create(value_from_unit()), true, false);
+        module const loaded = module_create(
+            unicode_view_copy(unicode_view_from_string(element.name.value)), value_from_unit(), type_from_unit());
+        add_module(state->root, loaded);
+        return return_module(state, function, loaded);
     }
     LPG_TO_DO();
 }
@@ -2850,7 +2868,7 @@ checked_program check(sequence const root, structure const global, check_error_h
             type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())));
         program.enums[1] = enumeration_create(elements, 2);
     }
-    program_check check_root = {NULL, 0, NULL, 0};
+    program_check check_root = {NULL, 0, NULL, 0, NULL, 0};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty());
