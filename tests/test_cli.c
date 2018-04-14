@@ -48,8 +48,8 @@ static void expect_output_with_source_flags(char const *const source, char **con
     deallocate(arguments);
 }
 
-static void test_formatting_tool(char const *const source, char const *const expected_output,
-                                 bool const expected_exit_code, char const *const expected_diagnostics)
+static void formatting_tool(char const *const source, char const *const expected_output, bool const expected_exit_code,
+                            char const *const expected_diagnostics)
 {
     unicode_string name = write_temporary_file(source);
     char *arguments[] = {"lpg", unicode_string_c_str(&name), "--format"};
@@ -60,6 +60,35 @@ static void test_formatting_tool(char const *const source, char const *const exp
     blob_free(&read.success);
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
+}
+
+static void test_formatting_tool()
+{
+    formatting_tool("", "", false, "");
+    // test_formatting_tool("let i= 0", "let i = 0", false, "");
+    //    test_formatting_tool("let t:int(1,2)=1", "let t : int(1, 2) = 1", false, "");
+    formatting_tool("loop\n"
+                    "    break\n"
+                    "match x\n"
+                    "    case 1: 0\n"
+                    "    case 2:\n"
+                    "        1\n"
+                    "let s = struct\n"
+                    "    i: unit",
+                    "loop\n"
+                    "    break\n"
+                    "match x\n"
+                    "    case 1: 0\n"
+                    "    case 2:\n"
+                    "        1\n"
+                    "\n"
+                    "let s = struct\n"
+                    "    i: unit",
+                    false, "");
+    formatting_tool("let a: int = 1", "let a : int = 1", false, "");
+    formatting_tool("let a :int = 1", "let a : int = 1", false, "");
+    formatting_tool("let a : int =1", "let a : int = 1", false, "");
+    formatting_tool("let a : int= 1", "let a : int = 1", false, "");
 }
 
 void test_cli(void)
@@ -164,25 +193,5 @@ void test_cli(void)
                                     "xor(boolean.true, boolean.false)\n"
                                     "^\n");
 
-    test_formatting_tool("", "", false, "");
-    // test_formatting_tool("let i= 0", "let i = 0", false, "");
-    //    test_formatting_tool("let t:int(1,2)=1", "let t : int(1, 2) = 1", false, "");
-    test_formatting_tool("loop\n"
-                         "    break\n"
-                         "match x\n"
-                         "    case 1: 0\n"
-                         "    case 2:\n"
-                         "        1\n"
-                         "let s = struct\n"
-                         "    i: unit",
-                         "loop\n"
-                         "    break\n"
-                         "match x\n"
-                         "    case 1: 0\n"
-                         "    case 2:\n"
-                         "        1\n"
-                         "\n"
-                         "let s = struct\n"
-                         "    i: unit",
-                         false, "");
+    test_formatting_tool();
 }
