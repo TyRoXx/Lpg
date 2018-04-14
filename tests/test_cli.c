@@ -89,6 +89,11 @@ static void test_formatting_tool()
     formatting_tool("let a :int = 1", "let a : int = 1", false, "");
     formatting_tool("let a : int =1", "let a : int = 1", false, "");
     formatting_tool("let a : int= 1", "let a : int = 1", false, "");
+    formatting_tool("match a\n"
+                    "    case 1:2\n",
+                    "match a\n"
+                    "    case 1: 2\n",
+                    false, "");
 }
 
 void test_cli(void)

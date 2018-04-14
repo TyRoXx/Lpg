@@ -222,14 +222,9 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
             return 0;
         }
         pop(parser);
+        if (!parse_space(parser))
         {
-            rich_token const space = peek(parser);
-            pop(parser);
-            if (space.token != token_space)
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
-                return 0;
-            }
+            return 0;
         }
         expression_parser_result const key = parse_expression(parser, indentation, 0);
         if (!key.is_success)
@@ -261,14 +256,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
         }
         else
         {
-            if (space.token == token_space)
-            {
-                pop(parser);
-            }
-            else
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
-            }
+            parse_optional_space(parser);
 
             expression_parser_result const value = parse_expression(parser, indentation, 0);
             if (!value.is_success)
@@ -295,14 +283,9 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
 static expression_parser_result parse_match(expression_parser *parser, size_t const indentation,
                                             source_location const begin)
 {
+    if (!parse_space(parser))
     {
-        rich_token const space = peek(parser);
-        pop(parser);
-        if (space.token != token_space)
-        {
-            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
-            return expression_parser_result_failure;
-        }
+        return expression_parser_result_failure;
     }
     expression_parser_result const input = parse_expression(parser, indentation, 0);
     if (!input.is_success)
