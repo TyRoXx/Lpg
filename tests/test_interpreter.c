@@ -18,6 +18,7 @@
 #include "lpg_remove_unused_functions.h"
 #include "lpg_save_expression.h"
 #include "lpg_thread.h"
+#include "lpg_rename_file.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -126,13 +127,28 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
     unicode_view const c_test_dir_pieces[] = {tests_dir, unicode_view_from_c_str("in_lpg"), test_name};
     unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
     REQUIRE(success == create_directory(unicode_view_from_string(c_test_dir)));
+    unicode_view const last_success_pieces[] = {
+        unicode_view_from_string(c_test_dir), unicode_view_from_c_str("last_success.c")};
+    unicode_string const last_success = path_combine(last_success_pieces, LPG_ARRAY_SIZE(last_success_pieces));
     {
-        unicode_view const source_pieces[] = {
-            unicode_view_from_string(c_test_dir), unicode_view_from_c_str("generated_test.c")};
-        unicode_string const source_file = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
-        write_file_if_necessary(unicode_view_from_string(source_file), c_source);
-        unicode_string_free(&source_file);
+        unicode_string const last_success_zero = unicode_view_zero_terminate(unicode_view_from_string(last_success));
+        blob_or_error const last_success_read = read_file(last_success_zero.data);
+        unicode_string_free(&last_success_zero);
+        if (!last_success_read.error)
+        {
+            bool const equal = ((last_success_read.success.length == c_source.length) &&
+                                !memcmp(last_success_read.success.data, c_source.begin, c_source.length));
+            blob_free(&last_success_read.success);
+            if (equal)
+            {
+                goto out;
+            }
+        }
     }
+    unicode_view const source_pieces[] = {
+        unicode_view_from_string(c_test_dir), unicode_view_from_c_str("generated_test.c")};
+    unicode_string const source_file = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+    write_file_if_necessary(unicode_view_from_string(source_file), c_source);
     {
         unicode_view const cmakelists_pieces[] = {
             unicode_view_from_string(c_test_dir), unicode_view_from_c_str("CMakeLists.txt")};
@@ -214,7 +230,11 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_string_free(&test_executable);
         REQUIRE(process.success == success);
         REQUIRE(0 == wait_for_process_exit(process.created));
+        REQUIRE(rename_file(unicode_view_from_string(source_file), unicode_view_from_string(last_success)));
     }
+    unicode_string_free(&source_file);
+out:
+    unicode_string_free(&last_success);
     unicode_string_free(&executable_path);
     unicode_string_free(&c_test_dir);
 }
