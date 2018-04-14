@@ -3,7 +3,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #else
-#include <unistd.h>
+#include <stdio.h>
 #endif
 
 bool rename_file(unicode_view const from, unicode_view const to)

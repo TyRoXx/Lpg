@@ -17,6 +17,7 @@
 #endif
 #include <stdio.h>
 #include "lpg_win32.h"
+#include "lpg_rename_file.h"
 #ifdef _WIN32
 #include <Windows.h>
 #endif
