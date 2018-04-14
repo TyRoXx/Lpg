@@ -72,8 +72,7 @@ int main(void)
         tests[i]();
     }
     duration const finished_at = read_monotonic_clock();
-    printf("Test duration: %" PRIu64 " seconds\n",
-           (absolute_duration_difference(started_at, finished_at).milliseconds / 1000u));
+    printf("Test duration: %" PRIu64 " ms\n", absolute_duration_difference(started_at, finished_at).milliseconds);
     printf("Dynamic allocations: %zu\n", count_total_allocations());
     if (count_active_allocations() == 0)
     {
