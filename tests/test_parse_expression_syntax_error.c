@@ -674,54 +674,6 @@ static void test_let(void)
 {
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_space, source_location_create(0, 5))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 7)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a: int = 1"));
-    }
-    {
-        parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_space, source_location_create(0, 7))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 7)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a :int = 1"));
-    }
-    {
-        parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_space, source_location_create(0, 11))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 8)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a : int= 1"));
-    }
-    {
-        parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_space, source_location_create(0, 13))};
-        expression expected = expression_from_declare(declare_create(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)),
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("int"), source_location_create(0, 8)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 13))))));
-        test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let a : int =1"));
-    }
-    {
-        parse_error const expected_errors[] = {
             parse_error_create(parse_error_invalid_token, source_location_create(0, 14)),
             parse_error_create(parse_error_expected_expression, source_location_create(0, 15))};
         test_syntax_error(
@@ -745,7 +697,6 @@ static void test_let(void)
             parse_error_create(parse_error_expected_expression, source_location_create(0, 9)),
             parse_error_create(parse_error_expected_expression, source_location_create(0, 10)),
             parse_error_create(parse_error_expected_expression, source_location_create(0, 11)),
-            parse_error_create(parse_error_expected_space, source_location_create(0, 13)),
             parse_error_create(parse_error_expected_declaration_or_assignment, source_location_create(0, 13))};
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let a : ? = 1"));
