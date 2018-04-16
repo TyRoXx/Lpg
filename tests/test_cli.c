@@ -65,8 +65,10 @@ static void formatting_tool(char const *const source, char const *const expected
 static void test_formatting_tool()
 {
     formatting_tool("", "", false, "");
-    // test_formatting_tool("let i= 0", "let i = 0", false, "");
-    //    test_formatting_tool("let t:int(1,2)=1", "let t : int(1, 2) = 1", false, "");
+    formatting_tool("let a: int = 1", "let a : int = 1", false, "");
+    formatting_tool("let a :int = 1", "let a : int = 1", false, "");
+    formatting_tool("let a : int =1", "let a : int = 1", false, "");
+    formatting_tool("let a : int= 1", "let a : int = 1", false, "");
     formatting_tool("loop\n"
                     "    break\n"
                     "match x\n"
@@ -85,10 +87,6 @@ static void test_formatting_tool()
                     "let s = struct\n"
                     "    i: unit",
                     false, "");
-    formatting_tool("let a: int = 1", "let a : int = 1", false, "");
-    formatting_tool("let a :int = 1", "let a : int = 1", false, "");
-    formatting_tool("let a : int =1", "let a : int = 1", false, "");
-    formatting_tool("let a : int= 1", "let a : int = 1", false, "");
     formatting_tool("match a\n"
                     "    case 1:2\n",
                     "match a\n"
