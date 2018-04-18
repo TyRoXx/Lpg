@@ -307,6 +307,14 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
+static import_result cli_importer(unicode_view name, void *user)
+{
+    (void)name;
+    (void)user;
+    import_result const failure = {optional_value_empty, type_from_unit()};
+    return failure;
+}
+
 bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
 {
     compiler_arguments arguments = parse_compiler_arguments(argc, argv);
@@ -329,13 +337,6 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
     {
         ASSERT(success == stream_writer_write_string(diagnostics, "Source code must in in ASCII (UTF-8 is TODO)\n"));
         return true;
-    }
-
-    value globals_values[standard_library_element_count];
-
-    for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
-    {
-        globals_values[i] = value_from_unit();
     }
 
     optional_sequence const root = parse(unicode_view_from_string(source), diagnostics);
@@ -378,9 +379,15 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
     }
 
     standard_library_description const standard_library = describe_standard_library();
+    value globals_values[standard_library_element_count];
+    for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
+    {
+        globals_values[i] = value_from_unit();
+    }
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
-    checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &context);
+    checked_program checked =
+        check(root.value, standard_library.globals, handle_semantic_error, cli_importer, &context);
     sequence_free(&root.value);
     if (!context.has_error && !arguments.flags.compile_only)
     {

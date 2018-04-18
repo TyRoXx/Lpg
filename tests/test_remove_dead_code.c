@@ -26,11 +26,19 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
+static import_result failing_importer(unicode_view name, void *user)
+{
+    (void)name;
+    (void)user;
+    import_result const failure = {optional_value_empty, type_from_unit()};
+    return failure;
+}
+
 static void check_single_wellformed_function(char const *const source, structure const non_empty_global,
                                              instruction *const expected_body_elements, size_t const expected_body_size)
 {
     sequence root = parse(source);
-    checked_program checked = check(root, non_empty_global, expect_no_errors, NULL);
+    checked_program checked = check(root, non_empty_global, expect_no_errors, failing_importer, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
     remove_dead_code(&checked);

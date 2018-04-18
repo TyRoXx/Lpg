@@ -28,10 +28,18 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
+static import_result failing_importer(unicode_view name, void *user)
+{
+    (void)name;
+    (void)user;
+    import_result const failure = {optional_value_empty, type_from_unit()};
+    return failure;
+}
+
 static void check_generated_c_code(char const *const source, standard_library_description const standard_library)
 {
     sequence root = parse(unicode_view_from_c_str(source));
-    checked_program checked = check(root, standard_library.globals, expect_no_errors, NULL);
+    checked_program checked = check(root, standard_library.globals, expect_no_errors, failing_importer, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
     remove_dead_code(&checked);

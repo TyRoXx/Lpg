@@ -297,6 +297,18 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
     }
 }
 
+static import_result dummy_importer(unicode_view name, void *user)
+{
+    if (unicode_view_equals_c_str(name, "std"))
+    {
+        import_result const success = {optional_value_create(value_from_unit()), type_from_unit()};
+        return success;
+    }
+    (void)user;
+    import_result const failure = {optional_value_empty, type_from_unit()};
+    return failure;
+}
+
 static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
 {
     sequence const root = parse(source);
@@ -310,7 +322,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&buffer);
     }
 
-    checked_program checked = check(root, global_object, expect_no_errors, NULL);
+    checked_program checked = check(root, global_object, expect_no_errors, dummy_importer, NULL);
     sequence_free(&root);
     test_all_backends(test_name, checked, global_object);
     {
