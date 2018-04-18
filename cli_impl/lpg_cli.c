@@ -335,7 +335,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
     unicode_string const source = unicode_string_validate(source_or_error.success);
     if (source.length != source_or_error.success.length)
     {
-        ASSERT(success == stream_writer_write_string(diagnostics, "Source code must in in ASCII (UTF-8 is TODO)\n"));
+        ASSERT(success == stream_writer_write_string(diagnostics, "Source code must be in ASCII (UTF-8 is TODO)\n"));
         return true;
     }
 
