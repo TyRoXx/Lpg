@@ -8,7 +8,7 @@
 #include "lpg_write_file.h"
 #include <string.h>
 #include "duktape.h"
-#include "lpg_javascript_backend.h"
+#include "lpg_ecmascript_backend.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_read_file.h"
@@ -46,7 +46,7 @@ static value assert_impl(function_call_arguments const arguments, struct value c
     return value_from_unit();
 }
 
-static bool from_javascript_bool(double const value)
+static bool from_ecmascript_bool(double const value)
 {
     if (value == 0.0)
     {
@@ -59,9 +59,9 @@ static bool from_javascript_bool(double const value)
     FAIL();
 }
 
-static duk_ret_t javascript_assert(duk_context *const duktape)
+static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
-    REQUIRE(from_javascript_bool(duk_get_number(duktape, 0)));
+    REQUIRE(from_ecmascript_bool(duk_get_number(duktape, 0)));
     return 0;
 }
 
@@ -276,12 +276,12 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_javascript(program, memory_writer_erase(&generated)));
+        REQUIRE(success == generate_ecmascript(program, memory_writer_erase(&generated)));
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
 
-        duk_push_c_function(duktape, javascript_assert, 1);
+        duk_push_c_function(duktape, ecmascript_assert, 1);
         duk_put_global_string(duktape, "assert");
 
         duk_eval_lstring(duktape, generated.data, generated.used);

@@ -48,7 +48,7 @@ file(GLOB_RECURSE formatted
 	cli/**.c cli/**.h
 	cli_impl/**.c cli_impl/**.h
 	generic/**.c generic/**.h
-	javascript_backend/**.c javascript_backend/**.h
+    ecmascript_backend/**.c ecmascript_backend/**.h
 	optimization/**.c optimization/**.h
 	semantics/**.c semantics/**.h
 	syntax/**.c syntax/**.h
@@ -110,6 +110,6 @@ add_subdirectory(semantics)
 add_subdirectory(optimization)
 add_subdirectory(cli_impl)
 add_subdirectory(c_backend)
-add_subdirectory(javascript_backend)
+add_subdirectory(ecmascript_backend)
 add_subdirectory(tests)
 add_subdirectory(cli)
