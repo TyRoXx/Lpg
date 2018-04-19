@@ -1,6 +1,6 @@
 #include "test_path.h"
 #include "test.h"
-#include "path.h"
+#include "lpg_path.h"
 #include "lpg_array_size.h"
 
 void test_path(void)

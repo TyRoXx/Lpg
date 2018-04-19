@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include "lpg_remove_unused_functions.h"
 #include "lpg_remove_dead_code.h"
-#include "path.h"
+#include "find_module_directory.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -31,7 +31,8 @@ static void expect_no_errors(semantic_error const error, void *user)
 static void check_generated_c_code(char const *const source, standard_library_description const standard_library)
 {
     sequence root = parse(unicode_view_from_c_str(source));
-    module_loader loader = module_loader_create();
+    unicode_string const module_directory = find_module_directory();
+    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
     checked_program checked = check(root, standard_library.globals, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
@@ -44,6 +45,7 @@ static void check_generated_c_code(char const *const source, standard_library_de
 
     checked_program_free(&optimized);
     memory_writer_free(&generated);
+    unicode_string_free(&module_directory);
 }
 
 void test_c_backend(void)

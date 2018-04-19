@@ -10,6 +10,7 @@
 #include "lpg_standard_library.h"
 #include <stdio.h>
 #include "print_instruction.h"
+#include "find_module_directory.h"
 
 static sequence parse(char const *input)
 {
@@ -31,7 +32,8 @@ static void check_single_wellformed_function(char const *const source, structure
                                              instruction *const expected_body_elements, size_t const expected_body_size)
 {
     sequence root = parse(source);
-    module_loader loader = module_loader_create();
+    unicode_string const module_directory = find_module_directory();
+    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
     checked_program checked = check(root, non_empty_global, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
@@ -45,6 +47,7 @@ static void check_single_wellformed_function(char const *const source, structure
         FAIL();
     }
     checked_program_free(&checked);
+    unicode_string_free(&module_directory);
     instruction_sequence_free(&expected_body);
 }
 
@@ -70,7 +73,8 @@ static void check_wellformed_program(char const *const source, structure const n
                                      checked_program const expected)
 {
     sequence root = parse(source);
-    module_loader loader = module_loader_create();
+    unicode_string const module_directory = find_module_directory();
+    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
     checked_program checked = check(root, non_empty_global, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == expected.function_count);
@@ -80,6 +84,7 @@ static void check_wellformed_program(char const *const source, structure const n
     }
     checked_program_free(&checked);
     checked_program_free(&expected);
+    unicode_string_free(&module_directory);
 }
 
 static void test_loops(const standard_library_description *std_library);
@@ -127,7 +132,8 @@ void test_semantics(void)
     {
         structure const empty_global = structure_create(NULL, 0);
         sequence root = sequence_create(NULL, 0);
-        module_loader loader = module_loader_create();
+        unicode_string const module_directory = find_module_directory();
+        module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
         checked_program checked = check(root, empty_global, expect_no_errors, &loader, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -139,6 +145,7 @@ void test_semantics(void)
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
+        unicode_string_free(&module_directory);
     }
 
     standard_library_description const std_library = describe_standard_library();

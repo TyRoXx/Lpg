@@ -8,6 +8,7 @@
 #include "lpg_interpret.h"
 #include "lpg_allocate.h"
 #include "lpg_read_file.h"
+#include "lpg_path.h"
 #include "lpg_standard_library.h"
 #include "lpg_save_expression.h"
 #include "lpg_write_file.h"
@@ -307,7 +308,7 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
-bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
+bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, unicode_view const module_directory)
 {
     compiler_arguments arguments = parse_compiler_arguments(argc, argv);
 
@@ -378,7 +379,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics)
     }
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
-    module_loader loader = module_loader_create();
+    module_loader loader = module_loader_create(module_directory);
     checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader, &context);
     sequence_free(&root.value);
     if (!context.has_error && !arguments.flags.compile_only)

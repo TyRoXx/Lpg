@@ -9,6 +9,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_instruction.h"
 #include "lpg_allocate.h"
+#include "find_module_directory.h"
 
 static sequence parse(char const *input)
 {
@@ -30,7 +31,8 @@ static void check_single_wellformed_function(char const *const source, structure
                                              instruction *const expected_body_elements, size_t const expected_body_size)
 {
     sequence root = parse(source);
-    module_loader loader = module_loader_create();
+    unicode_string const module_directory = find_module_directory();
+    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
     checked_program checked = check(root, non_empty_global, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
@@ -45,6 +47,7 @@ static void check_single_wellformed_function(char const *const source, structure
         FAIL();
     }
     checked_program_free(&checked);
+    unicode_string_free(&module_directory);
     instruction_sequence_free(&expected_body);
 }
 

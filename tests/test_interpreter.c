@@ -12,7 +12,6 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_read_file.h"
-#include "path.h"
 #include "lpg_c_backend.h"
 #include "lpg_remove_dead_code.h"
 #include "lpg_remove_unused_functions.h"
@@ -20,6 +19,8 @@
 #include "lpg_thread.h"
 #include "lpg_rename_file.h"
 #include "lpg_load_module.h"
+#include "lpg_path.h"
+#include "find_module_directory.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -311,7 +312,8 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&buffer);
     }
 
-    module_loader loader = module_loader_create();
+    unicode_string const module_directory = find_module_directory();
+    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
     checked_program checked = check(root, global_object, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     test_all_backends(test_name, checked, global_object);
@@ -329,6 +331,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&optimized_test_name);
         checked_program_free(&optimized);
     }
+    unicode_string_free(&module_directory);
     checked_program_free(&checked);
 }
 

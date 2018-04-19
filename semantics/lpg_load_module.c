@@ -1,8 +1,8 @@
 #include "lpg_load_module.h"
 
-module_loader module_loader_create(void)
+module_loader module_loader_create(unicode_view module_directory)
 {
-    module_loader result = {NULL};
+    module_loader result = {module_directory};
     return result;
 }
 

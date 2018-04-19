@@ -4,10 +4,10 @@
 
 typedef struct module_loader
 {
-    void *dummy;
+    unicode_view module_directory;
 } module_loader;
 
-module_loader module_loader_create(void);
+module_loader module_loader_create(unicode_view module_directory);
 
 typedef struct load_module_result
 {

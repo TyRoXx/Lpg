@@ -1,8 +1,8 @@
-#include "print_instruction.h"
-#include "path.h"
+#include "lpg_path.h"
 #include "lpg_allocate.h"
 #include <string.h>
 #include "lpg_win32.h"
+#include "lpg_assert.h"
 #ifdef _WIN32
 #include <Windows.h>
 #else

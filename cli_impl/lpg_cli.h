@@ -15,4 +15,5 @@ typedef struct compiler_arguments
     compiler_flags flags;
 } compiler_arguments;
 
-bool run_cli(int const argc, LPG_NON_NULL(char **const argv), stream_writer const diagnostics);
+bool run_cli(int const argc, LPG_NON_NULL(char **const argv), stream_writer const diagnostics,
+             unicode_view const module_directory);
