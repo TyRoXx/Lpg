@@ -36,18 +36,11 @@ static void test_assert(const standard_library_description *std_library);
 static void test_operators(const standard_library_description *std_library);
 static void test_let_assignments(const standard_library_description *std_library);
 
-static import_result failing_importer(unicode_view name, void *user)
-{
-    (void)name;
-    (void)user;
-    import_result const failure = {optional_value_empty, type_from_unit()};
-    return failure;
-}
-
 static checked_program simple_check(sequence const root, structure const global, check_error_handler *on_error,
                                     void *user)
 {
-    return check(root, global, on_error, failing_importer, user);
+    module_loader loader = module_loader_create();
+    return check(root, global, on_error, &loader, user);
 }
 
 void test_semantic_errors(void)
