@@ -95,3 +95,18 @@ unicode_string unicode_view_zero_terminate(unicode_view original)
     result.data[result.length] = '\0';
     return result;
 }
+
+unicode_string unicode_view_concat(unicode_view first, unicode_view second)
+{
+    size_t const result_size = first.length + second.length;
+    unicode_string const result = {allocate(result_size), result_size};
+    if (first.length)
+    {
+        memcpy(result.data, first.begin, first.length);
+    }
+    if (second.length)
+    {
+        memcpy(result.data + first.length, second.begin, second.length);
+    }
+    return result;
+}

@@ -25,11 +25,16 @@
 
 typedef struct cli_parser_user
 {
-    parser_user base;
-    unicode_view source;
     stream_writer diagnostics;
     bool has_error;
 } cli_parser_user;
+
+typedef struct parse_error_translator
+{
+    cli_parser_user *base;
+    unicode_view file_name;
+    unicode_view source;
+} parse_error_translator;
 
 static unicode_view find_whole_line(unicode_view const source, line_number const found_line)
 {
@@ -137,20 +142,28 @@ static char const *describe_parse_error(parse_error_type const error)
     LPG_UNREACHABLE();
 }
 
-static void handle_parse_error(parse_error const error, callback_user const user)
+static void handle_parse_error(complete_parse_error const error, callback_user const user)
 {
     cli_parser_user *const actual_user = user;
     actual_user->has_error = true;
-    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.type)));
+    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.relative.type)));
     ASSERT(success == stream_writer_write_string(actual_user->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
-        integer_format(integer_create(0, error.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
+        integer_format(integer_create(0, error.relative.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
     ASSERT(success ==
            stream_writer_write_bytes(actual_user->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
     ASSERT(success == stream_writer_write_string(actual_user->diagnostics, ":\n"));
-    print_source_location_hint(actual_user->source, actual_user->diagnostics, error.where);
+    print_source_location_hint(error.source, actual_user->diagnostics, error.relative.where);
+}
+
+static void translate_parse_error(parse_error const error, callback_user const user)
+{
+    parse_error_translator *const actual_user = user;
+    complete_parse_error const complete =
+        complete_parse_error_create(error, actual_user->file_name, actual_user->source);
+    handle_parse_error(complete, actual_user->base);
 }
 
 typedef struct optional_sequence
@@ -167,17 +180,19 @@ static optional_sequence make_optional_sequence(sequence const value)
 
 static optional_sequence const optional_sequence_none = {false, {NULL, 0}};
 
-static optional_sequence parse(unicode_view const input, stream_writer const diagnostics)
+static optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source)
 {
-    cli_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, input, diagnostics, false};
-    expression_parser parser = expression_parser_create(find_next_token, handle_parse_error, &user);
+    parser_user parser_state = {source.begin, source.length, source_location_create(0, 0)};
+    parse_error_translator translator = {&user, file_name, source};
+    expression_parser parser =
+        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const result = parse_program(&parser);
     if (user.has_error)
     {
         sequence_free(&result);
         return optional_sequence_none;
     }
-    ASSUME(user.base.remaining_size == 0);
+    ASSUME(parser_state.remaining_size == 0);
     return make_optional_sequence(result);
 }
 
@@ -251,6 +266,9 @@ static char const *semantic_error_text(semantic_error_type const type)
 
     case semantic_error_expected_compile_time_value:
         return "Expected compile time value";
+
+    case semantic_error_import_failed:
+        return "import failed";
     }
     LPG_UNREACHABLE();
 }
@@ -332,7 +350,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
-    optional_sequence const root = parse(unicode_view_from_string(source), diagnostics);
+    cli_parser_user user = {diagnostics, false};
+    optional_sequence const root =
+        parse(user, unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source));
     if (!root.has_value)
     {
         sequence_free(&root.value);
@@ -379,7 +399,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     }
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
-    module_loader loader = module_loader_create(module_directory);
+    module_loader loader = module_loader_create(module_directory, handle_parse_error, &user);
     checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader, &context);
     sequence_free(&root.value);
     if (!context.has_error && !arguments.flags.compile_only)

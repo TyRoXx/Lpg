@@ -2538,7 +2538,8 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
     load_module_result const imported = load_module(state->root->loader, unicode_view_from_string(element.name.value));
     if (!imported.loaded.is_set)
     {
-        LPG_TO_DO();
+        state->on_error(semantic_error_create(semantic_error_import_failed, element.begin), state->user);
+        return evaluate_expression_result_empty;
     }
     module const loaded = module_create(
         unicode_view_copy(unicode_view_from_string(element.name.value)), imported.loaded.value_, imported.schema);

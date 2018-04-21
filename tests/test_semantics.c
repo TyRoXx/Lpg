@@ -10,12 +10,12 @@
 #include "lpg_standard_library.h"
 #include <stdio.h>
 #include "print_instruction.h"
-#include "find_module_directory.h"
+#include "find_builtin_module_directory.h"
 
 static sequence parse(char const *input)
 {
     test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
@@ -28,12 +28,20 @@ static void expect_no_errors(semantic_error const error, void *user)
     FAIL();
 }
 
+static void expect_no_complete_parse_error(complete_parse_error error, callback_user user)
+{
+    (void)error;
+    (void)user;
+    FAIL();
+}
+
 static void check_single_wellformed_function(char const *const source, structure const non_empty_global,
                                              instruction *const expected_body_elements, size_t const expected_body_size)
 {
     sequence root = parse(source);
-    unicode_string const module_directory = find_module_directory();
-    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
+    unicode_string const module_directory = find_builtin_module_directory();
+    module_loader loader =
+        module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
     checked_program checked = check(root, non_empty_global, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
@@ -73,8 +81,9 @@ static void check_wellformed_program(char const *const source, structure const n
                                      checked_program const expected)
 {
     sequence root = parse(source);
-    unicode_string const module_directory = find_module_directory();
-    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
+    unicode_string const module_directory = find_builtin_module_directory();
+    module_loader loader =
+        module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
     checked_program checked = check(root, non_empty_global, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == expected.function_count);
@@ -132,8 +141,9 @@ void test_semantics(void)
     {
         structure const empty_global = structure_create(NULL, 0);
         sequence root = sequence_create(NULL, 0);
-        unicode_string const module_directory = find_module_directory();
-        module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
+        unicode_string const module_directory = find_builtin_module_directory();
+        module_loader loader =
+            module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
         checked_program checked = check(root, empty_global, expect_no_errors, &loader, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);

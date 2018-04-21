@@ -26,7 +26,7 @@ static void test_new_lines(void);
 static void test_successful_parse_impl(expression const expected, unicode_string const input, bool const is_statement)
 {
     test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
     expression_parser_result result = parse_expression(&parser, 0, is_statement);
     REQUIRE(result.is_success);
     REQUIRE(user.base.remaining_size == 0);
@@ -209,7 +209,7 @@ static void test_new_lines(void)
     {
         unicode_string const input = unicode_string_from_c_str("  ");
         test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+        expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
 
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 0);
@@ -221,7 +221,7 @@ static void test_new_lines(void)
     {
         unicode_string const input = unicode_string_from_c_str("    ");
         test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+        expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
 
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 0);
@@ -245,7 +245,7 @@ static void test_new_lines(void)
 
         unicode_string const input = unicode_string_from_c_str("200 != 2 ");
         test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+        expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
 
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 1);
@@ -266,7 +266,7 @@ static void test_new_lines(void)
         expression loop_expression = expression_from_loop(sequence_create(elements, 1));
 
         test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
-        expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+        expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
 
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 1);

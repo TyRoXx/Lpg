@@ -18,6 +18,7 @@
 #include "test_expression.h"
 #include "test_instruction.h"
 #include "test_semantics.h"
+#include "test_import_errors.h"
 #include "test_interpreter.h"
 #include "test_cli.h"
 #include "test_c_backend.h"
@@ -58,6 +59,7 @@ int main(void)
                                     test_parse_expression_success,
                                     test_parse_expression_syntax_error,
                                     test_semantics,
+                                    test_import_errors,
                                     test_implicitly_convertible,
                                     test_cli,
                                     test_blob,

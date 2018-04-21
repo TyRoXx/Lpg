@@ -26,13 +26,14 @@ bool parse_error_equals(parse_error left, parse_error right)
     return (left.type == right.type) && source_location_equals(left.where, right.where);
 }
 
-expression_parser expression_parser_create(rich_token_producer find_next_token, parse_error_handler on_error,
-                                           callback_user user)
+expression_parser expression_parser_create(rich_token_producer find_next_token, callback_user find_next_token_user,
+                                           parse_error_handler on_error, callback_user on_error_user)
 {
     expression_parser const result = {
         find_next_token,
+        find_next_token_user,
         on_error,
-        user,
+        on_error_user,
         {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
         0};
     return result;
@@ -48,7 +49,7 @@ static rich_token peek_at(expression_parser *parser, size_t const offset)
     ASSUME(offset < LPG_ARRAY_SIZE(parser->cached_tokens));
     while (parser->cached_token_count <= offset)
     {
-        parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->user);
+        parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->find_next_token_user);
         switch (parser->cached_tokens[parser->cached_token_count].status)
         {
         case tokenize_success:
@@ -58,7 +59,7 @@ static rich_token peek_at(expression_parser *parser, size_t const offset)
         case tokenize_invalid:
             parser->on_error(
                 parse_error_create(parse_error_invalid_token, parser->cached_tokens[parser->cached_token_count].where),
-                parser->user);
+                parser->on_error_user);
             break;
         }
     }
@@ -123,7 +124,7 @@ static bool parse_space(expression_parser *const parser)
 
     if (maybe_space.token != token_space || maybe_space.content.length == 0)
     {
-        parser->on_error(parse_error_create(parse_error_expected_space, maybe_space.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_space, maybe_space.where), parser->on_error_user);
         return false;
     }
 
@@ -196,7 +197,7 @@ static expression_parser_result parse_loop(expression_parser *parser, size_t ind
     pop(parser);
     if (maybe_newline.token != token_newline)
     {
-        parser->on_error(parse_error_create(parse_error_expected_newline, maybe_newline.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_newline, maybe_newline.where), parser->on_error_user);
         return expression_parser_result_failure;
     }
     expression_parser_result const result = {1, expression_from_loop(parse_sequence(parser, (indentation + 1)))};
@@ -218,7 +219,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
         rich_token const expected_case = peek(parser);
         if (expected_case.token != token_case)
         {
-            parser->on_error(parse_error_create(parse_error_expected_case, expected_case.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_case, expected_case.where), parser->on_error_user);
             return 0;
         }
         pop(parser);
@@ -236,7 +237,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
             pop(parser);
             if (colon.token != token_colon)
             {
-                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
                 return 0;
             }
         }
@@ -247,7 +248,8 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
             sequence const value = parse_sequence(parser, (indentation + 1));
             if (value.length < 1)
             {
-                parser->on_error(parse_error_create(parse_error_expected_expression, peek(parser).where), parser->user);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_expression, peek(parser).where), parser->on_error_user);
                 return 0;
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
@@ -268,7 +270,8 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
                 pop(parser);
                 if (newline.token != token_newline)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
                     return 0;
                 }
             }
@@ -297,7 +300,7 @@ static expression_parser_result parse_match(expression_parser *parser, size_t co
         pop(parser);
         if (newline.token != token_newline)
         {
-            parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
             expression_free(&input.success);
             return expression_parser_result_failure;
         }
@@ -361,7 +364,7 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
         return result;
     }
     pop(parser);
-    parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->user);
+    parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->on_error_user);
 
     clean_up_parameters(header.parameters, header.parameter_count);
     if (header.return_type != NULL)
@@ -423,7 +426,8 @@ static function_header_parse_result parse_function_header(expression_parser *con
                 }
                 else
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
                     clean_up_parameters(parameters, parameter_count);
                     return function_header_parse_result_failure;
                 }
@@ -431,7 +435,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
             else
             {
                 pop(parser);
-                parser->on_error(parse_error_create(parse_error_expected_comma, head.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_comma, head.where), parser->on_error_user);
                 clean_up_parameters(parameters, parameter_count);
                 return function_header_parse_result_failure;
             }
@@ -441,7 +445,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
         pop(parser);
         if (name.token != token_identifier)
         {
-            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
             clean_up_parameters(parameters, parameter_count);
             return function_header_parse_result_failure;
         }
@@ -451,7 +455,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
             pop(parser);
             if (colon.token != token_colon)
             {
-                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
                 clean_up_parameters(parameters, parameter_count);
                 return function_header_parse_result_failure;
             }
@@ -462,7 +466,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
             pop(parser);
             if (space.token != token_space)
             {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
                 clean_up_parameters(parameters, parameter_count);
                 return function_header_parse_result_failure;
             }
@@ -523,7 +527,7 @@ static expression_parser_result parse_interface(expression_parser *const parser,
         rich_token const name = peek(parser);
         if (name.token != token_identifier)
         {
-            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
             is_success = false;
             break;
         }
@@ -533,8 +537,8 @@ static expression_parser_result parse_interface(expression_parser *const parser,
             rich_token const left_parenthesis = peek(parser);
             if (left_parenthesis.token != token_left_parenthesis)
             {
-                parser->on_error(
-                    parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where),
+                                 parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -589,7 +593,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
         rich_token const name = peek(parser);
         if (name.token != token_identifier)
         {
-            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
             is_success = false;
             break;
         }
@@ -599,7 +603,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
             rich_token const colon = peek(parser);
             if (colon.token != token_colon)
             {
-                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -610,7 +614,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
             rich_token const space = peek(parser);
             if (space.token != token_space)
             {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -711,7 +715,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
         rich_token const name = peek(parser);
         if (name.token != token_identifier)
         {
-            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
             is_success = false;
             break;
         }
@@ -735,7 +739,8 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
             }
             else
             {
-                parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, name.where), parser->user);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_right_parenthesis, name.where), parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -764,8 +769,8 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
         rich_token const left_parenthesis = peek(parser);
         if (left_parenthesis.token != token_left_parenthesis)
         {
-            parser->on_error(
-                parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where),
+                             parser->on_error_user);
             return expression_parser_result_failure;
         }
     }
@@ -779,8 +784,8 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
         rich_token const right_parenthesis = peek(parser);
         if (right_parenthesis.token != token_right_parenthesis)
         {
-            parser->on_error(
-                parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where),
+                             parser->on_error_user);
             expression_free(&target_parsed.success);
             return expression_parser_result_failure;
         }
@@ -796,14 +801,14 @@ static expression_parser_result parse_import(expression_parser *const parser, so
     rich_token const space = peek(parser);
     if ((space.token != token_space) || (space.content.length != 1))
     {
-        parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
         return expression_parser_result_failure;
     }
     pop(parser);
     rich_token const name = peek(parser);
     if (name.token != token_identifier)
     {
-        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
         return expression_parser_result_failure;
     }
     pop(parser);
@@ -821,7 +826,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         if (is_end_of_file(&head))
         {
             pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
             return expression_parser_result_failure;
         }
         switch (head.token)
@@ -881,7 +886,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         case token_greater_than:
         case token_greater_than_or_equals:
             pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
             break;
 
         case token_integer:
@@ -894,7 +899,8 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
                     1, expression_from_integer_literal(integer_literal_expression_create(value, head.where))};
                 return result;
             }
-            parser->on_error(parse_error_create(parse_error_integer_literal_out_of_range, head.where), parser->user);
+            parser->on_error(
+                parse_error_create(parse_error_integer_literal_out_of_range, head.where), parser->on_error_user);
             break;
         }
 
@@ -960,7 +966,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
 
         case token_impl:
             pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
             return expression_parser_result_failure;
 
         case token_type_of:
@@ -1010,7 +1016,7 @@ static expression_parser_result parse_tuple(expression_parser *parser, size_t in
                 {
                     deallocate(tuple_elements);
                 }
-                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->on_error_user);
                 return expression_parser_result_failure;
             }
         }
@@ -1056,7 +1062,8 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
             if (is_end_of_file(&maybe_close))
             {
                 pop(parser);
-                parser->on_error(parse_error_create(parse_error_expected_arguments, maybe_close.where), parser->user);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_arguments, maybe_close.where), parser->on_error_user);
                 if (arguments)
                 {
                     deallocate(arguments);
@@ -1069,7 +1076,7 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                 if (expect_another_argument)
                 {
                     parser->on_error(
-                        parse_error_create(parse_error_expected_expression, maybe_close.where), parser->user);
+                        parse_error_create(parse_error_expected_expression, maybe_close.where), parser->on_error_user);
                 }
                 *result = expression_from_call(call_create(expression_allocate(*result),
                                                            tuple_create(arguments, argument_count, opening_parenthesis),
@@ -1089,7 +1096,8 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
         if (is_end_of_file(&maybe_comma))
         {
             pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_arguments, maybe_comma.where), parser->user);
+            parser->on_error(
+                parse_error_create(parse_error_expected_arguments, maybe_comma.where), parser->on_error_user);
             for (size_t i = 0; i < argument_count; ++i)
             {
                 expression_free(arguments + i);
@@ -1111,7 +1119,8 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
             }
             else
             {
-                parser->on_error(parse_error_create(parse_error_expected_space, expected_space.where), parser->user);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_space, expected_space.where), parser->on_error_user);
             }
         }
         else
@@ -1163,7 +1172,7 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
                 {
                     deallocate(arguments);
                 }
-                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->on_error_user);
                 LPG_TO_DO();
             }
         }
@@ -1203,7 +1212,7 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     rich_token const token = peek(parser);
     if (token.token != token_space)
     {
-        parser->on_error(parse_error_create(parse_error_expected_space, peek(parser).where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_space, peek(parser).where), parser->on_error_user);
     }
     else
     {
@@ -1278,7 +1287,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, not_equals);
@@ -1287,7 +1297,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, greater_than);
@@ -1296,7 +1307,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, greater_than_or_equals);
@@ -1305,7 +1317,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, less_than);
@@ -1314,7 +1327,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, less_than_or_equals);
@@ -1323,7 +1337,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             {
                 if (peeking == 0)
                 {
-                    parser->on_error(parse_error_create(parse_error_expected_space, next_operator.where), parser->user);
+                    parser->on_error(
+                        parse_error_create(parse_error_expected_space, next_operator.where), parser->on_error_user);
                 }
                 pop_n(parser, peeking + 1);
                 return parse_binary_operator(parser, indentation, result.success, equals);
@@ -1342,7 +1357,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
                 result.success = access;
                 continue;
             }
-            parser->on_error(parse_error_create(parse_error_expected_element_name, element_name.where), parser->user);
+            parser->on_error(
+                parse_error_create(parse_error_expected_element_name, element_name.where), parser->on_error_user);
             ASSUME(result.is_success);
             expression_free(&result.success);
             return expression_parser_result_failure;
@@ -1358,7 +1374,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         pop(parser);
         if (space.token != token_space)
         {
-            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
         }
     }
 
@@ -1373,7 +1389,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         pop(parser);
         if (space.token != token_space || space.content.length != 1)
         {
-            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
             return expression_parser_result_failure;
         }
@@ -1384,7 +1400,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         pop(parser);
         if ((for_.token != token_identifier) || !unicode_view_equals_c_str(for_.content, "for"))
         {
-            parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
             return expression_parser_result_failure;
         }
@@ -1395,7 +1411,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         pop(parser);
         if (space.token != token_space)
         {
-            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
             return expression_parser_result_failure;
         }
@@ -1413,7 +1429,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         pop(parser);
         if (newline.token != token_newline)
         {
-            parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
             expression_free(&self.success);
             return expression_parser_result_failure;
@@ -1438,7 +1454,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         rich_token const name = peek(parser);
         if (name.token != token_identifier)
         {
-            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
             is_success = false;
             break;
         }
@@ -1448,8 +1464,8 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
             rich_token const left_parenthesis = peek(parser);
             if (left_parenthesis.token != token_left_parenthesis)
             {
-                parser->on_error(
-                    parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where), parser->user);
+                parser->on_error(parse_error_create(parse_error_expected_parameter_list, left_parenthesis.where),
+                                 parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -1467,7 +1483,8 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
             rich_token const new_line = peek(parser);
             if (new_line.token != token_newline)
             {
-                parser->on_error(parse_error_create(parse_error_expected_newline, new_line.where), parser->user);
+                parser->on_error(
+                    parse_error_create(parse_error_expected_newline, new_line.where), parser->on_error_user);
                 is_success = false;
                 break;
             }
@@ -1502,7 +1519,7 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
     pop(parser);
     if (name.token != token_identifier)
     {
-        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_identifier, name.where), parser->on_error_user);
         return expression_parser_result_failure;
     }
 
@@ -1533,8 +1550,8 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
         {
             expression_free(&declared_variable_type.success);
         }
-        parser->on_error(
-            parse_error_create(parse_error_expected_declaration_or_assignment, colon_or_assign.where), parser->user);
+        parser->on_error(parse_error_create(parse_error_expected_declaration_or_assignment, colon_or_assign.where),
+                         parser->on_error_user);
         return expression_parser_result_failure;
     }
     pop(parser);
@@ -1576,7 +1593,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 }
                 return result;
             }
-            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->user);
+            parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
             return expression_parser_result_failure;
         }
         if (head.token == token_let)

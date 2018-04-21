@@ -64,3 +64,11 @@ blob_or_error read_file(char const *const name)
     fclose(source_file);
     return make_blob_success(source);
 }
+
+blob_or_error read_file_unicode_view_name(unicode_view const name)
+{
+    unicode_string const zero_name = unicode_view_zero_terminate(name);
+    blob_or_error const result = read_file(zero_name.data);
+    unicode_string_free(&zero_name);
+    return result;
+}

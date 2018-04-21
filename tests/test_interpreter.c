@@ -20,12 +20,12 @@
 #include "lpg_rename_file.h"
 #include "lpg_load_module.h"
 #include "lpg_path.h"
-#include "find_module_directory.h"
+#include "find_builtin_module_directory.h"
 
 static sequence parse(unicode_view const input)
 {
     test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
     sequence const result = parse_program(&parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
@@ -299,6 +299,13 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
     }
 }
 
+static void expect_no_complete_parse_error(complete_parse_error error, callback_user user)
+{
+    (void)error;
+    (void)user;
+    FAIL();
+}
+
 static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object)
 {
     sequence const root = parse(source);
@@ -312,8 +319,9 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&buffer);
     }
 
-    unicode_string const module_directory = find_module_directory();
-    module_loader loader = module_loader_create(unicode_view_from_string(module_directory));
+    unicode_string const module_directory = find_builtin_module_directory();
+    module_loader loader =
+        module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
     checked_program checked = check(root, global_object, expect_no_errors, &loader, NULL);
     sequence_free(&root);
     test_all_backends(test_name, checked, global_object);

@@ -5,7 +5,7 @@
 #include "lpg_allocate.h"
 #include "lpg_read_file.h"
 #include "lpg_write_file.h"
-#include "find_module_directory.h"
+#include "find_builtin_module_directory.h"
 #include <stdio.h>
 #include <string.h>
 #ifndef _WIN32
@@ -14,7 +14,7 @@
 
 static void expect_output(int argc, char **argv, bool const expected_exit_code, char const *const expected_diagnostics)
 {
-    unicode_string const module_directory = find_module_directory();
+    unicode_string const module_directory = find_builtin_module_directory();
     memory_writer diagnostics = {NULL, 0, 0};
     bool real_error_code =
         run_cli(argc, argv, memory_writer_erase(&diagnostics), unicode_view_from_string(module_directory));

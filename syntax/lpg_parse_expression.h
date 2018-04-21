@@ -56,14 +56,16 @@ typedef void (*parse_error_handler)(parse_error, callback_user);
 typedef struct expression_parser
 {
     rich_token_producer find_next_token;
+    callback_user find_next_token_user;
     parse_error_handler on_error;
-    callback_user user;
+    callback_user on_error_user;
     rich_token cached_tokens[3];
     size_t cached_token_count;
 } expression_parser;
 
 expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),
-                                           LPG_NON_NULL(parse_error_handler on_error), callback_user user);
+                                           callback_user find_next_token_user,
+                                           LPG_NON_NULL(parse_error_handler on_error), callback_user on_error_user);
 bool expression_parser_has_remaining_non_empty_tokens(LPG_NON_NULL(expression_parser const *const parser));
 
 typedef struct expression_parser_result
