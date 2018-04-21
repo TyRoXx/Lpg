@@ -299,6 +299,13 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
     return run_sequence_result_continue;
 }
 
+optional_value call_checked_function(checked_function const callee, value const *const captures,
+                                     function_call_arguments arguments)
+{
+    return call_interpreted_function(callee, arguments.self, arguments.arguments, arguments.globals, captures,
+                                     arguments.gc, arguments.all_functions, arguments.all_interfaces);
+}
+
 static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
                                                 value *const arguments, value const *globals,
                                                 value const *const captures, garbage_collector *const gc,

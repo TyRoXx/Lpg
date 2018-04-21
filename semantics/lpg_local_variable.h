@@ -1,6 +1,7 @@
 #pragma once
 #include "lpg_register.h"
 #include "lpg_value.h"
+#include "lpg_source_location.h"
 #include "lpg_captures.h"
 
 typedef struct local_variable

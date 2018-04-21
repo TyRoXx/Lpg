@@ -15,6 +15,8 @@ typedef struct program_check
     module *modules;
     size_t module_count;
     module_loader *loader;
+    structure global;
+    value const *const globals;
 } program_check;
 
 void program_check_free(program_check const freed);

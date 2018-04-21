@@ -1,6 +1,6 @@
 #include <lpg_allocate.h>
 #include "lpg_captures.h"
-#include "function_checking_state.h"
+#include "lpg_function_checking_state.h"
 
 capture capture_create(variable_address const from, type const what)
 {

@@ -59,7 +59,7 @@ static void check_single_wellformed_function(char const *const source, structure
     instruction_sequence_free(&expected_body);
 }
 
-static void check_function(checked_function const expected, checked_function const gotten)
+static void test_function(checked_function const expected, checked_function const gotten)
 {
     REQUIRE(expected.number_of_registers == gotten.number_of_registers);
     for (register_id i = 0; i < expected.number_of_registers; ++i)
@@ -89,7 +89,7 @@ static void check_wellformed_program(char const *const source, structure const n
     REQUIRE(checked.function_count == expected.function_count);
     for (size_t i = 0; i < expected.function_count; ++i)
     {
-        check_function(expected.functions[i], checked.functions[i]);
+        test_function(expected.functions[i], checked.functions[i]);
     }
     checked_program_free(&checked);
     checked_program_free(&expected);

@@ -908,10 +908,11 @@ static type find_boolean(void)
     return type_from_enumeration(0);
 }
 
-static success_indicator generate_tuple_initializer(c_backend_state *state,
-                                                    checked_function const *const current_function,
-                                                    size_t const element_count, register_id *const elements,
-                                                    stream_writer const c_output)
+static success_indicator generate_tuple_initializer_from_registers(c_backend_state *state,
+                                                                   checked_function const *const current_function,
+                                                                   size_t const element_count,
+                                                                   register_id *const elements,
+                                                                   stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{"));
     if (element_count > 0)
@@ -934,6 +935,54 @@ static success_indicator generate_tuple_initializer(c_backend_state *state,
     return success;
 }
 
+static success_indicator generate_value(value const generated, type const type_of, c_backend_state *state,
+                                        stream_writer const c_output);
+
+static success_indicator generate_structure_initializer_from_values(c_backend_state *state, size_t const element_count,
+                                                                    value const *const elements,
+                                                                    structure_member const *const members,
+                                                                    stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "{"));
+    if (element_count > 0)
+    {
+        for (size_t i = 0; i < element_count; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", "));
+            }
+            LPG_TRY(generate_value(elements[i], members[i].what, state, c_output));
+        }
+    }
+    else
+    {
+        /*for dummy in struct unit*/
+        LPG_TRY(stream_writer_write_string(c_output, "0"));
+    }
+    LPG_TRY(stream_writer_write_string(c_output, "}"));
+    return success;
+}
+
+static success_indicator generate_structure_variable(c_backend_state *state,
+                                                     checked_function const *const current_function,
+                                                     struct_id const root_id, value const *const elements,
+                                                     register_id const result, size_t const indentation,
+                                                     stream_writer const c_output)
+{
+    set_register_variable(state, result, register_resource_ownership_owns, type_from_struct(root_id));
+    structure const root = state->program->structs[root_id];
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(generate_type(
+        type_from_struct(root_id), &state->standard_library, state->definitions, state->program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const "));
+    LPG_TRY(generate_register_name(result, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " = "));
+    LPG_TRY(generate_structure_initializer_from_values(state, root.count, elements, root.members, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    return success;
+}
+
 static success_indicator generate_tuple_variable(c_backend_state *state, checked_function const *const current_function,
                                                  tuple_type const tuple, register_id *const elements,
                                                  register_id const result, size_t const indentation,
@@ -951,7 +1000,7 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     LPG_TRY(stream_writer_write_string(c_output, " const "));
     LPG_TRY(generate_register_name(result, current_function, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " = "));
-    LPG_TRY(generate_tuple_initializer(state, current_function, tuple.length, elements, c_output));
+    LPG_TRY(generate_tuple_initializer_from_registers(state, current_function, tuple.length, elements, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     return success;
 }
@@ -976,8 +1025,8 @@ static success_indicator generate_instantiate_struct(c_backend_state *state,
     LPG_TRY(stream_writer_write_string(c_output, " const "));
     LPG_TRY(generate_register_name(generated.into, current_function, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " = "));
-    LPG_TRY(
-        generate_tuple_initializer(state, current_function, generated.argument_count, generated.arguments, c_output));
+    LPG_TRY(generate_tuple_initializer_from_registers(
+        state, current_function, generated.argument_count, generated.arguments, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     return success;
 }
@@ -1783,6 +1832,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success;
 
+        case value_kind_flat_object:
+            ASSUME(input.literal.type_of.kind == type_kind_structure);
+            return generate_structure_variable(state, current_function, input.literal.type_of.structure_,
+                                               input.literal.value_.flat_object, input.literal.into, indentation,
+                                               c_output);
+
         case value_kind_type_erased:
         {
             set_register_variable(state, input.literal.into, register_resource_ownership_owns, input.literal.type_of);
@@ -1797,7 +1852,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success;
         }
 
-        case value_kind_flat_object:
         case value_kind_pattern:
             LPG_TO_DO();
 
@@ -1846,6 +1900,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_UNREACHABLE();
 
     case instruction_tuple:
+        ASSUME(input.type == instruction_tuple);
         return generate_tuple_variable(state, current_function, input.tuple_.result_type, input.tuple_.elements,
                                        input.tuple_.result, indentation, c_output);
 
@@ -2006,7 +2061,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " const "));
         LPG_TRY(generate_register_name(input.lambda_with_captures.into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = "));
-        LPG_TRY(generate_tuple_initializer(
+        LPG_TRY(generate_tuple_initializer_from_registers(
             state, current_function, captures.length, input.lambda_with_captures.captures, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
         return success;

@@ -3,7 +3,7 @@
 #include "lpg_allocate.h"
 #include "lpg_for.h"
 #include "lpg_instruction.h"
-#include "function_checking_state.h"
+#include "lpg_function_checking_state.h"
 
 local_variable local_variable_create(unicode_string name, type const type_, optional_value compile_time_value,
                                      register_id where)

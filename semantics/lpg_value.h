@@ -132,6 +132,9 @@ typedef struct function_call_arguments
     value *const arguments;
     value const *globals;
     garbage_collector *const gc;
+
+    /*TODO are all_functions and all_interfaces safe to use? Can't they change whenever a new function or interface is
+     * defined?*/
     checked_function const *const all_functions;
     interface const *all_interfaces;
 } function_call_arguments;

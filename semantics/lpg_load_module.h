@@ -31,4 +31,6 @@ typedef struct load_module_result
     type schema;
 } load_module_result;
 
-load_module_result load_module(LPG_NON_NULL(module_loader *loader), unicode_view name);
+struct function_checking_state;
+
+load_module_result load_module(LPG_NON_NULL(struct function_checking_state *state), unicode_view name);

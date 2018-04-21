@@ -19,10 +19,6 @@ let not = (input: boolean)
         case boolean.true: boolean.false
         case boolean.false: boolean.true
 
-let option = enum[T]
-    none
-    some(T)
-
 let type = type-of(type-of(0))
 let string-ref = type-of("")
 let unit_value = ()
@@ -36,5 +32,4 @@ let export = struct
     boolean: type
     unit: type
     unit_value: unit
-    option: type-of(option)
-export{and, or, type, string-ref, boolean, unit, unit_value, option}
+export{and, or, type, string-ref, boolean, unit, unit_value}

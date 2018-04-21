@@ -374,7 +374,8 @@ void test_interpreter(void)
     standard_library_description const std_library = describe_standard_library();
 
     {
-        static char const *const test_files[] = {"boolean.lpg",
+        static char const *const test_files[] = {"struct-compile-time.lpg",
+                                                 "boolean.lpg",
                                                  "concat.lpg",
                                                  "empty.lpg",
                                                  "enum-generic.lpg",

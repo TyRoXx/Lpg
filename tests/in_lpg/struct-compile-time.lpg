@@ -1,0 +1,13 @@
+let test-type = enum
+    a
+    b
+
+let compile-time-test = struct
+    t: type-of(test-type)
+let instance = compile-time-test{test-type}
+let t = instance.t
+let x : t = t.a
+assert(match x
+    case t.a: boolean.true
+    case t.b: boolean.false
+)

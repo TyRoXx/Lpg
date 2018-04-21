@@ -4,6 +4,8 @@
 #include "lpg_read_file.h"
 #include "lpg_parse_expression.h"
 #include "lpg_find_next_token.h"
+#include "lpg_check.h"
+#include "lpg_interpret.h"
 
 complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source)
 {
@@ -50,9 +52,57 @@ static void translate_parse_error(parse_error const error, void *user)
     translator->on_error(complete_error, translator->on_error_user);
 }
 
-load_module_result load_module(module_loader *loader, unicode_view name)
+typedef struct semantic_error_translator
+{
+    check_error_handler *on_error;
+    void *user;
+    bool has_error;
+} semantic_error_translator;
+
+static void translate_semantic_error(semantic_error const error, void *user)
+{
+    semantic_error_translator *const translator = user;
+    translator->has_error = true;
+    translator->on_error(error, translator->user);
+}
+
+static load_module_result type_check_module(function_checking_state *state, sequence const parsed)
+{
+    semantic_error_translator translator = {state->on_error, state->user, false};
+    check_function_result const checked = check_function(
+        state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
+        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty());
+    if (!checked.success)
+    {
+        load_module_result const failure = {optional_value_empty, type_from_unit()};
+        return failure;
+    }
+    ASSERT(checked.capture_count == 0);
+    if (translator.has_error)
+    {
+        checked_function_free(&checked.function);
+        load_module_result const failure = {optional_value_empty, type_from_unit()};
+        return failure;
+    }
+    optional_value const module_value = call_checked_function(
+        checked.function, NULL,
+        function_call_arguments_create(optional_value_empty, NULL, state->root->globals, &state->program->memory,
+                                       state->program->functions, state->program->interfaces));
+    if (!module_value.is_set)
+    {
+        checked_function_free(&checked.function);
+        load_module_result const failure = {optional_value_empty, type_from_unit()};
+        return failure;
+    }
+    load_module_result const success = {module_value, checked.function.signature->result};
+    checked_function_free(&checked.function);
+    return success;
+}
+
+load_module_result load_module(function_checking_state *state, unicode_view name)
 {
     unicode_string const file_name = unicode_view_concat(name, unicode_view_from_c_str(".lpg"));
+    module_loader *const loader = state->root->loader;
     unicode_view const pieces[] = {loader->module_directory, unicode_view_from_string(file_name)};
     unicode_string const full_module_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     unicode_string_free(&file_name);
@@ -69,14 +119,17 @@ load_module_result load_module(module_loader *loader, unicode_view name)
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const parsed = parse_program(&parser);
-    sequence_free(&parsed);
-    unicode_string_free(&full_module_path);
-    blob_free(&module_source.success);
     if (translator.has_error)
     {
+        sequence_free(&parsed);
+        unicode_string_free(&full_module_path);
+        blob_free(&module_source.success);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const success = {optional_value_create(value_from_unit()), type_from_unit()};
-    return success;
+    load_module_result const result = type_check_module(state, parsed);
+    sequence_free(&parsed);
+    unicode_string_free(&full_module_path);
+    blob_free(&module_source.success);
+    return result;
 }

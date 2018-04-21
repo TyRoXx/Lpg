@@ -1,8 +1,11 @@
 #pragma once
 
-#include "lpg_check.h"
 #include "lpg_local_variable.h"
 #include "lpg_program_check.h"
+#include "lpg_semantic_error.h"
+#include "lpg_checked_program.h"
+
+typedef void check_error_handler(semantic_error, void *);
 
 typedef struct function_checking_state
 {
@@ -23,4 +26,10 @@ typedef struct function_checking_state
     instruction_sequence *body;
     optional_type return_type;
     bool has_declared_return_type;
+    optional_value *register_compile_time_values;
+    register_id register_compile_time_value_count;
 } function_checking_state;
+
+optional_value read_register_compile_time_value(function_checking_state const *state, register_id const which);
+void write_register_compile_time_value(function_checking_state *state, register_id const which,
+                                       value const compile_time_value);

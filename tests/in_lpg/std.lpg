@@ -1,2 +1,7 @@
 let std = import std
 let std-again = import std
+let a = std.boolean.true
+assert(match a
+    case std.boolean.true: boolean.true
+    case std.boolean.false: boolean.false
+)

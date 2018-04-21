@@ -50,10 +50,12 @@ static success_indicator encode_string_literal(unicode_view const content, strea
 
 static success_indicator generate_value(value const generated, type const type_of,
                                         checked_function const *all_functions, function_id const function_count,
-                                        interface const *const all_interfaces, stream_writer const ecmascript_output);
+                                        interface const *const all_interfaces, structure const *const all_structs,
+                                        stream_writer const ecmascript_output);
 
 static success_indicator generate_enum_element(enum_element_value const element, checked_function const *all_functions,
                                                function_id const function_count, interface const *const all_interfaces,
+                                               structure const *const all_structs,
                                                stream_writer const ecmascript_output)
 {
     if (element.state)
@@ -61,8 +63,8 @@ static success_indicator generate_enum_element(enum_element_value const element,
         LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
         LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, element.which)));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
-        LPG_TRY(generate_value(
-            *element.state, element.state_type, all_functions, function_count, all_interfaces, ecmascript_output));
+        LPG_TRY(generate_value(*element.state, element.state_type, all_functions, function_count, all_interfaces,
+                               all_structs, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
         return success;
     }
@@ -147,8 +149,8 @@ generate_lambda_value_from_registers(checked_function const *all_functions, func
 static success_indicator generate_lambda_value_from_values(checked_function const *all_functions,
                                                            function_id const function_count,
                                                            interface const *const all_interfaces,
-                                                           function_id const lambda, value const *const captures,
-                                                           size_t const capture_count,
+                                                           structure const *const all_structs, function_id const lambda,
+                                                           value const *const captures, size_t const capture_count,
                                                            stream_writer const ecmascript_output)
 {
     LPG_TRY(stream_writer_write_string(ecmascript_output, "function ("));
@@ -176,7 +178,7 @@ static success_indicator generate_lambda_value_from_values(checked_function cons
             comma = true;
         }
         LPG_TRY(generate_value(captures[i], function->signature->captures.elements[i], all_functions, function_count,
-                               all_interfaces, ecmascript_output));
+                               all_interfaces, all_structs, ecmascript_output));
     }
     ASSUME(comma);
     for (register_id i = 0; i < function->signature->parameters.length; ++i)
@@ -190,7 +192,8 @@ static success_indicator generate_lambda_value_from_values(checked_function cons
 
 static success_indicator generate_value(value const generated, type const type_of,
                                         checked_function const *all_functions, function_id const function_count,
-                                        interface const *const all_interfaces, stream_writer const ecmascript_output)
+                                        interface const *const all_interfaces, structure const *const all_structs,
+                                        stream_writer const ecmascript_output)
 {
     switch (generated.kind)
     {
@@ -203,7 +206,7 @@ static success_indicator generate_value(value const generated, type const type_o
                                all_interfaces[generated.type_erased.impl.target]
                                    .implementations[generated.type_erased.impl.implementation_index]
                                    .self,
-                               all_functions, function_count, all_interfaces, ecmascript_output));
+                               all_functions, function_count, all_interfaces, all_structs, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")"));
         return success;
 
@@ -222,12 +225,11 @@ static success_indicator generate_value(value const generated, type const type_o
         if (generated.function_pointer.capture_count > 0)
         {
             return generate_lambda_value_from_values(
-                all_functions, function_count, all_interfaces, generated.function_pointer.code,
+                all_functions, function_count, all_interfaces, all_structs, generated.function_pointer.code,
                 generated.function_pointer.captures, generated.function_pointer.capture_count, ecmascript_output);
         }
         return generate_function_name(generated.function_pointer.code, function_count, ecmascript_output);
 
-    case value_kind_flat_object:
     case value_kind_pattern:
         LPG_TO_DO();
 
@@ -239,10 +241,28 @@ static success_indicator generate_value(value const generated, type const type_o
 
     case value_kind_enum_element:
         return generate_enum_element(
-            generated.enum_element, all_functions, function_count, all_interfaces, ecmascript_output);
+            generated.enum_element, all_functions, function_count, all_interfaces, all_structs, ecmascript_output);
 
     case value_kind_unit:
         return stream_writer_write_string(ecmascript_output, "undefined");
+
+    case value_kind_flat_object:
+    {
+        LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
+        ASSUME(type_of.kind == type_kind_structure);
+        structure const object = all_structs[type_of.structure_];
+        for (size_t i = 0; i < object.count; ++i)
+        {
+            if (i > 0)
+            {
+                LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+            }
+            LPG_TRY(generate_value(generated.flat_object[i], object.members[i].what, all_functions, function_count,
+                                   all_interfaces, all_structs, ecmascript_output));
+        }
+        LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
+        return success;
+    }
 
     case value_kind_tuple:
     {
@@ -256,7 +276,7 @@ static success_indicator generate_value(value const generated, type const type_o
                 LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
             }
             LPG_TRY(generate_value(generated.tuple_.elements[i], type_of.tuple_.elements[i], all_functions,
-                                   function_count, all_interfaces, ecmascript_output));
+                                   function_count, all_interfaces, all_structs, ecmascript_output));
         }
         LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
         return success;
@@ -329,11 +349,12 @@ static success_indicator write_register(function_generation *const state, regist
 
 static success_indicator generate_literal(function_generation *const state, literal_instruction const generated,
                                           checked_function const *all_functions, function_id const function_count,
-                                          interface const *const all_interfaces, stream_writer const ecmascript_output)
+                                          interface const *const all_interfaces, structure const *const all_structs,
+                                          stream_writer const ecmascript_output)
 {
     LPG_TRY(write_register(state, generated.into, generated.type_of, ecmascript_output));
-    LPG_TRY(generate_value(
-        generated.value_, generated.type_of, all_functions, function_count, all_interfaces, ecmascript_output));
+    LPG_TRY(generate_value(generated.value_, generated.type_of, all_functions, function_count, all_interfaces,
+                           all_structs, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success;
 }
@@ -484,7 +505,7 @@ static success_indicator generate_loop(function_generation *const state, loop_in
     LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     LPG_TRY(write_register(state, generated.unit_goes_into, type_from_unit(), ecmascript_output));
     LPG_TRY(generate_value(value_from_unit(), type_from_unit(), state->all_functions, state->function_count,
-                           state->all_interfaces, ecmascript_output));
+                           state->all_interfaces, state->all_structs, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success;
 }
@@ -764,7 +785,7 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_literal:
         return generate_literal(state, generated.literal, state->all_functions, state->function_count,
-                                state->all_interfaces, ecmascript_output);
+                                state->all_interfaces, state->all_structs, ecmascript_output);
 
     case instruction_tuple:
         return generate_tuple(state, generated.tuple_, ecmascript_output);
