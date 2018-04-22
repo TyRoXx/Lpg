@@ -28,12 +28,12 @@ create_thread_result create_thread(thread_function body, void *user)
     uintptr_t const rc = _beginthreadex(NULL, 0, win32_thread_function, impl, 0, NULL);
     if (rc == 0)
     {
-        create_thread_result const result = {failure, NULL};
+        create_thread_result const result = {success_no, NULL};
         deallocate(impl);
         return result;
     }
     impl->handle = rc;
-    create_thread_result const result = {success, impl};
+    create_thread_result const result = {success_yes, impl};
     return result;
 }
 
