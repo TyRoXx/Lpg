@@ -100,7 +100,7 @@ if(MSVC)
 	add_definitions(/D_WIN32_WINNT_WIN10_RS3=0)
 	set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS} /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221)
 else()
-    set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS} -std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla -Wshadow)
+    set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS} -std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla -Wshadow -Wpedantic)
 endif()
 
 add_subdirectory(generic)
