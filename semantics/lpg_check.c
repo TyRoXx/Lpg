@@ -2538,17 +2538,6 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                     expression_source_begin(*element.generic));
 }
 
-static evaluate_expression_result return_module(function_checking_state *const state,
-                                                instruction_sequence *const function, module const current_module)
-{
-    register_id const where = allocate_register(&state->used_registers);
-    write_register_compile_time_value(state, where, current_module.content);
-    add_instruction(function, instruction_create_literal(
-                                  literal_instruction_create(where, current_module.content, current_module.schema)));
-    return evaluate_expression_result_create(
-        true, where, current_module.schema, optional_value_create(current_module.content), true, false);
-}
-
 static evaluate_expression_result evaluate_import(function_checking_state *const state,
                                                   instruction_sequence *const function, import_expression const element)
 {
@@ -2558,19 +2547,36 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
         if (unicode_view_equals(
                 unicode_view_from_string(current_module.name), unicode_view_from_string(element.name.value)))
         {
-            return return_module(state, function, current_module);
+            if (!current_module.content.is_set)
+            {
+                state->on_error(semantic_error_create(semantic_error_import_failed, element.begin), state->user);
+                return evaluate_expression_result_empty;
+            }
+            ASSUME(current_module.schema.is_set);
+            register_id const where = allocate_register(&state->used_registers);
+            write_register_compile_time_value(state, where, current_module.content.value_);
+            add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                          where, current_module.content.value_, current_module.schema.value)));
+            return evaluate_expression_result_create(true, where, current_module.schema.value,
+                                                     optional_value_create(current_module.content.value_), true, false);
         }
     }
+    begin_load_module(state->root, unicode_view_copy(unicode_view_from_string(element.name.value)));
     load_module_result const imported = load_module(state, unicode_view_from_string(element.name.value));
     if (!imported.loaded.is_set)
     {
+        fail_load_module(state->root, unicode_view_from_string(element.name.value));
         state->on_error(semantic_error_create(semantic_error_import_failed, element.begin), state->user);
         return evaluate_expression_result_empty;
     }
-    module const loaded = module_create(
-        unicode_view_copy(unicode_view_from_string(element.name.value)), imported.loaded.value_, imported.schema);
-    add_module(state->root, loaded);
-    return return_module(state, function, loaded);
+    succeed_load_module(
+        state->root, unicode_view_from_string(element.name.value), imported.loaded.value_, imported.schema);
+    register_id const where = allocate_register(&state->used_registers);
+    write_register_compile_time_value(state, where, imported.loaded.value_);
+    add_instruction(function, instruction_create_literal(
+                                  literal_instruction_create(where, imported.loaded.value_, imported.schema)));
+    return evaluate_expression_result_create(
+        true, where, imported.schema, optional_value_create(imported.loaded.value_), true, false);
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,

@@ -120,6 +120,21 @@ void test_import_errors(void)
         checked_program_free(&checked);
     }
 
+    {
+        sequence root = parse("import importsitself\n");
+        semantic_error const semantic_errors[] = {
+            semantic_error_create(semantic_error_import_failed, source_location_create(0, 11)),
+            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0))};
+        expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
+        expected_parse_errors const expected_parse_errors_ = {NULL, 0};
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

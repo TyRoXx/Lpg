@@ -20,4 +20,6 @@ typedef struct program_check
 } program_check;
 
 void program_check_free(program_check const freed);
-void add_module(program_check *to, module added);
+void begin_load_module(program_check *to, unicode_string name);
+void fail_load_module(program_check *to, unicode_view const name);
+void succeed_load_module(program_check *to, unicode_view const name, value const content, type const schema);
