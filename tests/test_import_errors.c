@@ -97,10 +97,6 @@ void test_import_errors(void)
             semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8)),
             semantic_error_create(semantic_error_import_failed, source_location_create(0, 0))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
-        unicode_view const expected_file_name_pieces[] = {
-            module_directory_view, unicode_view_from_c_str("semanticerror.lpg")};
-        unicode_string const expected_file_name =
-            path_combine(expected_file_name_pieces, LPG_ARRAY_SIZE(expected_file_name_pieces));
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
         checked_program checked = simple_check(
             root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_);
@@ -108,7 +104,20 @@ void test_import_errors(void)
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
-        unicode_string_free(&expected_file_name);
+    }
+
+    {
+        sequence root = parse("import doesnotexist\n");
+        semantic_error const semantic_errors[] = {
+            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0))};
+        expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
+        expected_parse_errors const expected_parse_errors_ = {NULL, 0};
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_);
+        REQUIRE(expected.count == 0);
+        sequence_free(&root);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
     }
 
     unicode_string_free(&module_directory);

@@ -109,7 +109,9 @@ load_module_result load_module(function_checking_state *state, unicode_view name
     blob_or_error const module_source = read_file_unicode_view_name(unicode_view_from_string(full_module_path));
     if (module_source.error)
     {
-        LPG_TO_DO();
+        unicode_string_free(&full_module_path);
+        load_module_result const failure = {optional_value_empty, type_from_unit()};
+        return failure;
     }
     /*TODO: check whether source is UTF-8*/
     parser_user parser_state = {module_source.success.data, module_source.success.length, source_location_create(0, 0)};
