@@ -30,6 +30,6 @@ typedef struct function_checking_state
     register_id register_compile_time_value_count;
 } function_checking_state;
 
-optional_value read_register_compile_time_value(function_checking_state const *state, register_id const which);
-void write_register_compile_time_value(function_checking_state *state, register_id const which,
+optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which);
+void write_register_compile_time_value(function_checking_state *const state, register_id const which,
                                        value const compile_time_value);

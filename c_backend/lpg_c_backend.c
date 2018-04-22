@@ -362,7 +362,7 @@ static success_indicator generate_interface_vtable_definition(interface_id const
     LPG_TRY(indent(1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "void (*_add_reference)(void *, ptrdiff_t);\n"));
 
-    interface const our_interface = program->interfaces[generated];
+    lpg_interface const our_interface = program->interfaces[generated];
     for (function_id i = 0; i < our_interface.method_count; ++i)
     {
         LPG_TRY(indent(1, c_output));
@@ -2345,7 +2345,7 @@ success_indicator generate_c(checked_program const program, stream_writer const 
 
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
-        interface const interface_ = program.interfaces[i];
+        lpg_interface const interface_ = program.interfaces[i];
         for (size_t k = 0; k < interface_.implementation_count; ++k)
         {
             LPG_TRY_GOTO(generate_interface_impl_definition(implementation_ref_create(i, k), &definitions, &program,

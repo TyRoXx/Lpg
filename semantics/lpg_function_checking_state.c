@@ -1,7 +1,7 @@
 #include "lpg_function_checking_state.h"
 #include "lpg_allocate.h"
 
-optional_value read_register_compile_time_value(function_checking_state const *state, register_id const which)
+optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which)
 {
     if (which >= state->register_compile_time_value_count)
     {

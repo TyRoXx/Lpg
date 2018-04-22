@@ -13,7 +13,7 @@ bool implementation_ref_equals(implementation_ref const left, implementation_ref
     return (left.target == right.target) && (left.implementation_index == right.implementation_index);
 }
 
-implementation *implementation_ref_resolve(interface const *const interfaces, implementation_ref const ref)
+implementation *implementation_ref_resolve(lpg_interface const *const interfaces, implementation_ref const ref)
 {
     return &interfaces[ref.target].implementations[ref.implementation_index].target;
 }
@@ -304,7 +304,7 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
 function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
                                                        value const *globals, garbage_collector *const gc,
                                                        checked_function const *const all_functions,
-                                                       interface const *all_interfaces)
+                                                       lpg_interface const *all_interfaces)
 {
     ASSUME(globals);
     ASSUME(gc);

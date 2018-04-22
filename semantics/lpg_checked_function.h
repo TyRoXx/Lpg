@@ -20,4 +20,4 @@ checked_function checked_function_create(LPG_NON_NULL(function_pointer *signatur
 void checked_function_free(LPG_NON_NULL(checked_function const *function));
 
 type get_return_type(type const callee, checked_function const *const all_functions,
-                     interface const *const all_interfaces);
+                     lpg_interface const *const all_interfaces);

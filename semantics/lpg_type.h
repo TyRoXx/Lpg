@@ -48,17 +48,17 @@ bool tuple_type_equals(tuple_type const left, tuple_type const right);
 typedef struct method_description method_description;
 typedef struct implementation_entry implementation_entry;
 
-typedef struct interface
+typedef struct lpg_interface
 {
     method_description *methods;
     function_id method_count;
     implementation_entry *implementations;
     size_t implementation_count;
-} interface;
+} lpg_interface;
 
-interface interface_create(method_description *methods, function_id method_count, implementation_entry *implementations,
-                           size_t implementation_count);
-void interface_free(interface const value);
+lpg_interface interface_create(method_description *methods, function_id method_count,
+                               implementation_entry *implementations, size_t implementation_count);
+void interface_free(lpg_interface const value);
 
 typedef enum type_kind
 {

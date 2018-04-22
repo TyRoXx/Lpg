@@ -6,10 +6,10 @@
 #include "lpg_structure_member.h"
 
 static void mark_function(bool *const used_functions, checked_function const *const all_functions,
-                          interface const *const all_interfaces, function_id const marked_function);
+                          lpg_interface const *const all_interfaces, function_id const marked_function);
 
 static void mark_implementation(implementation const marked, bool *used_functions,
-                                checked_function const *const all_functions, interface const *const all_interfaces)
+                                checked_function const *const all_functions, lpg_interface const *const all_interfaces)
 {
     for (size_t i = 0; i < marked.method_count; ++i)
     {
@@ -18,7 +18,7 @@ static void mark_implementation(implementation const marked, bool *used_function
 }
 
 static void mark_value(value const root, bool *used_functions, checked_function const *const all_functions,
-                       interface const *const all_interfaces)
+                       lpg_interface const *const all_interfaces)
 {
     switch (root.kind)
     {
@@ -63,7 +63,7 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 
 static void mark_used_functions_in_sequence(instruction_sequence const sequence, bool *used_functions,
                                             checked_function const *const all_functions,
-                                            interface const *const all_interfaces)
+                                            lpg_interface const *const all_interfaces)
 {
     for (size_t j = 0; j < sequence.length; ++j)
     {
@@ -120,10 +120,10 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
 }
 
 static void mark_function_pointer(bool *const used_functions, checked_function const *const all_functions,
-                                  interface const *const all_interfaces, function_pointer const marked_function);
+                                  lpg_interface const *const all_interfaces, function_pointer const marked_function);
 
 static void mark_type(bool *const used_functions, checked_function const *const all_functions,
-                      interface const *const all_interfaces, type const marked)
+                      lpg_interface const *const all_interfaces, type const marked)
 {
     switch (marked.kind)
     {
@@ -159,7 +159,7 @@ static void mark_type(bool *const used_functions, checked_function const *const 
 }
 
 static void mark_function_pointer(bool *const used_functions, checked_function const *const all_functions,
-                                  interface const *const all_interfaces, function_pointer const marked_function)
+                                  lpg_interface const *const all_interfaces, function_pointer const marked_function)
 {
     if (marked_function.self.is_set)
     {
@@ -171,7 +171,7 @@ static void mark_function_pointer(bool *const used_functions, checked_function c
 }
 
 static void mark_function(bool *const used_functions, checked_function const *const all_functions,
-                          interface const *const all_interfaces, function_id const marked_function)
+                          lpg_interface const *const all_interfaces, function_id const marked_function)
 {
     if (used_functions[marked_function])
     {
@@ -479,8 +479,8 @@ static implementation_entry clone_implementation_entry(implementation_entry cons
         type_clone(original.self, gc, new_function_ids), implementation_create(methods, original.target.method_count));
 }
 
-static interface clone_interface(interface const original, garbage_collector *const gc,
-                                 function_id const *const new_function_ids)
+static lpg_interface clone_interface(lpg_interface const original, garbage_collector *const gc,
+                                     function_id const *const new_function_ids)
 {
     method_description *const methods = allocate_array(original.method_count, sizeof(*methods));
     for (interface_id i = 0; i < original.method_count; ++i)
@@ -496,10 +496,10 @@ static interface clone_interface(interface const original, garbage_collector *co
     return interface_create(methods, original.method_count, implementations, original.implementation_count);
 }
 
-static interface *clone_interfaces(interface *const interfaces, const interface_id interface_count,
-                                   garbage_collector *const gc, function_id const *const new_function_ids)
+static lpg_interface *clone_interfaces(lpg_interface *const interfaces, const interface_id interface_count,
+                                       garbage_collector *const gc, function_id const *const new_function_ids)
 {
-    interface *const result = allocate_array(interface_count, sizeof(*result));
+    lpg_interface *const result = allocate_array(interface_count, sizeof(*result));
     for (interface_id i = 0; i < interface_count; ++i)
     {
         result[i] = clone_interface(interfaces[i], gc, new_function_ids);

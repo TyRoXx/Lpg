@@ -202,7 +202,7 @@ read_interface_element(function_checking_state *state, instruction_sequence *fun
                        interface_id const from_type, unicode_view const element_name,
                        source_location const element_source, register_id const result)
 {
-    interface *const from_interface = state->program->interfaces + from_type;
+    lpg_interface *const from_interface = state->program->interfaces + from_type;
     for (function_id i = 0; i < from_interface->method_count; ++i)
     {
         if (unicode_view_equals(unicode_view_from_string(from_interface->methods[i].name), element_name))
@@ -794,7 +794,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         true, destination, result_type, optional_value_create(result), false, false);
 }
 
-static optional_size find_implementation(interface const *const in, type const self)
+static optional_size find_implementation(lpg_interface const *const in, type const self)
 {
     for (size_t i = 0; i < in->implementation_count; ++i)
     {
@@ -1847,7 +1847,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
-static void add_implementation(interface *const to, implementation_entry const added)
+static void add_implementation(lpg_interface *const to, implementation_entry const added)
 {
     size_t const new_impl_count = to->implementation_count + 1;
     to->implementations = reallocate_array(to->implementations, new_impl_count, sizeof(*to->implementations));
@@ -1873,7 +1873,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
             state->user);
         return evaluate_expression_result_empty;
     }
-    interface *const target_interface = state->program->interfaces + interface_evaluated.compile_time_value.interface_;
+    lpg_interface *const target_interface =
+        state->program->interfaces + interface_evaluated.compile_time_value.interface_;
 
     compile_time_type_expression_result const self_evaluated = expect_compile_time_type(state, function, *element.self);
     if (!self_evaluated.has_value)

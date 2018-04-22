@@ -99,6 +99,21 @@ static load_module_result type_check_module(function_checking_state *state, sequ
     return success;
 }
 
+static size_t remove_carriage_returns(char *const from, size_t const length)
+{
+    size_t new_length = 0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        if (from[i] == '\r')
+        {
+            continue;
+        }
+        from[new_length] = from[i];
+        ++new_length;
+    }
+    return new_length;
+}
+
 load_module_result load_module(function_checking_state *state, unicode_view name)
 {
     unicode_string const file_name = unicode_view_concat(name, unicode_view_from_c_str(".lpg"));
@@ -106,13 +121,14 @@ load_module_result load_module(function_checking_state *state, unicode_view name
     unicode_view const pieces[] = {loader->module_directory, unicode_view_from_string(file_name)};
     unicode_string const full_module_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     unicode_string_free(&file_name);
-    blob_or_error const module_source = read_file_unicode_view_name(unicode_view_from_string(full_module_path));
+    blob_or_error module_source = read_file_unicode_view_name(unicode_view_from_string(full_module_path));
     if (module_source.error)
     {
         unicode_string_free(&full_module_path);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
+    module_source.success.length = remove_carriage_returns(module_source.success.data, module_source.success.length);
     /*TODO: check whether source is UTF-8*/
     parser_user parser_state = {module_source.success.data, module_source.success.length, source_location_create(0, 0)};
     parse_error_translator translator = parse_error_translator_create(

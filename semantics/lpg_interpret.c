@@ -9,7 +9,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
                                                 value *const arguments, value const *globals,
                                                 value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
-                                                interface const *const all_interfaces);
+                                                lpg_interface const *const all_interfaces);
 
 typedef enum run_sequence_result
 {
@@ -63,7 +63,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
                                         value const *globals, value *registers, value const *const captures,
                                         garbage_collector *const gc, checked_function const *const all_functions,
-                                        interface const *const all_interfaces)
+                                        lpg_interface const *const all_interfaces)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
@@ -77,7 +77,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_captures));
             pseudo_captures[0] = registers[element.get_method.from];
             pseudo_captures[1] = value_from_integer(integer_create(0, element.get_method.method));
-            interface const *const interface_ = &all_interfaces[element.get_method.interface_];
+            lpg_interface const *const interface_ = &all_interfaces[element.get_method.interface_];
             ASSUME(element.get_method.method < interface_->method_count);
             pseudo_captures[2] =
                 value_from_integer(integer_create(0, interface_->methods[element.get_method.method].parameters.length));
@@ -310,7 +310,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
                                                 value *const arguments, value const *globals,
                                                 value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
-                                                interface const *const all_interfaces)
+                                                lpg_interface const *const all_interfaces)
 {
     /*there has to be at least one register for the return value, even if it is
      * unit*/

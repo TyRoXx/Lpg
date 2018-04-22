@@ -8,7 +8,7 @@
 
 typedef struct checked_program
 {
-    interface *interfaces;
+    lpg_interface *interfaces;
     interface_id interface_count;
     structure *structs;
     struct_id struct_count;

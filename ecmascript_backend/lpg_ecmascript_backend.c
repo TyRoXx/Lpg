@@ -50,11 +50,12 @@ static success_indicator encode_string_literal(unicode_view const content, strea
 
 static success_indicator generate_value(value const generated, type const type_of,
                                         checked_function const *all_functions, function_id const function_count,
-                                        interface const *const all_interfaces, structure const *const all_structs,
+                                        lpg_interface const *const all_interfaces, structure const *const all_structs,
                                         stream_writer const ecmascript_output);
 
 static success_indicator generate_enum_element(enum_element_value const element, checked_function const *all_functions,
-                                               function_id const function_count, interface const *const all_interfaces,
+                                               function_id const function_count,
+                                               lpg_interface const *const all_interfaces,
                                                structure const *const all_structs,
                                                stream_writer const ecmascript_output)
 {
@@ -148,7 +149,7 @@ generate_lambda_value_from_registers(checked_function const *all_functions, func
 
 static success_indicator generate_lambda_value_from_values(checked_function const *all_functions,
                                                            function_id const function_count,
-                                                           interface const *const all_interfaces,
+                                                           lpg_interface const *const all_interfaces,
                                                            structure const *const all_structs, function_id const lambda,
                                                            value const *const captures, size_t const capture_count,
                                                            stream_writer const ecmascript_output)
@@ -192,7 +193,7 @@ static success_indicator generate_lambda_value_from_values(checked_function cons
 
 static success_indicator generate_value(value const generated, type const type_of,
                                         checked_function const *all_functions, function_id const function_count,
-                                        interface const *const all_interfaces, structure const *const all_structs,
+                                        lpg_interface const *const all_interfaces, structure const *const all_structs,
                                         stream_writer const ecmascript_output)
 {
     switch (generated.kind)
@@ -321,15 +322,16 @@ typedef struct function_generation
     register_info *registers;
     checked_function const *all_functions;
     function_id function_count;
-    interface const *all_interfaces;
+    lpg_interface const *all_interfaces;
     enumeration const *all_enums;
     structure const *all_structs;
     checked_function const *current_function;
 } function_generation;
 
 static function_generation function_generation_create(register_info *registers, checked_function const *all_functions,
-                                                      function_id const function_count, interface const *all_interfaces,
-                                                      enumeration const *all_enums, structure const *all_structs,
+                                                      function_id const function_count,
+                                                      lpg_interface const *all_interfaces, enumeration const *all_enums,
+                                                      structure const *all_structs,
                                                       checked_function const *current_function)
 {
     function_generation const result = {
@@ -349,7 +351,7 @@ static success_indicator write_register(function_generation *const state, regist
 
 static success_indicator generate_literal(function_generation *const state, literal_instruction const generated,
                                           checked_function const *all_functions, function_id const function_count,
-                                          interface const *const all_interfaces, structure const *const all_structs,
+                                          lpg_interface const *const all_interfaces, structure const *const all_structs,
                                           stream_writer const ecmascript_output)
 {
     LPG_TRY(write_register(state, generated.into, generated.type_of, ecmascript_output));
@@ -826,9 +828,9 @@ static success_indicator generate_sequence(function_generation *const state, ins
 
 static success_indicator generate_function_body(checked_function const function,
                                                 checked_function const *const all_functions,
-                                                function_id const function_count, interface const *const all_interfaces,
-                                                enumeration const *all_enums, structure const *all_structs,
-                                                stream_writer const ecmascript_output)
+                                                function_id const function_count,
+                                                lpg_interface const *const all_interfaces, enumeration const *all_enums,
+                                                structure const *all_structs, stream_writer const ecmascript_output)
 {
     function_generation state =
         function_generation_create(allocate_array(function.number_of_registers, sizeof(*state.registers)),
@@ -872,7 +874,7 @@ static success_indicator generate_argument_list(size_t const length, stream_writ
 
 static success_indicator define_function(function_id const id, checked_function const function,
                                          checked_function const *const all_functions, function_id const function_count,
-                                         interface const *const all_interfaces, enumeration const *all_enums,
+                                         lpg_interface const *const all_interfaces, enumeration const *all_enums,
                                          structure const *all_structs, stream_writer const ecmascript_output)
 {
     LPG_TRY(generate_function_name(id, function_count, ecmascript_output));
@@ -907,7 +909,7 @@ static success_indicator define_function(function_id const id, checked_function 
     return success_yes;
 }
 
-static success_indicator define_implementation(LPG_NON_NULL(interface const *const implemented_interface),
+static success_indicator define_implementation(LPG_NON_NULL(lpg_interface const *const implemented_interface),
                                                interface_id const implemented_id, size_t const implementation_index,
                                                implementation const defined, function_id const function_count,
                                                stream_writer const ecmascript_output)
@@ -943,7 +945,7 @@ static success_indicator define_implementation(LPG_NON_NULL(interface const *con
     return success_yes;
 }
 
-static success_indicator define_interface(interface_id const id, interface const defined,
+static success_indicator define_interface(interface_id const id, lpg_interface const defined,
                                           function_id const function_count, stream_writer const ecmascript_output)
 {
     for (size_t i = 0; i < defined.implementation_count; ++i)

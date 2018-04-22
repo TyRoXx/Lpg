@@ -14,7 +14,7 @@ typedef struct implementation_ref
 
 implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index);
 bool implementation_ref_equals(implementation_ref const left, implementation_ref const right);
-implementation *implementation_ref_resolve(interface const *const interfaces, implementation_ref const ref);
+implementation *implementation_ref_resolve(lpg_interface const *const interfaces, implementation_ref const ref);
 
 typedef struct enumeration enumeration;
 
@@ -136,12 +136,12 @@ typedef struct function_call_arguments
     /*TODO are all_functions and all_interfaces safe to use? Can't they change whenever a new function or interface is
      * defined?*/
     checked_function const *const all_functions;
-    interface const *all_interfaces;
+    lpg_interface const *all_interfaces;
 } function_call_arguments;
 
 function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
                                                        value const *globals, LPG_NON_NULL(garbage_collector *const gc),
                                                        LPG_NON_NULL(checked_function const *const all_functions),
-                                                       interface const *all_interfaces);
+                                                       lpg_interface const *all_interfaces);
 
 type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments));
