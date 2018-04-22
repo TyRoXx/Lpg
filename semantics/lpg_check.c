@@ -1973,13 +1973,14 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     bool is_pure = true;
     for (register_id i = 0; i < arguments_evaluated.tuple_type_for_result.length; ++i)
     {
-        optional_value const element = read_register_compile_time_value(state, arguments_evaluated.registers[i]);
-        if (!element.is_set)
+        optional_value const current_element =
+            read_register_compile_time_value(state, arguments_evaluated.registers[i]);
+        if (!current_element.is_set)
         {
             is_pure = false;
             break;
         }
-        compile_time_values[i] = element.value_;
+        compile_time_values[i] = current_element.value_;
     }
     register_id const into = allocate_register(&state->used_registers);
     if (is_pure)
