@@ -2735,15 +2735,16 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
             return evaluate_expression_result_empty;
         }
 
+        register_id final_where = initializer.where;
         if (initializer.compile_time_value.is_set)
         {
-            restore_instructions(before_initialization);
-            add_instruction(
-                function, instruction_create_literal(literal_instruction_create(
-                              initializer.where, initializer.compile_time_value.value_, initializer.type_)));
+            restore(before_initialization);
+            final_where = allocate_register(&state->used_registers);
+            write_register_compile_time_value(state, final_where, initializer.compile_time_value.value_);
+            add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                          final_where, initializer.compile_time_value.value_, initializer.type_)));
         }
 
-        register_id final_where = initializer.where;
         type final_type = initializer.type_;
         optional_value final_compile_time_value = initializer.compile_time_value;
 
@@ -2764,7 +2765,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
                 else
                 {
                     conversion_result const converted =
-                        convert(state, function, initializer.where, initializer.type_, initializer.compile_time_value,
+                        convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
                                 expression_source_begin(*element.declare.initializer),
                                 declared_type.compile_time_value.value_.type_, false);
                     if (converted.ok == failure)

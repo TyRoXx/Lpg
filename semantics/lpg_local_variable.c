@@ -94,6 +94,7 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
         register_id const where = allocate_register(&state->used_registers);
         add_instruction(sequence, instruction_create_literal(literal_instruction_create(
                                       where, outer_variable.compile_time_value.value_, outer_variable.what)));
+        write_register_compile_time_value(state, where, outer_variable.compile_time_value.value_);
         return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
                                                  outer_variable.compile_time_value, outer_variable.is_pure);
     }

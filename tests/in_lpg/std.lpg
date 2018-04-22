@@ -1,7 +1,12 @@
 let std = import std
 let std-again = import std
-let a = std.boolean.true
-assert(match a
-    case std.boolean.true: boolean.true
-    case std.boolean.false: boolean.false
-)
+let e = std.boolean.true
+let imports-are-equivalent : std-again.boolean = e
+
+let to-builtin-boolean = (a: std.boolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to-builtin-boolean(e))
+assert(to-builtin-boolean(std.and(std.boolean.true, std.boolean.true)))
