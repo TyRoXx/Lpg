@@ -48,13 +48,13 @@ static value assert_impl(function_call_arguments const arguments, struct value c
     return value_from_unit();
 }
 
-static bool from_ecmascript_bool(double const value)
+static bool from_ecmascript_bool(double const input)
 {
-    if (value == 0.0)
+    if (input == 0.0)
     {
         return false;
     }
-    if (value == 1.0)
+    if (input == 1.0)
     {
         return true;
     }
@@ -111,7 +111,7 @@ static void write_file_if_necessary(unicode_view const path, unicode_view const 
     if ((existing.error != NULL) ||
         !unicode_view_equals(unicode_view_create(existing.success.data, existing.success.length), content))
     {
-        REQUIRE(success == write_file(path, content));
+        REQUIRE(success_yes == write_file(path, content));
     }
     blob_free(&existing.success);
     unicode_string_free(&source_file_zero_terminated);
@@ -128,7 +128,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
 #endif
     unicode_view const c_test_dir_pieces[] = {tests_dir, unicode_view_from_c_str("in_lpg"), test_name};
     unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
-    REQUIRE(success == create_directory(unicode_view_from_string(c_test_dir)));
+    REQUIRE(success_yes == create_directory(unicode_view_from_string(c_test_dir)));
     unicode_view const last_success_pieces[] = {
         unicode_view_from_string(c_test_dir), unicode_view_from_c_str("last_success.c")};
     unicode_string const last_success = path_combine(last_success_pieces, LPG_ARRAY_SIZE(last_success_pieces));
@@ -157,23 +157,23 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_string const cmakelists = path_combine(cmakelists_pieces, LPG_ARRAY_SIZE(cmakelists_pieces));
         memory_writer cmakelists_content = {NULL, 0, 0};
         stream_writer writer = memory_writer_erase(&cmakelists_content);
-        REQUIRE(success == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
-                                                              "project(generated_test_solution)\n"
-                                                              "if(MSVC)\n"
-                                                              "    add_definitions(/WX)\n"
-                                                              "    add_definitions(/wd4101)\n"
-                                                              "endif()\n"));
-        REQUIRE(success == stream_writer_write_string(writer, "include_directories(\""));
+        REQUIRE(success_yes == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
+                                                                  "project(generated_test_solution)\n"
+                                                                  "if(MSVC)\n"
+                                                                  "    add_definitions(/WX)\n"
+                                                                  "    add_definitions(/wd4101)\n"
+                                                                  "endif()\n"));
+        REQUIRE(success_yes == stream_writer_write_string(writer, "include_directories(\""));
         {
             unicode_view const pieces[] = {path_remove_leaf(path_remove_leaf(unicode_view_from_c_str(__FILE__))),
                                            unicode_view_from_c_str("c_backend"),
                                            unicode_view_from_c_str("environment")};
             unicode_string const include_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
-            REQUIRE(success == stream_writer_write_unicode_view(writer, unicode_view_from_string(include_path)));
+            REQUIRE(success_yes == stream_writer_write_unicode_view(writer, unicode_view_from_string(include_path)));
             unicode_string_free(&include_path);
         }
-        REQUIRE(success == stream_writer_write_string(writer, "\")\n"));
-        REQUIRE(success == stream_writer_write_string(writer, "add_executable(generated_test generated_test.c)\n"));
+        REQUIRE(success_yes == stream_writer_write_string(writer, "\")\n"));
+        REQUIRE(success_yes == stream_writer_write_string(writer, "add_executable(generated_test generated_test.c)\n"));
         write_file_if_necessary(unicode_view_from_string(cmakelists),
                                 unicode_view_create(cmakelists_content.data, cmakelists_content.used));
         memory_writer_free(&cmakelists_content);
@@ -192,7 +192,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
                 create_process(unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments,
                                LPG_ARRAY_SIZE(cmake_arguments), unicode_view_from_string(c_test_dir),
                                get_standard_input(), get_standard_output(), get_standard_error());
-            REQUIRE(cmake_process.success == success);
+            REQUIRE(cmake_process.success == success_yes);
             REQUIRE(0 == wait_for_process_exit(cmake_process.created));
         }
         unicode_string_free(&cmakecache);
@@ -203,7 +203,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         create_process_result const cmake_process = create_process(
             unicode_view_from_c_str(LPG_CMAKE_EXECUTABLE), cmake_arguments, LPG_ARRAY_SIZE(cmake_arguments),
             unicode_view_from_string(c_test_dir), get_standard_input(), get_standard_output(), get_standard_error());
-        REQUIRE(cmake_process.success == success);
+        REQUIRE(cmake_process.success == success_yes);
         REQUIRE(0 == wait_for_process_exit(cmake_process.created));
     }
     {
@@ -230,7 +230,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
                            get_standard_input(), get_standard_output(), get_standard_error());
 #endif
         unicode_string_free(&test_executable);
-        REQUIRE(process.success == success);
+        REQUIRE(process.success == success_yes);
         REQUIRE(0 == wait_for_process_exit(process.created));
         REQUIRE(rename_file(unicode_view_from_string(source_file), unicode_view_from_string(last_success)));
     }
@@ -278,7 +278,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_ecmascript(program, memory_writer_erase(&generated)));
+        REQUIRE(success_yes == generate_ecmascript(program, memory_writer_erase(&generated)));
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
@@ -293,7 +293,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success == generate_c(program, memory_writer_erase(&generated)));
+        REQUIRE(success_yes == generate_c(program, memory_writer_erase(&generated)));
         run_c_test(test_name, unicode_view_create(generated.data, generated.used));
         memory_writer_free(&generated);
     }
@@ -313,7 +313,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     {
         memory_writer buffer = {NULL, 0, 0};
         whitespace_state const whitespace = {0, false};
-        REQUIRE(success == save_sequence(memory_writer_erase(&buffer), root, whitespace));
+        REQUIRE(success_yes == save_sequence(memory_writer_erase(&buffer), root, whitespace));
         sequence const reparsed = parse(unicode_view_create(buffer.data, buffer.used));
         sequence_free(&reparsed);
         memory_writer_free(&buffer);
@@ -331,8 +331,8 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer optimized_test_name = {NULL, 0, 0};
         {
             stream_writer const writer = memory_writer_erase(&optimized_test_name);
-            REQUIRE(success == stream_writer_write_unicode_view(writer, test_name));
-            REQUIRE(success == stream_writer_write_string(writer, "+optimized"));
+            REQUIRE(success_yes == stream_writer_write_unicode_view(writer, test_name));
+            REQUIRE(success_yes == stream_writer_write_string(writer, "+optimized"));
         }
         test_all_backends(
             unicode_view_create(optimized_test_name.data, optimized_test_name.used), optimized, global_object);
@@ -411,7 +411,7 @@ void test_interpreter(void)
             state->file = test_files[i];
             state->globals = std_library.globals;
             create_thread_result const created = create_thread(run_file_in_thread, state);
-            REQUIRE(created.is_success == success);
+            REQUIRE(created.is_success == success_yes);
             state->thread = created.success;
             size_t const max_concurrency = 6;
             if (i >= max_concurrency)

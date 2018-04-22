@@ -69,11 +69,11 @@ create_thread_result create_thread(thread_function body, void *user)
     int const rc = pthread_create(&impl->handle, NULL, posix_thread_function, impl);
     if (rc != 0)
     {
-        create_thread_result const result = {failure, NULL};
+        create_thread_result const result = {success_no, NULL};
         deallocate(impl);
         return result;
     }
-    create_thread_result const result = {success, impl};
+    create_thread_result const result = {success_yes, impl};
     return result;
 }
 

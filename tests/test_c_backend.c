@@ -49,7 +49,7 @@ static void check_generated_c_code(char const *const source, standard_library_de
     checked_program_free(&checked);
 
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success == generate_c(optimized, memory_writer_erase(&generated)));
+    REQUIRE(success_yes == generate_c(optimized, memory_writer_erase(&generated)));
 
     checked_program_free(&optimized);
     memory_writer_free(&generated);

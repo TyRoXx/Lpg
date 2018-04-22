@@ -3,9 +3,9 @@
 
 void handle_error(parse_error const error, callback_user user)
 {
-    test_parser_user *const parser_user = user;
-    REQUIRE(parser_user->expected_count >= 1);
-    REQUIRE(parse_error_equals(parser_user->expected_errors[0], error));
-    --parser_user->expected_count;
-    ++parser_user->expected_errors;
+    test_parser_user *const actual_user = user;
+    REQUIRE(actual_user->expected_count >= 1);
+    REQUIRE(parse_error_equals(actual_user->expected_errors[0], error));
+    --actual_user->expected_count;
+    ++actual_user->expected_errors;
 }

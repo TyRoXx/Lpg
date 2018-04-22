@@ -2,24 +2,24 @@
 
 typedef enum success_indicator
 {
-    success,
-    failure
+    success_yes,
+    success_no
 } success_indicator;
 
 #define LPG_TRY(expression)                                                                                            \
     switch (expression)                                                                                                \
     {                                                                                                                  \
-    case failure:                                                                                                      \
-        return failure;                                                                                                \
-    case success:                                                                                                      \
+    case success_no:                                                                                                   \
+        return success_no;                                                                                             \
+    case success_yes:                                                                                                  \
         break;                                                                                                         \
     }
 
 #define LPG_TRY_GOTO(expression, on_failure)                                                                           \
     switch (expression)                                                                                                \
     {                                                                                                                  \
-    case failure:                                                                                                      \
+    case success_no:                                                                                                   \
         goto on_failure;                                                                                               \
-    case success:                                                                                                      \
+    case success_yes:                                                                                                  \
         break;                                                                                                         \
     }

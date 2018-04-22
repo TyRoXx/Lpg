@@ -8,7 +8,7 @@ static success_indicator indent(const stream_writer to, whitespace_state const w
     {
         LPG_TRY(stream_writer_write_string(to, "    "));
     }
-    return success;
+    return success_yes;
 }
 
 static whitespace_state go_deeper(whitespace_state const whitespace, size_t additional_indentation)
@@ -30,7 +30,7 @@ static success_indicator space_here(stream_writer const to, whitespace_state *wh
         whitespace->pending_space = 0;
         return stream_writer_write_string(to, " ");
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator save_tuple_elements(stream_writer const to, tuple const value, whitespace_state whitespace)
@@ -43,7 +43,7 @@ static success_indicator save_tuple_elements(stream_writer const to, tuple const
         }
         LPG_TRY(save_expression(to, value.elements + i, whitespace));
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator save_function_header(stream_writer const to, function_header_tree const header,
@@ -67,7 +67,7 @@ static success_indicator save_function_header(stream_writer const to, function_h
         LPG_TRY(stream_writer_write_string(to, ": "));
         LPG_TRY(save_expression(to, header.return_type, whitespace));
     }
-    return success;
+    return success_yes;
 }
 
 success_indicator save_sequence(stream_writer const to, sequence const value, whitespace_state whitespace)
@@ -86,7 +86,7 @@ success_indicator save_sequence(stream_writer const to, sequence const value, wh
         LPG_TRY(indent(to, whitespace));
         LPG_TRY(save_expression(to, value.elements + i, whitespace));
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator save_tuple_expression(stream_writer const to, tuple const value, whitespace_state whitespace)
@@ -109,7 +109,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(save_function_header(to, value->lambda.header, whitespace));
         LPG_TRY(save_expression(to, value->lambda.result, add_space_or_newline(whitespace)));
-        return success;
+        return success_yes;
 
     case expression_type_call:
     {
@@ -152,7 +152,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(save_expression(to, value->match.cases[i].action, add_space_or_newline(go_deeper(whitespace, 1))));
             LPG_TRY(stream_writer_write_string(to, "\n"));
         }
-        return success;
+        return success_yes;
 
     case expression_type_string:
         LPG_TRY(space_here(to, &whitespace));
@@ -213,7 +213,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         }
         LPG_TRY(stream_writer_write_string(to, " = "));
         LPG_TRY(save_expression(to, value->declare.initializer, whitespace));
-        return success;
+        return success_yes;
 
     case expression_type_tuple:
         return save_tuple_expression(to, value->tuple, whitespace);
@@ -289,7 +289,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
                 LPG_TRY(save_expression(to, &body, in_impl));
             }
         }
-        return success;
+        return success_yes;
     }
 
     case expression_type_struct:
@@ -305,7 +305,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, &value->struct_.elements[i].type, whitespace));
         }
-        return success;
+        return success_yes;
     }
 
     case expression_type_enum:
@@ -324,7 +324,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
                 LPG_TRY(stream_writer_write_string(to, ")"));
             }
         }
-        return success;
+        return success_yes;
     }
 
     case expression_type_interface:
@@ -339,7 +339,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
                 stream_writer_write_unicode_view(to, unicode_view_from_string(value->interface.methods[i].name.value)));
             LPG_TRY(save_function_header(to, value->interface.methods[i].header, whitespace));
         }
-        return success;
+        return success_yes;
     }
 
     case expression_type_instantiate_struct:
@@ -364,13 +364,13 @@ success_indicator save_expression(stream_writer const to, expression const *valu
             LPG_TRY(save_expression(to, &value->generic_instantiation.arguments[i], whitespace));
         }
         LPG_TRY(stream_writer_write_string(to, "]"));
-        return success;
+        return success_yes;
 
     case expression_type_type_of:
         LPG_TRY(stream_writer_write_string(to, "type-of("));
         LPG_TRY(save_expression(to, value->type_of.target, whitespace));
         LPG_TRY(stream_writer_write_string(to, ")"));
-        return success;
+        return success_yes;
     }
     LPG_UNREACHABLE();
 }

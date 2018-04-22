@@ -11,15 +11,15 @@ structure structure_create(structure_member *members, struct_member_id count)
     return result;
 }
 
-void structure_free(structure const *value)
+void structure_free(structure const *freed)
 {
-    LPG_FOR(struct_member_id, i, value->count)
+    LPG_FOR(struct_member_id, i, freed->count)
     {
-        struct_member_free(value->members + i);
+        struct_member_free(freed->members + i);
     }
-    if (value->members)
+    if (freed->members)
     {
-        deallocate(value->members);
+        deallocate(freed->members);
     }
 }
 
@@ -29,15 +29,15 @@ enumeration enumeration_create(enumeration_element *elements, enum_element_id si
     return result;
 }
 
-void enumeration_free(enumeration const *value)
+void enumeration_free(enumeration const *freed)
 {
-    LPG_FOR(size_t, i, value->size)
+    LPG_FOR(size_t, i, freed->size)
     {
-        enumeration_element_free(value->elements + i);
+        enumeration_element_free(freed->elements + i);
     }
-    if (value->elements)
+    if (freed->elements)
     {
-        deallocate(value->elements);
+        deallocate(freed->elements);
     }
 }
 
@@ -82,29 +82,29 @@ interface interface_create(method_description *methods, function_id method_count
     return result;
 }
 
-void interface_free(interface const value)
+void interface_free(interface const freed)
 {
-    for (function_id i = 0; i < value.method_count; ++i)
+    for (function_id i = 0; i < freed.method_count; ++i)
     {
-        method_description_free(value.methods[i]);
+        method_description_free(freed.methods[i]);
     }
-    if (value.methods)
+    if (freed.methods)
     {
-        deallocate(value.methods);
+        deallocate(freed.methods);
     }
-    for (size_t i = 0; i < value.implementation_count; ++i)
+    for (size_t i = 0; i < freed.implementation_count; ++i)
     {
-        implementation_entry_free(value.implementations[i]);
+        implementation_entry_free(freed.implementations[i]);
     }
-    if (value.implementations)
+    if (freed.implementations)
     {
-        deallocate(value.implementations);
+        deallocate(freed.implementations);
     }
 }
 
-lambda_type lambda_type_create(function_id const lambda)
+lambda_type lambda_type_create(function_id const function)
 {
-    lambda_type const result = {lambda};
+    lambda_type const result = {function};
     return result;
 }
 
@@ -119,9 +119,9 @@ bool method_pointer_type_equals(method_pointer_type const left, method_pointer_t
     return (left.interface_ == right.interface_) && (left.method_index == right.method_index);
 }
 
-optional_type optional_type_create_set(type const value)
+optional_type optional_type_create_set(type const content)
 {
-    optional_type const result = {true, value};
+    optional_type const result = {true, content};
     return result;
 }
 
@@ -146,18 +146,18 @@ method_description method_description_create(unicode_string name, tuple_type par
     return returning;
 }
 
-void method_description_free(method_description const value)
+void method_description_free(method_description const freed)
 {
-    unicode_string_free(&value.name);
-    if (value.parameters.elements)
+    unicode_string_free(&freed.name);
+    if (freed.parameters.elements)
     {
-        deallocate(value.parameters.elements);
+        deallocate(freed.parameters.elements);
     }
 }
 
-enum_constructor_type enum_constructor_type_create(enum_id enumeration, enum_element_id which)
+enum_constructor_type enum_constructor_type_create(enum_id constructed, enum_element_id which)
 {
-    enum_constructor_type const result = {enumeration, which};
+    enum_constructor_type const result = {constructed, which};
     return result;
 }
 
@@ -172,11 +172,11 @@ implementation implementation_create(struct function_pointer_value *methods, siz
     return result;
 }
 
-void implementation_free(implementation const value)
+void implementation_free(implementation const freed)
 {
-    if (value.methods)
+    if (freed.methods)
     {
-        deallocate(value.methods);
+        deallocate(freed.methods);
     }
 }
 
@@ -186,9 +186,9 @@ implementation_entry implementation_entry_create(type self, implementation targe
     return result;
 }
 
-void implementation_entry_free(implementation_entry const value)
+void implementation_entry_free(implementation_entry const freed)
 {
-    implementation_free(value.target);
+    implementation_free(freed.target);
 }
 
 enumeration_element enumeration_element_create(unicode_string name, type state)
@@ -197,9 +197,9 @@ enumeration_element enumeration_element_create(unicode_string name, type state)
     return result;
 }
 
-void enumeration_element_free(enumeration_element const *value)
+void enumeration_element_free(enumeration_element const *freed)
 {
-    unicode_string_free(&value->name);
+    unicode_string_free(&freed->name);
 }
 
 function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures, optional_type self)
@@ -218,11 +218,11 @@ bool function_pointer_equals(function_pointer const left, function_pointer const
            optional_type_equals(left.self, right.self);
 }
 
-type type_from_function_pointer(function_pointer const *value)
+type type_from_function_pointer(function_pointer const *pointer)
 {
     type result;
     result.kind = type_kind_function_pointer;
-    result.function_pointer_ = value;
+    result.function_pointer_ = pointer;
     return result;
 }
 
@@ -240,19 +240,19 @@ type type_from_string_ref(void)
     return result;
 }
 
-type type_from_enumeration(enum_id const value)
+type type_from_enumeration(enum_id const content)
 {
     type result;
     result.kind = type_kind_enumeration;
-    result.enum_ = value;
+    result.enum_ = content;
     return result;
 }
 
-type type_from_tuple_type(tuple_type const value)
+type type_from_tuple_type(tuple_type const content)
 {
     type result;
     result.kind = type_kind_tuple;
-    result.tuple_ = value;
+    result.tuple_ = content;
     return result;
 }
 
@@ -263,11 +263,11 @@ type type_from_type(void)
     return result;
 }
 
-type type_from_integer_range(integer_range value)
+type type_from_integer_range(integer_range content)
 {
     type result;
     result.kind = type_kind_integer_range;
-    result.integer_range_ = value;
+    result.integer_range_ = content;
     return result;
 }
 
@@ -279,35 +279,35 @@ type type_from_enum_constructor(LPG_NON_NULL(enum_constructor_type *enum_constru
     return result;
 }
 
-type type_from_lambda(lambda_type const lambda)
+type type_from_lambda(lambda_type const content)
 {
     type result;
     result.kind = type_kind_lambda;
-    result.lambda = lambda;
+    result.lambda = content;
     return result;
 }
 
-type type_from_interface(interface_id const value)
+type type_from_interface(interface_id const content)
 {
     type result;
     result.kind = type_kind_interface;
-    result.interface_ = value;
+    result.interface_ = content;
     return result;
 }
 
-type type_from_method_pointer(method_pointer_type const value)
+type type_from_method_pointer(method_pointer_type const content)
 {
     type result;
     result.kind = type_kind_method_pointer;
-    result.method_pointer = value;
+    result.method_pointer = content;
     return result;
 }
 
-type type_from_struct(struct_id const value)
+type type_from_struct(struct_id const content)
 {
     type result;
     result.kind = type_kind_structure;
-    result.structure_ = value;
+    result.structure_ = content;
     return result;
 }
 
@@ -318,10 +318,10 @@ type type_from_generic_enum()
     return result;
 }
 
-type *type_allocate(type const value)
+type *type_allocate(type const content)
 {
     type *const result = allocate(sizeof(*result));
-    *result = value;
+    *result = content;
     return result;
 }
 
@@ -443,15 +443,15 @@ optional_type optional_type_clone(optional_type const original, garbage_collecto
     return optional_type_create_set(type_clone(original.value, clone_gc, new_function_ids));
 }
 
-void function_pointer_free(function_pointer const *value)
+void function_pointer_free(function_pointer const *freed)
 {
-    if (value->parameters.elements)
+    if (freed->parameters.elements)
     {
-        deallocate(value->parameters.elements);
+        deallocate(freed->parameters.elements);
     }
-    if (value->captures.elements)
+    if (freed->captures.elements)
     {
-        deallocate(value->captures.elements);
+        deallocate(freed->captures.elements);
     }
 }
 

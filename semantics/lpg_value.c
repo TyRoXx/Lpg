@@ -84,11 +84,11 @@ value value_from_flat_object(value const *flat_object)
     return result;
 }
 
-value value_from_function_pointer(function_pointer_value function_pointer)
+value value_from_function_pointer(function_pointer_value pointer)
 {
     value result;
     result.kind = value_kind_function_pointer;
-    result.function_pointer = function_pointer;
+    result.function_pointer = pointer;
     return result;
 }
 

@@ -793,11 +793,11 @@ void match_free(match const *this)
     }
 }
 
-expression expression_from_lambda(lambda lambda)
+expression expression_from_lambda(lambda content)
 {
     expression result;
     result.type = expression_type_lambda;
-    result.lambda = lambda;
+    result.lambda = content;
     return result;
 }
 

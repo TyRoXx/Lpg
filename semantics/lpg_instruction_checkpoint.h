@@ -12,7 +12,7 @@ typedef struct instruction_checkpoint
     register_id originally_used_registers;
 } instruction_checkpoint;
 
-instruction_checkpoint make_checkpoint(function_checking_state *const state, instruction_sequence *sequence);
+instruction_checkpoint make_checkpoint(function_checking_state *const state, instruction_sequence *body);
 
 void restore_instructions(instruction_checkpoint const previous_code);
 

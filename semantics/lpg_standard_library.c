@@ -293,9 +293,9 @@ standard_library_description describe_standard_library(void)
     return result;
 }
 
-void standard_library_description_free(standard_library_description const *value)
+void standard_library_description_free(standard_library_description const *freed)
 {
-    structure_free(&value->globals);
-    standard_library_stable_free(value->stable);
-    deallocate(value->stable);
+    structure_free(&freed->globals);
+    standard_library_stable_free(freed->stable);
+    deallocate(freed->stable);
 }

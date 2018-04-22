@@ -51,7 +51,7 @@ success_indicator memory_writer_write(void *user, char const *data, size_t lengt
         memmove(writer->data + writer->used, data, length);
     }
     writer->used = new_used;
-    return success;
+    return success_yes;
 }
 
 bool memory_writer_equals(memory_writer const writer, char const *c_str)

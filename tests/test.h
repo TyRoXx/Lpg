@@ -19,7 +19,7 @@
     } while ((void)0, 0)
 #endif
 
-int lpg_check(int success);
+int lpg_check(bool success);
 int lpg_print_test_summary(void);
 
 #ifdef NDEBUG

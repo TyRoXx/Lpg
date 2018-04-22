@@ -86,9 +86,9 @@ file_handle get_standard_error()
 #endif
 }
 
-create_process_result create_process_result_create(success_indicator success, child_process created)
+create_process_result create_process_result_create(success_indicator is_success, child_process created)
 {
-    create_process_result const result = {success, created};
+    create_process_result const result = {is_success, created};
     return result;
 }
 
@@ -118,10 +118,10 @@ create_process_result create_process(unicode_view const executable, unicode_view
     {
         CloseHandle(process.hThread);
         child_process const created = {process.hProcess};
-        return create_process_result_create(success, created);
+        return create_process_result_create(success_yes, created);
     }
     child_process const created = {INVALID_HANDLE_VALUE};
-    return create_process_result_create(failure, created);
+    return create_process_result_create(success_no, created);
 #else
     unicode_string const current_path_zero_terminated = unicode_view_zero_terminate(current_path);
     char **const exec_arguments = allocate_array(argument_count + 2, sizeof(*exec_arguments));
@@ -181,12 +181,12 @@ create_process_result create_process(unicode_view const executable, unicode_view
     if (forked < 0)
     {
         child_process const created = {-1};
-        return create_process_result_create(failure, created);
+        return create_process_result_create(success_no, created);
     }
     else
     {
         child_process const created = {forked};
-        return create_process_result_create(success, created);
+        return create_process_result_create(success_yes, created);
     }
 #endif
 }

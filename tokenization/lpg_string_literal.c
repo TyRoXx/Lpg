@@ -17,10 +17,10 @@ decode_string_literal_result decode_string_literal(unicode_view source, stream_w
             {
                 switch (stream_writer_write_bytes(decoded, &c, 1))
                 {
-                case failure:
+                case success_no:
                     return decode_string_literal_result_create(false, i);
 
-                case success:
+                case success_yes:
                     break;
                 }
             }
@@ -28,10 +28,10 @@ decode_string_literal_result decode_string_literal(unicode_view source, stream_w
             {
                 switch (stream_writer_write_string(decoded, "\n"))
                 {
-                case failure:
+                case success_no:
                     return decode_string_literal_result_create(false, i);
 
-                case success:
+                case success_yes:
                     break;
                 }
             }
@@ -39,10 +39,10 @@ decode_string_literal_result decode_string_literal(unicode_view source, stream_w
             {
                 switch (stream_writer_write_string(decoded, "\t"))
                 {
-                case failure:
+                case success_no:
                     return decode_string_literal_result_create(false, i);
 
-                case success:
+                case success_yes:
                     break;
                 }
             }
@@ -64,10 +64,10 @@ decode_string_literal_result decode_string_literal(unicode_view source, stream_w
         {
             switch (stream_writer_write_bytes(decoded, &c, 1))
             {
-            case failure:
+            case success_no:
                 return decode_string_literal_result_create(false, i);
 
-            case success:
+            case success_yes:
                 break;
             }
         }

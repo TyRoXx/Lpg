@@ -48,7 +48,7 @@ typedef struct call_instruction
 
 call_instruction call_instruction_create(register_id callee, register_id *arguments, size_t argument_count,
                                          register_id result);
-void call_instruction_free(LPG_NON_NULL(call_instruction const *value));
+void call_instruction_free(LPG_NON_NULL(call_instruction const *freed));
 bool call_instruction_equals(call_instruction const left, call_instruction const right);
 
 typedef struct return_instruction
@@ -220,9 +220,9 @@ struct match_instruction_case
 };
 
 match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
-                                                           register_id value);
+                                                           register_id returned);
 match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
-                                                                   instruction_sequence action, register_id value);
+                                                                   instruction_sequence action, register_id returned);
 void match_instruction_case_free(match_instruction_case freed);
 bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right);
 
@@ -232,7 +232,7 @@ instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(loop_instruction loop);
 instruction instruction_create_break(register_id const into);
-instruction instruction_create_literal(literal_instruction const value);
+instruction instruction_create_literal(literal_instruction const content);
 instruction instruction_create_tuple(tuple_instruction argument);
 instruction instruction_create_enum_construct(enum_construct_instruction argument);
 instruction instruction_create_match(match_instruction argument);
@@ -242,6 +242,6 @@ instruction instruction_create_get_method(get_method_instruction const argument)
 instruction instruction_create_erase_type(erase_type_instruction const argument);
 instruction instruction_create_instantiate_struct(instantiate_struct_instruction const argument);
 
-void instruction_free(LPG_NON_NULL(instruction const *value));
+void instruction_free(LPG_NON_NULL(instruction const *freed));
 bool instruction_equals(instruction const left, instruction const right);
 void add_instruction(instruction_sequence *to, instruction const added);

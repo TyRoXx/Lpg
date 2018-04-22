@@ -20,15 +20,15 @@ success_indicator write_file(unicode_view const path, unicode_view const content
     unicode_string_free(&path_zero_terminated);
     if (!file)
     {
-        return failure;
+        return success_no;
     }
     if (fwrite(content.begin, 1, content.length, file) != content.length)
     {
         fclose(file);
-        return failure;
+        return success_no;
     }
     fclose(file);
-    return success;
+    return success_yes;
 }
 
 unicode_string write_temporary_file(char const *const content)

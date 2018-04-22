@@ -1,10 +1,10 @@
 #include "lpg_instruction_checkpoint.h"
 #include "lpg_instruction.h"
 
-instruction_checkpoint make_checkpoint(function_checking_state *const state, instruction_sequence *sequence)
+instruction_checkpoint make_checkpoint(function_checking_state *const state, instruction_sequence *body)
 {
-    instruction_checkpoint const result = {&state->used_registers, &state->register_compile_time_value_count, sequence,
-                                           sequence->length, state->used_registers};
+    instruction_checkpoint const result = {
+        &state->used_registers, &state->register_compile_time_value_count, body, body->length, state->used_registers};
     return result;
 }
 

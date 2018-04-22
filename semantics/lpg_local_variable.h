@@ -15,7 +15,7 @@ typedef struct local_variable
 local_variable local_variable_create(unicode_string name, type const type_, optional_value compile_time_value,
                                      register_id where);
 
-void local_variable_free(local_variable const *const value);
+void local_variable_free(local_variable const *const freed);
 
 typedef struct local_variable_container
 {

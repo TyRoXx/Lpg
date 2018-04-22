@@ -194,15 +194,15 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case instruction_tuple:
         {
-            value value_tuple;
-            value_tuple.kind = value_kind_tuple;
+            value new_tuple;
+            new_tuple.kind = value_kind_tuple;
             value *values = garbage_collector_allocate_array(gc, element.tuple_.element_count, sizeof(*values));
             for (size_t j = 0; j < element.tuple_.element_count; ++j)
             {
                 values[j] = registers[*(element.tuple_.elements + j)];
             }
-            value_tuple.tuple_ = value_tuple_create(values, element.tuple_.element_count);
-            registers[element.tuple_.result] = value_tuple;
+            new_tuple.tuple_ = value_tuple_create(values, element.tuple_.element_count);
+            registers[element.tuple_.result] = new_tuple;
             break;
         }
 

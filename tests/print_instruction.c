@@ -1,11 +1,11 @@
 #include "print_instruction.h"
 #include "lpg_instruction.h"
 
-static void print_integer(integer const value)
+static void print_integer(integer const printed)
 {
     char buffer[64];
     buffer[sizeof(buffer) - 1] = '\0';
-    char *const formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
+    char *const formatted = integer_format(printed, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
     printf("%s", formatted);
 }
 

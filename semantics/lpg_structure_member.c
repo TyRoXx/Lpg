@@ -6,7 +6,7 @@ structure_member structure_member_create(type what, unicode_string name, optiona
     return result;
 }
 
-void struct_member_free(structure_member const *value)
+void struct_member_free(structure_member const *freed)
 {
-    unicode_string_free(&value->name);
+    unicode_string_free(&freed->name);
 }

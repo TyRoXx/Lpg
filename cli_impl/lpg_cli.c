@@ -85,13 +85,13 @@ static void print_source_location_hint(unicode_view const source, stream_writer 
                                        source_location const where)
 {
     unicode_view const affected_line = find_whole_line(source, where.line);
-    ASSERT(success == stream_writer_write_bytes(diagnostics, affected_line.begin, affected_line.length));
-    ASSERT(success == stream_writer_write_string(diagnostics, "\n"));
+    ASSERT(success_yes == stream_writer_write_bytes(diagnostics, affected_line.begin, affected_line.length));
+    ASSERT(success_yes == stream_writer_write_string(diagnostics, "\n"));
     for (column_number i = 0; i < where.approximate_column; ++i)
     {
-        ASSERT(success == stream_writer_write_string(diagnostics, " "));
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, " "));
     }
-    ASSERT(success == stream_writer_write_string(diagnostics, "^\n"));
+    ASSERT(success_yes == stream_writer_write_string(diagnostics, "^\n"));
 }
 
 static char const *describe_parse_error(parse_error_type const error)
@@ -146,15 +146,16 @@ static void handle_parse_error(complete_parse_error const error, callback_user c
 {
     cli_parser_user *const actual_user = user;
     actual_user->has_error = true;
-    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.relative.type)));
-    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, " in line "));
+    ASSERT(success_yes ==
+           stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.relative.type)));
+    ASSERT(success_yes == stream_writer_write_string(actual_user->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
         integer_format(integer_create(0, error.relative.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
-    ASSERT(success ==
+    ASSERT(success_yes ==
            stream_writer_write_bytes(actual_user->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
-    ASSERT(success == stream_writer_write_string(actual_user->diagnostics, ":\n"));
+    ASSERT(success_yes == stream_writer_write_string(actual_user->diagnostics, ":\n"));
     print_source_location_hint(error.source, actual_user->diagnostics, error.relative.where);
 }
 
@@ -172,9 +173,9 @@ typedef struct optional_sequence
     sequence value;
 } optional_sequence;
 
-static optional_sequence make_optional_sequence(sequence const value)
+static optional_sequence make_optional_sequence(sequence const content)
 {
-    optional_sequence const result = {true, value};
+    optional_sequence const result = {true, content};
     return result;
 }
 
@@ -203,9 +204,9 @@ typedef struct semantic_error_context
     bool has_error;
 } semantic_error_context;
 
-static char const *semantic_error_text(semantic_error_type const type)
+static char const *semantic_error_text(semantic_error_type const error)
 {
-    switch (type)
+    switch (error)
     {
     case semantic_error_unknown_element:
         return "Unknown structure element or global identifier";
@@ -277,14 +278,15 @@ static void handle_semantic_error(semantic_error const error, void *user)
 {
     semantic_error_context *const context = user;
     context->has_error = true;
-    ASSERT(success == stream_writer_write_string(context->diagnostics, semantic_error_text(error.type)));
-    ASSERT(success == stream_writer_write_string(context->diagnostics, " in line "));
+    ASSERT(success_yes == stream_writer_write_string(context->diagnostics, semantic_error_text(error.type)));
+    ASSERT(success_yes == stream_writer_write_string(context->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
         integer_format(integer_create(0, error.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
-    ASSERT(success == stream_writer_write_bytes(context->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
-    ASSERT(success == stream_writer_write_string(context->diagnostics, ":\n"));
+    ASSERT(success_yes ==
+           stream_writer_write_bytes(context->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(success_yes == stream_writer_write_string(context->diagnostics, ":\n"));
     print_source_location_hint(context->source, context->diagnostics, error.where);
 }
 
@@ -332,21 +334,22 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     if (!arguments.valid)
     {
-        ASSERT(success == stream_writer_write_string(diagnostics, "Arguments: filename\n"));
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, "Arguments: filename\n"));
         return true;
     }
 
     blob_or_error const source_or_error = read_file(arguments.file_name);
     if (source_or_error.error)
     {
-        ASSERT(success == stream_writer_write_string(diagnostics, source_or_error.error));
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, source_or_error.error));
         return true;
     }
 
     unicode_string const source = unicode_string_validate(source_or_error.success);
     if (source.length != source_or_error.success.length)
     {
-        ASSERT(success == stream_writer_write_string(diagnostics, "Source code must be in ASCII (UTF-8 is TODO)\n"));
+        ASSERT(success_yes ==
+               stream_writer_write_string(diagnostics, "Source code must be in ASCII (UTF-8 is TODO)\n"));
         return true;
     }
 
@@ -364,8 +367,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     {
         memory_writer format_buffer = {NULL, 0, 0};
         whitespace_state const whitespace = {0, false};
-        if ((save_sequence(memory_writer_erase(&format_buffer), root.value, whitespace) != success) ||
-            (stream_writer_write_bytes(memory_writer_erase(&format_buffer), "", 1) != success))
+        if ((save_sequence(memory_writer_erase(&format_buffer), root.value, whitespace) != success_yes) ||
+            (stream_writer_write_bytes(memory_writer_erase(&format_buffer), "", 1) != success_yes))
         {
             memory_writer_free(&format_buffer);
             sequence_free(&root.value);
@@ -378,7 +381,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         unicode_string temporary = write_temporary_file(format_buffer.data);
         if (!rename_file(unicode_view_from_string(temporary), unicode_view_from_c_str(arguments.file_name)))
         {
-            ASSERT(success == stream_writer_write_string(diagnostics, "Could not write formatted file\n"));
+            ASSERT(success_yes == stream_writer_write_string(diagnostics, "Could not write formatted file\n"));
             memory_writer_free(&format_buffer);
             unicode_string_free(&temporary);
             unicode_string_free(&source);

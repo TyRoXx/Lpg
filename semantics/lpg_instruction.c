@@ -17,11 +17,11 @@ call_instruction call_instruction_create(register_id callee, register_id *argume
     return created;
 }
 
-void call_instruction_free(call_instruction const *value)
+void call_instruction_free(call_instruction const *freed)
 {
-    if (value->arguments)
+    if (freed->arguments)
     {
-        deallocate(value->arguments);
+        deallocate(freed->arguments);
     }
 }
 
@@ -279,24 +279,24 @@ match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create
 }
 
 match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
-                                                           register_id value)
+                                                           register_id returned)
 {
     match_instruction_case result;
     result.kind = match_instruction_case_kind_value;
     result.key_value = key_value;
     result.action = action;
-    result.value = value;
+    result.value = returned;
     return result;
 }
 
 match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
-                                                                   instruction_sequence action, register_id value)
+                                                                   instruction_sequence action, register_id returned)
 {
     match_instruction_case result;
     result.kind = match_instruction_case_kind_stateful_enum;
     result.stateful_enum = stateful_enum;
     result.action = action;
-    result.value = value;
+    result.value = returned;
     return result;
 }
 
@@ -382,24 +382,24 @@ instruction instruction_create_break(register_id const into)
     return result;
 }
 
-instruction instruction_create_literal(literal_instruction const value)
+instruction instruction_create_literal(literal_instruction const content)
 {
     instruction result;
     result.type = instruction_literal;
-    result.literal = value;
+    result.literal = content;
     return result;
 }
 
-void instruction_free(instruction const *value)
+void instruction_free(instruction const *freed)
 {
-    switch (value->type)
+    switch (freed->type)
     {
     case instruction_call:
-        call_instruction_free(&value->call);
+        call_instruction_free(&freed->call);
         break;
 
     case instruction_loop:
-        loop_instruction_free(value->loop);
+        loop_instruction_free(freed->loop);
         break;
 
     case instruction_get_method:
@@ -414,27 +414,27 @@ void instruction_free(instruction const *value)
         break;
 
     case instruction_tuple:
-        deallocate(value->tuple_.elements);
-        deallocate(value->tuple_.result_type.elements);
+        deallocate(freed->tuple_.elements);
+        deallocate(freed->tuple_.result_type.elements);
         break;
 
     case instruction_instantiate_struct:
-        deallocate(value->instantiate_struct.arguments);
+        deallocate(freed->instantiate_struct.arguments);
         break;
 
     case instruction_match:
-        for (size_t i = 0; i < value->match.count; ++i)
+        for (size_t i = 0; i < freed->match.count; ++i)
         {
-            match_instruction_case_free(value->match.cases[i]);
+            match_instruction_case_free(freed->match.cases[i]);
         }
-        if (value->match.cases)
+        if (freed->match.cases)
         {
-            deallocate(value->match.cases);
+            deallocate(freed->match.cases);
         }
         break;
 
     case instruction_lambda_with_captures:
-        lambda_with_captures_instruction_free(value->lambda_with_captures);
+        lambda_with_captures_instruction_free(freed->lambda_with_captures);
         break;
     }
 }

@@ -9,15 +9,15 @@ instruction_sequence instruction_sequence_create(instruction *elements, size_t l
     return result;
 }
 
-void instruction_sequence_free(instruction_sequence const *value)
+void instruction_sequence_free(instruction_sequence const *freed)
 {
-    LPG_FOR(size_t, i, value->length)
+    LPG_FOR(size_t, i, freed->length)
     {
-        instruction_free(value->elements + i);
+        instruction_free(freed->elements + i);
     }
-    if (value->elements)
+    if (freed->elements)
     {
-        deallocate(value->elements);
+        deallocate(freed->elements);
     }
 }
 

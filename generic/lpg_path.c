@@ -162,7 +162,7 @@ success_indicator create_directory(unicode_view const path)
 {
     if (directory_exists(path))
     {
-        return success;
+        return success_yes;
     }
     {
         unicode_view const parent = path_remove_leaf(path);
@@ -170,10 +170,10 @@ success_indicator create_directory(unicode_view const path)
         {
             switch (create_directory(parent))
             {
-            case failure:
-                return failure;
+            case success_no:
+                return success_no;
 
-            case success:
+            case success_yes:
                 break;
             }
         }
@@ -184,17 +184,17 @@ success_indicator create_directory(unicode_view const path)
     win32_string_free(path_argument);
     if (result)
     {
-        return success;
+        return success_yes;
     }
-    return failure;
+    return success_no;
 #else
     unicode_string const zero_terminated_path = unicode_view_zero_terminate(path);
     if (mkdir(zero_terminated_path.data, 0744) < 0)
     {
         unicode_string_free(&zero_terminated_path);
-        return failure;
+        return success_no;
     }
     unicode_string_free(&zero_terminated_path);
-    return success;
+    return success_yes;
 #endif
 }

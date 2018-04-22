@@ -12,9 +12,9 @@ local_variable local_variable_create(unicode_string name, type const type_, opti
     return result;
 }
 
-void local_variable_free(local_variable const *const value)
+void local_variable_free(local_variable const *const freed)
 {
-    unicode_string_free(&value->name);
+    unicode_string_free(&freed->name);
 }
 
 void local_variable_container_free(local_variable_container const freed)
@@ -62,7 +62,7 @@ variable_address variable_address_from_local(register_id const local)
 }
 
 read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                               instruction_sequence *const sequence, unicode_view const name,
+                                               instruction_sequence *const body, unicode_view const name,
                                                source_location const original_reference_location)
 {
     LPG_FOR(size_t, i, state->local_variables.count)
@@ -89,11 +89,11 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
     case read_local_variable_status_ok:
         break;
     }
-    if (outer_variable.compile_time_value.is_set && sequence)
+    if (outer_variable.compile_time_value.is_set && body)
     {
         register_id const where = allocate_register(&state->used_registers);
-        add_instruction(sequence, instruction_create_literal(literal_instruction_create(
-                                      where, outer_variable.compile_time_value.value_, outer_variable.what)));
+        add_instruction(body, instruction_create_literal(literal_instruction_create(
+                                  where, outer_variable.compile_time_value.value_, outer_variable.what)));
         write_register_compile_time_value(state, where, outer_variable.compile_time_value.value_);
         return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
                                                  outer_variable.compile_time_value, outer_variable.is_pure);

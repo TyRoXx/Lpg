@@ -8,9 +8,9 @@ static success_indicator write_file(void *const user, char const *const data, si
 {
     if (fwrite(data, 1, length, user) == length)
     {
-        return success;
+        return success_yes;
     }
-    return failure;
+    return success_no;
 }
 
 static stream_writer make_file_writer(LPG_NON_NULL(FILE *const file))

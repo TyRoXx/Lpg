@@ -40,7 +40,7 @@ static void test_save_expression_roundtrip(expression const tree, bool const is_
 {
     memory_writer buffer = {NULL, 0, 0};
     whitespace_state const whitespace = {0, false};
-    REQUIRE(success == save_expression(memory_writer_erase(&buffer), &tree, whitespace));
+    REQUIRE(success_yes == save_expression(memory_writer_erase(&buffer), &tree, whitespace));
     test_successful_parse_impl(tree, unicode_string_from_range(buffer.data, buffer.used), is_statement);
     memory_writer_free(&buffer);
 }
@@ -515,13 +515,13 @@ static void test_match_cases(void)
 
     {
         match_case *const cases = allocate_array(2, sizeof(*cases));
-        expression *sequence = allocate_array(1, sizeof(*sequence));
-        sequence[0] = expression_from_integer_literal(
+        expression *case_0 = allocate_array(1, sizeof(*case_0));
+        case_0[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 2), source_location_create(2, 8)));
         cases[0] =
             match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 1), source_location_create(1, 9)))),
-                              expression_allocate(expression_from_sequence(sequence_create(sequence, 1))));
+                              expression_allocate(expression_from_sequence(sequence_create(case_0, 1))));
         cases[1] =
             match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 3), source_location_create(3, 9)))),

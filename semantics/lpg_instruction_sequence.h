@@ -12,6 +12,6 @@ typedef struct instruction_sequence
 } instruction_sequence;
 
 instruction_sequence instruction_sequence_create(instruction *elements, size_t length);
-void instruction_sequence_free(LPG_NON_NULL(instruction_sequence const *value));
+void instruction_sequence_free(LPG_NON_NULL(instruction_sequence const *freed));
 bool instruction_sequence_equals(LPG_NON_NULL(instruction_sequence const *left),
                                  LPG_NON_NULL(instruction_sequence const *right));

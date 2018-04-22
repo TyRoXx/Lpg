@@ -99,7 +99,7 @@ typedef struct value
 } value;
 
 value value_from_flat_object(LPG_NON_NULL(value const *flat_object));
-value value_from_function_pointer(function_pointer_value function_pointer);
+value value_from_function_pointer(function_pointer_value pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
 value value_from_type(type const type_);

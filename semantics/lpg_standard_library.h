@@ -52,4 +52,4 @@ typedef struct standard_library_description
 } standard_library_description;
 
 standard_library_description describe_standard_library(void);
-void standard_library_description_free(LPG_NON_NULL(standard_library_description const *value));
+void standard_library_description_free(LPG_NON_NULL(standard_library_description const *freed));

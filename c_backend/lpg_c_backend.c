@@ -201,15 +201,15 @@ static success_indicator encode_string_literal(unicode_view const content, strea
         }
     }
     LPG_TRY(stream_writer_write_string(c_output, "\""));
-    return success;
+    return success_yes;
 }
 
-static success_indicator generate_integer(integer const value, stream_writer const c_output)
+static success_indicator generate_integer(integer const generated, stream_writer const c_output)
 {
     char buffer[64];
-    char const *const formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer));
+    char const *const formatted = integer_format(generated, lower_case_digits, 10, buffer, sizeof(buffer));
     LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-    return success;
+    return success_yes;
 }
 
 static success_indicator escape_identifier(unicode_view const original, stream_writer const c_output)
@@ -225,7 +225,7 @@ static success_indicator escape_identifier(unicode_view const original, stream_w
             LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(original.begin + i, 1)));
         }
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_register_name(register_id const id, checked_function const *const current_function,
@@ -256,7 +256,7 @@ static success_indicator generate_function_name(function_id const id, stream_wri
     char buffer[64];
     char const *const formatted = integer_format(integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
     LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-    return success;
+    return success_yes;
 }
 
 static unicode_string const *find_type_definition(type_definitions const definitions, type const needle)
@@ -290,7 +290,7 @@ static success_indicator indent(size_t const indentation, stream_writer const c_
     {
         LPG_TRY(stream_writer_write_string(c_output, "    "));
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
@@ -385,7 +385,7 @@ static success_indicator generate_interface_vtable_definition(interface_id const
 
     LPG_TRY(generate_interface_vtable_name(generated, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_interface_reference_name(interface_id const generated, stream_writer const c_output)
@@ -420,7 +420,7 @@ static success_indicator generate_interface_reference_definition(interface_id co
 
     LPG_TRY(generate_interface_reference_name(generated, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_interface_impl_name(implementation_ref const generated, stream_writer const c_output)
@@ -429,7 +429,7 @@ static success_indicator generate_interface_impl_name(implementation_ref const g
     LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.implementation_index)));
     LPG_TRY(stream_writer_write_string(c_output, "_for_"));
     LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.target)));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_interface_impl_add_reference(implementation_ref const generated,
@@ -439,7 +439,7 @@ static success_indicator generate_interface_impl_add_reference(implementation_re
     LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.implementation_index)));
     LPG_TRY(stream_writer_write_string(c_output, "_for_"));
     LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.target)));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
@@ -498,7 +498,7 @@ static success_indicator generate_interface_impl_definition(implementation_ref c
         LPG_TRY(generate_function_name(impl.target.methods[i].code, c_output));
     }
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_struct_member_name(unicode_view const name, stream_writer const c_output)
@@ -515,7 +515,7 @@ static success_indicator generate_struct_member_name(unicode_view const name, st
             LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(name.begin + i, 1)));
         }
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_struct_definition(struct_id const id, structure const generated,
@@ -543,14 +543,14 @@ static success_indicator generate_struct_definition(struct_id const id, structur
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     }
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
-    return success;
+    return success_yes;
 }
 
-static success_indicator generate_stateful_enum_name(enum_id const enumeration, stream_writer const c_output)
+static success_indicator generate_stateful_enum_name(enum_id const generated, stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "enum_"));
-    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, enumeration)));
-    return success;
+    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated)));
+    return success_yes;
 }
 
 static success_indicator generate_stateful_enum_definition(enum_id const id,
@@ -582,7 +582,7 @@ static success_indicator generate_stateful_enum_definition(enum_id const id,
     LPG_TRY(indent(1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
@@ -744,7 +744,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_capture:
         LPG_TRY(stream_writer_write_string(c_output, "captures->"));
         LPG_TRY(generate_tuple_element_name(state->registers[from].capture, c_output));
-        return success;
+        return success_yes;
 
     case register_meaning_unit:
         state->standard_library.using_unit = true;
@@ -756,7 +756,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
 static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
                                                 checked_program const *const program, stream_writer const c_output);
 
-static success_indicator generate_add_reference_to_tuple(unicode_view const value, type const *const elements,
+static success_indicator generate_add_reference_to_tuple(unicode_view const tuple_name, type const *const elements,
                                                          size_t const element_count, size_t const indentation,
                                                          checked_program const *const program,
                                                          stream_writer const c_output)
@@ -764,17 +764,17 @@ static success_indicator generate_add_reference_to_tuple(unicode_view const valu
     for (struct_member_id i = 0; i < element_count; ++i)
     {
         memory_writer name_buffer = {NULL, 0, 0};
-        LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), value));
+        LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), tuple_name));
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
         LPG_TRY(generate_tuple_element_name(i, memory_writer_erase(&name_buffer)));
         LPG_TRY(
             generate_add_reference(memory_writer_content(name_buffer), elements[i], indentation, program, c_output));
         memory_writer_free(&name_buffer);
     }
-    return success;
+    return success_yes;
 }
 
-static success_indicator generate_add_reference_to_structure(unicode_view const value, structure const type_of,
+static success_indicator generate_add_reference_to_structure(unicode_view const structure_name, structure const type_of,
                                                              size_t const indentation,
                                                              checked_program const *const program,
                                                              stream_writer const c_output)
@@ -782,7 +782,7 @@ static success_indicator generate_add_reference_to_structure(unicode_view const 
     for (struct_member_id i = 0; i < type_of.count; ++i)
     {
         memory_writer name_buffer = {NULL, 0, 0};
-        LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), value));
+        LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), structure_name));
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
         LPG_TRY(generate_struct_member_name(
             unicode_view_from_string(type_of.members[i].name), memory_writer_erase(&name_buffer)));
@@ -790,18 +790,19 @@ static success_indicator generate_add_reference_to_structure(unicode_view const 
             memory_writer_content(name_buffer), type_of.members[i].what, indentation, program, c_output));
         memory_writer_free(&name_buffer);
     }
-    return success;
+    return success_yes;
 }
 
-static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
-                                                checked_program const *const program, stream_writer const c_output)
+static success_indicator generate_add_reference(unicode_view const pointer_name, type const what,
+                                                size_t const indentation, checked_program const *const program,
+                                                stream_writer const c_output)
 {
     switch (what.kind)
     {
     case type_kind_string_ref:
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "string_ref_add_reference(&"));
-        LPG_TRY(stream_writer_write_unicode_view(c_output, value));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         return stream_writer_write_string(c_output, ");\n");
 
     case type_kind_enumeration:
@@ -809,30 +810,30 @@ static success_indicator generate_add_reference(unicode_view const value, type c
     case type_kind_integer_range:
     case type_kind_type:
     case type_kind_function_pointer:
-        return success;
+        return success_yes;
 
     case type_kind_tuple:
         return generate_add_reference_to_tuple(
-            value, what.tuple_.elements, what.tuple_.length, indentation, program, c_output);
+            pointer_name, what.tuple_.elements, what.tuple_.length, indentation, program, c_output);
 
     case type_kind_lambda:
     {
         tuple_type const captures = program->functions[what.lambda.lambda].signature->captures;
         return generate_add_reference_to_tuple(
-            value, captures.elements, captures.length, indentation, program, c_output);
+            pointer_name, captures.elements, captures.length, indentation, program, c_output);
     }
 
     case type_kind_interface:
-        LPG_TRY(stream_writer_write_unicode_view(c_output, value));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         LPG_TRY(stream_writer_write_string(c_output, ".vtable->_add_reference("));
-        LPG_TRY(stream_writer_write_unicode_view(c_output, value));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         LPG_TRY(stream_writer_write_string(c_output, ".self, 1);\n"));
-        return success;
+        return success_yes;
 
     case type_kind_structure:
     {
         return generate_add_reference_to_structure(
-            value, program->structs[what.structure_], indentation, program, c_output);
+            pointer_name, program->structs[what.structure_], indentation, program, c_output);
     }
 
     case type_kind_method_pointer:
@@ -870,7 +871,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
         switch (state->registers[from].ownership)
         {
         case register_resource_ownership_owns:
-            return success;
+            return success_yes;
 
         case register_resource_ownership_borrows:
             ASSUME(state->registers[from].type_of.is_set);
@@ -889,7 +890,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
     case register_meaning_unit:
-        return success;
+        return success_yes;
 
     case register_meaning_nothing:
     case register_meaning_captures:
@@ -932,7 +933,7 @@ static success_indicator generate_tuple_initializer_from_registers(c_backend_sta
         LPG_TRY(stream_writer_write_string(c_output, "0"));
     }
     LPG_TRY(stream_writer_write_string(c_output, "}"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_value(value const generated, type const type_of, c_backend_state *state,
@@ -961,7 +962,7 @@ static success_indicator generate_structure_initializer_from_values(c_backend_st
         LPG_TRY(stream_writer_write_string(c_output, "0"));
     }
     LPG_TRY(stream_writer_write_string(c_output, "}"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_structure_variable(c_backend_state *state,
@@ -980,7 +981,7 @@ static success_indicator generate_structure_variable(c_backend_state *state,
     LPG_TRY(stream_writer_write_string(c_output, " = "));
     LPG_TRY(generate_structure_initializer_from_values(state, root.count, elements, root.members, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_tuple_variable(c_backend_state *state, checked_function const *const current_function,
@@ -1002,7 +1003,7 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     LPG_TRY(stream_writer_write_string(c_output, " = "));
     LPG_TRY(generate_tuple_initializer_from_registers(state, current_function, tuple.length, elements, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_instantiate_struct(c_backend_state *state,
@@ -1028,7 +1029,7 @@ static success_indicator generate_instantiate_struct(c_backend_state *state,
     LPG_TRY(generate_tuple_initializer_from_registers(
         state, current_function, generated.argument_count, generated.arguments, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_erase_type(c_backend_state *state, register_id const destination,
@@ -1071,7 +1072,7 @@ static success_indicator generate_erase_type(c_backend_state *state, register_id
     {
         LPG_TRY(generate_add_reference(self, self_type, indentation, state->program, c_output));
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_value(value const generated, type const type_of, c_backend_state *state,
@@ -1086,7 +1087,7 @@ static success_indicator generate_value(value const generated, type const type_o
             char buffer[40];
             char *formatted = integer_format(generated.integer_, lower_case_digits, 10, buffer, sizeof(buffer));
             LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-            return success;
+            return success_yes;
         }
         LPG_TO_DO();
     }
@@ -1103,7 +1104,7 @@ static success_indicator generate_value(value const generated, type const type_o
             LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
         }
         LPG_TRY(stream_writer_write_string(c_output, ")"));
-        return success;
+        return success_yes;
 
     case value_kind_function_pointer:
     {
@@ -1123,7 +1124,7 @@ static success_indicator generate_value(value const generated, type const type_o
         {
             LPG_TRY(generate_function_name(generated.function_pointer.code, c_output));
         }
-        return success;
+        return success_yes;
     }
 
     case value_kind_tuple:
@@ -1139,7 +1140,7 @@ static success_indicator generate_value(value const generated, type const type_o
             LPG_TRY(generate_value(generated.tuple_.elements[i], type_of.tuple_.elements[i], state, c_output));
         }
         LPG_TRY(stream_writer_write_string(c_output, "}"));
-        return success;
+        return success_yes;
 
     case value_kind_type_erased:
     case value_kind_flat_object:
@@ -1150,11 +1151,11 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_type:
         state->standard_library.using_unit = true;
         LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
-        return success;
+        return success_yes;
 
     case value_kind_enum_constructor:
         LPG_TRY(stream_writer_write_string(c_output, "/*enum constructor*/"));
-        return success;
+        return success_yes;
 
     case value_kind_enum_element:
     {
@@ -1171,19 +1172,19 @@ static success_indicator generate_value(value const generated, type const type_o
             LPG_TRY(generate_value(value_or_unit(generated.enum_element.state),
                                    enum_.elements[generated.enum_element.which].state, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "}}"));
-            return success;
+            return success_yes;
         }
         char buffer[64];
         char const *const formatted = integer_format(
             integer_create(0, generated.enum_element.which), lower_case_digits, 10, buffer, sizeof(buffer));
         LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
-        return success;
+        return success_yes;
     }
 
     case value_kind_unit:
         state->standard_library.using_unit = true;
         LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
-        return success;
+        return success_yes;
     }
     LPG_UNREACHABLE();
 }
@@ -1207,7 +1208,7 @@ static success_indicator generate_free_register(c_backend_state *state, register
     }
 
     case register_resource_ownership_borrows:
-        return success;
+        return success_yes;
     }
     LPG_UNREACHABLE();
 }
@@ -1228,7 +1229,7 @@ static success_indicator generate_free_registers(c_backend_state *state, size_t 
         LPG_TRY(generate_free_register(state, which, current_function, indentation, c_output));
     }
     state->active_register_count = previously_active_registers;
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const current_function,
@@ -1274,7 +1275,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                                     unicode_view_create(original_self.data, original_self.used), add_reference_to_self,
                                     current_function, indentation, c_output));
         memory_writer_free(&original_self);
-        return success;
+        return success_yes;
     }
 
     case instruction_get_method:
@@ -1289,7 +1290,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_c_read_access(state, current_function, input.get_method.from, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-        return success;
+        return success_yes;
     }
 
     case instruction_return:
@@ -1306,7 +1307,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "unit const "));
         LPG_TRY(generate_register_name(input.return_.unit_goes_into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-        return success;
+        return success_yes;
 
     case instruction_call:
         LPG_TRY(indent(indentation, c_output));
@@ -1325,7 +1326,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, "unit const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_assert:
             state->standard_library.using_assert = true;
@@ -1336,7 +1337,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_string_equals:
             standard_library_usage_use_string_ref(&state->standard_library);
@@ -1349,7 +1350,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_integer_equals:
             state->standard_library.using_integer = true;
@@ -1362,7 +1363,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_integer_less:
             state->standard_library.using_integer = true;
@@ -1375,7 +1376,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_integer_to_string:
             state->standard_library.using_integer = true;
@@ -1387,7 +1388,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_concat:
             standard_library_usage_use_string_ref(&state->standard_library);
@@ -1400,7 +1401,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ", "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_capture:
         case register_meaning_variable:
@@ -1434,7 +1435,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[i], c_output));
                 }
                 LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-                return success;
+                return success_yes;
             }
 
             case type_kind_function_pointer:
@@ -1491,7 +1492,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[i], c_output));
                 }
                 LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-                return success;
+                return success_yes;
             }
             }
             set_register_function_variable(state, input.call.result, register_resource_ownership_owns, result_type);
@@ -1509,7 +1510,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " & "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_or:
             ASSUME(input.call.argument_count == 2);
@@ -1521,7 +1522,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " | "));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_not:
             ASSUME(input.call.argument_count == 1);
@@ -1531,7 +1532,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = !"));
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
 
         case register_meaning_argument:
             LPG_TO_DO();
@@ -1555,7 +1556,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[i], c_output));
         }
         LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-        return success;
+        return success_yes;
 
     case instruction_loop:
         LPG_TRY(indent(indentation, c_output));
@@ -1571,12 +1572,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "unit const "));
         LPG_TRY(generate_register_name(input.loop.unit_goes_into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-        return success;
+        return success_yes;
 
     case instruction_global:
         set_register_meaning(
             state, input.global_into, optional_type_create_set(type_from_struct(0)), register_meaning_global);
-        return success;
+        return success_yes;
 
     case instruction_read_struct:
         switch (state->registers[input.read_struct.from_object].meaning)
@@ -1597,39 +1598,39 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 4:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_assert);
-                return success;
+                return success_yes;
 
             case 5:
                 set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_and);
-                return success;
+                return success_yes;
 
             case 6:
                 set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_or);
-                return success;
+                return success_yes;
 
             case 7:
                 set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_not);
-                return success;
+                return success_yes;
 
             case 8:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_concat);
-                return success;
+                return success_yes;
 
             case 9:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_string_equals);
-                return success;
+                return success_yes;
 
             case 12:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_equals);
-                return success;
+                return success_yes;
 
             case 13:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_unit);
-                return success;
+                return success_yes;
 
             case 14:
                 state->standard_library.using_unit = true;
@@ -1639,22 +1640,22 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, "unit const "));
                 LPG_TRY(generate_register_name(input.read_struct.into, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-                return success;
+                return success_yes;
 
             case 16:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_less);
-                return success;
+                return success_yes;
 
             case 17:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_to_string);
-                return success;
+                return success_yes;
 
             case 18:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_side_effect);
-                return success;
+                return success_yes;
 
             default:
                 printf("%u\n", input.read_struct.member);
@@ -1683,7 +1684,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, "."));
                 LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-                return success;
+                return success_yes;
             }
 
             case type_kind_tuple:
@@ -1700,7 +1701,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, "."));
                 LPG_TRY(generate_tuple_element_name(input.read_struct.member, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-                return success;
+                return success_yes;
             }
 
             case type_kind_method_pointer:
@@ -1735,7 +1736,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             ASSUME(capture_tuple.value.kind == type_kind_tuple);
             set_register_to_capture(state, input.read_struct.into, input.read_struct.member,
                                     capture_tuple.value.tuple_.elements[input.read_struct.member]);
-            return success;
+            return success_yes;
         }
         }
 
@@ -1748,7 +1749,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
-        return success;
+        return success_yes;
 
     case instruction_literal:
         LPG_TRY(indent(indentation, c_output));
@@ -1759,7 +1760,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
             LPG_TRY(stream_writer_write_string(c_output, "/*generic enum omitted*/\n"));
-            return success;
+            return success_yes;
 
         case value_kind_integer:
             set_register_variable(
@@ -1769,7 +1770,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
 
         case value_kind_string:
             set_register_variable(
@@ -1780,7 +1781,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
 
         case value_kind_function_pointer:
             set_register_variable(
@@ -1816,7 +1817,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             }
-            return success;
+            return success_yes;
 
         case value_kind_tuple:
             set_register_variable(
@@ -1830,7 +1831,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
 
         case value_kind_flat_object:
             ASSUME(input.literal.type_of.kind == type_kind_structure);
@@ -1849,7 +1850,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                                         unicode_view_create(self.data, self.used), false, current_function, indentation,
                                         c_output));
             memory_writer_free(&self);
-            return success;
+            return success_yes;
         }
 
         case value_kind_pattern:
@@ -1864,13 +1865,13 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
 
         case value_kind_enum_constructor:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
             LPG_TRY(stream_writer_write_string(c_output, "/*enum constructor omitted*/\n"));
-            return success;
+            return success_yes;
 
         case value_kind_enum_element:
         {
@@ -1883,7 +1884,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
         }
 
         case value_kind_unit:
@@ -1895,7 +1896,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-            return success;
+            return success_yes;
         }
         LPG_UNREACHABLE();
 
@@ -1928,7 +1929,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(generate_add_reference_to_register(current_function, input.enum_construct.state,
                                                    enum_.elements[input.enum_construct.which.which].state, indentation,
                                                    state->program, c_output));
-        return success;
+        return success_yes;
     }
 
     case instruction_match:
@@ -2037,14 +2038,14 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         }
-        return success;
+        return success_yes;
     }
 
     case instruction_get_captures:
         set_register_meaning(state, input.captures,
                              optional_type_create_set(type_from_tuple_type(current_function->signature->captures)),
                              register_meaning_captures);
-        return success;
+        return success_yes;
 
     case instruction_lambda_with_captures:
     {
@@ -2064,7 +2065,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(generate_tuple_initializer_from_registers(
             state, current_function, captures.length, input.lambda_with_captures.captures, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-        return success;
+        return success_yes;
     }
     }
     LPG_UNREACHABLE();
@@ -2077,7 +2078,7 @@ static success_indicator generate_free_enumeration(standard_library_usage *const
 {
     if (!has_stateful_element(what))
     {
-        return success;
+        return success_yes;
     }
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "switch ("));
@@ -2104,7 +2105,7 @@ static success_indicator generate_free_enumeration(standard_library_usage *const
     }
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "}\n"));
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
@@ -2123,7 +2124,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         LPG_TRY(stream_writer_write_string(c_output, ".vtable->_add_reference("));
         LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
         LPG_TRY(stream_writer_write_string(c_output, ".self, -1);\n"));
-        return success;
+        return success_yes;
 
     case type_kind_string_ref:
         standard_library->using_string_ref = true;
@@ -2131,7 +2132,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
         LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-        return success;
+        return success_yes;
 
     case type_kind_structure:
     {
@@ -2147,7 +2148,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
                                   program, indentation, c_output));
             memory_writer_free(&name_buffer);
         }
-        return success;
+        return success_yes;
     }
 
     case type_kind_tuple:
@@ -2161,7 +2162,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
                                   program, indentation, c_output));
             memory_writer_free(&name_buffer);
         }
-        return success;
+        return success_yes;
 
     case type_kind_enum_constructor:
     case type_kind_function_pointer:
@@ -2169,7 +2170,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     case type_kind_unit:
     case type_kind_integer_range:
     case type_kind_generic_enum:
-        return success;
+        return success_yes;
 
     case type_kind_enumeration:
         return generate_free_enumeration(
@@ -2180,7 +2181,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         checked_function const lambda_function = program->functions[what.lambda.lambda];
         LPG_TRY(generate_free(standard_library, freed, type_from_tuple_type(lambda_function.signature->captures),
                               program, indentation, c_output));
-        return success;
+        return success_yes;
     }
     }
     LPG_UNREACHABLE();
@@ -2249,7 +2250,7 @@ static success_indicator generate_function_body(checked_function const current_f
     {
         deallocate(state.active_registers);
     }
-    return success;
+    return success_yes;
 }
 
 static success_indicator generate_function_declaration(function_id const id, function_pointer const signature,
@@ -2296,7 +2297,7 @@ static success_indicator generate_function_declaration(function_id const id, fun
         LPG_TRY(generate_register_name(signature.self.is_set + j, program->functions + id, program_defined_writer));
     }
     LPG_TRY(stream_writer_write_string(program_defined_writer, ")"));
-    return success;
+    return success_yes;
 }
 
 success_indicator generate_c(checked_program const program, stream_writer const c_output)
@@ -2461,10 +2462,10 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined.data, program_defined.used), fail);
     type_definitions_free(definitions);
     memory_writer_free(&program_defined);
-    return success;
+    return success_yes;
 
 fail:
     type_definitions_free(definitions);
     memory_writer_free(&program_defined);
-    return failure;
+    return success_no;
 }

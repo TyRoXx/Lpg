@@ -5,7 +5,7 @@
 static size_t total_checks;
 static size_t failures;
 
-int lpg_check(int success)
+int lpg_check(bool const success)
 {
     atomic_size_increment(&total_checks);
     if (!success)

@@ -71,18 +71,18 @@ static function_checking_state function_checking_state_create(
 static evaluate_expression_result check_sequence(function_checking_state *const state,
                                                  instruction_sequence *const output, sequence const input);
 
-static type get_parameter_type(type const callee, size_t const parameter, checked_function const *const all_functions,
-                               enumeration const *const all_enums)
+static type get_parameter_type(type const callee, size_t const which_parameter,
+                               checked_function const *const all_functions, enumeration const *const all_enums)
 {
     switch (callee.kind)
     {
     case type_kind_lambda:
-        ASSUME(parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
-        return all_functions[callee.lambda.lambda].signature->parameters.elements[parameter];
+        ASSUME(which_parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
+        return all_functions[callee.lambda.lambda].signature->parameters.elements[which_parameter];
 
     case type_kind_function_pointer:
-        ASSUME(parameter < callee.function_pointer_->parameters.length);
-        return callee.function_pointer_->parameters.elements[parameter];
+        ASSUME(which_parameter < callee.function_pointer_->parameters.length);
+        return callee.function_pointer_->parameters.elements[which_parameter];
 
     case type_kind_structure:
     case type_kind_unit:
@@ -97,7 +97,7 @@ static type get_parameter_type(type const callee, size_t const parameter, checke
         LPG_UNREACHABLE();
 
     case type_kind_enum_constructor:
-        ASSUME(parameter == 0);
+        ASSUME(which_parameter == 0);
         return all_enums[callee.enum_constructor->enumeration].elements[callee.enum_constructor->which].state;
     }
     LPG_UNREACHABLE();
@@ -121,13 +121,13 @@ static read_structure_element_result read_structure_element_result_create(bool c
 
 static read_structure_element_result
 read_structure_element(function_checking_state *const state, instruction_sequence *const function,
-                       structure const *const type, register_id const where, unicode_view const element_name,
+                       structure const *const structure_type, register_id const where, unicode_view const element_name,
                        source_location const element_name_location, register_id const result)
 {
     optional_value const compile_time_value = read_register_compile_time_value(state, where);
-    LPG_FOR(struct_member_id, i, type->count)
+    LPG_FOR(struct_member_id, i, structure_type->count)
     {
-        if (!unicode_view_equals(element_name, unicode_view_from_string(type->members[i].name)))
+        if (!unicode_view_equals(element_name, unicode_view_from_string(structure_type->members[i].name)))
         {
             continue;
         }
@@ -135,22 +135,22 @@ read_structure_element(function_checking_state *const state, instruction_sequenc
         {
             ASSERT(compile_time_value.value_.kind == value_kind_flat_object);
             value const element_value = compile_time_value.value_.flat_object[i];
-            add_instruction(function, instruction_create_literal(
-                                          literal_instruction_create(result, element_value, type->members[i].what)));
+            add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                          result, element_value, structure_type->members[i].what)));
             write_register_compile_time_value(state, result, element_value);
             return read_structure_element_result_create(
-                true, type->members[i].what, optional_value_create(element_value), true);
+                true, structure_type->members[i].what, optional_value_create(element_value), true);
         }
         add_instruction(function, instruction_create_read_struct(read_struct_instruction_create(where, i, result)));
         return read_structure_element_result_create(
-            true, type->members[i].what, type->members[i].compile_time_value, true);
+            true, structure_type->members[i].what, structure_type->members[i].compile_time_value, true);
     }
     state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
     return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 }
 
 static read_structure_element_result read_tuple_element(function_checking_state *state, instruction_sequence *function,
-                                                        tuple_type const type, register_id const where,
+                                                        tuple_type const read_from, register_id const where,
                                                         unicode_view const element_name,
                                                         source_location const element_name_location,
                                                         register_id const result)
@@ -161,7 +161,7 @@ static read_structure_element_result read_tuple_element(function_checking_state 
         state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
-    if (!integer_less(element_index, integer_create(0, type.length)))
+    if (!integer_less(element_index, integer_create(0, read_from.length)))
     {
         state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
@@ -169,7 +169,8 @@ static read_structure_element_result read_tuple_element(function_checking_state 
     ASSERT(integer_less(element_index, integer_create(0, ~(struct_member_id)0)));
     add_instruction(function, instruction_create_read_struct(
                                   read_struct_instruction_create(where, (struct_member_id)element_index.low, result)));
-    return read_structure_element_result_create(true, type.elements[element_index.low], optional_value_empty, true);
+    return read_structure_element_result_create(
+        true, read_from.elements[element_index.low], optional_value_empty, true);
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
@@ -514,7 +515,7 @@ check_function_result check_function(program_check *const root, function_checkin
                     expression_source_begin(body_in), explicit_return_type.value, false);
                 switch (converted.ok)
                 {
-                case failure:
+                case success_no:
                     for (size_t i = 0; i < state.register_debug_name_count; ++i)
                     {
                         unicode_string_free(state.register_debug_names + i);
@@ -526,7 +527,7 @@ check_function_result check_function(program_check *const root, function_checkin
                     instruction_sequence_free(&body_out);
                     return check_function_result_empty;
 
-                case success:
+                case success_yes:
                     return_type = converted.result_type;
                     ASSUME(type_equals(explicit_return_type.value, converted.result_type));
                     break;
@@ -787,12 +788,10 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
                                       destination, this_lambda_id, captures, checked.capture_count)));
         return evaluate_expression_result_create(true, destination, result_type, optional_value_empty, false, false);
     }
-    value const function_pointer =
-        value_from_function_pointer(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
-    add_instruction(
-        function, instruction_create_literal(literal_instruction_create(destination, function_pointer, result_type)));
+    value const result = value_from_function_pointer(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
+    add_instruction(function, instruction_create_literal(literal_instruction_create(destination, result, result_type)));
     return evaluate_expression_result_create(
-        true, destination, result_type, optional_value_create(function_pointer), false, false);
+        true, destination, result_type, optional_value_create(result), false, false);
 }
 
 static optional_size find_implementation(interface const *const in, type const self)
@@ -816,13 +815,13 @@ static conversion_result convert_to_interface(function_checking_state *const sta
     if (impl.state == optional_empty)
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, from, optional_value_empty};
+        conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
     register_id const converted = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(
                                   original, converted, implementation_ref_create(to, impl.value_if_set))));
-    conversion_result const result = {success, converted, type_from_interface(to), optional_value_empty};
+    conversion_result const result = {success_yes, converted, type_from_interface(to), optional_value_empty};
     return result;
 }
 
@@ -833,7 +832,7 @@ static conversion_result convert(function_checking_state *const state, instructi
 {
     if (type_equals(from, to))
     {
-        conversion_result const result = {success, original, to, original_compile_time_value};
+        conversion_result const result = {success_yes, original, to, original_compile_time_value};
         return result;
     }
     switch (to.kind)
@@ -848,7 +847,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     case type_kind_type:
     {
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, from, optional_value_empty};
+        conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
 
@@ -862,24 +861,24 @@ static conversion_result convert(function_checking_state *const state, instructi
         if (from.kind != type_kind_integer_range)
         {
             state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-            conversion_result const result = {failure, original, from, optional_value_empty};
+            conversion_result const result = {success_no, original, from, optional_value_empty};
             return result;
         }
         if (integer_less_or_equals(to.integer_range_.minimum, from.integer_range_.minimum) &&
             integer_less_or_equals(from.integer_range_.maximum, to.integer_range_.maximum))
         {
-            conversion_result const result = {success, original, to, original_compile_time_value};
+            conversion_result const result = {success_yes, original, to, original_compile_time_value};
             return result;
         }
         if (may_widen_result_type)
         {
-            conversion_result const result = {success, original, type_from_integer_range(integer_range_combine(
-                                                                     from.integer_range_, to.integer_range_)),
+            conversion_result const result = {success_yes, original, type_from_integer_range(integer_range_combine(
+                                                                         from.integer_range_, to.integer_range_)),
                                               original_compile_time_value};
             return result;
         }
         state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
-        conversion_result const result = {failure, original, from, optional_value_empty};
+        conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
 
@@ -904,7 +903,7 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
     evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree);
     if (!argument.has_value)
     {
-        argument_evaluation_result const result = {failure, optional_value_empty, 0};
+        argument_evaluation_result const result = {success_no, optional_value_empty, 0};
         return result;
     }
     conversion_result const converted =
@@ -916,10 +915,10 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
 }
 
 static evaluate_expression_result evaluate_call_expression(function_checking_state *state,
-                                                           instruction_sequence *function, call call)
+                                                           instruction_sequence *function, call const called)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const callee = evaluate_expression(state, function, *call.callee);
+    evaluate_expression_result const callee = evaluate_expression(state, function, *called.callee);
     if (!callee.has_value)
     {
         return make_compile_time_unit();
@@ -943,7 +942,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_interface:
     case type_kind_generic_enum:
         state->on_error(
-            semantic_error_create(semantic_error_not_callable, expression_source_begin(*call.callee)), state->user);
+            semantic_error_create(semantic_error_not_callable, expression_source_begin(*called.callee)), state->user);
         return make_compile_time_unit();
     }
     size_t const expected_arguments =
@@ -951,9 +950,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     register_id *const arguments = allocate_array(expected_arguments, sizeof(*arguments));
     value *const compile_time_arguments = allocate_array(expected_arguments, sizeof(*compile_time_arguments));
     bool all_compile_time_arguments = true;
-    LPG_FOR(size_t, i, call.arguments.length)
+    LPG_FOR(size_t, i, called.arguments.length)
     {
-        expression const argument_tree = call.arguments.elements[i];
+        expression const argument_tree = called.arguments.elements[i];
         if (i >= expected_arguments)
         {
             state->on_error(
@@ -962,7 +961,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             break;
         }
         argument_evaluation_result const result = evaluate_argument(state, function, argument_tree, callee.type_, i);
-        if (result.ok != success)
+        if (result.ok != success_yes)
         {
             restore(previous_code);
             deallocate(compile_time_arguments);
@@ -979,12 +978,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         }
         arguments[i] = result.where;
     }
-    if (call.arguments.length < expected_arguments)
+    if (called.arguments.length < expected_arguments)
     {
         deallocate(compile_time_arguments);
         restore(previous_code);
         deallocate(arguments);
-        state->on_error(semantic_error_create(semantic_error_missing_argument, call.closing_parenthesis), state->user);
+        state->on_error(
+            semantic_error_create(semantic_error_missing_argument, called.closing_parenthesis), state->user);
         return evaluate_expression_result_empty;
     }
     type const return_type = get_return_type(callee.type_, state->program->functions, state->program->interfaces);
@@ -1076,7 +1076,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             LPG_UNREACHABLE();
 
         case type_kind_enum_constructor:
-            ASSUME(call.arguments.length == 1);
+            ASSUME(called.arguments.length == 1);
             add_instruction(function, instruction_create_enum_construct(enum_construct_instruction_create(
                                           result, *callee.type_.enum_constructor, arguments[0],
                                           state->program->enums[callee.type_.enum_constructor->enumeration]
@@ -1740,12 +1740,12 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
 }
 
 static evaluate_expression_result evaluate_struct(function_checking_state *state, instruction_sequence *function,
-                                                  struct_expression const structure)
+                                                  struct_expression const evaluated)
 {
-    structure_member *elements = allocate_array(structure.element_count, sizeof(*elements));
-    for (size_t i = 0; i < structure.element_count; ++i)
+    structure_member *elements = allocate_array(evaluated.element_count, sizeof(*elements));
+    for (size_t i = 0; i < evaluated.element_count; ++i)
     {
-        struct_expression_element const element = structure.elements[i];
+        struct_expression_element const element = evaluated.elements[i];
         evaluate_expression_result const element_type_evaluated = evaluate_expression(state, function, element.type);
         if (!element_type_evaluated.has_value)
         {
@@ -1776,7 +1776,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     struct_id const id = state->program->struct_count;
     state->program->structs = reallocate_array(state->program->structs, (id + 1), sizeof(*state->program->structs));
     state->program->structs[id] =
-        structure_create(elements, /*TODO avoid truncation safely*/ (struct_id)structure.element_count);
+        structure_create(elements, /*TODO avoid truncation safely*/ (struct_id)evaluated.element_count);
     state->program->struct_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     value const result = value_from_type(type_from_struct(id));
@@ -1944,14 +1944,14 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     }
     struct_id const structure_id = type_evaluated.compile_time_value.value_.type_.structure_;
     ASSUME(structure_id < state->program->struct_count);
-    structure const *const structure = state->program->structs + structure_id;
-    if (element.arguments.length < structure->count)
+    structure const *const instantiated_structure = state->program->structs + structure_id;
+    if (element.arguments.length < instantiated_structure->count)
     {
         state->on_error(semantic_error_create(semantic_error_missing_argument, expression_source_begin(*element.type)),
                         state->user);
         return make_compile_time_unit();
     }
-    if (element.arguments.length > structure->count)
+    if (element.arguments.length > instantiated_structure->count)
     {
         state->on_error(
             semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)),
@@ -2686,7 +2686,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     }
 
     case expression_type_return:
-        return evaluate_return_expression(state, function, &element);
+        return evaluate_return_expression(state, function, element.return_);
 
     case expression_type_loop:
     {
@@ -2769,7 +2769,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
                         convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
                                 expression_source_begin(*element.declare.initializer),
                                 declared_type.compile_time_value.value_.type_, false);
-                    if (converted.ok == failure)
+                    if (converted.ok == success_no)
                     {
                         return make_compile_time_unit();
                     }
@@ -2816,31 +2816,29 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     LPG_UNREACHABLE();
 }
 
-static evaluate_expression_result
-evaluate_return_expression(function_checking_state *state, instruction_sequence *sequence, const expression *expression)
+static evaluate_expression_result evaluate_return_expression(function_checking_state *state, instruction_sequence *body,
+                                                             const expression *returned)
 {
-    evaluate_expression_result const result = evaluate_expression(state, sequence, *expression->return_);
+    evaluate_expression_result const result = evaluate_expression(state, body, *returned);
     if (!result.has_value)
     {
         return result;
     }
     if (state->return_type.is_set)
     {
-        conversion_result const converted =
-            convert(state, sequence, result.where, result.type_, result.compile_time_value,
-                    expression_source_begin(*expression), state->return_type.value, true);
+        conversion_result const converted = convert(state, body, result.where, result.type_, result.compile_time_value,
+                                                    expression_source_begin(*returned), state->return_type.value, true);
         switch (converted.ok)
         {
-        case failure:
+        case success_no:
             return evaluate_expression_result_empty;
 
-        case success:
+        case success_yes:
         {
             state->return_type = optional_type_create_set(converted.result_type);
             register_id const unit_goes_into = allocate_register(&state->used_registers);
-            instruction const return_instruction =
-                instruction_create_return(return_instruction_create(converted.where, unit_goes_into));
-            add_instruction(sequence, return_instruction);
+            add_instruction(
+                body, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
             return evaluate_expression_result_create(
                 true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
         }
@@ -2852,9 +2850,7 @@ evaluate_return_expression(function_checking_state *state, instruction_sequence 
         state->return_type = optional_type_create_set(result.type_);
     }
     register_id const unit_goes_into = allocate_register(&state->used_registers);
-    instruction const return_instruction =
-        instruction_create_return(return_instruction_create(result.where, unit_goes_into));
-    add_instruction(sequence, return_instruction);
+    add_instruction(body, instruction_create_return(return_instruction_create(result.where, unit_goes_into)));
     return evaluate_expression_result_create(true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
 }
 

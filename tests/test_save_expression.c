@@ -13,7 +13,7 @@ static void check_expression_rendering(expression tree, char const *expected)
 {
     memory_writer buffer = {NULL, 0, 0};
     whitespace_state whitespace = {0, 0};
-    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree, whitespace) == success);
+    REQUIRE(save_expression(memory_writer_erase(&buffer), &tree, whitespace) == success_yes);
     if (!memory_writer_equals(buffer, expected))
     {
         printf("Expected  (%zu): [%s]\n", strlen(expected), expected);
@@ -315,13 +315,13 @@ void test_save_expression(void)
                                   integer_create(0, 123), source_location_create(0, 0)))),
                               expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 456), source_location_create(0, 0)))));
-        expression *const sequence = allocate_array(2, sizeof(*sequence));
-        sequence[0] = expression_from_break(source_location_create(0, 0));
-        sequence[1] = expression_from_break(source_location_create(0, 0));
+        expression *const case_1 = allocate_array(2, sizeof(*case_1));
+        case_1[0] = expression_from_break(source_location_create(0, 0));
+        case_1[1] = expression_from_break(source_location_create(0, 0));
         cases[1] =
             match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 124), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_sequence(sequence_create(sequence, 2))));
+                              expression_allocate(expression_from_sequence(sequence_create(case_1, 2))));
         check_expression_rendering(
             expression_from_match(
                 match_create(source_location_create(0, 0),

@@ -17,7 +17,7 @@ void test_thread(void)
     {
         int argument = 123;
         create_thread_result const result = create_thread(trivial_thread_function, &argument);
-        REQUIRE(result.is_success == success);
+        REQUIRE(result.is_success == success_yes);
         join_thread(result.success);
         REQUIRE(argument == 124);
     }

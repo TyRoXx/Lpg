@@ -195,9 +195,9 @@ void test_semantics(void)
     standard_library_description_free(&std_library);
 }
 
-static type make_integer_constant_type(integer value)
+static type make_integer_constant_type(integer const constant)
 {
-    return type_from_integer_range(integer_range_create(value, value));
+    return type_from_integer_range(integer_range_create(constant, constant));
 }
 
 static void test_functions(const standard_library_description *std_library)
