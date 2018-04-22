@@ -181,11 +181,14 @@ success_indicator create_directory(unicode_view const path)
 #ifdef _WIN32
     win32_string const path_argument = to_win32_path(path);
     BOOL const result = CreateDirectoryW(path_argument.c_str, NULL);
-    win32_string_free(path_argument);
     if (result)
     {
+        win32_string_free(path_argument);
         return success_yes;
     }
+    DWORD const last_error = GetLastError();
+    fprintf(stderr, "Could not create directory '%ls', error: %lu\n", path_argument.c_str, last_error);
+    win32_string_free(path_argument);
     return success_no;
 #else
     unicode_string const zero_terminated_path = unicode_view_zero_terminate(path);
