@@ -59,19 +59,21 @@ typedef struct semantic_error_translator
     bool has_error;
 } semantic_error_translator;
 
-static void translate_semantic_error(semantic_error const error, void *user)
+static void translate_semantic_error(complete_semantic_error const error, void *user)
 {
     semantic_error_translator *const translator = user;
     translator->has_error = true;
     translator->on_error(error, translator->user);
 }
 
-static load_module_result type_check_module(function_checking_state *state, sequence const parsed)
+static load_module_result type_check_module(function_checking_state *state, sequence const parsed,
+                                            unicode_view const file_name, unicode_view const source)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
-    check_function_result const checked = check_function(
-        state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
-        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty());
+    check_function_result const checked =
+        check_function(state->root, NULL, expression_from_sequence(parsed), state->root->global,
+                       translate_semantic_error, &translator, state->program, NULL, NULL, 0,
+                       optional_type_create_empty(), false, optional_type_create_empty(), file_name, source);
     if (!checked.success)
     {
         load_module_result const failure = {optional_value_empty, type_from_unit()};
@@ -145,7 +147,9 @@ load_module_result load_module(function_checking_state *state, unicode_view name
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const result = type_check_module(state, parsed);
+    load_module_result const result =
+        type_check_module(state, parsed, unicode_view_from_string(full_module_path),
+                          unicode_view_create(module_source.success.data, module_source.success.length));
     sequence_free(&parsed);
     unicode_string_free(&full_module_path);
     blob_free(&module_source.success);

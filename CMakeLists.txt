@@ -89,7 +89,6 @@ if(MSVC)
 	target_compile_options(duktape PUBLIC /DDUK_USE_DATE_NOW_WINDOWS)
 	if(MSVC_VERSION LESS 1911)
 		add_definitions(/D_WIN32_WINNT_WINTHRESHOLD=0)
-		add_definitions(/WX)
 	endif()
 	#avoid bogus warnings in Windows headers
 	add_definitions(/DNTDDI_WIN7SP1=0)
@@ -98,7 +97,7 @@ if(MSVC)
 	add_definitions(/D_WIN32_WINNT_WIN10_RS1=0)
 	add_definitions(/D_WIN32_WINNT_WIN10_RS2=0)
 	add_definitions(/D_WIN32_WINNT_WIN10_RS3=0)
-	set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS} /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221)
+	set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS} /Wall /wd4820 /wd4255 /wd4201 /wd4204 /wd4710 /wd4711 /wd4221 /WX)
 else()
     set(LPG_COMPILE_FLAGS ${LPG_COMPILE_FLAGS}
         -std=gnu11 -Wall -Wextra -Wconversion -Werror -Wunused -Wundef -Wvla -Wshadow -Wpedantic

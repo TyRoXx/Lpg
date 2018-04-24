@@ -100,9 +100,8 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
     }
     if (!state->may_capture_runtime_variables)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_cannot_capture_runtime_variable, original_reference_location),
-            state->user);
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_cannot_capture_runtime_variable, original_reference_location));
         return read_local_variable_result_forbidden;
     }
     capture_index const existing_capture = require_capture(state, outer_variable.where, outer_variable.what);

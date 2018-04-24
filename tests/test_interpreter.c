@@ -31,7 +31,7 @@ static sequence parse(unicode_view const input)
     return result;
 }
 
-static void expect_no_errors(semantic_error const error, void *user)
+static void expect_no_errors(complete_semantic_error const error, void *user)
 {
     (void)error;
     (void)user;
@@ -310,7 +310,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
-    checked_program checked = check(root, global_object, expect_no_errors, &loader, NULL);
+    checked_program checked = check(root, global_object, expect_no_errors, &loader, test_name, source, NULL);
     sequence_free(&root);
 
     {

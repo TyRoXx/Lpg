@@ -23,7 +23,8 @@ check_function_result check_function(program_check *const root, function_checkin
                                      void *user, checked_program *const program, type const *const parameter_types,
                                      unicode_string *const parameter_names, size_t const parameter_count,
                                      optional_type const self, bool const may_capture_runtime_variables,
-                                     optional_type const explicit_return_type);
+                                     optional_type const explicit_return_type, unicode_view file_name,
+                                     unicode_view source);
 
 checked_program check(sequence const root, structure const global, LPG_NON_NULL(check_error_handler *on_error),
-                      LPG_NON_NULL(module_loader *loader), void *user);
+                      LPG_NON_NULL(module_loader *loader), unicode_view file_name, unicode_view source, void *user);

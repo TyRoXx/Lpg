@@ -41,10 +41,12 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 static evaluate_expression_result const evaluate_expression_result_empty = {
     false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false, false};
 
-static function_checking_state function_checking_state_create(
-    program_check *const root, function_checking_state *parent, bool const may_capture_runtime_variables,
-    structure const *global, check_error_handler *on_error, void *user, checked_program *const program,
-    instruction_sequence *const body, optional_type const return_type, bool const has_declared_return_type)
+static function_checking_state
+function_checking_state_create(program_check *const root, function_checking_state *parent,
+                               bool const may_capture_runtime_variables, structure const *global,
+                               check_error_handler *on_error, void *user, checked_program *const program,
+                               instruction_sequence *const body, optional_type const return_type,
+                               bool const has_declared_return_type, unicode_view file_name, unicode_view source)
 {
     function_checking_state const result = {root,
                                             parent,
@@ -64,7 +66,9 @@ static function_checking_state function_checking_state_create(
                                             return_type,
                                             has_declared_return_type,
                                             NULL,
-                                            0};
+                                            0,
+                                            file_name,
+                                            source};
     return result;
 }
 
@@ -145,7 +149,7 @@ read_structure_element(function_checking_state *const state, instruction_sequenc
         return read_structure_element_result_create(
             true, structure_type->members[i].what, structure_type->members[i].compile_time_value, true);
     }
-    state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
+    emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element_name_location));
     return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 }
 
@@ -158,12 +162,12 @@ static read_structure_element_result read_tuple_element(function_checking_state 
     integer element_index;
     if (!integer_parse(&element_index, element_name))
     {
-        state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element_name_location));
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
     if (!integer_less(element_index, integer_create(0, read_from.length)))
     {
-        state->on_error(semantic_error_create(semantic_error_unknown_element, element_name_location), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element_name_location));
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
     ASSERT(integer_less(element_index, integer_create(0, ~(struct_member_id)0)));
@@ -210,7 +214,7 @@ read_interface_element(function_checking_state *state, instruction_sequence *fun
             return read_interface_element_at(state, function, from, from_type, i, result);
         }
     }
-    state->on_error(semantic_error_create(semantic_error_unknown_element, element_source), state->user);
+    emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element_source));
     return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 }
 
@@ -246,12 +250,11 @@ static read_structure_element_result read_element(function_checking_state *state
     case type_kind_unit:
     case type_kind_function_pointer:
     case type_kind_string_ref:
-        state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_enumeration:
-        state->on_error(
-            semantic_error_create(semantic_error_no_members_on_enum_elements, element->source), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_no_members_on_enum_elements, element->source));
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_tuple:
@@ -263,8 +266,8 @@ static read_structure_element_result read_element(function_checking_state *state
         if (!object.compile_time_value.is_set)
         {
             restore(previous_code);
-            state->on_error(
-                semantic_error_create(semantic_error_expected_compile_time_type, element->source), state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_expected_compile_time_type, element->source));
             return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
         }
         type const left_side_type = object.compile_time_value.value_.type_;
@@ -275,7 +278,7 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_type:
         case type_kind_integer_range:
         case type_kind_interface:
-            state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
             return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
         case type_kind_structure:
@@ -315,7 +318,7 @@ static read_structure_element_result read_element(function_checking_state *state
                         true, type_from_enum_constructor(constructor_type), optional_value_create(literal), true);
                 }
             }
-            state->on_error(semantic_error_create(semantic_error_unknown_element, element->source), state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
             return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
         }
         }
@@ -450,13 +453,14 @@ check_function_result check_function(program_check *const root, function_checkin
                                      void *user, checked_program *const program, type const *const parameter_types,
                                      unicode_string *const parameter_names, size_t const parameter_count,
                                      optional_type const self, bool const may_capture_runtime_variables,
-                                     optional_type const explicit_return_type)
+                                     optional_type const explicit_return_type, unicode_view file_name,
+                                     unicode_view source)
 {
     ASSUME(root);
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     function_checking_state state =
         function_checking_state_create(root, parent, may_capture_runtime_variables, &global, on_error, user, program,
-                                       &body_out, explicit_return_type, explicit_return_type.is_set);
+                                       &body_out, explicit_return_type, explicit_return_type.is_set, file_name, source);
 
     if (self.is_set)
     {
@@ -637,9 +641,8 @@ expect_compile_time_type(function_checking_state *state, instruction_sequence *f
     {
         if (!result.compile_time_value.is_set || (result.compile_time_value.value_.kind != value_kind_type))
         {
-            state->on_error(
-                semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(element)),
-                state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                             expression_source_begin(element)));
             return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
         }
     }
@@ -742,7 +745,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     check_function_result const checked =
         check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
-                       optional_type_create_empty(), true, header.return_type);
+                       optional_type_create_empty(), true, header.return_type, state->file_name, state->source);
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -814,7 +817,7 @@ static conversion_result convert_to_interface(function_checking_state *const sta
     optional_size const impl = find_implementation(state->program->interfaces + to, from);
     if (impl.state == optional_empty)
     {
-        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
         conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
@@ -846,7 +849,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     case type_kind_structure:
     case type_kind_type:
     {
-        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
         conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
@@ -860,7 +863,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     {
         if (from.kind != type_kind_integer_range)
         {
-            state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
             conversion_result const result = {success_no, original, from, optional_value_empty};
             return result;
         }
@@ -877,7 +880,7 @@ static conversion_result convert(function_checking_state *const state, instructi
                                               original_compile_time_value};
             return result;
         }
-        state->on_error(semantic_error_create(semantic_error_type_mismatch, original_source), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
         conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
@@ -941,8 +944,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_integer_range:
     case type_kind_interface:
     case type_kind_generic_enum:
-        state->on_error(
-            semantic_error_create(semantic_error_not_callable, expression_source_begin(*called.callee)), state->user);
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_not_callable, expression_source_begin(*called.callee)));
         return make_compile_time_unit();
     }
     size_t const expected_arguments =
@@ -955,9 +958,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         expression const argument_tree = called.arguments.elements[i];
         if (i >= expected_arguments)
         {
-            state->on_error(
-                semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(argument_tree)),
-                state->user);
+            emit_semantic_error(state, semantic_error_create(
+                                           semantic_error_extraneous_argument, expression_source_begin(argument_tree)));
             break;
         }
         argument_evaluation_result const result = evaluate_argument(state, function, argument_tree, callee.type_, i);
@@ -983,8 +985,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         deallocate(compile_time_arguments);
         restore(previous_code);
         deallocate(arguments);
-        state->on_error(
-            semantic_error_create(semantic_error_missing_argument, called.closing_parenthesis), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, called.closing_parenthesis));
         return evaluate_expression_result_empty;
     }
     type const return_type = get_return_type(callee.type_, state->program->functions, state->program->interfaces);
@@ -1119,8 +1120,8 @@ evaluate_expression_result evaluate_not_expression(function_checking_state *stat
         return evaluate_expression_result_create(
             true, result_register, result.type_, optional_value_empty, false, false);
     }
-    state->on_error(
-        semantic_error_create(semantic_error_type_mismatch, expression_source_begin((*element))), state->user);
+    emit_semantic_error(
+        state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin((*element))));
     return evaluate_expression_result_empty;
 }
 
@@ -1289,17 +1290,15 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         enumeration const *const enum_ = state->program->enums + key.type_.enum_;
         if (enum_->size == 0)
         {
-            state->on_error(
-                semantic_error_create(semantic_error_match_unsupported, expression_source_begin((*element))),
-                state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_match_unsupported, expression_source_begin((*element))));
             return evaluate_expression_result_empty;
         }
 
         if (enum_->size != (*element).match.number_of_cases)
         {
-            state->on_error(
-                semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))),
-                state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))));
             return evaluate_expression_result_empty;
         }
 
@@ -1325,9 +1324,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             {
                 if (maybe_pattern.stateful_enum_element.enumeration != key.type_.enum_)
                 {
-                    state->on_error(
-                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
-                        state->user);
+                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                     expression_source_begin(*case_tree.key)));
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
@@ -1336,9 +1334,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     bool *const case_handled = (enum_elements_handled + maybe_pattern.stateful_enum_element.which);
                     if (*case_handled)
                     {
-                        state->on_error(semantic_error_create(semantic_error_duplicate_match_case,
-                                                              expression_source_begin(*case_tree.key)),
-                                        state->user);
+                        emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
+                                                                         expression_source_begin(*case_tree.key)));
                         deallocate_boolean_cases(cases, enum_elements_handled, i);
                         return evaluate_expression_result_empty;
                     }
@@ -1350,9 +1347,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 placeholder_where = allocate_register(&state->used_registers);
                 if (local_variable_name_exists(state->local_variables, maybe_pattern.placeholder_name))
                 {
-                    state->on_error(semantic_error_create(semantic_error_declaration_with_existing_name,
-                                                          maybe_pattern.placeholder_name_source),
-                                    state->user);
+                    emit_semantic_error(state, semantic_error_create(semantic_error_declaration_with_existing_name,
+                                                                     maybe_pattern.placeholder_name_source));
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
@@ -1381,9 +1377,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
                 if (!type_equals(key.type_, key_evaluated.type_))
                 {
-                    state->on_error(
-                        semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
-                        state->user);
+                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                     expression_source_begin(*case_tree.key)));
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
@@ -1400,9 +1395,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                         (enum_elements_handled + key_evaluated.compile_time_value.value_.enum_element.which);
                     if (*case_handled)
                     {
-                        state->on_error(semantic_error_create(semantic_error_duplicate_match_case,
-                                                              expression_source_begin(*case_tree.key)),
-                                        state->user);
+                        emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
+                                                                         expression_source_begin(*case_tree.key)));
                         deallocate_boolean_cases(cases, enum_elements_handled, i);
                         return evaluate_expression_result_empty;
                     }
@@ -1446,9 +1440,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             else if (!type_equals(result_type, action_evaluated.type_))
             {
                 /*TODO: support types that are not the same, but still comparable*/
-                state->on_error(
-                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
-                    state->user);
+                emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                 expression_source_begin(*case_tree.action)));
                 deallocate_boolean_cases(cases, enum_elements_handled, i);
                 instruction_sequence_free(&action);
                 return evaluate_expression_result_empty;
@@ -1510,9 +1503,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
         if (!integer_equal(expected_cases, integer_create(0, (*element).match.number_of_cases)))
         {
-            state->on_error(
-                semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))),
-                state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_missing_match_case, expression_source_begin((*element))));
             return evaluate_expression_result_empty;
         }
 
@@ -1537,9 +1529,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             if (key_evaluated.type_.kind != type_kind_integer_range)
             {
-                state->on_error(
-                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.key)),
-                    state->user);
+                emit_semantic_error(state, semantic_error_create(
+                                               semantic_error_type_mismatch, expression_source_begin(*case_tree.key)));
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 return evaluate_expression_result_empty;
             }
@@ -1552,9 +1543,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 else
                 {
                     // TODO: Better error description
-                    state->on_error(semantic_error_create(
-                                        semantic_error_duplicate_match_case, expression_source_begin(*case_tree.key)),
-                                    state->user);
+                    emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
+                                                                     expression_source_begin(*case_tree.key)));
                     deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                     return evaluate_expression_result_empty;
                 }
@@ -1581,9 +1571,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             else if (!type_equals(result_type, action_evaluated.type_))
             {
                 /*TODO: support types that are not the same, but still comparable*/
-                state->on_error(
-                    semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)),
-                    state->user);
+                emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                 expression_source_begin(*case_tree.action)));
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return evaluate_expression_result_empty;
@@ -1719,8 +1708,8 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
             if (unicode_view_equals(
                     unicode_view_from_string(methods[k].name), unicode_view_from_string(method.name.value)))
             {
-                state->on_error(
-                    semantic_error_create(semantic_error_duplicate_method_name, method.name.source), state->user);
+                emit_semantic_error(
+                    state, semantic_error_create(semantic_error_duplicate_method_name, method.name.source));
             }
         }
         methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
@@ -1759,9 +1748,8 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
         if (!element_type_evaluated.compile_time_value.is_set ||
             (element_type_evaluated.compile_time_value.value_.kind != value_kind_type))
         {
-            state->on_error(
-                semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(element.type)),
-                state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                             expression_source_begin(element.type)));
             for (size_t j = 0; j < i; ++j)
             {
                 struct_member_free(elements + j);
@@ -1810,9 +1798,8 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     }
     if (header.return_type.is_set && !is_implicitly_convertible(header.return_type.value, declared_result_type))
     {
-        state->on_error(
-            semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*method.header.return_type)),
-            state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                         expression_source_begin(*method.header.return_type)));
         for (size_t i = 0; i < method.header.parameter_count; ++i)
         {
             unicode_string_free(header.parameter_names + i);
@@ -1822,10 +1809,11 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         return method_evaluation_result_failure;
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked = check_function(
-        state->root, state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
-        state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
-        optional_type_create_set(self), false, optional_type_create_set(declared_result_type));
+    check_function_result const checked =
+        check_function(state->root, state, expression_from_sequence(method.body), *state->global, state->on_error,
+                       state->user, state->program, header.parameter_types, header.parameter_names,
+                       method.header.parameter_count, optional_type_create_set(self), false,
+                       optional_type_create_set(declared_result_type), state->file_name, state->source);
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1868,9 +1856,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     }
     if (interface_evaluated.compile_time_value.kind != type_kind_interface)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_expected_interface, expression_source_begin(*element.interface)),
-            state->user);
+        emit_semantic_error(state, semantic_error_create(
+                                       semantic_error_expected_interface, expression_source_begin(*element.interface)));
         return evaluate_expression_result_empty;
     }
     lpg_interface *const target_interface =
@@ -1901,9 +1888,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     {
         if (type_equals(self, target_interface->implementations[i].self))
         {
-            state->on_error(
-                semantic_error_create(semantic_error_duplicate_impl, expression_source_begin(*element.self)),
-                state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_duplicate_impl, expression_source_begin(*element.self)));
             deallocate(methods);
             return evaluate_expression_result_empty;
         }
@@ -1924,23 +1910,20 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     }
     if (!type_evaluated.compile_time_value.is_set)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(*element.type)),
-            state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                         expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
     if (type_evaluated.compile_time_value.value_.kind != value_kind_type)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_expected_compile_time_type, expression_source_begin(*element.type)),
-            state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                         expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
     if (type_evaluated.compile_time_value.value_.type_.kind != type_kind_structure)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_expected_structure, expression_source_begin(*element.type)),
-            state->user);
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_expected_structure, expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
     struct_id const structure_id = type_evaluated.compile_time_value.value_.type_.structure_;
@@ -1948,15 +1931,14 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     structure const *const instantiated_structure = state->program->structs + structure_id;
     if (element.arguments.length < instantiated_structure->count)
     {
-        state->on_error(semantic_error_create(semantic_error_missing_argument, expression_source_begin(*element.type)),
-                        state->user);
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_missing_argument, expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
     if (element.arguments.length > instantiated_structure->count)
     {
-        state->on_error(
-            semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)),
-            state->user);
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
     evaluate_arguments_result const arguments_evaluated =
@@ -2031,7 +2013,7 @@ static void resolve_generic_enum_closure_identifier(generic_enum_closures *const
         {
             if (!state->local_variables.elements[i].compile_time_value.is_set)
             {
-                state->on_error(semantic_error_create(semantic_error_expected_compile_time_type, source), state->user);
+                emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type, source));
                 return;
             }
             closures->elements = reallocate_array(closures->elements, closures->count + 1, sizeof(*closures->elements));
@@ -2276,9 +2258,9 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                 if (!state_evaluated.compile_time_value.is_set ||
                     (state_evaluated.compile_time_value.value_.kind != value_kind_type))
                 {
-                    state->on_error(semantic_error_create(semantic_error_expected_compile_time_type,
-                                                          expression_source_begin(*element.elements[i].state)),
-                                    state->user);
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                     expression_source_begin(*element.elements[i].state)));
                     for (size_t m = 0; m < i; ++m)
                     {
                         enumeration_element_free(elements + m);
@@ -2307,8 +2289,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         {
             if (unicode_string_equals(element.elements[i].name, element.elements[k].name))
             {
-                state->on_error(
-                    semantic_error_create(semantic_error_duplicate_enum_element, element.begin), state->user);
+                emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_enum_element, element.begin));
                 for (size_t m = 0; m <= i; ++m)
                 {
                     enumeration_element_free(elements + m);
@@ -2379,9 +2360,9 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     }
     enum_expression const original = root->generic_enums[generic].tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
-    function_checking_state enum_checking =
-        function_checking_state_create(state->root, NULL, false, state->global, state->on_error, state->user,
-                                       state->program, &ignored_instructions, optional_type_create_empty(), false);
+    function_checking_state enum_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
+        optional_type_create_empty(), false, state->file_name, state->source);
     generic_enum const instantiated_enum = state->root->generic_enums[generic];
     if (argument_count < instantiated_enum.tree.generic_parameter_count)
     {
@@ -2393,7 +2374,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         {
             deallocate(argument_types);
         }
-        state->on_error(semantic_error_create(semantic_error_missing_argument, where), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
         return evaluate_expression_result_empty;
     }
     if (argument_count > instantiated_enum.tree.generic_parameter_count)
@@ -2406,7 +2387,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         {
             deallocate(argument_types);
         }
-        state->on_error(semantic_error_create(semantic_error_extraneous_argument, where), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
         return evaluate_expression_result_empty;
     }
     for (size_t i = 0; i < instantiated_enum.tree.generic_parameter_count; ++i)
@@ -2510,9 +2491,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
             {
                 deallocate(argument_types);
             }
-            state->on_error(semantic_error_create(semantic_error_expected_compile_time_value,
-                                                  expression_source_begin(element.arguments[i])),
-                            state->user);
+            emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_value,
+                                                             expression_source_begin(element.arguments[i])));
             return evaluate_expression_result_empty;
         }
         arguments[i] = argument_evaluated.compile_time_value.value_;
@@ -2529,9 +2509,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         {
             deallocate(argument_types);
         }
-        state->on_error(
-            semantic_error_create(semantic_error_expected_generic_type, expression_source_begin(*element.generic)),
-            state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_generic_type,
+                                                         expression_source_begin(*element.generic)));
         return evaluate_expression_result_empty;
     }
     return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
@@ -2550,7 +2529,7 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
         {
             if (!current_module.content.is_set)
             {
-                state->on_error(semantic_error_create(semantic_error_import_failed, element.begin), state->user);
+                emit_semantic_error(state, semantic_error_create(semantic_error_import_failed, element.begin));
                 return evaluate_expression_result_empty;
             }
             ASSUME(current_module.schema.is_set);
@@ -2567,7 +2546,7 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
     if (!imported.loaded.is_set)
     {
         fail_load_module(state->root, unicode_view_from_string(element.name.value));
-        state->on_error(semantic_error_create(semantic_error_import_failed, element.begin), state->user);
+        emit_semantic_error(state, semantic_error_create(semantic_error_import_failed, element.begin));
         return evaluate_expression_result_empty;
     }
     succeed_load_module(
@@ -2723,9 +2702,8 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         }
         else
         {
-            state->on_error(
-                semantic_error_create(semantic_error_break_outside_of_loop, expression_source_begin(element)),
-                state->user);
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_break_outside_of_loop, expression_source_begin(element)));
         }
         return evaluate_expression_result_create(true, into, type_from_unit(), optional_value_empty, false, false);
     }
@@ -2766,9 +2744,9 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
             {
                 if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
                 {
-                    state->on_error(semantic_error_create(semantic_error_expected_compile_time_type,
-                                                          expression_source_begin(*element.declare.optional_type)),
-                                    state->user);
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                     expression_source_begin(*element.declare.optional_type)));
                 }
                 else
                 {
@@ -2789,9 +2767,8 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
 
         if (local_variable_name_exists(state->local_variables, unicode_view_from_string(element.declare.name.value)))
         {
-            state->on_error(
-                semantic_error_create(semantic_error_declaration_with_existing_name, element.declare.name.source),
-                state->user);
+            emit_semantic_error(state, semantic_error_create(
+                                           semantic_error_declaration_with_existing_name, element.declare.name.source));
         }
         else
         {
@@ -2881,7 +2858,7 @@ static structure clone_structure(structure const original)
 }
 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, module_loader *loader,
-                      void *user)
+                      unicode_view file_name, unicode_view source, void *user)
 {
     structure *const structures = allocate_array(1, sizeof(*structures));
     structures[0] = clone_structure(global);
@@ -2922,7 +2899,7 @@ checked_program check(sequence const root, structure const global, check_error_h
     program_check check_root = {NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
-                       0, optional_type_create_empty(), true, optional_type_create_empty());
+                       0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);
     deallocate(globals);
     if (checked.success)
     {

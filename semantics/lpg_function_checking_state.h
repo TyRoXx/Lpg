@@ -5,7 +5,7 @@
 #include "lpg_semantic_error.h"
 #include "lpg_checked_program.h"
 
-typedef void check_error_handler(semantic_error, void *);
+typedef void check_error_handler(complete_semantic_error, void *);
 
 typedef struct function_checking_state
 {
@@ -28,8 +28,11 @@ typedef struct function_checking_state
     bool has_declared_return_type;
     optional_value *register_compile_time_values;
     register_id register_compile_time_value_count;
+    unicode_view file_name;
+    unicode_view source;
 } function_checking_state;
 
 optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which);
 void write_register_compile_time_value(function_checking_state *const state, register_id const which,
                                        value const compile_time_value);
+void emit_semantic_error(function_checking_state const *const state, semantic_error const error);

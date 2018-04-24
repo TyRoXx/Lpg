@@ -1,5 +1,6 @@
 #pragma once
 #include "lpg_source_location.h"
+#include "lpg_unicode_view.h"
 
 typedef enum semantic_error_type
 {
@@ -34,3 +35,14 @@ typedef struct semantic_error
 
 semantic_error semantic_error_create(semantic_error_type type, source_location where);
 bool semantic_error_equals(semantic_error const left, semantic_error const right);
+
+typedef struct complete_semantic_error
+{
+    semantic_error relative;
+    unicode_view file_name;
+    unicode_view source;
+} complete_semantic_error;
+
+complete_semantic_error complete_semantic_error_create(semantic_error relative, unicode_view file_name,
+                                                       unicode_view source);
+bool complete_semantic_error_equals(complete_semantic_error const left, complete_semantic_error const right);

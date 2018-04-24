@@ -199,7 +199,6 @@ static optional_sequence parse(cli_parser_user user, unicode_view const file_nam
 
 typedef struct semantic_error_context
 {
-    unicode_view source;
     stream_writer diagnostics;
     bool has_error;
 } semantic_error_context;
@@ -274,20 +273,20 @@ static char const *semantic_error_text(semantic_error_type const error)
     LPG_UNREACHABLE();
 }
 
-static void handle_semantic_error(semantic_error const error, void *user)
+static void handle_semantic_error(complete_semantic_error const error, void *user)
 {
     semantic_error_context *const context = user;
     context->has_error = true;
-    ASSERT(success_yes == stream_writer_write_string(context->diagnostics, semantic_error_text(error.type)));
+    ASSERT(success_yes == stream_writer_write_string(context->diagnostics, semantic_error_text(error.relative.type)));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, " in line "));
     char buffer[64];
     char const *const line =
-        integer_format(integer_create(0, error.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
+        integer_format(integer_create(0, error.relative.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
     ASSERT(line);
     ASSERT(success_yes ==
            stream_writer_write_bytes(context->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, ":\n"));
-    print_source_location_hint(context->source, context->diagnostics, error.where);
+    print_source_location_hint(error.source, context->diagnostics, error.relative.where);
 }
 
 static compiler_flags parse_compiler_flags(int const argument_count, char **const arguments, bool *const valid)
@@ -401,9 +400,11 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         globals_values[i] = value_from_unit();
     }
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
-    semantic_error_context context = {unicode_view_from_string(source), diagnostics, false};
+    semantic_error_context context = {diagnostics, false};
     module_loader loader = module_loader_create(module_directory, handle_parse_error, &user);
-    checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader, &context);
+    checked_program checked =
+        check(root.value, standard_library.globals, handle_semantic_error, &loader,
+              unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source), &context);
     sequence_free(&root.value);
     if (!context.has_error && !arguments.flags.compile_only)
     {

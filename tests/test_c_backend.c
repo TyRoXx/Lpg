@@ -21,7 +21,7 @@ static sequence parse(unicode_view const input)
     return result;
 }
 
-static void expect_no_errors(semantic_error const error, void *user)
+static void expect_no_errors(complete_semantic_error const error, void *user)
 {
     (void)error;
     (void)user;
@@ -41,7 +41,8 @@ static void check_generated_c_code(char const *const source, standard_library_de
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
-    checked_program checked = check(root, standard_library.globals, expect_no_errors, &loader, NULL);
+    checked_program checked = check(root, standard_library.globals, expect_no_errors, &loader,
+                                    unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source), NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
     remove_dead_code(&checked);
