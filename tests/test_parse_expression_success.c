@@ -280,6 +280,7 @@ static void test_new_lines(void)
 
 static void test_lambdas()
 {
+    // Lamda with direct return value
     test_successful_parse(expression_from_lambda(lambda_create(
                               function_header_tree_create(NULL, 0, NULL),
                               expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
@@ -287,6 +288,7 @@ static void test_lambdas()
                               source_location_create(0, 0))),
                           unicode_string_from_c_str("() 1"), false);
 
+    // Lamda with return type and implicit return
     {
         expression *result_expression = allocate(sizeof(*result_expression));
         *result_expression = expression_from_integer_literal(
@@ -304,6 +306,7 @@ static void test_lambdas()
                               false);
     }
 
+    // Lamda returning a lamda
     test_successful_parse(expression_from_lambda(lambda_create(
                               function_header_tree_create(NULL, 0, NULL),
                               expression_allocate(expression_from_lambda(lambda_create(
@@ -314,6 +317,7 @@ static void test_lambdas()
                               source_location_create(0, 0))),
                           unicode_string_from_c_str("() () 1"), false);
 
+    // Lamda without a return type
     {
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
@@ -326,7 +330,7 @@ static void test_lambdas()
                                                         "    1"),
                               false);
     }
-
+    // Lamda with a typed parameter and no return type
     {
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
@@ -345,6 +349,7 @@ static void test_lambdas()
                               false);
     }
 
+    // Lamda with two paramaters
     {
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
