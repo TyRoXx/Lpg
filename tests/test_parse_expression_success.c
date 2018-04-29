@@ -469,6 +469,20 @@ static void test_assignments(void)
             expression_allocate(expression_from_integer_literal(
                 integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 14)))))),
         unicode_string_from_c_str("let a : int = 1"), true);
+
+    {
+        expression *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)));
+        elements[1] = expression_from_identifier(
+            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)));
+
+        test_successful_parse(
+            expression_from_declare(declare_create(
+                identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
+                expression_allocate(expression_from_tuple(tuple_create(elements, 2, source_location_create(0, 14)))))),
+            unicode_string_from_c_str("let f = {a,a}"), true);
+    }
 }
 
 static void test_match_cases(void)

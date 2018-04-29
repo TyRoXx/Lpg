@@ -419,18 +419,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
             if (head.token == token_comma)
             {
                 pop(parser);
-                rich_token const space = peek(parser);
-                if (space.token == token_space)
-                {
-                    pop(parser);
-                }
-                else
-                {
-                    parser->on_error(
-                        parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
-                    clean_up_parameters(parameters, parameter_count);
-                    return function_header_parse_result_failure;
-                }
+                parse_optional_space(parser);
             }
             else
             {
@@ -461,15 +450,10 @@ static function_header_parse_result parse_function_header(expression_parser *con
             }
         }
 
+        if (!parse_space(parser))
         {
-            rich_token const space = peek(parser);
-            pop(parser);
-            if (space.token != token_space)
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
-                clean_up_parameters(parameters, parameter_count);
-                return function_header_parse_result_failure;
-            }
+            clean_up_parameters(parameters, parameter_count);
+            return function_header_parse_result_failure;
         }
 
         expression_parser_result const parsed_type = parse_expression(parser, indentation, false);
@@ -610,15 +594,10 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
             pop(parser);
         }
 
+        if (!parse_space(parser))
         {
-            rich_token const space = peek(parser);
-            if (space.token != token_space)
-            {
-                parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
-                is_success = false;
-                break;
-            }
-            pop(parser);
+            is_success = false;
+            break;
         }
 
         expression_parser_result const type_parsed = parse_expression(parser, indentation, false);
@@ -668,11 +647,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
                     if (after_parameter.token == token_comma)
                     {
                         pop(parser);
-                        rich_token const maybe_space = peek(parser);
-                        if (maybe_space.token == token_space)
-                        {
-                            pop(parser);
-                        }
+                        parse_optional_space(parser);
                     }
                     else if (after_parameter.token != token_right_bracket)
                     {
@@ -798,13 +773,11 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
 
 static expression_parser_result parse_import(expression_parser *const parser, source_location const begin)
 {
-    rich_token const space = peek(parser);
-    if ((space.token != token_space) || (space.content.length != 1))
+    if (!parse_space(parser))
     {
-        parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
         return expression_parser_result_failure;
     }
-    pop(parser);
+
     rich_token const name = peek(parser);
     if (name.token != token_identifier)
     {
@@ -1001,24 +974,7 @@ static expression_parser_result parse_tuple(expression_parser *parser, size_t in
         {
             more_elements = true;
             pop(parser);
-            next = peek(parser);
-            if (next.token == token_space)
-            {
-                pop(parser);
-            }
-            else
-            {
-                for (size_t i = 0; i < element_count; ++i)
-                {
-                    expression_free(tuple_elements + i);
-                }
-                if (tuple_elements)
-                {
-                    deallocate(tuple_elements);
-                }
-                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->on_error_user);
-                return expression_parser_result_failure;
-            }
+            parse_optional_space(parser);
         }
         expression_parser_result const parser_result = parse_expression(parser, indentation, false);
         if (parser_result.is_success && more_elements)
