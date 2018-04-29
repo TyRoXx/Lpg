@@ -1,3 +1,5 @@
+let std = import std
+
 /*use a captured variable in a compile-time context*/
 let m = boolean
 let f5 = ()
@@ -26,7 +28,7 @@ let f6 = (a: boolean, b: boolean)
     let indirection = () a
     (c: unit, d: unit)
         side-effect()
-        and(indirection(), b)
+        std.and(indirection(), b)
 assert(f6(boolean.true, boolean.true)(unit_value, unit_value))
 
 /*capture an argument at runtime*/
@@ -35,7 +37,7 @@ let f7 = (a: boolean, b: boolean)
     let indirection = () a
     (c: unit, d: unit)
         side-effect()
-        and(indirection(), b)
+        std.and(indirection(), b)
 assert(f7(boolean.true, boolean.true)(unit_value, unit_value))
 
 /*capture multiple variables*/
@@ -48,7 +50,7 @@ assert(t())
 /*function with multiple parameters captures something*/
 let z = (a: boolean, d: boolean)
     side-effect()
-    and(a, and(d, integer-equals(c, 23)))
+    std.and(a, std.and(d, integer-equals(c, 23)))
 assert(z(boolean.true, boolean.true))
 
 /*capture the same variable twice*/

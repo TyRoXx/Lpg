@@ -232,30 +232,34 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 {
     {
         value const globals_values[] = {
-            /*type*/ value_from_unit(),
-            /*string-ref*/ value_from_unit(),
-            /*removed2*/ value_from_unit(),
-            /*boolean*/ global_object.members[3].compile_time_value.value_,
-            /*assert*/ value_from_function_pointer(function_pointer_value_from_external(assert_impl, NULL, NULL, 0)),
-            /*and*/ value_from_function_pointer(function_pointer_value_from_external(and_impl, NULL, NULL, 0)),
-            /*or*/ value_from_function_pointer(function_pointer_value_from_external(or_impl, NULL, NULL, 0)),
-            /*not*/ value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL, NULL, 0)),
-            /*concat*/ value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL, NULL, 0)),
-            /*string-equals*/ value_from_function_pointer(
-                function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0)),
-            /*removed*/ value_from_unit(),
-            /*int*/ value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, 0)),
-            /*integer-equals*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0)),
-            /*unit*/ value_from_unit(),
-            /*unit_value*/ value_from_unit(),
-            /*option*/ value_from_unit(),
-            /*integer-less*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_less_impl, NULL, NULL, 0)),
-            /*integer-to-string*/ value_from_function_pointer(
-                function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, 0)),
-            /*side-effect*/ value_from_function_pointer(
-                function_pointer_value_from_external(side_effect_impl, NULL, NULL, 0))};
+            /*0 type*/ value_from_unit(),
+            /*1 string-ref*/ value_from_unit(),
+            /*2 removed*/ value_from_unit(),
+            /*3 boolean*/ global_object.members[3].compile_time_value.value_,
+            /*4 assert*/ value_from_function_pointer(function_pointer_value_from_external(
+                assert_impl, NULL, NULL, *global_object.members[4].what.function_pointer_)),
+            /*5 removed*/ value_from_unit(),
+            /*6 removed*/ value_from_unit(),
+            /*7 not*/ value_from_function_pointer(function_pointer_value_from_external(
+                not_impl, NULL, NULL, *global_object.members[7].what.function_pointer_)),
+            /*8 concat*/ value_from_function_pointer(function_pointer_value_from_external(
+                concat_impl, NULL, NULL, *global_object.members[8].what.function_pointer_)),
+            /*9 string-equals*/ value_from_function_pointer(function_pointer_value_from_external(
+                string_equals_impl, NULL, NULL, *global_object.members[9].what.function_pointer_)),
+            /*10 removed*/ value_from_unit(),
+            /*11 int*/ value_from_function_pointer(function_pointer_value_from_external(
+                int_impl, NULL, NULL, *global_object.members[11].what.function_pointer_)),
+            /*12 integer-equals*/ value_from_function_pointer(function_pointer_value_from_external(
+                integer_equals_impl, NULL, NULL, *global_object.members[12].what.function_pointer_)),
+            /*13 unit*/ value_from_unit(),
+            /*14 unit_value*/ value_from_unit(),
+            /*15 option*/ value_from_unit(),
+            /*16 integer-less*/ value_from_function_pointer(function_pointer_value_from_external(
+                integer_less_impl, NULL, NULL, *global_object.members[16].what.function_pointer_)),
+            /*17 integer-to-string*/ value_from_function_pointer(function_pointer_value_from_external(
+                integer_to_string_impl, NULL, NULL, *global_object.members[17].what.function_pointer_)),
+            /*18 side-effect*/ value_from_function_pointer(function_pointer_value_from_external(
+                side_effect_impl, NULL, NULL, *global_object.members[18].what.function_pointer_))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = {NULL};
         interpret(program, globals_values, &gc);

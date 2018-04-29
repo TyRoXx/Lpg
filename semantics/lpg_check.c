@@ -39,7 +39,7 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
 }
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
-    false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {NULL}}}, false, false};
+    false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, false, false};
 
 static function_checking_state
 function_checking_state_create(program_check *const root, function_checking_state *parent,
@@ -137,8 +137,9 @@ read_structure_element(function_checking_state *const state, instruction_sequenc
         }
         if (compile_time_value.is_set)
         {
-            ASSERT(compile_time_value.value_.kind == value_kind_flat_object);
-            value const element_value = compile_time_value.value_.flat_object[i];
+            ASSERT(compile_time_value.value_.kind == value_kind_structure);
+            ASSUME(i < compile_time_value.value_.structure.count);
+            value const element_value = compile_time_value.value_.structure.members[i];
             add_instruction(function, instruction_create_literal(literal_instruction_create(
                                           result, element_value, structure_type->members[i].what)));
             write_register_compile_time_value(state, result, element_value);
@@ -304,6 +305,7 @@ static read_structure_element_result read_element(function_checking_state *state
                         value const literal = value_from_enum_element(i, enum_->elements[i].state, NULL);
                         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                       result, literal, type_from_enumeration(left_side_type.enum_))));
+                        write_register_compile_time_value(state, result, literal);
                         return read_structure_element_result_create(
                             true, left_side_type, optional_value_create(literal), true);
                     }
@@ -312,6 +314,7 @@ static read_structure_element_result read_element(function_checking_state *state
                         garbage_collector_allocate(&state->program->memory, sizeof(*constructor_type));
                     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                   result, literal, type_from_enum_constructor(constructor_type))));
+                    write_register_compile_time_value(state, result, literal);
                     constructor_type->enumeration = left_side_type.enum_;
                     constructor_type->which = i;
                     return read_structure_element_result_create(
@@ -1009,7 +1012,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             case value_kind_type_erased:
             case value_kind_integer:
             case value_kind_string:
-            case value_kind_flat_object:
+            case value_kind_structure:
             case value_kind_type:
             case value_kind_enum_element:
             case value_kind_unit:
@@ -1477,6 +1480,33 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
         {
             ASSUME(enum_elements_handled[i]);
+            switch (cases[i].kind)
+            {
+            case match_instruction_case_kind_stateful_enum:
+                break;
+
+            case match_instruction_case_kind_value:
+                for (size_t k = (i + 1); k < (*element).match.number_of_cases; ++k)
+                {
+                    switch (cases[k].kind)
+                    {
+                    case match_instruction_case_kind_stateful_enum:
+                        break;
+
+                    case match_instruction_case_kind_value:
+                    {
+                        optional_value const left = read_register_compile_time_value(state, cases[i].key_value);
+                        optional_value const right = read_register_compile_time_value(state, cases[k].key_value);
+                        if (left.is_set && right.is_set)
+                        {
+                            ASSUME(!value_equals(left.value_, right.value_));
+                        }
+                        break;
+                    }
+                    }
+                }
+                break;
+            }
         }
         register_id result_register = allocate_register(&state->used_registers);
         add_instruction(
@@ -1778,7 +1808,8 @@ typedef struct method_evaluation_result
     function_pointer_value success;
 } method_evaluation_result;
 
-static method_evaluation_result const method_evaluation_result_failure = {false, {0, NULL, NULL, NULL, 0}};
+static method_evaluation_result const method_evaluation_result_failure = {
+    false, {0, NULL, NULL, NULL, 0, {{(type_kind)0, {0}}, {NULL, 0}, {NULL, 0}, {false, {(type_kind)0, {0}}}}}};
 
 static method_evaluation_result method_evaluation_result_create(function_pointer_value success)
 {
@@ -1969,7 +2000,8 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     if (is_pure)
     {
         deallocate(arguments_evaluated.registers);
-        value const compile_time_value = value_from_flat_object(compile_time_values);
+        value const compile_time_value = value_from_structure(
+            structure_value_create(compile_time_values, arguments_evaluated.tuple_type_for_result.length));
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       into, compile_time_value, type_from_struct(structure_id))));
         write_register_compile_time_value(state, into, compile_time_value);

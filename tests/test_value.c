@@ -51,12 +51,27 @@ void test_value(void)
             function_pointer_value_from_internal(0, left_captures, LPG_ARRAY_SIZE(left_captures)),
             function_pointer_value_from_internal(0, right_captures, LPG_ARRAY_SIZE(right_captures))));
     }
-    REQUIRE(!function_pointer_value_equals(function_pointer_value_from_internal(0, NULL, 0),
-                                           function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0)));
-    REQUIRE(!function_pointer_value_equals(function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0),
-                                           function_pointer_value_from_internal(0, NULL, 0)));
-    REQUIRE(!function_pointer_value_equals(function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0),
-                                           function_pointer_value_from_external(integer_less_impl, NULL, NULL, 0)));
+    REQUIRE(!function_pointer_value_equals(
+        function_pointer_value_from_internal(0, NULL, 0),
+        function_pointer_value_from_external(
+            integer_equals_impl, NULL, NULL,
+            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0),
+                                    optional_type_create_empty()))));
+    REQUIRE(!function_pointer_value_equals(
+        function_pointer_value_from_external(
+            integer_equals_impl, NULL, NULL,
+            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0),
+                                    optional_type_create_empty())),
+        function_pointer_value_from_internal(0, NULL, 0)));
+    REQUIRE(!function_pointer_value_equals(
+        function_pointer_value_from_external(
+            integer_equals_impl, NULL, NULL,
+            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0),
+                                    optional_type_create_empty())),
+        function_pointer_value_from_external(
+            integer_less_impl, NULL, NULL,
+            function_pointer_create(type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0),
+                                    optional_type_create_empty()))));
     REQUIRE(value_equals(value_from_type(type_from_unit()), value_from_type(type_from_unit())));
     REQUIRE(!value_less_than(value_from_type(type_from_unit()), value_from_integer(integer_create(0, 0))));
     REQUIRE(!value_less_than(value_from_integer(integer_create(0, 0)), value_from_integer(integer_create(0, 0))));

@@ -1,3 +1,4 @@
+let std = import std
 let single = enum
     a(string-ref)
 let test-single = (arg: single)
@@ -9,7 +10,7 @@ let make-runtime-string = (value: string-ref)
     side-effect()
     concat("", value)
 assert(test-single(single.a(make-runtime-string("abc"))))
-assert(not(test-single(single.a("def"))))
+assert(std.not(test-single(single.a("def"))))
 
 assert(string-equals("abc", match single.a(make-runtime-string("abc"))
     case single.a(let state): state

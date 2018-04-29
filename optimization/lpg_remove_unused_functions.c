@@ -41,7 +41,7 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 
     case value_kind_integer:
     case value_kind_string:
-    case value_kind_flat_object:
+    case value_kind_structure:
     case value_kind_type:
     case value_kind_enum_element:
     case value_kind_unit:
@@ -247,7 +247,16 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         return value_from_type_erased(type_erased_value_create(from.type_erased.impl, self));
     }
 
-    case value_kind_flat_object:
+    case value_kind_structure:
+    {
+        value *const elements = garbage_collector_allocate_array(clone_gc, from.structure.count, sizeof(*elements));
+        for (size_t i = 0; i < from.structure.count; ++i)
+        {
+            elements[i] = adapt_value(from.structure.members[i], clone_gc, new_function_ids);
+        }
+        return value_from_structure(structure_value_create(elements, from.structure.count));
+    }
+
     case value_kind_pattern:
         LPG_TO_DO();
 

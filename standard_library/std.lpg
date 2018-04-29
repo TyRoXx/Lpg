@@ -1,6 +1,3 @@
-let boolean = enum
-    false
-    true
 let and = (left: boolean, right: boolean)
     match left
         case boolean.true:
@@ -27,9 +24,10 @@ let unit = type-of(unit_value)
 let export = struct
     and: type-of(and)
     or: type-of(or)
+    not: type-of(not)
     type: type
     string-ref: type
     boolean: type
     unit: type
     unit_value: unit
-export{and, or, type, string-ref, boolean, unit, unit_value}
+export{and, or, not, type, string-ref, boolean, unit, unit_value}

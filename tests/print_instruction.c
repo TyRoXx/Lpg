@@ -66,8 +66,13 @@ void print_value(value const printed, size_t const indentation)
         printf("function pointer ?");
         break;
 
-    case value_kind_flat_object:
-        printf("flat object ?");
+    case value_kind_structure:
+        printf("structure");
+        for (size_t i = 0; i < printed.structure.count; ++i)
+        {
+            printf("\n");
+            print_value(printed.structure.members[i], indentation + 1);
+        }
         break;
 
     case value_kind_type:

@@ -5,10 +5,6 @@ value not_impl(function_call_arguments const arguments, struct value const *cons
 
 value concat_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
-value and_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
-
-value or_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
-
 value string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
                          void *environment);
 
@@ -27,8 +23,6 @@ value side_effect_impl(function_call_arguments const arguments, struct value con
 typedef struct standard_library_stable
 {
     function_pointer assert_;
-    function_pointer and_;
-    function_pointer or_;
     function_pointer not_;
     function_pointer concat;
     function_pointer string_equals;

@@ -54,20 +54,21 @@ let duplicate = (message: string-ref)
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
 ```lpg
-let xor = (left: boolean, right: boolean) and(or(left, right), not(and(left, right)))
+let std = import std
+let xor = (left: std.boolean, right: std.boolean) std.and(std.or(left, right), std.not(std.and(left, right)))
 ```
 
 There is no possibility of defining the return type of a function. This will be determined implicitly.
 
 **Calling a function** is as easy as writing the function name and then the parameters (if there are any).
 ```lpg
-xor(boolean.true, boolean.false)
+xor(std.boolean.true, std.boolean.false)
 ```
 
 ### Tuples
 Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
 ```lpg
-let tuple = {10, boolean.true, "Hello", () boolean}
+let tuple = {10, std.boolean.true, "Hello", () std.boolean}
 ```
 The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string-ref "Hello"`.
 
@@ -81,10 +82,10 @@ let make-percent = interface
 And this is how you implement this:
 ```lpg
 let printable = interface
-    print(): string-ref
+    print(): std.string-ref
 
 impl printable for string-ref
-    print(): string-ref
+    print(): std.string-ref
         self
 ```
 
@@ -98,16 +99,16 @@ let print-percent = (something: make-percent)
 Structures provide the tool to define your own data structures. Like so:
 ```lpg
 let t : type = struct
-    a: boolean
-let t-instance : t = t{boolean.true}
+    a: std.boolean
+let t-instance : t = t{std.boolean.true}
 ```
 
 When you want to nest a struct inside a struct, you can do this as well.
 ```lpg
 let u = struct
     a: t
-    b: string-ref
-let u-instance = u{t{boolean.true}, "abc"}
+    b: std.string-ref
+let u-instance = u{t{std.boolean.true}, "abc"}
 ```
 
 ## Concepts
@@ -117,11 +118,11 @@ The match expression works similar to the switch statement in other languages.
 Currently it only supports stateless enumerations, for example `boolean`.
 
 ```
-let a = boolean.true
+let a = std.boolean.true
 let result : int(1, 2) = match a
-    case boolean.false:
+    case std.boolean.false:
         1
-    case boolean.true:
+    case std.boolean.true:
         2
 assert(integer-equals(2, result))
 ```
@@ -134,19 +135,19 @@ The result can be `unit` if you don't want to return anything.
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
 ```lpg
 loop
-    assert(boolean.true)
+    assert(std.boolean.true)
 ```
 If you don't want to have an infinite loop, you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
 ```lpg
-let a = boolean.true
+let a = std.boolean.true
 loop
     let still-running = match a
-        case boolean.false:
+        case std.boolean.false:
             break
             unit
-        case boolean.true:
+        case std.boolean.true:
             unit
-assert(boolean.true)
+assert(std.boolean.true)
 ```
 
 ### Comments

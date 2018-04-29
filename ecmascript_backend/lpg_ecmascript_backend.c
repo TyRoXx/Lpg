@@ -247,19 +247,20 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_unit:
         return stream_writer_write_string(ecmascript_output, "undefined");
 
-    case value_kind_flat_object:
+    case value_kind_structure:
     {
         LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
         ASSUME(type_of.kind == type_kind_structure);
         structure const object = all_structs[type_of.structure_];
+        ASSUME(generated.structure.count == object.count);
         for (size_t i = 0; i < object.count; ++i)
         {
             if (i > 0)
             {
                 LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
             }
-            LPG_TRY(generate_value(generated.flat_object[i], object.members[i].what, all_functions, function_count,
-                                   all_interfaces, all_structs, ecmascript_output));
+            LPG_TRY(generate_value(generated.structure.members[i], object.members[i].what, all_functions,
+                                   function_count, all_interfaces, all_structs, ecmascript_output));
         }
         LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
         return success_yes;

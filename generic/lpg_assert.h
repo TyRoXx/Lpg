@@ -2,11 +2,18 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#ifdef _MSC_VER
+#define LPG_DEBUG_BREAK() __debugbreak()
+#else
+#define LPG_DEBUG_BREAK() (void)0
+#endif
+
 #define ASSERT(x)                                                                                                      \
     do                                                                                                                 \
     {                                                                                                                  \
         if (!(x))                                                                                                      \
         {                                                                                                              \
+            LPG_DEBUG_BREAK();                                                                                         \
             abort();                                                                                                   \
         }                                                                                                              \
     } while ((void)0, 0)

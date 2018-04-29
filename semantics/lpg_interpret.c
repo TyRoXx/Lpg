@@ -4,6 +4,7 @@
 #include "lpg_allocate.h"
 #include "lpg_instruction.h"
 #include <string.h>
+#include "lpg_standard_library.h"
 
 static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
                                                 value *const arguments, value const *globals,
@@ -26,7 +27,9 @@ optional_value call_function(function_pointer_value const callee, function_call_
     ASSUME(arguments.all_functions);
     if (callee.external)
     {
-        return optional_value_create(callee.external(arguments, callee.captures, callee.external_environment));
+        value const return_value = callee.external(arguments, callee.captures, callee.external_environment);
+        ASSUME(value_conforms_to_type(return_value, callee.external_signature.result));
+        return optional_value_create(return_value);
     }
     return call_interpreted_function(arguments.all_functions[callee.code], arguments.self, arguments.arguments,
                                      arguments.globals, callee.captures, arguments.gc, arguments.all_functions,
@@ -61,7 +64,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
-                                        value const *globals, value *registers, value const *const captures,
+                                        value const *globals, value *registers, structure_value const captures,
                                         garbage_collector *const gc, checked_function const *const all_functions,
                                         lpg_interface const *const all_interfaces)
 {
@@ -75,14 +78,25 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             size_t const capture_count = 3;
             value *const pseudo_captures =
                 garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_captures));
+            ASSUME(value_is_valid(registers[element.get_method.from]));
             pseudo_captures[0] = registers[element.get_method.from];
             pseudo_captures[1] = value_from_integer(integer_create(0, element.get_method.method));
             lpg_interface const *const interface_ = &all_interfaces[element.get_method.interface_];
             ASSUME(element.get_method.method < interface_->method_count);
-            pseudo_captures[2] =
-                value_from_integer(integer_create(0, interface_->methods[element.get_method.method].parameters.length));
-            registers[element.get_method.into] = value_from_function_pointer(
-                function_pointer_value_from_external(invoke_method, NULL, pseudo_captures, capture_count));
+            method_description const method = interface_->methods[element.get_method.method];
+            pseudo_captures[2] = value_from_integer(integer_create(0, method.parameters.length));
+            type *const pseudo_capture_types =
+                garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_capture_types));
+            pseudo_capture_types[0] = type_from_interface(element.get_method.interface_);
+            pseudo_capture_types[1] =
+                type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
+            pseudo_capture_types[2] =
+                type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
+            registers[element.get_method.into] = value_from_function_pointer(function_pointer_value_from_external(
+                invoke_method, NULL, pseudo_captures,
+                function_pointer_create(method.result, method.parameters,
+                                        tuple_type_create(pseudo_capture_types, capture_count),
+                                        optional_type_create_empty())));
             break;
         }
 
@@ -119,6 +133,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 {
                     return run_sequence_result_unavailable_at_this_time;
                 }
+                ASSUME(value_is_valid(result.value_));
                 registers[element.call.result] = result.value_;
                 break;
             }
@@ -126,7 +141,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             case value_kind_type_erased:
             case value_kind_integer:
             case value_kind_string:
-            case value_kind_flat_object:
+            case value_kind_structure:
             case value_kind_type:
             case value_kind_enum_element:
             case value_kind_unit:
@@ -143,6 +158,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case instruction_return:
             *return_value = registers[element.return_.returned_value];
+            ASSUME(value_is_valid(*return_value));
             registers[element.return_.unit_goes_into] = value_from_unit();
             return run_sequence_result_return;
 
@@ -173,13 +189,16 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         }
 
         case instruction_global:
-            registers[element.global_into] = value_from_flat_object(globals);
+            registers[element.global_into] =
+                value_from_structure(structure_value_create(globals, standard_library_element_count));
             break;
 
         case instruction_read_struct:
         {
-            value const *const from = registers[element.read_struct.from_object].flat_object;
-            value const member = from[element.read_struct.member];
+            structure_value const from = registers[element.read_struct.from_object].structure;
+            ASSUME(element.read_struct.member < from.count);
+            value const member = from.members[element.read_struct.member];
+            ASSUME(value_is_valid(member));
             registers[element.read_struct.into] = member;
             break;
         }
@@ -189,6 +208,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             return run_sequence_result_break;
 
         case instruction_literal:
+            ASSUME(value_is_valid(element.literal.value_));
             registers[element.literal.into] = element.literal.value_;
             break;
 
@@ -200,6 +220,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             for (size_t j = 0; j < element.tuple_.element_count; ++j)
             {
                 values[j] = registers[*(element.tuple_.elements + j)];
+                ASSUME(value_is_valid(values[j]));
             }
             new_tuple.tuple_ = value_tuple_create(values, element.tuple_.element_count);
             registers[element.tuple_.result] = new_tuple;
@@ -208,16 +229,15 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case instruction_instantiate_struct:
         {
-            value value_struct;
-            value_struct.kind = value_kind_flat_object;
-            value *values =
+            value *const values =
                 garbage_collector_allocate_array(gc, element.instantiate_struct.argument_count, sizeof(*values));
             for (size_t j = 0; j < element.instantiate_struct.argument_count; ++j)
             {
                 values[j] = registers[*(element.instantiate_struct.arguments + j)];
+                ASSUME(value_is_valid(values[j]));
             }
-            value_struct.flat_object = values;
-            registers[element.instantiate_struct.into] = value_struct;
+            registers[element.instantiate_struct.into] =
+                value_from_structure(structure_value_create(values, element.instantiate_struct.argument_count));
             break;
         }
 
@@ -225,6 +245,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         {
             value *const state = garbage_collector_allocate(gc, sizeof(*state));
             *state = registers[element.enum_construct.state];
+            ASSUME(value_is_valid(*state));
             registers[element.enum_construct.into] =
                 value_from_enum_element(element.enum_construct.which.which, element.enum_construct.state_type, state);
             break;
@@ -233,6 +254,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         case instruction_match:
         {
             value const key = registers[element.match.key];
+            ASSUME(value_is_valid(key));
+            bool found_match = false;
             for (size_t j = 0; j < element.match.count; ++j)
             {
                 match_instruction_case *const this_case = element.match.cases + j;
@@ -256,6 +279,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 {
                     continue;
                 }
+                found_match = true;
                 switch (run_sequence(
                     this_case->action, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
                 {
@@ -271,14 +295,17 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 case run_sequence_result_return:
                     return run_sequence_result_return;
                 }
+                ASSUME(value_is_valid(registers[this_case->value]));
+                ASSUME(value_conforms_to_type(registers[this_case->value], element.match.result_type));
                 registers[element.match.result] = registers[this_case->value];
                 break;
             }
+            ASSUME(found_match);
             break;
         }
 
         case instruction_get_captures:
-            registers[element.captures] = value_from_flat_object(captures);
+            registers[element.captures] = value_from_structure(captures);
             break;
 
         case instruction_lambda_with_captures:
@@ -288,6 +315,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             for (size_t j = 0; j < element.lambda_with_captures.capture_count; ++j)
             {
                 inner_captures[j] = registers[element.lambda_with_captures.captures[j]];
+                ASSUME(value_is_valid(inner_captures[j]));
             }
             registers[element.lambda_with_captures.into] =
                 value_from_function_pointer(function_pointer_value_from_internal(
@@ -332,11 +360,15 @@ static optional_value call_interpreted_function(checked_function const callee, o
     }
     for (size_t i = 0; i < callee.signature->parameters.length; ++i)
     {
+        type const parameter = callee.signature->parameters.elements[i];
+        ASSUME(value_conforms_to_type(arguments[i], parameter));
         registers[next_register] = arguments[i];
         ++next_register;
     }
     value return_value = value_from_unit();
-    switch (run_sequence(callee.body, &return_value, globals, registers, captures, gc, all_functions, all_interfaces))
+    switch (run_sequence(callee.body, &return_value, globals, registers,
+                         structure_value_create(captures, callee.signature->captures.length), gc, all_functions,
+                         all_interfaces))
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
@@ -344,6 +376,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
     case run_sequence_result_continue:
     case run_sequence_result_return:
         deallocate(registers);
+        ASSUME(value_conforms_to_type(return_value, callee.signature->result));
         return optional_value_create(return_value);
 
     case run_sequence_result_unavailable_at_this_time:

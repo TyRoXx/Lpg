@@ -42,13 +42,16 @@ typedef struct read_local_variable_result
     bool is_pure;
 } read_local_variable_result;
 
-static read_local_variable_result const read_local_variable_result_unknown = {
-    read_local_variable_status_unknown, {{false, 0}, 0}, {type_kind_unit, {0}}, {false, {value_kind_unit, {0}}}, false};
+static read_local_variable_result const read_local_variable_result_unknown = {read_local_variable_status_unknown,
+                                                                              {{false, 0}, 0},
+                                                                              {type_kind_unit, {0}},
+                                                                              {false, {value_kind_unit, {{NULL, 0}}}},
+                                                                              false};
 
 static read_local_variable_result const read_local_variable_result_forbidden = {read_local_variable_status_forbidden,
                                                                                 {{false, 0}, 0},
                                                                                 {type_kind_unit, {0}},
-                                                                                {false, {value_kind_unit, {0}}},
+                                                                                {false, {value_kind_unit, {{NULL, 0}}}},
                                                                                 false};
 
 read_local_variable_result read_local_variable_result_create(variable_address where, type what,

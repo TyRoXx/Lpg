@@ -434,7 +434,7 @@ static void test_assert(const standard_library_description *std_library)
         instruction const expected_body_elements[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(0, type_from_enumeration(0), NULL), type_from_enumeration(0))),
+                2, value_from_enum_element(0, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_call(call_instruction_create(1, arguments, 1, 3)),
             instruction_create_return(return_instruction_create(3, 4))};
         check_single_wellformed_function(
@@ -446,7 +446,7 @@ static void test_assert(const standard_library_description *std_library)
         instruction const expected_body_elements[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 4, 1)),
             instruction_create_literal(literal_instruction_create(
-                2, value_from_enum_element(1, type_from_enumeration(0), NULL), type_from_enumeration(0))),
+                2, value_from_enum_element(1, type_from_unit(), NULL), type_from_enumeration(0))),
             instruction_create_call(call_instruction_create(1, arguments, 1, 3)),
             instruction_create_return(return_instruction_create(3, 4))};
         check_single_wellformed_function(

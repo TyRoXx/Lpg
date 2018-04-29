@@ -30,21 +30,22 @@ typedef struct function_pointer_value
     void *external_environment;
     struct value *captures;
     size_t capture_count;
+    function_pointer external_signature;
 } function_pointer_value;
 
 function_pointer_value function_pointer_value_from_external(LPG_NON_NULL(external_function *external),
                                                             void *environment, struct value *const captures,
-                                                            size_t const capture_count);
+                                                            function_pointer const signature);
 function_pointer_value function_pointer_value_from_internal(function_id const code, struct value *const captures,
                                                             size_t const capture_count);
 bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right);
 
 typedef enum value_kind
 {
-    value_kind_integer,
+    value_kind_integer = 1,
     value_kind_string,
     value_kind_function_pointer,
-    value_kind_flat_object,
+    value_kind_structure,
     value_kind_type,
     value_kind_enum_element,
     value_kind_unit,
@@ -81,12 +82,20 @@ typedef struct type_erased_value
 
 type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL(struct value *self));
 
+typedef struct structure_value
+{
+    struct value const *members;
+    size_t count;
+} structure_value;
+
+structure_value structure_value_create(struct value const *members, size_t count);
+
 typedef struct value
 {
     value_kind kind;
     union
     {
-        struct value const *flat_object;
+        structure_value structure;
         integer integer_;
         unicode_view string_ref;
         function_pointer_value function_pointer;
@@ -98,7 +107,7 @@ typedef struct value
     };
 } value;
 
-value value_from_flat_object(LPG_NON_NULL(value const *flat_object));
+value value_from_structure(structure_value const content);
 value value_from_function_pointer(function_pointer_value pointer);
 value value_from_string_ref(unicode_view const string_ref);
 value value_from_unit(void);
@@ -115,6 +124,7 @@ bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);
 bool enum_less_than(enum_element_value const left, enum_element_value const right);
+bool value_is_valid(value const checked);
 
 typedef struct optional_value
 {
@@ -124,7 +134,7 @@ typedef struct optional_value
 
 optional_value optional_value_create(value v);
 
-static optional_value const optional_value_empty = {false, {value_kind_integer, {NULL}}};
+static optional_value const optional_value_empty = {false, {(value_kind)0, {{NULL, 0}}}};
 
 typedef struct function_call_arguments
 {
@@ -145,3 +155,4 @@ function_call_arguments function_call_arguments_create(optional_value const self
                                                        lpg_interface const *all_interfaces);
 
 type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments));
+bool value_conforms_to_type(value const instance, type const expected);

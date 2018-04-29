@@ -19,16 +19,20 @@ implementation *implementation_ref_resolve(lpg_interface const *const interfaces
 }
 
 function_pointer_value function_pointer_value_from_external(external_function *external, void *environment,
-                                                            struct value *const captures, size_t const capture_count)
+                                                            struct value *const captures,
+                                                            function_pointer const signature)
 {
-    function_pointer_value const result = {0, external, environment, captures, capture_count};
+    function_pointer_value const result = {0, external, environment, captures, signature.captures.length, signature};
     return result;
 }
 
 function_pointer_value function_pointer_value_from_internal(function_id const code, struct value *const captures,
                                                             size_t const capture_count)
 {
-    function_pointer_value const result = {code, NULL, NULL, captures, capture_count};
+    function_pointer_value const result = {
+        code, NULL, NULL, captures, capture_count,
+        function_pointer_create(
+            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty())};
     return result;
 }
 
@@ -76,11 +80,18 @@ type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL
     return result;
 }
 
-value value_from_flat_object(value const *flat_object)
+structure_value structure_value_create(struct value const *members, size_t count)
+{
+    ASSUME((count == 0) || (members != NULL));
+    structure_value const result = {members, count};
+    return result;
+}
+
+value value_from_structure(structure_value const content)
 {
     value result;
-    result.kind = value_kind_flat_object;
-    result.flat_object = flat_object;
+    result.kind = value_kind_structure;
+    result.structure = content;
     return result;
 }
 
@@ -180,6 +191,8 @@ value value_or_unit(value const *const maybe)
 
 bool value_equals(value const left, value const right)
 {
+    ASSUME(value_is_valid(left));
+    ASSUME(value_is_valid(right));
     if (left.kind != right.kind)
     {
         return false;
@@ -200,7 +213,7 @@ bool value_equals(value const left, value const right)
     case value_kind_function_pointer:
         return function_pointer_value_equals(left.function_pointer, right.function_pointer);
 
-    case value_kind_flat_object:
+    case value_kind_structure:
         LPG_TO_DO();
 
     case value_kind_type:
@@ -270,7 +283,7 @@ bool value_less_than(value const left, value const right)
         return false;
 
     case value_kind_function_pointer:
-    case value_kind_flat_object:
+    case value_kind_structure:
     case value_kind_type:
     case value_kind_tuple:
     case value_kind_enum_constructor:
@@ -301,6 +314,11 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
     return left.which < right.which;
 }
 
+bool value_is_valid(value const checked)
+{
+    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_enum);
+}
+
 function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
                                                        value const *globals, garbage_collector *const gc,
                                                        checked_function const *const all_functions,
@@ -319,4 +337,83 @@ type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments))
     ASSUME(boolean.kind == value_kind_type);
     ASSUME(boolean.type_.kind == type_kind_enumeration);
     return boolean.type_;
+}
+
+bool value_conforms_to_type(value const instance, type const expected)
+{
+    ASSUME(value_is_valid(instance));
+    switch (expected.kind)
+    {
+    case type_kind_unit:
+        return (instance.kind == value_kind_unit);
+
+    case type_kind_structure:
+        return (instance.kind == value_kind_structure);
+
+    case type_kind_tuple:
+    {
+        if (instance.kind != value_kind_tuple)
+        {
+            return false;
+        }
+        if (instance.tuple_.element_count != expected.tuple_.length)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < expected.tuple_.length; ++i)
+        {
+            if (!value_conforms_to_type(instance.tuple_.elements[i], expected.tuple_.elements[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    case type_kind_enumeration:
+        return (instance.kind == value_kind_enum_element);
+
+    case type_kind_string_ref:
+        return (instance.kind == value_kind_string);
+
+    case type_kind_integer_range:
+        return (instance.kind == value_kind_integer) &&
+               integer_range_contains_integer(expected.integer_range_, instance.integer_);
+
+    case type_kind_lambda:
+        return (instance.kind == value_kind_function_pointer);
+
+    case type_kind_type:
+        return (instance.kind == value_kind_type);
+
+    case type_kind_interface:
+        return (instance.kind == value_kind_type_erased) && (instance.type_erased.impl.target == expected.interface_);
+
+    case type_kind_function_pointer:
+    {
+        if (instance.kind != value_kind_function_pointer)
+        {
+            return false;
+        }
+        if (instance.function_pointer.capture_count != expected.function_pointer_->captures.length)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < instance.function_pointer.capture_count; ++i)
+        {
+            if (!value_conforms_to_type(
+                    instance.function_pointer.captures[i], expected.function_pointer_->captures.elements[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    case type_kind_enum_constructor:
+    case type_kind_method_pointer:
+    case type_kind_generic_enum:
+        LPG_TO_DO();
+    }
+    LPG_UNREACHABLE();
 }

@@ -62,7 +62,7 @@ void interface_free(lpg_interface const value);
 
 typedef enum type_kind
 {
-    type_kind_structure,
+    type_kind_structure = 1,
     type_kind_function_pointer,
     type_kind_unit,
     type_kind_string_ref,

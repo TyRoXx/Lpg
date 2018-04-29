@@ -6,8 +6,6 @@
 static void standard_library_stable_free(standard_library_stable *stable)
 {
     function_pointer_free(&stable->assert_);
-    function_pointer_free(&stable->and_);
-    function_pointer_free(&stable->or_);
     function_pointer_free(&stable->not_);
     function_pointer_free(&stable->concat);
     function_pointer_free(&stable->string_equals);
@@ -24,7 +22,7 @@ value not_impl(function_call_arguments const arguments, struct value const *cons
     (void)environment;
     (void)captures;
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
-    return value_from_enum_element(!argument, get_boolean(&arguments), NULL);
+    return value_from_enum_element(!argument, type_from_unit(), NULL);
 }
 
 value concat_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -40,31 +38,13 @@ value concat_impl(function_call_arguments const arguments, struct value const *c
     return value_from_string_ref(unicode_view_create(result, result_length));
 }
 
-value and_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
-{
-    (void)environment;
-    (void)captures;
-    enum_element_id const left = arguments.arguments[0].enum_element.which;
-    enum_element_id const right = arguments.arguments[1].enum_element.which;
-    return value_from_enum_element(left && right, get_boolean(&arguments), NULL);
-}
-
-value or_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
-{
-    (void)environment;
-    (void)captures;
-    enum_element_id const left = arguments.arguments[0].enum_element.which;
-    enum_element_id const right = arguments.arguments[1].enum_element.which;
-    return value_from_enum_element(left || right, get_boolean(&arguments), NULL);
-}
-
 value string_equals_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
     (void)environment;
     (void)captures;
     unicode_view const left = arguments.arguments[0].string_ref;
     unicode_view const right = arguments.arguments[1].string_ref;
-    return value_from_enum_element(unicode_view_equals(left, right), get_boolean(&arguments), NULL);
+    return value_from_enum_element(unicode_view_equals(left, right), type_from_unit(), NULL);
 }
 
 value type_equals_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -73,7 +53,7 @@ value type_equals_impl(function_call_arguments const arguments, struct value con
     (void)captures;
     type const left = arguments.arguments[0].type_;
     type const right = arguments.arguments[1].type_;
-    return value_from_enum_element(type_equals(left, right), get_boolean(&arguments), NULL);
+    return value_from_enum_element(type_equals(left, right), type_from_unit(), NULL);
 }
 
 value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -96,7 +76,7 @@ value integer_equals_impl(function_call_arguments const arguments, struct value 
     (void)captures;
     integer const left = arguments.arguments[0].integer_;
     integer const right = arguments.arguments[1].integer_;
-    return value_from_enum_element(integer_equal(left, right), get_boolean(&arguments), NULL);
+    return value_from_enum_element(integer_equal(left, right), type_from_unit(), NULL);
 }
 
 value integer_less_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -105,7 +85,7 @@ value integer_less_impl(function_call_arguments const arguments, struct value co
     (void)captures;
     integer const left = arguments.arguments[0].integer_;
     integer const right = arguments.arguments[1].integer_;
-    return value_from_enum_element(integer_less(left, right), get_boolean(&arguments), NULL);
+    return value_from_enum_element(integer_less(left, right), type_from_unit(), NULL);
 }
 
 value integer_to_string_impl(function_call_arguments const arguments, struct value const *const captures,
@@ -140,20 +120,6 @@ standard_library_description describe_standard_library(void)
 
     stable->assert_ = function_pointer_create(type_from_unit(), tuple_type_create(type_allocate(boolean), 1),
                                               tuple_type_create(NULL, 0), optional_type_create_empty());
-    {
-        type *const and_parameters = allocate_array(2, sizeof(*and_parameters));
-        and_parameters[0] = boolean;
-        and_parameters[1] = boolean;
-        stable->and_ = function_pointer_create(
-            boolean, tuple_type_create(and_parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
-    }
-    {
-        type *const or_parameters = allocate_array(2, sizeof(*or_parameters));
-        or_parameters[0] = boolean;
-        or_parameters[1] = boolean;
-        stable->or_ = function_pointer_create(
-            boolean, tuple_type_create(or_parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
-    }
     {
         type *const not_parameters = allocate_array(1, sizeof(*not_parameters));
         not_parameters[0] = boolean;
@@ -223,8 +189,8 @@ standard_library_description describe_standard_library(void)
 
     globals[2] = structure_member_create(
         type_from_function_pointer(&stable->type_equals), unicode_string_from_c_str("type-equals"),
-        optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(type_equals_impl, NULL, NULL, 0))));
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(type_equals_impl, NULL, NULL, stable->type_equals))));
 
     globals[3] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("boolean"), optional_value_create(value_from_type(boolean)));
@@ -232,38 +198,38 @@ standard_library_description describe_standard_library(void)
     globals[4] = structure_member_create(
         type_from_function_pointer(&stable->assert_), unicode_string_from_c_str("assert"), optional_value_empty);
 
-    globals[5] = structure_member_create(type_from_function_pointer(&stable->and_), unicode_string_from_c_str("and"),
-                                         optional_value_create(value_from_function_pointer(
-                                             function_pointer_value_from_external(and_impl, NULL, NULL, 0))));
+    globals[5] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed5"),
+                                         optional_value_create(value_from_type(type_from_unit())));
 
-    globals[6] = structure_member_create(type_from_function_pointer(&stable->or_), unicode_string_from_c_str("or"),
-                                         optional_value_create(value_from_function_pointer(
-                                             function_pointer_value_from_external(or_impl, NULL, NULL, 0))));
+    globals[6] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed6"),
+                                         optional_value_create(value_from_type(type_from_unit())));
 
-    globals[7] = structure_member_create(type_from_function_pointer(&stable->not_), unicode_string_from_c_str("not"),
-                                         optional_value_create(value_from_function_pointer(
-                                             function_pointer_value_from_external(not_impl, NULL, NULL, 0))));
-
-    globals[8] = structure_member_create(
-        type_from_function_pointer(&stable->concat), unicode_string_from_c_str("concat"),
+    globals[7] = structure_member_create(
+        type_from_function_pointer(&stable->not_), unicode_string_from_c_str("not"),
         optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(concat_impl, NULL, NULL, 0))));
+            value_from_function_pointer(function_pointer_value_from_external(not_impl, NULL, NULL, stable->not_))));
+
+    globals[8] =
+        structure_member_create(type_from_function_pointer(&stable->concat), unicode_string_from_c_str("concat"),
+                                optional_value_create(value_from_function_pointer(
+                                    function_pointer_value_from_external(concat_impl, NULL, NULL, stable->concat))));
 
     globals[9] = structure_member_create(
         type_from_function_pointer(&stable->string_equals), unicode_string_from_c_str("string-equals"),
-        optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(string_equals_impl, NULL, NULL, 0))));
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(string_equals_impl, NULL, NULL, stable->string_equals))));
 
     globals[10] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed"), optional_value_empty);
 
-    globals[11] = structure_member_create(type_from_function_pointer(&stable->int_), unicode_string_from_c_str("int"),
-                                          optional_value_create(value_from_function_pointer(
-                                              function_pointer_value_from_external(int_impl, NULL, NULL, 0))));
+    globals[11] = structure_member_create(
+        type_from_function_pointer(&stable->int_), unicode_string_from_c_str("int"),
+        optional_value_create(
+            value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, stable->int_))));
 
     globals[12] = structure_member_create(
         type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer-equals"),
-        optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(integer_equals_impl, NULL, NULL, 0))));
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
 
     globals[13] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("unit"), optional_value_create(value_from_type(type_from_unit())));
@@ -276,13 +242,13 @@ standard_library_description describe_standard_library(void)
 
     globals[16] = structure_member_create(
         type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),
-        optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(integer_less_impl, NULL, NULL, 0))));
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
 
     globals[17] = structure_member_create(
         type_from_function_pointer(&stable->integer_to_string), unicode_string_from_c_str("integer-to-string"),
-        optional_value_create(
-            value_from_function_pointer(function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, 0))));
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, stable->integer_to_string))));
 
     globals[18] = structure_member_create(type_from_function_pointer(&stable->side_effect),
                                           unicode_string_from_c_str("side-effect"), optional_value_empty);
