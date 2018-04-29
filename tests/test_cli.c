@@ -200,5 +200,11 @@ void test_cli(void)
                                     "xor(boolean.true, boolean.false)\n"
                                     "^\n");
 
+    expect_output_with_source("import unknown\n", true, "import failed in line 1:\n"
+                                                        "import unknown\n"
+                                                        "^\n");
+
+    expect_output_with_source("let std = import std\n", false, "");
+
     test_formatting_tool();
 }
