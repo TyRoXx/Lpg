@@ -393,7 +393,7 @@ static success_indicator generate_read_struct_value(function_generation *const s
         switch (generated.member)
         {
         case 0:
-            return stream_writer_write_string(ecmascript_output, "undefined");
+            return stream_writer_write_string(ecmascript_output, "side_effect");
 
         case 4:
             return stream_writer_write_string(ecmascript_output, "assert");
@@ -427,9 +427,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
 
         case 17:
             return stream_writer_write_string(ecmascript_output, "integer_to_string");
-
-        case 18:
-            return stream_writer_write_string(ecmascript_output, "side_effect");
 
         default:
             LPG_TO_DO();

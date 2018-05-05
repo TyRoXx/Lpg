@@ -232,8 +232,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 {
     {
         value const globals_values[] = {
-            /*0 type*/ value_from_unit(),
-            /*1 string-ref*/ value_from_unit(),
+            /*0 side-effect*/ value_from_function_pointer(function_pointer_value_from_external(
+                side_effect_impl, NULL, NULL, *global_object.members[0].what.function_pointer_)),
+            /*1 removed*/ value_from_unit(),
             /*2 removed*/ value_from_unit(),
             /*3 boolean*/ global_object.members[3].compile_time_value.value_,
             /*4 assert*/ value_from_function_pointer(function_pointer_value_from_external(
@@ -251,15 +252,13 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 int_impl, NULL, NULL, *global_object.members[11].what.function_pointer_)),
             /*12 integer-equals*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_equals_impl, NULL, NULL, *global_object.members[12].what.function_pointer_)),
-            /*13 unit*/ value_from_unit(),
-            /*14 unit_value*/ value_from_unit(),
-            /*15 option*/ value_from_unit(),
+            /*13 removed*/ value_from_unit(),
+            /*14 removed*/ value_from_unit(),
+            /*15 removed*/ value_from_unit(),
             /*16 integer-less*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_less_impl, NULL, NULL, *global_object.members[16].what.function_pointer_)),
             /*17 integer-to-string*/ value_from_function_pointer(function_pointer_value_from_external(
-                integer_to_string_impl, NULL, NULL, *global_object.members[17].what.function_pointer_)),
-            /*18 side-effect*/ value_from_function_pointer(function_pointer_value_from_external(
-                side_effect_impl, NULL, NULL, *global_object.members[18].what.function_pointer_))};
+                integer_to_string_impl, NULL, NULL, *global_object.members[17].what.function_pointer_))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = {NULL};
         interpret(program, globals_values, &gc);

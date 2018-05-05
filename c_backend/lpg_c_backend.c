@@ -1629,6 +1629,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_global:
             switch (input.read_struct.member)
             {
+            case 0:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_side_effect);
+                return success_yes;
+
             case 4:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_assert);
@@ -1684,11 +1689,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 17:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_to_string);
-                return success_yes;
-
-            case 18:
-                set_register_meaning(
-                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_side_effect);
                 return success_yes;
 
             default:

@@ -171,7 +171,7 @@ void test_semantics(void)
         LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
         {
             instruction const expected_body_elements[] = {
-                instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
+                instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
                 instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
                 instruction_create_return(return_instruction_create(2, 3))};
             check_single_wellformed_function(sources[i], std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
@@ -351,7 +351,7 @@ static void test_loops(const standard_library_description *std_library)
 {
     {
         instruction const loop_body[] = {instruction_create_global(0),
-                                         instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
+                                         instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
                                          instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
         expected_body_elements[0] =
@@ -363,10 +363,10 @@ static void test_loops(const standard_library_description *std_library)
     }
     {
         instruction const loop_body[] = {instruction_create_global(0),
-                                         instruction_create_read_struct(read_struct_instruction_create(0, 18, 1)),
+                                         instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
                                          instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
                                          instruction_create_global(3),
-                                         instruction_create_read_struct(read_struct_instruction_create(3, 18, 4)),
+                                         instruction_create_read_struct(read_struct_instruction_create(3, 0, 4)),
                                          instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
         instruction const expected_body_elements[] = {
             instruction_create_loop(loop_instruction_create(6, instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))),

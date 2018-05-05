@@ -181,8 +181,8 @@ standard_library_description describe_standard_library(void)
     }
 
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));
-    globals[0] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed0"),
-                                         optional_value_create(value_from_type(type_from_type())));
+    globals[0] = structure_member_create(type_from_function_pointer(&stable->side_effect),
+                                         unicode_string_from_c_str("side-effect"), optional_value_empty);
 
     globals[1] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed1"),
                                          optional_value_create(value_from_type(type_from_unit())));
@@ -250,10 +250,7 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, stable->integer_to_string))));
 
-    globals[18] = structure_member_create(type_from_function_pointer(&stable->side_effect),
-                                          unicode_string_from_c_str("side-effect"), optional_value_empty);
-
-    LPG_STATIC_ASSERT(standard_library_element_count == 19);
+    LPG_STATIC_ASSERT(standard_library_element_count == 18);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;
