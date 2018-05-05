@@ -98,7 +98,7 @@ let print-percent = (something: make-percent)
 ### Structures
 Structures provide the tool to define your own data structures. Like so:
 ```lpg
-let t : type = struct
+let t : std.type = struct
     a: std.boolean
 let t-instance : t = t{std.boolean.true}
 ```

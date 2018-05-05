@@ -395,6 +395,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 0:
             return stream_writer_write_string(ecmascript_output, "side_effect");
 
+        case 1:
+            return stream_writer_write_string(ecmascript_output, "integer_to_string");
+
         case 4:
             return stream_writer_write_string(ecmascript_output, "assert");
 
@@ -424,9 +427,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
 
         case 16:
             return stream_writer_write_string(ecmascript_output, "integer_less");
-
-        case 17:
-            return stream_writer_write_string(ecmascript_output, "integer_to_string");
 
         default:
             LPG_TO_DO();
