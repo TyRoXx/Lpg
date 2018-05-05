@@ -824,6 +824,7 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     }
 
     case type_kind_interface:
+        LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         LPG_TRY(stream_writer_write_string(c_output, ".vtable->_add_reference("));
         LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
