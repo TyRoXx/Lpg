@@ -404,6 +404,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 5:
             return stream_writer_write_string(ecmascript_output, "integer_less");
 
+        case 6:
+            return stream_writer_write_string(ecmascript_output, "integer_equals");
+
         case 7:
             return stream_writer_write_string(ecmascript_output, "not");
 
@@ -412,15 +415,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
 
         case 9:
             return stream_writer_write_string(ecmascript_output, "string_equals");
-
-        case 12:
-            return stream_writer_write_string(ecmascript_output, "integer_equals");
-
-        case 13:
-            return stream_writer_write_string(ecmascript_output, "undefined");
-
-        case 14:
-            return stream_writer_write_string(ecmascript_output, "undefined");
 
         default:
             LPG_TO_DO();

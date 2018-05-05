@@ -205,8 +205,10 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
 
-    globals[6] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed6"),
-                                         optional_value_create(value_from_type(type_from_unit())));
+    globals[6] = structure_member_create(
+        type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer-equals"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
 
     globals[7] = structure_member_create(
         type_from_function_pointer(&stable->not_), unicode_string_from_c_str("not"),
@@ -230,12 +232,7 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, stable->int_))));
 
-    globals[12] = structure_member_create(
-        type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer-equals"),
-        optional_value_create(value_from_function_pointer(
-            function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
-
-    LPG_STATIC_ASSERT(standard_library_element_count == 13);
+    LPG_STATIC_ASSERT(standard_library_element_count == 12);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

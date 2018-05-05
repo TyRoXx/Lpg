@@ -1609,6 +1609,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_less);
                 return success_yes;
 
+            case 6:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_equals);
+                return success_yes;
+
             case 7:
                 set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_not);
                 return success_yes;
@@ -1621,26 +1626,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 9:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_string_equals);
-                return success_yes;
-
-            case 12:
-                set_register_meaning(
-                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_equals);
-                return success_yes;
-
-            case 13:
-                set_register_meaning(
-                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_unit);
-                return success_yes;
-
-            case 14:
-                state->standard_library.using_unit = true;
-                set_register_variable(
-                    state, input.read_struct.into, register_resource_ownership_borrows, type_from_unit());
-                LPG_TRY(indent(indentation, c_output));
-                LPG_TRY(stream_writer_write_string(c_output, "unit const "));
-                LPG_TRY(generate_register_name(input.read_struct.into, current_function, c_output));
-                LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
                 return success_yes;
 
             default:

@@ -242,7 +242,8 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 assert_impl, NULL, NULL, *global_object.members[4].what.function_pointer_)),
             /*5 integer-less*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_less_impl, NULL, NULL, *global_object.members[5].what.function_pointer_)),
-            /*6 removed*/ value_from_unit(),
+            /*6 integer-equals*/ value_from_function_pointer(function_pointer_value_from_external(
+                integer_equals_impl, NULL, NULL, *global_object.members[6].what.function_pointer_)),
             /*7 not*/ value_from_function_pointer(function_pointer_value_from_external(
                 not_impl, NULL, NULL, *global_object.members[7].what.function_pointer_)),
             /*8 concat*/ value_from_function_pointer(function_pointer_value_from_external(
@@ -251,9 +252,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 string_equals_impl, NULL, NULL, *global_object.members[9].what.function_pointer_)),
             /*10 removed*/ value_from_unit(),
             /*11 int*/ value_from_function_pointer(function_pointer_value_from_external(
-                int_impl, NULL, NULL, *global_object.members[11].what.function_pointer_)),
-            /*12 integer-equals*/ value_from_function_pointer(function_pointer_value_from_external(
-                integer_equals_impl, NULL, NULL, *global_object.members[12].what.function_pointer_))};
+                int_impl, NULL, NULL, *global_object.members[11].what.function_pointer_))};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = {NULL};
         interpret(program, globals_values, &gc);
