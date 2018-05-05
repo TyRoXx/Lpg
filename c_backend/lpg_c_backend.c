@@ -30,8 +30,6 @@ typedef enum register_meaning
     register_meaning_integer_equals,
     register_meaning_integer_less,
     register_meaning_integer_to_string,
-    register_meaning_or,
-    register_meaning_and,
     register_meaning_not,
     register_meaning_concat,
     register_meaning_argument,
@@ -738,14 +736,6 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_integer_to_string:
         LPG_TO_DO();
 
-    case register_meaning_and:
-        state->standard_library.using_boolean = true;
-        return stream_writer_write_string(c_output, "and_impl");
-
-    case register_meaning_or:
-        state->standard_library.using_boolean = true;
-        return stream_writer_write_string(c_output, "or_impl");
-
     case register_meaning_not:
         state->standard_library.using_boolean = true;
         return stream_writer_write_string(c_output, "not_impl");
@@ -902,9 +892,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_equals:
     case register_meaning_concat:
     case register_meaning_side_effect:
-    case register_meaning_and:
     case register_meaning_not:
-    case register_meaning_or:
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
     case register_meaning_unit:
@@ -1295,8 +1283,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_integer_equals:
         case register_meaning_integer_less:
         case register_meaning_integer_to_string:
-        case register_meaning_or:
-        case register_meaning_and:
         case register_meaning_not:
         case register_meaning_concat:
         case register_meaning_captures:
@@ -1534,30 +1520,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             break;
         }
 
-        case register_meaning_and:
-            ASSUME(input.call.argument_count == 2);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
-            LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
-            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = ("));
-            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " & "));
-            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success_yes;
-
-        case register_meaning_or:
-            ASSUME(input.call.argument_count == 2);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
-            LPG_TRY(stream_writer_write_string(c_output, "size_t const "));
-            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = ("));
-            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " | "));
-            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
-            return success_yes;
-
         case register_meaning_not:
             ASSUME(input.call.argument_count == 1);
             set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
@@ -1617,9 +1579,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         switch (state->registers[input.read_struct.from_object].meaning)
         {
         case register_meaning_nothing:
-        case register_meaning_and:
         case register_meaning_not:
-        case register_meaning_or:
         case register_meaning_unit:
             LPG_UNREACHABLE();
 
@@ -1645,11 +1605,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 return success_yes;
 
             case 5:
-                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_and);
-                return success_yes;
-
-            case 6:
-                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_or);
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_less);
                 return success_yes;
 
             case 7:
@@ -1684,11 +1641,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, "unit const "));
                 LPG_TRY(generate_register_name(input.read_struct.into, current_function, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
-                return success_yes;
-
-            case 16:
-                set_register_meaning(
-                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_less);
                 return success_yes;
 
             default:

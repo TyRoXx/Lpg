@@ -402,10 +402,7 @@ static success_indicator generate_read_struct_value(function_generation *const s
             return stream_writer_write_string(ecmascript_output, "assert");
 
         case 5:
-            return stream_writer_write_string(ecmascript_output, "and");
-
-        case 6:
-            return stream_writer_write_string(ecmascript_output, "or");
+            return stream_writer_write_string(ecmascript_output, "integer_less");
 
         case 7:
             return stream_writer_write_string(ecmascript_output, "not");
@@ -424,9 +421,6 @@ static success_indicator generate_read_struct_value(function_generation *const s
 
         case 14:
             return stream_writer_write_string(ecmascript_output, "undefined");
-
-        case 16:
-            return stream_writer_write_string(ecmascript_output, "integer_less");
 
         default:
             LPG_TO_DO();
@@ -967,12 +961,6 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
         ecmascript_output, "var integer_less = function (left, right) { return (left < right) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         ecmascript_output, "var concat = function (left, right) { return (left + right); };\n"));
-    LPG_TRY(stream_writer_write_string(
-        ecmascript_output,
-        "var or = function (left, right) { return ((left === 1.0) || (right === 1.0)) ? 1.0 : 0.0; };\n"));
-    LPG_TRY(stream_writer_write_string(
-        ecmascript_output,
-        "var and = function (left, right) { return ((left === 1.0) && (right === 1.0)) ? 1.0 : 0.0; };\n"));
     LPG_TRY(stream_writer_write_string(
         ecmascript_output, "var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "var side_effect = function () {};\n"));

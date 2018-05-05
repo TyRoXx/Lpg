@@ -200,8 +200,10 @@ standard_library_description describe_standard_library(void)
     globals[4] = structure_member_create(
         type_from_function_pointer(&stable->assert_), unicode_string_from_c_str("assert"), optional_value_empty);
 
-    globals[5] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed5"),
-                                         optional_value_create(value_from_type(type_from_unit())));
+    globals[5] = structure_member_create(
+        type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
 
     globals[6] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed6"),
                                          optional_value_create(value_from_type(type_from_unit())));
@@ -233,21 +235,7 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
 
-    globals[13] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("removed13"), optional_value_create(value_from_unit()));
-
-    globals[14] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("removed14"), optional_value_create(value_from_unit()));
-
-    globals[15] = structure_member_create(
-        type_from_unit(), unicode_string_from_c_str("removed15"), optional_value_create(value_from_unit()));
-
-    globals[16] = structure_member_create(
-        type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),
-        optional_value_create(value_from_function_pointer(
-            function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
-
-    LPG_STATIC_ASSERT(standard_library_element_count == 17);
+    LPG_STATIC_ASSERT(standard_library_element_count == 13);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

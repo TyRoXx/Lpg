@@ -36,7 +36,7 @@ typedef struct standard_library_stable
 
 enum
 {
-    standard_library_element_count = 17
+    standard_library_element_count = 13
 };
 
 typedef struct standard_library_description
