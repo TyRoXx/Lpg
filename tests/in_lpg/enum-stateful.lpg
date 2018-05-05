@@ -1,12 +1,12 @@
 let std = import std
 let single = enum
-    a(string-ref)
+    a(std.string-ref)
 let test-single = (arg: single)
     match arg
         case single.a(let state):
             side-effect()
             string-equals("abc", state)
-let make-runtime-string = (value: string-ref)
+let make-runtime-string = (value: std.string-ref)
     side-effect()
     concat("", value)
 assert(test-single(single.a(make-runtime-string("abc"))))
@@ -24,7 +24,7 @@ assert(string-equals("abc", match return-stateful-enum()
 ))
 
 let structure = struct
-    x: string-ref
+    x: std.string-ref
     y: boolean
 let multi = enum
     a(single)

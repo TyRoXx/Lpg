@@ -550,13 +550,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 19))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 23))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = string-ref.a\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = std.string-ref.a\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -723,14 +722,14 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_interface, source_location_create(0, 5))};
+            semantic_error_create(semantic_error_expected_interface, source_location_create(1, 5))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("impl string-ref for unit\n"
-                                               "    f(): unit\n"
-                                               "        unit_value\n",
+        checked_program checked = simple_check("let std = import std\n"
+                                               "impl std.string-ref for std.unit\n"
+                                               "    f(): std.unit\n"
+                                               "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -800,7 +799,7 @@ void test_semantic_errors(void)
                                                "let i = interface\n"
                                                "    f(a: boolean): std.unit\n"
                                                "impl i for std.unit\n"
-                                               "    f(a: boolean): string-ref\n"
+                                               "    f(a: boolean): std.string-ref\n"
                                                "        \"\"\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);

@@ -9,13 +9,13 @@ assert(match a
         s
 )
 
-let runtime-string = (arg: string-ref)
+let runtime-string = (arg: std.string-ref)
     side-effect()
     concat("", arg)
 
-let b = single-parameter[string-ref].a(runtime-string("abc"))
+let b = single-parameter[std.string-ref].a(runtime-string("abc"))
 assert(match b
-    case single-parameter[string-ref].a(let s):
+    case single-parameter[std.string-ref].a(let s):
         string-equals("abc", s)
 )
 
@@ -23,11 +23,11 @@ let two-parameters = enum[First, Second]
     first(First)
     second(Second)
 
-let c = two-parameters[boolean, string-ref].second(runtime-string("abc"))
+let c = two-parameters[boolean, std.string-ref].second(runtime-string("abc"))
 assert(match c
-    case two-parameters[boolean, string-ref].first(let s):
+    case two-parameters[boolean, std.string-ref].first(let s):
         boolean.false
-    case two-parameters[boolean, string-ref].second(let s):
+    case two-parameters[boolean, std.string-ref].second(let s):
         string-equals("abc", s)
 )
 

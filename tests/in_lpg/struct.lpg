@@ -1,3 +1,5 @@
+let std = import std
+
 let s = struct
 let s-instance = s{}
 
@@ -8,7 +10,7 @@ assert(t-instance.a)
 
 let u = struct
     a: t
-    b: string-ref
+    b: std.string-ref
 let u-instance = u{t{boolean.true}, "abc"}
 assert(u-instance.a.a)
 assert(string-equals("abc", u-instance.b))

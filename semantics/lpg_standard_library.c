@@ -184,8 +184,8 @@ standard_library_description describe_standard_library(void)
     globals[0] = structure_member_create(
         type_from_type(), unicode_string_from_c_str("type"), optional_value_create(value_from_type(type_from_type())));
 
-    globals[1] = structure_member_create(type_from_type(), unicode_string_from_c_str("string-ref"),
-                                         optional_value_create(value_from_type(type_from_string_ref())));
+    globals[1] = structure_member_create(type_from_type(), unicode_string_from_c_str("removed1"),
+                                         optional_value_create(value_from_type(type_from_unit())));
 
     globals[2] = structure_member_create(
         type_from_function_pointer(&stable->type_equals), unicode_string_from_c_str("type-equals"),

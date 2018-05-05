@@ -80,10 +80,11 @@ void test_c_backend(void)
                            "f()\n",
                            std_library);
 
-    check_generated_c_code("let read = ()\n"
+    check_generated_c_code("let std = import std\n"
+                           "let read = ()\n"
                            "    side-effect()\n"
                            "    \"\"\n"
-                           "let s = (a: string-ref) a\n"
+                           "let s = (a: std.string-ref) a\n"
                            "let t = s(concat(read(), \"\"))\n"
                            "assert(string-equals(\"\", t))\n",
                            std_library);
@@ -97,9 +98,10 @@ void test_c_backend(void)
                            ")\n",
                            std_library);
 
-    check_generated_c_code("let printable = interface\n"
-                           "    print(): string-ref\n"
-                           "impl printable for string-ref\n"
+    check_generated_c_code("let std = import std\n"
+                           "let printable = interface\n"
+                           "    print(): std.string-ref\n"
+                           "impl printable for std.string-ref\n"
                            "    print()\n"
                            "        side-effect()\n"
                            "        self\n"

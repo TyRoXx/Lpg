@@ -48,13 +48,13 @@ If a line just consists of one value that is not assigned to anything and it is 
 
 If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
-let duplicate = (message: string-ref)
+let std = import std
+let duplicate = (message: std.string-ref)
     {message, message}
 ```
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
 ```lpg
-let std = import std
 let xor = (left: std.boolean, right: std.boolean) std.and(std.or(left, right), std.not(std.and(left, right)))
 ```
 
@@ -84,7 +84,7 @@ And this is how you implement this:
 let printable = interface
     print(): std.string-ref
 
-impl printable for string-ref
+impl printable for std.string-ref
     print(): std.string-ref
         self
 ```
@@ -144,9 +144,9 @@ loop
     let still-running = match a
         case std.boolean.false:
             break
-            unit
+            std.unit
         case std.boolean.true:
-            unit
+            std.unit
 assert(std.boolean.true)
 ```
 
