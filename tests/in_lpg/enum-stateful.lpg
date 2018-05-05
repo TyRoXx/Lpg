@@ -29,7 +29,7 @@ let structure = struct
 let multi = enum
     a(single)
     b(structure)
-    c(unit)
+    c(std.unit)
     d(boolean)
     e
     f

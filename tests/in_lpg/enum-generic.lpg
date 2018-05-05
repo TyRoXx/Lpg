@@ -1,3 +1,5 @@
+let std = import std
+
 let single-parameter = enum[T]
     a(T)
 
@@ -59,7 +61,7 @@ let using-local = enum[T]
             x
         let cover-enum-var = cover-enum.x
         match cover-enum-var
-            case cover-enum.x: unit
+            case cover-enum.x: std.unit
         let cover-not = !boolean.true
         let cover-interface = interface
             m(): boolean

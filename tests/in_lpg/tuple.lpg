@@ -1,5 +1,6 @@
+let std = import std
 let s = {}
-let t = {unit}
+let t = {std.unit}
 let u = {1, 2, 3, 4, 5, 6}
 let v5 = {123, "abc"}
 assert(integer-equals(123, v5.0))

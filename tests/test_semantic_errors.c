@@ -540,13 +540,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 13))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 17))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = unit.a\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = std.unit.a\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -594,12 +593,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 21))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 25))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = (a: unit, b: 1) 2\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = (a: std.unit, b: 1) 2\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -626,26 +625,26 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 24))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(3, 24))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    method(): unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    method(): std.unit\n"
                                                "let f = (a: i) a.method.unknown()\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 9))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(3, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    a(): unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    a(): std.unit\n"
                                                "    b(): unknown\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -695,16 +694,16 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(3, 9))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    f(): unit\n"
-                                               "impl i for unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "impl i for std.unit\n"
                                                "    f(): 1\n"
                                                "        unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -713,9 +712,9 @@ void test_semantic_errors(void)
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
-                                               "    f(): unit\n"
-                                               "impl i for unit\n"
-                                               "    f(): unit\n"
+                                               "    f(): std.unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
                                                "        a\n"
                                                "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
@@ -752,9 +751,9 @@ void test_semantic_errors(void)
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
-                                               "    f(): unit\n"
+                                               "    f(): std.unit\n"
                                                "impl i for 1\n"
-                                               "    f(): unit\n"
+                                               "    f(): std.unit\n"
                                                "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
@@ -766,12 +765,12 @@ void test_semantic_errors(void)
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
-                                               "    f(): unit\n"
-                                               "impl i for unit\n"
-                                               "    f(): unit\n"
+                                               "    f(): std.unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
                                                "        std.unit_value\n"
-                                               "impl i for unit\n"
-                                               "    f(): unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
                                                "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
@@ -783,10 +782,10 @@ void test_semantic_errors(void)
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
-                                               "    f(): unit\n"
+                                               "    f(): std.unit\n"
                                                "let runtime-value = side-effect()\n"
-                                               "impl i for unit\n"
-                                               "    f(): unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
                                                "        let captured = runtime-value\n"
                                                "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
@@ -795,42 +794,42 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 19))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(4, 19))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    f(a: boolean): unit\n"
-                                               "impl i for unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(a: boolean): std.unit\n"
+                                               "impl i for std.unit\n"
                                                "    f(a: boolean): string-ref\n"
                                                "        \"\"\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(4, 8))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(5, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    f(): unit\n"
-                                               "impl i for unit\n"
-                                               "    f(): unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
                                                "        \"\"\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_duplicate_method_name, source_location_create(2, 4))};
+            semantic_error_create(semantic_error_duplicate_method_name, source_location_create(3, 4))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = interface\n"
-                                               "    f(): unit\n"
-                                               "    f(): unit\n",
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "    f(): std.unit\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -879,12 +878,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_structure, source_location_create(0, 8))};
+            semantic_error_create(semantic_error_expected_structure, source_location_create(1, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = unit{}\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = std.unit{}\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -925,42 +924,42 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 7))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(3, 7))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let s = struct\n"
-                                               "    a: unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let s = struct\n"
+                                               "    a: std.unit\n"
                                                "    b: u\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(2, 7))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(3, 7))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let s = struct\n"
-                                               "    a: unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let s = struct\n"
+                                               "    a: std.unit\n"
                                                "    b: 1\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(6, 7))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(7, 7))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let f = ()\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let f = ()\n"
                                                "    side-effect()\n"
                                                "    1\n"
                                                "let t = f()\n"
                                                "let s = struct\n"
-                                               "    a: unit\n"
+                                               "    a: std.unit\n"
                                                "    b: t\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     {
@@ -1120,13 +1119,13 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(1, 11))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(2, 11))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let f = (): unit\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let f = (): std.unit\n"
                                                "    return 2",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
 

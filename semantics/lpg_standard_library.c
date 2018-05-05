@@ -232,7 +232,7 @@ standard_library_description describe_standard_library(void)
             function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
 
     globals[13] = structure_member_create(
-        type_from_type(), unicode_string_from_c_str("unit"), optional_value_create(value_from_type(type_from_unit())));
+        type_from_unit(), unicode_string_from_c_str("removed13"), optional_value_create(value_from_unit()));
 
     globals[14] = structure_member_create(
         type_from_unit(), unicode_string_from_c_str("removed14"), optional_value_create(value_from_unit()));

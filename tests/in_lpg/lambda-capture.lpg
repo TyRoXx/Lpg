@@ -26,7 +26,7 @@ h()
 /*capture an argument at compile time*/
 let f6 = (a: boolean, b: boolean)
     let indirection = () a
-    (c: unit, d: unit)
+    (c: std.unit, d: std.unit)
         side-effect()
         std.and(indirection(), b)
 assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
@@ -35,7 +35,7 @@ assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 let f7 = (a: boolean, b: boolean)
     side-effect()
     let indirection = () a
-    (c: unit, d: unit)
+    (c: std.unit, d: std.unit)
         side-effect()
         std.and(indirection(), b)
 assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))

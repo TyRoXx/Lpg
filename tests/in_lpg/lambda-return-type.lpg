@@ -2,12 +2,12 @@ let std = import std
 
 let printable2 = interface
     print(): string-ref
-    other-method(): unit
+    other-method(): std.unit
 
 impl printable2 for string-ref
     print(): string-ref
         self
-    other-method(): unit
+    other-method(): std.unit
         std.unit_value
 
 let explicit-return-type = (): int(1, 1)

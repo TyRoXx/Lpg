@@ -8,7 +8,7 @@ let f4 = (printed: printable)
 
 let printable2 = interface
     print(): string-ref
-    other-method(): unit
+    other-method(): std.unit
 
 let pure = (a: printable2)
     let print = a.print
@@ -24,10 +24,10 @@ let runtime = (a: printable2)
 impl printable2 for string-ref
     print(): string-ref
         self
-    other-method(): unit
+    other-method(): std.unit
         std.unit_value
 
-impl printable2 for unit
+impl printable2 for std.unit
     print()
         "unit"
     other-method()
@@ -75,7 +75,7 @@ assert(string-equals("abc", a2.print()))
 let test-interface = interface
     method(a: boolean, b: boolean): printable2
 
-impl test-interface for unit
+impl test-interface for std.unit
     method(a: boolean, b: boolean)
         assert(a)
         assert(not(b))

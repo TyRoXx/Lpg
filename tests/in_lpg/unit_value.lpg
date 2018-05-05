@@ -2,4 +2,4 @@ let std = import std
 let runtime-unit = ()
     side-effect()
     std.unit_value
-let u : unit = runtime-unit()
+let u : std.unit = runtime-unit()
