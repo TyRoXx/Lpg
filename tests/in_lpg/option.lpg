@@ -1,3 +1,6 @@
+let std = import std
+let option = std.option
+
 let runtime = (arg: int(0, 1000))
     side-effect()
     option.some(arg)

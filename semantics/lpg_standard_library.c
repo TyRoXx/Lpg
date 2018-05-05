@@ -237,8 +237,8 @@ standard_library_description describe_standard_library(void)
     globals[14] = structure_member_create(
         type_from_unit(), unicode_string_from_c_str("unit_value"), optional_value_create(value_from_unit()));
 
-    globals[15] = structure_member_create(type_from_type(), unicode_string_from_c_str("option"),
-                                          optional_value_create(value_from_type(type_from_enumeration(1))));
+    globals[15] = structure_member_create(
+        type_from_unit(), unicode_string_from_c_str("removed15"), optional_value_create(value_from_unit()));
 
     globals[16] = structure_member_create(
         type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),

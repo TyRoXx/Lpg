@@ -21,6 +21,11 @@ let string-ref = type-of("")
 let unit_value = ()
 ()
 let unit = type-of(unit_value)
+
+let option = enum
+    some(int(0, 340282366920938463463374607431768211455))
+    none
+
 let export = struct
     and: type-of(and)
     or: type-of(or)
@@ -30,4 +35,5 @@ let export = struct
     boolean: type
     unit: type
     unit_value: unit
-export{and, or, not, type, string-ref, boolean, unit, unit_value}
+    option: type-of(option)
+export{and, or, not, type, string-ref, boolean, unit, unit_value, option}

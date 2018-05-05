@@ -531,13 +531,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 20))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 24))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = option.some.a\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = std.option.some.a\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1014,66 +1013,71 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_duplicate_match_case, source_location_create(2, 9))};
+            semantic_error_create(semantic_error_duplicate_match_case, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("match option.none\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "match option.none\n"
                                                "    case option.some(let i): 0\n"
                                                "    case option.some(let i): 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_declaration_with_existing_name, source_location_create(2, 25))};
+            semantic_error_create(semantic_error_declaration_with_existing_name, source_location_create(4, 25))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = 0\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "let i = 0\n"
                                                "match option.none\n"
                                                "    case option.some(let i): 0\n"
                                                "    case option.none: 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 21))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(4, 21))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = 0\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "let i = 0\n"
                                                "match option.none\n"
                                                "    case option.some(u): 0\n"
                                                "    case option.none: 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 9))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = 0\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "let i = 0\n"
                                                "match option.none\n"
                                                "    case u(let s): 0\n"
                                                "    case option.none: 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_not_callable, source_location_create(2, 9))};
+            semantic_error_create(semantic_error_not_callable, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let i = 0\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "let i = 0\n"
                                                "match option.none\n"
                                                "    case i(let s): 0\n"
                                                "    case option.none: 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {
@@ -1104,14 +1108,15 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(1, 9))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("match boolean.true\n"
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let option = std.option\n"
+                                               "match boolean.true\n"
                                                "    case option.some(let i): 0\n"
                                                "    case option.none: 0\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {

@@ -1,3 +1,5 @@
+let std = import std
+let option = std.option
 let g = (arg: option)
     match arg
         case option.some(let state):

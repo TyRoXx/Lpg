@@ -178,20 +178,6 @@ void test_semantics(void)
         }
     }
     test_loops(&std_library);
-
-    {
-        value state = value_from_integer(integer_create(0, 123));
-        instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(
-                0, value_from_enum_element(
-                       1, type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())), &state),
-                type_from_enumeration(1))),
-            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1, 2))};
-        check_single_wellformed_function(
-            "let s = option.some(123)", std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
-    }
-
     test_let_assignments(&std_library);
     test_functions(&std_library);
     test_assert(&std_library);
