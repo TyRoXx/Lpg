@@ -1,3 +1,5 @@
+let std = import std
+
 let printable = interface
     print(): string-ref
 let f4 = (printed: printable)
@@ -23,25 +25,25 @@ impl printable2 for string-ref
     print(): string-ref
         self
     other-method(): unit
-        unit_value
+        std.unit_value
 
 impl printable2 for unit
     print()
         "unit"
     other-method()
-        unit_value
+        std.unit_value
 
 impl printable2 for int(0, 0)
     print()
         "0"
     other-method()
-        unit_value
+        std.unit_value
 
 impl printable2 for int(1, 1)
     print()
         "1"
     other-method()
-        unit_value
+        std.unit_value
 
 impl printable2 for boolean
     print()
@@ -49,11 +51,11 @@ impl printable2 for boolean
             case boolean.true: "true"
             case boolean.false: "false"
     other-method()
-        unit_value
+        std.unit_value
 
 assert(string-equals("", pure("")))
 assert(string-equals("a", pure("a")))
-assert(string-equals("unit", pure(unit_value)))
+assert(string-equals("unit", pure(std.unit_value)))
 assert(string-equals("0", pure(0)))
 assert(string-equals("1", pure(1)))
 assert(string-equals("true", pure(boolean.true)))
@@ -61,7 +63,7 @@ assert(string-equals("false", pure(boolean.false)))
 
 assert(string-equals("", runtime("")))
 assert(string-equals("a", runtime("a")))
-assert(string-equals("unit", runtime(unit_value)))
+assert(string-equals("unit", runtime(std.unit_value)))
 assert(string-equals("0", runtime(0)))
 assert(string-equals("1", runtime(1)))
 assert(string-equals("true", runtime(boolean.true)))
@@ -79,11 +81,11 @@ impl test-interface for unit
         assert(not(b))
         "test"
 
-let g : test-interface = unit_value
+let g : test-interface = std.unit_value
 assert(string-equals("test", g.method(boolean.true, boolean.false).print()))
 
 let create-impl = (): test-interface
-    unit_value
+    std.unit_value
 let compile-time-impl = create-impl()
 assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
 

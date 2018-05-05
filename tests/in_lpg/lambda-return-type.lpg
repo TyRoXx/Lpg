@@ -1,3 +1,5 @@
+let std = import std
+
 let printable2 = interface
     print(): string-ref
     other-method(): unit
@@ -6,7 +8,7 @@ impl printable2 for string-ref
     print(): string-ref
         self
     other-method(): unit
-        unit_value
+        std.unit_value
 
 let explicit-return-type = (): int(1, 1)
     1

@@ -1,3 +1,5 @@
+let std = import std
+
 let trivial-return-explicit-type = (): boolean
     return boolean.true
 assert(trivial-return-explicit-type())
@@ -11,7 +13,7 @@ let match-return-explicit-type = (arg: boolean): string-ref
         case boolean.true:
             return "a"
         case boolean.false:
-            unit_value
+            std.unit_value
     return "b"
 assert(string-equals("a", match-return-explicit-type(boolean.true)))
 
@@ -20,7 +22,7 @@ let match-return-implicit-type = (arg: boolean)
         case boolean.true:
             return "a"
         case boolean.false:
-            unit_value
+            std.unit_value
     return "b"
 assert(string-equals("a", match-return-implicit-type(boolean.true)))
 

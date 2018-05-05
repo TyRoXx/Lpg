@@ -29,7 +29,7 @@ let f6 = (a: boolean, b: boolean)
     (c: unit, d: unit)
         side-effect()
         std.and(indirection(), b)
-assert(f6(boolean.true, boolean.true)(unit_value, unit_value))
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 
 /*capture an argument at runtime*/
 let f7 = (a: boolean, b: boolean)
@@ -38,7 +38,7 @@ let f7 = (a: boolean, b: boolean)
     (c: unit, d: unit)
         side-effect()
         std.and(indirection(), b)
-assert(f7(boolean.true, boolean.true)(unit_value, unit_value))
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 
 /*capture multiple variables*/
 let x = 2

@@ -468,12 +468,4 @@ static void test_let_assignments(const standard_library_description *std_library
         check_single_wellformed_function(
             "let v : int(10, 1) = 1\n", std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
     }
-    {
-        instruction const expected_body_elements[] = {
-            instruction_create_literal(literal_instruction_create(0, value_from_unit(), type_from_unit())),
-            instruction_create_literal(literal_instruction_create(1, value_from_unit(), type_from_unit())),
-            instruction_create_return(return_instruction_create(1, 2))};
-        check_single_wellformed_function(
-            "let v : unit = unit_value\n", std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
-    }
 }

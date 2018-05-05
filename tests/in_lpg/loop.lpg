@@ -1,3 +1,5 @@
+let std = import std
+
 loop
     side-effect()
     break
@@ -6,7 +8,7 @@ loop
     match boolean.true
         case boolean.true:
             break
-        case boolean.false: unit_value
+        case boolean.false: std.unit_value
 
 loop
     loop
