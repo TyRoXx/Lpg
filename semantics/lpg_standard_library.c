@@ -225,14 +225,12 @@ standard_library_description describe_standard_library(void)
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(string_equals_impl, NULL, NULL, stable->string_equals))));
 
-    globals[10] = structure_member_create(type_from_unit(), unicode_string_from_c_str("removed"), optional_value_empty);
-
-    globals[11] = structure_member_create(
+    globals[10] = structure_member_create(
         type_from_function_pointer(&stable->int_), unicode_string_from_c_str("int"),
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, stable->int_))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 12);
+    LPG_STATIC_ASSERT(standard_library_element_count == 11);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;
