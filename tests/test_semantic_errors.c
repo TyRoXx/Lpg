@@ -560,13 +560,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 13))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 17))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = type.a\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = std.type.a\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -582,12 +581,12 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 20))};
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 24))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked =
-            simple_check("let v = (a: type) a.true\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let v = (a: std.type) a.true\n",
+                                               std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 2);
         checked_program_free(&checked);
     }
     {
