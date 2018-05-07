@@ -5,6 +5,7 @@
 #include "lpg_garbage_collector.h"
 #include "lpg_function_id.h"
 #include "lpg_generic_enum_id.h"
+#include "lpg_generic_interface_id.h"
 
 typedef struct implementation_ref
 {
@@ -53,7 +54,8 @@ typedef enum value_kind
     value_kind_enum_constructor,
     value_kind_type_erased,
     value_kind_pattern,
-    value_kind_generic_enum
+    value_kind_generic_enum,
+    value_kind_generic_interface
 } value_kind;
 
 typedef struct value_tuple
@@ -104,6 +106,7 @@ typedef struct value
         value_tuple tuple_;
         type_erased_value type_erased;
         generic_enum_id generic_enum;
+        generic_interface_id generic_interface;
     };
 } value;
 
@@ -118,6 +121,7 @@ value value_from_tuple(value_tuple content);
 value value_from_enum_constructor(void);
 value value_from_type_erased(type_erased_value content);
 value value_from_generic_enum(generic_enum_id content);
+value value_from_generic_interface(generic_interface_id content);
 value *value_allocate(value const content);
 value value_or_unit(value const *const maybe);
 bool value_equals(value const left, value const right);

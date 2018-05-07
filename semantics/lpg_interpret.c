@@ -151,6 +151,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
             case value_kind_enum_constructor:
             case value_kind_generic_enum:
+            case value_kind_generic_interface:
                 LPG_TO_DO();
             }
             break;

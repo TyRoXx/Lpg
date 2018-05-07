@@ -11,6 +11,14 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.generic_enums);
     }
+    for (size_t i = 0; i < freed.generic_interface_count; ++i)
+    {
+        generic_interface_free(freed.generic_interfaces[i]);
+    }
+    if (freed.generic_interfaces)
+    {
+        deallocate(freed.generic_interfaces);
+    }
     for (size_t i = 0; i < freed.enum_instantiation_count; ++i)
     {
         generic_enum_instantiation_free(freed.enum_instantiations[i]);

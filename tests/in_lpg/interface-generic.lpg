@@ -1,0 +1,15 @@
+let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+/*impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())*/

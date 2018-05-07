@@ -177,6 +177,14 @@ value value_from_generic_enum(generic_enum_id content)
     return result;
 }
 
+value value_from_generic_interface(generic_interface_id content)
+{
+    value result;
+    result.kind = value_kind_generic_interface;
+    result.generic_interface = content;
+    return result;
+}
+
 value *value_allocate(value const content)
 {
     value *const result = allocate(sizeof(*result));
@@ -202,6 +210,7 @@ bool value_equals(value const left, value const right)
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
+    case value_kind_generic_interface:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -268,6 +277,7 @@ bool value_less_than(value const left, value const right)
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
+    case value_kind_generic_interface:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -413,6 +423,7 @@ bool value_conforms_to_type(value const instance, type const expected)
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
     case type_kind_generic_enum:
+    case type_kind_generic_interface:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();

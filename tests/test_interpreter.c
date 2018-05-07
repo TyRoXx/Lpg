@@ -396,6 +396,7 @@ void test_interpreter(void)
                                                  "integer-less.lpg",
                                                  "integer-to-string.lpg",
                                                  "interface.lpg",
+                                                 "interface-generic.lpg",
                                                  "lambda-capture.lpg",
                                                  "lambda-parameters.lpg",
                                                  "lambda-recapture.lpg",

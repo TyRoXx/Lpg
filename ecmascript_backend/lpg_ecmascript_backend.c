@@ -232,6 +232,7 @@ static success_indicator generate_value(value const generated, type const type_o
         return generate_function_name(generated.function_pointer.code, function_count, ecmascript_output);
 
     case value_kind_pattern:
+    case value_kind_generic_interface:
         LPG_TO_DO();
 
     case value_kind_generic_enum:
@@ -454,6 +455,7 @@ static success_indicator generate_read_struct(function_generation *const state, 
     case type_kind_interface:
     case type_kind_method_pointer:
     case type_kind_generic_enum:
+    case type_kind_generic_interface:
         LPG_UNREACHABLE();
     }
     LPG_TRY(generate_read_struct_value(state, generated, ecmascript_output));
@@ -670,6 +672,7 @@ static success_indicator generate_match(function_generation *const state, match_
     case type_kind_interface:
     case type_kind_method_pointer:
     case type_kind_generic_enum:
+    case type_kind_generic_interface:
         LPG_UNREACHABLE();
     }
     LPG_UNREACHABLE();

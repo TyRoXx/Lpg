@@ -48,6 +48,7 @@ type get_return_type(type const callee, checked_function const *const all_functi
     case type_kind_integer_range:
     case type_kind_interface:
     case type_kind_generic_enum:
+    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_method_pointer:

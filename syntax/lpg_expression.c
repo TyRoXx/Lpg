@@ -178,7 +178,6 @@ interface_expression interface_expression_create(generic_parameter_list paramete
 
 void interface_expression_free(interface_expression value)
 {
-    generic_parameter_list_free(value.parameters);
     for (size_t i = 0; i < value.method_count; ++i)
     {
         interface_expression_method_free(value.methods[i]);
@@ -187,6 +186,7 @@ void interface_expression_free(interface_expression value)
     {
         deallocate(value.methods);
     }
+    generic_parameter_list_free(value.parameters);
 }
 
 bool interface_expression_equals(interface_expression const left, interface_expression const right)
