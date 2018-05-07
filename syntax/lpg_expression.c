@@ -133,6 +133,24 @@ void not_free(LPG_NON_NULL(not const *value))
     deallocate(value->expr);
 }
 
+generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count)
+{
+    generic_parameter_list const result = {names, count};
+    return result;
+}
+
+void generic_parameter_list_free(generic_parameter_list const freed)
+{
+    for (size_t i = 0; i < freed.count; ++i)
+    {
+        unicode_string_free(&freed.names[i]);
+    }
+    if (freed.names)
+    {
+        deallocate(freed.names);
+    }
+}
+
 interface_expression_method interface_expression_method_create(identifier_expression name, function_header_tree header)
 {
     interface_expression_method const result = {name, header};
@@ -151,15 +169,16 @@ bool interface_expression_method_equals(interface_expression_method const left, 
            function_header_tree_equals(left.header, right.header);
 }
 
-interface_expression interface_expression_create(source_location source, interface_expression_method *methods,
-                                                 size_t method_count)
+interface_expression interface_expression_create(generic_parameter_list parameters, source_location source,
+                                                 interface_expression_method *methods, size_t method_count)
 {
-    interface_expression const result = {source, methods, method_count};
+    interface_expression const result = {parameters, source, methods, method_count};
     return result;
 }
 
 void interface_expression_free(interface_expression value)
 {
+    generic_parameter_list_free(value.parameters);
     for (size_t i = 0; i < value.method_count; ++i)
     {
         interface_expression_method_free(value.methods[i]);
@@ -573,11 +592,10 @@ bool enum_expression_element_equals(enum_expression_element const left, enum_exp
     return !right.state;
 }
 
-enum_expression enum_expression_create(source_location const begin, unicode_string *const generic_parameters,
-                                       size_t const generic_parameter_count, enum_expression_element *const elements,
-                                       enum_element_id const element_count)
+enum_expression enum_expression_create(source_location const begin, generic_parameter_list parameters,
+                                       enum_expression_element *const elements, enum_element_id const element_count)
 {
-    enum_expression const result = {begin, generic_parameters, generic_parameter_count, elements, element_count};
+    enum_expression const result = {begin, parameters, elements, element_count};
     return result;
 }
 
@@ -591,14 +609,7 @@ void enum_expression_free(enum_expression const freed)
     {
         deallocate(freed.elements);
     }
-    for (size_t i = 0; i < freed.generic_parameter_count; ++i)
-    {
-        unicode_string_free(&freed.generic_parameters[i]);
-    }
-    if (freed.generic_parameters)
-    {
-        deallocate(freed.generic_parameters);
-    }
+    generic_parameter_list_free(freed.parameters);
 }
 
 bool enum_expression_equals(enum_expression const left, enum_expression const right)

@@ -485,9 +485,59 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
     return parse_lambda_body(parser, indentation, parsed_header.header, lambda_begin);
 }
 
+static generic_parameter_list parse_generic_parameters(expression_parser *const parser)
+{
+    unicode_string *generic_parameters = NULL;
+    size_t generic_parameter_count = 0;
+
+    {
+        rich_token const maybe_bracket = peek(parser);
+        if (maybe_bracket.token == token_left_bracket)
+        {
+            pop(parser);
+            for (;;)
+            {
+                rich_token const next = peek(parser);
+                if (next.token == token_identifier)
+                {
+                    generic_parameters =
+                        reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
+                    generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
+                    ++generic_parameter_count;
+                    pop(parser);
+                    rich_token const after_parameter = peek(parser);
+                    if (after_parameter.token == token_comma)
+                    {
+                        pop(parser);
+                        parse_optional_space(parser);
+                    }
+                    else if (after_parameter.token != token_right_bracket)
+                    {
+                        LPG_TO_DO();
+                    }
+                }
+                else if (next.token == token_right_bracket)
+                {
+                    pop(parser);
+                    break;
+                }
+                else
+                {
+                    LPG_TO_DO();
+                }
+            }
+        }
+    }
+
+    generic_parameter_list result = {generic_parameters, generic_parameter_count};
+    return result;
+}
+
 static expression_parser_result parse_interface(expression_parser *const parser, size_t const indentation,
                                                 source_location const begin)
 {
+    generic_parameter_list const parameters = parse_generic_parameters(parser);
+
     interface_expression_method *methods = NULL;
     size_t method_count = 0;
     bool is_success = true;
@@ -541,7 +591,7 @@ static expression_parser_result parse_interface(expression_parser *const parser,
             identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header);
         ++method_count;
     }
-    interface_expression const parsed = interface_expression_create(begin, methods, method_count);
+    interface_expression const parsed = interface_expression_create(parameters, begin, methods, method_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_interface(parsed)};
@@ -625,47 +675,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
 static expression_parser_result parse_enum(expression_parser *const parser, size_t const indentation,
                                            source_location const begin)
 {
-    unicode_string *generic_parameters = NULL;
-    size_t generic_parameter_count = 0;
-
-    {
-        rich_token const maybe_bracket = peek(parser);
-        if (maybe_bracket.token == token_left_bracket)
-        {
-            pop(parser);
-            for (;;)
-            {
-                rich_token const next = peek(parser);
-                if (next.token == token_identifier)
-                {
-                    generic_parameters =
-                        reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
-                    generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
-                    ++generic_parameter_count;
-                    pop(parser);
-                    rich_token const after_parameter = peek(parser);
-                    if (after_parameter.token == token_comma)
-                    {
-                        pop(parser);
-                        parse_optional_space(parser);
-                    }
-                    else if (after_parameter.token != token_right_bracket)
-                    {
-                        LPG_TO_DO();
-                    }
-                }
-                else if (next.token == token_right_bracket)
-                {
-                    pop(parser);
-                    break;
-                }
-                else
-                {
-                    return expression_parser_result_failure;
-                }
-            }
-        }
-    }
+    generic_parameter_list const parameters = parse_generic_parameters(parser);
 
     enum_expression_element *elements = NULL;
     enum_element_id element_count = 0;
@@ -726,8 +736,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
         elements[element_count] = enum_expression_element_create(unicode_view_copy(name.content), state);
         ++element_count;
     }
-    enum_expression const parsed =
-        enum_expression_create(begin, generic_parameters, generic_parameter_count, elements, element_count);
+    enum_expression const parsed = enum_expression_create(begin, parameters, elements, element_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_enum(parsed)};

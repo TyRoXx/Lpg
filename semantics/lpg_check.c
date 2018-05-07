@@ -2270,7 +2270,7 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
 static evaluate_expression_result
 evaluate_enum_expression(function_checking_state *state, instruction_sequence *function, enum_expression const element)
 {
-    if (element.generic_parameter_count > 0)
+    if (element.parameters.count > 0)
     {
         return evaluate_generic_enum_expression(state, function, element);
     }
@@ -2396,7 +2396,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->file_name, state->source);
     generic_enum const instantiated_enum = state->root->generic_enums[generic];
-    if (argument_count < instantiated_enum.tree.generic_parameter_count)
+    if (argument_count < instantiated_enum.tree.parameters.count)
     {
         if (arguments)
         {
@@ -2409,7 +2409,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
         return evaluate_expression_result_empty;
     }
-    if (argument_count > instantiated_enum.tree.generic_parameter_count)
+    if (argument_count > instantiated_enum.tree.parameters.count)
     {
         if (arguments)
         {
@@ -2422,14 +2422,13 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
         return evaluate_expression_result_empty;
     }
-    for (size_t i = 0; i < instantiated_enum.tree.generic_parameter_count; ++i)
+    for (size_t i = 0; i < instantiated_enum.tree.parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&enum_checking.used_registers);
-        add_local_variable(
-            &enum_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.generic_parameters[i])),
-                argument_types[i], optional_value_create(arguments[i]), argument_register));
+        add_local_variable(&enum_checking.local_variables,
+                           local_variable_create(
+                               unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.parameters.names[i])),
+                               argument_types[i], optional_value_create(arguments[i]), argument_register));
     }
     for (size_t i = 0; i < instantiated_enum.closure_count; ++i)
     {
@@ -2440,9 +2439,10 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                                   instantiated_enum.closures[i].what,
                                   optional_value_create(instantiated_enum.closures[i].content), closure_register));
     }
-    evaluate_expression_result const evaluated = evaluate_enum_expression(
-        &enum_checking, &ignored_instructions,
-        enum_expression_create(original.begin, NULL, 0, original.elements, original.element_count));
+    evaluate_expression_result const evaluated =
+        evaluate_enum_expression(&enum_checking, &ignored_instructions,
+                                 enum_expression_create(original.begin, generic_parameter_list_create(NULL, 0),
+                                                        original.elements, original.element_count));
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(enum_checking.local_variables);
     if (enum_checking.register_compile_time_values)

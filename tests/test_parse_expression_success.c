@@ -80,7 +80,8 @@ void test_parse_expression_success(void)
                               integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 1)))))),
                           unicode_string_from_c_str("!1"), true);
 
-    test_successful_parse(expression_from_interface(interface_expression_create(source_location_create(0, 0), NULL, 0)),
+    test_successful_parse(expression_from_interface(interface_expression_create(
+                              generic_parameter_list_create(NULL, 0), source_location_create(0, 0), NULL, 0)),
                           unicode_string_from_c_str("interface"), false);
 
     {
@@ -90,11 +91,11 @@ void test_parse_expression_success(void)
             function_header_tree_create(
                 NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
                              unicode_string_from_c_str("return-type"), source_location_create(1, 14))))));
-        test_successful_parse(
-            expression_from_interface(interface_expression_create(source_location_create(0, 0), methods, 1)),
-            unicode_string_from_c_str("interface\n"
-                                      "    method(): return-type"),
-            false);
+        test_successful_parse(expression_from_interface(interface_expression_create(
+                                  generic_parameter_list_create(NULL, 0), source_location_create(0, 0), methods, 1)),
+                              unicode_string_from_c_str("interface\n"
+                                                        "    method(): return-type"),
+                              false);
     }
 
     {
@@ -109,12 +110,12 @@ void test_parse_expression_success(void)
             function_header_tree_create(
                 NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
                              unicode_string_from_c_str("d"), source_location_create(2, 9))))));
-        test_successful_parse(
-            expression_from_interface(interface_expression_create(source_location_create(0, 0), methods, 2)),
-            unicode_string_from_c_str("interface\n"
-                                      "    a(): c\n"
-                                      "    b(): d"),
-            false);
+        test_successful_parse(expression_from_interface(interface_expression_create(
+                                  generic_parameter_list_create(NULL, 0), source_location_create(0, 0), methods, 2)),
+                              unicode_string_from_c_str("interface\n"
+                                                        "    a(): c\n"
+                                                        "    b(): d"),
+                              false);
     }
 
     test_successful_parse(expression_from_struct(struct_expression_create(source_location_create(0, 0), NULL, 0)),
@@ -154,18 +155,18 @@ void test_parse_expression_success(void)
     {
         unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = unicode_string_from_c_str("a");
-        test_successful_parse(
-            expression_from_enum(enum_expression_create(source_location_create(0, 0), parameters, 1, NULL, 0)),
-            unicode_string_from_c_str("enum[a]"), false);
+        test_successful_parse(expression_from_enum(enum_expression_create(
+                                  source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0)),
+                              unicode_string_from_c_str("enum[a]"), false);
     }
 
     {
         unicode_string *const parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] = unicode_string_from_c_str("a");
         parameters[1] = unicode_string_from_c_str("b");
-        test_successful_parse(
-            expression_from_enum(enum_expression_create(source_location_create(0, 0), parameters, 2, NULL, 0)),
-            unicode_string_from_c_str("enum[a, b]"), false);
+        test_successful_parse(expression_from_enum(enum_expression_create(
+                                  source_location_create(0, 0), generic_parameter_list_create(parameters, 2), NULL, 0)),
+                              unicode_string_from_c_str("enum[a, b]"), false);
     }
 
     {

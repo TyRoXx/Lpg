@@ -174,6 +174,15 @@ typedef struct declare
     expression *initializer;
 } declare;
 
+typedef struct generic_parameter_list
+{
+    unicode_string *names;
+    size_t count;
+} generic_parameter_list;
+
+generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count);
+void generic_parameter_list_free(generic_parameter_list const freed);
+
 typedef struct interface_expression_method
 {
     identifier_expression name;
@@ -187,13 +196,14 @@ bool interface_expression_method_equals(interface_expression_method const left,
 
 typedef struct interface_expression
 {
+    generic_parameter_list parameters;
     source_location source;
     interface_expression_method *methods;
     size_t method_count;
 } interface_expression;
 
-interface_expression interface_expression_create(source_location source, interface_expression_method *methods,
-                                                 size_t method_count);
+interface_expression interface_expression_create(generic_parameter_list parameters, source_location source,
+                                                 interface_expression_method *methods, size_t method_count);
 void interface_expression_free(interface_expression value);
 bool interface_expression_equals(interface_expression const left, interface_expression const right);
 
@@ -310,15 +320,13 @@ bool enum_expression_element_equals(enum_expression_element const left, enum_exp
 typedef struct enum_expression
 {
     source_location begin;
-    unicode_string *generic_parameters;
-    size_t generic_parameter_count;
+    generic_parameter_list parameters;
     enum_expression_element *elements;
     enum_element_id element_count;
 } enum_expression;
 
-enum_expression enum_expression_create(source_location const begin, unicode_string *const generic_parameters,
-                                       size_t const generic_parameter_count, enum_expression_element *const elements,
-                                       enum_element_id const element_count);
+enum_expression enum_expression_create(source_location const begin, generic_parameter_list parameters,
+                                       enum_expression_element *const elements, enum_element_id const element_count);
 void enum_expression_free(enum_expression const freed);
 bool enum_expression_equals(enum_expression const left, enum_expression const right);
 
