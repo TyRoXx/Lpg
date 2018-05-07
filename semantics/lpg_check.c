@@ -2654,7 +2654,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     }
 
     case expression_type_comment:
-        return make_compile_time_unit();
+        return make_unit(&state->used_registers, function);
 
     case expression_type_not:
         return evaluate_not_expression(state, function, &element);

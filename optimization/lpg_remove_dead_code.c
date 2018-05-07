@@ -70,6 +70,11 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_match:
+            /*Prevent removal of match expression because they might contain return or break even though the result is
+             * not used.*/
+            /*TODO: Check whether removal of match is safe and remove it if possible.*/
+            registers_read_from[current_instruction.match.result] = true;
+
             registers_read_from[current_instruction.match.key] = true;
             for (size_t j = 0; j < current_instruction.match.count; ++j)
             {
@@ -239,6 +244,8 @@ typedef enum removed_something
 
 static removed_something remove_one_layer_of_dead_code_from_function(checked_function *const from)
 {
+    ASSUME(from->number_of_registers >= 1);
+    ASSUME(from->body.length >= 1);
     bool *const registers_read_from = allocate_array(from->number_of_registers, sizeof(*registers_read_from));
     memset(registers_read_from, 0, from->number_of_registers * sizeof(*registers_read_from));
     for (size_t i = 0; i < from->signature->parameters.length; ++i)
@@ -275,6 +282,8 @@ static removed_something remove_one_layer_of_dead_code_from_function(checked_fun
     deallocate(registers_read_from);
     change_register_ids_in_sequence(&from->body, new_register_ids);
     deallocate(new_register_ids);
+    ASSUME(from->body.length >= 1);
+    ASSUME(from->number_of_registers >= 1);
     return result;
 }
 

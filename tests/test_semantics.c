@@ -163,20 +163,6 @@ void test_semantics(void)
 
     standard_library_description const std_library = describe_standard_library();
 
-    {
-        char const *const sources[] = {"side-effect()\n", "side-effect()", "/*comment*/\n"
-                                                                           "side-effect()\n",
-                                       "//comment\n"
-                                       "side-effect()\n"};
-        LPG_FOR(size_t, i, LPG_ARRAY_SIZE(sources))
-        {
-            instruction const expected_body_elements[] = {
-                instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
-                instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
-                instruction_create_return(return_instruction_create(2, 3))};
-            check_single_wellformed_function(sources[i], std_library.globals, LPG_COPY_ARRAY(expected_body_elements));
-        }
-    }
     test_loops(&std_library);
     test_let_assignments(&std_library);
     test_functions(&std_library);
