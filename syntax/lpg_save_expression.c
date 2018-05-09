@@ -97,6 +97,25 @@ static success_indicator save_tuple_expression(stream_writer const to, tuple con
     return stream_writer_write_string(to, "}");
 }
 
+static success_indicator save_generic_parameters_if_not_empty(stream_writer const to,
+                                                              generic_parameter_list const parameters)
+{
+    if (parameters.count == 0)
+    {
+        return success_yes;
+    }
+    LPG_TRY(stream_writer_write_string(to, "["));
+    for (size_t i = 0; i < parameters.count; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(to, ", "));
+        }
+        LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(parameters.names[i])));
+    }
+    return stream_writer_write_string(to, "]");
+}
+
 success_indicator save_expression(stream_writer const to, expression const *value, whitespace_state whitespace)
 {
     switch (value->type)
@@ -311,6 +330,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_enum:
     {
         LPG_TRY(stream_writer_write_string(to, "enum"));
+        LPG_TRY(save_generic_parameters_if_not_empty(to, value->enum_.parameters));
         whitespace_state in_struct = go_deeper(whitespace, 1);
         for (size_t i = 0; i < value->enum_.element_count; ++i)
         {

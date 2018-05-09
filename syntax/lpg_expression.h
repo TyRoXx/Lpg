@@ -182,6 +182,7 @@ typedef struct generic_parameter_list
 
 generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count);
 void generic_parameter_list_free(generic_parameter_list const freed);
+bool generic_parameter_list_equals(generic_parameter_list const left, generic_parameter_list const right);
 
 typedef struct interface_expression_method
 {

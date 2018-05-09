@@ -151,6 +151,22 @@ void generic_parameter_list_free(generic_parameter_list const freed)
     }
 }
 
+bool generic_parameter_list_equals(generic_parameter_list const left, generic_parameter_list const right)
+{
+    if (left.count != right.count)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.count; ++i)
+    {
+        if (!unicode_string_equals(left.names[i], right.names[i]))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 interface_expression_method interface_expression_method_create(identifier_expression name, function_header_tree header)
 {
     interface_expression_method const result = {name, header};
@@ -614,6 +630,10 @@ void enum_expression_free(enum_expression const freed)
 
 bool enum_expression_equals(enum_expression const left, enum_expression const right)
 {
+    if (!generic_parameter_list_equals(left.parameters, right.parameters))
+    {
+        return false;
+    }
     if (!source_location_equals(left.begin, right.begin))
     {
         return false;

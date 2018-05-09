@@ -209,6 +209,37 @@ void test_parse_expression_syntax_error(void)
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("import "));
     }
 
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_right_bracket, source_location_create(0, 5))};
+        expression expected = expression_from_enum(
+            enum_expression_create(source_location_create(0, 0), generic_parameter_list_create(NULL, 0), NULL, 0));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("enum["));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_right_bracket, source_location_create(0, 7))};
+        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_string_from_c_str("a");
+        expression expected = expression_from_enum(enum_expression_create(
+            source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("enum[a,"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_right_bracket, source_location_create(0, 6))};
+        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_string_from_c_str("a");
+        expression expected = expression_from_enum(enum_expression_create(
+            source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("enum[a"));
+    }
+
     test_tokenizer_error();
     test_unnamed_function();
     test_function();

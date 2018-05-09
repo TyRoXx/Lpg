@@ -487,49 +487,51 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
 
 static generic_parameter_list parse_generic_parameters(expression_parser *const parser)
 {
+    rich_token const maybe_bracket = peek(parser);
+    if (maybe_bracket.token != token_left_bracket)
+    {
+        generic_parameter_list const result = {NULL, 0};
+        return result;
+    }
+    pop(parser);
     unicode_string *generic_parameters = NULL;
     size_t generic_parameter_count = 0;
-
+    for (;;)
     {
-        rich_token const maybe_bracket = peek(parser);
-        if (maybe_bracket.token == token_left_bracket)
+        rich_token const next = peek(parser);
+        if (next.token == token_identifier)
+        {
+            generic_parameters =
+                reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
+            generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
+            ++generic_parameter_count;
+            pop(parser);
+            rich_token const after_parameter = peek(parser);
+            if (after_parameter.token == token_comma)
+            {
+                pop(parser);
+                parse_optional_space(parser);
+            }
+            else if (after_parameter.token != token_right_bracket)
+            {
+                parser->on_error(parse_error_create(parse_error_expected_right_bracket, after_parameter.where),
+                                 parser->on_error_user);
+                break;
+            }
+        }
+        else if (next.token == token_right_bracket)
         {
             pop(parser);
-            for (;;)
-            {
-                rich_token const next = peek(parser);
-                if (next.token == token_identifier)
-                {
-                    generic_parameters =
-                        reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
-                    generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
-                    ++generic_parameter_count;
-                    pop(parser);
-                    rich_token const after_parameter = peek(parser);
-                    if (after_parameter.token == token_comma)
-                    {
-                        pop(parser);
-                        parse_optional_space(parser);
-                    }
-                    else if (after_parameter.token != token_right_bracket)
-                    {
-                        LPG_TO_DO();
-                    }
-                }
-                else if (next.token == token_right_bracket)
-                {
-                    pop(parser);
-                    break;
-                }
-                else
-                {
-                    LPG_TO_DO();
-                }
-            }
+            break;
+        }
+        else
+        {
+            parser->on_error(parse_error_create(parse_error_expected_right_bracket, next.where), parser->on_error_user);
+            break;
         }
     }
 
-    generic_parameter_list result = {generic_parameters, generic_parameter_count};
+    generic_parameter_list const result = {generic_parameters, generic_parameter_count};
     return result;
 }
 
