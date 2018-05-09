@@ -653,6 +653,10 @@ expect_compile_time_type(function_checking_state *state, instruction_sequence *f
             return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
         }
     }
+    else
+    {
+        return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
+    }
     return compile_time_type_expression_result_create(
         result.has_value, result.where, result.compile_time_value.value_.type_);
 }
@@ -2467,6 +2471,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                            local_variable_create(
                                unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.parameters.names[i])),
                                argument_types[i], optional_value_create(arguments[i]), argument_register));
+        write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_enum.closure_count; ++i)
     {
@@ -2476,6 +2481,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
             local_variable_create(unicode_view_copy(unicode_view_from_string(instantiated_enum.closures[i].name)),
                                   instantiated_enum.closures[i].what,
                                   optional_value_create(instantiated_enum.closures[i].content), closure_register));
+        write_register_compile_time_value(&enum_checking, closure_register, instantiated_enum.closures[i].content);
     }
     evaluate_expression_result const evaluated =
         evaluate_enum_expression(&enum_checking, &ignored_instructions,
@@ -2602,6 +2608,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.tree.parameters.names[i])),
                 argument_types[i], optional_value_create(arguments[i]), argument_register));
+        write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_interface.closures.count; ++i)
     {
@@ -2612,6 +2619,8 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.closures.elements[i].name)),
                 instantiated_interface.closures.elements[i].what,
                 optional_value_create(instantiated_interface.closures.elements[i].content), closure_register));
+        write_register_compile_time_value(
+            &interface_checking, closure_register, instantiated_interface.closures.elements[i].content);
     }
     evaluate_expression_result const evaluated =
         evaluate_interface(&interface_checking, &ignored_instructions,

@@ -503,11 +503,13 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_integer_range:
         return integer_range_contains(flat_into.integer_range_, flat_from.integer_range_);
 
+    case type_kind_interface:
+        return (flat_from.interface_ == flat_into.interface_);
+
     case type_kind_method_pointer:
     case type_kind_lambda:
     case type_kind_structure:
     case type_kind_enum_constructor:
-    case type_kind_interface:
     case type_kind_generic_interface:
         LPG_TO_DO();
     }

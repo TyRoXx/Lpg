@@ -1,6 +1,6 @@
 let std = import std
 let std-again = import std
-let e = std.boolean.true
+let e : std.boolean = std.boolean.true
 let imports-are-equivalent : std-again.boolean = e
 
 let to-builtin-boolean = (a: std.boolean)
