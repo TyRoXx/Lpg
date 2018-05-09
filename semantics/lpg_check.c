@@ -1941,9 +1941,9 @@ static evaluate_expression_result evaluate_generic_interface_expression(function
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_interface(id), type_from_generic_interface())));
-    write_register_compile_time_value(state, into, value_from_generic_enum(id));
-    return evaluate_expression_result_create(
-        true, into, type_from_generic_enum(), optional_value_create(value_from_generic_enum(id)), true, false);
+    write_register_compile_time_value(state, into, value_from_generic_interface(id));
+    return evaluate_expression_result_create(true, into, type_from_generic_interface(),
+                                             optional_value_create(value_from_generic_interface(id)), true, false);
 }
 
 static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
@@ -2524,6 +2524,143 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     return evaluated;
 }
 
+static evaluate_expression_result instantiate_generic_interface(function_checking_state *const state,
+                                                                instruction_sequence *const function,
+                                                                generic_interface_id const generic,
+                                                                value *const arguments, size_t const argument_count,
+                                                                type *const argument_types, source_location const where)
+{
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->interface_instantiation_count; ++i)
+    {
+        generic_interface_instantiation *const instantiation = root->interface_instantiations + i;
+        if (instantiation->generic != generic)
+        {
+            continue;
+        }
+        if (argument_count != instantiation->argument_count)
+        {
+            LPG_UNREACHABLE();
+        }
+        if (!values_equal(instantiation->arguments, arguments, argument_count))
+        {
+            continue;
+        }
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        register_id const into = allocate_register(&state->used_registers);
+        value const literal = value_from_type(type_from_interface(instantiation->instantiated));
+        add_instruction(
+            function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+        write_register_compile_time_value(state, into, literal);
+        return evaluate_expression_result_create(
+            true, into, type_from_type(), optional_value_create(literal), true, false);
+    }
+    interface_expression const original = root->generic_interfaces[generic].tree;
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    function_checking_state interface_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
+        optional_type_create_empty(), false, state->file_name, state->source);
+    generic_interface const instantiated_interface = state->root->generic_interfaces[generic];
+    if (argument_count < instantiated_interface.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_interface.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    for (size_t i = 0; i < instantiated_interface.tree.parameters.count; ++i)
+    {
+        register_id const argument_register = allocate_register(&interface_checking.used_registers);
+        add_local_variable(
+            &interface_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_interface.tree.parameters.names[i])),
+                argument_types[i], optional_value_create(arguments[i]), argument_register));
+    }
+    for (size_t i = 0; i < instantiated_interface.closures.count; ++i)
+    {
+        register_id const closure_register = allocate_register(&interface_checking.used_registers);
+        add_local_variable(
+            &interface_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_interface.closures.elements[i].name)),
+                instantiated_interface.closures.elements[i].what,
+                optional_value_create(instantiated_interface.closures.elements[i].content), closure_register));
+    }
+    evaluate_expression_result const evaluated =
+        evaluate_interface(&interface_checking, &ignored_instructions,
+                           interface_expression_create(generic_parameter_list_create(NULL, 0), original.source,
+                                                       original.methods, original.method_count));
+    instruction_sequence_free(&ignored_instructions);
+    local_variable_container_free(interface_checking.local_variables);
+    if (interface_checking.register_compile_time_values)
+    {
+        deallocate(interface_checking.register_compile_time_values);
+    }
+    if (!evaluated.has_value)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        return evaluate_expression_result_empty;
+    }
+    if (!evaluated.compile_time_value.is_set)
+    {
+        LPG_UNREACHABLE();
+    }
+    if (evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_UNREACHABLE();
+    }
+    if (evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
+    {
+        LPG_UNREACHABLE();
+    }
+    size_t const id = root->interface_instantiation_count;
+    root->interface_instantiations =
+        reallocate_array(root->interface_instantiations, root->interface_instantiation_count + 1,
+                         sizeof(*root->interface_instantiations));
+    root->interface_instantiations[id] = generic_interface_instantiation_create(
+        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.interface_);
+    root->interface_instantiation_count += 1;
+    if (argument_types)
+    {
+        deallocate(argument_types);
+    }
+    return evaluated;
+}
+
 static evaluate_expression_result evaluate_generic_instantiation(function_checking_state *const state,
                                                                  instruction_sequence *const function,
                                                                  generic_instantiation_expression const element)
@@ -2568,8 +2705,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         arguments[i] = argument_evaluated.compile_time_value.value_;
         argument_types[i] = argument_evaluated.type_;
     }
-    if (!generic_evaluated.compile_time_value.is_set ||
-        (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum))
+    if (!generic_evaluated.compile_time_value.is_set)
     {
         if (arguments)
         {
@@ -2579,13 +2715,33 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         {
             deallocate(argument_types);
         }
-        emit_semantic_error(state, semantic_error_create(semantic_error_expected_generic_type,
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_value,
                                                          expression_source_begin(*element.generic)));
         return evaluate_expression_result_empty;
     }
-    return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
-                                    arguments, element.count, argument_types,
-                                    expression_source_begin(*element.generic));
+    if (generic_evaluated.compile_time_value.value_.kind == value_kind_generic_enum)
+    {
+        return instantiate_generic_enum(state, function, generic_evaluated.compile_time_value.value_.generic_enum,
+                                        arguments, element.count, argument_types,
+                                        expression_source_begin(*element.generic));
+    }
+    if (generic_evaluated.compile_time_value.value_.kind == value_kind_generic_interface)
+    {
+        return instantiate_generic_interface(state, function,
+                                             generic_evaluated.compile_time_value.value_.generic_interface, arguments,
+                                             element.count, argument_types, expression_source_begin(*element.generic));
+    }
+    if (arguments)
+    {
+        deallocate(arguments);
+    }
+    if (argument_types)
+    {
+        deallocate(argument_types);
+    }
+    emit_semantic_error(
+        state, semantic_error_create(semantic_error_expected_generic_type, expression_source_begin(*element.generic)));
+    return evaluate_expression_result_empty;
 }
 
 static evaluate_expression_result evaluate_import(function_checking_state *const state,
@@ -2966,7 +3122,7 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
+    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);

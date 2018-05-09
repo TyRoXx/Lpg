@@ -27,6 +27,14 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.enum_instantiations);
     }
+    for (size_t i = 0; i < freed.interface_instantiation_count; ++i)
+    {
+        generic_interface_instantiation_free(freed.interface_instantiations[i]);
+    }
+    if (freed.interface_instantiations)
+    {
+        deallocate(freed.interface_instantiations);
+    }
     for (size_t i = 0; i < freed.module_count; ++i)
     {
         module_free(freed.modules[i]);

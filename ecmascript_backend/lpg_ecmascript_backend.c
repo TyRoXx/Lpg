@@ -232,8 +232,10 @@ static success_indicator generate_value(value const generated, type const type_o
         return generate_function_name(generated.function_pointer.code, function_count, ecmascript_output);
 
     case value_kind_pattern:
-    case value_kind_generic_interface:
         LPG_TO_DO();
+
+    case value_kind_generic_interface:
+        return stream_writer_write_string(ecmascript_output, "/*generic interface*/ undefined");
 
     case value_kind_generic_enum:
         return stream_writer_write_string(ecmascript_output, "/*generic enum*/ undefined");

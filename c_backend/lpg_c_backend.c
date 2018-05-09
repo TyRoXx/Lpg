@@ -13,6 +13,7 @@ typedef struct standard_library_usage
     bool using_stdint;
     bool using_integer;
     bool using_boolean;
+    bool using_stdlib;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -472,6 +473,7 @@ static success_indicator generate_interface_impl_definition(implementation_ref c
         memory_writer_free(&freed);
     }
     LPG_TRY(indent(2, c_output));
+    standard_library->using_stdlib = true;
     LPG_TRY(stream_writer_write_string(c_output, "free(counter);\n"));
 
     LPG_TRY(indent(1, c_output));
@@ -1738,6 +1740,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, "/*generic enum omitted*/\n"));
             return success_yes;
 
+        case value_kind_generic_interface:
+            set_register_variable(
+                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            LPG_TRY(stream_writer_write_string(c_output, "/*generic interface omitted*/\n"));
+            return success_yes;
+
         case value_kind_integer:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
@@ -1829,7 +1837,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         }
 
         case value_kind_pattern:
-        case value_kind_generic_interface:
             LPG_TO_DO();
 
         case value_kind_type:
@@ -2282,7 +2289,7 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     memory_writer program_defined = {NULL, 0, 0};
     stream_writer program_defined_writer = memory_writer_erase(&program_defined);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0, 0};
 
@@ -2373,6 +2380,10 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     if (standard_library.using_stdint)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdint.h>\n"), fail);
+    }
+    if (standard_library.using_stdlib)
+    {
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stdlib.h>\n"), fail);
     }
     if (standard_library.using_integer)
     {

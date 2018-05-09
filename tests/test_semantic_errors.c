@@ -294,7 +294,7 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expected_generic_type, source_location_create(3, 8))};
+            semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(3, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = ()\n"
                                                "    side-effect()\n"

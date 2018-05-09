@@ -5,6 +5,7 @@
 #include "lpg_generic_enum.h"
 #include "lpg_generic_enum_id.h"
 #include "lpg_generic_enum_instantiation.h"
+#include "lpg_generic_interface_instantiation.h"
 #include "lpg_module.h"
 #include "lpg_load_module.h"
 
@@ -16,6 +17,8 @@ typedef struct program_check
     size_t enum_instantiation_count;
     generic_interface *generic_interfaces;
     generic_interface_id generic_interface_count;
+    generic_interface_instantiation *interface_instantiations;
+    size_t interface_instantiation_count;
     module *modules;
     size_t module_count;
     module_loader *loader;

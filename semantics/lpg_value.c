@@ -326,7 +326,7 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
 
 bool value_is_valid(value const checked)
 {
-    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_enum);
+    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_interface);
 }
 
 function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,

@@ -7,9 +7,19 @@ let transformer = interface[From, To]
     transform(input: From): To
 
 let dummy = struct
-/*impl producer[std.boolean] for dummy
+impl producer[std.boolean] for dummy
     produce()
         std.boolean.true
 
 let a : producer[std.boolean] = dummy{}
-assert(a.produce())*/
+assert(a.produce())
+
+impl transformer[std.boolean, std.string-ref] for dummy
+    transform(input: std.boolean): std.string-ref
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string-ref] = dummy{}
+assert(string-equals("true", b.transform(std.boolean.true)))
+assert(string-equals("false", b.transform(std.boolean.false)))
