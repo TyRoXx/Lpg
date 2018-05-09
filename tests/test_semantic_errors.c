@@ -350,6 +350,42 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 11))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface[E]\n"
+                                               "    a(arg: unknown): std.unit\n"
+                                               "let k = i[std.unit]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(3, 8))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface[E]\n"
+                                               "    a(): std.unit\n"
+                                               "let k = i[std.unit, std.unit]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(3, 8))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface[E]\n"
+                                               "    a(): std.unit\n"
+                                               "let k = i[]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("side-effect()\n"
