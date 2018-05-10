@@ -1,5 +1,5 @@
 let std = import std
-let option = std.option
+let option = std.option-int
 let f = (a: boolean, b: std.string-ref, c: option, d: int(0, 2))
     side-effect()
     assert(a)

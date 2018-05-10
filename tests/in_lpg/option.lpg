@@ -1,11 +1,11 @@
 let std = import std
 let option = std.option
 
-let runtime = (arg: int(0, 1000))
+let runtime = (arg: std.boolean)
     side-effect()
-    option.some(arg)
-runtime(123)
+    option[std.boolean].some(arg)
+runtime(std.boolean.true)
 
-let compile-time = (arg: int(0, 1000))
-    option.some(arg)
-compile-time(123)
+let compile-time = (arg: std.boolean)
+    option[std.boolean].some(arg)
+compile-time(std.boolean.false)

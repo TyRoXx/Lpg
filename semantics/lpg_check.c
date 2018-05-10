@@ -239,8 +239,6 @@ static read_structure_element_result read_element(function_checking_state *state
                                       unicode_view_from_string(element->value), element->source, result);
 
     case type_kind_method_pointer:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_interface:
@@ -253,6 +251,8 @@ static read_structure_element_result read_element(function_checking_state *state
     case type_kind_unit:
     case type_kind_function_pointer:
     case type_kind_string_ref:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
         emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
@@ -1940,7 +1940,7 @@ static evaluate_expression_result evaluate_generic_interface_expression(function
         root->generic_interfaces, root->generic_interface_count + 1, sizeof(*root->generic_interfaces));
     generic_interface_id const id = root->generic_interface_count;
     generic_enum_closures const closures = find_generic_interface_closures(state, element);
-    root->generic_interfaces[id] = generic_interface_create(element, closures);
+    root->generic_interfaces[id] = generic_interface_create(interface_expression_clone(element), closures);
     root->generic_interface_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -2299,7 +2299,7 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
         reallocate_array(root->generic_enums, root->generic_enum_count + 1, sizeof(*root->generic_enums));
     generic_enum_id const id = root->generic_enum_count;
     generic_enum_closures const closures = find_generic_enum_closures(state, element);
-    root->generic_enums[id] = generic_enum_create(element, closures.elements, closures.count);
+    root->generic_enums[id] = generic_enum_create(enum_expression_clone(element), closures.elements, closures.count);
     root->generic_enum_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(

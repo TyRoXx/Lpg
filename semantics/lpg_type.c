@@ -433,8 +433,10 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
         return type_from_struct(original.structure_);
 
     case type_kind_method_pointer:
-    case type_kind_generic_interface:
         LPG_TO_DO();
+
+    case type_kind_generic_interface:
+        return type_from_generic_interface();
 
     case type_kind_generic_enum:
         return type_from_generic_enum();

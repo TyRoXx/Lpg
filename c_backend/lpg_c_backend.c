@@ -652,13 +652,13 @@ static success_indicator generate_type(type const generated, standard_library_us
         return stream_writer_write_string(c_output, "uint64_t");
 
     case type_kind_type:
+    case type_kind_generic_interface:
+    case type_kind_generic_enum:
         standard_library->using_unit = true;
         return stream_writer_write_string(c_output, "unit");
 
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_structure:
@@ -820,6 +820,8 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     case type_kind_integer_range:
     case type_kind_type:
     case type_kind_function_pointer:
+    case type_kind_generic_interface:
+    case type_kind_generic_enum:
         return success_yes;
 
     case type_kind_tuple:
@@ -849,8 +851,6 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
 
     case type_kind_method_pointer:
     case type_kind_enum_constructor:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -1171,11 +1171,11 @@ static success_indicator generate_value(value const generated, type const type_o
 
     case value_kind_type_erased:
     case value_kind_pattern:
-    case value_kind_generic_enum:
-    case value_kind_generic_interface:
         LPG_TO_DO();
 
     case value_kind_type:
+    case value_kind_generic_interface:
+    case value_kind_generic_enum:
         state->standard_library.using_unit = true;
         LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
         return success_yes;

@@ -139,6 +139,8 @@ static void mark_type(bool *const used_functions, checked_function const *const 
     case type_kind_enumeration:
     case type_kind_structure:
     case type_kind_type:
+    case type_kind_generic_interface:
+    case type_kind_generic_enum:
         break;
 
     case type_kind_tuple:
@@ -150,8 +152,6 @@ static void mark_type(bool *const used_functions, checked_function const *const 
 
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_lambda:
@@ -260,8 +260,10 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     }
 
     case value_kind_pattern:
-    case value_kind_generic_interface:
         LPG_TO_DO();
+
+    case value_kind_generic_interface:
+        return value_from_generic_interface(from.generic_interface);
 
     case value_kind_generic_enum:
         return value_from_generic_enum(from.generic_enum);

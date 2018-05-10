@@ -22,9 +22,18 @@ let unit_value = ()
 ()
 let unit = type-of(unit_value)
 
-let option = enum
-    some(int(0, 340282366920938463463374607431768211455))
+let any-integer = int(0, 340282366920938463463374607431768211455)
+
+let option = enum[T]
+    some(T)
     none
+let option-int = option[any-integer]
+
+let array = interface[T]
+    size(): any-integer
+    load(index: any-integer): option[T]
+    store(index: any-integer, element: T): boolean
+    append(element: T): boolean
 
 let export = struct
     and: type-of(and)
@@ -36,4 +45,6 @@ let export = struct
     unit: type
     unit_value: unit
     option: type-of(option)
-export{and, or, not, type, string-ref, boolean, unit, unit_value, option}
+    option-int: type-of(option-int)
+    array: type-of(array)
+export{and, or, not, type, string-ref, boolean, unit, unit_value, option, option-int, array}

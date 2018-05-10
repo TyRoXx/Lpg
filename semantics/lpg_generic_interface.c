@@ -22,4 +22,5 @@ generic_interface generic_interface_create(interface_expression tree, generic_en
 void generic_interface_free(generic_interface const freed)
 {
     generic_enum_closures_free(freed.closures);
+    interface_expression_free(freed.tree);
 }

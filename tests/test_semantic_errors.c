@@ -566,10 +566,10 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 24))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 28))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let v = std.option.some.a\n",
+                                               "let v = std.option-int.some.a\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
@@ -1048,7 +1048,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_duplicate_match_case, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "match option.none\n"
                                                "    case option.some(let i): 0\n"
                                                "    case option.some(let i): 0\n",
@@ -1061,7 +1061,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_declaration_with_existing_name, source_location_create(4, 25))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "let i = 0\n"
                                                "match option.none\n"
                                                "    case option.some(let i): 0\n"
@@ -1075,7 +1075,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_unknown_element, source_location_create(4, 21))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "let i = 0\n"
                                                "match option.none\n"
                                                "    case option.some(u): 0\n"
@@ -1089,7 +1089,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_unknown_element, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "let i = 0\n"
                                                "match option.none\n"
                                                "    case u(let s): 0\n"
@@ -1103,7 +1103,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_not_callable, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "let i = 0\n"
                                                "match option.none\n"
                                                "    case i(let s): 0\n"
@@ -1143,7 +1143,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_type_mismatch, source_location_create(3, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
-                                               "let option = std.option\n"
+                                               "let option = std.option-int\n"
                                                "match boolean.true\n"
                                                "    case option.some(let i): 0\n"
                                                "    case option.none: 0\n",

@@ -80,7 +80,7 @@ int main(void)
     {
         return lpg_print_test_summary();
     }
-    printf("Detected memory leak\n");
+    printf("Detected memory leak, %zu active allocation(s)\n", count_active_allocations());
     lpg_print_test_summary();
     return 1;
 }

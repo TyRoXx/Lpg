@@ -382,7 +382,7 @@ void test_interpreter(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&executable_path);
 
-        static char const *const test_files[] = {"struct-compile-time.lpg",
+        static char const *const test_files[] = {"array.lpg",
                                                  "boolean.lpg",
                                                  "concat.lpg",
                                                  "comment-multi.lpg",
@@ -407,10 +407,12 @@ void test_interpreter(void)
                                                  "match-integer.lpg",
                                                  "match-return.lpg",
                                                  "option.lpg",
+                                                 "option-int.lpg",
                                                  "raw-string-literal.lpg",
                                                  "return.lpg",
                                                  "std.lpg",
                                                  "string-equals.lpg",
+                                                 "struct-compile-time.lpg",
                                                  "struct.lpg",
                                                  "tuple.lpg",
                                                  "type-of.lpg",

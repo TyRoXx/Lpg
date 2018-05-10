@@ -28,4 +28,5 @@ void generic_enum_free(generic_enum const freed)
     {
         deallocate(freed.closures);
     }
+    enum_expression_free(freed.tree);
 }
