@@ -1,0 +1,7 @@
+let option = enum[T]
+    some(T)
+    none
+
+let export = struct
+    option: type-of(option)
+export{option}

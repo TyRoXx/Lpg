@@ -1,3 +1,8 @@
+let arrays = import array
+let array = arrays.array
+let options = import option
+let option = options.option
+
 let and = (left: boolean, right: boolean)
     match left
         case boolean.true:
@@ -24,16 +29,7 @@ let unit = type-of(unit_value)
 
 let any-integer = int(0, 340282366920938463463374607431768211455)
 
-let option = enum[T]
-    some(T)
-    none
 let option-int = option[any-integer]
-
-let array = interface[T]
-    size(): any-integer
-    load(index: any-integer): option[T]
-    store(index: any-integer, element: T): boolean
-    append(element: T): boolean
 
 let export = struct
     and: type-of(and)
