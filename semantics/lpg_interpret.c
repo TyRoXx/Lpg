@@ -73,6 +73,14 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         instruction const element = sequence.elements[i];
         switch (element.type)
         {
+        case instruction_new_array:
+        {
+            array_value *const array = garbage_collector_allocate(gc, sizeof(*array));
+            *array = array_value_create(NULL, 0, element.new_array.element_type);
+            registers[element.new_array.into] = value_from_array(array);
+            break;
+        }
+
         case instruction_get_method:
         {
             size_t const capture_count = 3;
@@ -123,6 +131,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             }
             switch (callee.kind)
             {
+            case value_kind_array:
+                LPG_TO_DO();
+
             case value_kind_function_pointer:
             {
                 optional_value const result = call_function(

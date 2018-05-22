@@ -802,6 +802,46 @@ static expression_parser_result parse_import(expression_parser *const parser, so
     return result;
 }
 
+static expression_parser_result parse_new_array(expression_parser *const parser, size_t indentation)
+{
+    parse_optional_space(parser);
+
+    {
+        rich_token const left_parenthesis = peek(parser);
+        if (left_parenthesis.token != token_left_parenthesis)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where),
+                             parser->on_error_user);
+            return expression_parser_result_failure;
+        }
+        pop(parser);
+    }
+
+    expression_parser_result const argument = parse_expression(parser, indentation, false);
+    if (!argument.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+
+    parse_optional_space(parser);
+
+    {
+        rich_token const right_parenthesis = peek(parser);
+        if (right_parenthesis.token != token_right_parenthesis)
+        {
+            expression_free(&argument.success);
+            parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where),
+                             parser->on_error_user);
+            return expression_parser_result_failure;
+        }
+        pop(parser);
+    }
+
+    expression_parser_result const result = {
+        1, expression_from_new_array(new_array_expression_create(expression_allocate(argument.success)))};
+    return result;
+}
+
 static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
@@ -960,6 +1000,10 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         case token_import:
             pop(parser);
             return parse_import(parser, head.where);
+
+        case token_new_array:
+            pop(parser);
+            return parse_new_array(parser, indentation);
         }
     }
 }

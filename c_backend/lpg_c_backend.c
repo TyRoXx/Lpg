@@ -1,9 +1,9 @@
-#include "lpg_c_backend.h"
-#include "lpg_assert.h"
-#include "lpg_instruction.h"
 #include "lpg_allocate.h"
-#include <string.h>
+#include "lpg_assert.h"
+#include "lpg_c_backend.h"
+#include "lpg_instruction.h"
 #include "lpg_structure_member.h"
+#include <string.h>
 
 typedef struct standard_library_usage
 {
@@ -14,6 +14,7 @@ typedef struct standard_library_usage
     bool using_integer;
     bool using_boolean;
     bool using_stdlib;
+    bool using_c_assert;
 } standard_library_usage;
 
 static void standard_library_usage_use_string_ref(standard_library_usage *usage)
@@ -110,6 +111,51 @@ static size_t *type_definitions_sort_by_order(type_definitions const definitions
     return result;
 }
 
+static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
+                                       type const what, checked_program const *const program, size_t const indentation,
+                                       stream_writer const c_output);
+
+typedef struct array_vtable
+{
+    interface_id array_type;
+    unicode_string definition;
+} array_vtable;
+
+static array_vtable array_vtable_create(interface_id array_type, unicode_string definition)
+{
+    array_vtable const result = {array_type, definition};
+    return result;
+}
+
+static void array_vtable_free(array_vtable const freed)
+{
+    unicode_string_free(&freed.definition);
+}
+
+typedef struct array_vtable_cache
+{
+    array_vtable *array_vtables;
+    size_t array_vtable_count;
+} array_vtable_cache;
+
+static void array_vtable_cache_free(array_vtable_cache const freed)
+{
+    for (size_t i = 0; i < freed.array_vtable_count; ++i)
+    {
+        array_vtable_free(freed.array_vtables[i]);
+    }
+    if (freed.array_vtables)
+    {
+        deallocate(freed.array_vtables);
+    }
+}
+
+static success_indicator generate_interface_vtable_name(interface_id const generated, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "interface_vtable_"));
+    return stream_writer_write_integer(c_output, integer_create(0, generated));
+}
+
 typedef struct c_backend_state
 {
     register_state *registers;
@@ -118,7 +164,123 @@ typedef struct c_backend_state
     size_t active_register_count;
     type_definitions *definitions;
     checked_program const *program;
+    array_vtable_cache *array_vtables;
 } c_backend_state;
+
+static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
+                                       type_definitions *const definitions, checked_program const *const program,
+                                       stream_writer const c_output);
+
+static success_indicator generate_array_vtable_name(stream_writer const c_output, interface_id const array_interface)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "array_vtable_"));
+    return stream_writer_write_integer(c_output, integer_create(0, array_interface));
+}
+
+static success_indicator generate_array_impl_name(stream_writer const c_output, interface_id const array_interface)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "array_impl_"));
+    return stream_writer_write_integer(c_output, integer_create(0, array_interface));
+}
+
+static success_indicator generate_array_vtable(stream_writer const c_output, interface_id const array_interface,
+                                               type const element_type, standard_library_usage *const standard_library,
+                                               type_definitions *const definitions,
+                                               checked_program const *const program)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, "\n{\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " *elements;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    size_t used;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    size_t allocated;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    ptrdiff_t references;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "} "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    /*
+    enum_3 (*load)(void *, uint64_t);
+    stateless_enum (*store)(void *, uint64_t, stateless_enum);
+    stateless_enum (*append)(void *, stateless_enum);
+     */
+    LPG_TRY(stream_writer_write_string(c_output, "static void "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_add_reference(void *self, ptrdiff_t difference)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    impl->references += difference;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    if (impl->references > 0)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    {\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "        return;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"));
+    standard_library->using_c_assert = true;
+    LPG_TRY(stream_writer_write_string(c_output, "    assert(impl->references == 0);\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    for (size_t i = 0, c = impl->used; i < c; ++i)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    {\n"));
+    LPG_TRY(generate_free(
+        standard_library, unicode_view_from_c_str("(impl->elements + i)"), element_type, program, 2, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    free(impl->elements);\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    free(impl);\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+
+    LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_size(void *self)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    return impl->used;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+
+    LPG_TRY(stream_writer_write_string(c_output, "static "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const "));
+    LPG_TRY(generate_array_vtable_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " = {"));
+
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_add_reference, "));
+
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_size"));
+
+    LPG_TRY(stream_writer_write_string(c_output, "};\n"));
+    return success_yes;
+}
+
+static void require_array_vtable(array_vtable_cache *const state, interface_id const array_interface,
+                                 type const element_type, standard_library_usage *const standard_library,
+                                 type_definitions *const definitions, checked_program const *const program)
+{
+    for (size_t i = 0; i < state->array_vtable_count; ++i)
+    {
+        if (state->array_vtables[i].array_type == array_interface)
+        {
+            return;
+        }
+    }
+    memory_writer buffer = {NULL, 0, 0};
+    stream_writer const writer = memory_writer_erase(&buffer);
+    switch (generate_array_vtable(writer, array_interface, element_type, standard_library, definitions, program))
+    {
+    case success_yes:
+        break;
+
+    case success_no:
+        LPG_TO_DO();
+    }
+    state->array_vtables =
+        reallocate_array(state->array_vtables, (state->array_vtable_count + 1), sizeof(*state->array_vtables));
+    unicode_string const definition = {buffer.data, buffer.used};
+    state->array_vtables[state->array_vtable_count] = array_vtable_create(array_interface, definition);
+    state->array_vtable_count += 1;
+}
 
 static void active_register(c_backend_state *const state, register_id const id)
 {
@@ -292,10 +454,6 @@ static success_indicator indent(size_t const indentation, stream_writer const c_
     return success_yes;
 }
 
-static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
-                                       type_definitions *const definitions, checked_program const *const program,
-                                       stream_writer const c_output);
-
 static success_indicator generate_c_function_pointer(type const generated,
                                                      standard_library_usage *const standard_library,
                                                      type_definitions *const definitions,
@@ -339,12 +497,6 @@ static success_indicator generate_c_function_pointer(type const generated,
     new_definition->definition.length = definition_buffer.used;
     new_definition->order = definitions->next_order++;
     return stream_writer_write_unicode_view(c_output, unicode_view_from_string(name));
-}
-
-static success_indicator generate_interface_vtable_name(interface_id const generated, stream_writer const c_output)
-{
-    LPG_TRY(stream_writer_write_string(c_output, "interface_vtable_"));
-    return stream_writer_write_integer(c_output, integer_create(0, generated));
 }
 
 static success_indicator generate_interface_vtable_definition(interface_id const generated,
@@ -434,10 +586,6 @@ static success_indicator generate_interface_impl_add_reference(implementation_re
     LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.target)));
     return success_yes;
 }
-
-static success_indicator generate_free(standard_library_usage *const standard_library, unicode_view const freed,
-                                       type const what, checked_program const *const program, size_t const indentation,
-                                       stream_writer const c_output);
 
 static success_indicator generate_interface_impl_definition(implementation_ref const generated,
                                                             type_definitions *const definitions,
@@ -699,7 +847,7 @@ static success_indicator generate_type(type const generated, standard_library_us
             }
             LPG_TRY(stream_writer_write_string(definition_writer, "} "));
             /*no newline here because clang-format will replace it with a
-            * space*/
+             * space*/
         }
         else
         {
@@ -1089,6 +1237,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_integer:
     {
         if (integer_less(generated.integer_, integer_create(1, 0)))
@@ -1259,12 +1410,65 @@ static success_indicator generate_free_registers(c_backend_state *state, size_t 
     return success_yes;
 }
 
+static success_indicator generate_new_array(c_backend_state *const state,
+                                            checked_function const *const current_function,
+                                            new_array_instruction const new_array, size_t const indentation,
+                                            stream_writer const c_output)
+{
+    set_register_variable(
+        state, new_array.into, register_resource_ownership_owns, type_from_interface(new_array.result_type));
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(generate_interface_reference_name(new_array.result_type, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const "));
+    LPG_TRY(generate_register_name(new_array.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " = {&"));
+    require_array_vtable(state->array_vtables, new_array.result_type, new_array.element_type, &state->standard_library,
+                         state->definitions, state->program);
+    LPG_TRY(generate_array_vtable_name(c_output, new_array.result_type));
+    state->standard_library.using_stdlib = true;
+    LPG_TRY(stream_writer_write_string(c_output, ", malloc(sizeof("));
+    LPG_TRY(generate_array_impl_name(c_output, new_array.result_type));
+    LPG_TRY(stream_writer_write_string(c_output, "))};\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "(("));
+    LPG_TRY(generate_array_impl_name(c_output, new_array.result_type));
+    LPG_TRY(stream_writer_write_string(c_output, " *)"));
+    LPG_TRY(generate_register_name(new_array.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ".self)->elements = NULL;\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "(("));
+    LPG_TRY(generate_array_impl_name(c_output, new_array.result_type));
+    LPG_TRY(stream_writer_write_string(c_output, " *)"));
+    LPG_TRY(generate_register_name(new_array.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ".self)->used = 0;\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "(("));
+    LPG_TRY(generate_array_impl_name(c_output, new_array.result_type));
+    LPG_TRY(stream_writer_write_string(c_output, " *)"));
+    LPG_TRY(generate_register_name(new_array.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ".self)->allocated = 0;\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "(("));
+    LPG_TRY(generate_array_impl_name(c_output, new_array.result_type));
+    LPG_TRY(stream_writer_write_string(c_output, " *)"));
+    LPG_TRY(generate_register_name(new_array.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ".self)->references = 1;\n"));
+    return success_yes;
+}
+
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const current_function,
                                               instruction const input, size_t const indentation,
                                               stream_writer const c_output)
 {
     switch (input.type)
     {
+    case instruction_new_array:
+        return generate_new_array(state, current_function, input.new_array, indentation, c_output);
+
     case instruction_erase_type:
     {
         set_register_variable(state, input.erase_type.into, register_resource_ownership_owns,
@@ -1734,6 +1938,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         ASSERT(state->registers[input.literal.into].meaning == register_meaning_nothing);
         switch (input.literal.value_.kind)
         {
+        case value_kind_array:
+            LPG_TO_DO();
+
         case value_kind_generic_enum:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
@@ -2187,7 +2394,8 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
 static success_indicator generate_function_body(checked_function const current_function,
                                                 checked_program const *const program, stream_writer const c_output,
                                                 standard_library_usage *standard_library,
-                                                type_definitions *const definitions)
+                                                type_definitions *const definitions,
+                                                array_vtable_cache *const array_vtables)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
@@ -2196,7 +2404,8 @@ static success_indicator generate_function_body(checked_function const current_f
                              NULL,
                              0,
                              definitions,
-                             program};
+                             program,
+                             array_vtables};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;
@@ -2286,18 +2495,20 @@ static success_indicator generate_function_declaration(function_id const id, fun
 
 success_indicator generate_c(checked_program const program, stream_writer const c_output)
 {
-    memory_writer program_defined = {NULL, 0, 0};
-    stream_writer program_defined_writer = memory_writer_erase(&program_defined);
+    memory_writer program_defined_a = {NULL, 0, 0};
+    stream_writer const program_defined_writer_a = memory_writer_erase(&program_defined_a);
+    memory_writer program_defined_b = {NULL, 0, 0};
+    stream_writer const program_defined_writer_b = memory_writer_erase(&program_defined_b);
 
-    standard_library_usage standard_library = {false, false, false, false, false, false, false};
+    standard_library_usage standard_library = {false, false, false, false, false, false, false, false};
 
     type_definitions definitions = {NULL, 0, 0};
 
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
-        LPG_TRY_GOTO(
-            generate_interface_vtable_definition(i, &standard_library, &definitions, &program, program_defined_writer),
-            fail);
+        LPG_TRY_GOTO(generate_interface_vtable_definition(
+                         i, &standard_library, &definitions, &program, program_defined_writer_a),
+                     fail);
     }
 
     for (enum_id i = 0; i < program.enum_count; ++i)
@@ -2307,7 +2518,7 @@ success_indicator generate_c(checked_program const program, stream_writer const 
             continue;
         }
         LPG_TRY_GOTO(
-            generate_stateful_enum_definition(i, &standard_library, &definitions, &program, program_defined_writer),
+            generate_stateful_enum_definition(i, &standard_library, &definitions, &program, program_defined_writer_a),
             fail);
     }
 
@@ -2315,9 +2526,9 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     {
         checked_function const current_function = program.functions[i];
         LPG_TRY_GOTO(generate_function_declaration(i, *current_function.signature, &standard_library, &definitions,
-                                                   &program, program_defined_writer),
+                                                   &program, program_defined_writer_a),
                      fail);
-        LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, ";\n"), fail);
+        LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_a, ";\n"), fail);
     }
 
     for (interface_id i = 0; i < program.interface_count; ++i)
@@ -2326,44 +2537,46 @@ success_indicator generate_c(checked_program const program, stream_writer const 
         for (size_t k = 0; k < interface_.implementation_count; ++k)
         {
             LPG_TRY_GOTO(generate_interface_impl_definition(implementation_ref_create(i, k), &definitions, &program,
-                                                            &standard_library, program_defined_writer),
+                                                            &standard_library, program_defined_writer_a),
                          fail);
         }
     }
+
+    array_vtable_cache array_vtables = {NULL, 0};
 
     for (function_id i = 1; i < program.function_count; ++i)
     {
         checked_function const current_function = program.functions[i];
         LPG_TRY_GOTO(generate_function_declaration(i, *current_function.signature, &standard_library, &definitions,
-                                                   &program, program_defined_writer),
+                                                   &program, program_defined_writer_b),
                      fail);
-        LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "\n"), fail);
-        LPG_TRY_GOTO(
-            generate_function_body(current_function, &program, program_defined_writer, &standard_library, &definitions),
-            fail);
+        LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "\n"), fail);
+        LPG_TRY_GOTO(generate_function_body(current_function, &program, program_defined_writer_b, &standard_library,
+                                            &definitions, &array_vtables),
+                     fail);
     }
 
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "static "), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "static "), fail);
     LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
-                               program_defined_writer),
+                               program_defined_writer_b),
                  fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, " lpg_main(void)\n"), fail);
-    LPG_TRY_GOTO(
-        generate_function_body(program.functions[0], &program, program_defined_writer, &standard_library, &definitions),
-        fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "int main(void)\n"), fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "{\n"), fail);
-    LPG_TRY_GOTO(indent(1, program_defined_writer), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, " lpg_main(void)\n"), fail);
+    LPG_TRY_GOTO(generate_function_body(program.functions[0], &program, program_defined_writer_b, &standard_library,
+                                        &definitions, &array_vtables),
+                 fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "int main(void)\n"), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "{\n"), fail);
+    LPG_TRY_GOTO(indent(1, program_defined_writer_b), fail);
     LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
-                               program_defined_writer),
+                               program_defined_writer_b),
                  fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, " const result = lpg_main();\n"), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, " const result = lpg_main();\n"), fail);
     LPG_TRY_GOTO(generate_free(&standard_library, unicode_view_from_c_str("result"),
-                               program.functions[0].signature->result, &program, 1, program_defined_writer),
+                               program.functions[0].signature->result, &program, 1, program_defined_writer_b),
                  fail);
-    LPG_TRY_GOTO(indent(1, program_defined_writer), fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "return 0;\n"), fail);
-    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer, "}\n"), fail);
+    LPG_TRY_GOTO(indent(1, program_defined_writer_b), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "return 0;\n"), fail);
+    LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "}\n"), fail);
 
     if (standard_library.using_unit)
     {
@@ -2392,6 +2605,10 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     if (standard_library.using_boolean)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_boolean.h>\n"), fail);
+    }
+    if (standard_library.using_c_assert)
+    {
+        LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <assert.h>\n"), fail);
     }
     LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <stddef.h>\n"
                                                       "typedef size_t stateless_enum;\n"),
@@ -2431,13 +2648,24 @@ success_indicator generate_c(checked_program const program, stream_writer const 
         }
     }
 
-    LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined.data, program_defined.used), fail);
+    for (size_t i = 0; i < array_vtables.array_vtable_count; ++i)
+    {
+        LPG_TRY_GOTO(stream_writer_write_unicode_view(
+                         program_defined_writer_a, unicode_view_from_string(array_vtables.array_vtables[i].definition)),
+                     fail);
+    }
+    array_vtable_cache_free(array_vtables);
+
+    LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined_a.data, program_defined_a.used), fail);
+    LPG_TRY_GOTO(stream_writer_write_bytes(c_output, program_defined_b.data, program_defined_b.used), fail);
     type_definitions_free(definitions);
-    memory_writer_free(&program_defined);
+    memory_writer_free(&program_defined_a);
+    memory_writer_free(&program_defined_b);
     return success_yes;
 
 fail:
     type_definitions_free(definitions);
-    memory_writer_free(&program_defined);
+    memory_writer_free(&program_defined_a);
+    memory_writer_free(&program_defined_b);
     return success_no;
 }

@@ -198,6 +198,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
         LPG_TRY(stream_writer_write_string(ecmascript_output, "new "));
         LPG_TRY(generate_implementation_name(
@@ -725,6 +728,14 @@ static success_indicator generate_get_method(function_generation *const state, g
     return success_yes;
 }
 
+static success_indicator generate_new_array(function_generation *const state, new_array_instruction const generated,
+                                            stream_writer const ecmascript_output)
+{
+    LPG_TRY(write_register(state, generated.into, type_from_interface(generated.result_type), ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "[];\n"));
+    return success_yes;
+}
+
 static success_indicator generate_erase_type(function_generation *const state, erase_type_instruction const generated,
                                              stream_writer const ecmascript_output)
 {
@@ -751,6 +762,9 @@ static success_indicator generate_instruction(function_generation *const state, 
 {
     switch (generated.type)
     {
+    case instruction_new_array:
+        return generate_new_array(state, generated.new_array, ecmascript_output);
+
     case instruction_get_method:
         return generate_get_method(state, generated.get_method, ecmascript_output);
 

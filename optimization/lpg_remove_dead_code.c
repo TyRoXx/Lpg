@@ -13,6 +13,9 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
         instruction const current_instruction = from.elements[from.length - i - 1u];
         switch (current_instruction.type)
         {
+        case instruction_new_array:
+            break;
+
         case instruction_get_method:
             registers_read_from[current_instruction.get_method.from] = true;
             break;
@@ -125,6 +128,9 @@ static bool change_register_ids(instruction *const where, register_id const *con
 {
     switch (where->type)
     {
+    case instruction_new_array:
+        return update_register_id(&where->new_array.into, new_register_ids);
+
     case instruction_get_method:
         ASSERT(update_register_id(&where->get_method.from, new_register_ids));
         return update_register_id(&where->get_method.into, new_register_ids);

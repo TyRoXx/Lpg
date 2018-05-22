@@ -495,6 +495,28 @@ placeholder_expression placeholder_expression_clone(placeholder_expression const
     return placeholder_expression_create(original.where, unicode_view_copy(unicode_view_from_string(original.name)));
 }
 
+new_array_expression new_array_expression_create(expression *element)
+{
+    new_array_expression const result = {element};
+    return result;
+}
+
+void new_array_expression_free(new_array_expression const freed)
+{
+    expression_deallocate(freed.element);
+}
+
+bool new_array_expression_equals(new_array_expression const left, new_array_expression const right)
+{
+    return expression_equals(left.element, right.element);
+}
+
+new_array_expression new_array_expression_clone(new_array_expression const original)
+{
+    ASSUME(original.element);
+    return new_array_expression_create(expression_allocate(*original.element));
+}
+
 sequence sequence_create(expression *elements, size_t length)
 {
     sequence const result = {elements, length};
@@ -632,6 +654,9 @@ source_location expression_source_begin(expression const value)
 {
     switch (value.type)
     {
+    case expression_type_new_array:
+        return expression_source_begin(*value.new_array.element);
+
     case expression_type_import:
         LPG_TO_DO();
 
@@ -1152,6 +1177,14 @@ expression expression_from_import(import_expression const value)
     return result;
 }
 
+expression expression_from_new_array(new_array_expression const content)
+{
+    expression result;
+    result.type = expression_type_new_array;
+    result.new_array = content;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -1163,6 +1196,10 @@ void expression_free(expression const *this)
 {
     switch (this->type)
     {
+    case expression_type_new_array:
+        new_array_expression_free(this->new_array);
+        break;
+
     case expression_type_import:
         import_expression_free(this->import);
         break;
@@ -1267,6 +1304,9 @@ expression expression_clone(expression const original)
 {
     switch (original.type)
     {
+    case expression_type_new_array:
+        LPG_TO_DO();
+
     case expression_type_identifier:
         return expression_from_identifier(identifier_expression_clone(original.identifier));
 
@@ -1397,12 +1437,17 @@ bool comment_equals(comment_expression left, comment_expression right)
 
 bool expression_equals(expression const *left, expression const *right)
 {
+    ASSUME(left);
+    ASSUME(right);
     if (left->type != right->type)
     {
         return 0;
     }
     switch (left->type)
     {
+    case expression_type_new_array:
+        LPG_TO_DO();
+
     case expression_type_import:
         LPG_TO_DO();
 

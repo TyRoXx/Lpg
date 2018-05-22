@@ -1,11 +1,11 @@
 #pragma once
 #include "lpg_checked_function.h"
-#include "lpg_integer.h"
-#include "lpg_type.h"
-#include "lpg_garbage_collector.h"
 #include "lpg_function_id.h"
+#include "lpg_garbage_collector.h"
 #include "lpg_generic_enum_id.h"
 #include "lpg_generic_interface_id.h"
+#include "lpg_integer.h"
+#include "lpg_type.h"
 
 typedef struct implementation_ref
 {
@@ -55,7 +55,8 @@ typedef enum value_kind
     value_kind_type_erased,
     value_kind_pattern,
     value_kind_generic_enum,
-    value_kind_generic_interface
+    value_kind_generic_interface,
+    value_kind_array
 } value_kind;
 
 typedef struct value_tuple
@@ -92,6 +93,16 @@ typedef struct structure_value
 
 structure_value structure_value_create(struct value const *members, size_t count);
 
+typedef struct array_value
+{
+    struct value *elements;
+    size_t count;
+    type element_type;
+} array_value;
+
+array_value array_value_create(struct value *elements, size_t count, type element_type);
+bool array_value_equals(array_value const left, array_value const right);
+
 typedef struct value
 {
     value_kind kind;
@@ -107,6 +118,7 @@ typedef struct value
         type_erased_value type_erased;
         generic_enum_id generic_enum;
         generic_interface_id generic_interface;
+        array_value *array;
     };
 } value;
 
@@ -122,6 +134,7 @@ value value_from_enum_constructor(void);
 value value_from_type_erased(type_erased_value content);
 value value_from_generic_enum(generic_enum_id content);
 value value_from_generic_interface(generic_interface_id content);
+value value_from_array(array_value *content);
 value *value_allocate(value const content);
 value value_or_unit(value const *const maybe);
 bool value_equals(value const left, value const right);

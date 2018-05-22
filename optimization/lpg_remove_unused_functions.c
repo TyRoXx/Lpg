@@ -22,6 +22,9 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 {
     switch (root.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
     {
         implementation const impl = all_interfaces[root.type_erased.impl.target]
@@ -71,6 +74,9 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         instruction const current_instruction = sequence.elements[j];
         switch (current_instruction.type)
         {
+        case instruction_new_array:
+            LPG_TO_DO();
+
         case instruction_get_method:
             mark_function(used_functions, all_functions, all_interfaces, current_instruction.get_method.method);
             break;
@@ -227,6 +233,9 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 {
     switch (from.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_integer:
     case value_kind_unit:
         return from;
@@ -317,6 +326,9 @@ static instruction clone_instruction(instruction const original, garbage_collect
 {
     switch (original.type)
     {
+    case instruction_new_array:
+        LPG_TO_DO();
+
     case instruction_get_method:
         return instruction_create_get_method(
             get_method_instruction_create(original.get_method.interface_, original.get_method.from,

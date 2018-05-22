@@ -1009,6 +1009,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         {
             switch (callee.compile_time_value.value_.kind)
             {
+            case value_kind_array:
+                LPG_TO_DO();
+
             case value_kind_function_pointer:
             {
                 compile_time_result =
@@ -1202,6 +1205,9 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
 {
     switch (root.type)
     {
+    case expression_type_new_array:
+        LPG_TO_DO();
+
     case expression_type_import:
         LPG_TO_DO();
 
@@ -1778,6 +1784,9 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
 {
     switch (from.type)
     {
+    case expression_type_new_array:
+        LPG_TO_DO();
+
     case expression_type_import:
         LPG_TO_DO();
 
@@ -2794,11 +2803,87 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
         true, where, imported.schema, optional_value_create(imported.loaded.value_), true, false);
 }
 
+static evaluate_expression_result evaluate_new_array(function_checking_state *const state,
+                                                     instruction_sequence *const function,
+                                                     new_array_expression const element)
+{
+    evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element);
+    if (!element_evaluated.has_value)
+    {
+        return element_evaluated;
+    }
+    if (!element_evaluated.compile_time_value.is_set)
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                         expression_source_begin(*element.element)));
+        return evaluate_expression_result_empty;
+    }
+    unicode_string array_module_name = {"array", 0};
+    array_module_name.length = strlen(array_module_name.data);
+    evaluate_expression_result const array_imported = evaluate_import(
+        state, function, import_expression_create(expression_source_begin(*element.element),
+                                                  identifier_expression_create(
+                                                      array_module_name, expression_source_begin(*element.element))));
+    if (!array_imported.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!array_imported.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (array_imported.compile_time_value.value_.kind != value_kind_structure)
+    {
+        LPG_TO_DO();
+    }
+    if (array_imported.compile_time_value.value_.structure.count != 1)
+    {
+        LPG_TO_DO();
+    }
+    value const generic_array = array_imported.compile_time_value.value_.structure.members[0];
+    if (generic_array.kind != value_kind_generic_interface)
+    {
+        LPG_TO_DO();
+    }
+    generic_interface_id const array_generic = generic_array.generic_interface;
+    value *const arguments = allocate_array(1, sizeof(*arguments));
+    arguments[0] = element_evaluated.compile_time_value.value_;
+    type *const argument_types = allocate_array(1, sizeof(*argument_types));
+    argument_types[0] = element_evaluated.type_;
+    evaluate_expression_result const array_instantiated = instantiate_generic_interface(
+        state, function, array_generic, arguments, 1, argument_types, expression_source_begin(*element.element));
+    if (!array_instantiated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!array_instantiated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (array_instantiated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    if (array_instantiated.compile_time_value.value_.type_.kind != type_kind_interface)
+    {
+        LPG_TO_DO();
+    }
+    register_id const into = allocate_register(&state->used_registers);
+    add_instruction(
+        function, instruction_create_new_array(new_array_instruction_create(
+                      array_instantiated.compile_time_value.value_.type_.interface_, into, element_evaluated.type_)));
+    return evaluate_expression_result_create(
+        true, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false, false);
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element)
 {
     switch (element.type)
     {
+    case expression_type_new_array:
+        return evaluate_new_array(state, function, element.new_array);
+
     case expression_type_import:
         return evaluate_import(state, function, element.import);
 

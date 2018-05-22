@@ -48,6 +48,9 @@ void print_value(value const printed, size_t const indentation)
 {
     switch (printed.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
         printf("type erased (impl: ?, self: ");
         print_value(*printed.type_erased.self, indentation);
@@ -111,6 +114,9 @@ void print_instruction(instruction const printed, size_t const indentation)
 {
     switch (printed.type)
     {
+    case instruction_new_array:
+        LPG_TO_DO();
+
     case instruction_instantiate_struct:
     case instruction_get_method:
     case instruction_erase_type:

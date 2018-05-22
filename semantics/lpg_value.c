@@ -1,6 +1,6 @@
-#include "lpg_value.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
+#include "lpg_value.h"
 
 implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index)
 {
@@ -85,6 +85,32 @@ structure_value structure_value_create(struct value const *members, size_t count
     ASSUME((count == 0) || (members != NULL));
     structure_value const result = {members, count};
     return result;
+}
+
+array_value array_value_create(struct value *elements, size_t count, type element_type)
+{
+    array_value const result = {elements, count, element_type};
+    return result;
+}
+
+bool array_value_equals(array_value const left, array_value const right)
+{
+    if (left.count != right.count)
+    {
+        return false;
+    }
+    if (!type_equals(left.element_type, right.element_type))
+    {
+        return false;
+    }
+    for (size_t i = 0; i < left.count; ++i)
+    {
+        if (!value_equals(left.elements[i], right.elements[i]))
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 value value_from_structure(structure_value const content)
@@ -185,6 +211,14 @@ value value_from_generic_interface(generic_interface_id content)
     return result;
 }
 
+value value_from_array(array_value *content)
+{
+    value result;
+    result.kind = value_kind_array;
+    result.array = content;
+    return result;
+}
+
 value *value_allocate(value const content)
 {
     value *const result = allocate(sizeof(*result));
@@ -207,6 +241,9 @@ bool value_equals(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
@@ -274,6 +311,9 @@ bool value_less_than(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_array:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
@@ -326,7 +366,7 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
 
 bool value_is_valid(value const checked)
 {
-    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_interface);
+    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_array);
 }
 
 function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,

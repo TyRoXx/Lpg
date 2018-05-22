@@ -206,6 +206,23 @@ bool loop_instruction_equals(loop_instruction const left, loop_instruction const
     return instruction_sequence_equals(&left.body, &right.body) && (left.unit_goes_into == right.unit_goes_into);
 }
 
+new_array_instruction new_array_instruction_create(interface_id result_type, register_id into, type element_type)
+{
+    new_array_instruction const result = {result_type, into, element_type};
+    return result;
+}
+
+void new_array_instruction_free(new_array_instruction const freed)
+{
+    (void)freed;
+}
+
+bool new_array_instruction_equals(new_array_instruction const left, new_array_instruction const right)
+{
+    return (left.result_type == right.result_type) && (left.into == right.into) &&
+           type_equals(left.element_type, right.element_type);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -267,6 +284,14 @@ instruction instruction_create_instantiate_struct(instantiate_struct_instruction
     instruction result;
     result.type = instruction_instantiate_struct;
     result.instantiate_struct = argument;
+    return result;
+}
+
+instruction instruction_create_new_array(new_array_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_new_array;
+    result.new_array = argument;
     return result;
 }
 
@@ -402,6 +427,7 @@ void instruction_free(instruction const *freed)
         loop_instruction_free(freed->loop);
         break;
 
+    case instruction_new_array:
     case instruction_get_method:
     case instruction_global:
     case instruction_read_struct:
@@ -447,6 +473,9 @@ bool instruction_equals(instruction const left, instruction const right)
     }
     switch (left.type)
     {
+    case instruction_new_array:
+        LPG_TO_DO();
+
     case instruction_instantiate_struct:
         return instantiate_struct_instruction_equals(left.instantiate_struct, right.instantiate_struct);
 
