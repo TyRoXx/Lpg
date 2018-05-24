@@ -58,6 +58,5 @@ script:
    fi
  - echo "travis_fold:start:documentation"
  - python documentation/compile_documentation.py
- - cat -n documentation.lpg
- - build/cli/lpg documentation.lpg --compile-only|| exit 1;
+ - exit $?
  - echo "travis_fold:end:documentation"
