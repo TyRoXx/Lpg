@@ -998,6 +998,11 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                                                           "        return [0, this.content[index]];\n"
                                                           "    }\n"
                                                           "    return 1;\n"
+                                                          "};\n"
+                                                          /*append()*/
+                                                          "new_array.prototype.call_method_3 = function (element) {\n"
+                                                          "    this.content.push(element);\n"
+                                                          "    return 1;\n"
                                                           "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {

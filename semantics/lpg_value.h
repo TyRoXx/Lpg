@@ -97,10 +97,11 @@ typedef struct array_value
 {
     struct value *elements;
     size_t count;
+    size_t allocated;
     type element_type;
 } array_value;
 
-array_value array_value_create(struct value *elements, size_t count, type element_type);
+array_value array_value_create(struct value *elements, size_t count, size_t allocated, type element_type);
 bool array_value_equals(array_value const left, array_value const right);
 
 typedef struct value

@@ -87,15 +87,19 @@ structure_value structure_value_create(struct value const *members, size_t count
     return result;
 }
 
-array_value array_value_create(struct value *elements, size_t count, type element_type)
+array_value array_value_create(struct value *elements, size_t count, size_t allocated, type element_type)
 {
-    array_value const result = {elements, count, element_type};
+    array_value const result = {elements, count, allocated, element_type};
     return result;
 }
 
 bool array_value_equals(array_value const left, array_value const right)
 {
     if (left.count != right.count)
+    {
+        return false;
+    }
+    if (left.allocated != right.allocated)
     {
         return false;
     }

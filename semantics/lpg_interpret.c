@@ -87,8 +87,31 @@ static value invoke_method(function_call_arguments const arguments, value const 
         }
 
         case 2:
-        case 3:
             LPG_TO_DO();
+
+        case 3:
+        {
+            value const new_element = arguments.arguments[0];
+            if (from.array->count == from.array->allocated)
+            {
+                size_t new_capacity = (from.array->count * 2);
+                if (new_capacity == 0)
+                {
+                    new_capacity = 1;
+                }
+                value *const new_elements =
+                    garbage_collector_allocate_array(arguments.gc, new_capacity, sizeof(*new_elements));
+                if (from.array->count > 0)
+                {
+                    memcpy(new_elements, from.array->elements, sizeof(*new_elements) * from.array->count);
+                }
+                from.array->elements = new_elements;
+                from.array->allocated = new_capacity;
+            }
+            from.array->elements[from.array->count] = new_element;
+            from.array->count += 1;
+            return value_from_enum_element(1, type_from_unit(), NULL);
+        }
 
         default:
             LPG_UNREACHABLE();
@@ -124,7 +147,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         case instruction_new_array:
         {
             array_value *const array = garbage_collector_allocate(gc, sizeof(*array));
-            *array = array_value_create(NULL, 0, element.new_array.element_type);
+            *array = array_value_create(NULL, 0, 0, element.new_array.element_type);
             registers[element.new_array.into] = value_from_array(array);
             break;
         }
