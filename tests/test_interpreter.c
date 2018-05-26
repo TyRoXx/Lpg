@@ -392,7 +392,8 @@ void test_interpreter(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&executable_path);
 
-        static char const *const test_files[] = {"array.lpg",
+        static char const *const test_files[] = {"array-boolean.lpg",
+                                                 "array-string.lpg",
                                                  "boolean.lpg",
                                                  "concat.lpg",
                                                  "comment-multi.lpg",

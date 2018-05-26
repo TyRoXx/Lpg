@@ -224,7 +224,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(stream_writer_write_string(c_output, "    for (size_t i = 0, c = impl->used; i < c; ++i)\n"));
     LPG_TRY(stream_writer_write_string(c_output, "    {\n"));
     LPG_TRY(generate_free(
-        standard_library, unicode_view_from_c_str("(impl->elements + i)"), element_type, program, 2, c_output));
+        standard_library, unicode_view_from_c_str("impl->elements[i]"), element_type, program, 2, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "    }\n"));
     LPG_TRY(stream_writer_write_string(c_output, "    free(impl->elements);\n"));
     LPG_TRY(stream_writer_write_string(c_output, "    free(impl);\n"));
@@ -259,7 +259,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    {\n"
                                                  "        result.which = 0;\n"
                                                  "        result.e_some = impl->elements[index];\n"));
-    LPG_TRY(generate_add_reference(unicode_view_from_c_str("result.state"), element_type, 2, program, c_output));
+    LPG_TRY(generate_add_reference(unicode_view_from_c_str("result.e_some"), element_type, 2, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "    }\n"
                                                  "    return result;\n"
                                                  "}\n"));
