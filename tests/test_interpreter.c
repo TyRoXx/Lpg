@@ -393,6 +393,7 @@ void test_interpreter(void)
         unicode_string_free(&executable_path);
 
         static char const *const test_files[] = {"array-boolean.lpg",
+                                                 "array-nesting.lpg",
                                                  "array-string.lpg",
                                                  "boolean.lpg",
                                                  "concat.lpg",

@@ -264,7 +264,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    return result;\n"
                                                  "}\n"));
 
-    LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
+    LPG_TRY(stream_writer_write_string(c_output, "static stateless_enum "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_store(void *self, uint64_t const index, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
@@ -284,7 +284,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    return 1;\n"
                                                  "}\n"));
 
-    LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
+    LPG_TRY(stream_writer_write_string(c_output, "static stateless_enum "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_append(void *self, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
