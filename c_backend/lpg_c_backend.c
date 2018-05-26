@@ -266,6 +266,26 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
 
     LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_store(void *self, uint64_t const index, "));
+    LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " element)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    if (index >= impl->used)\n"
+                                                 "    {\n"
+                                                 "        return 0;\n"
+                                                 "    }\n"));
+    LPG_TRY(generate_add_reference(unicode_view_from_c_str("element"), element_type, 1, program, c_output));
+    LPG_TRY(generate_free(
+        standard_library, unicode_view_from_c_str("impl->elements[index]"), element_type, program, 1, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "    impl->elements[index] = element;\n"
+                                                 "    return 1;\n"
+                                                 "}\n"));
+
+    LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_append(void *self, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " element)\n"));
@@ -315,7 +335,8 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_load, "));
 
-    LPG_TRY(stream_writer_write_string(c_output, "NULL, "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_store, "));
 
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_append"));

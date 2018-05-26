@@ -70,10 +70,10 @@ static value invoke_method(function_call_arguments const arguments, value const 
         ASSUME(method.integer_.high == 0);
         switch (method.integer_.low)
         {
-        case 0:
+        case 0: // size
             return value_from_integer(integer_create(0, from.array->count));
 
-        case 1:
+        case 1: // load
         {
             value const index = arguments.arguments[0];
             ASSUME(index.kind == value_kind_integer);
@@ -86,10 +86,20 @@ static value invoke_method(function_call_arguments const arguments, value const 
             return value_from_enum_element(1, type_from_unit(), NULL);
         }
 
-        case 2:
-            LPG_TO_DO();
+        case 2: // store
+        {
+            value const index = arguments.arguments[0];
+            ASSUME(index.kind == value_kind_integer);
+            if (!integer_less(index.integer_, integer_create(0, from.array->count)))
+            {
+                return value_from_enum_element(0, type_from_unit(), NULL);
+            }
+            value const new_element = arguments.arguments[1];
+            from.array->elements[index.integer_.low] = new_element;
+            return value_from_enum_element(1, type_from_unit(), NULL);
+        }
 
-        case 3:
+        case 3: // append
         {
             value const new_element = arguments.arguments[0];
             if (from.array->count == from.array->allocated)

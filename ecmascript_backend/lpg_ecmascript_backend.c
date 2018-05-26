@@ -985,25 +985,34 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     LPG_TRY(stream_writer_write_string(ecmascript_output, "var side_effect = function () {};\n"));
     LPG_TRY(stream_writer_write_string(
         ecmascript_output, "var integer_to_string = function (input) { return \"\" + input; };\n"));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "var new_array = function () {\n"
-                                                          "    this.content = [];\n"
-                                                          "};\n"
-                                                          /*size()*/
-                                                          "new_array.prototype.call_method_0 = function () {\n"
-                                                          "    return this.content.length;\n"
-                                                          "};\n"
-                                                          /*load()*/
-                                                          "new_array.prototype.call_method_1 = function (index) {\n"
-                                                          "    if (index < this.content.length) {\n"
-                                                          "        return [0, this.content[index]];\n"
-                                                          "    }\n"
-                                                          "    return 1;\n"
-                                                          "};\n"
-                                                          /*append()*/
-                                                          "new_array.prototype.call_method_3 = function (element) {\n"
-                                                          "    this.content.push(element);\n"
-                                                          "    return 1;\n"
-                                                          "};\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output,
+                                       "var new_array = function () {\n"
+                                       "    this.content = [];\n"
+                                       "};\n"
+                                       /*size()*/
+                                       "new_array.prototype.call_method_0 = function () {\n"
+                                       "    return this.content.length;\n"
+                                       "};\n"
+                                       /*load()*/
+                                       "new_array.prototype.call_method_1 = function (index) {\n"
+                                       "    if (index < this.content.length) {\n"
+                                       "        return [0, this.content[index]];\n"
+                                       "    }\n"
+                                       "    return 1;\n"
+                                       "};\n"
+                                       /*store()*/
+                                       "new_array.prototype.call_method_2 = function (index, element) {\n"
+                                       "    if (index >= this.content.length) {\n"
+                                       "        return 0;\n"
+                                       "    }\n"
+                                       "    this.content[index] = element;\n"
+                                       "    return 1;\n"
+                                       "};\n"
+                                       /*append()*/
+                                       "new_array.prototype.call_method_3 = function (element) {\n"
+                                       "    this.content.push(element);\n"
+                                       "    return 1;\n"
+                                       "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));
