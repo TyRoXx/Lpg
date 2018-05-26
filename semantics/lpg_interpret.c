@@ -40,27 +40,64 @@ static value invoke_method(function_call_arguments const arguments, value const 
 {
     (void)environment;
     ASSUME(captures);
-    value const from = captures[0];
-    ASSUME(from.kind == value_kind_type_erased);
-    implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
-    ASSUME(impl);
     value const method = captures[1];
     ASSUME(method.kind == value_kind_integer);
-    ASSUME(integer_less(method.integer_, integer_create(0, impl->method_count)));
-    value const method_parameter_count = captures[2];
-    ASSUME(method.kind == value_kind_integer);
-    function_pointer_value const *const function = &impl->methods[method.integer_.low];
-    ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
-    ASSUME(!arguments.self.is_set);
-    optional_value const result =
-        call_function(*function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
-                                                                arguments.arguments, arguments.globals, arguments.gc,
-                                                                arguments.all_functions, arguments.all_interfaces));
-    if (!result.is_set)
+    value const from = captures[0];
+    switch (from.kind)
     {
-        LPG_TO_DO();
+    case value_kind_type_erased:
+    {
+        implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
+        ASSUME(impl);
+        ASSUME(integer_less(method.integer_, integer_create(0, impl->method_count)));
+        value const method_parameter_count = captures[2];
+        ASSUME(method.kind == value_kind_integer);
+        function_pointer_value const *const function = &impl->methods[method.integer_.low];
+        ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
+        ASSUME(!arguments.self.is_set);
+        optional_value const result = call_function(
+            *function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
+                                                      arguments.arguments, arguments.globals, arguments.gc,
+                                                      arguments.all_functions, arguments.all_interfaces));
+        if (!result.is_set)
+        {
+            LPG_TO_DO();
+        }
+        return result.value_;
     }
-    return result.value_;
+
+    case value_kind_array:
+        ASSUME(method.integer_.high == 0);
+        switch (method.integer_.low)
+        {
+        case 0:
+            return value_from_integer(integer_create(0, from.array->count));
+
+        case 1:
+        case 2:
+        case 3:
+            LPG_TO_DO();
+
+        default:
+            LPG_UNREACHABLE();
+        }
+        LPG_TO_DO();
+
+    case value_kind_integer:
+    case value_kind_string:
+    case value_kind_function_pointer:
+    case value_kind_structure:
+    case value_kind_type:
+    case value_kind_enum_element:
+    case value_kind_unit:
+    case value_kind_tuple:
+    case value_kind_enum_constructor:
+    case value_kind_pattern:
+    case value_kind_generic_enum:
+    case value_kind_generic_interface:
+        LPG_UNREACHABLE();
+    }
+    LPG_UNREACHABLE();
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,

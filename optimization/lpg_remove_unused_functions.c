@@ -75,7 +75,7 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         switch (current_instruction.type)
         {
         case instruction_new_array:
-            LPG_TO_DO();
+            break;
 
         case instruction_get_method:
             mark_function(used_functions, all_functions, all_interfaces, current_instruction.get_method.method);
@@ -327,7 +327,8 @@ static instruction clone_instruction(instruction const original, garbage_collect
     switch (original.type)
     {
     case instruction_new_array:
-        LPG_TO_DO();
+        return instruction_create_new_array(new_array_instruction_create(
+            original.new_array.result_type, original.new_array.into, original.new_array.element_type));
 
     case instruction_get_method:
         return instruction_create_get_method(

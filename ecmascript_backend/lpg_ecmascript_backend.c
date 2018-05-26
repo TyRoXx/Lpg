@@ -732,7 +732,7 @@ static success_indicator generate_new_array(function_generation *const state, ne
                                             stream_writer const ecmascript_output)
 {
     LPG_TRY(write_register(state, generated.into, type_from_interface(generated.result_type), ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "[];\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "new new_array();\n"));
     return success_yes;
 }
 
@@ -979,6 +979,13 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     LPG_TRY(stream_writer_write_string(ecmascript_output, "var side_effect = function () {};\n"));
     LPG_TRY(stream_writer_write_string(
         ecmascript_output, "var integer_to_string = function (input) { return \"\" + input; };\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "var new_array = function () {\n"
+                                                          "    this.content = [];\n"
+                                                          "};\n"
+                                                          /*size()*/
+                                                          "new_array.prototype.call_method_0 = function () {\n"
+                                                          "    return this.content.length;\n"
+                                                          "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));
