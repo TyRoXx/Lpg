@@ -701,7 +701,13 @@ static success_indicator generate_get_method(function_generation *const state, g
     LPG_TRY(write_register(state, generated.into,
                            type_from_method_pointer(method_pointer_type_create(generated.interface_, generated.method)),
                            ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "function ("));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "(function () { "));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "var "));
+    LPG_TRY(generate_capture_alias(0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
+    LPG_TRY(generate_register_name(generated.from, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "    return function ("));
     struct method_description const method = state->all_interfaces[generated.interface_].methods[generated.method];
     for (register_id i = 0; i < method.parameters.length; ++i)
     {
@@ -712,7 +718,7 @@ static success_indicator generate_get_method(function_generation *const state, g
         LPG_TRY(generate_register_name(i, ecmascript_output));
     }
     LPG_TRY(stream_writer_write_string(ecmascript_output, ") { return "));
-    LPG_TRY(generate_register_name(generated.from, ecmascript_output));
+    LPG_TRY(generate_capture_alias(0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ".call_method_"));
     LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, generated.method)));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "("));
@@ -724,7 +730,7 @@ static success_indicator generate_get_method(function_generation *const state, g
         }
         LPG_TRY(generate_register_name(i, ecmascript_output));
     }
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "); };\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "); }; })();\n"));
     return success_yes;
 }
 
@@ -985,6 +991,13 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                                                           /*size()*/
                                                           "new_array.prototype.call_method_0 = function () {\n"
                                                           "    return this.content.length;\n"
+                                                          "};\n"
+                                                          /*load()*/
+                                                          "new_array.prototype.call_method_1 = function (index) {\n"
+                                                          "    if (index < this.content.length) {\n"
+                                                          "        return [0, this.content[index]];\n"
+                                                          "    }\n"
+                                                          "    return 1;\n"
                                                           "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {

@@ -183,6 +183,9 @@ static success_indicator generate_array_impl_name(stream_writer const c_output, 
     return stream_writer_write_integer(c_output, integer_create(0, array_interface));
 }
 
+static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
+                                                checked_program const *const program, stream_writer const c_output);
+
 static success_indicator generate_array_vtable(stream_writer const c_output, interface_id const array_interface,
                                                type const element_type, standard_library_usage *const standard_library,
                                                type_definitions *const definitions,
@@ -201,7 +204,6 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
     /*
-    enum_3 (*load)(void *, uint64_t);
     stateless_enum (*store)(void *, uint64_t, stateless_enum);
     stateless_enum (*append)(void *, stateless_enum);
      */
@@ -238,6 +240,30 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(stream_writer_write_string(c_output, "    return impl->used;\n"));
     LPG_TRY(stream_writer_write_string(c_output, "}\n"));
 
+    type const load_result = program->interfaces[array_interface].methods[1].result;
+    ASSUME(load_result.kind == type_kind_enumeration);
+    LPG_TRY(stream_writer_write_string(c_output, "static "));
+    LPG_TRY(generate_type(load_result, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_load(void *self, uint64_t const index)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(generate_type(load_result, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " result;\n"
+                                                 "    result.which = 1;\n"
+                                                 "    if (index < impl->used)\n"
+                                                 "    {\n"
+                                                 "        result.which = 0;\n"
+                                                 "        result.e_some = impl->elements[index];\n"));
+    LPG_TRY(generate_add_reference(unicode_view_from_c_str("result.state"), element_type, 2, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"
+                                                 "    return result;\n"
+                                                 "}\n"));
+
     LPG_TRY(stream_writer_write_string(c_output, "static "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const "));
@@ -248,7 +274,10 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(stream_writer_write_string(c_output, "_add_reference, "));
 
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_size"));
+    LPG_TRY(stream_writer_write_string(c_output, "_size, "));
+
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_load"));
 
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     return success_yes;
@@ -910,9 +939,6 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     }
     LPG_UNREACHABLE();
 }
-
-static success_indicator generate_add_reference(unicode_view const value, type const what, size_t const indentation,
-                                                checked_program const *const program, stream_writer const c_output);
 
 static success_indicator generate_add_reference_to_tuple(unicode_view const tuple_name, type const *const elements,
                                                          size_t const element_count, size_t const indentation,

@@ -63,6 +63,8 @@ static bool from_ecmascript_bool(double const input)
 
 static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
+    duk_int_t const argument_type = duk_get_type(duktape, 0);
+    REQUIRE(argument_type == DUK_TYPE_NUMBER);
     REQUIRE(from_ecmascript_bool(duk_get_number(duktape, 0)));
     return 0;
 }
@@ -151,6 +153,8 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
                                                                   "if(MSVC)\n"
                                                                   "    add_definitions(/WX)\n"
                                                                   "    add_definitions(/wd4101)\n"
+                                                                  "else()\n"
+                                                                  "    add_definitions(-std=gnu99)\n"
                                                                   "endif()\n"));
         REQUIRE(success_yes == stream_writer_write_string(writer, "include_directories(\""));
         {
@@ -268,6 +272,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         duk_push_c_function(duktape, ecmascript_assert, 1);
         duk_put_global_string(duktape, "assert");
 
+        // fwrite(generated.data, generated.used, 1, stdout);
+        // fflush(stdout);
+
         duk_eval_lstring(duktape, generated.data, generated.used);
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
@@ -309,13 +316,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     checked_program checked = check(root, global_object, expect_no_errors, &loader, test_name, source, NULL);
     sequence_free(&root);
 
-    {
-        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, test_name};
-        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
-        test_all_backends(test_name, checked, global_object, unicode_view_from_string(c_test_dir));
-        unicode_string_free(&c_test_dir);
-    }
-
+    // optimized
     {
         remove_dead_code(&checked);
         checked_program const optimized = remove_unused_functions(checked);
@@ -334,6 +335,15 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         memory_writer_free(&optimized_test_name);
         checked_program_free(&optimized);
     }
+
+    // not optimized
+    {
+        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, test_name};
+        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
+        test_all_backends(test_name, checked, global_object, unicode_view_from_string(c_test_dir));
+        unicode_string_free(&c_test_dir);
+    }
+
     unicode_string_free(&module_directory);
     checked_program_free(&checked);
 }

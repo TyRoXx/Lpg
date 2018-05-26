@@ -2869,9 +2869,10 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
         LPG_TO_DO();
     }
     register_id const into = allocate_register(&state->used_registers);
-    add_instruction(
-        function, instruction_create_new_array(new_array_instruction_create(
-                      array_instantiated.compile_time_value.value_.type_.interface_, into, element_evaluated.type_)));
+    ASSUME(element_evaluated.compile_time_value.value_.kind == value_kind_type);
+    add_instruction(function, instruction_create_new_array(new_array_instruction_create(
+                                  array_instantiated.compile_time_value.value_.type_.interface_, into,
+                                  element_evaluated.compile_time_value.value_.type_)));
     return evaluate_expression_result_create(
         true, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false, false);
 }

@@ -4,12 +4,12 @@ let array-type = std.array[std.boolean]
 let a : array-type = new-array(std.boolean)
 assert(integer-equals(0, a.size()))
 
-/*assert(match a.load(0)
+assert(match a.load(0)
     case std.option[std.boolean].some(let element): std.boolean.false
     case std.option[std.boolean].none: std.boolean.true
 )
 
-a.append(std.boolean.true)
+/*a.append(std.boolean.true)
 assert(integer-equals(1, a.size()))
 
 assert(match a.load(0)

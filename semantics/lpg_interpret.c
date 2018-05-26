@@ -74,6 +74,18 @@ static value invoke_method(function_call_arguments const arguments, value const 
             return value_from_integer(integer_create(0, from.array->count));
 
         case 1:
+        {
+            value const index = arguments.arguments[0];
+            ASSUME(index.kind == value_kind_integer);
+            if (integer_less(index.integer_, integer_create(0, from.array->count)))
+            {
+                value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
+                *state = from.array->elements[index.integer_.low];
+                return value_from_enum_element(0, from.array->element_type, state);
+            }
+            return value_from_enum_element(1, type_from_unit(), NULL);
+        }
+
         case 2:
         case 3:
             LPG_TO_DO();
@@ -81,7 +93,6 @@ static value invoke_method(function_call_arguments const arguments, value const 
         default:
             LPG_UNREACHABLE();
         }
-        LPG_TO_DO();
 
     case value_kind_integer:
     case value_kind_string:
