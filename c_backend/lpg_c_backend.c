@@ -193,52 +193,48 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
 {
     LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, "\n{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, "\n{\n"
+                                                 "    "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, " *elements;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    size_t used;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    size_t allocated;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    ptrdiff_t references;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "} "));
+    LPG_TRY(stream_writer_write_string(c_output, " *elements;\n"
+                                                 "    size_t used;\n"
+                                                 "    size_t allocated;\n"
+                                                 "    ptrdiff_t references;\n"
+                                                 "} "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
     LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    /*
-    stateless_enum (*store)(void *, uint64_t, stateless_enum);
-    stateless_enum (*append)(void *, stateless_enum);
-     */
     LPG_TRY(stream_writer_write_string(c_output, "static void "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_add_reference(void *self, ptrdiff_t difference)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, "_add_reference(void *self, ptrdiff_t difference)\n"
+                                                 "{\n"
+                                                 "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    impl->references += difference;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    if (impl->references > 0)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    {\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "        return;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    }\n"));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    impl->references += difference;\n"
+                                                 "    if (impl->references > 0)\n"
+                                                 "    {\n"
+                                                 "        return;\n"
+                                                 "    }\n"));
     standard_library->using_c_assert = true;
-    LPG_TRY(stream_writer_write_string(c_output, "    assert(impl->references == 0);\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    for (size_t i = 0, c = impl->used; i < c; ++i)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    {\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    assert(impl->references == 0);\n"
+                                                 "    for (size_t i = 0, c = impl->used; i < c; ++i)\n"
+                                                 "    {\n"));
     LPG_TRY(generate_free(
         standard_library, unicode_view_from_c_str("impl->elements[i]"), element_type, program, 2, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "    }\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    free(impl->elements);\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    free(impl);\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"
+                                                 "    free(impl->elements);\n"
+                                                 "    free(impl);\n"
+                                                 "}\n"));
 
     LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_size(void *self)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, "_size(void *self)\n"
+                                                 "{\n"
+                                                 "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    return impl->used;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    return impl->used;\n"
+                                                 "}\n"));
 
     type const load_result = program->interfaces[array_interface].methods[1].result;
     ASSUME(load_result.kind == type_kind_enumeration);
@@ -246,12 +242,12 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_type(load_result, standard_library, definitions, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_load(void *self, uint64_t const index)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, "_load(void *self, uint64_t const index)\n"
+                                                 "{\n"
+                                                 "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    "));
     LPG_TRY(generate_type(load_result, standard_library, definitions, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " result;\n"
                                                  "    result.which = 1;\n"
@@ -268,12 +264,12 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_store(void *self, uint64_t const index, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, " element)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, " element)\n"
+                                                 "{\n"
+                                                 "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    if (index >= impl->used)\n"
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    if (index >= impl->used)\n"
                                                  "    {\n"
                                                  "        return 0;\n"
                                                  "    }\n"));
@@ -288,9 +284,9 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_append(void *self, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, " element)\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "    "));
+    LPG_TRY(stream_writer_write_string(c_output, " element)\n"
+                                                 "{\n"
+                                                 "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
     LPG_TRY(stream_writer_write_string(
         c_output, " * const impl = self;\n"
