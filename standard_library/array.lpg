@@ -1,12 +1,11 @@
 let options = import option
+let std = import std
 let option = options.option
 
-let any-integer = int(0, 340282366920938463463374607431768211455)
-
 let array = interface[T]
-    size(): any-integer
-    load(index: any-integer): option[T]
-    store(index: any-integer, element: T): boolean
+    size(): std.any-integer
+    load(index: std.any-integer): option[T]
+    store(index: std.any-integer, element: T): boolean
     append(element: T): boolean
 
 let export = struct
