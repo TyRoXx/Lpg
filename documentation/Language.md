@@ -11,6 +11,8 @@
     1. [Loops](#Loops)
     1. [Comments](#Comments)
 1. [Standard Library Functions](#Standard-library-functions)
+1. [Standard Library Constants](#Standard-library-constants)
+1. [Built-in global functions](#Built-in-global-functions)
 1. [Optimizations](#Optimizations)
 
 ## Hello World
