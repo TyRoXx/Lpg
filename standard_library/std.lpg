@@ -43,4 +43,4 @@ let export = struct
     option: type-of(option)
     option-int: type-of(option-int)
     array: type-of(array)
-export{and, or, not, type, string-ref, boolean, unit, unit_value, option, option-int, array}
+export{and, or, not, type, string-ref, boolean, unit, unit_value, option, option-int, array, any-integer}
