@@ -27,7 +27,7 @@ void local_variable_container_free(local_variable_container const freed);
 
 typedef enum read_local_variable_status
 {
-    read_local_variable_status_ok,
+    read_local_variable_status_ok = 1,
     read_local_variable_status_unknown,
     read_local_variable_status_forbidden
 } read_local_variable_status;

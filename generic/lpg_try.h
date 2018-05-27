@@ -2,7 +2,7 @@
 
 typedef enum success_indicator
 {
-    success_yes,
+    success_yes = 1,
     success_no
 } success_indicator;
 

@@ -14,7 +14,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
 
 typedef enum run_sequence_result
 {
-    run_sequence_result_break,
+    run_sequence_result_break = 1,
     run_sequence_result_continue,
     run_sequence_result_return,
     run_sequence_result_unavailable_at_this_time

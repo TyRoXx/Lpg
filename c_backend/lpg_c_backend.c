@@ -24,7 +24,7 @@ static void standard_library_usage_use_string_ref(standard_library_usage *usage)
 
 typedef enum register_meaning
 {
-    register_meaning_nothing,
+    register_meaning_nothing = 1,
     register_meaning_global,
     register_meaning_variable,
     register_meaning_assert,
@@ -43,7 +43,7 @@ typedef enum register_meaning
 
 typedef enum register_resource_ownership
 {
-    register_resource_ownership_owns,
+    register_resource_ownership_owns = 1,
     register_resource_ownership_borrows
 } register_resource_ownership;
 

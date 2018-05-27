@@ -17,7 +17,7 @@ bool is_end_of_file(LPG_NON_NULL(rich_token const *token));
 
 typedef enum parse_error_type
 {
-    parse_error_invalid_token,
+    parse_error_invalid_token = 1,
     parse_error_expected_expression,
     parse_error_expected_arguments,
     parse_error_integer_literal_out_of_range,

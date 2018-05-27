@@ -37,7 +37,7 @@ lambda lambda_clone(lambda const original);
 
 typedef enum expression_type
 {
-    expression_type_lambda,
+    expression_type_lambda = 1,
     expression_type_call,
     expression_type_integer_literal,
     expression_type_access_structure,
@@ -156,7 +156,7 @@ not not_clone(not const original);
 
 typedef enum binary_operator
 {
-    less_than,
+    less_than = 1,
     less_than_or_equals,
     equals,
     greater_than,

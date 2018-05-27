@@ -244,7 +244,7 @@ static void change_register_ids_in_sequence(instruction_sequence *const sequence
 
 typedef enum removed_something
 {
-    removed_something_yes,
+    removed_something_yes = 1,
     removed_something_no
 } removed_something;
 
