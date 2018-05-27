@@ -58,5 +58,4 @@ script:
    fi
  - echo "travis_fold:start:documentation"
  - python documentation/compile_documentation.py
- - exit $?
  - echo "travis_fold:end:documentation"
