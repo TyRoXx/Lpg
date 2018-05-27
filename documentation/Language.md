@@ -190,15 +190,42 @@ End something */
 
 ## Standard library functions
 The standard library also includes some functions to work with the types.
+```lpg
+let std = import std
+```
+
+| Name              | Inputs                 | Explanation                                          | Output     |
+|-------------------|------------------------|------------------------------------------------------|------------|
+| and               | boolean, boolean       | Implementation of logical and                        | boolean    |
+| or                | boolean, boolean       | Implementation of logical or                         | boolean    |
+| not               | boolean                | Flips the value of the boolean                       | boolean    |
+
+## Standard library constants
+```lpg
+let std = import std
+```
+
+| Name              | Explanation                                                                                |
+|-------------------|--------------------------------------------------------------------------------------------|
+| type              | type of all types                                                                          |
+| string-ref        | name of the string type                                                                    |
+| boolean           | an enum with two states: false, true                                                       |
+| unit              | type with a single value that can be used to model the absence of a return value for example |
+| unit_value        | the single possible value of type unit                                                     |
+| option[T]         | enum with two states: `some(T)` and `none` |
+| option-int        | deprecated |
+| array[T]          | generic interface for arrays of type T. Create array instances with the `new-array` keyword, e.g. `new-array(std.string-ref)` |
+
+## Built-in global functions
+```lpg
+assert(boolean.true)
+```
 
 | Name              | Inputs                 | Explanation                                          | Output     |
 |-------------------|------------------------|------------------------------------------------------|------------|
 | assert            | boolean                | Ends the program if the input is `boolean.false`     | unit       |
-| and               | boolean, boolean       | Implementation of logical and                        | boolean    |
-| or                | boolean, boolean       | Implementation of logical or                         | boolean    |
-| not               | boolean                | Flips the value of the boolean                       | boolean    |
 | concat            | string-ref, string-ref | Returns the two strings together                     | string-ref |
-| string-eqauls     | string-ref, string-ref | Returns if two strings are equal                     | boolean    |
+| string-equals     | string-ref, string-ref | Returns if two strings are equal                     | boolean    |
 | integer-equals    | integer, integer       | Returns if two integers are equals                   | boolean    |
 | integer-less      | integer, integer       | Returns if the first integer is less than the second | boolean    |
 | integer-to-string | integer                | Turns an integer to a string                         | string-ref |
