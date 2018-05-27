@@ -396,10 +396,12 @@ static void set_register_meaning(c_backend_state *const state, register_id const
 static void set_register_to_capture(c_backend_state *const state, register_id const id, capture_index const capture,
                                     type const type_of)
 {
-    ASSERT(state->registers[id].meaning == register_meaning_nothing);
-    state->registers[id].meaning = register_meaning_capture;
-    state->registers[id].capture = capture;
-    state->registers[id].type_of = optional_type_create_set(type_of);
+    register_state *const target = state->registers + id;
+    ASSERT(target->meaning == register_meaning_nothing);
+    target->meaning = register_meaning_capture;
+    target->capture = capture;
+    target->type_of = optional_type_create_set(type_of);
+    target->ownership = register_resource_ownership_borrows;
     active_register(state, id);
 }
 
