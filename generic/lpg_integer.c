@@ -188,6 +188,13 @@ bool integer_parse(integer *into, unicode_view from)
 integer_division integer_divide(integer numerator, integer denominator)
 {
     ASSERT(denominator.low || denominator.high);
+    if ((numerator.high == 0) && (denominator.high == 0))
+    {
+        // optimization: avoid the slow loop below if possible
+        integer_division const result = {
+            {0, (numerator.low / denominator.low)}, {0, (numerator.low % denominator.low)}};
+        return result;
+    }
     integer_division result = {{0, 0}, {0, 0}};
     for (unsigned i = 0; i < 128u; ++i)
     {
