@@ -223,6 +223,14 @@ value value_from_array(array_value *content)
     return result;
 }
 
+value value_from_generic_lambda(generic_lambda_id content)
+{
+    value result;
+    result.kind = value_kind_generic_lambda;
+    result.generic_interface = content;
+    return result;
+}
+
 value *value_allocate(value const content)
 {
     value *const result = allocate(sizeof(*result));
@@ -245,6 +253,9 @@ bool value_equals(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_array:
         LPG_TO_DO();
 
@@ -315,6 +326,9 @@ bool value_less_than(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_array:
         LPG_TO_DO();
 
@@ -398,6 +412,9 @@ bool value_conforms_to_type(value const instance, type const expected)
     ASSUME(value_is_valid(instance));
     switch (expected.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_unit:
         return (instance.kind == value_kind_unit);
 

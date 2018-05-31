@@ -23,6 +23,14 @@ void program_check_free(program_check const freed)
     {
         generic_enum_instantiation_free(freed.enum_instantiations[i]);
     }
+    for (size_t i = 0; i < freed.generic_lambda_count; ++i)
+    {
+        generic_lambda_free(freed.generic_lambdas[i]);
+    }
+    if (freed.generic_lambdas)
+    {
+        deallocate(freed.generic_lambdas);
+    }
     if (freed.enum_instantiations)
     {
         deallocate(freed.enum_instantiations);
@@ -34,6 +42,14 @@ void program_check_free(program_check const freed)
     if (freed.interface_instantiations)
     {
         deallocate(freed.interface_instantiations);
+    }
+    for (size_t i = 0; i < freed.lambda_instantiation_count; ++i)
+    {
+        generic_lambda_instantiation_free(freed.lambda_instantiations[i]);
+    }
+    if (freed.lambda_instantiations)
+    {
+        deallocate(freed.lambda_instantiations);
     }
     for (size_t i = 0; i < freed.module_count; ++i)
     {

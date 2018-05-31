@@ -65,29 +65,32 @@ function_header_tree function_header_tree_clone(function_header_tree const origi
     return result;
 }
 
-lambda lambda_create(function_header_tree header, expression *result, source_location source)
+lambda lambda_create(generic_parameter_list generic_parameters, function_header_tree header, expression *result,
+                     source_location source)
 {
-    lambda const returning = {header, result, source};
+    lambda const returning = {generic_parameters, header, result, source};
     return returning;
 }
 
 void lambda_free(lambda const *this)
 {
+    generic_parameter_list_free(this->generic_parameters);
     function_header_tree_free(this->header);
     expression_deallocate(this->result);
 }
 
 bool lambda_equals(lambda const left, lambda const right)
 {
-    return function_header_tree_equals(left.header, right.header) && expression_equals(left.result, right.result) &&
+    return generic_parameter_list_equals(left.generic_parameters, right.generic_parameters) &&
+           function_header_tree_equals(left.header, right.header) && expression_equals(left.result, right.result) &&
            source_location_equals(left.source, right.source);
 }
 
 lambda lambda_clone(lambda const original)
 {
-    return lambda_create(function_header_tree_clone(original.header),
-                         original.result ? expression_allocate(expression_clone(*original.result)) : NULL,
-                         original.source);
+    return lambda_create(
+        generic_parameter_list_clone(original.generic_parameters), function_header_tree_clone(original.header),
+        original.result ? expression_allocate(expression_clone(*original.result)) : NULL, original.source);
 }
 
 tuple tuple_clone(tuple const original)

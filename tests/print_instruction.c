@@ -13,6 +13,9 @@ static void print_type(type const printed)
 {
     switch (printed.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_unit:
         printf("unit");
         break;
@@ -48,6 +51,9 @@ void print_value(value const printed, size_t const indentation)
 {
     switch (printed.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_array:
         LPG_TO_DO();
 

@@ -80,6 +80,9 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
 {
     switch (callee.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         ASSUME(which_parameter < all_functions[callee.lambda.lambda].signature->parameters.length);
         return all_functions[callee.lambda.lambda].signature->parameters.elements[which_parameter];
@@ -234,6 +237,9 @@ static read_structure_element_result read_element(function_checking_state *state
     type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_structure:
         return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
@@ -276,6 +282,9 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
+        case type_kind_generic_lambda:
+            LPG_TO_DO();
+
         case type_kind_string_ref:
         case type_kind_unit:
         case type_kind_type:
@@ -339,6 +348,9 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
@@ -744,9 +756,41 @@ static function_id reserve_function_id(function_checking_state *const state)
     return this_lambda_id;
 }
 
+static void find_generic_enum_closures_in_expression(generic_enum_closures *const closures,
+                                                     function_checking_state *const state, expression const from);
+
+static generic_enum_closures find_generic_lambda_closures(function_checking_state *const state, lambda const definition)
+{
+    generic_enum_closures result = {NULL, 0};
+    find_generic_enum_closures_in_expression(&result, state, expression_from_lambda(definition));
+    return result;
+}
+
+static evaluate_expression_result
+evaluate_generic_lambda_expression(function_checking_state *state, instruction_sequence *function, lambda const element)
+{
+    program_check *const root = state->root;
+    root->generic_lambdas =
+        reallocate_array(root->generic_lambdas, root->generic_lambda_count + 1, sizeof(*root->generic_lambdas));
+    generic_lambda_id const id = root->generic_lambda_count;
+    generic_enum_closures const closures = find_generic_lambda_closures(state, element);
+    root->generic_lambdas[id] = generic_lambda_create(lambda_clone(element), closures);
+    root->generic_lambda_count += 1;
+    register_id const into = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  into, value_from_generic_lambda(id), type_from_generic_lambda())));
+    write_register_compile_time_value(state, into, value_from_generic_lambda(id));
+    return evaluate_expression_result_create(
+        true, into, type_from_generic_lambda(), optional_value_create(value_from_generic_lambda(id)), true, false);
+}
+
 static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
                                                   instruction_sequence *const function, lambda const evaluated)
 {
+    if (evaluated.generic_parameters.count > 0)
+    {
+        return evaluate_generic_lambda_expression(state, function, evaluated);
+    }
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     if (!header.is_success)
     {
@@ -851,6 +895,9 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -941,6 +988,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
     switch (callee.type_.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_lambda:
     case type_kind_function_pointer:
     case type_kind_enum_constructor:
@@ -1009,6 +1059,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         {
             switch (callee.compile_time_value.value_.kind)
             {
+            case value_kind_generic_lambda:
+                LPG_TO_DO();
+
             case value_kind_array:
                 LPG_TO_DO();
 
@@ -1077,6 +1130,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
+        case type_kind_generic_lambda:
+            LPG_TO_DO();
+
         case type_kind_lambda:
         case type_kind_function_pointer:
             add_instruction(function, instruction_create_call(call_instruction_create(
@@ -1306,6 +1362,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
     switch (key.type_.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_enumeration:
     {
         enumeration const *const enum_ = state->program->enums + key.type_.enum_;
@@ -1725,9 +1784,6 @@ evaluate_expression_result evaluate_tuple_expression(function_checking_state *st
                                              type_from_tuple_type(arguments.tuple_type_for_result),
                                              optional_value_empty, false, false);
 }
-
-static void find_generic_enum_closures_in_expression(generic_enum_closures *const closures,
-                                                     function_checking_state *const state, expression const from);
 
 static void find_generic_enum_closures_in_function_header(generic_enum_closures *const closures,
                                                           function_checking_state *const state,
@@ -2679,6 +2735,142 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     return evaluated;
 }
 
+static evaluate_expression_result instantiate_generic_lambda(function_checking_state *const state,
+                                                             instruction_sequence *const function,
+                                                             generic_lambda_id const generic, value *const arguments,
+                                                             size_t const argument_count, type *const argument_types,
+                                                             source_location const where)
+{
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->lambda_instantiation_count; ++i)
+    {
+        generic_lambda_instantiation *const instantiation = root->lambda_instantiations + i;
+        if (instantiation->generic != generic)
+        {
+            continue;
+        }
+        if (argument_count != instantiation->argument_count)
+        {
+            LPG_UNREACHABLE();
+        }
+        if (!values_equal(instantiation->arguments, arguments, argument_count))
+        {
+            continue;
+        }
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        register_id const into = allocate_register(&state->used_registers);
+        value const literal =
+            value_from_function_pointer(function_pointer_value_from_internal(instantiation->instantiated, NULL, 0));
+        add_instruction(
+            function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+        write_register_compile_time_value(state, into, literal);
+        return evaluate_expression_result_create(
+            true, into, type_from_type(), optional_value_create(literal), true, false);
+    }
+    lambda const original = root->generic_lambdas[generic].tree;
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    function_checking_state lambda_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
+        optional_type_create_empty(), false, state->file_name, state->source);
+    generic_lambda const instantiated_lambda = state->root->generic_lambdas[generic];
+    if (argument_count < instantiated_lambda.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_lambda.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    for (size_t i = 0; i < instantiated_lambda.tree.generic_parameters.count; ++i)
+    {
+        register_id const argument_register = allocate_register(&lambda_checking.used_registers);
+        add_local_variable(
+            &lambda_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_lambda.tree.generic_parameters.names[i])),
+                argument_types[i], optional_value_create(arguments[i]), argument_register));
+        write_register_compile_time_value(&lambda_checking, argument_register, arguments[i]);
+    }
+    for (size_t i = 0; i < instantiated_lambda.closures.count; ++i)
+    {
+        register_id const closure_register = allocate_register(&lambda_checking.used_registers);
+        add_local_variable(
+            &lambda_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_lambda.closures.elements[i].name)),
+                instantiated_lambda.closures.elements[i].what,
+                optional_value_create(instantiated_lambda.closures.elements[i].content), closure_register));
+        write_register_compile_time_value(
+            &lambda_checking, closure_register, instantiated_lambda.closures.elements[i].content);
+    }
+    evaluate_expression_result const evaluated = evaluate_lambda(
+        &lambda_checking, &ignored_instructions,
+        lambda_create(generic_parameter_list_create(NULL, 0), original.header, original.result, original.source));
+    instruction_sequence_free(&ignored_instructions);
+    local_variable_container_free(lambda_checking.local_variables);
+    if (lambda_checking.register_compile_time_values)
+    {
+        deallocate(lambda_checking.register_compile_time_values);
+    }
+    if (!evaluated.has_value)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        return evaluate_expression_result_empty;
+    }
+    if (!evaluated.compile_time_value.is_set)
+    {
+        LPG_UNREACHABLE();
+    }
+    if (evaluated.compile_time_value.value_.kind != value_kind_function_pointer)
+    {
+        LPG_UNREACHABLE();
+    }
+    size_t const id = root->lambda_instantiation_count;
+    root->lambda_instantiations = reallocate_array(
+        root->lambda_instantiations, root->lambda_instantiation_count + 1, sizeof(*root->lambda_instantiations));
+    ASSUME(!evaluated.compile_time_value.value_.function_pointer.external);
+    root->lambda_instantiations[id] = generic_lambda_instantiation_create(
+        generic, arguments, argument_count, evaluated.compile_time_value.value_.function_pointer.code);
+    root->lambda_instantiation_count += 1;
+    if (argument_types)
+    {
+        deallocate(argument_types);
+    }
+    return evaluated;
+}
+
 static evaluate_expression_result evaluate_generic_instantiation(function_checking_state *const state,
                                                                  instruction_sequence *const function,
                                                                  generic_instantiation_expression const element)
@@ -2748,6 +2940,12 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
         return instantiate_generic_interface(state, function,
                                              generic_evaluated.compile_time_value.value_.generic_interface, arguments,
                                              element.count, argument_types, expression_source_begin(*element.generic));
+    }
+    if (generic_evaluated.compile_time_value.value_.kind == value_kind_generic_lambda)
+    {
+        return instantiate_generic_lambda(state, function, generic_evaluated.compile_time_value.value_.generic_lambda,
+                                          arguments, element.count, argument_types,
+                                          expression_source_begin(*element.generic));
     }
     if (arguments)
     {
@@ -3217,7 +3415,7 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
+    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);

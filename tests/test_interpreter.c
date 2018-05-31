@@ -410,6 +410,7 @@ void test_interpreter(void)
                                                  "interface.lpg",
                                                  "interface-generic.lpg",
                                                  "lambda-capture.lpg",
+                                                 "lambda-generic.lpg",
                                                  "lambda-parameters.lpg",
                                                  "lambda-recapture.lpg",
                                                  "lambda-return-type.lpg",

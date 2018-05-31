@@ -794,6 +794,9 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_interface:
         return generate_interface_reference_name(generated.interface_, c_output);
 
@@ -1043,6 +1046,9 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
 {
     switch (what.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_string_ref:
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "string_ref_add_reference(&"));
@@ -1323,6 +1329,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_array:
         LPG_TO_DO();
 
@@ -1726,6 +1735,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const callee_type = state->registers[input.call.callee].type_of.value;
             switch (callee_type.kind)
             {
+            case type_kind_generic_lambda:
+                LPG_TO_DO();
+
             case type_kind_method_pointer:
             {
                 method_description const called_method =
@@ -1936,6 +1948,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const object_type = state->registers[input.read_struct.from_object].type_of.value;
             switch (object_type.kind)
             {
+            case type_kind_generic_lambda:
+                LPG_TO_DO();
+
             case type_kind_structure:
             {
                 structure const struct_ = state->program->structs[object_type.structure_];
@@ -2024,6 +2039,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         ASSERT(state->registers[input.literal.into].meaning == register_meaning_nothing);
         switch (input.literal.value_.kind)
         {
+        case value_kind_generic_lambda:
+            LPG_TO_DO();
+
         case value_kind_array:
             LPG_TO_DO();
 
@@ -2390,6 +2408,9 @@ static success_indicator generate_free(standard_library_usage *const standard_li
 {
     switch (what.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_method_pointer:
         return generate_free(standard_library, freed, type_from_interface(what.method_pointer.interface_), program,
                              indentation, c_output);

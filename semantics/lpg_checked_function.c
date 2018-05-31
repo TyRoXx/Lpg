@@ -33,6 +33,9 @@ type get_return_type(type const callee, checked_function const *const all_functi
 {
     switch (callee.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->result;
 

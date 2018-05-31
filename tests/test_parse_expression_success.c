@@ -283,7 +283,7 @@ static void test_lambdas()
 {
     // Lamda with direct return value
     test_successful_parse(expression_from_lambda(lambda_create(
-                              function_header_tree_create(NULL, 0, NULL),
+                              generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
                               expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 1), source_location_create(0, 3)))),
                               source_location_create(0, 0))),
@@ -298,20 +298,21 @@ static void test_lambdas()
         expression *const elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
-        test_successful_parse(expression_from_lambda(lambda_create(
-                                  function_header_tree_create(NULL, 0, result_expression),
-                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
-                                  source_location_create(0, 0))),
-                              unicode_string_from_c_str("(): 1\n"
-                                                        "    1"),
-                              false);
+        test_successful_parse(
+            expression_from_lambda(lambda_create(
+                generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, result_expression),
+                expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                source_location_create(0, 0))),
+            unicode_string_from_c_str("(): 1\n"
+                                      "    1"),
+            false);
     }
 
     // Lamda returning a lamda
     test_successful_parse(expression_from_lambda(lambda_create(
-                              function_header_tree_create(NULL, 0, NULL),
+                              generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
                               expression_allocate(expression_from_lambda(lambda_create(
-                                  function_header_tree_create(NULL, 0, NULL),
+                                  generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
                                   expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                       integer_create(0, 1), source_location_create(0, 6)))),
                                   source_location_create(0, 3)))),
@@ -324,7 +325,7 @@ static void test_lambdas()
         elements[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
         test_successful_parse(expression_from_lambda(lambda_create(
-                                  function_header_tree_create(NULL, 0, NULL),
+                                  generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
                                   expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
                                   source_location_create(0, 0))),
                               unicode_string_from_c_str("()\n"
@@ -341,13 +342,14 @@ static void test_lambdas()
             parameter_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 1)),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("type"), source_location_create(0, 4)))));
-        test_successful_parse(expression_from_lambda(lambda_create(
-                                  function_header_tree_create(parameters, 1, NULL),
-                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
-                                  source_location_create(0, 0))),
-                              unicode_string_from_c_str("(a: type)\n"
-                                                        "    1"),
-                              false);
+        test_successful_parse(
+            expression_from_lambda(
+                lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 1, NULL),
+                              expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                              source_location_create(0, 0))),
+            unicode_string_from_c_str("(a: type)\n"
+                                      "    1"),
+            false);
     }
 
     // Lamda with two paramaters
@@ -364,13 +366,14 @@ static void test_lambdas()
             parameter_create(identifier_expression_create(unicode_string_from_c_str("c"), source_location_create(0, 7)),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("d"), source_location_create(0, 10)))));
-        test_successful_parse(expression_from_lambda(lambda_create(
-                                  function_header_tree_create(parameters, 2, NULL),
-                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
-                                  source_location_create(0, 0))),
-                              unicode_string_from_c_str("(a: b, c: d)\n"
-                                                        "    1"),
-                              false);
+        test_successful_parse(
+            expression_from_lambda(
+                lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 2, NULL),
+                              expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                              source_location_create(0, 0))),
+            unicode_string_from_c_str("(a: b, c: d)\n"
+                                      "    1"),
+            false);
     }
 }
 

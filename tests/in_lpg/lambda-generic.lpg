@@ -1,0 +1,8 @@
+let std = import std
+
+let f = [T](a: T)
+    a
+let g = f[std.boolean]
+assert(g(std.boolean.true))
+
+//assert(f(std.boolean.true))

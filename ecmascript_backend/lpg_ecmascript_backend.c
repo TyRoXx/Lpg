@@ -198,6 +198,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_array:
         LPG_TO_DO();
 
@@ -434,6 +437,9 @@ static success_indicator generate_read_struct(function_generation *const state, 
 {
     switch (state->registers[generated.from_object].type_of.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_structure:
     {
         struct_id const read_from = state->registers[generated.from_object].type_of.structure_;
@@ -654,6 +660,9 @@ static success_indicator generate_match(function_generation *const state, match_
     type const key_type = state->registers[generated.key].type_of;
     switch (key_type.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_integer_range:
         return generate_equality_comparable_match_cases(state, generated, ecmascript_output);
 

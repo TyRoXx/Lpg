@@ -183,7 +183,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 }
 
 static expression_parser_result const expression_parser_result_failure = {
-    0, {expression_type_lambda, {{{NULL, 0, NULL}, NULL, {0, 0}}}}};
+    0, {expression_type_lambda, {{{NULL, 0}, {NULL, 0, NULL}, NULL, {0, 0}}}}};
 
 static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
                                             source_location const opening_brace);
@@ -338,6 +338,7 @@ static void clean_up_parameters(parameter *const parameters, size_t parameter_co
 }
 
 static expression_parser_result parse_lambda_body(expression_parser *const parser, size_t const indentation,
+                                                  generic_parameter_list generic_parameters,
                                                   function_header_tree const header, source_location const lambda_begin)
 {
     rich_token const next_token = peek(parser);
@@ -350,7 +351,8 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
             return expression_parser_result_failure;
         }
         expression_parser_result const result = {
-            1, expression_from_lambda(lambda_create(header, expression_allocate(body.success), lambda_begin))};
+            1, expression_from_lambda(
+                   lambda_create(generic_parameters, header, expression_allocate(body.success), lambda_begin))};
 
         return result;
     }
@@ -359,8 +361,8 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
         pop(parser);
         sequence const body = parse_sequence(parser, (indentation + 1));
         expression_parser_result const result = {
-            1, expression_from_lambda(
-                   lambda_create(header, expression_allocate(expression_from_sequence(body)), lambda_begin))};
+            1, expression_from_lambda(lambda_create(
+                   generic_parameters, header, expression_allocate(expression_from_sequence(body)), lambda_begin))};
         return result;
     }
     pop(parser);
@@ -475,6 +477,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
 }
 
 static expression_parser_result parse_lambda(expression_parser *const parser, size_t const indentation,
+                                             generic_parameter_list generic_parameters,
                                              source_location const lambda_begin)
 {
     function_header_parse_result const parsed_header = parse_function_header(parser, indentation);
@@ -482,7 +485,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
     {
         return expression_parser_result_failure;
     }
-    return parse_lambda_body(parser, indentation, parsed_header.header, lambda_begin);
+    return parse_lambda_body(parser, indentation, generic_parameters, parsed_header.header, lambda_begin);
 }
 
 static generic_parameter_list parse_generic_parameters(expression_parser *const parser)
@@ -880,7 +883,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
 
         case token_left_parenthesis:
             pop(parser);
-            return parse_lambda(parser, indentation, head.where);
+            return parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where);
 
         case token_left_curly_brace:
         {
@@ -889,6 +892,18 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         }
 
         case token_left_bracket:
+        {
+            generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
+            parse_optional_space(parser);
+            rich_token const left_parenthesis = peek(parser);
+            if (left_parenthesis.token != token_left_parenthesis)
+            {
+                LPG_TO_DO();
+            }
+            pop(parser);
+            return parse_lambda(parser, indentation, generic_parameters, left_parenthesis.where);
+        }
+
         case token_right_bracket:
         case token_right_curly_brace:
         case token_right_parenthesis:

@@ -6,6 +6,7 @@
 #include "lpg_generic_interface_id.h"
 #include "lpg_integer.h"
 #include "lpg_type.h"
+#include "lpg_generic_lambda_id.h"
 
 typedef struct implementation_ref
 {
@@ -56,7 +57,8 @@ typedef enum value_kind
     value_kind_pattern,
     value_kind_generic_enum,
     value_kind_generic_interface,
-    value_kind_array
+    value_kind_array,
+    value_kind_generic_lambda
 } value_kind;
 
 typedef struct value_tuple
@@ -120,6 +122,7 @@ typedef struct value
         generic_enum_id generic_enum;
         generic_interface_id generic_interface;
         array_value *array;
+        generic_lambda_id generic_lambda;
     };
 } value;
 
@@ -136,6 +139,7 @@ value value_from_type_erased(type_erased_value content);
 value value_from_generic_enum(generic_enum_id content);
 value value_from_generic_interface(generic_interface_id content);
 value value_from_array(array_value *content);
+value value_from_generic_lambda(generic_lambda_id content);
 value *value_allocate(value const content);
 value value_or_unit(value const *const maybe);
 bool value_equals(value const left, value const right);

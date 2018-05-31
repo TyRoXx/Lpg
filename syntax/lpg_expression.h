@@ -23,14 +23,22 @@ void function_header_tree_free(function_header_tree value);
 bool function_header_tree_equals(function_header_tree const left, function_header_tree const right);
 function_header_tree function_header_tree_clone(function_header_tree const original);
 
+typedef struct generic_parameter_list
+{
+    unicode_string *names;
+    size_t count;
+} generic_parameter_list;
+
 typedef struct lambda
 {
+    generic_parameter_list generic_parameters;
     function_header_tree header;
     expression *result;
     source_location source;
 } lambda;
 
-lambda lambda_create(function_header_tree header, expression *result, source_location source);
+lambda lambda_create(generic_parameter_list generic_parameters, function_header_tree header, expression *result,
+                     source_location source);
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 lambda lambda_clone(lambda const original);
@@ -193,12 +201,6 @@ typedef struct declare
 } declare;
 
 declare declare_clone(declare const original);
-
-typedef struct generic_parameter_list
-{
-    unicode_string *names;
-    size_t count;
-} generic_parameter_list;
 
 generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count);
 void generic_parameter_list_free(generic_parameter_list const freed);

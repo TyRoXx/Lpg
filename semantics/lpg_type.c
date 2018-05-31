@@ -325,6 +325,13 @@ type type_from_generic_interface()
     return result;
 }
 
+type type_from_generic_lambda()
+{
+    type result;
+    result.kind = type_kind_generic_lambda;
+    return result;
+}
+
 type *type_allocate(type const content)
 {
     type *const result = allocate(sizeof(*result));
@@ -340,6 +347,9 @@ bool type_equals(type const left, type const right)
     }
     switch (left.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_method_pointer:
         return method_pointer_type_equals(left.method_pointer, right.method_pointer);
 
@@ -381,6 +391,9 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
 {
     switch (original.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         ASSUME(new_function_ids[original.lambda.lambda] != ~(register_id)0);
         return type_from_lambda(lambda_type_create(new_function_ids[original.lambda.lambda]));
@@ -474,6 +487,9 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     switch (flat_from.kind)
     {
+    case type_kind_generic_lambda:
+        LPG_TO_DO();
+
     case type_kind_type:
     case type_kind_unit:
     case type_kind_string_ref:

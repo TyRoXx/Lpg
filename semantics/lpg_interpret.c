@@ -45,6 +45,9 @@ static value invoke_method(function_call_arguments const arguments, value const 
     value const from = captures[0];
     switch (from.kind)
     {
+    case value_kind_generic_lambda:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
     {
         implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
@@ -212,6 +215,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             }
             switch (callee.kind)
             {
+            case value_kind_generic_lambda:
+                LPG_TO_DO();
+
             case value_kind_array:
                 LPG_TO_DO();
 

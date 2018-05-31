@@ -608,7 +608,8 @@ static void test_function(void)
         expression expected = expression_from_declare(declare_create(
             identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
             expression_allocate(expression_from_lambda(
-                lambda_create(function_header_tree_create(
+                lambda_create(generic_parameter_list_create(NULL, 0),
+                              function_header_tree_create(
                                   NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
                                                unicode_string_from_c_str("unit"), source_location_create(0, 12))))),
                               expression_allocate(expression_from_sequence(sequence_create(NULL, 0))),
