@@ -1,0 +1,22 @@
+let std = import std
+let options = import option
+let option = options.option
+
+let value = interface
+    load(element: std.string-ref): option[value]
+    store(element: std.string-ref, what: value): std.unit
+    call(arguments: std.array[value]): value
+    call-method(method: std.string-ref, arguments: std.array[value]): value
+
+let integer = int(0, 9007199254740991)
+
+let value-factory = interface
+    create-string(content: std.string-ref): value
+    create-boolean(content: std.boolean): value
+    create-number(content: integer): value
+
+let export = struct
+    value: type-of(value)
+    value-factory: type-of(value-factory)
+    integer: type-of(integer)
+export{value, value-factory, integer}

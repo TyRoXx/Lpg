@@ -97,24 +97,47 @@ void test_cli(void)
 {
     {
         char *arguments[] = {"lpg"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Arguments: [run|format|compile|web] filename [web output file]\n");
     }
     {
         char *arguments[] = {"lpg", "run"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Arguments: [run|format|compile|web] filename [web output file]\n");
     }
     {
         char *arguments[] = {"lpg", "unknown"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Arguments: [run|format|compile|web] filename [web output file]\n");
     }
     {
         char *arguments[] = {"lpg", "run", "not-found"};
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n");
     }
+    {
+        char *arguments[] = {"lpg", "web", "input.lpg"};
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true,
+                      "Arguments: [run|format|compile|web] filename [web output file]\n");
+    }
+    {
+        char *arguments[] = {"lpg", "web", "input.lpg", "output.html"};
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n");
+    }
+    {
+        unicode_string input = write_temporary_file("");
+        unicode_string output = write_temporary_file("");
+        char *arguments[] = {"lpg", "web", unicode_string_c_str(&input), unicode_string_c_str(&output)};
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, false, "");
+        REQUIRE(0 == remove(unicode_string_c_str(&input)));
+        unicode_string_free(&input);
+        REQUIRE(0 == remove(unicode_string_c_str(&output)));
+        unicode_string_free(&output);
+    }
 
     expect_output_with_source_flags("assert(boolean.true)\n", "compile", false, "");
     expect_output_with_source_flags("assert(boolean.true)\n", "run", false, "");
-    expect_output_with_source_flags("", "unknown", true, "Arguments: [run|format|compile] filename\n");
+    expect_output_with_source_flags(
+        "", "unknown", true, "Arguments: [run|format|compile|web] filename [web output file]\n");
 
     expect_output_with_source_flags("print(\"Hello World)\n", "compile", true,
                                     "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected expression "

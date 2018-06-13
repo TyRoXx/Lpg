@@ -12,6 +12,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_save_expression.h"
 #include "lpg_write_file.h"
+#include "lpg_ecmascript_backend.h"
 #include <string.h>
 #ifdef __linux__
 #include <fcntl.h>
@@ -306,6 +307,10 @@ static compiler_command parse_compiler_command(char const *const command, bool *
     {
         return compiler_command_run;
     }
+    else if (!strcmp(command, "web"))
+    {
+        return compiler_command_web;
+    }
     else
     {
         *valid = false;
@@ -315,7 +320,7 @@ static compiler_command parse_compiler_command(char const *const command, bool *
 
 static compiler_arguments parse_compiler_arguments(int const argument_count, char **const arguments)
 {
-    compiler_arguments result = {false, compiler_command_compile, ""};
+    compiler_arguments result = {false, compiler_command_compile, "", NULL};
     if (argument_count < 3)
     {
         result.valid = false;
@@ -326,6 +331,100 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     result.command = parse_compiler_command(arguments[1], &valid);
     result.file_name = arguments[2];
     result.valid = valid;
+    switch (result.command)
+    {
+    case compiler_command_compile:
+    case compiler_command_format:
+    case compiler_command_run:
+        if (argument_count != 3)
+        {
+            result.valid = false;
+            return result;
+        }
+        break;
+
+    case compiler_command_web:
+        if (argument_count != 4)
+        {
+            result.valid = false;
+            return result;
+        }
+        result.output_file_name = arguments[3];
+        break;
+    }
+    return result;
+}
+
+static success_indicator generate_main_html(checked_program const program, stream_writer const destination)
+{
+    (void)program;
+    LPG_TRY(stream_writer_write_string(
+        destination, "<!DOCTYPE html><html><head> <meta charset=\"UTF-8\"><title>LPG web</title>"));
+    LPG_TRY(stream_writer_write_string(destination, "<script type=\"text/javascript\">"));
+    LPG_TRY(stream_writer_write_string(destination, "\"use strict\";\n"));
+    LPG_TRY(stream_writer_write_string(
+        destination, "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"));
+    LPG_TRY(stream_writer_write_string(destination, "var main = "));
+    LPG_TRY(generate_ecmascript(program, destination));
+    LPG_TRY(stream_writer_write_string(destination, "\
+var wrapValue;\n\
+var WrappedValue = function (wrapped)\n\
+{\n\
+    this.wrapped = wrapped;\n\
+};\n\
+WrappedValue.prototype.call_method_0 = function (element)\n\
+{\n\
+    return [0, wrapValue(this.wrapped[element])];\n\
+};\n\
+WrappedValue.prototype.call_method_2 = function (arguments_)\n\
+{\n\
+    var convertedArguments = [];\n\
+    for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
+    {\n\
+        var wrappedValue = arguments_.call_method_1(i)[1];\n\
+        convertedArguments.push(wrappedValue.wrapped);\n\
+    }\n\
+    return wrapValue(this.wrapped.apply(null, convertedArguments));\n\
+};\n\
+WrappedValue.prototype.call_method_3 = function (method, arguments_)\n\
+{\n\
+    var convertedArguments = [];\n\
+    for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
+    {\n\
+        var wrappedValue = arguments_.call_method_1(i)[1];\n\
+        convertedArguments.push(wrappedValue.wrapped);\n\
+    }\n\
+    return wrapValue(this.wrapped[method].apply(this.wrapped, convertedArguments));\n\
+};\n\
+wrapValue = \
+function (wrapped)\n\
+{\n\
+    return new WrappedValue(wrapped);\n\
+};\n\
+var ValueFactory = function ()\n\
+{\n\
+};\n\
+ValueFactory.prototype.call_method_0 = function (content)\n\
+{\n\
+    return wrapValue(content);\n\
+};\n"));
+    LPG_TRY(stream_writer_write_string(destination, "main(wrapValue(window), new ValueFactory());\n"));
+    LPG_TRY(stream_writer_write_string(destination, "</script>"));
+    LPG_TRY(stream_writer_write_string(destination, "</head>"));
+    LPG_TRY(stream_writer_write_string(destination, "<body>"));
+    LPG_TRY(stream_writer_write_string(destination, "</body></html>"));
+    return success_yes;
+}
+
+static success_indicator generate_ecmascript_web_site(checked_program const program, unicode_view const html_file)
+{
+    memory_writer buffer = {NULL, 0, 0};
+    success_indicator result = generate_main_html(program, memory_writer_erase(&buffer));
+    if (result == success_yes)
+    {
+        result = write_file(html_file, unicode_view_create(buffer.data, buffer.used));
+    }
+    memory_writer_free(&buffer);
     return result;
 }
 
@@ -335,7 +434,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     if (!arguments.valid)
     {
-        ASSERT(success_yes == stream_writer_write_string(diagnostics, "Arguments: [run|format|compile] filename\n"));
+        ASSERT(success_yes == stream_writer_write_string(
+                                  diagnostics, "Arguments: [run|format|compile|web] filename [web output file]\n"));
         return true;
     }
 
@@ -399,6 +499,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     case compiler_command_compile:
     case compiler_command_run:
+    case compiler_command_web:
         break;
     }
 
@@ -415,11 +516,30 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         check(root.value, standard_library.globals, handle_semantic_error, &loader,
               unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source), &context);
     sequence_free(&root.value);
-    if (!context.has_error && (arguments.command == compiler_command_run))
+    switch (arguments.command)
     {
-        garbage_collector gc = {NULL};
-        interpret(checked, globals_values, &gc);
-        garbage_collector_free(gc);
+    case compiler_command_run:
+        if (!context.has_error)
+        {
+            garbage_collector gc = {NULL};
+            interpret(checked, globals_values, &gc);
+            garbage_collector_free(gc);
+        }
+        break;
+
+    case compiler_command_web:
+        if (!context.has_error)
+        {
+            unicode_view const output_file_name = unicode_view_from_c_str(arguments.output_file_name);
+            generate_ecmascript_web_site(checked, output_file_name);
+        }
+        break;
+
+    case compiler_command_compile:
+        break;
+
+    case compiler_command_format:
+        LPG_UNREACHABLE();
     }
     checked_program_free(&checked);
     standard_library_description_free(&standard_library);
