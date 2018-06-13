@@ -29,7 +29,7 @@ def compile_code(codeblock):
     with open('documentation.lpg', 'w') as f:
         f.write(codeblock)
 
-    exit_code = call(['build/cli/lpg', 'documentation.lpg', '--compile-only'])
+    exit_code = call(['build/cli/lpg', 'compile', 'documentation.lpg'])
     if exit_code != 0:
         raise Exception('Could not compile code')
 

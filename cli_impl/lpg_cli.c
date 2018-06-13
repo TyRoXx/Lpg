@@ -12,6 +12,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_save_expression.h"
 #include "lpg_write_file.h"
+#include <string.h>
 #ifdef __linux__
 #include <fcntl.h>
 #include <errno.h>
@@ -291,40 +292,39 @@ static void handle_semantic_error(complete_semantic_error const error, void *use
     print_source_location_hint(error.source, context->diagnostics, error.relative.where);
 }
 
-static compiler_flags parse_compiler_flags(int const argument_count, char **const arguments, bool *const valid)
+static compiler_command parse_compiler_command(char const *const command, bool *const valid)
 {
-    compiler_flags result = {false, false};
-    for (int i = 2; i < argument_count; ++i)
+    if (!strcmp(command, "compile"))
     {
-        unicode_view const possible_flag = unicode_view_from_c_str(arguments[i]);
-        if (unicode_view_equals(possible_flag, unicode_view_from_c_str("--compile-only")))
-        {
-            result.compile_only = true;
-        }
-        else if (unicode_view_equals(possible_flag, unicode_view_from_c_str("--format")))
-        {
-            result.format = true;
-        }
-        else
-        {
-            *valid = false;
-        }
+        return compiler_command_compile;
     }
-    return result;
+    else if (!strcmp(command, "format"))
+    {
+        return compiler_command_format;
+    }
+    else if (!strcmp(command, "run"))
+    {
+        return compiler_command_run;
+    }
+    else
+    {
+        *valid = false;
+    }
+    return compiler_command_compile;
 }
 
 static compiler_arguments parse_compiler_arguments(int const argument_count, char **const arguments)
 {
-    compiler_arguments result = {false, "", {false, false}};
-    if (argument_count < 2)
+    compiler_arguments result = {false, compiler_command_compile, ""};
+    if (argument_count < 3)
     {
         result.valid = false;
         return result;
     }
 
     bool valid = true;
-    result.file_name = arguments[1];
-    result.flags = parse_compiler_flags(argument_count, arguments, &valid);
+    result.command = parse_compiler_command(arguments[1], &valid);
+    result.file_name = arguments[2];
     result.valid = valid;
     return result;
 }
@@ -335,7 +335,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     if (!arguments.valid)
     {
-        ASSERT(success_yes == stream_writer_write_string(diagnostics, "Arguments: filename\n"));
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, "Arguments: [run|format|compile] filename\n"));
         return true;
     }
 
@@ -364,7 +364,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
-    if (arguments.flags.format)
+    switch (arguments.command)
+    {
+    case compiler_command_format:
     {
         memory_writer format_buffer = {NULL, 0, 0};
         whitespace_state const whitespace = {0, false};
@@ -395,6 +397,11 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return false;
     }
 
+    case compiler_command_compile:
+    case compiler_command_run:
+        break;
+    }
+
     standard_library_description const standard_library = describe_standard_library();
     value globals_values[standard_library_element_count];
     for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
@@ -408,7 +415,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         check(root.value, standard_library.globals, handle_semantic_error, &loader,
               unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source), &context);
     sequence_free(&root.value);
-    if (!context.has_error && !arguments.flags.compile_only)
+    if (!context.has_error && (arguments.command == compiler_command_run))
     {
         garbage_collector gc = {NULL};
         interpret(checked, globals_values, &gc);

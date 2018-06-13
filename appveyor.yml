@@ -37,7 +37,7 @@ test_script:
   - .\%BUILD_TYPE%\tests.exe
   - cd ..
   - cd cli
-  - .\%BUILD_TYPE%\lpg.exe ../../tests/in_lpg/interface.lpg
+  - .\%BUILD_TYPE%\lpg.exe run ../../tests/in_lpg/interface.lpg
   - cd ..
   - set CTEST_OUTPUT_ON_FAILURE=1
   - ctest -C %BUILD_TYPE%

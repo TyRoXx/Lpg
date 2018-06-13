@@ -28,35 +28,30 @@ static void expect_output_with_source(char const *const source, bool const expec
                                       char const *const expected_diagnostics)
 {
     unicode_string name = write_temporary_file(source);
-    char *arguments[] = {"lpg", unicode_string_c_str(&name)};
+    char *arguments[] = {"lpg", "run", unicode_string_c_str(&name)};
     expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics);
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
 }
 
-static void expect_output_with_source_flags(char const *const source, char **const flags, const size_t flag_count,
+static void expect_output_with_source_flags(char const *const source, char *const command,
                                             bool const expected_exit_code, char const *const expected_diagnostics)
 {
     unicode_string name = write_temporary_file(source);
-    size_t new_size = 2 + flag_count;
-    char **arguments = allocate_array(new_size, sizeof(arguments));
+    char *arguments[3];
     arguments[0] = "lpg";
-    arguments[1] = unicode_string_c_str(&name);
-    for (size_t i = 2; i < new_size; ++i)
-    {
-        arguments[i] = flags[i - 2];
-    }
-    expect_output((int)new_size, arguments, expected_exit_code, expected_diagnostics);
+    arguments[1] = command;
+    arguments[2] = unicode_string_c_str(&name);
+    expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics);
     REQUIRE(0 == remove(unicode_string_c_str(&name)));
     unicode_string_free(&name);
-    deallocate(arguments);
 }
 
 static void formatting_tool(char const *const source, char const *const expected_output, bool const expected_exit_code,
                             char const *const expected_diagnostics)
 {
     unicode_string name = write_temporary_file(source);
-    char *arguments[] = {"lpg", unicode_string_c_str(&name), "--format"};
+    char *arguments[] = {"lpg", "format", unicode_string_c_str(&name)};
     expect_output(LPG_ARRAY_SIZE(arguments), arguments, expected_exit_code, expected_diagnostics);
     blob_or_error const read = read_file(unicode_string_c_str(&name));
     REQUIRE(!read.error);
@@ -102,32 +97,29 @@ void test_cli(void)
 {
     {
         char *arguments[] = {"lpg"};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: filename\n");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
     }
     {
-        char *arguments[] = {"lpg", "not-found"};
+        char *arguments[] = {"lpg", "run"};
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
+    }
+    {
+        char *arguments[] = {"lpg", "unknown"};
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Arguments: [run|format|compile] filename\n");
+    }
+    {
+        char *arguments[] = {"lpg", "run", "not-found"};
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n");
     }
 
-    {
-        char *flags[] = {"--compile-only"};
-        expect_output_with_source_flags("assert(boolean.true)\n", flags, 1, false, "");
-    }
+    expect_output_with_source_flags("assert(boolean.true)\n", "compile", false, "");
+    expect_output_with_source_flags("assert(boolean.true)\n", "run", false, "");
+    expect_output_with_source_flags("", "unknown", true, "Arguments: [run|format|compile] filename\n");
 
-    expect_output_with_source_flags("assert(boolean.true)\n", NULL, 0, false, "");
-
-    {
-        char *flags[] = {"--unknown-flag"};
-        expect_output_with_source_flags("", flags, 1, true, "Arguments: filename\n");
-    }
-
-    {
-        char *flags[] = {"--compile-only"};
-        expect_output_with_source_flags("print(\"Hello World)\n", flags, 1, true,
-                                        "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected expression "
-                                        "in line 1:\nprint(\"Hello World)\n                   ^\nExpected expression "
-                                        "in line 2:\n\n^\nExpected arguments in line 2:\n\n^\n");
-    }
+    expect_output_with_source_flags("print(\"Hello World)\n", "compile", true,
+                                    "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected expression "
+                                    "in line 1:\nprint(\"Hello World)\n                   ^\nExpected expression "
+                                    "in line 2:\n\n^\nExpected arguments in line 2:\n\n^\n");
 
     expect_output_with_source("print(\"\")\n"
                               "print(a)\n"
