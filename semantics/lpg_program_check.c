@@ -59,6 +59,10 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.modules);
     }
+    if (freed.interfaces_defined)
+    {
+        deallocate(freed.interfaces_defined);
+    }
 }
 
 void begin_load_module(program_check *to, unicode_string name)

@@ -362,9 +362,11 @@ bool type_equals(type const left, type const right)
     case type_kind_structure:
         return (left.structure_ == right.structure_);
 
-    case type_kind_enum_constructor:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
+        return true;
+
+    case type_kind_enum_constructor:
         LPG_TO_DO();
 
     case type_kind_function_pointer:

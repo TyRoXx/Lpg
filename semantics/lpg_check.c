@@ -183,7 +183,8 @@ static read_structure_element_result read_tuple_element(function_checking_state 
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
-                                                      instruction_sequence *const function, expression const element);
+                                                      instruction_sequence *const function, expression const element,
+                                                      unicode_view const *const early_initialized_variable);
 
 static evaluate_expression_result evaluate_return_expression(function_checking_state *pState,
                                                              instruction_sequence *pSequence,
@@ -199,6 +200,10 @@ static read_structure_element_result read_interface_element_at(function_checking
     function_pointer *const method_object = garbage_collector_allocate(&state->program->memory, sizeof(*method_object));
     type *const captures = garbage_collector_allocate_array(&state->program->memory, 1, sizeof(*captures));
     captures[0] = type_from_interface(from_type);
+    if (!state->root->interfaces_defined[from_type])
+    {
+        LPG_TO_DO();
+    }
     method_description const method = state->program->interfaces[from_type].methods[method_index];
     *method_object = function_pointer_create(
         method.result, method.parameters, tuple_type_create(captures, 1), optional_type_create_empty());
@@ -211,6 +216,10 @@ read_interface_element(function_checking_state *state, instruction_sequence *fun
                        interface_id const from_type, unicode_view const element_name,
                        source_location const element_source, register_id const result)
 {
+    if (!state->root->interfaces_defined[from_type])
+    {
+        LPG_TO_DO();
+    }
     lpg_interface *const from_interface = state->program->interfaces + from_type;
     for (function_id i = 0; i < from_interface->method_count; ++i)
     {
@@ -228,7 +237,7 @@ static read_structure_element_result read_element(function_checking_state *state
                                                   const identifier_expression *const element, register_id const result)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const object = evaluate_expression(state, function, object_tree);
+    evaluate_expression_result const object = evaluate_expression(state, function, object_tree, NULL);
     if (!object.has_value)
     {
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
@@ -485,21 +494,23 @@ check_function_result check_function(program_check *const root, function_checkin
     {
         register_id const address = allocate_register(&state.used_registers);
         add_local_variable(
-            &state.local_variables, local_variable_create(unicode_view_copy(unicode_view_from_c_str("self")),
-                                                          self.value, optional_value_empty, address));
+            &state.local_variables,
+            local_variable_create(unicode_view_copy(unicode_view_from_c_str("self")), local_variable_phase_initialized,
+                                  self.value, optional_value_empty, address));
         define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_c_str("self")));
     }
 
     for (size_t i = 0; i < parameter_count; ++i)
     {
         register_id const address = allocate_register(&state.used_registers);
-        add_local_variable(&state.local_variables,
-                           local_variable_create(unicode_view_copy(unicode_view_from_string(parameter_names[i])),
-                                                 parameter_types[i], optional_value_empty, address));
+        add_local_variable(
+            &state.local_variables,
+            local_variable_create(unicode_view_copy(unicode_view_from_string(parameter_names[i])),
+                                  local_variable_phase_initialized, parameter_types[i], optional_value_empty, address));
         define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_string(parameter_names[i])));
     }
 
-    evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in);
+    evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
 
     for (size_t i = 0; i < state.local_variables.count; ++i)
     {
@@ -655,7 +666,7 @@ static compile_time_type_expression_result compile_time_type_expression_result_c
 static compile_time_type_expression_result
 expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
 {
-    evaluate_expression_result const result = evaluate_expression(state, function, element);
+    evaluate_expression_result const result = evaluate_expression(state, function, element, NULL);
     if (result.has_value)
     {
         if (!result.compile_time_value.is_set || (result.compile_time_value.value_.kind != value_kind_type))
@@ -869,6 +880,10 @@ static conversion_result convert_to_interface(function_checking_state *const sta
                                               type const from, source_location const original_source,
                                               interface_id const to)
 {
+    if (!state->root->interfaces_defined[to])
+    {
+        LPG_TO_DO();
+    }
     optional_size const impl = find_implementation(state->program->interfaces + to, from);
     if (impl.state == optional_empty)
     {
@@ -962,7 +977,7 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
                                                     expression const argument_tree, type const callee_type,
                                                     size_t const parameter_id)
 {
-    evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree);
+    evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree, NULL);
     if (!argument.has_value)
     {
         argument_evaluation_result const result = {success_no, optional_value_empty, 0};
@@ -980,7 +995,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                                                            instruction_sequence *function, call const called)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const callee = evaluate_expression(state, function, *called.callee);
+    evaluate_expression_result const callee = evaluate_expression(state, function, *called.callee, NULL);
     if (!callee.has_value)
     {
         return make_compile_time_unit();
@@ -1173,7 +1188,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 evaluate_expression_result evaluate_not_expression(function_checking_state *state, instruction_sequence *function,
                                                    const expression *element)
 {
-    evaluate_expression_result const result = evaluate_expression(state, function, *(*element).not.expr);
+    evaluate_expression_result const result = evaluate_expression(state, function, *(*element).not.expr, NULL);
     ASSUME(state->global->members[3].compile_time_value.is_set);
 
     value boolean_value = state->global->members[3].compile_time_value.value_;
@@ -1277,7 +1292,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
             return pattern_evaluate_result_no;
         }
         evaluate_expression_result const enum_element_evaluated =
-            evaluate_expression(state, function, *root.call.callee);
+            evaluate_expression(state, function, *root.call.callee, NULL);
         if (!enum_element_evaluated.has_value)
         {
             return pattern_evaluate_result_failure;
@@ -1332,7 +1347,7 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     LPG_FOR(size_t, i, input.length)
     {
-        final_result = evaluate_expression(state, output, input.elements[i]);
+        final_result = evaluate_expression(state, output, input.elements[i], NULL);
         if (!final_result.is_pure)
         {
             is_pure = false;
@@ -1355,7 +1370,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                                                      const expression *element)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const key = evaluate_expression(state, function, *(*element).match.input);
+    evaluate_expression_result const key = evaluate_expression(state, function, *(*element).match.input, NULL);
     if (!key.has_value)
     {
         return key;
@@ -1437,6 +1452,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 add_local_variable(
                     &state->local_variables,
                     local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
+                                          local_variable_phase_initialized,
                                           enum_->elements[maybe_pattern.stateful_enum_element.which].state,
                                           optional_value_empty, placeholder_where));
                 define_register_debug_name(state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
@@ -1448,7 +1464,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             case pattern_evaluate_result_kind_no_pattern:
             {
-                evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
+                evaluate_expression_result const key_evaluated =
+                    evaluate_expression(state, function, *case_tree.key, NULL);
                 if (!key_evaluated.has_value)
                 {
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
@@ -1491,7 +1508,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_);
                 key_value = key_evaluated.where;
 
-                action_evaluated = evaluate_expression(state, &action, *case_tree.action);
+                action_evaluated = evaluate_expression(state, &action, *case_tree.action, NULL);
                 break;
             }
 
@@ -1627,7 +1644,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
         {
             match_case const case_tree = (*element).match.cases[i];
-            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key);
+            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key, NULL);
             if (!key_evaluated.has_value)
             {
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
@@ -1661,7 +1678,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             ASSERT(key_evaluated.compile_time_value.is_set);
 
             instruction_sequence action = instruction_sequence_create(NULL, 0);
-            evaluate_expression_result const action_evaluated = evaluate_expression(state, &action, *case_tree.action);
+            evaluate_expression_result const action_evaluated =
+                evaluate_expression(state, &action, *case_tree.action, NULL);
             if (!action_evaluated.has_value)
             {
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
@@ -1752,7 +1770,7 @@ static evaluate_arguments_result evaluate_arguments(function_checking_state *con
         argument_count};
     for (size_t i = 0; i < argument_count; ++i)
     {
-        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i]);
+        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i], NULL);
         if (!argument_evaluated.has_value)
         {
             deallocate(registers);
@@ -2016,12 +2034,31 @@ static evaluate_expression_result evaluate_generic_interface_expression(function
 }
 
 static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
-                                                     interface_expression const element)
+                                                     interface_expression const element,
+                                                     unicode_view const *const early_initialized_variable)
 {
     if (element.parameters.count > 0)
     {
         return evaluate_generic_interface_expression(state, function, element);
     }
+
+    interface_id const id = state->program->interface_count;
+    state->root->interfaces_defined =
+        reallocate_array(state->root->interfaces_defined, (id + 1), sizeof(*state->root->interfaces_defined));
+    state->root->interfaces_defined[id] = false;
+    state->program->interfaces =
+        reallocate_array(state->program->interfaces, (id + 1), sizeof(*state->program->interfaces));
+    state->program->interfaces[id] = interface_create(NULL, 0, NULL, 0);
+    state->program->interface_count += 1;
+
+    register_id const into = allocate_register(&state->used_registers);
+
+    if (early_initialized_variable)
+    {
+        initialize_early(&state->local_variables, *early_initialized_variable, type_from_type(),
+                         optional_value_create(value_from_type(type_from_interface(id))), into);
+    }
+
     method_description *const methods = allocate_array(element.method_count, sizeof(*methods));
     for (size_t i = 0; i < element.method_count; ++i)
     {
@@ -2058,13 +2095,11 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
                                                tuple_type_create(header.parameter_types, method.header.parameter_count),
                                                header.return_type.value);
     }
-    interface_id const id = state->program->interface_count;
-    state->program->interfaces =
-        reallocate_array(state->program->interfaces, (id + 1), sizeof(*state->program->interfaces));
-    state->program->interfaces[id] =
-        interface_create(methods, /*TODO avoid truncation safely*/ (function_id)element.method_count, NULL, 0);
-    state->program->interface_count += 1;
-    register_id const into = allocate_register(&state->used_registers);
+
+    state->root->interfaces_defined[id] = true;
+    state->program->interfaces[id].methods = methods;
+    state->program->interfaces[id].method_count = /*TODO avoid truncation safely*/ (function_id)element.method_count;
+
     value const result = value_from_type(type_from_interface(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false, false);
@@ -2077,7 +2112,8 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     for (size_t i = 0; i < evaluated.element_count; ++i)
     {
         struct_expression_element const element = evaluated.elements[i];
-        evaluate_expression_result const element_type_evaluated = evaluate_expression(state, function, element.type);
+        evaluate_expression_result const element_type_evaluated =
+            evaluate_expression(state, function, element.type, NULL);
         if (!element_type_evaluated.has_value)
         {
             for (size_t j = 0; j < i; ++j)
@@ -2246,7 +2282,7 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
                                                               instruction_sequence *const function,
                                                               instantiate_struct_expression const element)
 {
-    evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type);
+    evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type, NULL);
     if (!type_evaluated.has_value)
     {
         return type_evaluated;
@@ -2331,7 +2367,7 @@ static evaluate_expression_result evaluate_type_of(function_checking_state *cons
                                                    type_of_expression const element)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const target_evaluated = evaluate_expression(state, function, *element.target);
+    evaluate_expression_result const target_evaluated = evaluate_expression(state, function, *element.target, NULL);
     restore(before);
     register_id const where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -2391,7 +2427,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         if (element.elements[i].state)
         {
             evaluate_expression_result const state_evaluated =
-                evaluate_expression(state, function, *element.elements[i].state);
+                evaluate_expression(state, function, *element.elements[i].state, NULL);
             if (state_evaluated.has_value)
             {
                 if (!state_evaluated.compile_time_value.is_set ||
@@ -2535,7 +2571,8 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         add_local_variable(&enum_checking.local_variables,
                            local_variable_create(
                                unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.parameters.names[i])),
-                               argument_types[i], optional_value_create(arguments[i]), argument_register));
+                               local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
+                               argument_register));
         write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_enum.closure_count; ++i)
@@ -2544,7 +2581,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         add_local_variable(
             &enum_checking.local_variables,
             local_variable_create(unicode_view_copy(unicode_view_from_string(instantiated_enum.closures[i].name)),
-                                  instantiated_enum.closures[i].what,
+                                  local_variable_phase_initialized, instantiated_enum.closures[i].what,
                                   optional_value_create(instantiated_enum.closures[i].content), closure_register));
         write_register_compile_time_value(&enum_checking, closure_register, instantiated_enum.closures[i].content);
     }
@@ -2672,7 +2709,8 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             &interface_checking.local_variables,
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.tree.parameters.names[i])),
-                argument_types[i], optional_value_create(arguments[i]), argument_register));
+                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
+                argument_register));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_interface.closures.count; ++i)
@@ -2682,7 +2720,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             &interface_checking.local_variables,
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.closures.elements[i].name)),
-                instantiated_interface.closures.elements[i].what,
+                local_variable_phase_initialized, instantiated_interface.closures.elements[i].what,
                 optional_value_create(instantiated_interface.closures.elements[i].content), closure_register));
         write_register_compile_time_value(
             &interface_checking, closure_register, instantiated_interface.closures.elements[i].content);
@@ -2690,7 +2728,8 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     evaluate_expression_result const evaluated =
         evaluate_interface(&interface_checking, &ignored_instructions,
                            interface_expression_create(generic_parameter_list_create(NULL, 0), original.source,
-                                                       original.methods, original.method_count));
+                                                       original.methods, original.method_count),
+                           NULL);
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(interface_checking.local_variables);
     if (interface_checking.register_compile_time_values)
@@ -2813,7 +2852,8 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
             &lambda_checking.local_variables,
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_lambda.tree.generic_parameters.names[i])),
-                argument_types[i], optional_value_create(arguments[i]), argument_register));
+                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
+                argument_register));
         write_register_compile_time_value(&lambda_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_lambda.closures.count; ++i)
@@ -2823,7 +2863,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
             &lambda_checking.local_variables,
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_lambda.closures.elements[i].name)),
-                instantiated_lambda.closures.elements[i].what,
+                local_variable_phase_initialized, instantiated_lambda.closures.elements[i].what,
                 optional_value_create(instantiated_lambda.closures.elements[i].content), closure_register));
         write_register_compile_time_value(
             &lambda_checking, closure_register, instantiated_lambda.closures.elements[i].content);
@@ -2875,7 +2915,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                                                  instruction_sequence *const function,
                                                                  generic_instantiation_expression const element)
 {
-    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *element.generic);
+    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *element.generic, NULL);
     if (!generic_evaluated.has_value)
     {
         return evaluate_expression_result_empty;
@@ -2885,7 +2925,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     for (size_t i = 0; i < element.count; ++i)
     {
         evaluate_expression_result const argument_evaluated =
-            evaluate_expression(state, function, element.arguments[i]);
+            evaluate_expression(state, function, element.arguments[i], NULL);
         if (!argument_evaluated.has_value)
         {
             if (arguments)
@@ -3005,7 +3045,7 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                      instruction_sequence *const function,
                                                      new_array_expression const element)
 {
-    evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element);
+    evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element, NULL);
     if (!element_evaluated.has_value)
     {
         return element_evaluated;
@@ -3078,8 +3118,25 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
 static evaluate_expression_result evaluate_declare(function_checking_state *const state,
                                                    instruction_sequence *const function, declare const element)
 {
+    bool const declaration_possible =
+        !local_variable_name_exists(state->local_variables, unicode_view_from_string(element.name.value));
+    if (declaration_possible)
+    {
+        add_local_variable(&state->local_variables,
+                           local_variable_create(unicode_view_copy(unicode_view_from_string(element.name.value)),
+                                                 local_variable_phase_declared, type_from_unit(), optional_value_empty,
+                                                 ~(register_id)0));
+    }
+    else
+    {
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_declaration_with_existing_name, element.name.source));
+    }
+
     instruction_checkpoint const before_initialization = make_checkpoint(state, function);
-    evaluate_expression_result const initializer = evaluate_expression(state, function, *element.initializer);
+    unicode_view const name = unicode_view_from_string(element.name.value);
+    evaluate_expression_result const initializer =
+        evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL);
     if (!initializer.has_value)
     {
         return evaluate_expression_result_empty;
@@ -3101,7 +3158,8 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     if (element.optional_type)
     {
         instruction_checkpoint const previous_code = make_checkpoint(state, function);
-        evaluate_expression_result const declared_type = evaluate_expression(state, function, *element.optional_type);
+        evaluate_expression_result const declared_type =
+            evaluate_expression(state, function, *element.optional_type, NULL);
         restore(previous_code);
         if (declared_type.has_value)
         {
@@ -3127,18 +3185,13 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
         }
     }
 
-    if (local_variable_name_exists(state->local_variables, unicode_view_from_string(element.name.value)))
+    if (declaration_possible)
     {
-        emit_semantic_error(
-            state, semantic_error_create(semantic_error_declaration_with_existing_name, element.name.source));
-    }
-    else
-    {
-        add_local_variable(&state->local_variables,
-                           local_variable_create(unicode_view_copy(unicode_view_from_string(element.name.value)),
-                                                 final_type, final_compile_time_value, final_where));
         define_register_debug_name(state, final_where, unicode_view_copy(unicode_view_from_string(element.name.value)));
+        local_variable_initialize(&state->local_variables, unicode_view_from_string(element.name.value), final_type,
+                                  final_compile_time_value, final_where);
     }
+
     register_id const unit_goes_into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(
                                   literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
@@ -3149,7 +3202,8 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
-                                                      instruction_sequence *const function, expression const element)
+                                                      instruction_sequence *const function, expression const element,
+                                                      unicode_view const *const early_initialized_variable)
 {
     switch (element.type)
     {
@@ -3169,7 +3223,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return evaluate_instantiate_struct(state, function, element.instantiate_struct);
 
     case expression_type_interface:
-        return evaluate_interface(state, function, element.interface);
+        return evaluate_interface(state, function, element.interface, early_initialized_variable);
 
     case expression_type_impl:
         return evaluate_impl(state, function, element.impl);
@@ -3321,7 +3375,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
 static evaluate_expression_result evaluate_return_expression(function_checking_state *state, instruction_sequence *body,
                                                              const expression *returned)
 {
-    evaluate_expression_result const result = evaluate_expression(state, body, *returned);
+    evaluate_expression_result const result = evaluate_expression(state, body, *returned, NULL);
     if (!result.has_value)
     {
         return result;
@@ -3414,7 +3468,8 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals};
+    program_check check_root = {
+        NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);

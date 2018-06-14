@@ -409,6 +409,7 @@ void test_interpreter(void)
                                                  "integer-to-string.lpg",
                                                  "interface.lpg",
                                                  "interface-generic.lpg",
+                                                 "interface-recursive.lpg",
                                                  "lambda-capture.lpg",
                                                  "lambda-generic.lpg",
                                                  "lambda-parameters.lpg",

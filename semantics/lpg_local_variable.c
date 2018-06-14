@@ -5,10 +5,10 @@
 #include "lpg_instruction.h"
 #include "lpg_function_checking_state.h"
 
-local_variable local_variable_create(unicode_string name, type const type_, optional_value compile_time_value,
-                                     register_id where)
+local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
+                                     optional_value compile_time_value, register_id where)
 {
-    local_variable const result = {name, type_, compile_time_value, where};
+    local_variable const result = {name, phase, type_, compile_time_value, where};
     return result;
 }
 
@@ -34,6 +34,58 @@ void add_local_variable(local_variable_container *to, local_variable variable)
     to->elements = reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));
     to->elements[to->count] = variable;
     ++(to->count);
+}
+
+void local_variable_initialize(local_variable_container *variables, unicode_view name, type what,
+                               optional_value compile_time_value, register_id where)
+{
+    LPG_FOR(size_t, i, variables->count)
+    {
+        local_variable *const variable = variables->elements + i;
+        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        {
+            switch (variable->phase)
+            {
+            case local_variable_phase_declared:
+            case local_variable_phase_early_initialized:
+                variable->where = where;
+                variable->type_ = what;
+                variable->compile_time_value = compile_time_value;
+                variable->phase = local_variable_phase_initialized;
+                return;
+
+            case local_variable_phase_initialized:
+                LPG_UNREACHABLE();
+            }
+        }
+    }
+    LPG_UNREACHABLE();
+}
+
+void initialize_early(local_variable_container *variables, unicode_view name, type what,
+                      optional_value compile_time_value, register_id where)
+{
+    LPG_FOR(size_t, i, variables->count)
+    {
+        local_variable *const variable = variables->elements + i;
+        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        {
+            switch (variable->phase)
+            {
+            case local_variable_phase_declared:
+                variable->where = where;
+                variable->type_ = what;
+                variable->compile_time_value = compile_time_value;
+                variable->phase = local_variable_phase_early_initialized;
+                return;
+
+            case local_variable_phase_initialized:
+            case local_variable_phase_early_initialized:
+                LPG_UNREACHABLE();
+            }
+        }
+    }
+    LPG_UNREACHABLE();
 }
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name)
@@ -70,8 +122,16 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
         local_variable const *const variable = state->local_variables.elements + i;
         if (unicode_view_equals(unicode_view_from_string(variable->name), name))
         {
-            return read_local_variable_result_create(
-                variable_address_from_local(variable->where), variable->type_, variable->compile_time_value, true);
+            switch (variable->phase)
+            {
+            case local_variable_phase_declared:
+                return read_local_variable_result_unknown;
+
+            case local_variable_phase_early_initialized:
+            case local_variable_phase_initialized:
+                return read_local_variable_result_create(
+                    variable_address_from_local(variable->where), variable->type_, variable->compile_time_value, true);
+            }
         }
     }
     if (!state->parent)

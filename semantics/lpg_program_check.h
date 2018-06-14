@@ -31,6 +31,7 @@ typedef struct program_check
     module_loader *loader;
     structure global;
     value const *const globals;
+    bool *interfaces_defined;
 } program_check;
 
 void program_check_free(program_check const freed);

@@ -4,16 +4,24 @@
 #include "lpg_source_location.h"
 #include "lpg_captures.h"
 
+typedef enum local_variable_phase
+{
+    local_variable_phase_declared = 1,
+    local_variable_phase_early_initialized = 2,
+    local_variable_phase_initialized = 3
+} local_variable_phase;
+
 typedef struct local_variable
 {
     unicode_string name;
+    local_variable_phase phase;
     type type_;
     optional_value compile_time_value;
     register_id where;
 } local_variable;
 
-local_variable local_variable_create(unicode_string name, type const type_, optional_value compile_time_value,
-                                     register_id where);
+local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
+                                     optional_value compile_time_value, register_id where);
 
 void local_variable_free(local_variable const *const freed);
 
@@ -63,6 +71,12 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(struct function_chec
                                                source_location const original_reference_location);
 
 void add_local_variable(local_variable_container *to, local_variable variable);
+
+void local_variable_initialize(local_variable_container *variables, unicode_view name, type what,
+                               optional_value compile_time_value, register_id where);
+
+void initialize_early(local_variable_container *variables, unicode_view name, type what,
+                      optional_value compile_time_value, register_id where);
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name);
 
