@@ -3075,6 +3075,79 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
         true, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false, false);
 }
 
+static evaluate_expression_result evaluate_declare(function_checking_state *const state,
+                                                   instruction_sequence *const function, declare const element)
+{
+    instruction_checkpoint const before_initialization = make_checkpoint(state, function);
+    evaluate_expression_result const initializer = evaluate_expression(state, function, *element.initializer);
+    if (!initializer.has_value)
+    {
+        return evaluate_expression_result_empty;
+    }
+
+    register_id final_where = initializer.where;
+    if (initializer.compile_time_value.is_set)
+    {
+        restore(before_initialization);
+        final_where = allocate_register(&state->used_registers);
+        write_register_compile_time_value(state, final_where, initializer.compile_time_value.value_);
+        add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                      final_where, initializer.compile_time_value.value_, initializer.type_)));
+    }
+
+    type final_type = initializer.type_;
+    optional_value final_compile_time_value = initializer.compile_time_value;
+
+    if (element.optional_type)
+    {
+        instruction_checkpoint const previous_code = make_checkpoint(state, function);
+        evaluate_expression_result const declared_type = evaluate_expression(state, function, *element.optional_type);
+        restore(previous_code);
+        if (declared_type.has_value)
+        {
+            if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
+            {
+                emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                                 expression_source_begin(*element.optional_type)));
+            }
+            else
+            {
+                conversion_result const converted =
+                    convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
+                            expression_source_begin(*element.initializer),
+                            declared_type.compile_time_value.value_.type_, false);
+                if (converted.ok == success_no)
+                {
+                    return make_compile_time_unit();
+                }
+                final_where = converted.where;
+                final_type = declared_type.compile_time_value.value_.type_;
+                final_compile_time_value = converted.compile_time_value;
+            }
+        }
+    }
+
+    if (local_variable_name_exists(state->local_variables, unicode_view_from_string(element.name.value)))
+    {
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_declaration_with_existing_name, element.name.source));
+    }
+    else
+    {
+        add_local_variable(&state->local_variables,
+                           local_variable_create(unicode_view_copy(unicode_view_from_string(element.name.value)),
+                                                 final_type, final_compile_time_value, final_where));
+        define_register_debug_name(state, final_where, unicode_view_copy(unicode_view_from_string(element.name.value)));
+    }
+    register_id const unit_goes_into = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(
+                                  literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
+    write_register_compile_time_value(state, unit_goes_into, value_from_unit());
+    evaluate_expression_result const result = {
+        true, unit_goes_into, type_from_unit(), optional_value_create(value_from_unit()), false, false};
+    return result;
+}
+
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element)
 {
@@ -3231,81 +3304,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return check_sequence(state, function, element.sequence);
 
     case expression_type_declare:
-    {
-        instruction_checkpoint const before_initialization = make_checkpoint(state, function);
-        evaluate_expression_result const initializer =
-            evaluate_expression(state, function, *element.declare.initializer);
-        if (!initializer.has_value)
-        {
-            return evaluate_expression_result_empty;
-        }
-
-        register_id final_where = initializer.where;
-        if (initializer.compile_time_value.is_set)
-        {
-            restore(before_initialization);
-            final_where = allocate_register(&state->used_registers);
-            write_register_compile_time_value(state, final_where, initializer.compile_time_value.value_);
-            add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                          final_where, initializer.compile_time_value.value_, initializer.type_)));
-        }
-
-        type final_type = initializer.type_;
-        optional_value final_compile_time_value = initializer.compile_time_value;
-
-        if (element.declare.optional_type)
-        {
-            instruction_checkpoint const previous_code = make_checkpoint(state, function);
-            evaluate_expression_result const declared_type =
-                evaluate_expression(state, function, *element.declare.optional_type);
-            restore(previous_code);
-            if (declared_type.has_value)
-            {
-                if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
-                {
-                    emit_semantic_error(
-                        state, semantic_error_create(semantic_error_expected_compile_time_type,
-                                                     expression_source_begin(*element.declare.optional_type)));
-                }
-                else
-                {
-                    conversion_result const converted =
-                        convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
-                                expression_source_begin(*element.declare.initializer),
-                                declared_type.compile_time_value.value_.type_, false);
-                    if (converted.ok == success_no)
-                    {
-                        return make_compile_time_unit();
-                    }
-                    final_where = converted.where;
-                    final_type = declared_type.compile_time_value.value_.type_;
-                    final_compile_time_value = converted.compile_time_value;
-                }
-            }
-        }
-
-        if (local_variable_name_exists(state->local_variables, unicode_view_from_string(element.declare.name.value)))
-        {
-            emit_semantic_error(state, semantic_error_create(
-                                           semantic_error_declaration_with_existing_name, element.declare.name.source));
-        }
-        else
-        {
-            add_local_variable(
-                &state->local_variables,
-                local_variable_create(unicode_view_copy(unicode_view_from_string(element.declare.name.value)),
-                                      final_type, final_compile_time_value, final_where));
-            define_register_debug_name(
-                state, final_where, unicode_view_copy(unicode_view_from_string(element.declare.name.value)));
-        }
-        register_id const unit_goes_into = allocate_register(&state->used_registers);
-        add_instruction(function, instruction_create_literal(
-                                      literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
-        write_register_compile_time_value(state, unit_goes_into, value_from_unit());
-        evaluate_expression_result const result = {
-            true, unit_goes_into, type_from_unit(), optional_value_create(value_from_unit()), false, false};
-        return result;
-    }
+        return evaluate_declare(state, function, element.declare);
 
     case expression_type_tuple:
         return evaluate_tuple_expression(state, function, element.tuple);
