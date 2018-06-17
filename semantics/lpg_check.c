@@ -1786,6 +1786,52 @@ static evaluate_arguments_result evaluate_arguments(function_checking_state *con
     return result;
 }
 
+typedef struct evaluate_struct_arguments_result
+{
+    register_id *registers;
+} evaluate_struct_arguments_result;
+
+static evaluate_struct_arguments_result evaluate_struct_arguments(function_checking_state *const state,
+                                                                  instruction_sequence *const function,
+                                                                  expression const *const arguments,
+                                                                  size_t const argument_count,
+                                                                  structure_member const *const members)
+{
+    register_id *registers = allocate_array(argument_count, sizeof(*registers));
+    for (size_t i = 0; i < argument_count; ++i)
+    {
+        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i], NULL);
+        if (!argument_evaluated.has_value)
+        {
+            deallocate(registers);
+            evaluate_struct_arguments_result const result = {NULL};
+            return result;
+        }
+        type const member_type = members[i].what;
+        if (type_equals(argument_evaluated.type_, member_type))
+        {
+            registers[i] = argument_evaluated.where;
+        }
+        else
+        {
+            conversion_result const converted = convert(state, function, argument_evaluated.where,
+                                                        argument_evaluated.type_, argument_evaluated.compile_time_value,
+                                                        expression_source_begin(arguments[i]), member_type, false);
+            switch (converted.ok)
+            {
+            case success_no:
+                LPG_TO_DO();
+
+            case success_yes:
+                break;
+            }
+            registers[i] = converted.where;
+        }
+    }
+    evaluate_struct_arguments_result const result = {registers};
+    return result;
+}
+
 evaluate_expression_result evaluate_tuple_expression(function_checking_state *state, instruction_sequence *function,
                                                      const tuple element)
 {
@@ -2320,20 +2366,16 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
             state, semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)));
         return make_compile_time_unit();
     }
-    evaluate_arguments_result const arguments_evaluated =
-        evaluate_arguments(state, function, element.arguments.elements, element.arguments.length);
+    evaluate_struct_arguments_result const arguments_evaluated = evaluate_struct_arguments(
+        state, function, element.arguments.elements, element.arguments.length, instantiated_structure->members);
     if (!arguments_evaluated.registers)
     {
         return make_compile_time_unit();
     }
-    if (arguments_evaluated.tuple_type_for_instruction.elements)
-    {
-        deallocate(arguments_evaluated.tuple_type_for_instruction.elements);
-    }
     value *const compile_time_values = garbage_collector_allocate_array(
-        &state->program->memory, arguments_evaluated.tuple_type_for_result.length, sizeof(*compile_time_values));
+        &state->program->memory, element.arguments.length, sizeof(*compile_time_values));
     bool is_pure = true;
-    for (register_id i = 0; i < arguments_evaluated.tuple_type_for_result.length; ++i)
+    for (register_id i = 0; i < element.arguments.length; ++i)
     {
         optional_value const current_element =
             read_register_compile_time_value(state, arguments_evaluated.registers[i]);
@@ -2348,8 +2390,8 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     if (is_pure)
     {
         deallocate(arguments_evaluated.registers);
-        value const compile_time_value = value_from_structure(
-            structure_value_create(compile_time_values, arguments_evaluated.tuple_type_for_result.length));
+        value const compile_time_value =
+            value_from_structure(structure_value_create(compile_time_values, element.arguments.length));
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       into, compile_time_value, type_from_struct(structure_id))));
         write_register_compile_time_value(state, into, compile_time_value);

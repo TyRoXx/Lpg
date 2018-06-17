@@ -95,5 +95,5 @@ assert(match using-local[boolean].b(local{boolean.true})
 let access-parameter = enum[Struct]
     e(Struct.element)
 let access-parameter-struct = struct
-    element: std.boolean
+    element: std.type
 let x = access-parameter[access-parameter-struct{std.boolean}].e(std.boolean.true)

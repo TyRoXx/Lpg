@@ -24,4 +24,4 @@ impl linked-list-node for middle-node
         std.option[linked-list-node].some(self.next)
 
 let list : linked-list-node = middle-node{boolean.true, final-node{boolean.false}}
-//assert(list.value())
+assert(list.value())
