@@ -25,3 +25,21 @@ impl linked-list-node for middle-node
 
 let list : linked-list-node = middle-node{boolean.true, final-node{boolean.false}}
 assert(list.value())
+
+/*let generic-self-reference = interface[T]
+    a(): generic-self-reference[T]
+    b(): generic-self-reference[std.boolean]
+
+impl generic-self-reference[std.boolean] for std.unit
+    a(): generic-self-reference[std.boolean]
+        self
+    b(): generic-self-reference[std.boolean]
+
+impl generic-self-reference[std.unit] for std.unit
+    a(): generic-self-reference[std.unit]
+        self
+    b(): generic-self-reference[std.boolean]
+        self
+
+let x0 : generic-self-reference[std.boolean] = std.unit_value
+let x1 : generic-self-reference[std.unit] = std.unit_value*/

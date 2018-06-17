@@ -2060,18 +2060,27 @@ static generic_enum_closures find_generic_interface_closures(function_checking_s
     return result;
 }
 
-static evaluate_expression_result evaluate_generic_interface_expression(function_checking_state *state,
-                                                                        instruction_sequence *function,
-                                                                        interface_expression const element)
+static evaluate_expression_result
+evaluate_generic_interface_expression(function_checking_state *state, instruction_sequence *function,
+                                      interface_expression const element,
+                                      unicode_view const *const early_initialized_variable)
 {
     program_check *const root = state->root;
     root->generic_interfaces = reallocate_array(
         root->generic_interfaces, root->generic_interface_count + 1, sizeof(*root->generic_interfaces));
     generic_interface_id const id = root->generic_interface_count;
+    register_id const into = allocate_register(&state->used_registers);
+
+    if (early_initialized_variable)
+    {
+        initialize_early(&state->local_variables, *early_initialized_variable, type_from_generic_interface(),
+                         optional_value_create(value_from_generic_interface(id)), into);
+    }
+
     generic_enum_closures const closures = find_generic_interface_closures(state, element);
     root->generic_interfaces[id] = generic_interface_create(interface_expression_clone(element), closures);
     root->generic_interface_count += 1;
-    register_id const into = allocate_register(&state->used_registers);
+
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_interface(id), type_from_generic_interface())));
     write_register_compile_time_value(state, into, value_from_generic_interface(id));
@@ -2085,7 +2094,7 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
 {
     if (element.parameters.count > 0)
     {
-        return evaluate_generic_interface_expression(state, function, element);
+        return evaluate_generic_interface_expression(state, function, element, early_initialized_variable);
     }
 
     interface_id const id = state->program->interface_count;
