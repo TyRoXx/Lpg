@@ -10,7 +10,7 @@
 ## Usage
 For a general introduction, have a look at the file `documentation/Language.md`
 
-Just write a `.lpg` file and run it. If you want to have syntax highlighting, there is a Visual Studio Code Plugin for this (see VS Code Package Manager) and a Notepad++ syntax file in this repository.
+Just write a `.lpg` file and run it. If you want to have syntax highlighting, there is a [Visual Studio Code Plugin](https://github.com/mamazu/LPG-for-Visual-Studio-Code) and a Notepad++ syntax file in this repository.
 
 ### Compilation
 In order to compile and run an `.lpg` file you need to build the whole project and run the following command in the terminal:
