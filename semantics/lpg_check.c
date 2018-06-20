@@ -249,14 +249,12 @@ static read_structure_element_result read_element(function_checking_state *state
     {
     case type_kind_host_value:
     case type_kind_generic_lambda:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_structure:
         return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
                                       unicode_view_from_string(element->value), element->source, result);
-
-    case type_kind_method_pointer:
-        LPG_TO_DO();
 
     case type_kind_interface:
         return read_interface_element(state, function, object.where, actual_type->interface_,
@@ -293,10 +291,6 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
-        case type_kind_host_value:
-        case type_kind_generic_lambda:
-            LPG_TO_DO();
-
         case type_kind_string_ref:
         case type_kind_unit:
         case type_kind_type:
@@ -313,6 +307,8 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_method_pointer:
         case type_kind_generic_enum:
         case type_kind_generic_interface:
+        case type_kind_host_value:
+        case type_kind_generic_lambda:
             LPG_TO_DO();
 
         case type_kind_enumeration:
@@ -360,10 +356,6 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
@@ -381,6 +373,8 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     case type_kind_interface:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
+    case type_kind_host_value:
+    case type_kind_generic_lambda:
         LPG_TO_DO();
 
     case type_kind_enum_constructor:
@@ -592,16 +586,6 @@ check_function_result check_function(program_check *const root, function_checkin
                     register_id const unit_goes_into = allocate_register(&state.used_registers);
                     add_instruction(&body_out, instruction_create_return(
                                                    return_instruction_create(body_evaluated.where, unit_goes_into)));
-                }
-                else if (body_evaluated.compile_time_value.is_set)
-                {
-                    register_id const return_value = allocate_register(&state.used_registers);
-                    add_instruction(
-                        &body_out, instruction_create_literal(literal_instruction_create(
-                                       return_value, body_evaluated.compile_time_value.value_, body_evaluated.type_)));
-                    register_id const unit_goes_into = allocate_register(&state.used_registers);
-                    add_instruction(
-                        &body_out, instruction_create_return(return_instruction_create(return_value, unit_goes_into)));
                 }
                 else
                 {
