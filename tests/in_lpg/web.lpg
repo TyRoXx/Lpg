@@ -5,11 +5,11 @@ let option = std.option
 (window: es.value, factory: es.value-factory)
     let arguments = new-array(es.value)
     assert(arguments.append(factory.create-string("Hello, world!")))
-    match window.load("console")
+    match window.load("document")
         case option[es.value].some(let console):
-            console.call-method("log", arguments)
+            console.call-method("write", arguments)
             std.unit_value
         case option[es.value].none:
             assert(boolean.false)
             std.unit_value
-    window.call-method("alert", arguments)
+
