@@ -206,6 +206,7 @@ bool type_equals(type const left, type const right);
 type type_clone(type const original, garbage_collector *const clone_gc, function_id const *const new_function_ids);
 optional_type optional_type_clone(optional_type const original, garbage_collector *const clone_gc,
                                   function_id const *const new_function_ids);
+bool type_is_valid(type const checked);
 
 void function_pointer_free(LPG_NON_NULL(function_pointer const *freed));
 

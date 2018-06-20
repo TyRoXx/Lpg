@@ -10,6 +10,7 @@
 #include "duktape.h"
 #include "lpg_ecmascript_backend.h"
 #include "lpg_allocate.h"
+#include "lpg_optimize.h"
 #include "lpg_assert.h"
 #include "lpg_read_file.h"
 #include "lpg_c_backend.h"
@@ -317,10 +318,35 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     checked_program checked = check(root, global_object, expect_no_errors, &loader, test_name, source, NULL);
     sequence_free(&root);
 
-    // optimized
+    // not optimized
+    {
+        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, test_name};
+        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
+        test_all_backends(test_name, checked, global_object, unicode_view_from_string(c_test_dir));
+        unicode_string_free(&c_test_dir);
+    }
+
+    // no dead code
     {
         remove_dead_code(&checked);
-        checked_program const optimized = remove_unused_functions(checked);
+        memory_writer optimized_test_name = {NULL, 0, 0};
+        {
+            stream_writer const writer = memory_writer_erase(&optimized_test_name);
+            REQUIRE(success_yes == stream_writer_write_unicode_view(writer, test_name));
+            REQUIRE(success_yes == stream_writer_write_string(writer, "-deadcode"));
+        }
+        unicode_view const optimized_test_name_view =
+            unicode_view_create(optimized_test_name.data, optimized_test_name.used);
+        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, optimized_test_name_view};
+        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
+        test_all_backends(optimized_test_name_view, checked, global_object, unicode_view_from_string(c_test_dir));
+        unicode_string_free(&c_test_dir);
+        memory_writer_free(&optimized_test_name);
+    }
+
+    // fully optimized
+    {
+        optimize(&checked);
         memory_writer optimized_test_name = {NULL, 0, 0};
         {
             stream_writer const writer = memory_writer_erase(&optimized_test_name);
@@ -331,18 +357,9 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
             unicode_view_create(optimized_test_name.data, optimized_test_name.used);
         unicode_view const c_test_dir_pieces[] = {in_lpg_directory, optimized_test_name_view};
         unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
-        test_all_backends(optimized_test_name_view, optimized, global_object, unicode_view_from_string(c_test_dir));
+        test_all_backends(optimized_test_name_view, checked, global_object, unicode_view_from_string(c_test_dir));
         unicode_string_free(&c_test_dir);
         memory_writer_free(&optimized_test_name);
-        checked_program_free(&optimized);
-    }
-
-    // not optimized
-    {
-        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, test_name};
-        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
-        test_all_backends(test_name, checked, global_object, unicode_view_from_string(c_test_dir));
-        unicode_string_free(&c_test_dir);
     }
 
     unicode_string_free(&module_directory);

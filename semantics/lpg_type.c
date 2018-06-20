@@ -482,6 +482,44 @@ optional_type optional_type_clone(optional_type const original, garbage_collecto
     return optional_type_create_set(type_clone(original.value, clone_gc, new_function_ids));
 }
 
+bool type_is_valid(type const checked)
+{
+    if ((checked.kind < type_kind_structure) || (checked.kind > type_kind_host_value))
+    {
+        return false;
+    }
+    switch (checked.kind)
+    {
+    case type_kind_tuple:
+        for (size_t i = 0; i < checked.tuple_.length; ++i)
+        {
+            if (!type_is_valid(checked.tuple_.elements[i]))
+            {
+                return false;
+            }
+        }
+        return true;
+
+    case type_kind_structure:
+    case type_kind_function_pointer:
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+    case type_kind_type:
+    case type_kind_integer_range:
+    case type_kind_enum_constructor:
+    case type_kind_lambda:
+    case type_kind_interface:
+    case type_kind_method_pointer:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
+    case type_kind_generic_lambda:
+    case type_kind_host_value:
+        return true;
+    }
+    LPG_UNREACHABLE();
+}
+
 void function_pointer_free(function_pointer const *freed)
 {
     if (freed->parameters.elements)

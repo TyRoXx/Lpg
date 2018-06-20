@@ -38,7 +38,8 @@ typedef enum register_meaning
     register_meaning_captures,
     register_meaning_capture,
     register_meaning_side_effect,
-    register_meaning_unit
+    register_meaning_unit,
+    register_meaning_host_value
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -980,6 +981,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_integer_less:
     case register_meaning_side_effect:
     case register_meaning_integer_to_string:
+    case register_meaning_host_value:
         LPG_TO_DO();
 
     case register_meaning_not:
@@ -1017,6 +1019,7 @@ static success_indicator generate_add_reference_to_tuple(unicode_view const tupl
         LPG_TRY(stream_writer_write_unicode_view(memory_writer_erase(&name_buffer), tuple_name));
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
         LPG_TRY(generate_tuple_element_name(i, memory_writer_erase(&name_buffer)));
+        ASSUME(type_is_valid(elements[i]));
         LPG_TRY(
             generate_add_reference(memory_writer_content(name_buffer), elements[i], indentation, program, c_output));
         memory_writer_free(&name_buffer);
@@ -1047,6 +1050,7 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
                                                 size_t const indentation, checked_program const *const program,
                                                 stream_writer const c_output)
 {
+    ASSUME(type_is_valid(what));
     switch (what.kind)
     {
     case type_kind_generic_lambda:
@@ -1069,6 +1073,10 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
         return success_yes;
 
     case type_kind_tuple:
+        for (size_t i = 0; i < what.tuple_.length; ++i)
+        {
+            ASSUME(type_is_valid(what.tuple_.elements[i]));
+        }
         return generate_add_reference_to_tuple(
             pointer_name, what.tuple_.elements, what.tuple_.length, indentation, program, c_output);
 
@@ -1108,6 +1116,7 @@ static success_indicator generate_add_reference_to_register(checked_function con
 {
     memory_writer name_buffer = {NULL, 0, 0};
     LPG_TRY(generate_register_name(where, current_function, memory_writer_erase(&name_buffer)));
+    ASSUME(type_is_valid(what));
     success_indicator const result =
         generate_add_reference(memory_writer_content(name_buffer), what, indentation, program, c_output);
     memory_writer_free(&name_buffer);
@@ -1144,6 +1153,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_less:
     case register_meaning_integer_to_string:
     case register_meaning_unit:
+    case register_meaning_host_value:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1245,6 +1255,7 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     set_register_variable(state, result, register_resource_ownership_owns, type_from_tuple_type(tuple));
     for (size_t i = 0; i < tuple.length; ++i)
     {
+        ASSUME(type_is_valid(tuple.elements[i]));
         LPG_TRY(generate_add_reference_to_register(
             current_function, elements[i], tuple.elements[i], indentation, state->program, c_output));
     }
@@ -1595,6 +1606,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_concat:
         case register_meaning_captures:
         case register_meaning_side_effect:
+        case register_meaning_host_value:
         case register_meaning_unit:
             break;
         }
@@ -1644,6 +1656,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_nothing:
         case register_meaning_global:
         case register_meaning_unit:
+        case register_meaning_host_value:
             LPG_UNREACHABLE();
 
         case register_meaning_side_effect:
@@ -1894,6 +1907,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_nothing:
         case register_meaning_not:
         case register_meaning_unit:
+        case register_meaning_host_value:
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
@@ -1939,6 +1953,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 9:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_string_equals);
+                return success_yes;
+
+            case 11:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_host_value);
                 return success_yes;
 
             default:
@@ -2045,9 +2064,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         ASSERT(state->registers[input.literal.into].meaning == register_meaning_nothing);
         switch (input.literal.value_.kind)
         {
-        case value_kind_generic_lambda:
-            LPG_TO_DO();
-
         case value_kind_array:
             LPG_TO_DO();
 
@@ -2061,6 +2077,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
             LPG_TRY(stream_writer_write_string(c_output, "/*generic interface omitted*/\n"));
+            return success_yes;
+
+        case value_kind_generic_lambda:
+            set_register_variable(
+                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            LPG_TRY(stream_writer_write_string(c_output, "/*generic lambda omitted*/\n"));
             return success_yes;
 
         case value_kind_integer:

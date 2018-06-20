@@ -6,6 +6,7 @@
 #include "lpg_check.h"
 #include "lpg_find_next_token.h"
 #include "lpg_interpret.h"
+#include "lpg_optimize.h"
 #include "lpg_allocate.h"
 #include "lpg_read_file.h"
 #include "lpg_path.h"
@@ -509,6 +510,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     case compiler_command_web:
         if (!context.has_error)
         {
+            optimize(&checked);
             unicode_view const output_file_name = unicode_view_from_c_str(arguments.output_file_name);
             generate_ecmascript_web_site(checked, output_file_name);
         }

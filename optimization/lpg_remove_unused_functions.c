@@ -397,8 +397,10 @@ static instruction clone_instruction(instruction const original, garbage_collect
         tuple_type const cloned_type = {
             allocate_array(original.tuple_.result_type.length, sizeof(*cloned_type.elements)),
             original.tuple_.result_type.length};
-        memcpy(cloned_type.elements, original.tuple_.result_type.elements,
-               (sizeof(*cloned_type.elements) * original.tuple_.result_type.length));
+        for (size_t i = 0; i < original.tuple_.result_type.length; ++i)
+        {
+            cloned_type.elements[i] = type_clone(original.tuple_.result_type.elements[i], clone_gc, new_function_ids);
+        }
         return instruction_create_tuple(
             tuple_instruction_create(elements, original.tuple_.element_count, original.tuple_.result, cloned_type));
     }

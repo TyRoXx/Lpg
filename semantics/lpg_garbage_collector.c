@@ -36,6 +36,10 @@ void *garbage_collector_allocate(LPG_NON_NULL(garbage_collector *const gc), size
     gc->blocks->used += (alignment - 1u);
     gc->blocks->used &= ~(alignment - 1u);
     ASSUME((gc->blocks->used % alignment) == 0);
+    if (gc->blocks->used > gc->blocks->size)
+    {
+        gc->blocks->used = gc->blocks->size;
+    }
     return result;
 }
 

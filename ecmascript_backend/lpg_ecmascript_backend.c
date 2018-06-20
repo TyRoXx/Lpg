@@ -198,9 +198,6 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
-    case value_kind_generic_lambda:
-        LPG_TO_DO();
-
     case value_kind_array:
         LPG_TO_DO();
 
@@ -254,6 +251,7 @@ static success_indicator generate_value(value const generated, type const type_o
             generated.enum_element, all_functions, function_count, all_interfaces, all_structs, ecmascript_output);
 
     case value_kind_unit:
+    case value_kind_generic_lambda:
         return stream_writer_write_string(ecmascript_output, "undefined");
 
     case value_kind_structure:
@@ -438,7 +436,10 @@ static success_indicator generate_read_struct_value(function_generation *const s
 static success_indicator generate_read_struct(function_generation *const state, read_struct_instruction const generated,
                                               stream_writer const ecmascript_output)
 {
-    switch (state->registers[generated.from_object].type_of.kind)
+    register_info const object = state->registers[generated.from_object];
+    ASSUME(object.kind != register_type_none);
+    type_kind const kind = object.type_of.kind;
+    switch (kind)
     {
     case type_kind_host_value:
     case type_kind_generic_lambda:
@@ -455,6 +456,7 @@ static success_indicator generate_read_struct(function_generation *const state, 
     case type_kind_tuple:
     {
         tuple_type const tuple_ = state->registers[generated.from_object].type_of.tuple_;
+        ASSUME(generated.member < tuple_.length);
         LPG_TRY(write_register(state, generated.into, tuple_.elements[generated.member], ecmascript_output));
         break;
     }

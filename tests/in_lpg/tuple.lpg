@@ -5,8 +5,14 @@ let u = {1, 2, 3, 4, 5, 6}
 let v5 = {123, "abc"}
 assert(integer-equals(123, v5.0))
 assert(string-equals("abc", v5.1))
+
+assert(integer-equals(123, {v5}.0.0))
+
 let w = {{{{123}}}}
 assert(integer-equals(123, w.0.0.0.0))
+
+let y = w.0.0.0.0
+assert(integer-equals(123, y))
 
 let runtime-tuple = ()
     side-effect()
