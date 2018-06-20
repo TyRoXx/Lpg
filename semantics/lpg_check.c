@@ -3255,9 +3255,6 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     case expression_type_call:
         return evaluate_call_expression(state, function, element.call);
 
-    case expression_type_binary:
-        LPG_TO_DO();
-
     case expression_type_enum:
         return evaluate_enum_expression(state, function, element.enum_);
 
@@ -3388,6 +3385,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return evaluate_struct(state, function, element.struct_);
 
     case expression_type_placeholder:
+    case expression_type_binary:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
