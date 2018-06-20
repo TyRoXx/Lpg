@@ -1812,7 +1812,11 @@ static evaluate_struct_arguments_result evaluate_struct_arguments(function_check
             switch (converted.ok)
             {
             case success_no:
-                LPG_TO_DO();
+            {
+                deallocate(registers);
+                evaluate_struct_arguments_result const result = {NULL};
+                return result;
+            }
 
             case success_yes:
                 break;
