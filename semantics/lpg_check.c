@@ -898,10 +898,6 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -916,6 +912,8 @@ static conversion_result convert(function_checking_state *const state, instructi
         return result;
     }
 
+    case type_kind_host_value:
+    case type_kind_generic_lambda:
     case type_kind_method_pointer:
     case type_kind_tuple:
     case type_kind_generic_enum:
@@ -1065,8 +1063,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             switch (callee.compile_time_value.value_.kind)
             {
             case value_kind_generic_lambda:
-                LPG_TO_DO();
-
             case value_kind_array:
                 LPG_TO_DO();
 
@@ -1137,6 +1133,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         {
         case type_kind_host_value:
         case type_kind_generic_lambda:
+        case type_kind_method_pointer:
+        case type_kind_interface:
+        case type_kind_generic_interface:
             LPG_TO_DO();
 
         case type_kind_lambda:
@@ -1164,11 +1163,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                                               .state)));
             deallocate(arguments);
             break;
-
-        case type_kind_method_pointer:
-        case type_kind_interface:
-        case type_kind_generic_interface:
-            LPG_TO_DO();
         }
     }
 
@@ -1268,11 +1262,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
     switch (root.type)
     {
     case expression_type_new_array:
-        LPG_TO_DO();
-
     case expression_type_import:
-        LPG_TO_DO();
-
     case expression_type_generic_instantiation:
         LPG_TO_DO();
 
@@ -1900,9 +1890,9 @@ static void find_generic_closures_in_expression(generic_closures *const closures
     switch (from.type)
     {
     case expression_type_new_array:
-        LPG_TO_DO();
-
+    case expression_type_type_of:
     case expression_type_import:
+    case expression_type_binary:
         LPG_TO_DO();
 
     case expression_type_lambda:
@@ -1910,18 +1900,12 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         find_generic_closures_in_expression(closures, state, *from.lambda.result);
         break;
 
-    case expression_type_type_of:
-        LPG_TO_DO();
-
     case expression_type_call:
         find_generic_closures_in_expression(closures, state, *from.call.callee);
         for (size_t i = 0; i < from.call.arguments.length; ++i)
         {
             find_generic_closures_in_expression(closures, state, from.call.arguments.elements[i]);
         }
-        break;
-
-    case expression_type_integer_literal:
         break;
 
     case expression_type_access_structure:
@@ -1937,7 +1921,11 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         }
         break;
 
+    case expression_type_integer_literal:
     case expression_type_string:
+    case expression_type_break:
+    case expression_type_comment:
+    case expression_type_placeholder:
         break;
 
     case expression_type_identifier:
@@ -1949,9 +1937,6 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         find_generic_closures_in_expression(closures, state, *from.not.expr);
         break;
 
-    case expression_type_binary:
-        LPG_TO_DO();
-
     case expression_type_return:
         find_generic_closures_in_expression(closures, state, *from.return_);
         break;
@@ -1961,9 +1946,6 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         {
             find_generic_closures_in_expression(closures, state, from.loop_body.elements[i]);
         }
-        break;
-
-    case expression_type_break:
         break;
 
     case expression_type_sequence:
@@ -1983,9 +1965,6 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         {
             find_generic_closures_in_expression(closures, state, from.tuple.elements[i]);
         }
-        break;
-
-    case expression_type_comment:
         break;
 
     case expression_type_interface:
@@ -2028,9 +2007,6 @@ static void find_generic_closures_in_expression(generic_closures *const closures
                 find_generic_closures_in_expression(closures, state, *from.enum_.elements[i].state);
             }
         }
-        break;
-
-    case expression_type_placeholder:
         break;
 
     case expression_type_generic_instantiation:
