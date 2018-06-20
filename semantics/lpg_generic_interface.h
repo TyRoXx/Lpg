@@ -4,19 +4,19 @@
 #include "lpg_value.h"
 #include "lpg_generic_enum.h"
 
-typedef struct generic_enum_closures
+typedef struct generic_closures
 {
-    generic_enum_closure *elements;
+    generic_closure *elements;
     size_t count;
-} generic_enum_closures;
+} generic_closures;
 
-void generic_enum_closures_free(generic_enum_closures const freed);
+void generic_closures_free(generic_closures const freed);
 
 typedef struct generic_interface
 {
     interface_expression tree;
-    generic_enum_closures closures;
+    generic_closures closures;
 } generic_interface;
 
-generic_interface generic_interface_create(interface_expression tree, generic_enum_closures closures);
+generic_interface generic_interface_create(interface_expression tree, generic_closures closures);
 void generic_interface_free(generic_interface const freed);

@@ -755,13 +755,13 @@ static function_id reserve_function_id(function_checking_state *const state)
     return this_lambda_id;
 }
 
-static void find_generic_enum_closures_in_expression(generic_enum_closures *const closures,
-                                                     function_checking_state *const state, expression const from);
+static void find_generic_closures_in_expression(generic_closures *const closures, function_checking_state *const state,
+                                                expression const from);
 
-static generic_enum_closures find_generic_lambda_closures(function_checking_state *const state, lambda const definition)
+static generic_closures find_generic_lambda_closures(function_checking_state *const state, lambda const definition)
 {
-    generic_enum_closures result = {NULL, 0};
-    find_generic_enum_closures_in_expression(&result, state, expression_from_lambda(definition));
+    generic_closures result = {NULL, 0};
+    find_generic_closures_in_expression(&result, state, expression_from_lambda(definition));
     return result;
 }
 
@@ -772,7 +772,7 @@ evaluate_generic_lambda_expression(function_checking_state *state, instruction_s
     root->generic_lambdas =
         reallocate_array(root->generic_lambdas, root->generic_lambda_count + 1, sizeof(*root->generic_lambdas));
     generic_lambda_id const id = root->generic_lambda_count;
-    generic_enum_closures const closures = find_generic_lambda_closures(state, element);
+    generic_closures const closures = find_generic_lambda_closures(state, element);
     root->generic_lambdas[id] = generic_lambda_create(lambda_clone(element), closures);
     root->generic_lambda_count += 1;
     register_id const into = allocate_register(&state->used_registers);
@@ -1845,32 +1845,31 @@ evaluate_expression_result evaluate_tuple_expression(function_checking_state *st
                                              optional_value_empty, false, false);
 }
 
-static void find_generic_enum_closures_in_function_header(generic_enum_closures *const closures,
-                                                          function_checking_state *const state,
-                                                          function_header_tree const header)
+static void find_generic_closures_in_function_header(generic_closures *const closures,
+                                                     function_checking_state *const state,
+                                                     function_header_tree const header)
 {
     for (size_t i = 0; i < header.parameter_count; ++i)
     {
-        find_generic_enum_closures_in_expression(closures, state, *header.parameters[i].type);
+        find_generic_closures_in_expression(closures, state, *header.parameters[i].type);
     }
     if (header.return_type)
     {
-        find_generic_enum_closures_in_expression(closures, state, *header.return_type);
+        find_generic_closures_in_expression(closures, state, *header.return_type);
     }
 }
 
-static void find_generic_enum_closures_in_sequence(generic_enum_closures *const closures,
-                                                   function_checking_state *const state, sequence const tree)
+static void find_generic_closures_in_sequence(generic_closures *const closures, function_checking_state *const state,
+                                              sequence const tree)
 {
     for (size_t i = 0; i < tree.length; ++i)
     {
-        find_generic_enum_closures_in_expression(closures, state, tree.elements[i]);
+        find_generic_closures_in_expression(closures, state, tree.elements[i]);
     }
 }
 
-static void resolve_generic_enum_closure_identifier(generic_enum_closures *const closures,
-                                                    function_checking_state *const state, unicode_view const name,
-                                                    source_location const source)
+static void resolve_generic_closure_identifier(generic_closures *const closures, function_checking_state *const state,
+                                               unicode_view const name, source_location const source)
 {
     for (size_t i = 0; i < state->local_variables.count; ++i)
     {
@@ -1883,20 +1882,20 @@ static void resolve_generic_enum_closure_identifier(generic_enum_closures *const
             }
             closures->elements = reallocate_array(closures->elements, closures->count + 1, sizeof(*closures->elements));
             closures->elements[closures->count] =
-                generic_enum_closure_create(unicode_view_copy(name), state->local_variables.elements[i].type_,
-                                            state->local_variables.elements[i].compile_time_value.value_);
+                generic_closure_create(unicode_view_copy(name), state->local_variables.elements[i].type_,
+                                       state->local_variables.elements[i].compile_time_value.value_);
             closures->count += 1;
             return;
         }
     }
     if (state->parent)
     {
-        resolve_generic_enum_closure_identifier(closures, state->parent, name, source);
+        resolve_generic_closure_identifier(closures, state->parent, name, source);
     }
 }
 
-static void find_generic_enum_closures_in_expression(generic_enum_closures *const closures,
-                                                     function_checking_state *const state, expression const from)
+static void find_generic_closures_in_expression(generic_closures *const closures, function_checking_state *const state,
+                                                expression const from)
 {
     switch (from.type)
     {
@@ -1907,18 +1906,18 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         LPG_TO_DO();
 
     case expression_type_lambda:
-        find_generic_enum_closures_in_function_header(closures, state, from.lambda.header);
-        find_generic_enum_closures_in_expression(closures, state, *from.lambda.result);
+        find_generic_closures_in_function_header(closures, state, from.lambda.header);
+        find_generic_closures_in_expression(closures, state, *from.lambda.result);
         break;
 
     case expression_type_type_of:
         LPG_TO_DO();
 
     case expression_type_call:
-        find_generic_enum_closures_in_expression(closures, state, *from.call.callee);
+        find_generic_closures_in_expression(closures, state, *from.call.callee);
         for (size_t i = 0; i < from.call.arguments.length; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.call.arguments.elements[i]);
+            find_generic_closures_in_expression(closures, state, from.call.arguments.elements[i]);
         }
         break;
 
@@ -1926,15 +1925,15 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_access_structure:
-        find_generic_enum_closures_in_expression(closures, state, *from.access_structure.object);
+        find_generic_closures_in_expression(closures, state, *from.access_structure.object);
         break;
 
     case expression_type_match:
-        find_generic_enum_closures_in_expression(closures, state, *from.match.input);
+        find_generic_closures_in_expression(closures, state, *from.match.input);
         for (size_t i = 0; i < from.match.number_of_cases; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, *from.match.cases[i].key);
-            find_generic_enum_closures_in_expression(closures, state, *from.match.cases[i].action);
+            find_generic_closures_in_expression(closures, state, *from.match.cases[i].key);
+            find_generic_closures_in_expression(closures, state, *from.match.cases[i].action);
         }
         break;
 
@@ -1942,25 +1941,25 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_identifier:
-        resolve_generic_enum_closure_identifier(
+        resolve_generic_closure_identifier(
             closures, state, unicode_view_from_string(from.identifier.value), from.identifier.source);
         break;
 
     case expression_type_not:
-        find_generic_enum_closures_in_expression(closures, state, *from.not.expr);
+        find_generic_closures_in_expression(closures, state, *from.not.expr);
         break;
 
     case expression_type_binary:
         LPG_TO_DO();
 
     case expression_type_return:
-        find_generic_enum_closures_in_expression(closures, state, *from.return_);
+        find_generic_closures_in_expression(closures, state, *from.return_);
         break;
 
     case expression_type_loop:
         for (size_t i = 0; i < from.loop_body.length; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.loop_body.elements[i]);
+            find_generic_closures_in_expression(closures, state, from.loop_body.elements[i]);
         }
         break;
 
@@ -1968,21 +1967,21 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_sequence:
-        find_generic_enum_closures_in_sequence(closures, state, from.sequence);
+        find_generic_closures_in_sequence(closures, state, from.sequence);
         break;
 
     case expression_type_declare:
         if (from.declare.optional_type)
         {
-            find_generic_enum_closures_in_expression(closures, state, *from.declare.optional_type);
+            find_generic_closures_in_expression(closures, state, *from.declare.optional_type);
         }
-        find_generic_enum_closures_in_expression(closures, state, *from.declare.initializer);
+        find_generic_closures_in_expression(closures, state, *from.declare.initializer);
         break;
 
     case expression_type_tuple:
         for (size_t i = 0; i < from.tuple.length; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.tuple.elements[i]);
+            find_generic_closures_in_expression(closures, state, from.tuple.elements[i]);
         }
         break;
 
@@ -1992,32 +1991,32 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
     case expression_type_interface:
         for (size_t i = 0; i < from.interface.method_count; ++i)
         {
-            find_generic_enum_closures_in_function_header(closures, state, from.interface.methods[i].header);
+            find_generic_closures_in_function_header(closures, state, from.interface.methods[i].header);
         }
         break;
 
     case expression_type_struct:
         for (size_t i = 0; i < from.struct_.element_count; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.struct_.elements[i].type);
+            find_generic_closures_in_expression(closures, state, from.struct_.elements[i].type);
         }
         break;
 
     case expression_type_impl:
-        find_generic_enum_closures_in_expression(closures, state, *from.impl.interface);
-        find_generic_enum_closures_in_expression(closures, state, *from.impl.self);
+        find_generic_closures_in_expression(closures, state, *from.impl.interface);
+        find_generic_closures_in_expression(closures, state, *from.impl.self);
         for (size_t i = 0; i < from.impl.method_count; ++i)
         {
-            find_generic_enum_closures_in_function_header(closures, state, from.impl.methods[i].header);
-            find_generic_enum_closures_in_sequence(closures, state, from.impl.methods[i].body);
+            find_generic_closures_in_function_header(closures, state, from.impl.methods[i].header);
+            find_generic_closures_in_sequence(closures, state, from.impl.methods[i].body);
         }
         break;
 
     case expression_type_instantiate_struct:
-        find_generic_enum_closures_in_expression(closures, state, *from.instantiate_struct.type);
+        find_generic_closures_in_expression(closures, state, *from.instantiate_struct.type);
         for (size_t i = 0; i < from.instantiate_struct.arguments.length; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.instantiate_struct.arguments.elements[i]);
+            find_generic_closures_in_expression(closures, state, from.instantiate_struct.arguments.elements[i]);
         }
         break;
 
@@ -2026,7 +2025,7 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         {
             if (from.enum_.elements[i].state)
             {
-                find_generic_enum_closures_in_expression(closures, state, *from.enum_.elements[i].state);
+                find_generic_closures_in_expression(closures, state, *from.enum_.elements[i].state);
             }
         }
         break;
@@ -2035,23 +2034,23 @@ static void find_generic_enum_closures_in_expression(generic_enum_closures *cons
         break;
 
     case expression_type_generic_instantiation:
-        find_generic_enum_closures_in_expression(closures, state, *from.generic_instantiation.generic);
+        find_generic_closures_in_expression(closures, state, *from.generic_instantiation.generic);
         for (size_t i = 0; i < from.generic_instantiation.count; ++i)
         {
-            find_generic_enum_closures_in_expression(closures, state, from.generic_instantiation.arguments[i]);
+            find_generic_closures_in_expression(closures, state, from.generic_instantiation.arguments[i]);
         }
         break;
     }
 }
 
-static generic_enum_closures find_generic_interface_closures(function_checking_state *const state,
-                                                             interface_expression const definition)
+static generic_closures find_generic_interface_closures(function_checking_state *const state,
+                                                        interface_expression const definition)
 {
-    generic_enum_closures result = {NULL, 0};
+    generic_closures result = {NULL, 0};
     for (size_t i = 0; i < definition.method_count; ++i)
     {
         interface_expression_method const method = definition.methods[i];
-        find_generic_enum_closures_in_function_header(&result, state, method.header);
+        find_generic_closures_in_function_header(&result, state, method.header);
     }
     return result;
 }
@@ -2073,7 +2072,7 @@ evaluate_generic_interface_expression(function_checking_state *state, instructio
                          optional_value_create(value_from_generic_interface(id)), into);
     }
 
-    generic_enum_closures const closures = find_generic_interface_closures(state, element);
+    generic_closures const closures = find_generic_interface_closures(state, element);
     root->generic_interfaces[id] = generic_interface_create(interface_expression_clone(element), closures);
     root->generic_interface_count += 1;
 
@@ -2424,15 +2423,14 @@ static evaluate_expression_result evaluate_type_of(function_checking_state *cons
         true, where, type_from_type(), optional_value_create(value_from_type(target_evaluated.type_)), true, false);
 }
 
-static generic_enum_closures find_generic_enum_closures(function_checking_state *state,
-                                                        enum_expression const definition)
+static generic_closures find_generic_closures(function_checking_state *state, enum_expression const definition)
 {
-    generic_enum_closures result = {NULL, 0};
+    generic_closures result = {NULL, 0};
     for (size_t i = 0; i < definition.element_count; ++i)
     {
         if (definition.elements[i].state)
         {
-            find_generic_enum_closures_in_expression(&result, state, *definition.elements[i].state);
+            find_generic_closures_in_expression(&result, state, *definition.elements[i].state);
         }
     }
     return result;
@@ -2446,7 +2444,7 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
     root->generic_enums =
         reallocate_array(root->generic_enums, root->generic_enum_count + 1, sizeof(*root->generic_enums));
     generic_enum_id const id = root->generic_enum_count;
-    generic_enum_closures const closures = find_generic_enum_closures(state, element);
+    generic_closures const closures = find_generic_closures(state, element);
     root->generic_enums[id] = generic_enum_create(enum_expression_clone(element), closures.elements, closures.count);
     root->generic_enum_count += 1;
     register_id const into = allocate_register(&state->used_registers);

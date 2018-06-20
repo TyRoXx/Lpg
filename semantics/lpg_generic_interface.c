@@ -1,11 +1,11 @@
 #include "lpg_generic_interface.h"
 #include "lpg_allocate.h"
 
-void generic_enum_closures_free(generic_enum_closures const freed)
+void generic_closures_free(generic_closures const freed)
 {
     for (size_t i = 0; i < freed.count; ++i)
     {
-        generic_enum_closure_free(freed.elements[i]);
+        generic_closure_free(freed.elements[i]);
     }
     if (freed.elements)
     {
@@ -13,7 +13,7 @@ void generic_enum_closures_free(generic_enum_closures const freed)
     }
 }
 
-generic_interface generic_interface_create(interface_expression tree, generic_enum_closures closures)
+generic_interface generic_interface_create(interface_expression tree, generic_closures closures)
 {
     generic_interface const result = {tree, closures};
     return result;
@@ -21,6 +21,6 @@ generic_interface generic_interface_create(interface_expression tree, generic_en
 
 void generic_interface_free(generic_interface const freed)
 {
-    generic_enum_closures_free(freed.closures);
+    generic_closures_free(freed.closures);
     interface_expression_free(freed.tree);
 }
