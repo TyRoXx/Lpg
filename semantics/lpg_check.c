@@ -2866,11 +2866,11 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         register_id const into = allocate_register(&state->used_registers);
         value const literal =
             value_from_function_pointer(function_pointer_value_from_internal(instantiation->instantiated, NULL, 0));
-        add_instruction(
-            function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+        type const function_type = type_from_lambda(lambda_type_create(instantiation->instantiated));
+        add_instruction(function, instruction_create_literal(literal_instruction_create(into, literal, function_type)));
         write_register_compile_time_value(state, into, literal);
         return evaluate_expression_result_create(
-            true, into, type_from_type(), optional_value_create(literal), true, false);
+            true, into, function_type, optional_value_create(literal), true, false);
     }
     lambda const original = root->generic_lambdas[generic].tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);

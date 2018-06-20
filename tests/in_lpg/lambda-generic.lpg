@@ -5,4 +5,12 @@ let f = [T](a: T)
 let g = f[std.boolean]
 assert(g(std.boolean.true))
 
-//assert(f(std.boolean.true))
+let instantiate-again = f[std.boolean]
+assert(instantiate-again(std.boolean.true))
+
+let other-argument = f[int(0, 3)]
+assert(integer-equals(2, other-argument(2)))
+
+let h = [T, U](a: T, b: U)
+    f[T](a)
+assert(h[std.boolean, std.unit](std.boolean.true, std.unit_value))

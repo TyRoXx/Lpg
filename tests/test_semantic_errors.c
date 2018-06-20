@@ -1309,6 +1309,36 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(1, 0))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let f = [T]()\n"
+                                               "f[]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(1, 0))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let f = [T]()\n"
+                                               "f[host-value, host-value]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 14))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let f = [T]() u\n"
+                                               "f[int(0, 1)]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }
