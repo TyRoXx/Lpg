@@ -1,22 +1,16 @@
 let std = import std
 let options = import option
 let option = options.option
-
-let value = interface
-    load(element: std.string-ref): option[value]
-    store(element: std.string-ref, what: value): std.unit
-    call(arguments: std.array[value]): value
-    call-method(method: std.string-ref, arguments: std.array[value]): value
-
 let integer = int(0, 9007199254740991)
+let string = std.string-ref
+let array = std.array
 
-let value-factory = interface
-    create-string(content: std.string-ref): value
-    create-boolean(content: std.boolean): value
-    create-number(content: integer): value
+let host = interface
+    read-property(from: host-value, name: string): option[host-value]
+    call-method(this: host-value, method: string, arguments: array[host-value]): option[host-value]
+    export-string(content: string): host-value
 
 let export = struct
-    value: type-of(value)
-    value-factory: type-of(value-factory)
     integer: type-of(integer)
-export{value, value-factory, integer}
+    host: type-of(host)
+export{integer, host}

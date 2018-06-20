@@ -794,6 +794,9 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
+    case type_kind_host_value:
+        return stream_writer_write_string(c_output, "void *");
+
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -1055,6 +1058,7 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
         LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         return stream_writer_write_string(c_output, ");\n");
 
+    case type_kind_host_value:
     case type_kind_enumeration:
     case type_kind_unit:
     case type_kind_integer_range:
@@ -1735,6 +1739,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const callee_type = state->registers[input.call.callee].type_of.value;
             switch (callee_type.kind)
             {
+            case type_kind_host_value:
             case type_kind_generic_lambda:
                 LPG_TO_DO();
 
@@ -1948,6 +1953,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const object_type = state->registers[input.read_struct.from_object].type_of.value;
             switch (object_type.kind)
             {
+            case type_kind_host_value:
             case type_kind_generic_lambda:
                 LPG_TO_DO();
 
@@ -2408,6 +2414,9 @@ static success_indicator generate_free(standard_library_usage *const standard_li
 {
     switch (what.kind)
     {
+    case type_kind_host_value:
+        return success_yes;
+
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

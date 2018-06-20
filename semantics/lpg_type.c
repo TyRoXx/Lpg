@@ -311,24 +311,31 @@ type type_from_struct(struct_id const content)
     return result;
 }
 
-type type_from_generic_enum()
+type type_from_generic_enum(void)
 {
     type result;
     result.kind = type_kind_generic_enum;
     return result;
 }
 
-type type_from_generic_interface()
+type type_from_generic_interface(void)
 {
     type result;
     result.kind = type_kind_generic_interface;
     return result;
 }
 
-type type_from_generic_lambda()
+type type_from_generic_lambda(void)
 {
     type result;
     result.kind = type_kind_generic_lambda;
+    return result;
+}
+
+type type_from_host_value(void)
+{
+    type result;
+    result.kind = type_kind_host_value;
     return result;
 }
 
@@ -347,6 +354,9 @@ bool type_equals(type const left, type const right)
     }
     switch (left.kind)
     {
+    case type_kind_host_value:
+        return true;
+
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -393,6 +403,9 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
 {
     switch (original.kind)
     {
+    case type_kind_host_value:
+        return type_from_host_value();
+
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -489,6 +502,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     switch (flat_from.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

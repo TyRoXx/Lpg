@@ -13,6 +13,7 @@ static void print_type(type const printed)
 {
     switch (printed.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

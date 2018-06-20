@@ -80,6 +80,7 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
 {
     switch (callee.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -246,6 +247,7 @@ static read_structure_element_result read_element(function_checking_state *state
     type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -291,6 +293,7 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
+        case type_kind_host_value:
         case type_kind_generic_lambda:
             LPG_TO_DO();
 
@@ -357,6 +360,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -910,6 +914,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -1003,6 +1008,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
     switch (callee.type_.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -1145,6 +1151,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
+        case type_kind_host_value:
         case type_kind_generic_lambda:
             LPG_TO_DO();
 
@@ -1377,6 +1384,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
     switch (key.type_.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

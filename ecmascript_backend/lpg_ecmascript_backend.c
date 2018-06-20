@@ -425,6 +425,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 9:
             return stream_writer_write_string(ecmascript_output, "string_equals");
 
+        case 11:
+            return stream_writer_write_string(ecmascript_output, "undefined");
+
         default:
             LPG_TO_DO();
         }
@@ -437,6 +440,7 @@ static success_indicator generate_read_struct(function_generation *const state, 
 {
     switch (state->registers[generated.from_object].type_of.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -660,6 +664,7 @@ static success_indicator generate_match(function_generation *const state, match_
     type const key_type = state->registers[generated.key].type_of;
     switch (key_type.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

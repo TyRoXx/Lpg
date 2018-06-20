@@ -357,7 +357,6 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
 
 static success_indicator generate_main_html(checked_program const program, stream_writer const destination)
 {
-    (void)program;
     LPG_TRY(stream_writer_write_string(
         destination, "<!DOCTYPE html><html><head> <meta charset=\"UTF-8\"><title>LPG web</title>"));
     LPG_TRY(stream_writer_write_string(destination, "<script type=\"text/javascript\">"));
@@ -367,48 +366,28 @@ static success_indicator generate_main_html(checked_program const program, strea
     LPG_TRY(stream_writer_write_string(destination, "var main = "));
     LPG_TRY(generate_ecmascript(program, destination));
     LPG_TRY(stream_writer_write_string(destination, "\
-var wrapValue;\n\
-var WrappedValue = function (wrapped)\n\
+var Host = function ()\n\
 {\n\
-    this.wrapped = wrapped;\n\
 };\n\
-WrappedValue.prototype.call_method_0 = function (element)\n\
+Host.prototype.call_method_0 = function (from, name)\n\
 {\n\
-    return [0, wrapValue(this.wrapped[element])];\n\
+    return [0, from[name]];\n\
 };\n\
-WrappedValue.prototype.call_method_2 = function (arguments_)\n\
+Host.prototype.call_method_1 = function (this_, method, arguments_)\n\
 {\n\
     var convertedArguments = [];\n\
     for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
     {\n\
-        var wrappedValue = arguments_.call_method_1(i)[1];\n\
-        convertedArguments.push(wrappedValue.wrapped);\n\
+        convertedArguments.push(arguments_.call_method_1(i)[1]);\n\
     }\n\
-    return wrapValue(this.wrapped.apply(null, convertedArguments));\n\
+    return this_[method].apply(this_, convertedArguments);\n\
 };\n\
-WrappedValue.prototype.call_method_3 = function (method, arguments_)\n\
+Host.prototype.call_method_2 = function (content)\n\
 {\n\
-    var convertedArguments = [];\n\
-    for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
-    {\n\
-        var wrappedValue = arguments_.call_method_1(i)[1];\n\
-        convertedArguments.push(wrappedValue.wrapped);\n\
-    }\n\
-    return wrapValue(this.wrapped[method].apply(this.wrapped, convertedArguments));\n\
+    return content;\n\
 };\n\
-wrapValue = \
-function (wrapped)\n\
-{\n\
-    return new WrappedValue(wrapped);\n\
-};\n\
-var ValueFactory = function ()\n\
-{\n\
-};\n\
-ValueFactory.prototype.call_method_0 = function (content)\n\
-{\n\
-    return wrapValue(content);\n\
-};\n"));
-    LPG_TRY(stream_writer_write_string(destination, "main(wrapValue(window), new ValueFactory());\n"));
+"));
+    LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"));
     LPG_TRY(stream_writer_write_string(destination, "</script>"));
     LPG_TRY(stream_writer_write_string(destination, "</head>"));
     LPG_TRY(stream_writer_write_string(destination, "<body>"));

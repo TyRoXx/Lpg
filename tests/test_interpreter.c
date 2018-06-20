@@ -255,7 +255,8 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*9 string-equals*/ value_from_function_pointer(function_pointer_value_from_external(
                 string_equals_impl, NULL, NULL, *global_object.members[9].what.function_pointer_)),
             /*10 int*/ value_from_function_pointer(function_pointer_value_from_external(
-                int_impl, NULL, NULL, *global_object.members[10].what.function_pointer_))};
+                int_impl, NULL, NULL, *global_object.members[10].what.function_pointer_)),
+            /*11 host-value*/ value_from_type(type_from_host_value())};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = {NULL};
         interpret(program, globals_values, &gc);

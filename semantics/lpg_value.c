@@ -412,6 +412,7 @@ bool value_conforms_to_type(value const instance, type const expected)
     ASSUME(value_is_valid(instance));
     switch (expected.kind)
     {
+    case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

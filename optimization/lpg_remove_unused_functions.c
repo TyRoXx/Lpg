@@ -144,6 +144,7 @@ static void mark_type(bool *const used_functions, checked_function const *const 
         mark_function_pointer(used_functions, all_functions, all_interfaces, *marked.function_pointer_);
         break;
 
+    case type_kind_host_value:
     case type_kind_unit:
     case type_kind_string_ref:
     case type_kind_interface:
