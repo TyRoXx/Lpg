@@ -45,6 +45,16 @@ You can also open the project using an IDE. QtCreator is recommended:
 sudo apt-get install qtcreator
 ```
 
+### Test coverage on Ubuntu
+
+How to measure test coverage:
+```bash
+sudo apt-get install lcov firefox
+cd build
+make testcoverage
+```
+It will run the tests, generate an HTML coverage report and open it in Firefox.
+
 ### Code formatting
 Install `clang-format` like this on Ubuntu:
 ```bash

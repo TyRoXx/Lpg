@@ -17,6 +17,13 @@ if(UNIX)
     if(LPG_WITH_GCOV)
         set(LPG_COMPILE_FLAGS -coverage)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage")
+        add_custom_target(testcoverage
+            COMMAND $<TARGET_FILE:tests> &&
+                lcov --capture --directory ${CMAKE_CURRENT_BINARY_DIR} --output-file coverage.info &&
+                genhtml coverage.info --output-directory coverage-html &&
+                firefox coverage-html/index.html
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BUILD_DIR})
+        add_dependencies(testcoverage tests)
     endif()
 
     option(LPG_WITH_UB_SANITIZER "compile with clang undefined behaviour sanitizer" OFF)
