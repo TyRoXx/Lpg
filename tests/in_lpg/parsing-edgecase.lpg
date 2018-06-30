@@ -1,0 +1,5 @@
+let f = ()
+    boolean.true
+// if you remove this comment line the parser fails erroneously
+()
+    f()

@@ -452,6 +452,7 @@ void test_interpreter(void)
                                                  "match-return.lpg",
                                                  "option.lpg",
                                                  "option-int.lpg",
+                                                 "parsing-edgecase.lpg",
                                                  "raw-string-literal.lpg",
                                                  "return.lpg",
                                                  "std.lpg",

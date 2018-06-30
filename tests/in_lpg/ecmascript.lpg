@@ -2,7 +2,7 @@ let std = import std
 let es = import ecmascript
 let option = std.option
 
-(host: es.host)
+let test-string = (host: es.host)
     let exported : host-value = host.export-string("hello")
     assert(match host.import-string(exported)
         case option[std.string-ref].some(let content):
@@ -16,3 +16,6 @@ let option = std.option
         case option[std.string-ref].none:
             boolean.true
 )
+//
+(host: es.host)
+    test-string(host)
