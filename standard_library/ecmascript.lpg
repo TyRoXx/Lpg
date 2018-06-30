@@ -9,6 +9,8 @@ let host = interface
     read-property(from: host-value, name: string): option[host-value]
     call-method(this: host-value, method: string, arguments: array[host-value]): option[host-value]
     export-string(content: string): host-value
+    import-string(from: host-value): option[string]
+    undefined(): host-value
 
 let export = struct
     integer: type-of(integer)

@@ -3,4 +3,16 @@ let es = import ecmascript
 let option = std.option
 
 (host: es.host)
-    let arguments = new-array(host-value)
+    let exported : host-value = host.export-string("hello")
+    assert(match host.import-string(exported)
+        case option[std.string-ref].some(let content):
+            string-equals("hello", content)
+        case option[std.string-ref].none:
+            boolean.false
+)
+    assert(match host.import-string(host.undefined())
+        case option[std.string-ref].some(let content):
+            boolean.false
+        case option[std.string-ref].none:
+            boolean.true
+)
