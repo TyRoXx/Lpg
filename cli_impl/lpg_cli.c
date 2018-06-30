@@ -366,28 +366,7 @@ static success_indicator generate_main_html(checked_program const program, strea
         destination, "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"));
     LPG_TRY(stream_writer_write_string(destination, "var main = "));
     LPG_TRY(generate_ecmascript(program, destination));
-    LPG_TRY(stream_writer_write_string(destination, "\
-var Host = function ()\n\
-{\n\
-};\n\
-Host.prototype.call_method_0 = function (from, name)\n\
-{\n\
-    return [0, from[name]];\n\
-};\n\
-Host.prototype.call_method_1 = function (this_, method, arguments_)\n\
-{\n\
-    var convertedArguments = [];\n\
-    for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
-    {\n\
-        convertedArguments.push(arguments_.call_method_1(i)[1]);\n\
-    }\n\
-    return this_[method].apply(this_, convertedArguments);\n\
-};\n\
-Host.prototype.call_method_2 = function (content)\n\
-{\n\
-    return content;\n\
-};\n\
-"));
+    LPG_TRY(generate_host_class(destination));
     LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"));
     LPG_TRY(stream_writer_write_string(destination, "</script>"));
     LPG_TRY(stream_writer_write_string(destination, "</head>"));

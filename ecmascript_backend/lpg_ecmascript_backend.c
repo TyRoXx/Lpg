@@ -1048,3 +1048,30 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     LPG_TRY(stream_writer_write_string(ecmascript_output, "})();\n"));
     return success_yes;
 }
+
+success_indicator generate_host_class(stream_writer const destination)
+{
+    LPG_TRY(stream_writer_write_string(destination, "\
+                                   var Host = function ()\n\
+                                   {\n\
+                                   };\n\
+                                   Host.prototype.call_method_0 = function (from, name)\n\
+                                   {\n\
+                                       return [0, from[name]];\n\
+                                   };\n\
+                                   Host.prototype.call_method_1 = function (this_, method, arguments_)\n\
+                                   {\n\
+                                       var convertedArguments = [];\n\
+                                       for (var i = 0, c = arguments_.call_method_0(); i < c; ++i)\n\
+                                       {\n\
+                                           convertedArguments.push(arguments_.call_method_1(i)[1]);\n\
+                                       }\n\
+                                       return this_[method].apply(this_, convertedArguments);\n\
+                                   };\n\
+                                   Host.prototype.call_method_2 = function (content)\n\
+                                   {\n\
+                                       return content;\n\
+                                   };\n\
+                                   "));
+    return success_yes;
+}

@@ -1,0 +1,6 @@
+let std = import std
+let es = import ecmascript
+let option = std.option
+
+(host: es.host)
+    let arguments = new-array(host-value)

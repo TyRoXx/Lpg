@@ -266,7 +266,17 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
+        bool const is_ecmascript_specific = unicode_view_equals_c_str(test_name, "ecmascript.lpg");
+        if (is_ecmascript_specific)
+        {
+            REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "var main = "));
+        }
         REQUIRE(success_yes == generate_ecmascript(program, memory_writer_erase(&generated)));
+        if (is_ecmascript_specific)
+        {
+            REQUIRE(success_yes == generate_host_class(memory_writer_erase(&generated)));
+            REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
+        }
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
         REQUIRE(duktape);
@@ -278,6 +288,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         // fflush(stdout);
 
         duk_eval_lstring(duktape, generated.data, generated.used);
+
         memory_writer_free(&generated);
         duk_destroy_heap(duktape);
     }
@@ -417,6 +428,7 @@ void test_interpreter(void)
                                                  "concat.lpg",
                                                  "comment-multi.lpg",
                                                  "comment-single.lpg",
+                                                 "ecmascript.lpg",
                                                  "empty.lpg",
                                                  "enum-generic.lpg",
                                                  "enum-stateful.lpg",
