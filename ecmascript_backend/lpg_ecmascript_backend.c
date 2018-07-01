@@ -1091,6 +1091,12 @@ Host.prototype.call_method_6 = function (left, right)\n\
 {\n\
    return (left === right) ? 1.0 : 0.0;\n\
 };\n\
+Host.prototype.call_method_7 = function (from)\n\
+{\n\
+   return ((typeof from === 'number') && \
+       isFinite(from) && \
+       (Math.floor(from) === from)) ? [0, from] : 1;\n\
+};\n\
 "));
     return success_yes;
 }

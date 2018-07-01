@@ -102,8 +102,9 @@ static void duktape_free(void *udata, void *ptr)
 
 static void duktake_handle_fatal(void *udata, const char *msg)
 {
-    (void)udata;
-    fprintf(stderr, "%s\n", msg);
+    memory_writer const *const source = udata;
+    fwrite(source->data, source->used, 1, stderr);
+    fprintf(stderr, "\n%s\n", msg);
     FAIL();
 }
 
@@ -278,7 +279,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
         }
         duk_context *const duktape =
-            duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, NULL, duktake_handle_fatal);
+            duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, &generated, duktake_handle_fatal);
         REQUIRE(duktape);
 
         duk_push_c_function(duktape, ecmascript_assert, 1);
