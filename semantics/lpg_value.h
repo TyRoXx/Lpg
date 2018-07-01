@@ -140,7 +140,6 @@ value value_from_generic_enum(generic_enum_id content);
 value value_from_generic_interface(generic_interface_id content);
 value value_from_array(array_value *content);
 value value_from_generic_lambda(generic_lambda_id content);
-value *value_allocate(value const content);
 value value_or_unit(value const *const maybe);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
@@ -176,5 +175,4 @@ function_call_arguments function_call_arguments_create(optional_value const self
                                                        LPG_NON_NULL(checked_function const *const all_functions),
                                                        lpg_interface const *all_interfaces);
 
-type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments));
 bool value_conforms_to_type(value const instance, type const expected);

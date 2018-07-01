@@ -231,13 +231,6 @@ value value_from_generic_lambda(generic_lambda_id content)
     return result;
 }
 
-value *value_allocate(value const content)
-{
-    value *const result = allocate(sizeof(*result));
-    *result = content;
-    return result;
-}
-
 value value_or_unit(value const *const maybe)
 {
     return maybe ? *maybe : value_from_unit();
@@ -254,15 +247,13 @@ bool value_equals(value const left, value const right)
     switch (left.kind)
     {
     case value_kind_generic_lambda:
-        LPG_TO_DO();
-
     case value_kind_array:
-        LPG_TO_DO();
-
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
     case value_kind_generic_interface:
+    case value_kind_structure:
+    case value_kind_enum_constructor:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -273,9 +264,6 @@ bool value_equals(value const left, value const right)
 
     case value_kind_function_pointer:
         return function_pointer_value_equals(left.function_pointer, right.function_pointer);
-
-    case value_kind_structure:
-        LPG_TO_DO();
 
     case value_kind_type:
         return type_equals(left.type_, right.type_);
@@ -311,9 +299,6 @@ bool value_equals(value const left, value const right)
             }
         }
         return true;
-
-    case value_kind_enum_constructor:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -327,15 +312,16 @@ bool value_less_than(value const left, value const right)
     switch (left.kind)
     {
     case value_kind_generic_lambda:
-        LPG_TO_DO();
-
     case value_kind_array:
-        LPG_TO_DO();
-
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
     case value_kind_generic_interface:
+    case value_kind_function_pointer:
+    case value_kind_structure:
+    case value_kind_type:
+    case value_kind_tuple:
+    case value_kind_enum_constructor:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -349,13 +335,6 @@ bool value_less_than(value const left, value const right)
 
     case value_kind_unit:
         return false;
-
-    case value_kind_function_pointer:
-    case value_kind_structure:
-    case value_kind_type:
-    case value_kind_tuple:
-    case value_kind_enum_constructor:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }
@@ -399,14 +378,6 @@ function_call_arguments function_call_arguments_create(optional_value const self
     return result;
 }
 
-type get_boolean(LPG_NON_NULL(function_call_arguments const *const arguments))
-{
-    value const boolean = arguments->globals[3];
-    ASSUME(boolean.kind == value_kind_type);
-    ASSUME(boolean.type_.kind == type_kind_enumeration);
-    return boolean.type_;
-}
-
 bool value_conforms_to_type(value const instance, type const expected)
 {
     ASSUME(value_is_valid(instance));
@@ -414,6 +385,10 @@ bool value_conforms_to_type(value const instance, type const expected)
     {
     case type_kind_host_value:
     case type_kind_generic_lambda:
+    case type_kind_enum_constructor:
+    case type_kind_method_pointer:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_unit:
@@ -481,12 +456,6 @@ bool value_conforms_to_type(value const instance, type const expected)
         }
         return true;
     }
-
-    case type_kind_enum_constructor:
-    case type_kind_method_pointer:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
-        LPG_TO_DO();
     }
     LPG_UNREACHABLE();
 }

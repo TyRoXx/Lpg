@@ -82,6 +82,30 @@ void test_value(void)
     REQUIRE(!value_less_than(
         value_from_enum_element(0, type_from_unit(), NULL), value_from_enum_element(0, type_from_unit(), NULL)));
 
+    REQUIRE(array_value_equals(
+        array_value_create(NULL, 0, 0, type_from_unit()), array_value_create(NULL, 0, 0, type_from_unit())));
+    REQUIRE(!array_value_equals(
+        array_value_create(NULL, 0, 0, type_from_unit()), array_value_create(NULL, 0, 0, type_from_generic_enum())));
+    {
+        value element = value_from_unit();
+        REQUIRE(!array_value_equals(
+            array_value_create(&element, 1, 0, type_from_unit()), array_value_create(NULL, 0, 0, type_from_unit())));
+    }
+    {
+        value left = value_from_integer(integer_create(0, 0));
+        value right = value_from_integer(integer_create(0, 1));
+        REQUIRE(!array_value_equals(
+            array_value_create(&left, 1, 1, type_from_unit()), array_value_create(&right, 1, 1, type_from_unit())));
+    }
+    {
+        value left = value_from_integer(integer_create(0, 0));
+        value right = value_from_integer(integer_create(0, 0));
+        REQUIRE(!array_value_equals(
+            array_value_create(&left, 1, 1, type_from_unit()), array_value_create(&right, 1, 2, type_from_unit())));
+    }
+    REQUIRE(value_equals(
+        value_from_string_ref(unicode_view_from_c_str("")), value_from_string_ref(unicode_view_from_c_str(""))));
+
     test_integer_comparison();
 }
 
