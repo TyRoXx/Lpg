@@ -16,6 +16,34 @@ let test-string = (host: es.host)
         case option[std.string-ref].none:
             boolean.true
 )
+
+let test-read-property = (host: es.host)
+    let object : host-value = host.export-string("hello")
+    assert(match host.read-property(object, "length")
+        case option[host-value].some(let length):
+            host.equals(host.export-integer(5), length)
+        case option[host-value].none:
+            boolean.false
+)
+
+let test-export-integer = (host: es.host)
+    let min = host.export-integer(0)
+    let max = host.export-integer(9007199254740991)
+    assert(host.equals(min, min))
+    assert(host.equals(max, max))
+    assert(not(host.equals(min, max)))
+    assert(not(host.equals(max, min)))
+    assert(not(host.equals(min, host.undefined())))
+    assert(not(host.equals(max, host.undefined())))
+
+let test-undefined = (host: es.host)
+    let u0 = host.undefined()
+    let u1 = host.undefined()
+    assert(host.equals(u0, u1))
+
 //
 (host: es.host)
     test-string(host)
+    test-read-property(host)
+    test-export-integer(host)
+    test-undefined(host)

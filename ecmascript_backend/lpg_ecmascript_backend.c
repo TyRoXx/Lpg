@@ -215,11 +215,14 @@ static success_indicator generate_value(value const generated, type const type_o
         return success_yes;
 
     case value_kind_integer:
-        if (integer_less(integer_create(0, UINT32_MAX), generated.integer_))
+    {
+        uint64_t const max_ecmascript_int = 9007199254740991;
+        if (integer_less(integer_create(0, max_ecmascript_int), generated.integer_))
         {
             LPG_TO_DO();
         }
         return stream_writer_write_integer(ecmascript_output, generated.integer_);
+    }
 
     case value_kind_string:
         return encode_string_literal(generated.string_ref, ecmascript_output);
@@ -1079,6 +1082,14 @@ Host.prototype.call_method_3 = function (from)\n\
 Host.prototype.call_method_4 = function ()\n\
 {\n\
    return undefined;\n\
+};\n\
+Host.prototype.call_method_5 = function (value)\n\
+{\n\
+   return value;\n\
+};\n\
+Host.prototype.call_method_6 = function (left, right)\n\
+{\n\
+   return (left === right) ? 1.0 : 0.0;\n\
 };\n\
 "));
     return success_yes;

@@ -11,6 +11,8 @@ let host = interface
     export-string(content: string): host-value
     import-string(from: host-value): option[string]
     undefined(): host-value
+    export-integer(value: integer): host-value
+    equals(left: host-value, right: host-value): boolean
 
 let export = struct
     integer: type-of(integer)
