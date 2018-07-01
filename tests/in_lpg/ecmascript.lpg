@@ -71,6 +71,15 @@ let test-import-integer = (host: es.host)
             boolean.false
 )
 
+let test-equals = (host: es.host)
+    assert(host.equals(host.undefined(), host.undefined()))
+    assert(host.equals(host.export-integer(0), host.export-integer(0)))
+    assert(host.equals(host.export-string("test"), host.export-string("test")))
+    assert(not(host.equals(host.export-integer(0), host.undefined())))
+    assert(not(host.equals(host.export-string("undefined"), host.undefined())))
+    assert(not(host.equals(host.export-integer(0), host.export-integer(1))))
+    assert(not(host.equals(host.export-integer(0), host.export-string("0"))))
+
 //
 (host: es.host)
     test-string(host)
@@ -79,3 +88,4 @@ let test-import-integer = (host: es.host)
     test-undefined(host)
     test-call-method(host)
     test-import-integer(host)
+    test-equals(host)
