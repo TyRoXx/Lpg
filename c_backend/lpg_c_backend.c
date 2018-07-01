@@ -1296,9 +1296,10 @@ static success_indicator generate_instantiate_struct(c_backend_state *state,
     return success_yes;
 }
 
-static success_indicator generate_erase_type(c_backend_state *state, register_id const destination,
-                                             implementation_ref const impl, unicode_view const self,
-                                             bool const add_reference_to_self,
+static success_indicator generate_erase_type(standard_library_usage *const standard_library,
+                                             type_definitions *const definitions, checked_program const *const program,
+                                             register_id const destination, implementation_ref const impl,
+                                             unicode_view const self, bool const add_reference_to_self,
                                              checked_function const *const current_function, size_t const indentation,
                                              stream_writer const c_output)
 {
@@ -1324,8 +1325,8 @@ static success_indicator generate_erase_type(c_backend_state *state, register_id
 
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "*("));
-    type const self_type = state->program->interfaces[impl.target].implementations[impl.implementation_index].self;
-    LPG_TRY(generate_type(self_type, &state->standard_library, state->definitions, state->program, c_output));
+    type const self_type = program->interfaces[impl.target].implementations[impl.implementation_index].self;
+    LPG_TRY(generate_type(self_type, standard_library, definitions, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " *)"));
     LPG_TRY(generate_register_name(destination, current_function, c_output));
     LPG_TRY(stream_writer_write_string(c_output, ".self = "));
@@ -1334,8 +1335,86 @@ static success_indicator generate_erase_type(c_backend_state *state, register_id
 
     if (add_reference_to_self)
     {
-        LPG_TRY(generate_add_reference(self, self_type, indentation, state->program, c_output));
+        LPG_TRY(generate_add_reference(self, self_type, indentation, program, c_output));
     }
+    return success_yes;
+}
+
+static success_indicator generate_type_erase_function_name(implementation_ref const id, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "erase_type_"));
+    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, id.implementation_index)));
+    LPG_TRY(stream_writer_write_string(c_output, "_"));
+    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, id.target)));
+    return success_yes;
+}
+
+static success_indicator generate_type_erase_function(implementation_ref const id, type_definitions *const definitions,
+                                                      checked_program const *const program,
+                                                      standard_library_usage *const standard_library,
+                                                      stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "static "));
+    LPG_TRY(generate_interface_reference_name(id.target, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " "));
+    LPG_TRY(generate_type_erase_function_name(id, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "("));
+    ASSUME(id.target < program->interface_count);
+    lpg_interface const interface_ = program->interfaces[id.target];
+    ASSUME(id.implementation_index < interface_.implementation_count);
+    type const self = interface_.implementations[id.implementation_index].self;
+    LPG_TRY(generate_type(self, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const self)\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+
+    size_t const indentation = 1;
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(generate_interface_reference_name(id.target, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " "));
+    LPG_TRY(stream_writer_write_string(c_output, "result"));
+    LPG_TRY(stream_writer_write_string(c_output, " = {&"));
+    LPG_TRY(generate_interface_impl_name(id, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ", malloc(sizeof(size_t) + sizeof(self))};\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "*(size_t *)"));
+    LPG_TRY(stream_writer_write_string(c_output, "result"));
+    LPG_TRY(stream_writer_write_string(c_output, ".self = 1;\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "result"));
+    LPG_TRY(stream_writer_write_string(c_output, ".self = (char *)"));
+    LPG_TRY(stream_writer_write_string(c_output, "result"));
+    LPG_TRY(stream_writer_write_string(c_output, ".self + sizeof(size_t);\n"));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "*("));
+    type const self_type = program->interfaces[id.target].implementations[id.implementation_index].self;
+    LPG_TRY(generate_type(self_type, standard_library, definitions, program, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " *)"));
+    LPG_TRY(stream_writer_write_string(c_output, "result"));
+    LPG_TRY(stream_writer_write_string(c_output, ".self = self"));
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+
+    LPG_TRY(generate_add_reference(unicode_view_from_c_str("self"), self_type, indentation, program, c_output));
+
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "return result;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "}\n"));
+    return success_yes;
+}
+
+static success_indicator generate_type_erased_value(type_erased_value const generated, c_backend_state *state,
+                                                    stream_writer const c_output)
+{
+    LPG_TRY(generate_type_erase_function_name(generated.impl, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "("));
+    ASSUME(generated.impl.target < state->program->interface_count);
+    lpg_interface const interface_ = state->program->interfaces[generated.impl.target];
+    ASSUME(generated.impl.implementation_index < interface_.implementation_count);
+    type const self = interface_.implementations[generated.impl.implementation_index].self;
+    LPG_TRY(generate_value((generated.self ? *generated.self : value_from_unit()), self, state, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, ")"));
     return success_yes;
 }
 
@@ -1344,12 +1423,6 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
-    case value_kind_generic_lambda:
-        LPG_TO_DO();
-
-    case value_kind_array:
-        LPG_TO_DO();
-
     case value_kind_integer:
     {
         if (integer_less(generated.integer_, integer_create(1, 0)))
@@ -1430,9 +1503,13 @@ static success_indicator generate_value(value const generated, type const type_o
         return success_yes;
     }
 
-    case value_kind_type_erased:
+    case value_kind_generic_lambda:
+    case value_kind_array:
     case value_kind_pattern:
         LPG_TO_DO();
+
+    case value_kind_type_erased:
+        return generate_type_erased_value(generated.type_erased, state, c_output);
 
     case value_kind_type:
     case value_kind_generic_interface:
@@ -1611,9 +1688,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             break;
         }
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(generate_erase_type(state, input.erase_type.into, input.erase_type.impl,
-                                    unicode_view_create(original_self.data, original_self.used), add_reference_to_self,
-                                    current_function, indentation, c_output));
+        LPG_TRY(generate_erase_type(&state->standard_library, state->definitions, state->program, input.erase_type.into,
+                                    input.erase_type.impl, unicode_view_create(original_self.data, original_self.used),
+                                    add_reference_to_self, current_function, indentation, c_output));
         memory_writer_free(&original_self);
         return success_yes;
     }
@@ -2107,8 +2184,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success_yes;
 
         case value_kind_function_pointer:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            set_register_variable(state, input.literal.into, register_resource_ownership_owns, input.literal.type_of);
             if (input.literal.value_.function_pointer.external)
             {
                 LPG_TO_DO();
@@ -2168,7 +2244,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             memory_writer self = {NULL, 0, 0};
             LPG_TRY(generate_value(
                 *input.literal.value_.type_erased.self, input.literal.type_of, state, memory_writer_erase(&self)));
-            LPG_TRY(generate_erase_type(state, input.literal.into, input.literal.value_.type_erased.impl,
+            LPG_TRY(generate_erase_type(&state->standard_library, state->definitions, state->program,
+                                        input.literal.into, input.literal.value_.type_erased.impl,
                                         unicode_view_create(self.data, self.used), false, current_function, indentation,
                                         c_output));
             memory_writer_free(&self);
@@ -2676,6 +2753,9 @@ success_indicator generate_c(checked_program const program, stream_writer const 
         {
             LPG_TRY_GOTO(generate_interface_impl_definition(implementation_ref_create(i, k), &definitions, &program,
                                                             &standard_library, program_defined_writer_a),
+                         fail);
+            LPG_TRY_GOTO(generate_type_erase_function(implementation_ref_create(i, k), &definitions, &program,
+                                                      &standard_library, program_defined_writer_a),
                          fail);
         }
     }

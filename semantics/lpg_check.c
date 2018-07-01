@@ -840,7 +840,32 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
                 captures[i] = current_capture.from.local_address;
             }
         }
+        value *compile_time_captures = garbage_collector_allocate_array(
+            &state->program->memory, checked.capture_count, sizeof(*compile_time_captures));
+        for (size_t i = 0; i < checked.capture_count; ++i)
+        {
+            optional_value const captured = read_register_compile_time_value(state, captures[i]);
+            if (captured.is_set)
+            {
+                compile_time_captures[i] = captured.value_;
+            }
+            else
+            {
+                compile_time_captures = NULL;
+                break;
+            }
+        }
         deallocate(checked.captures);
+        if (compile_time_captures)
+        {
+            deallocate(captures);
+            value const compile_time_lambda = value_from_function_pointer(
+                function_pointer_value_from_internal(this_lambda_id, compile_time_captures, checked.capture_count));
+            add_instruction(function, instruction_create_literal(
+                                          literal_instruction_create(destination, compile_time_lambda, result_type)));
+            return evaluate_expression_result_create(
+                true, destination, result_type, optional_value_create(compile_time_lambda), true, false);
+        }
         add_instruction(function, instruction_create_lambda_with_captures(lambda_with_captures_instruction_create(
                                       destination, this_lambda_id, captures, checked.capture_count)));
         return evaluate_expression_result_create(true, destination, result_type, optional_value_empty, false, false);

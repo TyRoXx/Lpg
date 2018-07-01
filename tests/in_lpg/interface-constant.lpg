@@ -1,0 +1,16 @@
+let std = import std
+
+let i = interface
+    to-string(): std.string-ref
+
+let s = struct
+    string: std.string-ref
+
+impl i for s
+    to-string()
+        self.string
+
+let constant : i = s{"hello"}
+let require-compile-time = enum[CompileTimeValue]
+//require-compile-time[constant]
+assert(string-equals("hello", constant.to-string()))
