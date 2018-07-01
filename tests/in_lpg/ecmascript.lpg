@@ -45,18 +45,8 @@ let test-call-method = (host: es.host)
     let object : host-value = host.export-string("hello")
     let arguments = new-array(host-value)
     assert(arguments.append(host.export-integer(0)))
-    match host.call-method(object, "charCodeAt", arguments)
-        case option[host-value].some(let result):
-            assert(host.equals(result, host.export-integer(104)))
-        case option[host-value].none:
-            assert(boolean.false)
-    // the following code leads to assert getting called with undefined as an argument
-    /*assert(match host.call-method(object, "charCodeAt", arguments)
-        case option[host-value].some(let result):
-            host.equals(result, host.export-integer(104))
-        case option[host-value].none:
-            boolean.false
-)*/
+    let charCode = host.call-method(object, "charCodeAt", arguments)
+    assert(host.equals(charCode, host.export-integer(104)))
 
 //
 (host: es.host)
