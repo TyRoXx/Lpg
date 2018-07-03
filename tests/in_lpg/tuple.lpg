@@ -19,3 +19,10 @@ let runtime-tuple = ()
     {123, "test"}
 assert(integer-equals(123, runtime-tuple().0))
 assert(string-equals("test", runtime-tuple().1))
+
+let require-compile-time = enum[CompileTimeValue]
+require-compile-time[{}]
+require-compile-time[{boolean.true}]
+require-compile-time[{boolean.true}.0]
+
+//

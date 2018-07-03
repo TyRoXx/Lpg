@@ -23,8 +23,8 @@ let not = (input: boolean)
 
 let type = type-of(type-of(0))
 let string-ref = type-of("")
-let unit_value = ()
-()
+let make_unit_value = ()
+let unit_value = make_unit_value()
 let unit = type-of(unit_value)
 
 let any-integer = int(0, 340282366920938463463374607431768211455)

@@ -847,7 +847,7 @@ static success_indicator generate_type(type const generated, standard_library_us
             return stream_writer_write_unicode_view(c_output, unicode_view_from_string(*existing_definition));
         }
         memory_writer definition_buffer = {NULL, 0, 0};
-        stream_writer definition_writer = memory_writer_erase(&definition_buffer);
+        stream_writer const definition_writer = memory_writer_erase(&definition_buffer);
         size_t const definition_index = definitions->count;
         ++(definitions->count);
         unicode_string const name = make_type_definition_name(definition_index);
@@ -1473,6 +1473,11 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_tuple:
         ASSUME(type_of.kind == type_kind_tuple);
         ASSUME(generated.tuple_.element_count == type_of.tuple_.length);
+        if (generated.tuple_.element_count == 0)
+        {
+            LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
+            return success_yes;
+        }
         LPG_TRY(stream_writer_write_string(c_output, "{"));
         for (size_t i = 0; i < generated.tuple_.element_count; ++i)
         {

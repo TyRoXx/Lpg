@@ -56,7 +56,7 @@ let local = struct
 let using-local = enum[T]
     a(T)
     b(local)
-    c(()
+    c({()
         let cover-integer-literal = 3
         let cover-string-literal = "abc"
         let cover-tuple = {local}
@@ -82,7 +82,7 @@ let using-local = enum[T]
         match cover-instantiation
             case single-parameter[boolean].a(let s): s
         local
-())
+}.0())
 assert(match using-local[boolean].b(local{boolean.true})
     case using-local[boolean].a(let s):
         boolean.false

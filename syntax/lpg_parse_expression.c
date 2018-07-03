@@ -845,7 +845,19 @@ static expression_parser_result parse_new_array(expression_parser *const parser,
     return result;
 }
 
-static expression_parser_result parse_callable(expression_parser *parser, size_t indentation)
+typedef struct parse_callable_result
+{
+    expression_parser_result content;
+    bool can_be_continued;
+} parse_callable_result;
+
+static parse_callable_result parse_callable_result_create(expression_parser_result content, bool can_be_continued)
+{
+    parse_callable_result const result = {content, can_be_continued};
+    return result;
+}
+
+static parse_callable_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
     {
@@ -854,7 +866,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
         {
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
-            return expression_parser_result_failure;
+            return parse_callable_result_create(expression_parser_result_failure, false);
         }
         switch (head.token)
         {
@@ -863,32 +875,33 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             pop(parser);
             expression_parser_result const result = {1, expression_from_identifier(identifier_expression_create(
                                                             unicode_view_copy(head.content), head.where))};
-            return result;
+            return parse_callable_result_create(result, true);
         }
 
         case token_break:
         {
             pop(parser);
             expression_parser_result const result = {1, expression_from_break(head.where)};
-            return result;
+            return parse_callable_result_create(result, true);
         }
 
         case token_loop:
             pop(parser);
-            return parse_loop(parser, indentation);
+            return parse_callable_result_create(parse_loop(parser, indentation), false);
 
         case token_match:
             pop(parser);
-            return parse_match(parser, indentation, head.where);
+            return parse_callable_result_create(parse_match(parser, indentation, head.where), false);
 
         case token_left_parenthesis:
             pop(parser);
-            return parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where);
+            return parse_callable_result_create(
+                parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where), false);
 
         case token_left_curly_brace:
         {
             pop(parser);
-            return parse_tuple(parser, indentation, head.where);
+            return parse_callable_result_create(parse_tuple(parser, indentation, head.where), true);
         }
 
         case token_left_bracket:
@@ -901,7 +914,8 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
                 LPG_TO_DO();
             }
             pop(parser);
-            return parse_lambda(parser, indentation, generic_parameters, left_parenthesis.where);
+            return parse_callable_result_create(
+                parse_lambda(parser, indentation, generic_parameters, left_parenthesis.where), false);
         }
 
         case token_right_bracket:
@@ -936,7 +950,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             {
                 expression_parser_result const result = {
                     1, expression_from_integer_literal(integer_literal_expression_create(value, head.where))};
-                return result;
+                return parse_callable_result_create(result, true);
             }
             parser->on_error(
                 parse_error_create(parse_error_integer_literal_out_of_range, head.where), parser->on_error_user);
@@ -956,14 +970,14 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             comment_expression const comment = comment_expression_create(unicode_view_copy(view), head.where);
 
             expression_parser_result const result = {1, expression_from_comment(comment)};
-            return result;
+            return parse_callable_result_create(result, false);
         }
         case token_string:
         {
             pop(parser);
             expression_parser_result const result = {
                 1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
-            return result;
+            return parse_callable_result_create(result, true);
         }
 
         case token_raw_string:
@@ -971,7 +985,7 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             pop(parser);
             expression_parser_result const result = {
                 1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
-            return result;
+            return parse_callable_result_create(result, true);
         }
 
         case token_not:
@@ -980,45 +994,45 @@ static expression_parser_result parse_callable(expression_parser *parser, size_t
             expression_parser_result const result = parse_expression(parser, indentation, false);
             if (!result.is_success)
             {
-                return expression_parser_result_failure;
+                return parse_callable_result_create(expression_parser_result_failure, false);
             }
 
-            expression *success = allocate(sizeof(*success));
+            expression *const success = allocate(sizeof(*success));
             *success = result.success;
 
             expression const expr = expression_from_not(not_expression_create(success));
             expression_parser_result const result1 = {1, expr};
-            return result1;
+            return parse_callable_result_create(result1, true);
         }
 
         case token_interface:
             pop(parser);
-            return parse_interface(parser, indentation + 1, head.where);
+            return parse_callable_result_create(parse_interface(parser, indentation + 1, head.where), false);
 
         case token_struct:
             pop(parser);
-            return parse_struct(parser, indentation + 1, head.where);
+            return parse_callable_result_create(parse_struct(parser, indentation + 1, head.where), false);
 
         case token_enum:
             pop(parser);
-            return parse_enum(parser, indentation + 1, head.where);
+            return parse_callable_result_create(parse_enum(parser, indentation + 1, head.where), false);
 
         case token_impl:
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
-            return expression_parser_result_failure;
+            return parse_callable_result_create(expression_parser_result_failure, false);
 
         case token_type_of:
             pop(parser);
-            return parse_type_of(parser, indentation, head.where);
+            return parse_callable_result_create(parse_type_of(parser, indentation, head.where), true);
 
         case token_import:
             pop(parser);
-            return parse_import(parser, head.where);
+            return parse_callable_result_create(parse_import(parser, head.where), true);
 
         case token_new_array:
             pop(parser);
-            return parse_new_array(parser, indentation);
+            return parse_callable_result_create(parse_new_array(parser, indentation), true);
         }
     }
 }
@@ -1268,12 +1282,16 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
                                                  bool const may_be_binary)
 {
-    expression_parser_result const callee = parse_callable(parser, indentation);
-    if (!callee.is_success)
+    parse_callable_result const callee = parse_callable(parser, indentation);
+    if (!callee.content.is_success)
     {
-        return callee;
+        return callee.content;
     }
-    expression_parser_result result = callee;
+    if (!callee.can_be_continued)
+    {
+        return callee.content;
+    }
+    expression_parser_result result = callee.content;
     for (;;)
     {
         rich_token const maybe_operator = peek(parser);

@@ -177,10 +177,18 @@ static read_structure_element_result read_tuple_element(function_checking_state 
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
     }
     ASSERT(integer_less(element_index, integer_create(0, ~(struct_member_id)0)));
-    add_instruction(function, instruction_create_read_struct(
-                                  read_struct_instruction_create(where, (struct_member_id)element_index.low, result)));
-    return read_structure_element_result_create(
-        true, read_from.elements[element_index.low], optional_value_empty, true);
+    struct_member_id const element = (struct_member_id)element_index.low;
+    add_instruction(function, instruction_create_read_struct(read_struct_instruction_create(where, element, result)));
+    optional_value const compile_time_tuple = read_register_compile_time_value(state, where);
+    if (compile_time_tuple.is_set)
+    {
+        ASSUME(element < compile_time_tuple.value_.tuple_.element_count);
+        value const compile_time_element = compile_time_tuple.value_.tuple_.elements[element];
+        write_register_compile_time_value(state, result, compile_time_element);
+        return read_structure_element_result_create(
+            true, read_from.elements[element], optional_value_create(compile_time_element), true);
+    }
+    return read_structure_element_result_create(true, read_from.elements[element], optional_value_empty, true);
 }
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
@@ -872,6 +880,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     }
     value const result = value_from_function_pointer(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
     add_instruction(function, instruction_create_literal(literal_instruction_create(destination, result, result_type)));
+    write_register_compile_time_value(state, destination, result);
     return evaluate_expression_result_create(
         true, destination, result_type, optional_value_create(result), false, false);
 }
@@ -1855,6 +1864,33 @@ evaluate_expression_result evaluate_tuple_expression(function_checking_state *st
     add_instruction(
         function, instruction_create_tuple(tuple_instruction_create(
                       arguments.registers, element.length, result_register, arguments.tuple_type_for_instruction)));
+
+    value *compile_time_arguments =
+        garbage_collector_allocate_array(&state->program->memory, element.length, sizeof(*compile_time_arguments));
+    for (size_t i = 0; i < element.length; ++i)
+    {
+        register_id const argument = arguments.registers[i];
+        optional_value const argument_value = read_register_compile_time_value(state, argument);
+        if (argument_value.is_set)
+        {
+            compile_time_arguments[i] = argument_value.value_;
+        }
+        else
+        {
+            compile_time_arguments = NULL;
+            break;
+        }
+    }
+
+    if (compile_time_arguments || (element.length == 0))
+    {
+        value const compile_time_value = value_from_tuple(value_tuple_create(compile_time_arguments, element.length));
+        write_register_compile_time_value(state, result_register, compile_time_value);
+        return evaluate_expression_result_create(true, result_register,
+                                                 type_from_tuple_type(arguments.tuple_type_for_result),
+                                                 optional_value_create(compile_time_value), true, false);
+    }
+
     return evaluate_expression_result_create(true, result_register,
                                              type_from_tuple_type(arguments.tuple_type_for_result),
                                              optional_value_empty, false, false);

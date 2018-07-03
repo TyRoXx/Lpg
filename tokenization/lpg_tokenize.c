@@ -31,7 +31,7 @@ static bool is_new_line(char c)
 
 static bool is_bracket(char c)
 {
-    return strchr("(){}", c) != NULL;
+    return strchr("(){}[]", c) != NULL;
 }
 
 static int can_follow_integer(char c)

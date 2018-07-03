@@ -1,16 +1,20 @@
 let std = import std
 
+let require-compile-time = enum[CompileTimeValue]
+
 /*use a captured variable in a compile-time context*/
 let m = boolean
 let f5 = ()
     let a : m = boolean.true
     a
+require-compile-time[f5]
 assert(f5())
 
 /*use a runtime variable in a runtime context*/
 let f = ()
     side-effect()
     23
+require-compile-time[f]
 let c = f()
 let g = ()
     assert(integer-equals(c, 23))
@@ -21,6 +25,7 @@ let b = 23
 let h = ()
     side-effect()
     assert(integer-equals(b, 23))
+require-compile-time[h]
 h()
 
 /*capture an argument at compile time*/
