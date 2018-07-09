@@ -359,19 +359,18 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
 static success_indicator generate_main_html(checked_program const program, stream_writer const destination)
 {
     LPG_TRY(stream_writer_write_string(
-        destination, "<!DOCTYPE html><html><head> <meta charset=\"UTF-8\"><title>LPG web</title>"));
-    LPG_TRY(stream_writer_write_string(destination, "<script type=\"text/javascript\">"));
-    LPG_TRY(stream_writer_write_string(destination, "\"use strict\";\n"));
-    LPG_TRY(stream_writer_write_string(
-        destination, "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"));
-    LPG_TRY(stream_writer_write_string(destination, "var main = "));
+        destination, "<!DOCTYPE html><html><head> <meta charset=\"UTF-8\"><title>LPG web</title>"
+                     "<script type=\"text/javascript\">"
+                     "\"use strict\";\n"
+                     "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
+                     "var main = "));
     LPG_TRY(generate_ecmascript(program, destination));
     LPG_TRY(generate_host_class(destination));
-    LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"));
-    LPG_TRY(stream_writer_write_string(destination, "</script>"));
-    LPG_TRY(stream_writer_write_string(destination, "</head>"));
-    LPG_TRY(stream_writer_write_string(destination, "<body>"));
-    LPG_TRY(stream_writer_write_string(destination, "</body></html>"));
+    LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
+                                                    "</script>"
+                                                    "</head>"
+                                                    "<body>"
+                                                    "</body></html>"));
     return success_yes;
 }
 
