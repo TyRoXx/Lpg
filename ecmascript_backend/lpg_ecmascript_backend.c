@@ -323,22 +323,29 @@ static success_indicator generate_register_read(function_generation *const state
     {
     case value_kind_integer:
     case value_kind_string:
+    case value_kind_generic_enum:
+    case value_kind_generic_interface:
+    case value_kind_generic_lambda:
+    case value_kind_type:
+    case value_kind_unit:
+    case value_kind_pattern:
         return generate_value(info.known_value.value_, info.type_of, state->all_functions, state->function_count,
                               state->all_interfaces, state->all_structs, ecmascript_output);
 
     case value_kind_function_pointer:
+        if (info.known_value.value_.function_pointer.capture_count > 0)
+        {
+            return generate_register_name(id, ecmascript_output);
+        }
+        return generate_value(info.known_value.value_, info.type_of, state->all_functions, state->function_count,
+                              state->all_interfaces, state->all_structs, ecmascript_output);
+
     case value_kind_structure:
-    case value_kind_type:
     case value_kind_enum_element:
-    case value_kind_unit:
     case value_kind_tuple:
     case value_kind_enum_constructor:
     case value_kind_type_erased:
-    case value_kind_pattern:
-    case value_kind_generic_enum:
-    case value_kind_generic_interface:
     case value_kind_array:
-    case value_kind_generic_lambda:
         return generate_register_name(id, ecmascript_output);
     }
     LPG_UNREACHABLE();
