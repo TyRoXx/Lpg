@@ -22,12 +22,6 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 {
     switch (root.kind)
     {
-    case value_kind_generic_lambda:
-        LPG_TO_DO();
-
-    case value_kind_array:
-        LPG_TO_DO();
-
     case value_kind_type_erased:
     {
         implementation const impl = all_interfaces[root.type_erased.impl.target]
@@ -56,6 +50,8 @@ static void mark_value(value const root, bool *used_functions, checked_function 
         break;
 
     case value_kind_pattern:
+    case value_kind_generic_lambda:
+    case value_kind_array:
     case value_kind_generic_interface:
         LPG_TO_DO();
 
@@ -77,9 +73,6 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
         instruction const current_instruction = sequence.elements[j];
         switch (current_instruction.type)
         {
-        case instruction_new_array:
-            break;
-
         case instruction_get_method:
             mark_function(used_functions, all_functions, all_interfaces, current_instruction.get_method.method);
             break;
@@ -89,10 +82,16 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
                 current_instruction.loop.body, used_functions, all_functions, all_interfaces);
             break;
 
+        case instruction_new_array:
         case instruction_call:
         case instruction_global:
         case instruction_read_struct:
         case instruction_break:
+        case instruction_tuple:
+        case instruction_enum_construct:
+        case instruction_get_captures:
+        case instruction_instantiate_struct:
+        case instruction_return:
             break;
 
         case instruction_erase_type:
@@ -100,13 +99,6 @@ static void mark_used_functions_in_sequence(instruction_sequence const sequence,
                                     .implementations[current_instruction.erase_type.impl.implementation_index]
                                     .target,
                                 used_functions, all_functions, all_interfaces);
-            break;
-
-        case instruction_tuple:
-        case instruction_enum_construct:
-        case instruction_get_captures:
-        case instruction_instantiate_struct:
-        case instruction_return:
             break;
 
         case instruction_literal:
@@ -137,9 +129,6 @@ static void mark_type(bool *const used_functions, checked_function const *const 
 {
     switch (marked.kind)
     {
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_function_pointer:
         mark_function_pointer(used_functions, all_functions, all_interfaces, *marked.function_pointer_);
         break;
@@ -163,6 +152,7 @@ static void mark_type(bool *const used_functions, checked_function const *const 
         }
         break;
 
+    case type_kind_generic_lambda:
     case type_kind_enum_constructor:
     case type_kind_method_pointer:
         LPG_TO_DO();
@@ -241,9 +231,8 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
     switch (from.kind)
     {
     case value_kind_generic_lambda:
-        LPG_TO_DO();
-
     case value_kind_array:
+    case value_kind_pattern:
         LPG_TO_DO();
 
     case value_kind_integer:
@@ -277,9 +266,6 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
         }
         return value_from_structure(structure_value_create(elements, from.structure.count));
     }
-
-    case value_kind_pattern:
-        LPG_TO_DO();
 
     case value_kind_generic_interface:
         return value_from_generic_interface(from.generic_interface);

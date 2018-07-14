@@ -149,6 +149,7 @@ static success_indicator generate_value(value const generated, type const type_o
     switch (generated.kind)
     {
     case value_kind_array:
+    case value_kind_pattern:
         LPG_TO_DO();
 
     case value_kind_type_erased:
@@ -186,9 +187,6 @@ static success_indicator generate_value(value const generated, type const type_o
                 generated.function_pointer.captures, generated.function_pointer.capture_count, ecmascript_output);
         }
         return generate_function_name(generated.function_pointer.code, function_count, ecmascript_output);
-
-    case value_kind_pattern:
-        LPG_TO_DO();
 
     case value_kind_generic_interface:
         return stream_writer_write_string(ecmascript_output, "/*generic interface*/ undefined");
@@ -743,10 +741,6 @@ static success_indicator generate_match(function_generation *const state, match_
     type const key_type = state->registers[generated.key].type_of;
     switch (key_type.kind)
     {
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
         return generate_equality_comparable_match_cases(state, generated, ecmascript_output);
 
@@ -759,6 +753,8 @@ static success_indicator generate_match(function_generation *const state, match_
         return generate_equality_comparable_match_cases(state, generated, ecmascript_output);
     }
 
+    case type_kind_host_value:
+    case type_kind_generic_lambda:
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
