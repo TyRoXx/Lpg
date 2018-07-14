@@ -486,10 +486,38 @@ static success_indicator generate_read_struct(function_generation *const state, 
 static success_indicator generate_call(function_generation *const state, call_instruction const generated,
                                        stream_writer const ecmascript_output)
 {
-    LPG_TRY(write_register(state, generated.result, get_return_type(state->registers[generated.callee].type_of,
-                                                                    state->all_functions, state->all_interfaces),
+    type const callee_type = state->registers[generated.callee].type_of;
+    LPG_TRY(write_register(state, generated.result,
+                           get_return_type(callee_type, state->all_functions, state->all_interfaces),
                            ecmascript_output));
     LPG_TRY(generate_register_name(generated.callee, ecmascript_output));
+    switch (callee_type.kind)
+    {
+    case type_kind_method_pointer:
+        LPG_TRY(stream_writer_write_string(ecmascript_output, ".call_method_"));
+        LPG_TRY(
+            stream_writer_write_integer(ecmascript_output, integer_create(0, callee_type.method_pointer.method_index)));
+        break;
+
+    case type_kind_function_pointer:
+    case type_kind_enum_constructor:
+    case type_kind_lambda:
+        break;
+
+    case type_kind_structure:
+    case type_kind_unit:
+    case type_kind_string_ref:
+    case type_kind_enumeration:
+    case type_kind_tuple:
+    case type_kind_type:
+    case type_kind_integer_range:
+    case type_kind_interface:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
+    case type_kind_generic_lambda:
+    case type_kind_host_value:
+        LPG_UNREACHABLE();
+    }
     LPG_TRY(stream_writer_write_string(ecmascript_output, "("));
     for (size_t i = 0; i < generated.argument_count; ++i)
     {
@@ -720,36 +748,8 @@ static success_indicator generate_get_method(function_generation *const state, g
     LPG_TRY(write_register(state, generated.into,
                            type_from_method_pointer(method_pointer_type_create(generated.interface_, generated.method)),
                            ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "(function () { "));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "var "));
-    LPG_TRY(generate_capture_alias(0, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
     LPG_TRY(generate_register_name(generated.from, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "    return function ("));
-    struct method_description const method = state->all_interfaces[generated.interface_].methods[generated.method];
-    for (register_id i = 0; i < method.parameters.length; ++i)
-    {
-        if (i > 0)
-        {
-            LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
-        }
-        LPG_TRY(generate_register_name(i, ecmascript_output));
-    }
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ") { return "));
-    LPG_TRY(generate_capture_alias(0, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ".call_method_"));
-    LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, generated.method)));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "("));
-    for (register_id i = 0; i < method.parameters.length; ++i)
-    {
-        if (i > 0)
-        {
-            LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
-        }
-        LPG_TRY(generate_register_name(i, ecmascript_output));
-    }
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "); }; })();\n"));
     return success_yes;
 }
 
