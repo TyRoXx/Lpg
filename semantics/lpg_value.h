@@ -129,7 +129,16 @@ typedef struct value
 value value_from_structure(structure_value const content);
 value value_from_function_pointer(function_pointer_value pointer);
 value value_from_string_ref(unicode_view const string_ref);
-value value_from_unit(void);
+
+static inline value value_from_unit(void)
+{
+    value result;
+    result.kind = value_kind_unit;
+    /*dummy value to avoid compiler warning*/
+    result.integer_ = integer_create(0, 0);
+    return result;
+}
+
 value value_from_type(type const type_);
 value value_from_enum_element(enum_element_id const element, type const state_type, value *const state);
 value value_from_integer(integer const content);

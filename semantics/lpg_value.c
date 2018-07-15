@@ -141,15 +141,6 @@ value value_from_string_ref(unicode_view const string_ref)
     return result;
 }
 
-value value_from_unit(void)
-{
-    value result;
-    result.kind = value_kind_unit;
-    /*dummy value to avoid compiler warning*/
-    result.integer_ = integer_create(0, 0);
-    return result;
-}
-
 value value_from_type(type const type_)
 {
     value result;
