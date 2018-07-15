@@ -360,18 +360,6 @@ bool value_is_valid(value const checked)
     return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_lambda);
 }
 
-function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
-                                                       value const *globals, garbage_collector *const gc,
-                                                       checked_function const *const all_functions,
-                                                       lpg_interface const *all_interfaces)
-{
-    ASSUME(globals);
-    ASSUME(gc);
-    ASSUME(all_functions);
-    function_call_arguments const result = {self, arguments, globals, gc, all_functions, all_interfaces};
-    return result;
-}
-
 bool value_conforms_to_type(value const instance, type const expected)
 {
     ASSUME(value_is_valid(instance));
