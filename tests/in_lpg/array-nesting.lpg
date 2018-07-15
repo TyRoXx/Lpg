@@ -1,5 +1,5 @@
 let std = import std
-let string = std.string-ref
+let string = std.string
 let option = std.option
 let a = new-array(std.array[std.array[string]])
 let b = new-array(std.array[string])

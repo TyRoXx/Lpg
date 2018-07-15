@@ -5,15 +5,15 @@ let option = std.option
 let test-string = (host: es.host)
     let exported : host-value = host.export-string("hello")
     assert(match host.import-string(exported)
-        case option[std.string-ref].some(let content):
+        case option[std.string].some(let content):
             string-equals("hello", content)
-        case option[std.string-ref].none:
+        case option[std.string].none:
             boolean.false
 )
     assert(match host.import-string(host.undefined())
-        case option[std.string-ref].some(let content):
+        case option[std.string].some(let content):
             boolean.false
-        case option[std.string-ref].none:
+        case option[std.string].none:
             boolean.true
 )
 

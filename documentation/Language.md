@@ -26,7 +26,7 @@ The first thing in every programming language is the "Hello World"-program. This
 | type            | A type of a variable / constant                  | `unit`, `boolean`, `int(0, 0)`                   |
 | boolean         | A logical value (either true or false)           | `boolean.true` or `boolean.false`                |
 | int(low, high)  | A whole number within a certain range            | `int(0, 100)` or `int(33, 100)`                  |
-| string-ref      | A reference to a string that is a string literal | `"Hello"` or `"\n"`                              |
+| string          | A reference to a string that is a string literal | `"Hello"` or `"\n"`                              |
 | *no syntax yet* | Contains a fixed number of elements              | `{"Hello"}` or `{}` or `{boolean.true, 123, {}}` |
 
 
@@ -51,7 +51,7 @@ If a line just consists of one value that is not assigned to anything and it is 
 If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
 let std = import std
-let duplicate = (message: std.string-ref)
+let duplicate = (message: std.string)
     {message, message}
 ```
 
@@ -77,7 +77,7 @@ Tuples are a collection of values. They do not have to have the same type to be 
 let std = import std
 let tuple = {10, std.boolean.true, "Hello", () std.boolean}
 ```
-The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string-ref "Hello"`.
+The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string "Hello"`.
 
 ### Interfaces
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
@@ -91,10 +91,10 @@ And this is how you implement this:
 let std = import std
 
 let printable = interface
-    print(): std.string-ref
+    print(): std.string
 
-impl printable for std.string-ref
-    print(): std.string-ref
+impl printable for std.string
+    print(): std.string
         self
 ```
 
@@ -127,7 +127,7 @@ let t : std.type = struct
 
 let u = struct
     a: t
-    b: std.string-ref
+    b: std.string
 
 let u-instance = u{t{std.boolean.true}, "abc"}
 ```
@@ -210,13 +210,13 @@ let std = import std
 | Name              | Explanation                                                                                |
 |-------------------|--------------------------------------------------------------------------------------------|
 | type              | type of all types                                                                          |
-| string-ref        | name of the string type                                                                    |
+| string            | name of the string type                                                                    |
 | boolean           | an enum with two states: false, true                                                       |
 | unit              | type with a single value that can be used to model the absence of a return value for example |
 | unit_value        | the single possible value of type unit                                                     |
 | option[T]         | enum with two states: `some(T)` and `none` |
 | option-int        | deprecated |
-| array[T]          | generic interface for arrays of type T. Create array instances with the `new-array` keyword, e.g. `new-array(std.string-ref)` |
+| array[T]          | generic interface for arrays of type T. Create array instances with the `new-array` keyword, e.g. `new-array(std.string)` |
 
 ## Built-in global functions
 ```lpg
@@ -226,11 +226,11 @@ assert(boolean.true)
 | Name              | Inputs                 | Explanation                                          | Output     |
 |-------------------|------------------------|------------------------------------------------------|------------|
 | assert            | boolean                | Ends the program if the input is `boolean.false`     | unit       |
-| concat            | string-ref, string-ref | Returns the two strings together                     | string-ref |
-| string-equals     | string-ref, string-ref | Returns if two strings are equal                     | boolean    |
+| concat            | string, string | Returns the two strings together                     | string |
+| string-equals     | string, string | Returns if two strings are equal                     | boolean    |
 | integer-equals    | integer, integer       | Returns if two integers are equals                   | boolean    |
 | integer-less      | integer, integer       | Returns if the first integer is less than the second | boolean    |
-| integer-to-string | integer                | Turns an integer to a string                         | string-ref |
+| integer-to-string | integer                | Turns an integer to a string                         | string |
 
 ## Optimizations
 There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:

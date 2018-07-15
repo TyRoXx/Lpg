@@ -1,6 +1,6 @@
 let std = import std
 
-let string = std.string-ref
+let string = std.string
 
 let array-type = std.array[string]
 let a : array-type = new-array(string)

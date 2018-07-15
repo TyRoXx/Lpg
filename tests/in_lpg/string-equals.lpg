@@ -1,5 +1,5 @@
 let std = import std
-let runtime-string = (a: std.string-ref)
+let runtime-string = (a: std.string)
     side-effect()
     a
 

@@ -8,7 +8,7 @@ let trivial-return-implicit-type = ()
     return boolean.true
 assert(trivial-return-implicit-type())
 
-let match-return-explicit-type = (arg: boolean): std.string-ref
+let match-return-explicit-type = (arg: boolean): std.string
     match arg
         case boolean.true:
             return "a"
@@ -54,17 +54,17 @@ let return-integer-explicit = (arg: boolean): int(1, 2)
 assert(integer-equals(1, return-integer-explicit(boolean.false)))
 assert(integer-equals(2, return-integer-explicit(boolean.true)))
 
-let return-runtime-string = (arg: std.string-ref)
+let return-runtime-string = (arg: std.string)
     side-effect()
     return concat("abc", arg)
 assert(string-equals("abcdef", return-runtime-string("def")))
 
 let test-interface = interface
     m(): boolean
-impl test-interface for std.string-ref
+impl test-interface for std.string
     m(): boolean
         return boolean.true
-let return-interface = (arg: std.string-ref): test-interface
+let return-interface = (arg: std.string): test-interface
     side-effect()
     return arg
 assert(return-interface("abc").m())

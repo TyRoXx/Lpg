@@ -10,7 +10,7 @@ assert(t-instance.a)
 
 let u = struct
     a: t
-    b: std.string-ref
+    b: std.string
     c: int(0, 1)
 let u-instance = u{t{boolean.true}, "abc", 0}
 assert(u-instance.a.a)

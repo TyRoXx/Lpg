@@ -697,7 +697,7 @@ static void test_tuples(void)
 
     expression *const tuple_type_expression = expression_allocate(
         expression_from_tuple(tuple_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                                               unicode_string_from_c_str("string-ref"), source_location_create(0, 9)))),
+                                               unicode_string_from_c_str("string"), source_location_create(0, 9)))),
                                            1, source_location_create(0, 8))));
 
     identifier_expression const variable_name =
@@ -705,5 +705,5 @@ static void test_tuples(void)
 
     expression const assign =
         expression_from_declare(declare_create(variable_name, tuple_type_expression, tuple_expression));
-    test_successful_parse(assign, unicode_string_from_c_str("let t : {string-ref} = {\"Test\"}"), true);
+    test_successful_parse(assign, unicode_string_from_c_str("let t : {string} = {\"Test\"}"), true);
 }

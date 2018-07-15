@@ -1,11 +1,11 @@
 let std = import std
 
 let printable2 = interface
-    print(): std.string-ref
+    print(): std.string
     other-method(): std.unit
 
-impl printable2 for std.string-ref
-    print(): std.string-ref
+impl printable2 for std.string
+    print(): std.string
         self
     other-method(): std.unit
         std.unit_value

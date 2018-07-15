@@ -1,5 +1,5 @@
 let std = import std
 assert(type-equals(type-of(0), type-of(0)))
 assert(type-equals(type-of(0), int(0, 0)))
-assert(type-equals(type-of(""), std.string-ref))
-assert(type-equals(type-of(std.string-ref), std.type))
+assert(type-equals(type-of(""), std.string))
+assert(type-equals(type-of(std.string), std.type))

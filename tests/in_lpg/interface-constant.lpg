@@ -1,10 +1,10 @@
 let std = import std
 
 let i = interface
-    to-string(): std.string-ref
+    to-string(): std.string
 
 let s = struct
-    string: std.string-ref
+    string: std.string
 
 impl i for s
     to-string()
