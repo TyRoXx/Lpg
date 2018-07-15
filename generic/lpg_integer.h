@@ -44,5 +44,5 @@ integer_division integer_divide(integer numerator, integer denominator) LPG_USE_
 
 extern char const lower_case_digits[];
 
-char *integer_format(integer const value, LPG_NON_NULL(char const *digits), unsigned base, LPG_NON_NULL(char *buffer),
-                     size_t buffer_size) LPG_USE_RESULT;
+unicode_view integer_format(integer const value, LPG_NON_NULL(char const *digits), unsigned base,
+                            LPG_NON_NULL(char *buffer), size_t buffer_size) LPG_USE_RESULT;

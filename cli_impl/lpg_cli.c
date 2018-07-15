@@ -155,11 +155,10 @@ static void handle_parse_error(complete_parse_error const error, callback_user c
            stream_writer_write_string(actual_user->diagnostics, describe_parse_error(error.relative.type)));
     ASSERT(success_yes == stream_writer_write_string(actual_user->diagnostics, " in line "));
     char buffer[64];
-    char const *const line =
+    unicode_view const line =
         integer_format(integer_create(0, error.relative.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
-    ASSERT(line);
-    ASSERT(success_yes ==
-           stream_writer_write_bytes(actual_user->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(line.begin);
+    ASSERT(success_yes == stream_writer_write_unicode_view(actual_user->diagnostics, line));
     ASSERT(success_yes == stream_writer_write_string(actual_user->diagnostics, ":\n"));
     print_source_location_hint(error.source, actual_user->diagnostics, error.relative.where);
 }
@@ -285,11 +284,10 @@ static void handle_semantic_error(complete_semantic_error const error, void *use
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, semantic_error_text(error.relative.type)));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, " in line "));
     char buffer[64];
-    char const *const line =
+    unicode_view const line =
         integer_format(integer_create(0, error.relative.where.line + 1), lower_case_digits, 10, buffer, sizeof(buffer));
-    ASSERT(line);
-    ASSERT(success_yes ==
-           stream_writer_write_bytes(context->diagnostics, line, (size_t)(buffer + sizeof(buffer) - line)));
+    ASSERT(line.begin);
+    ASSERT(success_yes == stream_writer_write_unicode_view(context->diagnostics, line));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, ":\n"));
     print_source_location_hint(error.source, context->diagnostics, error.relative.where);
 }

@@ -458,8 +458,8 @@ static success_indicator encode_string_literal(unicode_view const content, strea
 static success_indicator generate_integer(integer const generated, stream_writer const c_output)
 {
     char buffer[64];
-    char const *const formatted = integer_format(generated, lower_case_digits, 10, buffer, sizeof(buffer));
-    LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+    unicode_view const formatted = integer_format(generated, lower_case_digits, 10, buffer, sizeof(buffer));
+    LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
     return success_yes;
 }
 
@@ -505,8 +505,8 @@ static success_indicator generate_function_name(function_id const id, stream_wri
 {
     LPG_TRY(stream_writer_write_string(c_output, "lambda_"));
     char buffer[64];
-    char const *const formatted = integer_format(integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
-    LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+    unicode_view const formatted = integer_format(integer_create(0, id), lower_case_digits, 10, buffer, sizeof(buffer));
+    LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
     return success_yes;
 }
 
@@ -525,13 +525,14 @@ static unicode_string const *find_type_definition(type_definitions const definit
 static unicode_string make_type_definition_name(size_t const index)
 {
     char buffer[64];
-    char *const formatted = integer_format(integer_create(0, index), lower_case_digits, 10, buffer, sizeof(buffer));
-    size_t const index_length = (size_t)((buffer + sizeof(buffer)) - formatted);
+    unicode_view const formatted =
+        integer_format(integer_create(0, index), lower_case_digits, 10, buffer, sizeof(buffer));
+    size_t const index_length = formatted.length;
     char const *const prefix = "type_definition_";
     size_t const name_length = strlen(prefix) + index_length;
     unicode_string const name = {allocate(name_length), name_length};
     memcpy(name.data, prefix, strlen(prefix));
-    memcpy(name.data + strlen(prefix), formatted, index_length);
+    memcpy(name.data + strlen(prefix), formatted.begin, index_length);
     return name;
 }
 
@@ -1428,8 +1429,9 @@ static success_indicator generate_value(value const generated, type const type_o
         if (integer_less(generated.integer_, integer_create(1, 0)))
         {
             char buffer[40];
-            char *formatted = integer_format(generated.integer_, lower_case_digits, 10, buffer, sizeof(buffer));
-            LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+            unicode_view const formatted =
+                integer_format(generated.integer_, lower_case_digits, 10, buffer, sizeof(buffer));
+            LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
             return success_yes;
         }
         LPG_TO_DO();
@@ -1442,9 +1444,9 @@ static success_indicator generate_value(value const generated, type const type_o
         LPG_TRY(stream_writer_write_string(c_output, ", "));
         {
             char buffer[40];
-            char *formatted = integer_format(
+            unicode_view const formatted = integer_format(
                 integer_create(0, generated.string_ref.length), lower_case_digits, 10, buffer, sizeof(buffer));
-            LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+            LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
         }
         LPG_TRY(stream_writer_write_string(c_output, ")"));
         return success_yes;
@@ -1545,9 +1547,9 @@ static success_indicator generate_value(value const generated, type const type_o
             return success_yes;
         }
         char buffer[64];
-        char const *const formatted = integer_format(
+        unicode_view const formatted = integer_format(
             integer_create(0, generated.enum_element.which), lower_case_digits, 10, buffer, sizeof(buffer));
-        LPG_TRY(stream_writer_write_bytes(c_output, formatted, (size_t)((buffer + sizeof(buffer)) - formatted)));
+        LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
         return success_yes;
     }
 

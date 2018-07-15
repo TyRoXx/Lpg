@@ -183,10 +183,9 @@ typedef struct function_call_arguments
     lpg_interface const *all_interfaces;
 } function_call_arguments;
 
-static inline function_call_arguments function_call_arguments_create(optional_value const self, value *const arguments,
-                                                       value const *globals, LPG_NON_NULL(garbage_collector *const gc),
-                                                       LPG_NON_NULL(checked_function const *const all_functions),
-                                                       lpg_interface const *all_interfaces)
+static inline function_call_arguments function_call_arguments_create(
+    optional_value const self, value *const arguments, value const *globals, LPG_NON_NULL(garbage_collector *const gc),
+    LPG_NON_NULL(checked_function const *const all_functions), lpg_interface const *all_interfaces)
 {
     ASSUME(globals);
     ASSUME(gc);

@@ -1,4 +1,6 @@
 #include "lpg_integer.h"
+#include <stdio.h>
+#include <inttypes.h>
 
 integer integer_create(uint64_t high, uint64_t low)
 {
@@ -227,11 +229,35 @@ integer_division integer_divide(integer numerator, integer denominator)
 
 char const lower_case_digits[] = "0123456789abcdef";
 
-char *integer_format(integer const value, char const *digits, unsigned base, char *buffer, size_t buffer_size)
+unicode_view integer_format(integer const value, char const *digits, unsigned base, char *buffer, size_t buffer_size)
 {
     ASSUME(base >= 2);
     ASSUME(base <= 16);
     ASSUME(buffer_size > 0);
+    if (value.high == 0)
+    {
+        switch (base)
+        {
+        case 10:
+            if (buffer_size >= 21)
+            {
+                sprintf(buffer, "%" PRIu64, value.low);
+                return unicode_view_from_c_str(buffer);
+            }
+            break;
+
+        case 16:
+            if (buffer_size >= 16)
+            {
+                sprintf(buffer, "%" PRIx64, value.low);
+                return unicode_view_from_c_str(buffer);
+            }
+            break;
+
+        default:
+            break;
+        }
+    }
     size_t next_digit = buffer_size - 1;
     integer rest = value;
     for (;;)
@@ -245,11 +271,11 @@ char *integer_format(integer const value, char const *digits, unsigned base, cha
         }
         if (next_digit == 0)
         {
-            return NULL;
+            return unicode_view_create(NULL, 0);
         }
         --next_digit;
     }
-    return buffer + next_digit;
+    return unicode_view_create(buffer + next_digit, buffer_size - next_digit);
 }
 
 integer integer_maximum(integer const first, integer const second)

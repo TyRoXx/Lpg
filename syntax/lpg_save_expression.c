@@ -149,9 +149,9 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     {
         LPG_TRY(space_here(to, &whitespace));
         char buffer[39];
-        char *const formatted =
+        unicode_view const formatted =
             integer_format(value->integer_literal.value, lower_case_digits, 10, buffer, sizeof(buffer));
-        return stream_writer_write_bytes(to, formatted, (size_t)(buffer + sizeof(buffer) - formatted));
+        return stream_writer_write_unicode_view(to, formatted);
     }
 
     case expression_type_access_structure:

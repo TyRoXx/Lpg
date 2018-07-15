@@ -114,29 +114,32 @@ static void test_integer_format(void)
         for (unsigned value = 2; value < base; ++value)
         {
             char buffer[1];
-            char *formatted = integer_format(integer_create(0, value), lower_case_digits, base, buffer, sizeof(buffer));
-            REQUIRE(formatted == buffer);
+            unicode_view const formatted =
+                integer_format(integer_create(0, value), lower_case_digits, base, buffer, sizeof(buffer));
+            REQUIRE(formatted.begin == buffer);
             REQUIRE(buffer[0] == lower_case_digits[value]);
         }
     }
     {
         char buffer[39];
-        char *formatted = integer_format(
+        unicode_view const formatted = integer_format(
             integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 10, buffer, sizeof(buffer));
-        REQUIRE(buffer == formatted);
+        REQUIRE(buffer == formatted.begin);
         REQUIRE(!memcmp(buffer, "340282366920938463463374607431768211455", sizeof(buffer)));
     }
     {
         char buffer[32];
-        char *formatted = integer_format(
+        unicode_view const formatted = integer_format(
             integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 16, buffer, sizeof(buffer));
-        REQUIRE(buffer == formatted);
+        REQUIRE(buffer == formatted.begin);
         REQUIRE(!memcmp(buffer, "ffffffffffffffffffffffffffffffff", sizeof(buffer)));
     }
     {
         char buffer[38];
-        REQUIRE(NULL == integer_format(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 10,
-                                       buffer, sizeof(buffer)));
+        unicode_view const formatted = integer_format(
+            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), lower_case_digits, 10, buffer, sizeof(buffer));
+        REQUIRE(NULL == formatted.begin);
+        REQUIRE(0 == formatted.length);
     }
 }
 

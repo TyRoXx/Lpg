@@ -15,8 +15,8 @@ success_indicator stream_writer_write_bytes(stream_writer writer, char const *da
 success_indicator stream_writer_write_integer(stream_writer writer, integer const value)
 {
     char buffer[64];
-    char const *const formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer));
-    return stream_writer_write_bytes(writer, formatted, (size_t)((buffer + sizeof(buffer)) - formatted));
+    unicode_view const formatted = integer_format(value, lower_case_digits, 10, buffer, sizeof(buffer));
+    return stream_writer_write_unicode_view(writer, formatted);
 }
 
 void memory_writer_free(memory_writer *writer)

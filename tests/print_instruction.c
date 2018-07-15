@@ -5,8 +5,8 @@ static void print_integer(integer const printed)
 {
     char buffer[64];
     buffer[sizeof(buffer) - 1] = '\0';
-    char *const formatted = integer_format(printed, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
-    printf("%s", formatted);
+    unicode_view const formatted = integer_format(printed, lower_case_digits, 10, buffer, sizeof(buffer) - 1);
+    printf("%s", formatted.begin);
 }
 
 static void print_type(type const printed)

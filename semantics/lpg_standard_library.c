@@ -98,10 +98,8 @@ value integer_to_string_impl(function_call_arguments const arguments, struct val
     const unsigned int printing_base = 10;
     const size_t buffer_max_size = 20;
     char *buffer = garbage_collector_allocate(arguments.gc, buffer_max_size);
-    char *buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
-    size_t const index_length = (size_t)((buffer + buffer_max_size) - buffer_begin);
-
-    return value_from_string_ref(unicode_view_create(buffer_begin, index_length));
+    unicode_view const buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
+    return value_from_string_ref(buffer_begin);
 }
 
 value side_effect_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
