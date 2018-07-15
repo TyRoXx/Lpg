@@ -4,25 +4,25 @@
 #include <stdbool.h>
 #include <assert.h>
 
-typedef struct string_ref
+typedef struct string
 {
     char const *data;
     size_t length;
     size_t *references;
-} string_ref;
+} string;
 
-static string_ref string_ref_create(char const *const data, size_t const length, size_t *const references)
+static string string_create(char const *const data, size_t const length, size_t *const references)
 {
-    string_ref const result = {data, length, references};
+    string const result = {data, length, references};
     return result;
 }
 
-static string_ref string_literal(char const *const data, size_t const length)
+static string string_literal(char const *const data, size_t const length)
 {
-    return string_ref_create(data, length, NULL);
+    return string_create(data, length, NULL);
 }
 
-static void string_ref_add_reference(string_ref const *const s)
+static void string_add_reference(string const *const s)
 {
     if (!s->references)
     {
@@ -31,7 +31,7 @@ static void string_ref_add_reference(string_ref const *const s)
     (*s->references) += 1;
 }
 
-static void string_ref_free(string_ref const *const s)
+static void string_free(string const *const s)
 {
     if (!s->references)
     {
@@ -46,7 +46,7 @@ static void string_ref_free(string_ref const *const s)
     free(s->references);
 }
 
-static bool string_ref_equals(string_ref const left, string_ref const right)
+static bool string_equals(string const left, string const right)
 {
     if (left.length != right.length)
     {
@@ -55,7 +55,7 @@ static bool string_ref_equals(string_ref const left, string_ref const right)
     return !memcmp(left.data, right.data, left.length);
 }
 
-static string_ref string_ref_concat(string_ref const left, string_ref const right)
+static string string_concat(string const left, string const right)
 {
     size_t const result_length = (left.length + right.length);
     char *const allocation = malloc(sizeof(size_t) + result_length);
@@ -65,7 +65,7 @@ static string_ref string_ref_concat(string_ref const left, string_ref const righ
     }
     size_t *const references = (size_t *)allocation;
     *references = 1;
-    string_ref const result = {allocation + sizeof(*references), result_length, references};
+    string const result = {allocation + sizeof(*references), result_length, references};
     if (left.data)
     {
         memcpy((char *)result.data, left.data, left.length);

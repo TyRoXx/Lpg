@@ -135,7 +135,7 @@ static void mark_type(bool *const used_functions, checked_function const *const 
 
     case type_kind_host_value:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_interface:
     case type_kind_integer_range:
     case type_kind_enumeration:
@@ -241,9 +241,9 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 
     case value_kind_string:
     {
-        char *const copy = garbage_collector_allocate(clone_gc, from.string_ref.length);
-        memcpy(copy, from.string_ref.begin, from.string_ref.length);
-        return value_from_string_ref(unicode_view_create(copy, from.string_ref.length));
+        char *const copy = garbage_collector_allocate(clone_gc, from.string.length);
+        memcpy(copy, from.string.begin, from.string.length);
+        return value_from_string(unicode_view_create(copy, from.string.length));
     }
 
     case value_kind_function_pointer:

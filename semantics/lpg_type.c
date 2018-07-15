@@ -233,10 +233,10 @@ type type_from_unit(void)
     return result;
 }
 
-type type_from_string_ref(void)
+type type_from_string(void)
 {
     type result;
-    result.kind = type_kind_string_ref;
+    result.kind = type_kind_string;
     return result;
 }
 
@@ -383,7 +383,7 @@ bool type_equals(type const left, type const right)
         return function_pointer_equals(*left.function_pointer_, *right.function_pointer_);
 
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_type:
         return true;
 
@@ -430,7 +430,7 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
     }
 
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_interface:
     case type_kind_integer_range:
@@ -503,7 +503,7 @@ bool type_is_valid(type const checked)
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_type:
     case type_kind_integer_range:
@@ -546,7 +546,7 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
 
     case type_kind_type:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_generic_enum:
         return true;
 

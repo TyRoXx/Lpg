@@ -7,7 +7,7 @@
 
 typedef struct standard_library_usage
 {
-    bool using_string_ref;
+    bool using_string;
     bool using_assert;
     bool using_unit;
     bool using_stdint;
@@ -17,9 +17,9 @@ typedef struct standard_library_usage
     bool using_c_assert;
 } standard_library_usage;
 
-static void standard_library_usage_use_string_ref(standard_library_usage *usage)
+static void standard_library_usage_use_string(standard_library_usage *usage)
 {
-    usage->using_string_ref = true;
+    usage->using_string = true;
 }
 
 typedef enum register_meaning
@@ -829,9 +829,9 @@ static success_indicator generate_type(type const generated, standard_library_us
         standard_library->using_unit = true;
         return stream_writer_write_string(c_output, "unit");
 
-    case type_kind_string_ref:
-        standard_library_usage_use_string_ref(standard_library);
-        return stream_writer_write_string(c_output, "string_ref");
+    case type_kind_string:
+        standard_library_usage_use_string(standard_library);
+        return stream_writer_write_string(c_output, "string");
 
     case type_kind_enumeration:
         if (has_stateful_element(program->enums[generated.enum_]))
@@ -1057,9 +1057,9 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
-    case type_kind_string_ref:
+    case type_kind_string:
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "string_ref_add_reference(&"));
+        LPG_TRY(stream_writer_write_string(c_output, "string_add_reference(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         return stream_writer_write_string(c_output, ");\n");
 
@@ -1438,14 +1438,14 @@ static success_indicator generate_value(value const generated, type const type_o
     }
 
     case value_kind_string:
-        state->standard_library.using_string_ref = true;
+        state->standard_library.using_string = true;
         LPG_TRY(stream_writer_write_string(c_output, "string_literal("));
-        LPG_TRY(encode_string_literal(generated.string_ref, c_output));
+        LPG_TRY(encode_string_literal(generated.string, c_output));
         LPG_TRY(stream_writer_write_string(c_output, ", "));
         {
             char buffer[40];
             unicode_view const formatted = integer_format(
-                integer_create(0, generated.string_ref.length), lower_case_digits, 10, buffer, sizeof(buffer));
+                integer_create(0, generated.string.length), lower_case_digits, 10, buffer, sizeof(buffer));
             LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
         }
         LPG_TRY(stream_writer_write_string(c_output, ")"));
@@ -1765,11 +1765,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success_yes;
 
         case register_meaning_string_equals:
-            standard_library_usage_use_string_ref(&state->standard_library);
+            standard_library_usage_use_string(&state->standard_library);
             set_register_variable(state, input.call.result, register_resource_ownership_owns, find_boolean());
             LPG_TRY(stream_writer_write_string(c_output, "bool const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = string_ref_equals("));
+            LPG_TRY(stream_writer_write_string(c_output, " = string_equals("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
@@ -1805,9 +1805,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_integer_to_string:
             state->standard_library.using_integer = true;
-            standard_library_usage_use_string_ref(&state->standard_library);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_string_ref());
-            LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
+            standard_library_usage_use_string(&state->standard_library);
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_string());
+            LPG_TRY(stream_writer_write_string(c_output, "string const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = integer_to_string("));
             ASSERT(input.call.argument_count == 1);
@@ -1816,11 +1816,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success_yes;
 
         case register_meaning_concat:
-            standard_library_usage_use_string_ref(&state->standard_library);
-            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_string_ref());
-            LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
+            standard_library_usage_use_string(&state->standard_library);
+            set_register_variable(state, input.call.result, register_resource_ownership_owns, type_from_string());
+            LPG_TRY(stream_writer_write_string(c_output, "string const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = string_ref_concat("));
+            LPG_TRY(stream_writer_write_string(c_output, " = string_concat("));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ", "));
@@ -1874,7 +1874,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_interface:
             case type_kind_structure:
             case type_kind_unit:
-            case type_kind_string_ref:
+            case type_kind_string:
             case type_kind_enumeration:
             case type_kind_tuple:
             case type_kind_type:
@@ -2100,7 +2100,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case type_kind_lambda:
             case type_kind_function_pointer:
             case type_kind_unit:
-            case type_kind_string_ref:
+            case type_kind_string:
             case type_kind_enumeration:
             case type_kind_type:
             case type_kind_integer_range:
@@ -2182,8 +2182,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case value_kind_string:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            state->standard_library.using_string_ref = true;
-            LPG_TRY(stream_writer_write_string(c_output, "string_ref const "));
+            state->standard_library.using_string = true;
+            LPG_TRY(stream_writer_write_string(c_output, "string const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
             LPG_TRY(generate_value(input.literal.value_, input.literal.type_of, state, c_output));
@@ -2538,10 +2538,10 @@ static success_indicator generate_free(standard_library_usage *const standard_li
         LPG_TRY(stream_writer_write_string(c_output, ".self, -1);\n"));
         return success_yes;
 
-    case type_kind_string_ref:
-        standard_library->using_string_ref = true;
+    case type_kind_string:
+        standard_library->using_string = true;
         LPG_TRY(indent(indentation, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, "string_ref_free(&"));
+        LPG_TRY(stream_writer_write_string(c_output, "string_free(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, freed));
         LPG_TRY(stream_writer_write_string(c_output, ");\n"));
         return success_yes;
@@ -2811,7 +2811,7 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_assert.h>\n"), fail);
     }
-    if (standard_library.using_string_ref)
+    if (standard_library.using_string)
     {
         LPG_TRY_GOTO(stream_writer_write_string(c_output, "#include <lpg_std_string.h>\n"), fail);
     }

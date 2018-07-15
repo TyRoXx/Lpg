@@ -65,7 +65,7 @@ typedef enum type_kind
     type_kind_structure = 1,
     type_kind_function_pointer,
     type_kind_unit,
-    type_kind_string_ref,
+    type_kind_string,
     type_kind_enumeration,
     type_kind_tuple,
     type_kind_type,
@@ -187,7 +187,7 @@ bool function_pointer_equals(function_pointer const left, function_pointer const
 
 type type_from_function_pointer(function_pointer const *pointer);
 type type_from_unit(void);
-type type_from_string_ref(void);
+type type_from_string(void);
 type type_from_enumeration(enum_id const content);
 type type_from_tuple_type(tuple_type const content);
 type type_from_type(void);

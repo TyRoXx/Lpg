@@ -46,7 +46,7 @@ type get_return_type(type const callee, checked_function const *const all_functi
     case type_kind_tuple:
     case type_kind_structure:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_type:
     case type_kind_integer_range:

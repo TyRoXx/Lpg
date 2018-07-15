@@ -176,7 +176,7 @@ static success_indicator generate_value(value const generated, type const type_o
     }
 
     case value_kind_string:
-        return encode_string_literal(generated.string_ref, ecmascript_output);
+        return encode_string_literal(generated.string, ecmascript_output);
 
     case value_kind_function_pointer:
         ASSUME(!generated.function_pointer.external);
@@ -508,7 +508,7 @@ static success_indicator generate_read_struct(function_generation *const state, 
 
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_type:
     case type_kind_integer_range:
@@ -548,7 +548,7 @@ static success_indicator generate_call(function_generation *const state, call_in
 
     case type_kind_structure:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_tuple:
     case type_kind_type:
@@ -758,7 +758,7 @@ static success_indicator generate_match(function_generation *const state, match_
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_enum_constructor:

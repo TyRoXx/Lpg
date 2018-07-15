@@ -29,21 +29,21 @@ value concat_impl(function_call_arguments const arguments, struct value const *c
 {
     (void)environment;
     (void)captures;
-    unicode_view const left = arguments.arguments[0].string_ref;
-    unicode_view const right = arguments.arguments[1].string_ref;
+    unicode_view const left = arguments.arguments[0].string;
+    unicode_view const right = arguments.arguments[1].string;
     size_t const result_length = left.length + right.length;
     char *const result = garbage_collector_allocate(arguments.gc, result_length);
     memcpy(result, left.begin, left.length);
     memcpy(result + left.length, right.begin, right.length);
-    return value_from_string_ref(unicode_view_create(result, result_length));
+    return value_from_string(unicode_view_create(result, result_length));
 }
 
 value string_equals_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
     (void)environment;
     (void)captures;
-    unicode_view const left = arguments.arguments[0].string_ref;
-    unicode_view const right = arguments.arguments[1].string_ref;
+    unicode_view const left = arguments.arguments[0].string;
+    unicode_view const right = arguments.arguments[1].string;
     return value_from_enum_element(unicode_view_equals(left, right), type_from_unit(), NULL);
 }
 
@@ -99,7 +99,7 @@ value integer_to_string_impl(function_call_arguments const arguments, struct val
     const size_t buffer_max_size = 20;
     char *buffer = garbage_collector_allocate(arguments.gc, buffer_max_size);
     unicode_view const buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
-    return value_from_string_ref(buffer_begin);
+    return value_from_string(buffer_begin);
 }
 
 value side_effect_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -126,15 +126,15 @@ standard_library_description describe_standard_library(void)
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
-        parameters[0] = type_from_string_ref();
-        parameters[1] = type_from_string_ref();
-        stable->concat = function_pointer_create(type_from_string_ref(), tuple_type_create(parameters, 2),
+        parameters[0] = type_from_string();
+        parameters[1] = type_from_string();
+        stable->concat = function_pointer_create(type_from_string(), tuple_type_create(parameters, 2),
                                                  tuple_type_create(NULL, 0), optional_type_create_empty());
     }
     {
         type *const parameters = allocate_array(2, sizeof(*parameters));
-        parameters[0] = type_from_string_ref();
-        parameters[1] = type_from_string_ref();
+        parameters[0] = type_from_string();
+        parameters[1] = type_from_string();
         stable->string_equals = function_pointer_create(
             boolean, tuple_type_create(parameters, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
     }
@@ -163,7 +163,7 @@ standard_library_description describe_standard_library(void)
         type *const parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
 
-        stable->integer_to_string = function_pointer_create(type_from_string_ref(), tuple_type_create(parameters, 1),
+        stable->integer_to_string = function_pointer_create(type_from_string(), tuple_type_create(parameters, 1),
                                                             tuple_type_create(NULL, 0), optional_type_create_empty());
     }
 

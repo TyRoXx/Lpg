@@ -94,7 +94,7 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
 
     case type_kind_structure:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_tuple:
     case type_kind_type:
@@ -273,7 +273,7 @@ static read_structure_element_result read_element(function_checking_state *state
     case type_kind_lambda:
     case type_kind_unit:
     case type_kind_function_pointer:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
         emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
@@ -299,7 +299,7 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
-        case type_kind_string_ref:
+        case type_kind_string:
         case type_kind_unit:
         case type_kind_type:
         case type_kind_integer_range:
@@ -373,7 +373,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_tuple:
     case type_kind_type:
@@ -936,7 +936,7 @@ static conversion_result convert(function_checking_state *const state, instructi
     case type_kind_enumeration:
     case type_kind_function_pointer:
     case type_kind_lambda:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_unit:
     case type_kind_structure:
     case type_kind_type:
@@ -1036,7 +1036,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_enumeration:
     case type_kind_tuple:
     case type_kind_type:
@@ -1143,14 +1143,14 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             deallocate(arguments);
             restore(previous_code);
             result = allocate_register(&state->used_registers);
-            if (return_type.kind == type_kind_string_ref)
+            if (return_type.kind == type_kind_string)
             {
-                size_t const length = compile_time_result.value_.string_ref.length;
+                size_t const length = compile_time_result.value_.string.length;
                 char *const copy = garbage_collector_allocate(&state->program->memory, length);
-                memcpy(copy, compile_time_result.value_.string_ref.begin, length);
-                add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                              result, value_from_string_ref(unicode_view_create(copy, length)),
-                                              type_from_string_ref())));
+                memcpy(copy, compile_time_result.value_.string.begin, length);
+                add_instruction(
+                    function, instruction_create_literal(literal_instruction_create(
+                                  result, value_from_string(unicode_view_create(copy, length)), type_from_string())));
             }
             else
             {
@@ -1180,7 +1180,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
         case type_kind_structure:
         case type_kind_unit:
-        case type_kind_string_ref:
+        case type_kind_string:
         case type_kind_enumeration:
         case type_kind_tuple:
         case type_kind_type:
@@ -1753,7 +1753,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_type:
@@ -3382,11 +3382,11 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         }
 
         add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                      result, value_from_string_ref(literal), type_from_string_ref())));
-        write_register_compile_time_value(state, result, value_from_string_ref(literal));
-        type const string_type = {type_kind_string_ref, {0}};
+                                      result, value_from_string(literal), type_from_string())));
+        write_register_compile_time_value(state, result, value_from_string(literal));
+        type const string_type = {type_kind_string, {0}};
         return evaluate_expression_result_create(
-            true, result, string_type, optional_value_create(value_from_string_ref(literal)), true, false);
+            true, result, string_type, optional_value_create(value_from_string(literal)), true, false);
     }
 
     case expression_type_identifier:

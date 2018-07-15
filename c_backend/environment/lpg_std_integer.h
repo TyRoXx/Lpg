@@ -14,7 +14,7 @@ static size_t integer_less(uint64_t const left, uint64_t const right)
     return (left < right);
 }
 
-static string_ref integer_to_string(uint64_t const value)
+static string integer_to_string(uint64_t const value)
 {
     char buffer[40];
     int const formatted_length =
@@ -28,5 +28,5 @@ static string_ref integer_to_string(uint64_t const value)
          sizeof(buffer),
 #endif
          "%llu", (unsigned long long)value);
-    return string_ref_concat(string_literal("", 0), string_literal(buffer, (size_t)formatted_length));
+    return string_concat(string_literal("", 0), string_literal(buffer, (size_t)formatted_length));
 }

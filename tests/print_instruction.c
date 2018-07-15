@@ -35,7 +35,7 @@ static void print_type(type const printed)
 
     case type_kind_structure:
     case type_kind_function_pointer:
-    case type_kind_string_ref:
+    case type_kind_string:
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_enum_constructor:

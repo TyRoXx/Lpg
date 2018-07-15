@@ -125,11 +125,11 @@ value value_from_function_pointer(function_pointer_value pointer)
     return result;
 }
 
-value value_from_string_ref(unicode_view const string_ref)
+value value_from_string(unicode_view const string)
 {
     value result;
     result.kind = value_kind_string;
-    result.string_ref = string_ref;
+    result.string = string;
     return result;
 }
 
@@ -243,7 +243,7 @@ bool value_equals(value const left, value const right)
         return integer_equal(left.integer_, right.integer_);
 
     case value_kind_string:
-        return unicode_view_equals(left.string_ref, right.string_ref);
+        return unicode_view_equals(left.string, right.string);
 
     case value_kind_function_pointer:
         return function_pointer_value_equals(left.function_pointer, right.function_pointer);
@@ -311,7 +311,7 @@ bool value_less_than(value const left, value const right)
         return integer_less(left.integer_, right.integer_);
 
     case value_kind_string:
-        return unicode_view_less(left.string_ref, right.string_ref);
+        return unicode_view_less(left.string, right.string);
 
     case value_kind_enum_element:
         return enum_less_than(left.enum_element, right.enum_element);
@@ -385,7 +385,7 @@ bool value_conforms_to_type(value const instance, type const expected)
     case type_kind_enumeration:
         return (instance.kind == value_kind_enum_element);
 
-    case type_kind_string_ref:
+    case type_kind_string:
         return (instance.kind == value_kind_string);
 
     case type_kind_integer_range:

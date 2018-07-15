@@ -113,7 +113,7 @@ typedef struct value
     {
         structure_value structure;
         integer integer_;
-        unicode_view string_ref;
+        unicode_view string;
         function_pointer_value function_pointer;
         type type_;
         enum_element_value enum_element;
@@ -135,7 +135,7 @@ static inline value value_from_structure(structure_value const content)
 }
 
 value value_from_function_pointer(function_pointer_value pointer);
-value value_from_string_ref(unicode_view const string_ref);
+value value_from_string(unicode_view const string);
 
 static inline value value_from_unit(void)
 {
