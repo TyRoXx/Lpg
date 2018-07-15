@@ -9,11 +9,6 @@ unicode_view unicode_view_create(char const *begin, size_t length)
     return result;
 }
 
-unicode_view unicode_view_from_c_str(char const *c_str)
-{
-    return unicode_view_create(c_str, strlen(c_str));
-}
-
 unicode_view unicode_view_from_string(unicode_string string)
 {
     unicode_view const result = {string.data, string.length};

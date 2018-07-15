@@ -126,7 +126,14 @@ typedef struct value
     };
 } value;
 
-value value_from_structure(structure_value const content);
+static inline value value_from_structure(structure_value const content)
+{
+    value result;
+    result.kind = value_kind_structure;
+    result.structure = content;
+    return result;
+}
+
 value value_from_function_pointer(function_pointer_value pointer);
 value value_from_string_ref(unicode_view const string_ref);
 

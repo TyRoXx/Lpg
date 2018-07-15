@@ -117,14 +117,6 @@ bool array_value_equals(array_value const left, array_value const right)
     return true;
 }
 
-value value_from_structure(structure_value const content)
-{
-    value result;
-    result.kind = value_kind_structure;
-    result.structure = content;
-    return result;
-}
-
 value value_from_function_pointer(function_pointer_value pointer)
 {
     value result;
