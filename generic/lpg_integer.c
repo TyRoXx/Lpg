@@ -128,6 +128,16 @@ bool integer_multiply(integer *left, integer right)
         left->low = (left->low * right.low);
         return true;
     }
+#ifdef __GNUC__
+    __uint128_t const left_128 = ((__uint128_t)left->high << 64u) | left->low;
+    __uint128_t const right_128 = ((__uint128_t)right.high << 64u) | right.low;
+    __uint128_t const result = (left_128 * right_128);
+    if ((result < left_128) || (result < right_128))
+    {
+        return false;
+    }
+    integer const product = integer_create((uint64_t)(result >> 64u), (uint64_t)result);
+#else
     integer product = integer_create(0, 0);
     for (uint32_t i = 0; i < 128; ++i)
     {
@@ -144,6 +154,7 @@ bool integer_multiply(integer *left, integer right)
             }
         }
     }
+#endif
     *left = product;
     return 1;
 }
