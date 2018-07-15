@@ -153,7 +153,11 @@ typedef struct optional_value
     value value_;
 } optional_value;
 
-optional_value optional_value_create(value v);
+static inline optional_value optional_value_create(value v)
+{
+    optional_value const result = {true, v};
+    return result;
+}
 
 static optional_value const optional_value_empty = {false, {(value_kind)0, {{NULL, 0}}}};
 

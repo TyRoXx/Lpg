@@ -344,12 +344,6 @@ bool value_greater_than(value const left, value const right)
     return value_less_than(right, left);
 }
 
-optional_value optional_value_create(value v)
-{
-    optional_value const result = {true, v};
-    return result;
-}
-
 bool enum_less_than(enum_element_value const left, enum_element_value const right)
 {
     if (left.which == right.which)
