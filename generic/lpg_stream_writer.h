@@ -16,6 +16,11 @@ typedef struct stream_writer
 
 success_indicator stream_writer_write_unicode_view(stream_writer writer, unicode_view string) LPG_USE_RESULT;
 
+static inline success_indicator stream_writer_write_string(stream_writer writer, char const *c_str)
+{
+    return writer.write(writer.user, c_str, strlen(c_str));
+}
+
 success_indicator stream_writer_write_string(stream_writer writer, LPG_NON_NULL(char const *c_str)) LPG_USE_RESULT;
 success_indicator stream_writer_write_bytes(stream_writer writer, char const *data, size_t size) LPG_USE_RESULT;
 success_indicator stream_writer_write_integer(stream_writer writer, integer const value) LPG_USE_RESULT;

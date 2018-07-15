@@ -7,11 +7,6 @@ success_indicator stream_writer_write_unicode_view(stream_writer writer, unicode
     return stream_writer_write_bytes(writer, string.begin, string.length);
 }
 
-success_indicator stream_writer_write_string(stream_writer writer, char const *c_str)
-{
-    return writer.write(writer.user, c_str, strlen(c_str));
-}
-
 success_indicator stream_writer_write_bytes(stream_writer writer, char const *data, size_t size)
 {
     return writer.write(writer.user, data, size);
