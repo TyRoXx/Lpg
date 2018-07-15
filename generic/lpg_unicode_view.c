@@ -20,16 +20,6 @@ unicode_view unicode_view_from_string(unicode_string string)
     return result;
 }
 
-bool unicode_view_equals_c_str(unicode_view left, char const *right)
-{
-    size_t const length = strlen(right);
-    if (left.length != length)
-    {
-        return false;
-    }
-    return !memcmp(left.begin, right, length);
-}
-
 bool unicode_view_equals(unicode_view left, unicode_view right)
 {
     if (left.length != right.length)
