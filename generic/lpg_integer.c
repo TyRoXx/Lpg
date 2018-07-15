@@ -123,6 +123,11 @@ integer integer_subtract(integer minuend, integer subtrahend)
 
 bool integer_multiply(integer *left, integer right)
 {
+    if ((left->high == 0) && (left->low < UINT32_MAX) && (right.high == 0) && (right.low < UINT32_MAX))
+    {
+        left->low = (left->low * right.low);
+        return true;
+    }
     integer product = integer_create(0, 0);
     for (uint32_t i = 0; i < 128; ++i)
     {
