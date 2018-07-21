@@ -1,32 +1,14 @@
 #include "lpg_generic_enum.h"
 #include "lpg_allocate.h"
 
-generic_closure generic_closure_create(unicode_string name, type what, value content)
+generic_enum generic_enum_create(enum_expression tree, generic_closures closures)
 {
-    generic_closure const result = {name, what, content};
-    return result;
-}
-
-void generic_closure_free(generic_closure const freed)
-{
-    unicode_string_free(&freed.name);
-}
-
-generic_enum generic_enum_create(enum_expression tree, generic_closure *closures, size_t closure_count)
-{
-    generic_enum const result = {tree, closures, closure_count};
+    generic_enum const result = {tree, closures};
     return result;
 }
 
 void generic_enum_free(generic_enum const freed)
 {
-    for (size_t i = 0; i < freed.closure_count; ++i)
-    {
-        generic_closure_free(freed.closures[i]);
-    }
-    if (freed.closures)
-    {
-        deallocate(freed.closures);
-    }
+    generic_closures_free(freed.closures);
     enum_expression_free(freed.tree);
 }

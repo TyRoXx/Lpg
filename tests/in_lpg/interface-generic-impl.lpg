@@ -1,5 +1,45 @@
 let std = import std
 
+// impl for generic interface
+let gi = interface[T]
+    method(): std.boolean
+
+impl[T] gi[T] for std.unit
+    method(): std.boolean
+        std.boolean.true
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.boolean
+        std.boolean.false
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.boolean
+        std.boolean.false
+
+/*let x : gi[int(0, 0)] = std.unit_value
+assert(x.method())
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(y.method())
+
+// impl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z : i = gs[int(0, 0)]{0}
+assert(z.method())
+
+let u : i = gs[int(0, 1)]{1}
+assert(u.method())
+
+// impl for generic interface and generic self
 let mutable = interface[T]
     load(): T
     store(value: T): std.unit
@@ -7,7 +47,7 @@ let mutable = interface[T]
 let mutable-content = struct[T]
     content: std.array[T]
 
-/*impl[T] mutable[T] for mutable-content[T]
+impl[T] mutable[T] for mutable-content[T]
     load(): T
         match self.content.load(0)
             case std.option[T].some(let value):

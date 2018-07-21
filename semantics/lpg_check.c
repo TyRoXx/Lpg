@@ -2107,6 +2107,20 @@ static void find_generic_closures_in_expression(generic_closures *const closures
     }
 }
 
+static generic_closures find_generic_closures_in_impl(function_checking_state *const state, impl_expression const from)
+{
+    generic_closures result = {NULL, 0};
+    find_generic_closures_in_expression(&result, state, *from.interface);
+    find_generic_closures_in_expression(&result, state, *from.self);
+    for (size_t i = 0; i < from.method_count; ++i)
+    {
+        impl_expression_method const method = from.methods[i];
+        find_generic_closures_in_function_header(&result, state, method.header);
+        find_generic_closures_in_sequence(&result, state, method.body);
+    }
+    return result;
+}
+
 static generic_closures find_generic_interface_closures(function_checking_state *const state,
                                                         interface_expression const definition)
 {
@@ -2382,9 +2396,83 @@ static void add_implementation(lpg_interface *const to, implementation_entry con
     to->implementation_count = new_impl_count;
 }
 
+static evaluate_expression_result evaluate_generic_impl(function_checking_state *state,
+                                                        instruction_sequence *const function,
+                                                        impl_expression const element)
+{
+    if (element.interface->type != expression_type_generic_instantiation)
+    {
+        LPG_TO_DO();
+    }
+
+    generic_instantiation_expression const instantiation = element.interface->generic_instantiation;
+    if (instantiation.count != element.generic_parameters.count)
+    {
+        LPG_TO_DO();
+    }
+    for (size_t i = 0; i < instantiation.count; ++i)
+    {
+        expression const argument = instantiation.arguments[i];
+        if (argument.type != expression_type_identifier)
+        {
+            LPG_TO_DO();
+        }
+        if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
+                                 unicode_view_from_string(element.generic_parameters.names[i])))
+        {
+            LPG_TO_DO();
+        }
+    }
+
+    evaluate_expression_result const generic = evaluate_expression(state, function, *instantiation.generic, NULL);
+    if (!generic.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!generic.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (generic.compile_time_value.value_.kind != value_kind_generic_interface)
+    {
+        LPG_TO_DO();
+    }
+
+    evaluate_expression_result const self = evaluate_expression(state, function, *element.self, NULL);
+    if (!self.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!self.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (self.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+
+    generic_closures const closures = find_generic_closures_in_impl(state, element);
+
+    program_check *const root = state->root;
+    generic_interface *const interface_ =
+        &root->generic_interfaces[generic.compile_time_value.value_.generic_interface];
+    interface_->generic_impls = reallocate_array(
+        interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
+    interface_->generic_impls[interface_->generic_impl_count] =
+        generic_impl_create(impl_expression_clone(element), closures, self.compile_time_value.value_.type_);
+    interface_->generic_impl_count += 1;
+    return make_unit(&state->used_registers, function);
+}
+
 static evaluate_expression_result evaluate_impl(function_checking_state *state, instruction_sequence *const function,
                                                 impl_expression const element)
 {
+    if (element.generic_parameters.count > 0)
+    {
+        return evaluate_generic_impl(state, function, element);
+    }
+
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
 
     compile_time_type_expression_result const interface_evaluated =
@@ -2555,7 +2643,7 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
         reallocate_array(root->generic_enums, root->generic_enum_count + 1, sizeof(*root->generic_enums));
     generic_enum_id const id = root->generic_enum_count;
     generic_closures const closures = find_generic_closures(state, element);
-    root->generic_enums[id] = generic_enum_create(enum_expression_clone(element), closures.elements, closures.count);
+    root->generic_enums[id] = generic_enum_create(enum_expression_clone(element), closures);
     root->generic_enum_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -2730,15 +2818,17 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                                argument_register));
         write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < instantiated_enum.closure_count; ++i)
+    for (size_t i = 0; i < instantiated_enum.closures.count; ++i)
     {
         register_id const closure_register = allocate_register(&enum_checking.used_registers);
         add_local_variable(
             &enum_checking.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(instantiated_enum.closures[i].name)),
-                                  local_variable_phase_initialized, instantiated_enum.closures[i].what,
-                                  optional_value_create(instantiated_enum.closures[i].content), closure_register));
-        write_register_compile_time_value(&enum_checking, closure_register, instantiated_enum.closures[i].content);
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_enum.closures.elements[i].name)),
+                local_variable_phase_initialized, instantiated_enum.closures.elements[i].what,
+                optional_value_create(instantiated_enum.closures.elements[i].content), closure_register));
+        write_register_compile_time_value(
+            &enum_checking, closure_register, instantiated_enum.closures.elements[i].content);
     }
     evaluate_expression_result const evaluated =
         evaluate_enum_expression(&enum_checking, &ignored_instructions,

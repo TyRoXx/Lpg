@@ -12,6 +12,7 @@
 #include "lpg_generic_interface_instantiation.h"
 #include "lpg_module.h"
 #include "lpg_load_module.h"
+#include "lpg_generic_impl.h"
 #include "lpg_generic_lambda_instantiation.h"
 #include "lpg_generic_struct_instantiation.h"
 
