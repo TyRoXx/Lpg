@@ -441,6 +441,8 @@ void test_interpreter(void)
                                                  "interface.lpg",
                                                  "interface-constant.lpg",
                                                  "interface-generic.lpg",
+                                                 "struct-generic.lpg",
+                                                 "interface-generic-impl.lpg",
                                                  "interface-recursive.lpg",
                                                  "lambda-capture.lpg",
                                                  "lambda-capture-compile-time.lpg",

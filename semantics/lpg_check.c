@@ -80,6 +80,9 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
 {
     switch (callee.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -255,6 +258,9 @@ static read_structure_element_result read_element(function_checking_state *state
     type const *const actual_type = &object.type_;
     switch (actual_type->kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
     case type_kind_method_pointer:
@@ -299,6 +305,9 @@ static read_structure_element_result read_element(function_checking_state *state
         type const left_side_type = object.compile_time_value.value_.type_;
         switch (left_side_type.kind)
         {
+        case type_kind_generic_struct:
+            LPG_TO_DO();
+
         case type_kind_string:
         case type_kind_unit:
         case type_kind_type:
@@ -364,6 +373,9 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 {
     switch (callee.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->parameters.length;
 
@@ -932,6 +944,9 @@ static conversion_result convert(function_checking_state *const state, instructi
     }
     switch (to.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -1024,6 +1039,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
     switch (callee.type_.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -1096,6 +1114,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         {
             switch (callee.compile_time_value.value_.kind)
             {
+            case value_kind_generic_struct:
+                LPG_TO_DO();
+
             case value_kind_generic_lambda:
             case value_kind_array:
                 LPG_TO_DO();
@@ -1165,6 +1186,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         result = allocate_register(&state->used_registers);
         switch (callee.type_.kind)
         {
+        case type_kind_generic_struct:
+            LPG_TO_DO();
+
         case type_kind_host_value:
         case type_kind_generic_lambda:
         case type_kind_method_pointer:
@@ -1392,6 +1416,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
     switch (key.type_.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -2092,6 +2119,18 @@ static generic_closures find_generic_interface_closures(function_checking_state 
     return result;
 }
 
+static generic_closures find_generic_struct_closures(function_checking_state *const state,
+                                                     struct_expression const definition)
+{
+    generic_closures result = {NULL, 0};
+    for (size_t i = 0; i < definition.element_count; ++i)
+    {
+        struct_expression_element const element = definition.elements[i];
+        find_generic_closures_in_expression(&result, state, element.type);
+    }
+    return result;
+}
+
 static evaluate_expression_result
 evaluate_generic_interface_expression(function_checking_state *state, instruction_sequence *function,
                                       interface_expression const element,
@@ -2192,9 +2231,43 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false, false);
 }
 
-static evaluate_expression_result evaluate_struct(function_checking_state *state, instruction_sequence *function,
-                                                  struct_expression const evaluated)
+static evaluate_expression_result
+evaluate_generic_struct_expression(function_checking_state *state, instruction_sequence *function,
+                                   struct_expression const element,
+                                   unicode_view const *const early_initialized_variable)
 {
+    program_check *const root = state->root;
+    root->generic_structs =
+        reallocate_array(root->generic_structs, root->generic_struct_count + 1, sizeof(*root->generic_structs));
+    generic_struct_id const id = root->generic_struct_count;
+    register_id const into = allocate_register(&state->used_registers);
+
+    if (early_initialized_variable)
+    {
+        initialize_early(&state->local_variables, *early_initialized_variable, type_from_generic_struct(),
+                         optional_value_create(value_from_generic_struct(id)), into);
+    }
+
+    generic_closures const closures = find_generic_struct_closures(state, element);
+    root->generic_structs[id] = generic_struct_create(struct_expression_clone(element), closures);
+    root->generic_struct_count += 1;
+
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  into, value_from_generic_struct(id), type_from_generic_struct())));
+    write_register_compile_time_value(state, into, value_from_generic_struct(id));
+    return evaluate_expression_result_create(
+        true, into, type_from_generic_struct(), optional_value_create(value_from_generic_struct(id)), true, false);
+}
+
+static evaluate_expression_result evaluate_struct(function_checking_state *state, instruction_sequence *function,
+                                                  struct_expression const evaluated,
+                                                  unicode_view const *const early_initialized_variable)
+{
+    if (evaluated.generic_parameters.count > 0)
+    {
+        return evaluate_generic_struct_expression(state, function, evaluated, early_initialized_variable);
+    }
+
     structure_member *elements = allocate_array(evaluated.element_count, sizeof(*elements));
     for (size_t i = 0; i < evaluated.element_count; ++i)
     {
@@ -2714,6 +2787,147 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     return evaluated;
 }
 
+static evaluate_expression_result instantiate_generic_struct(function_checking_state *const state,
+                                                             instruction_sequence *const function,
+                                                             generic_struct_id const generic, value *const arguments,
+                                                             size_t const argument_count, type *const argument_types,
+                                                             source_location const where)
+{
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->struct_instantiation_count; ++i)
+    {
+        generic_struct_instantiation *const instantiation = root->struct_instantiations + i;
+        if (instantiation->generic != generic)
+        {
+            continue;
+        }
+        if (argument_count != instantiation->argument_count)
+        {
+            LPG_UNREACHABLE();
+        }
+        if (!values_equal(instantiation->arguments, arguments, argument_count))
+        {
+            continue;
+        }
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        register_id const into = allocate_register(&state->used_registers);
+        value const literal = value_from_type(type_from_struct(instantiation->instantiated));
+        add_instruction(
+            function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
+        write_register_compile_time_value(state, into, literal);
+        return evaluate_expression_result_create(
+            true, into, type_from_type(), optional_value_create(literal), true, false);
+    }
+    struct_expression const original = root->generic_structs[generic].tree;
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    function_checking_state struct_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
+        optional_type_create_empty(), false, state->file_name, state->source);
+    generic_struct const instantiated_struct = state->root->generic_structs[generic];
+    if (argument_count < instantiated_struct.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_struct.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    for (size_t i = 0; i < instantiated_struct.tree.generic_parameters.count; ++i)
+    {
+        register_id const argument_register = allocate_register(&struct_checking.used_registers);
+        add_local_variable(
+            &struct_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_struct.tree.generic_parameters.names[i])),
+                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
+                argument_register));
+        write_register_compile_time_value(&struct_checking, argument_register, arguments[i]);
+    }
+    for (size_t i = 0; i < instantiated_struct.closures.count; ++i)
+    {
+        register_id const closure_register = allocate_register(&struct_checking.used_registers);
+        add_local_variable(
+            &struct_checking.local_variables,
+            local_variable_create(
+                unicode_view_copy(unicode_view_from_string(instantiated_struct.closures.elements[i].name)),
+                local_variable_phase_initialized, instantiated_struct.closures.elements[i].what,
+                optional_value_create(instantiated_struct.closures.elements[i].content), closure_register));
+        write_register_compile_time_value(
+            &struct_checking, closure_register, instantiated_struct.closures.elements[i].content);
+    }
+    evaluate_expression_result const evaluated =
+        evaluate_struct(&struct_checking, &ignored_instructions,
+                        struct_expression_create(generic_parameter_list_create(NULL, 0), original.source,
+                                                 original.elements, original.element_count),
+                        NULL);
+    instruction_sequence_free(&ignored_instructions);
+    local_variable_container_free(struct_checking.local_variables);
+    if (struct_checking.register_compile_time_values)
+    {
+        deallocate(struct_checking.register_compile_time_values);
+    }
+    if (!evaluated.has_value)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        return evaluate_expression_result_empty;
+    }
+    if (!evaluated.compile_time_value.is_set)
+    {
+        LPG_UNREACHABLE();
+    }
+    if (evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_UNREACHABLE();
+    }
+    if (evaluated.compile_time_value.value_.type_.kind != type_kind_structure)
+    {
+        LPG_UNREACHABLE();
+    }
+    size_t const id = root->struct_instantiation_count;
+    root->struct_instantiations = reallocate_array(
+        root->struct_instantiations, root->struct_instantiation_count + 1, sizeof(*root->struct_instantiations));
+    root->struct_instantiations[id] = generic_struct_instantiation_create(
+        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.structure_);
+    root->struct_instantiation_count += 1;
+    if (argument_types)
+    {
+        deallocate(argument_types);
+    }
+    return evaluated;
+}
+
 static evaluate_expression_result instantiate_generic_interface(function_checking_state *const state,
                                                                 instruction_sequence *const function,
                                                                 generic_interface_id const generic,
@@ -3066,6 +3280,12 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     if (generic_evaluated.compile_time_value.value_.kind == value_kind_generic_lambda)
     {
         return instantiate_generic_lambda(state, function, generic_evaluated.compile_time_value.value_.generic_lambda,
+                                          arguments, element.count, argument_types,
+                                          expression_source_begin(*element.generic));
+    }
+    if (generic_evaluated.compile_time_value.value_.kind == value_kind_generic_struct)
+    {
+        return instantiate_generic_struct(state, function, generic_evaluated.compile_time_value.value_.generic_struct,
                                           arguments, element.count, argument_types,
                                           expression_source_begin(*element.generic));
     }
@@ -3443,7 +3663,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return evaluate_tuple_expression(state, function, element.tuple);
 
     case expression_type_struct:
-        return evaluate_struct(state, function, element.struct_);
+        return evaluate_struct(state, function, element.struct_, early_initialized_variable);
 
     case expression_type_placeholder:
     case expression_type_binary:
@@ -3549,7 +3769,7 @@ checked_program check(sequence const root, structure const global, check_error_h
         }
     }
     program_check check_root = {
-        NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL};
+        NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);

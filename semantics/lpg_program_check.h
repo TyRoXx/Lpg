@@ -3,7 +3,9 @@
 #include "lpg_generic_interface.h"
 #include "lpg_generic_interface_id.h"
 #include "lpg_generic_enum.h"
+#include "lpg_generic_struct.h"
 #include "lpg_generic_enum_id.h"
+#include "lpg_generic_struct_id.h"
 #include "lpg_generic_lambda.h"
 #include "lpg_generic_lambda_id.h"
 #include "lpg_generic_enum_instantiation.h"
@@ -11,6 +13,7 @@
 #include "lpg_module.h"
 #include "lpg_load_module.h"
 #include "lpg_generic_lambda_instantiation.h"
+#include "lpg_generic_struct_instantiation.h"
 
 typedef struct program_check
 {
@@ -26,6 +29,10 @@ typedef struct program_check
     generic_lambda_id generic_lambda_count;
     generic_lambda_instantiation *lambda_instantiations;
     size_t lambda_instantiation_count;
+    generic_struct *generic_structs;
+    generic_struct_id generic_struct_count;
+    generic_struct_instantiation *struct_instantiations;
+    size_t struct_instantiation_count;
     module *modules;
     size_t module_count;
     module_loader *loader;

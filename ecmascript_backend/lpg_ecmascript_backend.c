@@ -194,6 +194,9 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_generic_enum:
         return stream_writer_write_string(ecmascript_output, "/*generic enum*/ undefined");
 
+    case value_kind_generic_struct:
+        return stream_writer_write_string(ecmascript_output, "/*generic struct*/ undefined");
+
     case value_kind_type:
         return stream_writer_write_string(ecmascript_output, "/*TODO type*/ undefined");
 
@@ -319,6 +322,9 @@ static success_indicator generate_register_read(function_generation *const state
     }
     switch (info.known_value.value_.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_integer:
     case value_kind_string:
     case value_kind_generic_enum:
@@ -485,6 +491,9 @@ static success_indicator generate_read_struct(function_generation *const state, 
     type_kind const kind = object.type_of.kind;
     switch (kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -535,6 +544,9 @@ static success_indicator generate_call(function_generation *const state, call_in
     LPG_TRY(generate_register_read(state, generated.callee, ecmascript_output));
     switch (callee_type.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_method_pointer:
         LPG_TRY(stream_writer_write_string(ecmascript_output, ".call_method_"));
         LPG_TRY(
@@ -741,6 +753,9 @@ static success_indicator generate_match(function_generation *const state, match_
     type const key_type = state->registers[generated.key].type_of;
     switch (key_type.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_integer_range:
         return generate_equality_comparable_match_cases(state, generated, ecmascript_output);
 

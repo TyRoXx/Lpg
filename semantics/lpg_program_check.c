@@ -19,6 +19,14 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.generic_interfaces);
     }
+    for (size_t i = 0; i < freed.generic_struct_count; ++i)
+    {
+        generic_struct_free(freed.generic_structs[i]);
+    }
+    if (freed.generic_structs)
+    {
+        deallocate(freed.generic_structs);
+    }
     for (size_t i = 0; i < freed.enum_instantiation_count; ++i)
     {
         generic_enum_instantiation_free(freed.enum_instantiations[i]);
@@ -42,6 +50,14 @@ void program_check_free(program_check const freed)
     if (freed.interface_instantiations)
     {
         deallocate(freed.interface_instantiations);
+    }
+    for (size_t i = 0; i < freed.struct_instantiation_count; ++i)
+    {
+        generic_struct_instantiation_free(freed.struct_instantiations[i]);
+    }
+    if (freed.struct_instantiations)
+    {
+        deallocate(freed.struct_instantiations);
     }
     for (size_t i = 0; i < freed.lambda_instantiation_count; ++i)
     {

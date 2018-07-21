@@ -22,6 +22,9 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 {
     switch (root.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_type_erased:
     {
         implementation const impl = all_interfaces[root.type_erased.impl.target]
@@ -129,6 +132,9 @@ static void mark_type(bool *const used_functions, checked_function const *const 
 {
     switch (marked.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_function_pointer:
         mark_function_pointer(used_functions, all_functions, all_interfaces, *marked.function_pointer_);
         break;
@@ -230,6 +236,9 @@ static value adapt_value(value const from, garbage_collector *const clone_gc, fu
 {
     switch (from.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_generic_lambda:
     case value_kind_array:
     case value_kind_pattern:

@@ -13,6 +13,7 @@ static void print_type(type const printed)
 {
     switch (printed.kind)
     {
+    case type_kind_generic_struct:
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -52,6 +53,7 @@ void print_value(value const printed, size_t const indentation)
 {
     switch (printed.kind)
     {
+    case value_kind_generic_struct:
     case value_kind_generic_lambda:
         LPG_TO_DO();
 

@@ -609,6 +609,8 @@ static expression_parser_result parse_interface(expression_parser *const parser,
 static expression_parser_result parse_struct(expression_parser *const parser, size_t const indentation,
                                              source_location const begin)
 {
+    generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
+
     struct_expression_element *elements = NULL;
     size_t element_count = 0;
     bool is_success = true;
@@ -667,7 +669,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
             identifier_expression_create(unicode_view_copy(name.content), name.where), type_parsed.success);
         ++element_count;
     }
-    struct_expression const parsed = struct_expression_create(begin, elements, element_count);
+    struct_expression const parsed = struct_expression_create(generic_parameters, begin, elements, element_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_struct(parsed)};
@@ -1413,6 +1415,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
 
 static expression_parser_result parse_impl(expression_parser *const parser, size_t const indentation)
 {
+    generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
+
     {
         rich_token const space = peek(parser);
         pop(parser);
@@ -1542,8 +1546,9 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
             identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header, body);
         ++method_count;
     }
-    impl_expression const impl = impl_expression_create(
-        expression_allocate(implemented_interface.success), expression_allocate(self.success), methods, method_count);
+    impl_expression const impl =
+        impl_expression_create(generic_parameters, expression_allocate(implemented_interface.success),
+                               expression_allocate(self.success), methods, method_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_impl(impl)};

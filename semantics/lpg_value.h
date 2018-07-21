@@ -7,6 +7,7 @@
 #include "lpg_integer.h"
 #include "lpg_type.h"
 #include "lpg_generic_lambda_id.h"
+#include "lpg_generic_struct_id.h"
 
 typedef struct implementation_ref
 {
@@ -58,7 +59,8 @@ typedef enum value_kind
     value_kind_generic_enum,
     value_kind_generic_interface,
     value_kind_array,
-    value_kind_generic_lambda
+    value_kind_generic_lambda,
+    value_kind_generic_struct
 } value_kind;
 
 typedef struct value_tuple
@@ -123,6 +125,7 @@ typedef struct value
         generic_interface_id generic_interface;
         array_value *array;
         generic_lambda_id generic_lambda;
+        generic_struct_id generic_struct;
     };
 } value;
 
@@ -157,6 +160,7 @@ value value_from_generic_interface(generic_interface_id content);
 value value_from_array(array_value *content);
 value value_from_generic_lambda(generic_lambda_id content);
 value value_or_unit(value const *const maybe);
+value value_from_generic_struct(generic_struct_id content);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);

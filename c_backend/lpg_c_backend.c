@@ -796,6 +796,9 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
         return stream_writer_write_string(c_output, "void *");
 
@@ -1054,6 +1057,9 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     ASSUME(type_is_valid(what));
     switch (what.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_generic_lambda:
         LPG_TO_DO();
 
@@ -1424,6 +1430,9 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_integer:
     {
         if (integer_less(generated.integer_, integer_create(1, 0)))
@@ -1836,6 +1845,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const callee_type = state->registers[input.call.callee].type_of.value;
             switch (callee_type.kind)
             {
+            case type_kind_generic_struct:
+                LPG_TO_DO();
+
             case type_kind_host_value:
             case type_kind_generic_lambda:
                 LPG_TO_DO();
@@ -2056,6 +2068,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             type const object_type = state->registers[input.read_struct.from_object].type_of.value;
             switch (object_type.kind)
             {
+            case type_kind_generic_struct:
+                LPG_TO_DO();
+
             case type_kind_host_value:
             case type_kind_generic_lambda:
                 LPG_TO_DO();
@@ -2161,6 +2176,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
             LPG_TRY(stream_writer_write_string(c_output, "/*generic interface omitted*/\n"));
+            return success_yes;
+
+        case value_kind_generic_struct:
+            set_register_variable(
+                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            LPG_TRY(stream_writer_write_string(c_output, "/*generic struct omitted*/\n"));
             return success_yes;
 
         case value_kind_generic_lambda:
@@ -2523,6 +2544,7 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     case type_kind_host_value:
         return success_yes;
 
+    case type_kind_generic_struct:
     case type_kind_generic_lambda:
         LPG_TO_DO();
 

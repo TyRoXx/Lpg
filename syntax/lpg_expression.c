@@ -352,15 +352,16 @@ interface_expression interface_expression_clone(interface_expression const origi
     return result;
 }
 
-struct_expression struct_expression_create(source_location source, struct_expression_element *elements,
-                                           size_t element_count)
+struct_expression struct_expression_create(generic_parameter_list generic_parameters, source_location source,
+                                           struct_expression_element *elements, size_t element_count)
 {
-    struct_expression const result = {source, elements, element_count};
+    struct_expression const result = {generic_parameters, source, elements, element_count};
     return result;
 }
 
 void struct_expression_free(struct_expression const *const value)
 {
+    generic_parameter_list_free(value->generic_parameters);
     for (size_t i = 0; i < value->element_count; ++i)
     {
         struct_expression_element_free(&value->elements[i]);
@@ -373,6 +374,10 @@ void struct_expression_free(struct_expression const *const value)
 
 bool struct_expression_equals(struct_expression const left, struct_expression const right)
 {
+    if (!generic_parameter_list_equals(left.generic_parameters, right.generic_parameters))
+    {
+        return false;
+    }
     if (!source_location_equals(left.source, right.source))
     {
         return false;
@@ -398,7 +403,8 @@ struct_expression struct_expression_clone(struct_expression const original)
     {
         elements[i] = struct_expression_element_clone(original.elements[i]);
     }
-    return struct_expression_create(original.source, elements, original.element_count);
+    return struct_expression_create(
+        generic_parameter_list_clone(original.generic_parameters), original.source, elements, original.element_count);
 }
 
 impl_expression_method impl_expression_method_create(identifier_expression name, function_header_tree header,
@@ -427,15 +433,16 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
                                          function_header_tree_clone(original.header), sequence_clone(original.body));
 }
 
-impl_expression impl_expression_create(expression *interface, expression *self, impl_expression_method *methods,
-                                       size_t method_count)
+impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface,
+                                       expression *self, impl_expression_method *methods, size_t method_count)
 {
-    impl_expression const result = {interface, self, methods, method_count};
+    impl_expression const result = {generic_parameters, interface, self, methods, method_count};
     return result;
 }
 
 void impl_expression_free(impl_expression value)
 {
+    generic_parameter_list_free(value.generic_parameters);
     expression_deallocate(value.interface);
     expression_deallocate(value.self);
     for (size_t i = 0; i < value.method_count; ++i)
@@ -450,6 +457,10 @@ void impl_expression_free(impl_expression value)
 
 bool impl_expression_equals(impl_expression const left, impl_expression const right)
 {
+    if (!generic_parameter_list_equals(left.generic_parameters, right.generic_parameters))
+    {
+        return false;
+    }
     if (!expression_equals(left.interface, right.interface) || !expression_equals(left.self, right.self) ||
         (left.method_count != right.method_count))
     {
@@ -472,7 +483,8 @@ impl_expression impl_expression_clone(impl_expression const original)
     {
         methods[i] = impl_expression_method_clone(original.methods[i]);
     }
-    return impl_expression_create(expression_allocate(expression_clone(*original.interface)),
+    return impl_expression_create(generic_parameter_list_clone(original.generic_parameters),
+                                  expression_allocate(expression_clone(*original.interface)),
                                   expression_allocate(expression_clone(*original.self)), methods,
                                   original.method_count);
 }

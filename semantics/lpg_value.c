@@ -219,6 +219,14 @@ value value_or_unit(value const *const maybe)
     return maybe ? *maybe : value_from_unit();
 }
 
+value value_from_generic_struct(generic_struct_id content)
+{
+    value result;
+    result.kind = value_kind_generic_struct;
+    result.generic_struct = content;
+    return result;
+}
+
 bool value_equals(value const left, value const right)
 {
     ASSUME(value_is_valid(left));
@@ -229,6 +237,9 @@ bool value_equals(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_generic_lambda:
     case value_kind_array:
     case value_kind_type_erased:
@@ -294,6 +305,9 @@ bool value_less_than(value const left, value const right)
     }
     switch (left.kind)
     {
+    case value_kind_generic_struct:
+        LPG_TO_DO();
+
     case value_kind_generic_lambda:
     case value_kind_array:
     case value_kind_type_erased:
@@ -340,7 +354,7 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
 
 bool value_is_valid(value const checked)
 {
-    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_lambda);
+    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_struct);
 }
 
 bool value_conforms_to_type(value const instance, type const expected)
@@ -348,6 +362,9 @@ bool value_conforms_to_type(value const instance, type const expected)
     ASSUME(value_is_valid(instance));
     switch (expected.kind)
     {
+    case type_kind_generic_struct:
+        LPG_TO_DO();
+
     case type_kind_host_value:
     case type_kind_generic_lambda:
     case type_kind_enum_constructor:

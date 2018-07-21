@@ -118,7 +118,8 @@ void test_parse_expression_success(void)
                               false);
     }
 
-    test_successful_parse(expression_from_struct(struct_expression_create(source_location_create(0, 0), NULL, 0)),
+    test_successful_parse(expression_from_struct(struct_expression_create(
+                              generic_parameter_list_create(NULL, 0), source_location_create(0, 0), NULL, 0)),
                           unicode_string_from_c_str("struct"), false);
 
     {
@@ -127,11 +128,11 @@ void test_parse_expression_success(void)
             identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(1, 4)),
             expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("c"), source_location_create(1, 7))));
-        test_successful_parse(
-            expression_from_struct(struct_expression_create(source_location_create(0, 0), elements, 1)),
-            unicode_string_from_c_str("struct\n"
-                                      "    a: c"),
-            false);
+        test_successful_parse(expression_from_struct(struct_expression_create(
+                                  generic_parameter_list_create(NULL, 0), source_location_create(0, 0), elements, 1)),
+                              unicode_string_from_c_str("struct\n"
+                                                        "    a: c"),
+                              false);
     }
 
     {
@@ -144,12 +145,12 @@ void test_parse_expression_success(void)
             identifier_expression_create(unicode_string_from_c_str("b"), source_location_create(2, 4)),
             expression_from_identifier(
                 identifier_expression_create(unicode_string_from_c_str("d"), source_location_create(2, 7))));
-        test_successful_parse(
-            expression_from_struct(struct_expression_create(source_location_create(0, 0), elements, 2)),
-            unicode_string_from_c_str("struct\n"
-                                      "    a: c\n"
-                                      "    b: d"),
-            false);
+        test_successful_parse(expression_from_struct(struct_expression_create(
+                                  generic_parameter_list_create(NULL, 0), source_location_create(0, 0), elements, 2)),
+                              unicode_string_from_c_str("struct\n"
+                                                        "    a: c\n"
+                                                        "    b: d"),
+                              false);
     }
 
     {

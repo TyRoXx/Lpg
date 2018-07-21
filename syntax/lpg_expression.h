@@ -237,13 +237,14 @@ typedef struct struct_expression_element struct_expression_element;
 
 typedef struct struct_expression
 {
+    generic_parameter_list generic_parameters;
     source_location source;
     struct_expression_element *elements;
     size_t element_count;
 } struct_expression;
 
-struct_expression struct_expression_create(source_location source, struct_expression_element *elements,
-                                           size_t element_count);
+struct_expression struct_expression_create(generic_parameter_list generic_parameters, source_location source,
+                                           struct_expression_element *elements, size_t element_count);
 void struct_expression_free(LPG_NON_NULL(struct_expression const *const value));
 bool struct_expression_equals(struct_expression const left, struct_expression const right);
 struct_expression struct_expression_clone(struct_expression const original);
@@ -263,14 +264,15 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
 
 typedef struct impl_expression
 {
+    generic_parameter_list generic_parameters;
     expression *interface;
     expression *self;
     impl_expression_method *methods;
     size_t method_count;
 } impl_expression;
 
-impl_expression impl_expression_create(expression *interface, expression *self, impl_expression_method *methods,
-                                       size_t method_count);
+impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface,
+                                       expression *self, impl_expression_method *methods, size_t method_count);
 void impl_expression_free(impl_expression value);
 bool impl_expression_equals(impl_expression const left, impl_expression const right);
 impl_expression impl_expression_clone(impl_expression const original);
