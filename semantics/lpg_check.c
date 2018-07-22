@@ -21,12 +21,12 @@ check_function_result const check_function_result_empty = {false, {NULL, {NULL, 
 
 typedef struct evaluate_expression_result
 {
-    bool has_value;
-    register_id where;
     type type_;
     optional_value compile_time_value;
+    register_id where;
     bool is_pure;
     bool always_returns;
+    bool has_value;
 } evaluate_expression_result;
 
 static evaluate_expression_result evaluate_expression_result_create(bool const has_value, register_id const where,
@@ -34,12 +34,12 @@ static evaluate_expression_result evaluate_expression_result_create(bool const h
                                                                     optional_value const compile_time_value,
                                                                     bool const is_pure, bool const always_returns)
 {
-    evaluate_expression_result const result = {has_value, where, type_, compile_time_value, is_pure, always_returns};
+    evaluate_expression_result const result = {type_, compile_time_value, where, is_pure, always_returns, has_value};
     return result;
 }
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
-    false, 0, {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, false, false};
+    {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, 0, false, false, false};
 
 static function_checking_state
 function_checking_state_create(program_check *const root, function_checking_state *parent,
@@ -117,9 +117,9 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
 
 typedef struct read_structure_element_result
 {
-    bool success;
-    type type_;
     optional_value compile_time_value;
+    type type_;
+    bool success;
     bool is_pure;
 } read_structure_element_result;
 
@@ -127,7 +127,7 @@ static read_structure_element_result read_structure_element_result_create(bool c
                                                                           optional_value const compile_time_value,
                                                                           bool const is_pure)
 {
-    read_structure_element_result const result = {success, type_, compile_time_value, is_pure};
+    read_structure_element_result const result = {compile_time_value, type_, success, is_pure};
     return result;
 }
 
@@ -653,21 +653,21 @@ check_function_result check_function(program_check *const root, function_checkin
 static evaluate_expression_result make_compile_time_unit(void)
 {
     evaluate_expression_result const result = {
-        false, 0, type_from_unit(), optional_value_create(value_from_unit()), true, false};
+        type_from_unit(), optional_value_create(value_from_unit()), 0, true, false, false};
     return result;
 }
 
 typedef struct compile_time_type_expression_result
 {
-    bool has_value;
-    register_id where;
     type compile_time_value;
+    register_id where;
+    bool has_value;
 } compile_time_type_expression_result;
 
 static compile_time_type_expression_result compile_time_type_expression_result_create(bool has_value, register_id where,
                                                                                       type compile_time_value)
 {
-    compile_time_type_expression_result const result = {has_value, where, compile_time_value};
+    compile_time_type_expression_result const result = {compile_time_value, where, has_value};
     return result;
 }
 
@@ -694,21 +694,21 @@ expect_compile_time_type(function_checking_state *state, instruction_sequence *f
 
 typedef struct evaluated_function_header
 {
-    bool is_success;
+    optional_type return_type;
     type *parameter_types;
     unicode_string *parameter_names;
-    optional_type return_type;
+    bool is_success;
 } evaluated_function_header;
 
 static evaluated_function_header
 evaluated_function_header_create(type *parameter_types, unicode_string *parameter_names, optional_type return_type)
 {
-    evaluated_function_header const result = {true, parameter_types, parameter_names, return_type};
+    evaluated_function_header const result = {return_type, parameter_types, parameter_names, true};
     return result;
 }
 
 static evaluated_function_header const evaluated_function_header_failure = {
-    false, NULL, NULL, {false, {type_kind_unit, {0}}}};
+    {false, {type_kind_unit, {0}}}, NULL, NULL, false};
 
 static void evaluate_function_header_clean_up(type *const parameter_types, unicode_string *const parameter_names,
                                               size_t const parameter_count)
@@ -1003,9 +1003,9 @@ static conversion_result convert(function_checking_state *const state, instructi
 
 typedef struct argument_evaluation_result
 {
-    success_indicator ok;
     optional_value compile_time_value;
     register_id where;
+    success_indicator ok;
 } argument_evaluation_result;
 
 static argument_evaluation_result evaluate_argument(function_checking_state *const state,
@@ -1016,14 +1016,14 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
     evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree, NULL);
     if (!argument.has_value)
     {
-        argument_evaluation_result const result = {success_no, optional_value_empty, 0};
+        argument_evaluation_result const result = {optional_value_empty, 0, success_no};
         return result;
     }
     conversion_result const converted =
         convert(state, function, argument.where, argument.type_, argument.compile_time_value,
                 expression_source_begin(argument_tree),
                 get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums), false);
-    argument_evaluation_result const result = {converted.ok, converted.compile_time_value, converted.where};
+    argument_evaluation_result const result = {converted.compile_time_value, converted.where, converted.ok};
     return result;
 }
 
@@ -1293,24 +1293,24 @@ typedef enum pattern_evaluate_result_kind
 
 typedef struct pattern_evaluate_result
 {
-    pattern_evaluate_result_kind kind;
     enum_constructor_type stateful_enum_element;
     unicode_view placeholder_name;
     source_location placeholder_name_source;
+    pattern_evaluate_result_kind kind;
 } pattern_evaluate_result;
 
 static pattern_evaluate_result const pattern_evaluate_result_no = {
-    pattern_evaluate_result_kind_no_pattern, {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}};
+    {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}, pattern_evaluate_result_kind_no_pattern};
 
 static pattern_evaluate_result const pattern_evaluate_result_failure = {
-    pattern_evaluate_result_kind_failure, {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}};
+    {~(enum_id)0, ~(enum_element_id)0}, {NULL, 0}, {0, 0}, pattern_evaluate_result_kind_failure};
 
 static pattern_evaluate_result pattern_evaluate_result_create_pattern(enum_constructor_type stateful_enum_element,
                                                                       unicode_view placeholder_name,
                                                                       source_location placeholder_name_source)
 {
     pattern_evaluate_result const result = {
-        pattern_evaluate_result_kind_is_pattern, stateful_enum_element, placeholder_name, placeholder_name_source};
+        stateful_enum_element, placeholder_name, placeholder_name_source, pattern_evaluate_result_kind_is_pattern};
     return result;
 }
 
@@ -2326,16 +2326,18 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
 
 typedef struct method_evaluation_result
 {
-    bool is_success;
     function_pointer_value success;
+    bool is_success;
 } method_evaluation_result;
 
 static method_evaluation_result const method_evaluation_result_failure = {
-    false, {0, NULL, NULL, NULL, 0, {{(type_kind)0, {0}}, {NULL, 0}, {NULL, 0}, {false, {(type_kind)0, {0}}}}}};
+    {0, NULL, NULL, NULL, 0, {{(type_kind)0, {0}}, {NULL, 0}, {NULL, 0}, {false, {(type_kind)0, {0}}}}}, false};
 
 static method_evaluation_result method_evaluation_result_create(function_pointer_value success)
 {
-    method_evaluation_result const result = {true, success};
+    method_evaluation_result const result = {
+        success, true,
+    };
     return result;
 }
 
@@ -3589,7 +3591,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
                                   literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
     write_register_compile_time_value(state, unit_goes_into, value_from_unit());
     evaluate_expression_result const result = {
-        true, unit_goes_into, type_from_unit(), optional_value_create(value_from_unit()), false, false};
+        type_from_unit(), optional_value_create(value_from_unit()), unit_goes_into, false, false, true};
     return result;
 }
 
@@ -3719,12 +3721,12 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         state->is_in_loop = previous_is_in_loop;
         register_id const unit_goes_into = allocate_register(&state->used_registers);
         add_instruction(function, instruction_create_loop(loop_instruction_create(unit_goes_into, body)));
-        evaluate_expression_result const loop_result = {true,
-                                                        unit_goes_into,
-                                                        type_from_unit(),
+        evaluate_expression_result const loop_result = {type_from_unit(),
                                                         optional_value_create(value_from_unit()),
+                                                        unit_goes_into,
                                                         true,
-                                                        loop_body_result.always_returns};
+                                                        loop_body_result.always_returns,
+                                                        true};
         return loop_result;
     }
 
