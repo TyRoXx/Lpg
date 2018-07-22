@@ -196,9 +196,12 @@ success_indicator create_directory(unicode_view const path)
     if (mkdir(zero_terminated_path.data, 0744) < 0)
     {
         int const last_error = errno;
-        fprintf(stderr, "Could not create directory '%s', error: %d\n", zero_terminated_path.data, last_error);
-        unicode_string_free(&zero_terminated_path);
-        return success_no;
+        if (last_error != EEXIST)
+        {
+            fprintf(stderr, "Could not create directory '%s', error: %d\n", zero_terminated_path.data, last_error);
+            unicode_string_free(&zero_terminated_path);
+            return success_no;
+        }
     }
     unicode_string_free(&zero_terminated_path);
     return success_yes;
