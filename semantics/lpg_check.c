@@ -909,6 +909,88 @@ static optional_size find_implementation(lpg_interface const *const in, type con
     return optional_size_empty;
 }
 
+static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
+                                        impl_expression_method const *const method_trees, size_t const method_count,
+                                        type const self, interface_id const target_interface,
+                                        source_location const self_source);
+
+static optional_size instantiate_generic_impl(function_checking_state *const state, interface_id const target_interface,
+                                              generic_impl const generic, type const *const argument_types,
+                                              value *const arguments, type const self)
+{
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    function_checking_state interface_checking = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
+        optional_type_create_empty(), false, state->file_name, state->source);
+    for (size_t i = 0; i < generic.tree.generic_parameters.count; ++i)
+    {
+        register_id const argument_register = allocate_register(&interface_checking.used_registers);
+        add_local_variable(
+            &interface_checking.local_variables,
+            local_variable_create(unicode_view_copy(unicode_view_from_string(generic.tree.generic_parameters.names[i])),
+                                  local_variable_phase_initialized, argument_types[i],
+                                  optional_value_create(arguments[i]), argument_register));
+        write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
+    }
+    for (size_t i = 0; i < generic.closures.count; ++i)
+    {
+        register_id const closure_register = allocate_register(&interface_checking.used_registers);
+        add_local_variable(
+            &interface_checking.local_variables,
+            local_variable_create(unicode_view_copy(unicode_view_from_string(generic.closures.elements[i].name)),
+                                  local_variable_phase_initialized, generic.closures.elements[i].what,
+                                  optional_value_create(generic.closures.elements[i].content), closure_register));
+        write_register_compile_time_value(&interface_checking, closure_register, generic.closures.elements[i].content);
+    }
+    optional_size const evaluated =
+        evaluate_impl_core(&interface_checking, &ignored_instructions, generic.tree.methods, generic.tree.method_count,
+                           self, target_interface, expression_source_begin(*generic.tree.self));
+    instruction_sequence_free(&ignored_instructions);
+    local_variable_container_free(interface_checking.local_variables);
+    if (interface_checking.register_compile_time_values)
+    {
+        deallocate(interface_checking.register_compile_time_values);
+    }
+    return evaluated;
+}
+
+static optional_size try_to_instantiate_generic_impl(function_checking_state *const state,
+                                                     interface_id const target_interface, generic_interface_id const id,
+                                                     type const self, type *const argument_types,
+                                                     value *const arguments)
+{
+    generic_interface *const generic = state->root->generic_interfaces + id;
+    for (size_t i = 0; i < generic->generic_impl_count; ++i)
+    {
+        generic_impl *const impl = generic->generic_impls + i;
+        if (type_equals(impl->self, self))
+        {
+            return instantiate_generic_impl(state, target_interface, *impl, argument_types, arguments, self);
+        }
+    }
+    return optional_size_empty;
+}
+
+static optional_size require_implementation(function_checking_state *const state, interface_id const to,
+                                            type const self)
+{
+    optional_size const already_exists = find_implementation(state->program->interfaces + to, self);
+    if (already_exists.state == optional_set)
+    {
+        return already_exists;
+    }
+    for (size_t i = 0; i < state->root->interface_instantiation_count; ++i)
+    {
+        generic_interface_instantiation *const instantiation = state->root->interface_instantiations + i;
+        if (instantiation->instantiated == to)
+        {
+            return try_to_instantiate_generic_impl(
+                state, to, instantiation->generic, self, instantiation->argument_types, instantiation->arguments);
+        }
+    }
+    return optional_size_empty;
+}
+
 static conversion_result convert_to_interface(function_checking_state *const state,
                                               instruction_sequence *const function, register_id const original,
                                               type const from, source_location const original_source,
@@ -918,7 +1000,7 @@ static conversion_result convert_to_interface(function_checking_state *const sta
     {
         LPG_TO_DO();
     }
-    optional_size const impl = find_implementation(state->program->interfaces + to, from);
+    optional_size const impl = require_implementation(state, to, from);
     if (impl.state == optional_empty)
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
@@ -2390,12 +2472,14 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
-static void add_implementation(lpg_interface *const to, implementation_entry const added)
+static size_t add_implementation(lpg_interface *const to, implementation_entry const added)
 {
+    size_t const new_impl_id = to->implementation_count;
     size_t const new_impl_count = to->implementation_count + 1;
     to->implementations = reallocate_array(to->implementations, new_impl_count, sizeof(*to->implementations));
     to->implementations[to->implementation_count] = added;
     to->implementation_count = new_impl_count;
+    return new_impl_id;
 }
 
 static evaluate_expression_result evaluate_generic_impl(function_checking_state *state,
@@ -2467,6 +2551,38 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
     return make_unit(&state->used_registers, function);
 }
 
+static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
+                                        impl_expression_method const *const method_trees, size_t const method_count,
+                                        type const self, interface_id const target_interface,
+                                        source_location const self_source)
+{
+    function_pointer_value *const methods = allocate_array(method_count, sizeof(*methods));
+    for (size_t i = 0; i < method_count; ++i)
+    {
+        method_evaluation_result const method = evaluate_method_definition(
+            state, function, method_trees[i], self, state->program->interfaces[target_interface].methods[i].result);
+        if (!method.is_success)
+        {
+            deallocate(methods);
+            return optional_size_empty;
+        }
+        methods[i] = method.success;
+    }
+    lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
+    for (size_t i = 0; i < implemented_interface->implementation_count; ++i)
+    {
+        if (type_equals(self, implemented_interface->implementations[i].self))
+        {
+            emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_impl, self_source));
+            deallocate(methods);
+            return optional_size_empty;
+        }
+    }
+    size_t const impl_id = add_implementation(
+        implemented_interface, implementation_entry_create(self, implementation_create(methods, method_count)));
+    return make_optional_size(impl_id);
+}
+
 static evaluate_expression_result evaluate_impl(function_checking_state *state, instruction_sequence *const function,
                                                 impl_expression const element)
 {
@@ -2489,8 +2605,6 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
                                        semantic_error_expected_interface, expression_source_begin(*element.interface)));
         return evaluate_expression_result_empty;
     }
-    lpg_interface *const target_interface =
-        state->program->interfaces + interface_evaluated.compile_time_value.interface_;
 
     compile_time_type_expression_result const self_evaluated = expect_compile_time_type(state, function, *element.self);
     if (!self_evaluated.has_value)
@@ -2501,30 +2615,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     type const self = self_evaluated.compile_time_value;
 
     restore(previous_code);
-    function_pointer_value *const methods = allocate_array(element.method_count, sizeof(*methods));
-    for (size_t i = 0; i < element.method_count; ++i)
-    {
-        method_evaluation_result const method =
-            evaluate_method_definition(state, function, element.methods[i], self, target_interface->methods[i].result);
-        if (!method.is_success)
-        {
-            deallocate(methods);
-            return evaluate_expression_result_empty;
-        }
-        methods[i] = method.success;
-    }
-    for (size_t i = 0; i < target_interface->implementation_count; ++i)
-    {
-        if (type_equals(self, target_interface->implementations[i].self))
-        {
-            emit_semantic_error(
-                state, semantic_error_create(semantic_error_duplicate_impl, expression_source_begin(*element.self)));
-            deallocate(methods);
-            return evaluate_expression_result_empty;
-        }
-    }
-    add_implementation(
-        target_interface, implementation_entry_create(self, implementation_create(methods, element.method_count)));
+    evaluate_impl_core(state, function, element.methods, element.method_count, self,
+                       interface_evaluated.compile_time_value.interface_, expression_source_begin(*element.self));
     return make_unit(&state->used_registers, function);
 }
 
@@ -3153,12 +3245,8 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
         reallocate_array(root->interface_instantiations, root->interface_instantiation_count + 1,
                          sizeof(*root->interface_instantiations));
     root->interface_instantiations[id] = generic_interface_instantiation_create(
-        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.interface_);
+        generic, argument_types, arguments, argument_count, evaluated.compile_time_value.value_.type_.interface_);
     root->interface_instantiation_count += 1;
-    if (argument_types)
-    {
-        deallocate(argument_types);
-    }
     return evaluated;
 }
 
