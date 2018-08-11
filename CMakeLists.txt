@@ -60,6 +60,7 @@ file(GLOB_RECURSE formatted
     ecmascript_backend/**.c ecmascript_backend/**.h
     optimization/**.c optimization/**.h
     semantics/**.c semantics/**.h
+    type_check/**.c type_check/**.h
     syntax/**.c syntax/**.h
     tests/**.c tests/**.h
     tokenization/**.c tokenization/**.h
@@ -120,6 +121,7 @@ add_subdirectory(generic)
 add_subdirectory(tokenization)
 add_subdirectory(syntax)
 add_subdirectory(semantics)
+add_subdirectory(type_check)
 add_subdirectory(optimization)
 add_subdirectory(cli_impl)
 add_subdirectory(c_backend)
