@@ -963,9 +963,16 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
     for (size_t i = 0; i < generic->generic_impl_count; ++i)
     {
         generic_impl *const impl = generic->generic_impls + i;
-        if (type_equals(impl->self, self))
+        if (impl->self.is_regular)
         {
-            return instantiate_generic_impl(state, target_interface, *impl, argument_types, arguments, self);
+            if (type_equals(impl->self.regular, self))
+            {
+                return instantiate_generic_impl(state, target_interface, *impl, argument_types, arguments, self);
+            }
+        }
+        else
+        {
+            LPG_TO_DO();
         }
     }
     return optional_size_empty;
@@ -2482,15 +2489,10 @@ static size_t add_implementation(lpg_interface *const to, implementation_entry c
     return new_impl_id;
 }
 
-static evaluate_expression_result evaluate_generic_impl(function_checking_state *state,
-                                                        instruction_sequence *const function,
-                                                        impl_expression const element)
+static evaluate_expression_result evaluate_generic_impl_regular_self(function_checking_state *state,
+                                                                     instruction_sequence *const function,
+                                                                     impl_expression const element)
 {
-    if (element.interface->type != expression_type_generic_instantiation)
-    {
-        LPG_TO_DO();
-    }
-
     generic_instantiation_expression const instantiation = element.interface->generic_instantiation;
     if (instantiation.count != element.generic_parameters.count)
     {
@@ -2546,9 +2548,77 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
     interface_->generic_impls = reallocate_array(
         interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
     interface_->generic_impls[interface_->generic_impl_count] =
-        generic_impl_create(impl_expression_clone(element), closures, self.compile_time_value.value_.type_);
+        generic_impl_create(impl_expression_clone(element), closures,
+                            generic_impl_self_create_regular(self.compile_time_value.value_.type_));
     interface_->generic_impl_count += 1;
     return make_unit(&state->used_registers, function);
+}
+
+static evaluate_expression_result evaluate_generic_impl_regular_interface(function_checking_state *state,
+                                                                          instruction_sequence *const function,
+                                                                          expression const interface_,
+                                                                          generic_instantiation_expression const self,
+                                                                          impl_expression const tree)
+{
+    evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, interface_, NULL);
+    if (!interface_evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!interface_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (interface_evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        LPG_TO_DO();
+    }
+    if (interface_evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
+    {
+        LPG_TO_DO();
+    }
+
+    generic_closures const closures = find_generic_closures_in_impl(state, tree);
+
+    program_check *const root = state->root;
+    root->generic_impls_for_regular_interfaces = reallocate_array(root->generic_impls_for_regular_interfaces,
+                                                                  root->generic_impls_for_regular_interfaces_count + 1,
+                                                                  sizeof(*root->generic_impls_for_regular_interfaces));
+    root->generic_impls_for_regular_interfaces[root->generic_impls_for_regular_interfaces_count] =
+        generic_impl_regular_interface_create(interface_evaluated.compile_time_value.value_.type_.interface_,
+                                              impl_expression_clone(tree), closures,
+                                              generic_instantiation_expression_clone(self));
+    root->generic_impls_for_regular_interfaces_count += 1;
+    return make_unit(&state->used_registers, function);
+}
+
+static evaluate_expression_result evaluate_generic_impl(function_checking_state *state,
+                                                        instruction_sequence *const function,
+                                                        impl_expression const element)
+{
+    if (element.self->type == expression_type_generic_instantiation)
+    {
+        if (element.interface->type == expression_type_generic_instantiation)
+        {
+            LPG_TO_DO();
+        }
+        else
+        {
+            return evaluate_generic_impl_regular_interface(
+                state, function, *element.interface, element.self->generic_instantiation, element);
+        }
+    }
+    else
+    {
+        if (element.interface->type == expression_type_generic_instantiation)
+        {
+            return evaluate_generic_impl_regular_self(state, function, element);
+        }
+        else
+        {
+            LPG_TO_DO();
+        }
+    }
 }
 
 static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
@@ -3948,8 +4018,8 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {
-        NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL};
+    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL,   0,      NULL,    0,    NULL, 0,
+                                NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL, NULL, 0};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);

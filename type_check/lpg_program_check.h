@@ -15,6 +15,7 @@
 #include "lpg_generic_impl.h"
 #include "lpg_generic_lambda_instantiation.h"
 #include "lpg_generic_struct_instantiation.h"
+#include "lpg_generic_impl_regular_interface.h"
 
 typedef struct program_check
 {
@@ -40,6 +41,8 @@ typedef struct program_check
     structure global;
     value const *const globals;
     bool *interfaces_defined;
+    generic_impl_regular_interface *generic_impls_for_regular_interfaces;
+    size_t generic_impls_for_regular_interfaces_count;
 } program_check;
 
 void program_check_free(program_check const freed);

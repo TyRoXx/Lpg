@@ -35,15 +35,15 @@ let i = interface
 let gs = struct[T]
     dummy: T
 
-/*impl[T] i for gs[T]
+impl[T] i for gs[T]
     method(): std.boolean
         std.boolean.true
 
-let z : i = gs[int(0, 0)]{0}
+/*let z : i = gs[int(0, 0)]{0}
 assert(z.method())
 
 let u : i = gs[int(0, 1)]{1}
-assert(u.method())
+assert(u.method())*/
 
 // impl for generic interface and generic self
 let mutable = interface[T]
@@ -53,7 +53,7 @@ let mutable = interface[T]
 let mutable-content = struct[T]
     content: std.array[T]
 
-impl[T] mutable[T] for mutable-content[T]
+/*impl[T] mutable[T] for mutable-content[T]
     load(): T
         match self.content.load(0)
             case std.option[T].some(let value):

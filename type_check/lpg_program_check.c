@@ -79,6 +79,14 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.interfaces_defined);
     }
+    for (size_t i = 0; i < freed.generic_impls_for_regular_interfaces_count; ++i)
+    {
+        generic_impl_regular_interface_free(freed.generic_impls_for_regular_interfaces[i]);
+    }
+    if (freed.generic_impls_for_regular_interfaces)
+    {
+        deallocate(freed.generic_impls_for_regular_interfaces);
+    }
 }
 
 void begin_load_module(program_check *to, unicode_string name)

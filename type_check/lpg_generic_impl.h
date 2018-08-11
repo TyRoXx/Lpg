@@ -22,12 +22,23 @@ typedef struct generic_closures
 
 void generic_closures_free(generic_closures const freed);
 
+typedef struct generic_impl_self
+{
+    bool is_regular;
+    type regular;
+    generic_instantiation_expression generic;
+} generic_impl_self;
+
+generic_impl_self generic_impl_self_create_regular(type regular);
+generic_impl_self generic_impl_self_create_generic(generic_instantiation_expression generic);
+void generic_impl_self_free(generic_impl_self const freed);
+
 typedef struct generic_impl
 {
     impl_expression tree;
     generic_closures closures;
-    type self;
+    generic_impl_self self;
 } generic_impl;
 
-generic_impl generic_impl_create(impl_expression tree, generic_closures closures, type self);
+generic_impl generic_impl_create(impl_expression tree, generic_closures closures, generic_impl_self self);
 void generic_impl_free(generic_impl const freed);
