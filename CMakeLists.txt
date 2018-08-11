@@ -18,7 +18,9 @@ if(UNIX)
         set(LPG_COMPILE_FLAGS -coverage)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -coverage")
         add_custom_target(testcoverage
-            COMMAND $<TARGET_FILE:tests> &&
+            COMMAND
+                find ${CMAKE_CURRENT_BINARY_DIR} -type f -name '*.gcda' -delete &&
+                $<TARGET_FILE:tests> &&
                 lcov --capture --directory ${CMAKE_CURRENT_BINARY_DIR} --output-file coverage.info &&
                 genhtml coverage.info --output-directory coverage-html &&
                 firefox coverage-html/index.html
