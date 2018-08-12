@@ -915,36 +915,36 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
                                         source_location const self_source);
 
 static optional_size instantiate_generic_impl(function_checking_state *const state, interface_id const target_interface,
-                                              generic_impl const generic, type const *const argument_types,
-                                              value *const arguments, type const self)
+                                              impl_expression const tree, generic_closures const closures,
+                                              type const *const argument_types, value *const arguments, type const self)
 {
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->file_name, state->source);
-    for (size_t i = 0; i < generic.tree.generic_parameters.count; ++i)
+    for (size_t i = 0; i < tree.generic_parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&interface_checking.used_registers);
         add_local_variable(
             &interface_checking.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(generic.tree.generic_parameters.names[i])),
+            local_variable_create(unicode_view_copy(unicode_view_from_string(tree.generic_parameters.names[i])),
                                   local_variable_phase_initialized, argument_types[i],
                                   optional_value_create(arguments[i]), argument_register));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < generic.closures.count; ++i)
+    for (size_t i = 0; i < closures.count; ++i)
     {
         register_id const closure_register = allocate_register(&interface_checking.used_registers);
         add_local_variable(
             &interface_checking.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(generic.closures.elements[i].name)),
-                                  local_variable_phase_initialized, generic.closures.elements[i].what,
-                                  optional_value_create(generic.closures.elements[i].content), closure_register));
-        write_register_compile_time_value(&interface_checking, closure_register, generic.closures.elements[i].content);
+            local_variable_create(unicode_view_copy(unicode_view_from_string(closures.elements[i].name)),
+                                  local_variable_phase_initialized, closures.elements[i].what,
+                                  optional_value_create(closures.elements[i].content), closure_register));
+        write_register_compile_time_value(&interface_checking, closure_register, closures.elements[i].content);
     }
     optional_size const evaluated =
-        evaluate_impl_core(&interface_checking, &ignored_instructions, generic.tree.methods, generic.tree.method_count,
-                           self, target_interface, expression_source_begin(*generic.tree.self));
+        evaluate_impl_core(&interface_checking, &ignored_instructions, tree.methods, tree.method_count, self,
+                           target_interface, expression_source_begin(*tree.self));
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(interface_checking.local_variables);
     if (interface_checking.register_compile_time_values)
@@ -967,7 +967,8 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
         {
             if (type_equals(impl->self.regular, self))
             {
-                return instantiate_generic_impl(state, target_interface, *impl, argument_types, arguments, self);
+                return instantiate_generic_impl(
+                    state, target_interface, impl->tree, impl->closures, argument_types, arguments, self);
             }
         }
         else
@@ -978,22 +979,114 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
     return optional_size_empty;
 }
 
-static optional_size require_implementation(function_checking_state *const state, interface_id const to,
-                                            type const self)
+static optional_size instantiate_generic_impl_for_regular_interface(function_checking_state *const state,
+                                                                    interface_id const to,
+                                                                    generic_impl_regular_interface *const impl,
+                                                                    type *const argument_types, value *const arguments,
+                                                                    type const self)
+{
+    for (size_t i = 0; i < impl->instantiation_count; ++i)
+    {
+        generic_impl_regular_interface_instantiation *const instantiation = impl->instantiations + i;
+        if (type_equals(instantiation->self, self))
+        {
+            LPG_TO_DO();
+        }
+    }
+    return instantiate_generic_impl(state, to, impl->tree, impl->closures, argument_types, arguments, self);
+}
+
+typedef struct infer_generic_arguments_result
+{
+    bool can_be_inferred;
+    type *argument_types;
+    value *arguments;
+} infer_generic_arguments_result;
+
+static infer_generic_arguments_result infer_generic_arguments(function_checking_state *const state,
+                                                              instruction_sequence *const function,
+                                                              generic_instantiation_expression const self_tree,
+                                                              type const self)
+{
+    (void)self_tree;
+    if (self.kind != type_kind_structure)
+    {
+        LPG_TO_DO();
+    }
+    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *self_tree.generic, NULL);
+    if (!generic_evaluated.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!generic_evaluated.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_struct)
+    {
+        LPG_TO_DO();
+    }
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->struct_instantiation_count; ++i)
+    {
+        generic_struct_instantiation *const instantiation = root->struct_instantiations + i;
+        if (self.structure_ != instantiation->instantiated)
+        {
+            continue;
+        }
+        value *const arguments = allocate_array(instantiation->argument_count, sizeof(*arguments));
+        if (instantiation->argument_count)
+        {
+            memcpy(arguments, instantiation->arguments, sizeof(*arguments) * instantiation->argument_count);
+        }
+        type *const argument_types = allocate_array(instantiation->argument_count, sizeof(*argument_types));
+        if (instantiation->argument_count)
+        {
+            memcpy(
+                argument_types, instantiation->argument_types, sizeof(*argument_types) * instantiation->argument_count);
+        }
+        infer_generic_arguments_result const result = {true, argument_types, arguments};
+        return result;
+    }
+    infer_generic_arguments_result const result = {false, NULL, NULL};
+    return result;
+}
+
+static optional_size require_implementation(function_checking_state *const state, instruction_sequence *const function,
+                                            interface_id const to, type const self)
 {
     optional_size const already_exists = find_implementation(state->program->interfaces + to, self);
     if (already_exists.state == optional_set)
     {
         return already_exists;
     }
-    for (size_t i = 0; i < state->root->interface_instantiation_count; ++i)
+    program_check *const root = state->root;
+    for (size_t i = 0; i < root->interface_instantiation_count; ++i)
     {
-        generic_interface_instantiation *const instantiation = state->root->interface_instantiations + i;
+        generic_interface_instantiation *const instantiation = root->interface_instantiations + i;
         if (instantiation->instantiated == to)
         {
             return try_to_instantiate_generic_impl(
                 state, to, instantiation->generic, self, instantiation->argument_types, instantiation->arguments);
         }
+    }
+    for (size_t i = 0; i < root->generic_impls_for_regular_interfaces_count; ++i)
+    {
+        generic_impl_regular_interface *const impl = root->generic_impls_for_regular_interfaces + i;
+        if (impl->interface_ != to)
+        {
+            continue;
+        }
+        infer_generic_arguments_result const inferred = infer_generic_arguments(state, function, impl->self, self);
+        if (!inferred.can_be_inferred)
+        {
+            continue;
+        }
+        optional_size const result = instantiate_generic_impl_for_regular_interface(
+            state, to, impl, inferred.argument_types, inferred.arguments, self);
+        deallocate(inferred.argument_types);
+        deallocate(inferred.arguments);
+        return result;
     }
     return optional_size_empty;
 }
@@ -1007,7 +1100,7 @@ static conversion_result convert_to_interface(function_checking_state *const sta
     {
         LPG_TO_DO();
     }
-    optional_size const impl = require_implementation(state, to, from);
+    optional_size const impl = require_implementation(state, function, to, from);
     if (impl.state == optional_empty)
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
@@ -3173,12 +3266,8 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
     root->struct_instantiations = reallocate_array(
         root->struct_instantiations, root->struct_instantiation_count + 1, sizeof(*root->struct_instantiations));
     root->struct_instantiations[id] = generic_struct_instantiation_create(
-        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.structure_);
+        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.structure_, argument_types);
     root->struct_instantiation_count += 1;
-    if (argument_types)
-    {
-        deallocate(argument_types);
-    }
     return evaluated;
 }
 
