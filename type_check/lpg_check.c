@@ -2586,14 +2586,14 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
                                                                      instruction_sequence *const function,
                                                                      impl_expression const element)
 {
-    generic_instantiation_expression const instantiation = element.interface->generic_instantiation;
-    if (instantiation.count != element.generic_parameters.count)
+    generic_instantiation_expression const interface_instantiation = element.interface->generic_instantiation;
+    if (interface_instantiation.count != element.generic_parameters.count)
     {
         LPG_TO_DO();
     }
-    for (size_t i = 0; i < instantiation.count; ++i)
+    for (size_t i = 0; i < interface_instantiation.count; ++i)
     {
-        expression const argument = instantiation.arguments[i];
+        expression const argument = interface_instantiation.arguments[i];
         if (argument.type != expression_type_identifier)
         {
             LPG_TO_DO();
@@ -2605,7 +2605,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         }
     }
 
-    evaluate_expression_result const generic = evaluate_expression(state, function, *instantiation.generic, NULL);
+    evaluate_expression_result const generic =
+        evaluate_expression(state, function, *interface_instantiation.generic, NULL);
     if (!generic.has_value)
     {
         LPG_TO_DO();
@@ -2685,6 +2686,58 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
     return make_unit(&state->used_registers, function);
 }
 
+static evaluate_expression_result
+evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence *const function,
+                            generic_instantiation_expression const interface_expression_,
+                            generic_instantiation_expression const self, impl_expression const tree)
+{
+    if (interface_expression_.count != tree.generic_parameters.count)
+    {
+        LPG_TO_DO();
+    }
+    for (size_t i = 0; i < interface_expression_.count; ++i)
+    {
+        expression const argument = interface_expression_.arguments[i];
+        if (argument.type != expression_type_identifier)
+        {
+            LPG_TO_DO();
+        }
+        if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
+                                 unicode_view_from_string(tree.generic_parameters.names[i])))
+        {
+            LPG_TO_DO();
+        }
+    }
+
+    evaluate_expression_result const generic =
+        evaluate_expression(state, function, *interface_expression_.generic, NULL);
+    if (!generic.has_value)
+    {
+        LPG_TO_DO();
+    }
+    if (!generic.compile_time_value.is_set)
+    {
+        LPG_TO_DO();
+    }
+    if (generic.compile_time_value.value_.kind != value_kind_generic_interface)
+    {
+        LPG_TO_DO();
+    }
+
+    generic_closures const closures = find_generic_closures_in_impl(state, tree);
+
+    program_check *const root = state->root;
+    generic_interface *const interface_ =
+        &root->generic_interfaces[generic.compile_time_value.value_.generic_interface];
+    interface_->generic_impls = reallocate_array(
+        interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
+    interface_->generic_impls[interface_->generic_impl_count] =
+        generic_impl_create(impl_expression_clone(tree), closures,
+                            generic_impl_self_create_generic(generic_instantiation_expression_clone(self)));
+    interface_->generic_impl_count += 1;
+    return make_unit(&state->used_registers, function);
+}
+
 static evaluate_expression_result evaluate_generic_impl(function_checking_state *state,
                                                         instruction_sequence *const function,
                                                         impl_expression const element)
@@ -2693,7 +2746,8 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
     {
         if (element.interface->type == expression_type_generic_instantiation)
         {
-            LPG_TO_DO();
+            return evaluate_fully_generic_impl(state, function, element.interface->generic_instantiation,
+                                               element.self->generic_instantiation, element);
         }
         else
         {

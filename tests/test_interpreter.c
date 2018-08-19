@@ -435,6 +435,7 @@ void test_interpreter(void)
                                                  "enum-stateful.lpg",
                                                  "enum-stateless.lpg",
                                                  "function-pointer.lpg",
+                                                 "generic-impl-generic-self.lpg",
                                                  "integer-equals.lpg",
                                                  "integer-less.lpg",
                                                  "integer-to-string.lpg",
