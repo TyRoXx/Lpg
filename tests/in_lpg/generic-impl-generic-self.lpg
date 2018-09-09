@@ -18,8 +18,7 @@ impl[T] mutable[T] for mutable-content[T]
     store(value: T): std.unit
         assert(self.content.store(0, value))
 
-/*let make-mutable = [T](T: value): mutable[T]
+let make-mutable = [T](T: value): mutable[T]
     let content = new-array(T)
     assert(content.append(value))
     mutable-content[T]{content}
-*/

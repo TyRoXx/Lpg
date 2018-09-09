@@ -529,7 +529,7 @@ bool new_array_expression_equals(new_array_expression const left, new_array_expr
 new_array_expression new_array_expression_clone(new_array_expression const original)
 {
     ASSUME(original.element);
-    return new_array_expression_create(expression_allocate(*original.element));
+    return new_array_expression_create(expression_allocate(expression_clone(*original.element)));
 }
 
 sequence sequence_create(expression *elements, size_t length)
@@ -1320,7 +1320,7 @@ expression expression_clone(expression const original)
     switch (original.type)
     {
     case expression_type_new_array:
-        LPG_TO_DO();
+        return expression_from_new_array(new_array_expression_clone(original.new_array));
 
     case expression_type_identifier:
         return expression_from_identifier(identifier_expression_clone(original.identifier));

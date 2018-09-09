@@ -2160,6 +2160,9 @@ static void find_generic_closures_in_expression(generic_closures *const closures
     switch (from.type)
     {
     case expression_type_new_array:
+        find_generic_closures_in_expression(closures, state, *from.new_array.element);
+        break;
+
     case expression_type_type_of:
     case expression_type_import:
     case expression_type_binary:
