@@ -10,6 +10,8 @@ value string_equals_impl(function_call_arguments const arguments, struct value c
 
 value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
+value fail_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+
 value integer_equals_impl(function_call_arguments const arguments, struct value const *const captures,
                           void *environment);
 
@@ -32,11 +34,12 @@ typedef struct standard_library_stable
     function_pointer integer_to_string;
     function_pointer side_effect;
     function_pointer type_equals;
+    function_pointer fail;
 } standard_library_stable;
 
 enum
 {
-    standard_library_element_count = 12
+    standard_library_element_count = 13
 };
 
 typedef struct standard_library_description

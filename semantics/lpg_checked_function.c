@@ -28,8 +28,8 @@ void checked_function_free(checked_function const *function)
     deallocate(function->signature);
 }
 
-type get_return_type(type const callee, checked_function const *const all_functions,
-                     lpg_interface const *const all_interfaces)
+optional_type get_return_type(type const callee, checked_function const *const all_functions,
+                              lpg_interface const *const all_interfaces)
 {
     switch (callee.kind)
     {
@@ -59,10 +59,11 @@ type get_return_type(type const callee, checked_function const *const all_functi
         LPG_TO_DO();
 
     case type_kind_method_pointer:
-        return all_interfaces[callee.method_pointer.interface_].methods[callee.method_pointer.method_index].result;
+        return optional_type_create_set(
+            all_interfaces[callee.method_pointer.interface_].methods[callee.method_pointer.method_index].result);
 
     case type_kind_enum_constructor:
-        return type_from_enumeration(callee.enum_constructor->enumeration);
+        return optional_type_create_set(type_from_enumeration(callee.enum_constructor->enumeration));
     }
     LPG_UNREACHABLE();
 }

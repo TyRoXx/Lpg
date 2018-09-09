@@ -217,8 +217,8 @@ static read_structure_element_result read_interface_element_at(function_checking
         LPG_TO_DO();
     }
     method_description const method = state->program->interfaces[from_type].methods[method_index];
-    *method_object = function_pointer_create(
-        method.result, method.parameters, tuple_type_create(captures, 1), optional_type_create_empty());
+    *method_object = function_pointer_create(optional_type_create_set(method.result), method.parameters,
+                                             tuple_type_create(captures, 1), optional_type_create_empty());
     return read_structure_element_result_create(
         true, type_from_function_pointer(method_object), optional_value_empty, false);
 }
@@ -494,6 +494,25 @@ static conversion_result convert(function_checking_state *const state, instructi
                                  source_location const original_source, type const to,
                                  bool const may_widen_return_type);
 
+static void check_function_clean_up(function_checking_state *const state)
+{
+    for (size_t i = 0; i < state->local_variables.count; ++i)
+    {
+        local_variable *const variable = (state->local_variables.elements + i);
+        local_variable_free(variable);
+    }
+    if (state->local_variables.elements)
+    {
+        deallocate(state->local_variables.elements);
+    }
+    if (state->register_compile_time_values)
+    {
+        deallocate(state->register_compile_time_values);
+        state->register_compile_time_values = NULL;
+        state->register_compile_time_value_count = 0;
+    }
+}
+
 check_function_result check_function(program_check *const root, function_checking_state *parent,
                                      expression const body_in, structure const global, check_error_handler *on_error,
                                      void *user, checked_program *const program, type const *const parameter_types,
@@ -530,22 +549,6 @@ check_function_result check_function(program_check *const root, function_checkin
 
     evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
 
-    for (size_t i = 0; i < state.local_variables.count; ++i)
-    {
-        local_variable *const variable = (state.local_variables.elements + i);
-        local_variable_free(variable);
-    }
-    if (state.local_variables.elements)
-    {
-        deallocate(state.local_variables.elements);
-    }
-    if (state.register_compile_time_values)
-    {
-        deallocate(state.register_compile_time_values);
-        state.register_compile_time_values = NULL;
-        state.register_compile_time_value_count = 0;
-    }
-
     type return_type = type_from_unit();
     if (body_evaluated.has_value)
     {
@@ -577,6 +580,7 @@ check_function_result check_function(program_check *const root, function_checkin
                         deallocate(state.register_debug_names);
                     }
                     instruction_sequence_free(&body_out);
+                    check_function_clean_up(&state);
                     return check_function_result_empty;
 
                 case success_yes:
@@ -618,6 +622,7 @@ check_function_result check_function(program_check *const root, function_checkin
                         deallocate(state.register_debug_names);
                     }
                     instruction_sequence_free(&body_out);
+                    check_function_clean_up(&state);
                     return check_function_result_empty;
                 }
             }
@@ -633,7 +638,7 @@ check_function_result check_function(program_check *const root, function_checkin
 
     function_pointer *const signature = allocate(sizeof(*signature));
     *signature =
-        function_pointer_create(return_type, tuple_type_create(NULL, 0),
+        function_pointer_create(optional_type_create_set(return_type), tuple_type_create(NULL, 0),
                                 tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
 
     if (state.register_debug_name_count < state.used_registers)
@@ -647,6 +652,8 @@ check_function_result check_function(program_check *const root, function_checkin
     }
     checked_function const result =
         checked_function_create(signature, body_out, state.register_debug_names, state.used_registers);
+
+    check_function_clean_up(&state);
     return check_function_result_create(result, state.captures, state.capture_count);
 }
 
@@ -767,8 +774,9 @@ static function_id reserve_function_id(function_checking_state *const state)
         reallocate_array(state->program->functions, state->program->function_count, sizeof(*state->program->functions));
     {
         function_pointer *const dummy_signature = allocate(sizeof(*dummy_signature));
-        *dummy_signature = function_pointer_create(
-            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
+        *dummy_signature =
+            function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         state->program->functions[this_lambda_id] =
             checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
@@ -954,54 +962,18 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
     return evaluated;
 }
 
-static optional_size try_to_instantiate_generic_impl(function_checking_state *const state,
-                                                     interface_id const target_interface, generic_interface_id const id,
-                                                     type const self, type *const argument_types,
-                                                     value *const arguments)
-{
-    generic_interface *const generic = state->root->generic_interfaces + id;
-    for (size_t i = 0; i < generic->generic_impl_count; ++i)
-    {
-        generic_impl *const impl = generic->generic_impls + i;
-        if (impl->self.is_regular)
-        {
-            if (type_equals(impl->self.regular, self))
-            {
-                return instantiate_generic_impl(
-                    state, target_interface, impl->tree, impl->closures, argument_types, arguments, self);
-            }
-        }
-        else
-        {
-            LPG_TO_DO();
-        }
-    }
-    return optional_size_empty;
-}
-
-static optional_size instantiate_generic_impl_for_regular_interface(function_checking_state *const state,
-                                                                    interface_id const to,
-                                                                    generic_impl_regular_interface *const impl,
-                                                                    type *const argument_types, value *const arguments,
-                                                                    type const self)
-{
-    for (size_t i = 0; i < impl->instantiation_count; ++i)
-    {
-        generic_impl_regular_interface_instantiation *const instantiation = impl->instantiations + i;
-        if (type_equals(instantiation->self, self))
-        {
-            LPG_TO_DO();
-        }
-    }
-    return instantiate_generic_impl(state, to, impl->tree, impl->closures, argument_types, arguments, self);
-}
-
 typedef struct infer_generic_arguments_result
 {
     bool can_be_inferred;
     type *argument_types;
     value *arguments;
 } infer_generic_arguments_result;
+
+static void infer_generic_arguments_result_free(infer_generic_arguments_result const freed)
+{
+    deallocate(freed.argument_types);
+    deallocate(freed.arguments);
+}
 
 static infer_generic_arguments_result infer_generic_arguments(function_checking_state *const state,
                                                               instruction_sequence *const function,
@@ -1050,6 +1022,60 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     }
     infer_generic_arguments_result const result = {false, NULL, NULL};
     return result;
+}
+
+static optional_size try_to_instantiate_generic_impl(function_checking_state *const state,
+                                                     interface_id const target_interface, generic_interface_id const id,
+                                                     type const self, type *const argument_types,
+                                                     value *const arguments)
+{
+    generic_interface *const generic = state->root->generic_interfaces + id;
+    for (size_t i = 0; i < generic->generic_impl_count; ++i)
+    {
+        generic_impl *const impl = generic->generic_impls + i;
+        if (impl->self.is_regular)
+        {
+            if (type_equals(impl->self.regular, self))
+            {
+                return instantiate_generic_impl(
+                    state, target_interface, impl->tree, impl->closures, argument_types, arguments, self);
+            }
+        }
+        else
+        {
+            instruction_sequence ignored = instruction_sequence_create(NULL, 0);
+            infer_generic_arguments_result const inferred =
+                infer_generic_arguments(state, &ignored, impl->self.generic, self);
+            instruction_sequence_free(&ignored);
+            if (!inferred.can_be_inferred)
+            {
+                infer_generic_arguments_result_free(inferred);
+                continue;
+            }
+            optional_size const result = instantiate_generic_impl(
+                state, target_interface, impl->tree, impl->closures, inferred.argument_types, inferred.arguments, self);
+            infer_generic_arguments_result_free(inferred);
+            return result;
+        }
+    }
+    return optional_size_empty;
+}
+
+static optional_size instantiate_generic_impl_for_regular_interface(function_checking_state *const state,
+                                                                    interface_id const to,
+                                                                    generic_impl_regular_interface *const impl,
+                                                                    type *const argument_types, value *const arguments,
+                                                                    type const self)
+{
+    for (size_t i = 0; i < impl->instantiation_count; ++i)
+    {
+        generic_impl_regular_interface_instantiation *const instantiation = impl->instantiations + i;
+        if (type_equals(instantiation->self, self))
+        {
+            LPG_TO_DO();
+        }
+    }
+    return instantiate_generic_impl(state, to, impl->tree, impl->closures, argument_types, arguments, self);
 }
 
 static optional_size require_implementation(function_checking_state *const state, instruction_sequence *const function,
@@ -1288,7 +1314,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, called.closing_parenthesis));
         return evaluate_expression_result_empty;
     }
-    type const return_type = get_return_type(callee.type_, state->program->functions, state->program->interfaces);
+    optional_type const return_type =
+        get_return_type(callee.type_, state->program->functions, state->program->interfaces);
     register_id result = ~(register_id)0;
     optional_value compile_time_result = {false, value_from_unit()};
     if (callee.compile_time_value.is_set && all_compile_time_arguments)
@@ -1346,7 +1373,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             deallocate(arguments);
             restore(previous_code);
             result = allocate_register(&state->used_registers);
-            if (return_type.kind == type_kind_string)
+            if (!return_type.is_set)
+            {
+                LPG_TO_DO();
+            }
+            if (return_type.value.kind == type_kind_string)
             {
                 size_t const length = compile_time_result.value_.string.length;
                 char *const copy = garbage_collector_allocate(&state->program->memory, length);
@@ -1357,8 +1388,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             }
             else
             {
+                if (!return_type.is_set)
+                {
+                    LPG_TO_DO();
+                }
                 add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                              result, compile_time_result.value_, return_type)));
+                                              result, compile_time_result.value_, return_type.value)));
             }
         }
     }
@@ -1407,7 +1442,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     }
 
     deallocate(compile_time_arguments);
-    return evaluate_expression_result_create(true, result, return_type, compile_time_result, false, false);
+    if (!return_type.is_set)
+    {
+        return evaluate_expression_result_create(false, result, type_from_unit(), compile_time_result, false, false);
+    }
+    return evaluate_expression_result_create(true, result, return_type.value, compile_time_result, false, false);
 }
 
 evaluate_expression_result evaluate_not_expression(function_checking_state *state, instruction_sequence *function,
@@ -3589,6 +3628,10 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     {
         LPG_UNREACHABLE();
     }
+    if (evaluated.type_.kind != type_kind_lambda)
+    {
+        LPG_UNREACHABLE();
+    }
     size_t const id = root->lambda_instantiation_count;
     root->lambda_instantiations = reallocate_array(
         root->lambda_instantiations, root->lambda_instantiation_count + 1, sizeof(*root->lambda_instantiations));
@@ -4178,8 +4221,9 @@ checked_program check(sequence const root, structure const global, check_error_h
     else
     {
         function_pointer *const dummy_signature = allocate(sizeof(*dummy_signature));
-        *dummy_signature = function_pointer_create(
-            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
+        *dummy_signature =
+            function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         program.functions[0] = checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
     program_check_free(check_root);

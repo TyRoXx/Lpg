@@ -476,6 +476,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 11:
             return stream_writer_write_string(ecmascript_output, "undefined");
 
+        case 12:
+            return stream_writer_write_string(ecmascript_output, "fail");
+
         default:
             LPG_TO_DO();
         }
@@ -538,9 +541,11 @@ static success_indicator generate_call(function_generation *const state, call_in
                                        stream_writer const ecmascript_output)
 {
     type const callee_type = state->registers[generated.callee].type_of;
-    LPG_TRY(write_register(state, generated.result,
-                           get_return_type(callee_type, state->all_functions, state->all_interfaces),
-                           optional_value_empty, ecmascript_output));
+    optional_type const return_type = get_return_type(callee_type, state->all_functions, state->all_interfaces);
+    if (return_type.is_set)
+    {
+        LPG_TRY(write_register(state, generated.result, return_type.value, optional_value_empty, ecmascript_output));
+    }
     LPG_TRY(generate_register_read(state, generated.callee, ecmascript_output));
     switch (callee_type.kind)
     {

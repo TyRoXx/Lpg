@@ -202,7 +202,8 @@ void enumeration_element_free(enumeration_element const *freed)
     unicode_string_free(&freed->name);
 }
 
-function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures, optional_type self)
+function_pointer function_pointer_create(optional_type result, tuple_type parameters, tuple_type captures,
+                                         optional_type self)
 {
     function_pointer const returning = {result, parameters, captures, self};
     return returning;
@@ -210,7 +211,7 @@ function_pointer function_pointer_create(type result, tuple_type parameters, tup
 
 bool function_pointer_equals(function_pointer const left, function_pointer const right)
 {
-    if (!type_equals(left.result, right.result))
+    if (!optional_type_equals(left.result, right.result))
     {
         return false;
     }
@@ -436,7 +437,7 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
             arguments[i] = type_clone(original.function_pointer_->parameters.elements[i], clone_gc, new_function_ids);
         }
         *copy = function_pointer_create(
-            type_clone(original.function_pointer_->result, clone_gc, new_function_ids),
+            optional_type_clone(original.function_pointer_->result, clone_gc, new_function_ids),
             tuple_type_create(arguments, original.function_pointer_->parameters.length), tuple_type_create(NULL, 0),
             optional_type_clone(original.function_pointer_->self, clone_gc, new_function_ids));
         return type_from_function_pointer(copy);

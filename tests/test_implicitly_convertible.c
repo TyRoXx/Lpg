@@ -16,22 +16,25 @@ static void test_function_pointer_convertible(void)
         type_from_integer_range(integer_range_create(integer_create(20, 10), integer_create(30, 7)));
     type const big_range = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_create(700, 0)));
     type arguments[] = {small_range, small_range};
-    function_pointer function_pointer1 = function_pointer_create(
-        small_range, tuple_type_create(arguments, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
+    function_pointer function_pointer1 =
+        function_pointer_create(optional_type_create_set(small_range), tuple_type_create(arguments, 2),
+                                tuple_type_create(NULL, 0), optional_type_create_empty());
     type function1 = type_from_function_pointer(&function_pointer1);
 
     REQUIRE(is_implicitly_convertible(function1, function1));
     {
-        function_pointer function_pointer2 = function_pointer_create(
-            big_range, tuple_type_create(arguments, 2), tuple_type_create(NULL, 0), optional_type_create_empty());
+        function_pointer function_pointer2 =
+            function_pointer_create(optional_type_create_set(big_range), tuple_type_create(arguments, 2),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));
     }
     {
         type more_arguments[] = {small_range, small_range, small_range};
-        function_pointer function_pointer2 = function_pointer_create(
-            big_range, tuple_type_create(more_arguments, 3), tuple_type_create(NULL, 0), optional_type_create_empty());
+        function_pointer function_pointer2 =
+            function_pointer_create(optional_type_create_set(big_range), tuple_type_create(more_arguments, 3),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));
@@ -39,8 +42,8 @@ static void test_function_pointer_convertible(void)
     {
         type different_arguments[] = {small_range, big_range};
         function_pointer function_pointer2 =
-            function_pointer_create(big_range, tuple_type_create(different_arguments, 2), tuple_type_create(NULL, 0),
-                                    optional_type_create_empty());
+            function_pointer_create(optional_type_create_set(big_range), tuple_type_create(different_arguments, 2),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         type function2 = type_from_function_pointer(&function_pointer2);
 
         REQUIRE(!is_implicitly_convertible(function1, function2));

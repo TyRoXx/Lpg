@@ -23,8 +23,9 @@ void test_remove_unused_functions(void)
     for (function_id i = 0; i < original.function_count; ++i)
     {
         original.functions[i].signature = allocate(sizeof(*original.functions[i].signature));
-        *original.functions[i].signature = function_pointer_create(
-            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty());
+        *original.functions[i].signature =
+            function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
         original.functions[i].body = instruction_sequence_create(NULL, 0);
         original.functions[i].number_of_registers = 0;
     }

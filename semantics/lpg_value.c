@@ -31,8 +31,8 @@ function_pointer_value function_pointer_value_from_internal(function_id const co
 {
     function_pointer_value const result = {
         code, NULL, NULL, captures, capture_count,
-        function_pointer_create(
-            type_from_unit(), tuple_type_create(NULL, 0), tuple_type_create(NULL, 0), optional_type_create_empty())};
+        function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
+                                tuple_type_create(NULL, 0), optional_type_create_empty())};
     return result;
 }
 

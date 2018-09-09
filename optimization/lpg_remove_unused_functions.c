@@ -178,7 +178,10 @@ static void mark_function_pointer(bool *const used_functions, checked_function c
     }
     mark_type(used_functions, all_functions, all_interfaces, type_from_tuple_type(marked_function.captures));
     mark_type(used_functions, all_functions, all_interfaces, type_from_tuple_type(marked_function.parameters));
-    mark_type(used_functions, all_functions, all_interfaces, marked_function.result);
+    if (marked_function.result.is_set)
+    {
+        mark_type(used_functions, all_functions, all_interfaces, marked_function.result.value);
+    }
 }
 
 static void mark_function(bool *const used_functions, checked_function const *const all_functions,
@@ -200,7 +203,7 @@ static function_pointer *clone_function_pointer(function_pointer const original,
 {
     function_pointer *const result = allocate(sizeof(*result));
     *result = function_pointer_create(
-        type_clone(original.result, clone_gc, new_function_ids),
+        optional_type_clone(original.result, clone_gc, new_function_ids),
         tuple_type_create(allocate_array(original.parameters.length, sizeof(*result->parameters.elements)),
                           original.parameters.length),
         tuple_type_create(

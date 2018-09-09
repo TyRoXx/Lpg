@@ -5,6 +5,11 @@ let f = [T](a: T)
 let g = f[std.boolean]
 assert(g(std.boolean.true))
 
+let f2 = [T](a: T): T
+    a
+let g2 = f2[std.boolean]
+assert(g2(std.boolean.true))
+
 let instantiate-again = f[std.boolean]
 assert(instantiate-again(std.boolean.true))
 

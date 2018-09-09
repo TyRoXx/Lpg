@@ -177,13 +177,14 @@ void enumeration_element_free(LPG_NON_NULL(enumeration_element const *freed));
 
 struct function_pointer
 {
-    type result;
+    optional_type result;
     tuple_type parameters;
     tuple_type captures;
     optional_type self;
 };
 
-function_pointer function_pointer_create(type result, tuple_type parameters, tuple_type captures, optional_type self);
+function_pointer function_pointer_create(optional_type result, tuple_type parameters, tuple_type captures,
+                                         optional_type self);
 bool function_pointer_equals(function_pointer const left, function_pointer const right);
 
 type type_from_function_pointer(function_pointer const *pointer);

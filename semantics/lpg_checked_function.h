@@ -19,5 +19,5 @@ checked_function checked_function_create(LPG_NON_NULL(function_pointer *signatur
                                          unicode_string *register_debug_names, register_id number_of_registers);
 void checked_function_free(LPG_NON_NULL(checked_function const *function));
 
-type get_return_type(type const callee, checked_function const *const all_functions,
-                     lpg_interface const *const all_interfaces);
+optional_type get_return_type(type const callee, checked_function const *const all_functions,
+                              lpg_interface const *const all_interfaces);

@@ -28,7 +28,11 @@ optional_value call_function(function_pointer_value const callee, function_call_
     if (callee.external)
     {
         value const return_value = callee.external(arguments, callee.captures, callee.external_environment);
-        ASSUME(value_conforms_to_type(return_value, callee.external_signature.result));
+        if (!callee.external_signature.result.is_set)
+        {
+            LPG_TO_DO();
+        }
+        ASSUME(value_conforms_to_type(return_value, callee.external_signature.result.value));
         return optional_value_create(return_value);
     }
     return call_interpreted_function(arguments.all_functions[callee.code], arguments.self, arguments.arguments,
@@ -189,7 +193,7 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
             registers[element.get_method.into] = value_from_function_pointer(function_pointer_value_from_external(
                 invoke_method, NULL, pseudo_captures,
-                function_pointer_create(method.result, method.parameters,
+                function_pointer_create(optional_type_create_set(method.result), method.parameters,
                                         tuple_type_create(pseudo_capture_types, capture_count),
                                         optional_type_create_empty())));
             break;
@@ -481,7 +485,11 @@ static optional_value call_interpreted_function(checked_function const callee, o
     case run_sequence_result_continue:
     case run_sequence_result_return:
         deallocate(registers);
-        ASSUME(value_conforms_to_type(return_value, callee.signature->result));
+        if (!callee.signature->result.is_set)
+        {
+            LPG_TO_DO();
+        }
+        ASSUME(value_conforms_to_type(return_value, callee.signature->result.value));
         return optional_value_create(return_value);
 
     case run_sequence_result_unavailable_at_this_time:

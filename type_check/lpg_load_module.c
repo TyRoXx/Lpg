@@ -96,7 +96,11 @@ static load_module_result type_check_module(function_checking_state *state, sequ
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const success = {module_value, checked.function.signature->result};
+    if (!checked.function.signature->result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    load_module_result const success = {module_value, checked.function.signature->result.value};
     checked_function_free(&checked.function);
     return success;
 }

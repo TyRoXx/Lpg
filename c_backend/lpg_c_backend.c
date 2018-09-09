@@ -39,7 +39,8 @@ typedef enum register_meaning
     register_meaning_capture,
     register_meaning_side_effect,
     register_meaning_unit,
-    register_meaning_host_value
+    register_meaning_host_value,
+    register_meaning_fail
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -568,8 +569,12 @@ static success_indicator generate_c_function_pointer(type const generated,
         new_definition->name = name;
     }
     LPG_TRY(stream_writer_write_string(definition_writer, "typedef "));
-    LPG_TRY(
-        generate_type(generated.function_pointer_->result, standard_library, definitions, program, definition_writer));
+    if (!generated.function_pointer_->result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    LPG_TRY(generate_type(
+        generated.function_pointer_->result.value, standard_library, definitions, program, definition_writer));
     LPG_TRY(stream_writer_write_string(definition_writer, " (*"));
     LPG_TRY(stream_writer_write_unicode_view(definition_writer, unicode_view_from_string(name)));
     LPG_TRY(stream_writer_write_string(definition_writer, ")("));
@@ -986,6 +991,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_side_effect:
     case register_meaning_integer_to_string:
     case register_meaning_host_value:
+    case register_meaning_fail:
         LPG_TO_DO();
 
     case register_meaning_not:
@@ -1161,6 +1167,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_integer_to_string:
     case register_meaning_unit:
     case register_meaning_host_value:
+    case register_meaning_fail:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1701,6 +1708,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_side_effect:
         case register_meaning_host_value:
         case register_meaning_unit:
+        case register_meaning_fail:
             break;
         }
         LPG_TRY(indent(indentation, c_output));
@@ -1880,7 +1888,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             }
 
             case type_kind_function_pointer:
-                result_type = callee_type.function_pointer_->result;
+                if (callee_type.function_pointer_->result.is_set)
+                {
+                    LPG_TO_DO();
+                }
+                result_type = callee_type.function_pointer_->result.value;
                 break;
 
             case type_kind_interface:
@@ -1904,7 +1916,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 function_pointer const callee_signature =
                     *state->program->functions[state->registers[input.call.callee].type_of.value.lambda.lambda]
                          .signature;
-                result_type = callee_signature.result;
+                if (!callee_signature.result.is_set)
+                {
+                    LPG_TO_DO();
+                }
+                result_type = callee_signature.result.value;
                 set_register_function_variable(state, input.call.result, register_resource_ownership_owns, result_type);
                 LPG_TRY(
                     generate_type(result_type, &state->standard_library, state->definitions, state->program, c_output));
@@ -1954,6 +1970,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_argument:
             LPG_TO_DO();
+
+        case register_meaning_fail:
+            state->standard_library.using_stdlib = true;
+            LPG_TRY(stream_writer_write_string(c_output, "/*fail*/ abort();\n"));
+            return success_yes;
 
         case register_meaning_captures:
             LPG_UNREACHABLE();
@@ -2007,6 +2028,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_UNREACHABLE();
 
         case register_meaning_capture:
+        case register_meaning_fail:
             LPG_TO_DO();
 
         case register_meaning_global:
@@ -2054,6 +2076,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 11:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_host_value);
+                return success_yes;
+
+            case 12:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_fail);
                 return success_yes;
 
             default:
@@ -2697,7 +2724,11 @@ static success_indicator generate_function_declaration(function_id const id, fun
                                                        stream_writer const program_defined_writer)
 {
     LPG_TRY(stream_writer_write_string(program_defined_writer, "static "));
-    LPG_TRY(generate_type(signature.result, standard_library, definitions, program, program_defined_writer));
+    if (!signature.result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    LPG_TRY(generate_type(signature.result.value, standard_library, definitions, program, program_defined_writer));
     LPG_TRY(stream_writer_write_string(program_defined_writer, " "));
     LPG_TRY(generate_function_name(id, program_defined_writer));
     LPG_TRY(stream_writer_write_string(program_defined_writer, "("));
@@ -2804,7 +2835,11 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     }
 
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "static "), fail);
-    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
+    if (!program.functions[0].signature->result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result.value, &standard_library, &definitions, &program,
                                program_defined_writer_b),
                  fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, " lpg_main(void)\n"), fail);
@@ -2814,12 +2849,20 @@ success_indicator generate_c(checked_program const program, stream_writer const 
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "int main(void)\n"), fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "{\n"), fail);
     LPG_TRY_GOTO(indent(1, program_defined_writer_b), fail);
-    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result, &standard_library, &definitions, &program,
+    if (!program.functions[0].signature->result.is_set)
+    {
+        LPG_TO_DO();
+    }
+    LPG_TRY_GOTO(generate_type(program.functions[0].signature->result.value, &standard_library, &definitions, &program,
                                program_defined_writer_b),
                  fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, " const result = lpg_main();\n"), fail);
+    if (!program.functions[0].signature->result.is_set)
+    {
+        LPG_TO_DO();
+    }
     LPG_TRY_GOTO(generate_free(&standard_library, unicode_view_from_c_str("result"),
-                               program.functions[0].signature->result, &program, 1, program_defined_writer_b),
+                               program.functions[0].signature->result.value, &program, 1, program_defined_writer_b),
                  fail);
     LPG_TRY_GOTO(indent(1, program_defined_writer_b), fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "return 0;\n"), fail);
