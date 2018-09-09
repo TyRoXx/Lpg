@@ -683,10 +683,13 @@ static success_indicator generate_equality_comparable_match_cases(function_gener
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
         LPG_TRY(generate_sequence(state, generated.cases[i].action, ecmascript_output));
-        LPG_TRY(generate_register_name(generated.result, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
-        LPG_TRY(generate_register_read(state, generated.cases[i].value, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+        if (generated.cases[i].value.is_set)
+        {
+            LPG_TRY(generate_register_name(generated.result, ecmascript_output));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
+            LPG_TRY(generate_register_read(state, generated.cases[i].value.value, ecmascript_output));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+        }
         LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     }
     return success_yes;
@@ -741,10 +744,13 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
             break;
         }
         LPG_TRY(generate_sequence(state, generated.cases[i].action, ecmascript_output));
-        LPG_TRY(generate_register_name(generated.result, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
-        LPG_TRY(generate_register_read(state, generated.cases[i].value, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+        if (generated.cases[i].value.is_set)
+        {
+            LPG_TRY(generate_register_name(generated.result, ecmascript_output));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
+            LPG_TRY(generate_register_read(state, generated.cases[i].value.value, ecmascript_output));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+        }
         LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     }
     return success_yes;

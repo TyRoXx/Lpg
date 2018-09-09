@@ -191,7 +191,14 @@ void print_instruction(instruction const printed, size_t const indentation)
                 break;
             }
             print_instruction_sequence(printed.match.cases[i].action, (indentation + 1));
-            printf("return %u }\n", printed.match.cases[i].value);
+            if (printed.match.cases[i].value.is_set)
+            {
+                printf("return %u }\n", printed.match.cases[i].value.value);
+            }
+            else
+            {
+                printf("no return }\n");
+            }
         }
         return;
     }

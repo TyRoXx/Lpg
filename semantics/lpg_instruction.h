@@ -229,13 +229,14 @@ struct match_instruction_case
         match_instruction_case_stateful_enum stateful_enum;
     };
     instruction_sequence action;
-    register_id value;
+    optional_register_id value;
 };
 
 match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
-                                                           register_id returned);
+                                                           optional_register_id returned);
 match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
-                                                                   instruction_sequence action, register_id returned);
+                                                                   instruction_sequence action,
+                                                                   optional_register_id returned);
 void match_instruction_case_free(match_instruction_case freed);
 bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right);
 

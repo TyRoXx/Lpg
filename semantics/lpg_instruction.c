@@ -304,7 +304,7 @@ match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create
 }
 
 match_instruction_case match_instruction_case_create_value(register_id key_value, instruction_sequence action,
-                                                           register_id returned)
+                                                           optional_register_id returned)
 {
     match_instruction_case result;
     result.kind = match_instruction_case_kind_value;
@@ -315,7 +315,8 @@ match_instruction_case match_instruction_case_create_value(register_id key_value
 }
 
 match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
-                                                                   instruction_sequence action, register_id returned)
+                                                                   instruction_sequence action,
+                                                                   optional_register_id returned)
 {
     match_instruction_case result;
     result.kind = match_instruction_case_kind_stateful_enum;
@@ -356,7 +357,8 @@ bool match_instruction_case_equals(match_instruction_case const left, match_inst
         }
         break;
     }
-    return instruction_sequence_equals(&left.action, &right.action) && (left.value == right.value);
+    return instruction_sequence_equals(&left.action, &right.action) &&
+           optional_register_id_equals(left.value, right.value);
 }
 
 instruction instruction_create_call(call_instruction argument)

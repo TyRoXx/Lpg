@@ -89,7 +89,10 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
                     registers_read_from[current_instruction.match.cases[j].key_value] = true;
                     break;
                 }
-                registers_read_from[current_instruction.match.cases[j].value] = true;
+                if (current_instruction.match.cases[j].value.is_set)
+                {
+                    registers_read_from[current_instruction.match.cases[j].value.value] = true;
+                }
                 find_used_registers(current_instruction.match.cases[j].action, registers_read_from);
             }
             break;
@@ -199,7 +202,10 @@ static bool change_register_ids(instruction *const where, register_id const *con
                 ASSERT(update_register_id(&where->match.cases[j].key_value, new_register_ids));
                 break;
             }
-            ASSERT(update_register_id(&where->match.cases[j].value, new_register_ids));
+            if (where->match.cases[j].value.is_set)
+            {
+                ASSERT(update_register_id(&where->match.cases[j].value.value, new_register_ids));
+            }
             change_register_ids_in_sequence(&where->match.cases[j].action, new_register_ids);
         }
         return update_register_id(&where->match.result, new_register_ids);

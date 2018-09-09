@@ -2480,11 +2480,14 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(generate_free_registers(
                 state, previous_register_count, indentation + 1, current_function, ~(register_id)0, c_output));
 
-            LPG_TRY(indent(indentation + 1, c_output));
-            LPG_TRY(generate_register_name(input.match.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = "));
-            LPG_TRY(generate_c_read_access(state, current_function, input.match.cases[i].value, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            if (input.match.cases[i].value.is_set)
+            {
+                LPG_TRY(indent(indentation + 1, c_output));
+                LPG_TRY(generate_register_name(input.match.result, current_function, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                LPG_TRY(generate_c_read_access(state, current_function, input.match.cases[i].value.value, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+            }
 
             LPG_TRY(generate_add_reference_to_register(current_function, input.match.result, input.match.result_type,
                                                        indentation + 1, state->program, c_output));

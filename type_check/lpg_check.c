@@ -1787,25 +1787,21 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 #endif
             }
 
-            if (!action_evaluated.has_value)
+            if (action_evaluated.has_value)
             {
-                deallocate_boolean_cases(cases, enum_elements_handled, i);
-                instruction_sequence_free(&action);
-                return action_evaluated;
-            }
-
-            if (i == 0)
-            {
-                result_type = action_evaluated.type_;
-            }
-            else if (!type_equals(result_type, action_evaluated.type_))
-            {
-                /*TODO: support types that are not the same, but still comparable*/
-                emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
-                                                                 expression_source_begin(*case_tree.action)));
-                deallocate_boolean_cases(cases, enum_elements_handled, i);
-                instruction_sequence_free(&action);
-                return evaluate_expression_result_empty;
+                if (i == 0)
+                {
+                    result_type = action_evaluated.type_;
+                }
+                else if (!type_equals(result_type, action_evaluated.type_))
+                {
+                    /*TODO: support types that are not the same, but still comparable*/
+                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                     expression_source_begin(*case_tree.action)));
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    instruction_sequence_free(&action);
+                    return evaluate_expression_result_empty;
+                }
             }
 
             if (!compile_time_result.is_set && is_always_this_case && action_evaluated.compile_time_value.is_set &&
@@ -1823,12 +1819,16 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 cases[i] = match_instruction_case_create_stateful_enum(
                     match_instruction_case_stateful_enum_create(
                         maybe_pattern.stateful_enum_element.which, placeholder_where),
-                    action, action_evaluated.where);
+                    action, action_evaluated.has_value ? optional_register_id_create_set(action_evaluated.where)
+                                                       : optional_register_id_create_empty());
                 break;
 
             case pattern_evaluate_result_kind_no_pattern:
                 ASSUME(key_value != ~(register_id)0);
-                cases[i] = match_instruction_case_create_value(key_value, action, action_evaluated.where);
+                cases[i] = match_instruction_case_create_value(
+                    key_value, action, action_evaluated.has_value
+                                           ? optional_register_id_create_set(action_evaluated.where)
+                                           : optional_register_id_create_empty());
                 break;
 
             case pattern_evaluate_result_kind_failure:
@@ -1974,7 +1974,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
             }
 
-            cases[i] = match_instruction_case_create_value(key_evaluated.where, action, action_evaluated.where);
+            cases[i] = match_instruction_case_create_value(
+                key_evaluated.where, action, optional_register_id_create_set(action_evaluated.where));
         }
 
         ASSUME(integer_equal(integer_range_list_size(integer_ranges_unhandled), integer_create(0, 0)));
@@ -2554,8 +2555,12 @@ typedef struct method_evaluation_result
     bool is_success;
 } method_evaluation_result;
 
-static method_evaluation_result const method_evaluation_result_failure = {
-    {0, NULL, NULL, NULL, 0, {{(type_kind)0, {0}}, {NULL, 0}, {NULL, 0}, {false, {(type_kind)0, {0}}}}}, false};
+static method_evaluation_result make_method_evaluation_result_failure(void)
+{
+    method_evaluation_result result;
+    result.is_success = false;
+    return result;
+}
 
 static method_evaluation_result method_evaluation_result_create(function_pointer_value success)
 {
@@ -2573,7 +2578,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     evaluated_function_header const header = evaluate_function_header(state, function, method.header);
     if (!header.is_success)
     {
-        return method_evaluation_result_failure;
+        return make_method_evaluation_result_failure();
     }
     if (header.return_type.is_set && !is_implicitly_convertible(header.return_type.value, declared_result_type))
     {
@@ -2585,7 +2590,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         }
         deallocate(header.parameter_names);
         deallocate(header.parameter_types);
-        return method_evaluation_result_failure;
+        return make_method_evaluation_result_failure();
     }
     function_id const this_lambda_id = reserve_function_id(state);
     check_function_result const checked =
@@ -2601,7 +2606,7 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     if (!checked.success)
     {
         deallocate(header.parameter_types);
-        return method_evaluation_result_failure;
+        return make_method_evaluation_result_failure();
     }
     ASSUME(!checked.captures);
     ASSUME(checked.function.signature->parameters.length == 0);

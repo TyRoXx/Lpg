@@ -222,15 +222,6 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             }
             switch (callee.kind)
             {
-            case value_kind_generic_struct:
-                LPG_TO_DO();
-
-            case value_kind_generic_lambda:
-                LPG_TO_DO();
-
-            case value_kind_array:
-                LPG_TO_DO();
-
             case value_kind_function_pointer:
             {
                 optional_value const result = call_function(
@@ -260,6 +251,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             case value_kind_enum_constructor:
             case value_kind_generic_enum:
             case value_kind_generic_interface:
+            case value_kind_generic_struct:
+            case value_kind_generic_lambda:
+            case value_kind_array:
                 LPG_TO_DO();
             }
             break;
@@ -404,9 +398,12 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 case run_sequence_result_return:
                     return run_sequence_result_return;
                 }
-                ASSUME(value_is_valid(registers[this_case->value]));
-                ASSUME(value_conforms_to_type(registers[this_case->value], element.match.result_type));
-                registers[element.match.result] = registers[this_case->value];
+                if (this_case->value.is_set)
+                {
+                    ASSUME(value_is_valid(registers[this_case->value.value]));
+                    ASSUME(value_conforms_to_type(registers[this_case->value.value], element.match.result_type));
+                    registers[element.match.result] = registers[this_case->value.value];
+                }
                 break;
             }
             ASSUME(found_match);
