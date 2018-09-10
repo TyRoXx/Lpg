@@ -33,19 +33,15 @@ optional_type get_return_type(type const callee, checked_function const *const a
 {
     switch (callee.kind)
     {
-    case type_kind_generic_struct:
-        LPG_TO_DO();
-
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_lambda:
         return all_functions[callee.lambda.lambda].signature->result;
 
     case type_kind_function_pointer:
         return callee.function_pointer_->result;
 
+    case type_kind_generic_struct:
+    case type_kind_host_value:
+    case type_kind_generic_lambda:
     case type_kind_tuple:
     case type_kind_structure:
     case type_kind_unit:

@@ -1248,8 +1248,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     switch (callee.type_.kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -1324,8 +1322,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
             switch (callee.compile_time_value.value_.kind)
             {
             case value_kind_generic_struct:
-                LPG_TO_DO();
-
             case value_kind_generic_lambda:
             case value_kind_array:
                 LPG_TO_DO();
@@ -1404,8 +1400,6 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         switch (callee.type_.kind)
         {
         case type_kind_generic_struct:
-            LPG_TO_DO();
-
         case type_kind_host_value:
         case type_kind_generic_lambda:
         case type_kind_method_pointer:
@@ -3507,7 +3501,11 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     root->interface_instantiations[id] = generic_interface_instantiation_create(
         generic, argument_types, arguments, argument_count, evaluated.compile_time_value.value_.type_.interface_);
     root->interface_instantiation_count += 1;
-    return evaluated;
+    register_id const result_where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  result_where, evaluated.compile_time_value.value_, evaluated.type_)));
+    return evaluate_expression_result_create(
+        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
 }
 
 static evaluate_expression_result instantiate_generic_lambda(function_checking_state *const state,

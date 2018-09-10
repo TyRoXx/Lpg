@@ -39,7 +39,13 @@ assert(integer-equals(3, n.load()))
 n.store(0)
 assert(integer-equals(0, n.load()))
 
-/*let p = make-mutable[std.string]("test")
+let o = make-mutable[std.string]
+let p = o("test")
 assert(string-equals("test", p.load()))
 p.store("123")
-assert(string-equals("123", p.load()))*/
+assert(string-equals("123", p.load()))
+
+let p2 = make-mutable[std.string]("test")
+assert(string-equals("test", p2.load()))
+p2.store("123")
+assert(string-equals("123", p2.load()))
