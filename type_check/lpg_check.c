@@ -3226,7 +3226,11 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     {
         deallocate(argument_types);
     }
-    return evaluated;
+    register_id const result_where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  result_where, evaluated.compile_time_value.value_, evaluated.type_)));
+    return evaluate_expression_result_create(
+        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
 }
 
 static evaluate_expression_result instantiate_generic_struct(function_checking_state *const state,
@@ -3363,7 +3367,11 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
     root->struct_instantiations[id] = generic_struct_instantiation_create(
         generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.structure_, argument_types);
     root->struct_instantiation_count += 1;
-    return evaluated;
+    register_id const result_where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  result_where, evaluated.compile_time_value.value_, evaluated.type_)));
+    return evaluate_expression_result_create(
+        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
 }
 
 static evaluate_expression_result instantiate_generic_interface(function_checking_state *const state,
@@ -3646,7 +3654,11 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     {
         deallocate(argument_types);
     }
-    return evaluated;
+    register_id const result_where = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                  result_where, evaluated.compile_time_value.value_, evaluated.type_)));
+    return evaluate_expression_result_create(
+        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
 }
 
 static evaluate_expression_result evaluate_generic_instantiation(function_checking_state *const state,

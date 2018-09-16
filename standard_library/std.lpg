@@ -31,6 +31,29 @@ let any-integer = int(0, 340282366920938463463374607431768211455)
 
 let option-int = option[any-integer]
 
+let mutable = interface[T]
+    load(): T
+    store(value: T): unit
+
+let mutable-content = struct[T]
+    content: array[T]
+
+impl[T] mutable[T] for mutable-content[T]
+    load(): T
+        match self.content.load(0)
+            case option[T].some(let value):
+                value
+            case option[T].none:
+                fail()
+    store(value: T): unit
+        assert(self.content.store(0, value))
+
+let make-mutable = [T](value: T): mutable[T]
+    let content = new-array(T)
+    assert(content.append(value))
+    assert(integer-equals(1, content.size()))
+    mutable-content[T]{content}
+
 let export = struct
     and: type-of(and)
     or: type-of(or)
@@ -43,4 +66,6 @@ let export = struct
     option: type-of(option)
     option-int: type-of(option-int)
     array: type-of(array)
-export{and, or, not, type, string, boolean, unit, unit_value, option, option-int, array}
+    mutable: type-of(mutable)
+    make-mutable: type-of(make-mutable)
+export{and, or, not, type, string, boolean, unit, unit_value, option, option-int, array, mutable, make-mutable}

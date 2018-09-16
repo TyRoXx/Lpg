@@ -807,9 +807,6 @@ static success_indicator generate_type(type const generated, standard_library_us
     case type_kind_host_value:
         return stream_writer_write_string(c_output, "void *");
 
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_interface:
         return generate_interface_reference_name(generated.interface_, c_output);
 
@@ -904,6 +901,7 @@ static success_indicator generate_type(type const generated, standard_library_us
         standard_library->using_stdint = true;
         return stream_writer_write_string(c_output, "uint64_t");
 
+    case type_kind_generic_lambda:
     case type_kind_type:
     case type_kind_generic_interface:
     case type_kind_generic_enum:
@@ -1526,7 +1524,6 @@ static success_indicator generate_value(value const generated, type const type_o
         return success_yes;
     }
 
-    case value_kind_generic_lambda:
     case value_kind_array:
     case value_kind_pattern:
         LPG_TO_DO();
@@ -1534,6 +1531,7 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_type_erased:
         return generate_type_erased_value(generated.type_erased, state, c_output);
 
+    case value_kind_generic_lambda:
     case value_kind_type:
     case value_kind_generic_interface:
     case value_kind_generic_enum:
@@ -2572,10 +2570,10 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     switch (what.kind)
     {
     case type_kind_host_value:
+    case type_kind_generic_lambda:
         return success_yes;
 
     case type_kind_generic_struct:
-    case type_kind_generic_lambda:
         LPG_TO_DO();
 
     case type_kind_method_pointer:

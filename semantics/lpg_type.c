@@ -366,10 +366,8 @@ bool type_equals(type const left, type const right)
         LPG_TO_DO();
 
     case type_kind_host_value:
-        return true;
-
     case type_kind_generic_lambda:
-        LPG_TO_DO();
+        return true;
 
     case type_kind_method_pointer:
         return method_pointer_type_equals(left.method_pointer, right.method_pointer);
@@ -421,7 +419,7 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
         return type_from_host_value();
 
     case type_kind_generic_lambda:
-        LPG_TO_DO();
+        return type_from_generic_lambda();
 
     case type_kind_lambda:
         ASSUME(new_function_ids[original.lambda.lambda] != ~(register_id)0);
