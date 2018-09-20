@@ -416,7 +416,9 @@ bool value_conforms_to_type(value const instance, type const expected)
         return (instance.kind == value_kind_type);
 
     case type_kind_interface:
-        return (instance.kind == value_kind_type_erased) && (instance.type_erased.impl.target == expected.interface_);
+        return ((instance.kind == value_kind_type_erased) &&
+                (instance.type_erased.impl.target == expected.interface_)) ||
+               (instance.kind == value_kind_array);
 
     case type_kind_function_pointer:
     {

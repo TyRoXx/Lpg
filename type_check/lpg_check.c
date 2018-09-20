@@ -109,8 +109,13 @@ static type get_parameter_type(type const callee, size_t const which_parameter,
         LPG_UNREACHABLE();
 
     case type_kind_enum_constructor:
+    {
         ASSUME(which_parameter == 0);
-        return all_enums[callee.enum_constructor->enumeration].elements[callee.enum_constructor->which].state;
+        optional_type const state =
+            all_enums[callee.enum_constructor->enumeration].elements[callee.enum_constructor->which].state;
+        ASSUME(state.is_set);
+        return state.value;
+    }
     }
     LPG_UNREACHABLE();
 }
@@ -337,9 +342,9 @@ static read_structure_element_result read_element(function_checking_state *state
                 if (unicode_view_equals(
                         unicode_view_from_string(element->value), unicode_view_from_string(enum_->elements[i].name)))
                 {
-                    if (enum_->elements[i].state.kind == type_kind_unit)
+                    if (!enum_->elements[i].state.is_set)
                     {
-                        value const literal = value_from_enum_element(i, enum_->elements[i].state, NULL);
+                        value const literal = value_from_enum_element(i, enum_->elements[i].state.value, NULL);
                         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                                       result, literal, type_from_enumeration(left_side_type.enum_))));
                         write_register_compile_time_value(state, result, literal);
@@ -401,7 +406,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
     {
         enumeration const *const enum_ = all_enums + callee.enum_constructor->enumeration;
         ASSUME(callee.enum_constructor->which < enum_->size);
-        return enum_->elements[callee.enum_constructor->which].state.kind != type_kind_unit;
+        return enum_->elements[callee.enum_constructor->which].state.is_set ? 1 : 0;
     }
     }
     LPG_UNREACHABLE();
@@ -1354,12 +1359,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 value *const enum_state = garbage_collector_allocate(&state->program->memory, sizeof(*enum_state));
                 ASSUME(expected_arguments == 1);
                 *enum_state = compile_time_arguments[0];
+                optional_type const enum_state_type = state->program->enums[callee.type_.enum_constructor->enumeration]
+                                                          .elements[callee.type_.enum_constructor->which]
+                                                          .state;
+                ASSUME(enum_state_type.is_set);
                 compile_time_result = optional_value_create(
-                    value_from_enum_element(callee.type_.enum_constructor->which,
-                                            state->program->enums[callee.type_.enum_constructor->enumeration]
-                                                .elements[callee.type_.enum_constructor->which]
-                                                .state,
-                                            enum_state));
+                    value_from_enum_element(callee.type_.enum_constructor->which, enum_state_type.value, enum_state));
                 break;
             }
             }
@@ -1425,11 +1430,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
         case type_kind_enum_constructor:
             ASSUME(called.arguments.length == 1);
+            optional_type const enum_state = state->program->enums[callee.type_.enum_constructor->enumeration]
+                                                 .elements[callee.type_.enum_constructor->which]
+                                                 .state;
+            ASSUME(enum_state.is_set);
             add_instruction(function, instruction_create_enum_construct(enum_construct_instruction_create(
-                                          result, *callee.type_.enum_constructor, arguments[0],
-                                          state->program->enums[callee.type_.enum_constructor->enumeration]
-                                              .elements[callee.type_.enum_constructor->which]
-                                              .state)));
+                                          result, *callee.type_.enum_constructor, arguments[0], enum_state.value)));
             deallocate(arguments);
             break;
         }
@@ -1707,11 +1713,12 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 }
 
                 ASSUME(placeholder_where != ~(register_id)0);
+                ASSUME(enum_->elements[maybe_pattern.stateful_enum_element.which].state.is_set);
                 add_local_variable(
                     &state->local_variables,
                     local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
                                           local_variable_phase_initialized,
-                                          enum_->elements[maybe_pattern.stateful_enum_element.which].state,
+                                          enum_->elements[maybe_pattern.stateful_enum_element.which].state.value,
                                           optional_value_empty, placeholder_where));
                 define_register_debug_name(state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
 
@@ -3018,7 +3025,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
     enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
     for (size_t i = 0; i < element.element_count; ++i)
     {
-        type element_state = type_from_unit();
+        optional_type element_state = optional_type_create_empty();
         if (element.elements[i].state)
         {
             evaluate_expression_result const state_evaluated =
@@ -3039,7 +3046,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                     state->program->enum_count -= 1;
                     return evaluate_expression_result_empty;
                 }
-                element_state = state_evaluated.compile_time_value.value_.type_;
+                element_state = optional_type_create_set(state_evaluated.compile_time_value.value_.type_);
             }
             else
             {
@@ -4195,16 +4202,16 @@ checked_program check(sequence const root, structure const global, check_error_h
                                2};
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));
-        elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), type_from_unit());
-        elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), type_from_unit());
+        elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), optional_type_create_empty());
+        elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), optional_type_create_empty());
         program.enums[0] = enumeration_create(elements, 2);
     }
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));
-        elements[0] = enumeration_element_create(unicode_string_from_c_str("none"), type_from_unit());
+        elements[0] = enumeration_element_create(unicode_string_from_c_str("none"), optional_type_create_empty());
         elements[1] = enumeration_element_create(
-            unicode_string_from_c_str("some"),
-            type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max())));
+            unicode_string_from_c_str("some"), optional_type_create_set(type_from_integer_range(
+                                                   integer_range_create(integer_create(0, 0), integer_max()))));
         program.enums[1] = enumeration_create(elements, 2);
     }
     size_t const globals_count = global.count;

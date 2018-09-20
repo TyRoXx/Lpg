@@ -783,11 +783,14 @@ static success_indicator generate_stateful_enum_definition(enum_id const id,
     for (struct_member_id i = 0; i < generated.size; ++i)
     {
         enumeration_element const member = generated.elements[i];
-        LPG_TRY(indent(2, c_output));
-        LPG_TRY(generate_type(member.state, standard_library, definitions, program, c_output));
-        LPG_TRY(stream_writer_write_string(c_output, " "));
-        LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
-        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+        if (member.state.is_set)
+        {
+            LPG_TRY(indent(2, c_output));
+            LPG_TRY(generate_type(member.state.value, standard_library, definitions, program, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " "));
+            LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+        }
     }
     LPG_TRY(indent(1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
@@ -1551,13 +1554,21 @@ static success_indicator generate_value(value const generated, type const type_o
         {
             LPG_TRY(stream_writer_write_string(c_output, "{"));
             LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated.enum_element.which)));
-            LPG_TRY(stream_writer_write_string(c_output, ", {."));
-            LPG_TRY(generate_struct_member_name(
-                unicode_view_from_string(enum_.elements[generated.enum_element.which].name), c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = "));
-            LPG_TRY(generate_value(value_or_unit(generated.enum_element.state),
-                                   enum_.elements[generated.enum_element.which].state, state, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, "}}"));
+            optional_type const enum_state = enum_.elements[generated.enum_element.which].state;
+            if (enum_state.is_set)
+            {
+                LPG_TRY(stream_writer_write_string(c_output, ", {."));
+                LPG_TRY(generate_struct_member_name(
+                    unicode_view_from_string(enum_.elements[generated.enum_element.which].name), c_output));
+                LPG_TRY(stream_writer_write_string(c_output, " = "));
+                ASSUME(enum_state.is_set);
+                LPG_TRY(generate_value(value_or_unit(generated.enum_element.state), enum_state.value, state, c_output));
+                LPG_TRY(stream_writer_write_string(c_output, "}}"));
+            }
+            else
+            {
+                LPG_TRY(stream_writer_write_string(c_output, "}"));
+            }
             return success_yes;
         }
         char buffer[64];
@@ -2378,9 +2389,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, " = "));
         LPG_TRY(generate_c_read_access(state, current_function, input.enum_construct.state, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}};\n"));
-        LPG_TRY(generate_add_reference_to_register(current_function, input.enum_construct.state,
-                                                   enum_.elements[input.enum_construct.which.which].state, indentation,
-                                                   state->program, c_output));
+        optional_type const enum_state = enum_.elements[input.enum_construct.which.which].state;
+        if (enum_state.is_set)
+        {
+            LPG_TRY(generate_add_reference_to_register(
+                current_function, input.enum_construct.state, enum_state.value, indentation, state->program, c_output));
+        }
         return success_yes;
     }
 
@@ -2448,7 +2462,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 ASSUME(state->registers[input.match.key].type_of.is_set);
                 ASSUME(state->registers[input.match.key].type_of.value.kind == type_kind_enumeration);
                 enumeration const enum_ = state->program->enums[state->registers[input.match.key].type_of.value.enum_];
-                type const state_type = enum_.elements[input.match.cases[i].stateful_enum.element].state;
+                optional_type const maybe_state_type = enum_.elements[input.match.cases[i].stateful_enum.element].state;
+                ASSUME(maybe_state_type.is_set);
+                type const state_type = maybe_state_type.value;
                 set_register_variable(
                     state, input.match.cases[i].stateful_enum.where, register_resource_ownership_owns, state_type);
                 LPG_TRY(indent(indentation + 1, c_output));
@@ -2552,8 +2568,11 @@ static success_indicator generate_free_enumeration(standard_library_usage *const
         LPG_TRY(stream_writer_write_string(memory_writer_erase(&name_buffer), "."));
         LPG_TRY(generate_struct_member_name(
             unicode_view_from_string(what.elements[i].name), memory_writer_erase(&name_buffer)));
-        LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), what.elements[i].state, program,
-                              indentation + 1, c_output));
+        if (what.elements[i].state.is_set)
+        {
+            LPG_TRY(generate_free(standard_library, memory_writer_content(name_buffer), what.elements[i].state.value,
+                                  program, indentation + 1, c_output));
+        }
         memory_writer_free(&name_buffer);
         LPG_TRY(indent(indentation + 1, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));

@@ -730,15 +730,18 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         switch (generated.cases[i].kind)
         {
         case match_instruction_case_kind_stateful_enum:
+        {
             ASSUME(state->registers[generated.key].type_of.kind == type_kind_enumeration);
-            LPG_TRY(write_register(state, generated.cases[i].stateful_enum.where,
-                                   state->all_enums[state->registers[generated.key].type_of.enum_]
-                                       .elements[generated.cases[i].stateful_enum.element]
-                                       .state,
+            optional_type const enum_state = state->all_enums[state->registers[generated.key].type_of.enum_]
+                                                 .elements[generated.cases[i].stateful_enum.element]
+                                                 .state;
+            ASSUME(enum_state.is_set);
+            LPG_TRY(write_register(state, generated.cases[i].stateful_enum.where, enum_state.value,
                                    optional_value_empty, ecmascript_output));
             LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
             LPG_TRY(stream_writer_write_string(ecmascript_output, "[1];\n"));
             break;
+        }
 
         case match_instruction_case_kind_value:
             break;

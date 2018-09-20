@@ -169,6 +169,16 @@ static void mark_type(bool *const used_functions, checked_function const *const 
     }
 }
 
+static void mark_optional_type(bool *const used_functions, checked_function const *const all_functions,
+                               lpg_interface const *const all_interfaces, optional_type const marked)
+{
+    if (!marked.is_set)
+    {
+        return;
+    }
+    mark_type(used_functions, all_functions, all_interfaces, marked.value);
+}
+
 static void mark_function_pointer(bool *const used_functions, checked_function const *const all_functions,
                                   lpg_interface const *const all_interfaces, function_pointer const marked_function)
 {
@@ -578,7 +588,7 @@ static enumeration clone_enumeration(enumeration const original, garbage_collect
     for (size_t i = 0; i < original.size; ++i)
     {
         elements[i] = enumeration_element_create(unicode_view_copy(unicode_view_from_string(original.elements[i].name)),
-                                                 type_clone(original.elements[i].state, gc, new_function_ids));
+                                                 optional_type_clone(original.elements[i].state, gc, new_function_ids));
     }
     return enumeration_create(elements, original.size);
 }
@@ -617,7 +627,7 @@ checked_program remove_unused_functions(checked_program const from)
         enumeration const enum_ = from.enums[i];
         for (enum_element_id k = 0; k < enum_.size; ++k)
         {
-            mark_type(used_functions, from.functions, from.interfaces, enum_.elements[k].state);
+            mark_optional_type(used_functions, from.functions, from.interfaces, enum_.elements[k].state);
         }
     }
 

@@ -45,7 +45,7 @@ bool has_stateful_element(enumeration const enum_)
 {
     for (size_t i = 0; i < enum_.size; ++i)
     {
-        if (enum_.elements[i].state.kind != type_kind_unit)
+        if (enum_.elements[i].state.is_set)
         {
             return true;
         }
@@ -191,7 +191,7 @@ void implementation_entry_free(implementation_entry const freed)
     implementation_free(freed.target);
 }
 
-enumeration_element enumeration_element_create(unicode_string name, type state)
+enumeration_element enumeration_element_create(unicode_string name, optional_type state)
 {
     enumeration_element const result = {name, state};
     return result;
@@ -556,8 +556,6 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     switch (flat_from.kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -596,9 +594,11 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_interface:
         return (flat_from.interface_ == flat_into.interface_);
 
+    case type_kind_structure:
+        return (flat_from.structure_ == flat_into.structure_);
+
     case type_kind_method_pointer:
     case type_kind_lambda:
-    case type_kind_structure:
     case type_kind_enum_constructor:
     case type_kind_generic_interface:
         LPG_TO_DO();

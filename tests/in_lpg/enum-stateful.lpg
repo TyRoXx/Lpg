@@ -38,7 +38,7 @@ assert(match multi.b(structure{"abc", boolean.true})
     case multi.b(let state):
         side-effect()
         string-equals("abc", state.x)
-    case multi.c: boolean.false
+    case multi.c(let state): boolean.false
     case multi.d(let state): boolean.false
     case multi.e: boolean.false
     case multi.f: boolean.false
@@ -50,3 +50,11 @@ let nested-enum = enum
         b)
     b
 let n = nested-enum.b
+
+let unit-as-state = enum
+    a(std.unit)
+let x = unit-as-state.a(std.unit_value)
+assert(match x
+    case unit-as-state.a(let ignored):
+        std.boolean.true
+)

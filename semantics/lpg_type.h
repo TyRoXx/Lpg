@@ -169,10 +169,10 @@ void implementation_entry_free(implementation_entry const freed);
 struct enumeration_element
 {
     unicode_string name;
-    type state;
+    optional_type state;
 };
 
-enumeration_element enumeration_element_create(unicode_string name, type state);
+enumeration_element enumeration_element_create(unicode_string name, optional_type state);
 void enumeration_element_free(LPG_NON_NULL(enumeration_element const *freed));
 
 struct function_pointer
