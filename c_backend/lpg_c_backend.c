@@ -804,9 +804,6 @@ static success_indicator generate_type(type const generated, standard_library_us
 {
     switch (generated.kind)
     {
-    case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
         return stream_writer_write_string(c_output, "void *");
 
@@ -908,10 +905,11 @@ static success_indicator generate_type(type const generated, standard_library_us
     case type_kind_type:
     case type_kind_generic_interface:
     case type_kind_generic_enum:
+    case type_kind_generic_struct:
+    case type_kind_enum_constructor:
         standard_library->using_unit = true;
         return stream_writer_write_string(c_output, "unit");
 
-    case type_kind_enum_constructor:
     case type_kind_method_pointer:
         LPG_TO_DO();
 
@@ -1064,18 +1062,14 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     ASSUME(type_is_valid(what));
     switch (what.kind)
     {
-    case type_kind_generic_struct:
-        LPG_TO_DO();
-
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_string:
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "string_add_reference(&"));
         LPG_TRY(stream_writer_write_unicode_view(c_output, pointer_name));
         return stream_writer_write_string(c_output, ");\n");
 
+    case type_kind_generic_lambda:
+    case type_kind_generic_struct:
     case type_kind_host_value:
     case type_kind_enumeration:
     case type_kind_unit:
@@ -1084,6 +1078,7 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     case type_kind_function_pointer:
     case type_kind_generic_interface:
     case type_kind_generic_enum:
+    case type_kind_enum_constructor:
         return success_yes;
 
     case type_kind_tuple:
@@ -1116,7 +1111,6 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     }
 
     case type_kind_method_pointer:
-    case type_kind_enum_constructor:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();
@@ -2590,10 +2584,8 @@ static success_indicator generate_free(standard_library_usage *const standard_li
     {
     case type_kind_host_value:
     case type_kind_generic_lambda:
-        return success_yes;
-
     case type_kind_generic_struct:
-        LPG_TO_DO();
+        return success_yes;
 
     case type_kind_method_pointer:
         return generate_free(standard_library, freed, type_from_interface(what.method_pointer.interface_), program,

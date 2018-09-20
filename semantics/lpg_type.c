@@ -363,10 +363,13 @@ bool type_equals(type const left, type const right)
     switch (left.kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
     case type_kind_generic_lambda:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
+    case type_kind_unit:
+    case type_kind_string:
+    case type_kind_type:
         return true;
 
     case type_kind_method_pointer:
@@ -381,20 +384,11 @@ bool type_equals(type const left, type const right)
     case type_kind_structure:
         return (left.structure_ == right.structure_);
 
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
-        return true;
-
     case type_kind_enum_constructor:
-        LPG_TO_DO();
+        return (enum_constructor_type_equals(*left.enum_constructor, *right.enum_constructor));
 
     case type_kind_function_pointer:
         return function_pointer_equals(*left.function_pointer_, *right.function_pointer_);
-
-    case type_kind_unit:
-    case type_kind_string:
-    case type_kind_type:
-        return true;
 
     case type_kind_enumeration:
         return (left.enum_ == right.enum_);
@@ -496,15 +490,12 @@ optional_type optional_type_clone(optional_type const original, garbage_collecto
 
 bool type_is_valid(type const checked)
 {
-    if ((checked.kind < type_kind_structure) || (checked.kind > type_kind_host_value))
+    if ((checked.kind < type_kind_structure) || (checked.kind > type_kind_generic_struct))
     {
         return false;
     }
     switch (checked.kind)
     {
-    case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_tuple:
         for (size_t i = 0; i < checked.tuple_.length; ++i)
         {
@@ -515,6 +506,7 @@ bool type_is_valid(type const checked)
         }
         return true;
 
+    case type_kind_generic_struct:
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
@@ -555,15 +547,14 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     }
     switch (flat_from.kind)
     {
-    case type_kind_generic_struct:
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_type:
     case type_kind_unit:
     case type_kind_string:
     case type_kind_generic_enum:
+    case type_kind_host_value:
+    case type_kind_generic_struct:
+    case type_kind_generic_lambda:
+    case type_kind_generic_interface:
         return true;
 
     case type_kind_function_pointer:
@@ -597,10 +588,13 @@ bool is_implicitly_convertible(type const flat_from, type const flat_into)
     case type_kind_structure:
         return (flat_from.structure_ == flat_into.structure_);
 
-    case type_kind_method_pointer:
     case type_kind_lambda:
+        return (flat_from.lambda.lambda == flat_into.lambda.lambda);
+
     case type_kind_enum_constructor:
-    case type_kind_generic_interface:
+        return enum_constructor_type_equals(*flat_from.enum_constructor, *flat_into.enum_constructor);
+
+    case type_kind_method_pointer:
         LPG_TO_DO();
     }
     LPG_UNREACHABLE();

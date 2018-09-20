@@ -362,16 +362,24 @@ bool value_conforms_to_type(value const instance, type const expected)
     ASSUME(value_is_valid(instance));
     switch (expected.kind)
     {
-    case type_kind_generic_struct:
+    case type_kind_host_value:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-    case type_kind_enum_constructor:
-    case type_kind_method_pointer:
-    case type_kind_generic_enum:
     case type_kind_generic_interface:
-        LPG_TO_DO();
+        return (instance.kind == value_kind_generic_interface);
+
+    case type_kind_enum_constructor:
+        return (instance.kind == value_kind_enum_constructor);
+
+    case type_kind_generic_lambda:
+        return (instance.kind == value_kind_generic_lambda);
+
+    case type_kind_generic_struct:
+        return (instance.kind == value_kind_generic_struct);
+
+    case type_kind_generic_enum:
+        return (instance.kind == value_kind_generic_enum);
 
     case type_kind_unit:
         return (instance.kind == value_kind_unit);

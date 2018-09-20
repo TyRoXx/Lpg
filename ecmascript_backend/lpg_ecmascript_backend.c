@@ -323,8 +323,6 @@ static success_indicator generate_register_read(function_generation *const state
     switch (info.known_value.value_.kind)
     {
     case value_kind_generic_struct:
-        LPG_TO_DO();
-
     case value_kind_integer:
     case value_kind_string:
     case value_kind_generic_enum:
