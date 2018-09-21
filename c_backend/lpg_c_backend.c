@@ -1530,12 +1530,9 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_type:
     case value_kind_generic_interface:
     case value_kind_generic_enum:
+    case value_kind_enum_constructor:
         state->standard_library.using_unit = true;
         LPG_TRY(stream_writer_write_string(c_output, "unit_impl"));
-        return success_yes;
-
-    case value_kind_enum_constructor:
-        LPG_TRY(stream_writer_write_string(c_output, "/*enum constructor*/"));
         return success_yes;
 
     case value_kind_enum_element:
@@ -2298,12 +2295,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success_yes;
 
-        case value_kind_enum_constructor:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            LPG_TRY(stream_writer_write_string(c_output, "/*enum constructor omitted*/\n"));
-            return success_yes;
-
         case value_kind_enum_element:
         {
             set_register_variable(
@@ -2318,6 +2309,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success_yes;
         }
 
+        case value_kind_enum_constructor:
         case value_kind_generic_enum:
         case value_kind_generic_interface:
         case value_kind_generic_struct:

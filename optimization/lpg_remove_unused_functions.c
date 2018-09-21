@@ -131,6 +131,7 @@ static void mark_type(bool *const used_functions, checked_function const *const 
     switch (marked.kind)
     {
     case type_kind_generic_struct:
+    case type_kind_method_pointer:
         LPG_TO_DO();
 
     case type_kind_function_pointer:
@@ -158,8 +159,9 @@ static void mark_type(bool *const used_functions, checked_function const *const 
         break;
 
     case type_kind_enum_constructor:
-    case type_kind_method_pointer:
-        LPG_TO_DO();
+        mark_type(
+            used_functions, all_functions, all_interfaces, type_from_enumeration(marked.enum_constructor->enumeration));
+        break;
 
     case type_kind_lambda:
         mark_function(used_functions, all_functions, all_interfaces, marked.lambda.lambda);
