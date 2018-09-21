@@ -407,7 +407,7 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
     switch (original.kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
+        return type_from_generic_struct();
 
     case type_kind_host_value:
         return type_from_host_value();
