@@ -22,9 +22,6 @@ static void mark_value(value const root, bool *used_functions, checked_function 
 {
     switch (root.kind)
     {
-    case value_kind_generic_struct:
-        LPG_TO_DO();
-
     case value_kind_type_erased:
     {
         implementation const impl = all_interfaces[root.type_erased.impl.target]
@@ -50,12 +47,13 @@ static void mark_value(value const root, bool *used_functions, checked_function 
     case value_kind_unit:
     case value_kind_enum_constructor:
     case value_kind_generic_enum:
+    case value_kind_generic_struct:
+    case value_kind_generic_lambda:
+    case value_kind_generic_interface:
         break;
 
     case value_kind_pattern:
-    case value_kind_generic_lambda:
     case value_kind_array:
-    case value_kind_generic_interface:
         LPG_TO_DO();
 
     case value_kind_tuple:

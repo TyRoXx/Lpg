@@ -1432,9 +1432,6 @@ static success_indicator generate_value(value const generated, type const type_o
 {
     switch (generated.kind)
     {
-    case value_kind_generic_struct:
-        LPG_TO_DO();
-
     case value_kind_integer:
     {
         if (integer_less(generated.integer_, integer_create(1, 0)))
@@ -1528,6 +1525,7 @@ static success_indicator generate_value(value const generated, type const type_o
     case value_kind_type_erased:
         return generate_type_erased_value(generated.type_erased, state, c_output);
 
+    case value_kind_generic_struct:
     case value_kind_generic_lambda:
     case value_kind_type:
     case value_kind_generic_interface:
@@ -2196,30 +2194,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case value_kind_array:
             LPG_TO_DO();
 
-        case value_kind_generic_enum:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            LPG_TRY(stream_writer_write_string(c_output, "/*generic enum omitted*/\n"));
-            return success_yes;
-
-        case value_kind_generic_interface:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            LPG_TRY(stream_writer_write_string(c_output, "/*generic interface omitted*/\n"));
-            return success_yes;
-
-        case value_kind_generic_struct:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            LPG_TRY(stream_writer_write_string(c_output, "/*generic struct omitted*/\n"));
-            return success_yes;
-
-        case value_kind_generic_lambda:
-            set_register_variable(
-                state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
-            LPG_TRY(stream_writer_write_string(c_output, "/*generic lambda omitted*/\n"));
-            return success_yes;
-
         case value_kind_integer:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
@@ -2344,6 +2318,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             return success_yes;
         }
 
+        case value_kind_generic_enum:
+        case value_kind_generic_interface:
+        case value_kind_generic_struct:
+        case value_kind_generic_lambda:
         case value_kind_unit:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
