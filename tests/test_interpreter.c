@@ -340,24 +340,6 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
         unicode_string_free(&c_test_dir);
     }
 
-    // no dead code
-    {
-        remove_dead_code(&checked);
-        memory_writer optimized_test_name = {NULL, 0, 0};
-        {
-            stream_writer const writer = memory_writer_erase(&optimized_test_name);
-            REQUIRE(success_yes == stream_writer_write_unicode_view(writer, test_name));
-            REQUIRE(success_yes == stream_writer_write_string(writer, "-deadcode"));
-        }
-        unicode_view const optimized_test_name_view =
-            unicode_view_create(optimized_test_name.data, optimized_test_name.used);
-        unicode_view const c_test_dir_pieces[] = {in_lpg_directory, optimized_test_name_view};
-        unicode_string const c_test_dir = path_combine(c_test_dir_pieces, LPG_ARRAY_SIZE(c_test_dir_pieces));
-        test_all_backends(optimized_test_name_view, checked, global_object, unicode_view_from_string(c_test_dir));
-        unicode_string_free(&c_test_dir);
-        memory_writer_free(&optimized_test_name);
-    }
-
     // fully optimized
     {
         optimize(&checked);
