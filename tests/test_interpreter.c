@@ -423,6 +423,7 @@ void test_interpreter(void)
                                                  "fail.lpg",
                                                  "function-pointer.lpg",
                                                  "generic-impl-generic-self.lpg",
+                                                 "generic-nesting.lpg",
                                                  "integer-equals.lpg",
                                                  "integer-less.lpg",
                                                  "integer-to-string.lpg",

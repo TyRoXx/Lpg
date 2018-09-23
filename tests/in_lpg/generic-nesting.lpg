@@ -1,0 +1,20 @@
+let std = import std
+
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            {T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+assert(type-equals(std.boolean, tuple.0))
+assert(integer-equals(123, tuple.1))
+assert(string-equals("test", tuple.2))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make-enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type-equals(make-enum[1]()[std.unit], make-enum[2]()[std.unit])))
+assert(type-equals(make-enum[1]()[std.unit], make-enum[1]()[std.unit]))
+assert(type-equals(make-enum[2]()[std.unit], make-enum[2]()[std.unit]))
