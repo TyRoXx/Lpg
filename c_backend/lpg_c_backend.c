@@ -1858,6 +1858,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
             return success_yes;
 
+        case register_meaning_argument:
         case register_meaning_capture:
         case register_meaning_variable:
         {
@@ -1981,9 +1982,6 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success_yes;
-
-        case register_meaning_argument:
-            LPG_TO_DO();
 
         case register_meaning_fail:
             state->standard_library.using_stdlib = true;

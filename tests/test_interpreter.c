@@ -432,6 +432,7 @@ void test_interpreter(void)
                                                  "struct-generic.lpg",
                                                  "interface-generic-impl.lpg",
                                                  "interface-recursive.lpg",
+                                                 "lambda-as-parameter.lpg",
                                                  "lambda-capture.lpg",
                                                  "lambda-capture-compile-time.lpg",
                                                  "lambda-generic.lpg",
