@@ -817,7 +817,8 @@ evaluate_generic_lambda_expression(function_checking_state *state, instruction_s
 }
 
 static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
-                                                  instruction_sequence *const function, lambda const evaluated)
+                                                  instruction_sequence *const function, lambda const evaluated,
+                                                  unicode_view const *const early_initialized_variable)
 {
     if (evaluated.generic_parameters.count > 0)
     {
@@ -829,6 +830,11 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         return evaluate_expression_result_empty;
     }
     function_id const this_lambda_id = reserve_function_id(state);
+    if (early_initialized_variable)
+    {
+        initialize_lambda_begin_checked(&state->local_variables, *early_initialized_variable);
+    }
+
     check_function_result const checked =
         check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
@@ -3619,7 +3625,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     }
     evaluate_expression_result const evaluated = evaluate_lambda(
         &lambda_checking, &ignored_instructions,
-        lambda_create(generic_parameter_list_create(NULL, 0), original.header, original.result, original.source));
+        lambda_create(generic_parameter_list_create(NULL, 0), original.header, original.result, original.source), NULL);
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(lambda_checking.local_variables);
     if (lambda_checking.register_compile_time_values)
@@ -3992,7 +3998,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return evaluate_impl(state, function, element.impl);
 
     case expression_type_lambda:
-        return evaluate_lambda(state, function, element.lambda);
+        return evaluate_lambda(state, function, element.lambda, early_initialized_variable);
 
     case expression_type_call:
         return evaluate_call_expression(state, function, element.call);

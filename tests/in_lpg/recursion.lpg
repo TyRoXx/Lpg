@@ -1,0 +1,13 @@
+let std = import std
+
+/*let f = ()
+    f()
+
+let g = ()
+    ()
+        g()
+g()
+
+let e = ()
+    e
+*/

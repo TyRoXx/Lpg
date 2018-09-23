@@ -48,6 +48,7 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
             {
             case local_variable_phase_declared:
             case local_variable_phase_early_initialized:
+            case local_variable_phase_lambda_being_checked:
                 variable->where = where;
                 variable->type_ = what;
                 variable->compile_time_value = compile_time_value;
@@ -60,6 +61,19 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
         }
     }
     LPG_UNREACHABLE();
+}
+
+static local_variable *find_local_variable(local_variable_container *variables, unicode_view name)
+{
+    LPG_FOR(size_t, i, variables->count)
+    {
+        local_variable *const variable = variables->elements + i;
+        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        {
+            return variable;
+        }
+    }
+    return NULL;
 }
 
 void initialize_early(local_variable_container *variables, unicode_view name, type what,
@@ -79,6 +93,7 @@ void initialize_early(local_variable_container *variables, unicode_view name, ty
                 variable->phase = local_variable_phase_early_initialized;
                 return;
 
+            case local_variable_phase_lambda_being_checked:
             case local_variable_phase_initialized:
             case local_variable_phase_early_initialized:
                 LPG_UNREACHABLE();
@@ -86,6 +101,23 @@ void initialize_early(local_variable_container *variables, unicode_view name, ty
         }
     }
     LPG_UNREACHABLE();
+}
+
+void initialize_lambda_begin_checked(local_variable_container *variables, unicode_view name)
+{
+    local_variable *const variable = find_local_variable(variables, name);
+    ASSUME(variable);
+    switch (variable->phase)
+    {
+    case local_variable_phase_declared:
+        variable->phase = local_variable_phase_lambda_being_checked;
+        return;
+
+    case local_variable_phase_early_initialized:
+    case local_variable_phase_initialized:
+    case local_variable_phase_lambda_being_checked:
+        LPG_UNREACHABLE();
+    }
 }
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name)
@@ -117,20 +149,23 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
                                                instruction_sequence *const body, unicode_view const name,
                                                source_location const original_reference_location)
 {
-    LPG_FOR(size_t, i, state->local_variables.count)
     {
-        local_variable const *const variable = state->local_variables.elements + i;
-        if (unicode_view_equals(unicode_view_from_string(variable->name), name))
+        local_variable *const existing_variable = find_local_variable(&state->local_variables, name);
+        if (existing_variable)
         {
-            switch (variable->phase)
+            switch (existing_variable->phase)
             {
             case local_variable_phase_declared:
                 return read_local_variable_result_unknown;
 
             case local_variable_phase_early_initialized:
             case local_variable_phase_initialized:
-                return read_local_variable_result_create(
-                    variable_address_from_local(variable->where), variable->type_, variable->compile_time_value, true);
+                return read_local_variable_result_create(variable_address_from_local(existing_variable->where),
+                                                         existing_variable->type_,
+                                                         existing_variable->compile_time_value, true);
+
+            case local_variable_phase_lambda_being_checked:
+                LPG_TO_DO();
             }
         }
     }

@@ -8,7 +8,8 @@ typedef enum local_variable_phase
 {
     local_variable_phase_declared = 1,
     local_variable_phase_early_initialized = 2,
-    local_variable_phase_initialized = 3
+    local_variable_phase_lambda_being_checked = 3,
+    local_variable_phase_initialized = 4
 } local_variable_phase;
 
 typedef struct local_variable
@@ -77,6 +78,8 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
 
 void initialize_early(local_variable_container *variables, unicode_view name, type what,
                       optional_value compile_time_value, register_id where);
+
+void initialize_lambda_begin_checked(local_variable_container *variables, unicode_view name);
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name);
 
