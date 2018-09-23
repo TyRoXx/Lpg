@@ -64,5 +64,5 @@ std.make-mutable[type-of(assert)](assert)
 let f-load : type-of(f.load) = f.load
 std.make-mutable[type-of(f-load)](f-load)
 std.make-mutable[type-of(f.load)](f.load)
-//let lambda = () std.unit_value
-//std.make-mutable[type-of(lambda)](lambda)
+let lambda = () std.unit_value
+std.make-mutable[type-of(lambda)](lambda)
