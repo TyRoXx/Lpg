@@ -298,8 +298,11 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
     {
         memory_writer generated = {NULL, 0, 0};
-        REQUIRE(success_yes == generate_c(program, memory_writer_erase(&generated)));
-
+        {
+            garbage_collector additional_memory = {NULL};
+            REQUIRE(success_yes == generate_c(program, &additional_memory, memory_writer_erase(&generated)));
+            garbage_collector_free(additional_memory);
+        }
         run_c_test(test_name, unicode_view_create(generated.data, generated.used), c_test_dir);
         memory_writer_free(&generated);
     }

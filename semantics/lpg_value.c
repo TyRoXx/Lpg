@@ -434,11 +434,13 @@ bool value_conforms_to_type(value const instance, type const expected)
         {
             return false;
         }
-        if (instance.function_pointer.capture_count != expected.function_pointer_->captures.length)
+        size_t const given_count = instance.function_pointer.capture_count;
+        size_t const expected_count = expected.function_pointer_->captures.length;
+        if (given_count != expected_count)
         {
             return false;
         }
-        for (size_t i = 0; i < instance.function_pointer.capture_count; ++i)
+        for (size_t i = 0; i < expected_count; ++i)
         {
             if (!value_conforms_to_type(
                     instance.function_pointer.captures[i], expected.function_pointer_->captures.elements[i]))

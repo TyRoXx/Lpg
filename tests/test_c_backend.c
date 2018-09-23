@@ -50,8 +50,11 @@ static void check_generated_c_code(char const *const source, standard_library_de
     checked_program_free(&checked);
 
     memory_writer generated = {NULL, 0, 0};
-    REQUIRE(success_yes == generate_c(optimized, memory_writer_erase(&generated)));
-
+    {
+        garbage_collector additional_memory = {NULL};
+        REQUIRE(success_yes == generate_c(optimized, &additional_memory, memory_writer_erase(&generated)));
+        garbage_collector_free(additional_memory);
+    }
     checked_program_free(&optimized);
     memory_writer_free(&generated);
     unicode_string_free(&module_directory);

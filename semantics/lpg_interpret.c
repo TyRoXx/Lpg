@@ -40,13 +40,18 @@ optional_value call_function(function_pointer_value const callee, function_call_
                                      arguments.all_interfaces);
 }
 
+typedef struct invoke_method_parameters
+{
+    function_id method;
+    size_t parameter_count;
+} invoke_method_parameters;
+
 static value invoke_method(function_call_arguments const arguments, value const *const captures, void *environment)
 {
     (void)environment;
     ASSUME(captures);
-    value const method = captures[1];
-    ASSUME(method.kind == value_kind_integer);
     value const from = captures[0];
+    invoke_method_parameters const *const parameters = environment;
     switch (from.kind)
     {
     case value_kind_generic_struct:
@@ -59,11 +64,10 @@ static value invoke_method(function_call_arguments const arguments, value const 
     {
         implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
         ASSUME(impl);
-        ASSUME(integer_less(method.integer_, integer_create(0, impl->method_count)));
-        value const method_parameter_count = captures[2];
-        ASSUME(method.kind == value_kind_integer);
-        function_pointer_value const *const function = &impl->methods[method.integer_.low];
-        ASSUME(method_parameter_count.integer_.low < SIZE_MAX);
+        ASSUME(parameters->method < impl->method_count);
+        size_t const method_parameter_count = parameters->parameter_count;
+        function_pointer_value const *const function = &impl->methods[parameters->method];
+        ASSUME(method_parameter_count < SIZE_MAX);
         ASSUME(!arguments.self.is_set);
         optional_value const result = call_function(
             *function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
@@ -77,8 +81,8 @@ static value invoke_method(function_call_arguments const arguments, value const 
     }
 
     case value_kind_array:
-        ASSUME(method.integer_.high == 0);
-        switch (method.integer_.low)
+    {
+        switch (parameters->method)
         {
         case 0: // size
             return value_from_integer(integer_create(0, from.array->count));
@@ -136,6 +140,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
         default:
             LPG_UNREACHABLE();
         }
+    }
 
     case value_kind_integer:
     case value_kind_string:
@@ -174,25 +179,22 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case instruction_get_method:
         {
-            size_t const capture_count = 3;
+            size_t const capture_count = 1;
             value *const pseudo_captures =
                 garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_captures));
             ASSUME(value_is_valid(registers[element.get_method.from]));
             pseudo_captures[0] = registers[element.get_method.from];
-            pseudo_captures[1] = value_from_integer(integer_create(0, element.get_method.method));
             lpg_interface const *const interface_ = &all_interfaces[element.get_method.interface_];
             ASSUME(element.get_method.method < interface_->method_count);
             method_description const method = interface_->methods[element.get_method.method];
-            pseudo_captures[2] = value_from_integer(integer_create(0, method.parameters.length));
+            invoke_method_parameters *const parameters = garbage_collector_allocate(gc, sizeof(*parameters));
+            parameters->method = element.get_method.method;
+            parameters->parameter_count = method.parameters.length;
             type *const pseudo_capture_types =
                 garbage_collector_allocate_array(gc, capture_count, sizeof(*pseudo_capture_types));
             pseudo_capture_types[0] = type_from_interface(element.get_method.interface_);
-            pseudo_capture_types[1] =
-                type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
-            pseudo_capture_types[2] =
-                type_from_integer_range(integer_range_create(integer_create(0, 0), integer_max()));
             registers[element.get_method.into] = value_from_function_pointer(function_pointer_value_from_external(
-                invoke_method, NULL, pseudo_captures,
+                invoke_method, parameters, pseudo_captures,
                 function_pointer_create(optional_type_create_set(method.result), method.parameters,
                                         tuple_type_create(pseudo_capture_types, capture_count),
                                         optional_type_create_empty())));

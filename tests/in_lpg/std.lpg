@@ -61,6 +61,8 @@ std.make-mutable[type-of(enum[T])](enum[T])
 std.make-mutable[std.string]("test")
 std.make-mutable[type-of({})]({})
 std.make-mutable[type-of(assert)](assert)
-//std.make-mutable[type-of(f.load)](f.load)
+let f-load : type-of(f.load) = f.load
+std.make-mutable[type-of(f-load)]//(f-load)
+std.make-mutable[type-of(f.load)]//(f.load)
 //let lambda = () std.unit_value
 //std.make-mutable[type-of(lambda)](lambda)
