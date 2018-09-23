@@ -428,10 +428,17 @@ type type_clone(type const original, garbage_collector *const clone_gc, function
         {
             arguments[i] = type_clone(original.function_pointer_->parameters.elements[i], clone_gc, new_function_ids);
         }
-        *copy = function_pointer_create(
-            optional_type_clone(original.function_pointer_->result, clone_gc, new_function_ids),
-            tuple_type_create(arguments, original.function_pointer_->parameters.length), tuple_type_create(NULL, 0),
-            optional_type_clone(original.function_pointer_->self, clone_gc, new_function_ids));
+        type *const captures =
+            garbage_collector_allocate_array(clone_gc, original.function_pointer_->captures.length, sizeof(*captures));
+        for (size_t i = 0; i < original.function_pointer_->captures.length; ++i)
+        {
+            captures[i] = type_clone(original.function_pointer_->captures.elements[i], clone_gc, new_function_ids);
+        }
+        *copy =
+            function_pointer_create(optional_type_clone(original.function_pointer_->result, clone_gc, new_function_ids),
+                                    tuple_type_create(arguments, original.function_pointer_->parameters.length),
+                                    tuple_type_create(captures, original.function_pointer_->captures.length),
+                                    optional_type_clone(original.function_pointer_->self, clone_gc, new_function_ids));
         return type_from_function_pointer(copy);
     }
 

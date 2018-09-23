@@ -8,9 +8,8 @@
 #include "lpg_read_file.h"
 #include "lpg_allocate.h"
 #include <stdio.h>
-#include "lpg_remove_unused_functions.h"
-#include "lpg_remove_dead_code.h"
 #include "find_builtin_module_directory.h"
+#include "lpg_optimize.h"
 
 static sequence parse(unicode_view const input)
 {
@@ -45,17 +44,15 @@ static void check_generated_c_code(char const *const source, standard_library_de
                                     unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source), NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
-    remove_dead_code(&checked);
-    checked_program optimized = remove_unused_functions(checked);
-    checked_program_free(&checked);
+    optimize(&checked);
 
     memory_writer generated = {NULL, 0, 0};
     {
         garbage_collector additional_memory = {NULL};
-        REQUIRE(success_yes == generate_c(optimized, &additional_memory, memory_writer_erase(&generated)));
+        REQUIRE(success_yes == generate_c(checked, &additional_memory, memory_writer_erase(&generated)));
         garbage_collector_free(additional_memory);
     }
-    checked_program_free(&optimized);
+    checked_program_free(&checked);
     memory_writer_free(&generated);
     unicode_string_free(&module_directory);
 }

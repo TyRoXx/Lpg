@@ -15,7 +15,6 @@
 #include "lpg_read_file.h"
 #include "lpg_c_backend.h"
 #include "lpg_remove_dead_code.h"
-#include "lpg_remove_unused_functions.h"
 #include "lpg_save_expression.h"
 #include "lpg_thread.h"
 #include "lpg_rename_file.h"

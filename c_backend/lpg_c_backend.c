@@ -804,6 +804,7 @@ static success_indicator generate_type(type const generated, standard_library_us
                                        type_definitions *const definitions, checked_program const *const program,
                                        garbage_collector *const additional_memory, stream_writer const c_output)
 {
+    ASSUME(type_is_valid(generated));
     switch (generated.kind)
     {
     case type_kind_host_value:

@@ -23,7 +23,6 @@
 #include "test_cli.h"
 #include "test_c_backend.h"
 #include "test_implicitly_convertible.h"
-#include "test_remove_unused_functions.h"
 #include "test_remove_dead_code.h"
 #include "test_semantic_errors.h"
 #include "test_value.h"
@@ -66,7 +65,6 @@ int main(void)
                                     test_c_backend,
                                     test_interpreter,
                                     test_value,
-                                    test_remove_unused_functions,
                                     test_remove_dead_code,
                                     test_type};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
