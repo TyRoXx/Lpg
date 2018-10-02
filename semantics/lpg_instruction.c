@@ -223,6 +223,23 @@ bool new_array_instruction_equals(new_array_instruction const left, new_array_in
            type_equals(left.element_type, right.element_type);
 }
 
+current_function_instruction current_function_instruction_create(register_id into)
+{
+    current_function_instruction const result = {into};
+    return result;
+}
+
+void current_function_instruction_free(current_function_instruction const freed)
+{
+    (void)freed;
+}
+
+bool current_function_instruction_equals(current_function_instruction const left,
+                                         current_function_instruction const right)
+{
+    return (left.into == right.into);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -292,6 +309,14 @@ instruction instruction_create_new_array(new_array_instruction const argument)
     instruction result;
     result.type = instruction_new_array;
     result.new_array = argument;
+    return result;
+}
+
+instruction instruction_create_current_function(current_function_instruction const argument)
+{
+    instruction result;
+    result.type = instruction_current_function;
+    result.current_function = argument;
     return result;
 }
 
@@ -421,6 +446,9 @@ void instruction_free(instruction const *freed)
 {
     switch (freed->type)
     {
+    case instruction_current_function:
+        LPG_TO_DO();
+
     case instruction_call:
         call_instruction_free(&freed->call);
         break;
@@ -475,6 +503,7 @@ bool instruction_equals(instruction const left, instruction const right)
     }
     switch (left.type)
     {
+    case instruction_current_function:
     case instruction_new_array:
         LPG_TO_DO();
 

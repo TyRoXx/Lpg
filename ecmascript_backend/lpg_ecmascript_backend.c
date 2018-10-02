@@ -831,6 +831,16 @@ static success_indicator generate_new_array(function_generation *const state, ne
     return success_yes;
 }
 
+static success_indicator generate_current_function(function_generation *const state,
+                                                   current_function_instruction const generated,
+                                                   stream_writer const ecmascript_output)
+{
+    LPG_TRY(write_register(state, generated.into, type_from_function_pointer(state->current_function->signature),
+                           optional_value_empty, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "current_function;\n"));
+    return success_yes;
+}
+
 static success_indicator generate_erase_type(function_generation *const state, erase_type_instruction const generated,
                                              stream_writer const ecmascript_output)
 {
@@ -859,6 +869,9 @@ static success_indicator generate_instruction(function_generation *const state, 
 {
     switch (generated.type)
     {
+    case instruction_current_function:
+        return generate_current_function(state, generated.current_function, ecmascript_output);
+
     case instruction_new_array:
         return generate_new_array(state, generated.new_array, ecmascript_output);
 
@@ -1009,6 +1022,9 @@ static success_indicator define_function(function_id const id, checked_function 
     }
     LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "    var current_function = "));
+    LPG_TRY(generate_function_name(id, function_count, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     LPG_TRY(generate_function_body(
         function, all_functions, function_count, all_interfaces, all_enums, all_structs, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "};\n"));

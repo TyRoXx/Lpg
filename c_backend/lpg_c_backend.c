@@ -1185,8 +1185,9 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
 }
 
 static success_indicator generate_sequence(c_backend_state *state, checked_function const *const current_function,
-                                           instruction_sequence const sequence, size_t const indentation,
-                                           garbage_collector *const additional_memory, stream_writer const c_output);
+                                           function_id const current_function_id, instruction_sequence const sequence,
+                                           size_t const indentation, garbage_collector *const additional_memory,
+                                           stream_writer const c_output);
 
 static type find_boolean(void)
 {
@@ -1681,12 +1682,46 @@ static success_indicator generate_new_array(c_backend_state *const state,
     return success_yes;
 }
 
+static success_indicator generate_current_function(c_backend_state *const state,
+                                                   checked_function const *const current_function,
+                                                   function_id const current_function_id,
+                                                   current_function_instruction const arguments,
+                                                   size_t const indentation, garbage_collector *const additional_memory,
+                                                   stream_writer const c_output)
+{
+    type const function_type = type_from_lambda(lambda_type_create(current_function_id));
+    set_register_variable(state, arguments.into, register_resource_ownership_borrows, function_type);
+    LPG_TRY(indent(indentation, c_output));
+    LPG_TRY(generate_type(
+        function_type, &state->standard_library, state->definitions, state->program, additional_memory, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " const "));
+    LPG_TRY(generate_register_name(arguments.into, current_function, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, " = "));
+    if (current_function->signature->captures.length > 0)
+    {
+        LPG_TRY(stream_writer_write_string(c_output, "*captures"));
+    }
+    else
+    {
+        LPG_TRY(generate_value(
+            value_from_function_pointer(function_pointer_value_from_internal(current_function_id, NULL, 0)),
+            function_type, state, c_output));
+    }
+    LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+    return success_yes;
+}
+
 static success_indicator generate_instruction(c_backend_state *state, checked_function const *const current_function,
-                                              instruction const input, size_t const indentation,
-                                              garbage_collector *const additional_memory, stream_writer const c_output)
+                                              function_id const current_function_id, instruction const input,
+                                              size_t const indentation, garbage_collector *const additional_memory,
+                                              stream_writer const c_output)
 {
     switch (input.type)
     {
+    case instruction_current_function:
+        return generate_current_function(state, current_function, current_function_id, input.current_function,
+                                         indentation, additional_memory, c_output);
+
     case instruction_new_array:
         return generate_new_array(state, current_function, input.new_array, indentation, additional_memory, c_output);
 
@@ -2014,8 +2049,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-        LPG_TRY(
-            generate_sequence(state, current_function, input.loop.body, indentation + 1, additional_memory, c_output));
+        LPG_TRY(generate_sequence(state, current_function, current_function_id, input.loop.body, indentation + 1,
+                                  additional_memory, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         state->standard_library.using_unit = true;
@@ -2469,8 +2504,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case match_instruction_case_kind_value:
                 break;
             }
-            LPG_TRY(generate_sequence(
-                state, current_function, input.match.cases[i].action, (indentation + 1), additional_memory, c_output));
+            LPG_TRY(generate_sequence(state, current_function, current_function_id, input.match.cases[i].action,
+                                      (indentation + 1), additional_memory, c_output));
 
             LPG_TRY(generate_free_registers(
                 state, previous_register_count, indentation + 1, current_function, ~(register_id)0, c_output));
@@ -2650,25 +2685,25 @@ static success_indicator generate_free(standard_library_usage *const standard_li
 }
 
 static success_indicator generate_sequence(c_backend_state *state, checked_function const *const current_function,
-                                           instruction_sequence const sequence, size_t const indentation,
-                                           garbage_collector *const additional_memory, stream_writer const c_output)
+                                           function_id const current_function_id, instruction_sequence const sequence,
+                                           size_t const indentation, garbage_collector *const additional_memory,
+                                           stream_writer const c_output)
 {
     size_t const previously_active_registers = state->active_register_count;
     for (size_t i = 0; i < sequence.length; ++i)
     {
-        LPG_TRY(generate_instruction(
-            state, current_function, sequence.elements[i], indentation, additional_memory, c_output));
+        LPG_TRY(generate_instruction(state, current_function, current_function_id, sequence.elements[i], indentation,
+                                     additional_memory, c_output));
     }
     return generate_free_registers(
         state, previously_active_registers, indentation, current_function, ~(register_id)0, c_output);
 }
 
-static success_indicator generate_function_body(checked_function const current_function,
-                                                checked_program const *const program, stream_writer const c_output,
-                                                standard_library_usage *standard_library,
-                                                type_definitions *const definitions,
-                                                array_vtable_cache *const array_vtables,
-                                                garbage_collector *const additional_memory)
+static success_indicator
+generate_function_body(checked_function const current_function, function_id const current_function_id,
+                       checked_program const *const program, stream_writer const c_output,
+                       standard_library_usage *standard_library, type_definitions *const definitions,
+                       array_vtable_cache *const array_vtables, garbage_collector *const additional_memory)
 {
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
@@ -2708,7 +2743,8 @@ static success_indicator generate_function_body(checked_function const current_f
         set_register_argument(&state, next_free_register, register_resource_ownership_borrows, parameter);
         ++next_free_register;
     }
-    LPG_TRY(generate_sequence(&state, &current_function, current_function.body, 1, additional_memory, c_output));
+    LPG_TRY(generate_sequence(
+        &state, &current_function, current_function_id, current_function.body, 1, additional_memory, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "}\n"));
     *standard_library = state.standard_library;
     deallocate(state.registers);
@@ -2835,7 +2871,7 @@ success_indicator generate_c(checked_program const program, garbage_collector *c
                                                    &program, additional_memory, program_defined_writer_b),
                      fail);
         LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "\n"), fail);
-        LPG_TRY_GOTO(generate_function_body(current_function, &program, program_defined_writer_b, &standard_library,
+        LPG_TRY_GOTO(generate_function_body(current_function, i, &program, program_defined_writer_b, &standard_library,
                                             &definitions, &array_vtables, additional_memory),
                      fail);
     }
@@ -2849,7 +2885,7 @@ success_indicator generate_c(checked_program const program, garbage_collector *c
                                additional_memory, program_defined_writer_b),
                  fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, " lpg_main(void)\n"), fail);
-    LPG_TRY_GOTO(generate_function_body(program.functions[0], &program, program_defined_writer_b, &standard_library,
+    LPG_TRY_GOTO(generate_function_body(program.functions[0], 0, &program, program_defined_writer_b, &standard_library,
                                         &definitions, &array_vtables, additional_memory),
                  fail);
     LPG_TRY_GOTO(stream_writer_write_string(program_defined_writer_b, "int main(void)\n"), fail);

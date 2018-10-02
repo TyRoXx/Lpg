@@ -25,7 +25,8 @@ typedef enum instruction_type
     instruction_erase_type,
     instruction_return,
     instruction_instantiate_struct,
-    instruction_new_array
+    instruction_new_array,
+    instruction_current_function
 } instruction_type;
 
 typedef struct tuple_instruction
@@ -181,6 +182,16 @@ new_array_instruction new_array_instruction_create(interface_id result_type, reg
 void new_array_instruction_free(new_array_instruction const freed);
 bool new_array_instruction_equals(new_array_instruction const left, new_array_instruction const right);
 
+typedef struct current_function_instruction
+{
+    register_id into;
+} current_function_instruction;
+
+current_function_instruction current_function_instruction_create(register_id into);
+void current_function_instruction_free(current_function_instruction const freed);
+bool current_function_instruction_equals(current_function_instruction const left,
+                                         current_function_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -202,6 +213,7 @@ struct instruction
         register_id break_into;
         instantiate_struct_instruction instantiate_struct;
         new_array_instruction new_array;
+        current_function_instruction current_function;
     };
 };
 
@@ -256,6 +268,7 @@ instruction instruction_create_get_method(get_method_instruction const argument)
 instruction instruction_create_erase_type(erase_type_instruction const argument);
 instruction instruction_create_instantiate_struct(instantiate_struct_instruction const argument);
 instruction instruction_create_new_array(new_array_instruction const argument);
+instruction instruction_create_current_function(current_function_instruction const argument);
 
 void instruction_free(LPG_NON_NULL(instruction const *freed));
 bool instruction_equals(instruction const left, instruction const right);

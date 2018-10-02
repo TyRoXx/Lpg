@@ -169,6 +169,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
         instruction const element = sequence.elements[i];
         switch (element.type)
         {
+        case instruction_current_function:
+            LPG_TO_DO();
+
         case instruction_new_array:
         {
             array_value *const array = garbage_collector_allocate(gc, sizeof(*array));

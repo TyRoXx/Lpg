@@ -123,9 +123,8 @@ void print_instruction(instruction const printed, size_t const indentation)
 {
     switch (printed.type)
     {
+    case instruction_current_function:
     case instruction_new_array:
-        LPG_TO_DO();
-
     case instruction_instantiate_struct:
     case instruction_get_method:
     case instruction_erase_type:

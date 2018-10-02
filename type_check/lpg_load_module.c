@@ -70,10 +70,10 @@ static load_module_result type_check_module(function_checking_state *state, sequ
                                             unicode_view const file_name, unicode_view const source)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
-    check_function_result const checked =
-        check_function(state->root, NULL, expression_from_sequence(parsed), state->root->global,
-                       translate_semantic_error, &translator, state->program, NULL, NULL, 0,
-                       optional_type_create_empty(), false, optional_type_create_empty(), file_name, source);
+    check_function_result const checked = check_function(
+        state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
+        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), file_name,
+        source, NULL, optional_function_id_empty());
     if (!checked.success)
     {
         load_module_result const failure = {optional_value_empty, type_from_unit()};

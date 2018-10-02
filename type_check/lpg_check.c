@@ -518,19 +518,25 @@ static void check_function_clean_up(function_checking_state *const state)
     }
 }
 
-check_function_result check_function(program_check *const root, function_checking_state *parent,
-                                     expression const body_in, structure const global, check_error_handler *on_error,
-                                     void *user, checked_program *const program, type const *const parameter_types,
-                                     unicode_string *const parameter_names, size_t const parameter_count,
-                                     optional_type const self, bool const may_capture_runtime_variables,
-                                     optional_type const explicit_return_type, unicode_view file_name,
-                                     unicode_view source)
+check_function_result
+check_function(program_check *const root, function_checking_state *const parent, expression const body_in,
+               structure const global, check_error_handler *const on_error, void *const user,
+               checked_program *const program, type const *const parameter_types, unicode_string *const parameter_names,
+               size_t const parameter_count, optional_type const self, bool const may_capture_runtime_variables,
+               optional_type const explicit_return_type, unicode_view const file_name, unicode_view const source,
+               unicode_view const *const early_initialized_variable, optional_function_id const current_function_id)
 {
     ASSUME(root);
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
     function_checking_state state =
         function_checking_state_create(root, parent, may_capture_runtime_variables, &global, on_error, user, program,
                                        &body_out, explicit_return_type, explicit_return_type.is_set, file_name, source);
+
+    if (early_initialized_variable && current_function_id.is_set)
+    {
+        type const recursive_lambda_type = type_from_lambda(lambda_type_create(current_function_id.value));
+        initialize_lambda_being_checked(&state.local_variables, *early_initialized_variable, recursive_lambda_type);
+    }
 
     if (self.is_set)
     {
@@ -830,15 +836,11 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         return evaluate_expression_result_empty;
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    if (early_initialized_variable)
-    {
-        initialize_lambda_begin_checked(&state->local_variables, *early_initialized_variable);
-    }
-
     check_function_result const checked =
         check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
-                       optional_type_create_empty(), true, header.return_type, state->file_name, state->source);
+                       optional_type_create_empty(), true, header.return_type, state->file_name, state->source,
+                       early_initialized_variable, optional_function_id_create(this_lambda_id));
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -2600,11 +2602,11 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
         return make_method_evaluation_result_failure();
     }
     function_id const this_lambda_id = reserve_function_id(state);
-    check_function_result const checked =
-        check_function(state->root, state, expression_from_sequence(method.body), *state->global, state->on_error,
-                       state->user, state->program, header.parameter_types, header.parameter_names,
-                       method.header.parameter_count, optional_type_create_set(self), false,
-                       optional_type_create_set(declared_result_type), state->file_name, state->source);
+    check_function_result const checked = check_function(
+        state->root, state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
+        state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
+        optional_type_create_set(self), false, optional_type_create_set(declared_result_type), state->file_name,
+        state->source, NULL, optional_function_id_empty());
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -4239,7 +4241,8 @@ checked_program check(sequence const root, structure const global, check_error_h
                                 NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL, NULL, 0};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
-                       0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source);
+                       0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source, NULL,
+                       optional_function_id_create(0));
     deallocate(globals);
     if (checked.success)
     {

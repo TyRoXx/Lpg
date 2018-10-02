@@ -79,7 +79,7 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
 void initialize_early(local_variable_container *variables, unicode_view name, type what,
                       optional_value compile_time_value, register_id where);
 
-void initialize_lambda_begin_checked(local_variable_container *variables, unicode_view name);
+void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what);
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name);
 

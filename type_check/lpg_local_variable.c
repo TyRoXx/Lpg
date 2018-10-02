@@ -103,21 +103,12 @@ void initialize_early(local_variable_container *variables, unicode_view name, ty
     LPG_UNREACHABLE();
 }
 
-void initialize_lambda_begin_checked(local_variable_container *variables, unicode_view name)
+void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what)
 {
-    local_variable *const variable = find_local_variable(variables, name);
-    ASSUME(variable);
-    switch (variable->phase)
-    {
-    case local_variable_phase_declared:
-        variable->phase = local_variable_phase_lambda_being_checked;
-        return;
-
-    case local_variable_phase_early_initialized:
-    case local_variable_phase_initialized:
-    case local_variable_phase_lambda_being_checked:
-        LPG_UNREACHABLE();
-    }
+    ASSUME(!local_variable_name_exists(*variables, name));
+    add_local_variable(
+        variables, local_variable_create(unicode_view_copy(name), local_variable_phase_lambda_being_checked, what,
+                                         optional_value_empty, ~(register_id)0));
 }
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name)
@@ -145,6 +136,15 @@ variable_address variable_address_from_local(register_id const local)
     return result;
 }
 
+static read_local_variable_result read_lambda_being_checked(LPG_NON_NULL(function_checking_state *const state),
+                                                            instruction_sequence *const body, type const what)
+{
+    register_id const into = allocate_register(&state->used_registers);
+    add_instruction(body, instruction_create_current_function(current_function_instruction_create(into)));
+    return read_local_variable_result_create(
+        variable_address_from_local(into), what, /*TODO*/ optional_value_empty, true);
+}
+
 read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
                                                instruction_sequence *const body, unicode_view const name,
                                                source_location const original_reference_location)
@@ -165,7 +165,7 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
                                                          existing_variable->compile_time_value, true);
 
             case local_variable_phase_lambda_being_checked:
-                LPG_TO_DO();
+                return read_lambda_being_checked(state, body, existing_variable->type_);
             }
         }
     }
