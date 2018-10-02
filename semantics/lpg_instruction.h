@@ -272,4 +272,4 @@ instruction instruction_create_current_function(current_function_instruction con
 
 void instruction_free(LPG_NON_NULL(instruction const *freed));
 bool instruction_equals(instruction const left, instruction const right);
-void add_instruction(instruction_sequence *to, instruction const added);
+void add_instruction(LPG_NON_NULL(instruction_sequence *to), instruction const added);

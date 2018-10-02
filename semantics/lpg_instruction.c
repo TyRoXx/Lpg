@@ -575,8 +575,9 @@ bool instruction_equals(instruction const left, instruction const right)
     LPG_UNREACHABLE();
 }
 
-void add_instruction(instruction_sequence *to, instruction const added)
+void add_instruction(LPG_NON_NULL(instruction_sequence *to), instruction const added)
 {
+    ASSUME(to);
     to->elements = reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
     to->elements[to->length] = added;
     ++(to->length);

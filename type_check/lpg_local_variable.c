@@ -140,7 +140,10 @@ static read_local_variable_result read_lambda_being_checked(LPG_NON_NULL(functio
                                                             instruction_sequence *const body, type const what)
 {
     register_id const into = allocate_register(&state->used_registers);
-    add_instruction(body, instruction_create_current_function(current_function_instruction_create(into)));
+    if (body)
+    {
+        add_instruction(body, instruction_create_current_function(current_function_instruction_create(into)));
+    }
     return read_local_variable_result_create(
         variable_address_from_local(into), what, /*TODO*/ optional_value_empty, true);
 }

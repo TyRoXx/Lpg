@@ -416,8 +416,8 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
                                                 LPG_NON_NULL(instruction_sequence *const to), unicode_view const name,
                                                 source_location const where)
 {
+    ASSUME(to);
     instruction_checkpoint const previous_code = make_checkpoint(state, to);
-
     read_local_variable_result const local = read_local_variable(state, to, name, where);
     switch (local.status)
     {
@@ -532,7 +532,7 @@ check_function(program_check *const root, function_checking_state *const parent,
         function_checking_state_create(root, parent, may_capture_runtime_variables, &global, on_error, user, program,
                                        &body_out, explicit_return_type, explicit_return_type.is_set, file_name, source);
 
-    if (early_initialized_variable && current_function_id.is_set)
+    if (early_initialized_variable && current_function_id.is_set && explicit_return_type.is_set)
     {
         type const recursive_lambda_type = type_from_lambda(lambda_type_create(current_function_id.value));
         initialize_lambda_being_checked(&state.local_variables, *early_initialized_variable, recursive_lambda_type);
@@ -4182,6 +4182,7 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
 static evaluate_expression_result check_sequence(function_checking_state *const state,
                                                  instruction_sequence *const output, sequence const input)
 {
+    ASSUME(output);
     size_t const previous_number_of_variables = state->local_variables.count;
     return check_sequence_finish(state, output, input, previous_number_of_variables);
 }

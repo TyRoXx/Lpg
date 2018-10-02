@@ -1,14 +1,4 @@
 let std = import std
 
-let f = ()
+let f = (): std.unit
     f()
-
-/*let g = ()
-    ()
-        g()
-g()
-
-let e = ()
-    e
-
-*/

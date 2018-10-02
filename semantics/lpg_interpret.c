@@ -425,8 +425,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                 gc, element.lambda_with_captures.capture_count, sizeof(*inner_captures));
             for (size_t j = 0; j < element.lambda_with_captures.capture_count; ++j)
             {
-                inner_captures[j] = registers[element.lambda_with_captures.captures[j]];
-                ASSUME(value_is_valid(inner_captures[j]));
+                value const capture = registers[element.lambda_with_captures.captures[j]];
+                inner_captures[j] = capture;
+                ASSUME(value_is_valid(capture));
             }
             registers[element.lambda_with_captures.into] =
                 value_from_function_pointer(function_pointer_value_from_internal(
