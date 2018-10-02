@@ -1,9 +1,9 @@
 let std = import std
 
-/*let f = ()
+let f = ()
     f()
 
-let g = ()
+/*let g = ()
     ()
         g()
 g()

@@ -447,7 +447,8 @@ void instruction_free(instruction const *freed)
     switch (freed->type)
     {
     case instruction_current_function:
-        LPG_TO_DO();
+        current_function_instruction_free(freed->current_function);
+        break;
 
     case instruction_call:
         call_instruction_free(&freed->call);
