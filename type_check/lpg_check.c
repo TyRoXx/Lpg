@@ -535,7 +535,8 @@ check_function(program_check *const root, function_checking_state *const parent,
     if (early_initialized_variable && current_function_id.is_set && explicit_return_type.is_set)
     {
         type const recursive_lambda_type = type_from_lambda(lambda_type_create(current_function_id.value));
-        initialize_lambda_being_checked(&state.local_variables, *early_initialized_variable, recursive_lambda_type);
+        initialize_lambda_being_checked(
+            &state.local_variables, *early_initialized_variable, recursive_lambda_type, &state);
     }
 
     if (self.is_set)
@@ -544,17 +545,17 @@ check_function(program_check *const root, function_checking_state *const parent,
         add_local_variable(
             &state.local_variables,
             local_variable_create(unicode_view_copy(unicode_view_from_c_str("self")), local_variable_phase_initialized,
-                                  self.value, optional_value_empty, address));
+                                  self.value, optional_value_empty, address, NULL));
         define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_c_str("self")));
     }
 
     for (size_t i = 0; i < parameter_count; ++i)
     {
         register_id const address = allocate_register(&state.used_registers);
-        add_local_variable(
-            &state.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(parameter_names[i])),
-                                  local_variable_phase_initialized, parameter_types[i], optional_value_empty, address));
+        add_local_variable(&state.local_variables,
+                           local_variable_create(unicode_view_copy(unicode_view_from_string(parameter_names[i])),
+                                                 local_variable_phase_initialized, parameter_types[i],
+                                                 optional_value_empty, address, NULL));
         define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_string(parameter_names[i])));
     }
 
@@ -805,16 +806,25 @@ static generic_closures find_generic_lambda_closures(function_checking_state *co
 }
 
 static evaluate_expression_result
-evaluate_generic_lambda_expression(function_checking_state *state, instruction_sequence *function, lambda const element)
+evaluate_generic_lambda_expression(function_checking_state *state, instruction_sequence *function, lambda const element,
+                                   unicode_view const *const early_initialized_variable)
 {
     program_check *const root = state->root;
     root->generic_lambdas =
         reallocate_array(root->generic_lambdas, root->generic_lambda_count + 1, sizeof(*root->generic_lambdas));
     generic_lambda_id const id = root->generic_lambda_count;
-    generic_closures const closures = find_generic_lambda_closures(state, element);
-    root->generic_lambdas[id] = generic_lambda_create(lambda_clone(element), closures);
+    root->generic_lambdas[id] = generic_lambda_create(lambda_clone(element), generic_closures_create(NULL, 0));
     root->generic_lambda_count += 1;
     register_id const into = allocate_register(&state->used_registers);
+    if (early_initialized_variable)
+    {
+        initialize_early(&state->local_variables, *early_initialized_variable, type_from_generic_lambda(),
+                         optional_value_create(value_from_generic_lambda(id)), into);
+    }
+    {
+        generic_closures const closures = find_generic_lambda_closures(state, element);
+        root->generic_lambdas[id].closures = closures;
+    }
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_lambda(id), type_from_generic_lambda())));
     write_register_compile_time_value(state, into, value_from_generic_lambda(id));
@@ -828,7 +838,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
 {
     if (evaluated.generic_parameters.count > 0)
     {
-        return evaluate_generic_lambda_expression(state, function, evaluated);
+        return evaluate_generic_lambda_expression(state, function, evaluated, early_initialized_variable);
     }
     evaluated_function_header const header = evaluate_function_header(state, function, evaluated.header);
     if (!header.is_success)
@@ -950,7 +960,7 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
             &interface_checking.local_variables,
             local_variable_create(unicode_view_copy(unicode_view_from_string(tree.generic_parameters.names[i])),
                                   local_variable_phase_initialized, argument_types[i],
-                                  optional_value_create(arguments[i]), argument_register));
+                                  optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < closures.count; ++i)
@@ -960,7 +970,7 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
             &interface_checking.local_variables,
             local_variable_create(unicode_view_copy(unicode_view_from_string(closures.elements[i].name)),
                                   local_variable_phase_initialized, closures.elements[i].what,
-                                  optional_value_create(closures.elements[i].content), closure_register));
+                                  optional_value_create(closures.elements[i].content), closure_register, NULL));
         write_register_compile_time_value(&interface_checking, closure_register, closures.elements[i].content);
     }
     optional_size const evaluated =
@@ -1727,7 +1737,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     local_variable_create(unicode_view_copy(maybe_pattern.placeholder_name),
                                           local_variable_phase_initialized,
                                           enum_->elements[maybe_pattern.stateful_enum_element.which].state.value,
-                                          optional_value_empty, placeholder_where));
+                                          optional_value_empty, placeholder_where, NULL));
                 define_register_debug_name(state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
 
                 action_evaluated = check_sequence_finish(
@@ -3182,7 +3192,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                            local_variable_create(
                                unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.parameters.names[i])),
                                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                               argument_register));
+                               argument_register, NULL));
         write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_enum.closures.count; ++i)
@@ -3193,7 +3203,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_enum.closures.elements[i].name)),
                 local_variable_phase_initialized, instantiated_enum.closures.elements[i].what,
-                optional_value_create(instantiated_enum.closures.elements[i].content), closure_register));
+                optional_value_create(instantiated_enum.closures.elements[i].content), closure_register, NULL));
         write_register_compile_time_value(
             &enum_checking, closure_register, instantiated_enum.closures.elements[i].content);
     }
@@ -3326,7 +3336,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_struct.tree.generic_parameters.names[i])),
                 local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register));
+                argument_register, NULL));
         write_register_compile_time_value(&struct_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_struct.closures.count; ++i)
@@ -3337,7 +3347,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_struct.closures.elements[i].name)),
                 local_variable_phase_initialized, instantiated_struct.closures.elements[i].what,
-                optional_value_create(instantiated_struct.closures.elements[i].content), closure_register));
+                optional_value_create(instantiated_struct.closures.elements[i].content), closure_register, NULL));
         write_register_compile_time_value(
             &struct_checking, closure_register, instantiated_struct.closures.elements[i].content);
     }
@@ -3467,7 +3477,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.tree.parameters.names[i])),
                 local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register));
+                argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_interface.closures.count; ++i)
@@ -3478,7 +3488,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_interface.closures.elements[i].name)),
                 local_variable_phase_initialized, instantiated_interface.closures.elements[i].what,
-                optional_value_create(instantiated_interface.closures.elements[i].content), closure_register));
+                optional_value_create(instantiated_interface.closures.elements[i].content), closure_register, NULL));
         write_register_compile_time_value(
             &interface_checking, closure_register, instantiated_interface.closures.elements[i].content);
     }
@@ -3610,7 +3620,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_lambda.tree.generic_parameters.names[i])),
                 local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register));
+                argument_register, NULL));
         write_register_compile_time_value(&lambda_checking, argument_register, arguments[i]);
     }
     for (size_t i = 0; i < instantiated_lambda.closures.count; ++i)
@@ -3621,7 +3631,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
             local_variable_create(
                 unicode_view_copy(unicode_view_from_string(instantiated_lambda.closures.elements[i].name)),
                 local_variable_phase_initialized, instantiated_lambda.closures.elements[i].what,
-                optional_value_create(instantiated_lambda.closures.elements[i].content), closure_register));
+                optional_value_create(instantiated_lambda.closures.elements[i].content), closure_register, NULL));
         write_register_compile_time_value(
             &lambda_checking, closure_register, instantiated_lambda.closures.elements[i].content);
     }
@@ -3896,7 +3906,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
         add_local_variable(&state->local_variables,
                            local_variable_create(unicode_view_copy(unicode_view_from_string(element.name.value)),
                                                  local_variable_phase_declared, type_from_unit(), optional_value_empty,
-                                                 ~(register_id)0));
+                                                 ~(register_id)0, NULL));
     }
     else
     {

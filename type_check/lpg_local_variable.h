@@ -19,10 +19,12 @@ typedef struct local_variable
     type type_;
     optional_value compile_time_value;
     register_id where;
+    struct function_checking_state *lambda_origin;
 } local_variable;
 
 local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
-                                     optional_value compile_time_value, register_id where);
+                                     optional_value compile_time_value, register_id where,
+                                     struct function_checking_state *lambda_origin);
 
 void local_variable_free(local_variable const *const freed);
 
@@ -68,7 +70,8 @@ read_local_variable_result read_local_variable_result_create(variable_address wh
 
 struct function_checking_state;
 read_local_variable_result read_local_variable(LPG_NON_NULL(struct function_checking_state *const state),
-                                               instruction_sequence *const sequence, unicode_view const name,
+                                               instruction_sequence *const body_of_lambda_using_the_variable,
+                                               unicode_view const name,
                                                source_location const original_reference_location);
 
 void add_local_variable(local_variable_container *to, local_variable variable);
@@ -79,7 +82,8 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
 void initialize_early(local_variable_container *variables, unicode_view name, type what,
                       optional_value compile_time_value, register_id where);
 
-void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what);
+void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what,
+                                     struct function_checking_state *lambda_origin);
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name);
 

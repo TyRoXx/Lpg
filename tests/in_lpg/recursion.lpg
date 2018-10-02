@@ -2,3 +2,40 @@ let std = import std
 
 let f = (): std.unit
     f()
+
+let g = (): std.unit
+    side-effect()
+    let inner = ()
+        side-effect()
+        g()
+
+let h = (): std.unit
+    let inner = ()
+        h()
+
+/*let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
+    match integer-equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                case std.option[std.boolean].some(let element):
+                    assert(to.append(element))
+                    copy-array-boolean(from, to)
+                case std.option[std.boolean].none:
+                    fail()
+copy-array-boolean(new-array(std.boolean), new-array(std.boolean))
+
+let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
+    match integer-equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                case std.option[T].some(let element):
+                    assert(to.append(element))
+                    copy-array[T](from, to)
+                case std.option[T].none:
+                    fail()
+copy-array[std.boolean](new-array(std.boolean), new-array(std.boolean))
+*/

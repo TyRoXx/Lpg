@@ -12,6 +12,12 @@ void generic_closure_free(generic_closure const freed)
     unicode_string_free(&freed.name);
 }
 
+generic_closures generic_closures_create(generic_closure *elements, size_t count)
+{
+    generic_closures const result = {elements, count};
+    return result;
+}
+
 void generic_closures_free(generic_closures const freed)
 {
     for (size_t i = 0; i < freed.count; ++i)

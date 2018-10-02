@@ -6,9 +6,10 @@
 #include "lpg_function_checking_state.h"
 
 local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
-                                     optional_value compile_time_value, register_id where)
+                                     optional_value compile_time_value, register_id where,
+                                     struct function_checking_state *lambda_origin)
 {
-    local_variable const result = {name, phase, type_, compile_time_value, where};
+    local_variable const result = {name, phase, type_, compile_time_value, where, lambda_origin};
     return result;
 }
 
@@ -103,12 +104,13 @@ void initialize_early(local_variable_container *variables, unicode_view name, ty
     LPG_UNREACHABLE();
 }
 
-void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what)
+void initialize_lambda_being_checked(local_variable_container *variables, unicode_view name, type const what,
+                                     struct function_checking_state *lambda_origin)
 {
     ASSUME(!local_variable_name_exists(*variables, name));
     add_local_variable(
         variables, local_variable_create(unicode_view_copy(name), local_variable_phase_lambda_being_checked, what,
-                                         optional_value_empty, ~(register_id)0));
+                                         optional_value_empty, ~(register_id)0, lambda_origin));
 }
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name)
@@ -136,20 +138,20 @@ variable_address variable_address_from_local(register_id const local)
     return result;
 }
 
-static read_local_variable_result read_lambda_being_checked(LPG_NON_NULL(function_checking_state *const state),
-                                                            instruction_sequence *const body, type const what)
+static read_local_variable_result read_lambda_being_checked(LPG_NON_NULL(function_checking_state *const lambda_origin),
+                                                            type const what)
 {
-    register_id const into = allocate_register(&state->used_registers);
-    if (body)
-    {
-        add_instruction(body, instruction_create_current_function(current_function_instruction_create(into)));
-    }
+    ASSUME(lambda_origin);
+    register_id const into = allocate_register(&lambda_origin->used_registers);
+    add_instruction(
+        lambda_origin->body, instruction_create_current_function(current_function_instruction_create(into)));
     return read_local_variable_result_create(
         variable_address_from_local(into), what, /*TODO*/ optional_value_empty, true);
 }
 
 read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                               instruction_sequence *const body, unicode_view const name,
+                                               instruction_sequence *const body_of_lambda_using_the_variable,
+                                               unicode_view const name,
                                                source_location const original_reference_location)
 {
     {
@@ -168,7 +170,7 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
                                                          existing_variable->compile_time_value, true);
 
             case local_variable_phase_lambda_being_checked:
-                return read_lambda_being_checked(state, body, existing_variable->type_);
+                return read_lambda_being_checked(existing_variable->lambda_origin, existing_variable->type_);
             }
         }
     }
@@ -187,11 +189,12 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
     case read_local_variable_status_ok:
         break;
     }
-    if (outer_variable.compile_time_value.is_set && body)
+    if (outer_variable.compile_time_value.is_set && body_of_lambda_using_the_variable)
     {
         register_id const where = allocate_register(&state->used_registers);
-        add_instruction(body, instruction_create_literal(literal_instruction_create(
-                                  where, outer_variable.compile_time_value.value_, outer_variable.what)));
+        add_instruction(body_of_lambda_using_the_variable,
+                        instruction_create_literal(literal_instruction_create(
+                            where, outer_variable.compile_time_value.value_, outer_variable.what)));
         write_register_compile_time_value(state, where, outer_variable.compile_time_value.value_);
         return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
                                                  outer_variable.compile_time_value, outer_variable.is_pure);

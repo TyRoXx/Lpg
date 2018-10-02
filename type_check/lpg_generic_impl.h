@@ -20,6 +20,7 @@ typedef struct generic_closures
     size_t count;
 } generic_closures;
 
+generic_closures generic_closures_create(generic_closure *elements, size_t count);
 void generic_closures_free(generic_closures const freed);
 
 typedef struct generic_impl_self
