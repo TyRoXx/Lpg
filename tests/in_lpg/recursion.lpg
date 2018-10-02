@@ -13,7 +13,17 @@ let h = (): std.unit
     let inner = ()
         h()
 
-/*let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
+/*let k = (a: std.boolean): int(0, 3)
+    side-effect()
+    match a
+        case std.boolean.true:
+            k(std.boolean.false)
+        case std.boolean.false:
+            3
+assert(integer-equals(3, k(std.boolean.true)))
+assert(integer-equals(3, k(std.boolean.false)))
+
+let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
     match integer-equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value

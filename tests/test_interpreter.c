@@ -154,6 +154,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
                                                                   "if(MSVC)\n"
                                                                   "    add_definitions(/WX)\n"
                                                                   "    add_definitions(/wd4101)\n"
+                                                                  "    add_definitions(/wd4717)\n"
                                                                   "else()\n"
                                                                   "    add_definitions(-std=gnu99)\n"
                                                                   "endif()\n"));
