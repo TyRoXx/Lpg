@@ -21,6 +21,8 @@
 #include "lpg_load_module.h"
 #include "lpg_path.h"
 #include "find_builtin_module_directory.h"
+#include "lpg_monotonic_clock.h"
+#include <inttypes.h>
 
 static sequence parse(unicode_view const input)
 {
@@ -386,12 +388,32 @@ typedef struct run_file_in_thread_state
     char const *file;
     structure globals;
     unicode_view in_lpg_directory;
+    duration how_long_did_it_take;
 } run_file_in_thread_state;
 
 static void run_file_in_thread(void *argument)
 {
     run_file_in_thread_state *const cast = argument;
+    duration const time_before = read_monotonic_clock();
     run_file(cast->file, cast->globals, cast->in_lpg_directory);
+    duration const time_after = read_monotonic_clock();
+    duration const difference = absolute_duration_difference(time_before, time_after);
+    cast->how_long_did_it_take = difference;
+}
+
+static int compare_threads_by_how_long_they_took(void const *const left, void const *const right)
+{
+    run_file_in_thread_state const *const real_left = left;
+    run_file_in_thread_state const *const real_right = right;
+    if (real_left->how_long_did_it_take.milliseconds > real_right->how_long_did_it_take.milliseconds)
+    {
+        return 1;
+    }
+    if (real_left->how_long_did_it_take.milliseconds < real_right->how_long_did_it_take.milliseconds)
+    {
+        return -1;
+    }
+    return 0;
 }
 
 void test_interpreter(void)
@@ -481,6 +503,14 @@ void test_interpreter(void)
         {
             join_thread(threads[i].thread);
         }
+
+        qsort(threads, LPG_ARRAY_SIZE(threads), sizeof(*threads), compare_threads_by_how_long_they_took);
+        for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
+        {
+            run_file_in_thread_state *const thread = threads + i;
+            printf("%" PRIu64 " ms %s\n", thread->how_long_did_it_take.milliseconds, thread->file);
+        }
+
         unicode_string_free(&in_lpg_dir);
     }
 
