@@ -468,7 +468,6 @@ void test_interpreter(void)
                                                  "match-integer.lpg",
                                                  "match-return.lpg",
                                                  "option.lpg",
-                                                 "option-int.lpg",
                                                  "parsing-edgecase.lpg",
                                                  "raw-string-literal.lpg",
                                                  "recursion.lpg",

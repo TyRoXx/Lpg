@@ -29,8 +29,6 @@ let unit = type-of(unit_value)
 
 let any-integer = int(0, 340282366920938463463374607431768211455)
 
-let option-int = option[any-integer]
-
 let mutable = interface[T]
     load(): T
     store(value: T): unit
@@ -64,8 +62,7 @@ let export = struct
     unit: type
     unit_value: unit
     option: type-of(option)
-    option-int: type-of(option-int)
     array: type-of(array)
     mutable: type-of(mutable)
     make-mutable: type-of(make-mutable)
-export{and, or, not, type, string, boolean, unit, unit_value, option, option-int, array, mutable, make-mutable}
+export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable}
