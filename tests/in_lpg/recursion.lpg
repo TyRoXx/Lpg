@@ -37,10 +37,10 @@ let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolea
 
 copy-array-boolean(new-array(std.boolean), new-array(std.boolean))
 
-let from = new-array(std.boolean)
-assert(from.append(std.boolean.true))
+let original = new-array(std.boolean)
+assert(original.append(std.boolean.true))
 let into = new-array(std.boolean)
-copy-array-boolean(from, into)
+copy-array-boolean(original, into)
 assert(integer-equals(1, into.size()))
 match into.load(0)
     case std.option[std.boolean].some(let value):
