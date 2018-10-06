@@ -48,7 +48,7 @@ match into.load(0)
     case std.option[std.boolean].none:
         fail()
 
-/*let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
+let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
     match integer-equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value
@@ -60,4 +60,3 @@ match into.load(0)
                 case std.option[T].none:
                     fail()
 copy-array[std.boolean](new-array(std.boolean), new-array(std.boolean))
-*/
