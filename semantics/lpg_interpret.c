@@ -4,10 +4,11 @@
 #include "lpg_allocate.h"
 #include "lpg_instruction.h"
 #include <string.h>
+#include "lpg_optional_function_id.h"
 #include "lpg_standard_library.h"
 
-static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
-                                                value *const arguments, value const *globals,
+static optional_value call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
+                                                optional_value const self, value *const arguments, value const *globals,
                                                 value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
                                                 lpg_interface const *const all_interfaces);
@@ -35,9 +36,9 @@ optional_value call_function(function_pointer_value const callee, function_call_
         ASSUME(value_conforms_to_type(return_value, callee.external_signature.result.value));
         return optional_value_create(return_value);
     }
-    return call_interpreted_function(arguments.all_functions[callee.code], arguments.self, arguments.arguments,
-                                     arguments.globals, callee.captures, arguments.gc, arguments.all_functions,
-                                     arguments.all_interfaces);
+    return call_interpreted_function(arguments.all_functions[callee.code], optional_function_id_create(callee.code),
+                                     arguments.self, arguments.arguments, arguments.globals, callee.captures,
+                                     arguments.gc, arguments.all_functions, arguments.all_interfaces);
 }
 
 typedef struct invoke_method_parameters
@@ -160,18 +161,16 @@ static value invoke_method(function_call_arguments const arguments, value const 
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
-                                        value const *globals, value *registers, structure_value const captures,
+                                        value const *globals, value *const registers, structure_value const captures,
                                         garbage_collector *const gc, checked_function const *const all_functions,
-                                        lpg_interface const *const all_interfaces)
+                                        lpg_interface const *const all_interfaces,
+                                        optional_function_id const current_function)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
         instruction const element = sequence.elements[i];
         switch (element.type)
         {
-        case instruction_current_function:
-            LPG_TO_DO();
-
         case instruction_new_array:
         {
             array_value *const array = garbage_collector_allocate(gc, sizeof(*array));
@@ -276,8 +275,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
             registers[element.loop.unit_goes_into] = value_from_unit();
             while (is_running)
             {
-                switch (run_sequence(
-                    element.loop.body, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
+                switch (run_sequence(element.loop.body, return_value, globals, registers, captures, gc, all_functions,
+                                     all_interfaces, current_function))
                 {
                 case run_sequence_result_break:
                     is_running = false;
@@ -388,8 +387,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                     continue;
                 }
                 found_match = true;
-                switch (run_sequence(
-                    this_case->action, return_value, globals, registers, captures, gc, all_functions, all_interfaces))
+                switch (run_sequence(this_case->action, return_value, globals, registers, captures, gc, all_functions,
+                                     all_interfaces, current_function))
                 {
                 case run_sequence_result_break:
                     return run_sequence_result_break;
@@ -434,20 +433,35 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                     element.lambda_with_captures.lambda, inner_captures, element.lambda_with_captures.capture_count));
             break;
         }
+
+        case instruction_current_function:
+        {
+            value *const inner_captures = garbage_collector_allocate_array(gc, captures.count, sizeof(*inner_captures));
+            for (size_t j = 0; j < captures.count; ++j)
+            {
+                value const capture = captures.members[j];
+                inner_captures[j] = capture;
+                ASSUME(value_is_valid(capture));
+            }
+            ASSUME(current_function.is_set);
+            registers[element.current_function.into] = value_from_function_pointer(
+                function_pointer_value_from_internal(current_function.value, inner_captures, captures.count));
+            break;
+        }
         }
     }
     return run_sequence_result_continue;
 }
 
-optional_value call_checked_function(checked_function const callee, value const *const captures,
-                                     function_call_arguments arguments)
+optional_value call_checked_function(checked_function const callee, optional_function_id const callee_id,
+                                     value const *const captures, function_call_arguments arguments)
 {
-    return call_interpreted_function(callee, arguments.self, arguments.arguments, arguments.globals, captures,
-                                     arguments.gc, arguments.all_functions, arguments.all_interfaces);
+    return call_interpreted_function(callee, callee_id, arguments.self, arguments.arguments, arguments.globals,
+                                     captures, arguments.gc, arguments.all_functions, arguments.all_interfaces);
 }
 
-static optional_value call_interpreted_function(checked_function const callee, optional_value const self,
-                                                value *const arguments, value const *globals,
+static optional_value call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
+                                                optional_value const self, value *const arguments, value const *globals,
                                                 value const *const captures, garbage_collector *const gc,
                                                 checked_function const *const all_functions,
                                                 lpg_interface const *const all_interfaces)
@@ -480,7 +494,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
     value return_value = value_from_unit();
     switch (run_sequence(callee.body, &return_value, globals, registers,
                          structure_value_create(captures, callee.signature->captures.length), gc, all_functions,
-                         all_interfaces))
+                         all_interfaces, callee_id))
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
@@ -504,7 +518,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
 
 void interpret(checked_program const program, value const *globals, garbage_collector *const gc)
 {
-    checked_function const entry_point = program.functions[0];
-    call_interpreted_function(
-        entry_point, optional_value_empty, NULL, globals, NULL, gc, program.functions, program.interfaces);
+    function_id const entry_point_id = 0;
+    call_interpreted_function(program.functions[entry_point_id], optional_function_id_create(entry_point_id),
+                              optional_value_empty, NULL, globals, NULL, gc, program.functions, program.interfaces);
 }

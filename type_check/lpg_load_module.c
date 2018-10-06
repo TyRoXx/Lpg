@@ -66,7 +66,7 @@ static void translate_semantic_error(complete_semantic_error const error, void *
     translator->on_error(error, translator->user);
 }
 
-static load_module_result type_check_module(function_checking_state *state, sequence const parsed,
+static load_module_result type_check_module(function_checking_state *const state, sequence const parsed,
                                             unicode_view const file_name, unicode_view const source)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
@@ -87,7 +87,7 @@ static load_module_result type_check_module(function_checking_state *state, sequ
         return failure;
     }
     optional_value const module_value = call_checked_function(
-        checked.function, NULL,
+        checked.function, optional_function_id_empty(), NULL,
         function_call_arguments_create(optional_value_empty, NULL, state->root->globals, &state->program->memory,
                                        state->program->functions, state->program->interfaces));
     if (!module_value.is_set)

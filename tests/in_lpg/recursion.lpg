@@ -13,15 +13,15 @@ let h = (): std.unit
     let inner = ()
         h()
 
-/*let k = (a: std.boolean): int(0, 3)
+let k = (a: std.boolean): std.string
     side-effect()
     match a
         case std.boolean.true:
             k(std.boolean.false)
         case std.boolean.false:
-            3
-assert(integer-equals(3, k(std.boolean.true)))
-assert(integer-equals(3, k(std.boolean.false)))
+            "3"
+assert(string-equals("3", k(std.boolean.true)))
+assert(string-equals("3", k(std.boolean.false)))
 
 let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
     match integer-equals(from.size(), to.size())
@@ -34,9 +34,21 @@ let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolea
                     copy-array-boolean(from, to)
                 case std.option[std.boolean].none:
                     fail()
+
 copy-array-boolean(new-array(std.boolean), new-array(std.boolean))
 
-let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
+let from = new-array(std.boolean)
+assert(from.append(std.boolean.true))
+let into = new-array(std.boolean)
+copy-array-boolean(from, into)
+assert(integer-equals(1, into.size()))
+match into.load(0)
+    case std.option[std.boolean].some(let value):
+        assert(value)
+    case std.option[std.boolean].none:
+        fail()
+
+/*let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
     match integer-equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value

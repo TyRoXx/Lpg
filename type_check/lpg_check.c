@@ -845,7 +845,15 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     {
         return evaluate_expression_result_empty;
     }
+
     function_id const this_lambda_id = reserve_function_id(state);
+    state->program->functions[this_lambda_id].signature->parameters =
+        tuple_type_create(header.parameter_types, evaluated.header.parameter_count);
+    if (header.return_type.is_set)
+    {
+        state->program->functions[this_lambda_id].signature->result = header.return_type;
+    }
+
     check_function_result const checked =
         check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
                        state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
@@ -866,6 +874,7 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = evaluated.header.parameter_count;
 
+    state->program->functions[this_lambda_id].signature->parameters = tuple_type_create(NULL, 0);
     checked_function_free(&state->program->functions[this_lambda_id]);
     state->program->functions[this_lambda_id] = checked.function;
     register_id const destination = allocate_register(&state->used_registers);
