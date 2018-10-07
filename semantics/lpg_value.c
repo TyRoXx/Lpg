@@ -241,6 +241,8 @@ bool value_equals(value const left, value const right)
         LPG_TO_DO();
 
     case value_kind_generic_lambda:
+        return (left.generic_lambda == right.generic_lambda);
+
     case value_kind_array:
     case value_kind_type_erased:
     case value_kind_pattern:

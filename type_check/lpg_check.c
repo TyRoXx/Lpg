@@ -1362,6 +1362,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
             case value_kind_function_pointer:
             {
+                if (!callee.compile_time_value.value_.function_pointer.external &&
+                    (state->program->functions[callee.compile_time_value.value_.function_pointer.code].body.length ==
+                     0))
+                {
+                    // This function has no body which means it is currently being type checked and can't be called yet.
+                    break;
+                }
                 compile_time_result =
                     call_function(callee.compile_time_value.value_.function_pointer,
                                   function_call_arguments_create(
@@ -3999,9 +4006,10 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     return result;
 }
 
-static evaluate_expression_result evaluate_expression(function_checking_state *const state,
-                                                      instruction_sequence *const function, expression const element,
-                                                      unicode_view const *const early_initialized_variable)
+static evaluate_expression_result evaluate_expression_core(function_checking_state *const state,
+                                                           instruction_sequence *const function,
+                                                           expression const element,
+                                                           unicode_view const *const early_initialized_variable)
 {
     switch (element.type)
     {
@@ -4169,6 +4177,24 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     LPG_UNREACHABLE();
 }
 
+static evaluate_expression_result evaluate_expression(function_checking_state *const state,
+                                                      instruction_sequence *const function, expression const element,
+                                                      unicode_view const *const early_initialized_variable)
+{
+    size_t const expression_recursion_limit = 20;
+    if (state->root->expression_recursion_depth >= expression_recursion_limit)
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_expression_recursion_limit_reached,
+                                                         expression_source_begin(element)));
+        return evaluate_expression_result_empty;
+    }
+    state->root->expression_recursion_depth += 1;
+    evaluate_expression_result const result =
+        evaluate_expression_core(state, function, element, early_initialized_variable);
+    state->root->expression_recursion_depth -= 1;
+    return result;
+}
+
 static evaluate_expression_result evaluate_return_expression(function_checking_state *state, instruction_sequence *body,
                                                              const expression *returned)
 {
@@ -4266,8 +4292,8 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {NULL, 0, NULL, 0, NULL, 0, NULL,   0,      NULL,    0,    NULL, 0,
-                                NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL, NULL, 0};
+    program_check check_root = {NULL, 0,    NULL, 0,    NULL, 0,      NULL,   0,       NULL, 0,    NULL, 0, NULL,
+                                0,    NULL, 0,    NULL, 0,    loader, global, globals, NULL, NULL, 0,    0};
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
                        0, optional_type_create_empty(), true, optional_type_create_empty(), file_name, source, NULL,

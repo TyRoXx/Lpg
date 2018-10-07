@@ -273,6 +273,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_import_failed:
         return "import failed";
+
+    case semantic_error_expression_recursion_limit_reached:
+        return "Expression nesting limit exceeded";
     }
     LPG_UNREACHABLE();
 }
