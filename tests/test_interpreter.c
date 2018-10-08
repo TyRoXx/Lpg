@@ -467,6 +467,7 @@ void test_interpreter(void)
                                                  "match-enum-stateful.lpg",
                                                  "match-enum-stateless.lpg",
                                                  "match-integer.lpg",
+                                                 "match-multiple-integers.lpg",
                                                  "match-return.lpg",
                                                  "option.lpg",
                                                  "parsing-edgecase.lpg",

@@ -1,6 +1,7 @@
 #include "test_type.h"
 #include "test.h"
 #include "lpg_type.h"
+#include <lpg_expression.h>
 
 void test_type(void)
 {
