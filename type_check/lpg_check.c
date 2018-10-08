@@ -1655,6 +1655,23 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
                                              final_result.compile_time_value, is_pure, always_returns);
 }
 
+static bool merge_types(type *result_type, const type evaluated_type)
+{
+    if(type_equals(*result_type, evaluated_type))
+    {
+        return true;
+    }
+
+    if(result_type->kind != evaluated_type.kind || result_type->kind != type_kind_integer_range)
+    {
+        return false;
+    }
+
+    *result_type = type_from_integer_range(integer_range_combine(result_type->integer_range_, evaluated_type.integer_range_));
+
+    return true;
+}
+
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
                                                      const expression *element)
 {
@@ -1821,7 +1838,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 {
                     result_type = action_evaluated.type_;
                 }
-                else if (!type_equals(result_type, action_evaluated.type_))
+                else if (!merge_types(&result_type, action_evaluated.type_))
                 {
                     /*TODO: support types that are not the same, but still comparable*/
                     emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,

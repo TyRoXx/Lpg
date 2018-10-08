@@ -1,0 +1,7 @@
+let a = boolean.true
+let result : int(1, 2) = match a
+    case boolean.false:
+        1
+    case boolean.true:
+        2
+assert(integer-equals(2, result))
