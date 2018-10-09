@@ -5,3 +5,15 @@ let result : int(1, 2) = match a
     case boolean.true:
         2
 assert(integer-equals(2, result))
+
+let runtime-var = ()
+    side-effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime-var()
+    case boolean.true:
+        40
+    case boolean.false:
+        1
+
+assert(integer-equals(40, something))
