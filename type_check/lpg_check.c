@@ -4279,21 +4279,13 @@ checked_program check(sequence const root, structure const global, check_error_h
     checked_program program = {NULL,       0,
                                structures, 1,
                                {NULL},     allocate_array(1, sizeof(*program.functions)),
-                               1,          allocate_array(2, sizeof(*program.enums)),
-                               2};
+                               1,          allocate_array(1, sizeof(*program.enums)),
+                               1};
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));
         elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), optional_type_create_empty());
         elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), optional_type_create_empty());
         program.enums[0] = enumeration_create(elements, 2);
-    }
-    {
-        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
-        elements[0] = enumeration_element_create(unicode_string_from_c_str("none"), optional_type_create_empty());
-        elements[1] = enumeration_element_create(
-            unicode_string_from_c_str("some"), optional_type_create_set(type_from_integer_range(
-                                                   integer_range_create(integer_create(0, 0), integer_max()))));
-        program.enums[1] = enumeration_create(elements, 2);
     }
     size_t const globals_count = global.count;
     value *const globals = allocate_array(globals_count, sizeof(*globals));

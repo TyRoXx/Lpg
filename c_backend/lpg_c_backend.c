@@ -229,6 +229,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    free(impl);\n"
                                                  "}\n"));
 
+    standard_library->using_stdint = true;
     LPG_TRY(stream_writer_write_string(c_output, "static uint64_t "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "_size(void *self)\n"
@@ -245,6 +246,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(generate_type(load_result, standard_library, definitions, program, additional_memory, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    standard_library->using_stdint = true;
     LPG_TRY(stream_writer_write_string(c_output, "_load(void *self, uint64_t const index)\n"
                                                  "{\n"
                                                  "    "));
@@ -265,6 +267,7 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
 
     LPG_TRY(stream_writer_write_string(c_output, "static stateless_enum "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    standard_library->using_stdint = true;
     LPG_TRY(stream_writer_write_string(c_output, "_store(void *self, uint64_t const index, "));
     LPG_TRY(generate_type(element_type, standard_library, definitions, program, additional_memory, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " element)\n"
@@ -2244,6 +2247,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case value_kind_integer:
             set_register_variable(
                 state, input.literal.into, register_resource_ownership_borrows, input.literal.type_of);
+            state->standard_library.using_stdint = true;
             LPG_TRY(stream_writer_write_string(c_output, "uint64_t const "));
             LPG_TRY(generate_register_name(input.literal.into, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = "));
