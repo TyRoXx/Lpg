@@ -1664,17 +1664,18 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
 
 static bool merge_types(type *result_type, const type evaluated_type)
 {
-    if(type_equals(*result_type, evaluated_type))
+    if (type_equals(*result_type, evaluated_type))
     {
         return true;
     }
 
-    if(result_type->kind != evaluated_type.kind || result_type->kind != type_kind_integer_range)
+    if (result_type->kind != evaluated_type.kind || result_type->kind != type_kind_integer_range)
     {
         return false;
     }
 
-    *result_type = type_from_integer_range(integer_range_combine(result_type->integer_range_, evaluated_type.integer_range_));
+    *result_type =
+        type_from_integer_range(integer_range_combine(result_type->integer_range_, evaluated_type.integer_range_));
 
     return true;
 }
