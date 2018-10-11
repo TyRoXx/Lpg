@@ -43,7 +43,8 @@ void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
 lambda lambda_clone(lambda const original);
 
-typedef enum expression_type {
+typedef enum expression_type
+{
     expression_type_lambda = 1,
     expression_type_call,
     expression_type_integer_literal,
@@ -161,7 +162,8 @@ not not_expression_create(expression * value);
 void not_free(LPG_NON_NULL(not const *expression));
 not not_clone(not const original);
 
-typedef enum binary_operator {
+typedef enum binary_operator
+{
     less_than = 1,
     less_than_or_equals,
     equals,
@@ -413,7 +415,8 @@ bool import_expression_equals(import_expression const left, import_expression co
 struct expression
 {
     expression_type type;
-    union {
+    union
+    {
         lambda lambda;
         call call;
         integer_literal_expression integer_literal;

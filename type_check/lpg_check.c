@@ -1541,7 +1541,8 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     integer_range_list_deallocate(integer_ranges);
 }
 
-typedef enum pattern_evaluate_result_kind {
+typedef enum pattern_evaluate_result_kind
+{
     pattern_evaluate_result_kind_is_pattern = 1,
     pattern_evaluate_result_kind_no_pattern,
     pattern_evaluate_result_kind_failure

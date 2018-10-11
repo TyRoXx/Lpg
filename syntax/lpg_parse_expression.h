@@ -15,7 +15,8 @@ typedef struct rich_token
 rich_token rich_token_create(tokenize_status status, token_type token, unicode_view content, source_location where);
 bool is_end_of_file(LPG_NON_NULL(rich_token const *token));
 
-typedef enum parse_error_type {
+typedef enum parse_error_type
+{
     parse_error_invalid_token = 1,
     parse_error_expected_expression,
     parse_error_expected_arguments,

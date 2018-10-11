@@ -60,7 +60,8 @@ lpg_interface interface_create(method_description *methods, function_id method_c
                                implementation_entry *implementations, size_t implementation_count);
 void interface_free(lpg_interface const value);
 
-typedef enum type_kind {
+typedef enum type_kind
+{
     type_kind_structure = 1,
     type_kind_function_pointer,
     type_kind_unit,
@@ -103,7 +104,8 @@ bool method_pointer_type_equals(method_pointer_type const left, method_pointer_t
 struct type
 {
     type_kind kind;
-    union {
+    union
+    {
         struct_id structure_;
         function_pointer const *function_pointer_;
         enum_id enum_;

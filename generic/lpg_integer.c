@@ -107,8 +107,11 @@ integer integer_subtract(integer minuend, integer subtrahend)
 {
     integer result
 #ifndef _MSC_VER
-        = { 0,
-            0 }
+        =
+    {
+        0,
+        0
+    }
 #endif
     ;
     result.low = (minuend.low - subtrahend.low);

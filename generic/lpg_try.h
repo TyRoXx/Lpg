@@ -1,6 +1,10 @@
 #pragma once
 
-typedef enum success_indicator { success_yes = 1, success_no } success_indicator;
+typedef enum success_indicator
+{
+    success_yes = 1,
+    success_no
+} success_indicator;
 
 #define LPG_TRY(expression)                                                                                            \
     switch (expression)                                                                                                \

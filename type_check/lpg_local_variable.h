@@ -4,7 +4,8 @@
 #include "lpg_source_location.h"
 #include "lpg_value.h"
 
-typedef enum local_variable_phase {
+typedef enum local_variable_phase
+{
     local_variable_phase_declared = 1,
     local_variable_phase_early_initialized = 2,
     local_variable_phase_lambda_being_checked = 3,
@@ -35,7 +36,8 @@ typedef struct local_variable_container
 
 void local_variable_container_free(local_variable_container const freed);
 
-typedef enum read_local_variable_status {
+typedef enum read_local_variable_status
+{
     read_local_variable_status_ok = 1,
     read_local_variable_status_unknown,
     read_local_variable_status_forbidden

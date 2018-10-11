@@ -268,7 +268,8 @@ static success_indicator generate_var(register_id const id, stream_writer const 
     return success_yes;
 }
 
-typedef enum register_type {
+typedef enum register_type
+{
     register_type_none = 1,
     register_type_variable,
     register_type_global,
