@@ -1,6 +1,6 @@
 #include "lpg_integer.h"
-#include <stdio.h>
 #include <inttypes.h>
+#include <stdio.h>
 
 integer integer_create(uint64_t high, uint64_t low)
 {
@@ -107,11 +107,8 @@ integer integer_subtract(integer minuend, integer subtrahend)
 {
     integer result
 #ifndef _MSC_VER
-        =
-    {
-        0,
-        0
-    }
+        = { 0,
+            0 }
 #endif
     ;
     result.low = (minuend.low - subtrahend.low);

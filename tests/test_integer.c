@@ -1,6 +1,6 @@
 #include "test_integer.h"
-#include "test.h"
 #include "lpg_integer.h"
+#include "test.h"
 #include <string.h>
 
 static void test_add_success(integer left, integer right, integer expected)

@@ -1,14 +1,14 @@
 #include "lpg_path.h"
 #include "lpg_allocate.h"
-#include <string.h>
-#include "lpg_win32.h"
 #include "lpg_assert.h"
+#include "lpg_win32.h"
+#include <string.h>
 #ifdef _WIN32
 #include <Windows.h>
 #else
+#include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
 #endif
 #ifdef __APPLE__
 #include <mach-o/dyld.h>

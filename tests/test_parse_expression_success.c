@@ -1,9 +1,9 @@
 #include "test_parse_expression_success.h"
-#include "test.h"
-#include "lpg_parse_expression.h"
-#include "lpg_allocate.h"
 #include "handle_parse_error.h"
+#include "lpg_allocate.h"
+#include "lpg_parse_expression.h"
 #include "lpg_save_expression.h"
+#include "test.h"
 
 static void test_tuples(void);
 

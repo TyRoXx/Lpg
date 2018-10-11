@@ -1,6 +1,6 @@
 #pragma once
-#include "lpg_unicode_view.h"
 #include "lpg_create_process.h"
+#include "lpg_unicode_view.h"
 
 unicode_view path_remove_leaf(unicode_view const full) LPG_USE_RESULT;
 unicode_string path_combine(unicode_view const *begin, size_t count) LPG_USE_RESULT;

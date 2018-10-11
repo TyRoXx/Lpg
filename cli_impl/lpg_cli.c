@@ -1,27 +1,27 @@
 #ifndef _MSC_VER
 #define _FILE_OFFSET_BITS 64
 #endif
-#include <stdio.h>
 #include "lpg_cli.h"
+#include "lpg_allocate.h"
 #include "lpg_check.h"
+#include "lpg_ecmascript_backend.h"
 #include "lpg_find_next_token.h"
 #include "lpg_interpret.h"
 #include "lpg_optimize.h"
-#include "lpg_allocate.h"
-#include "lpg_read_file.h"
 #include "lpg_path.h"
-#include "lpg_standard_library.h"
+#include "lpg_read_file.h"
 #include "lpg_save_expression.h"
+#include "lpg_standard_library.h"
 #include "lpg_write_file.h"
-#include "lpg_ecmascript_backend.h"
+#include <stdio.h>
 #include <string.h>
 #ifdef __linux__
-#include <fcntl.h>
 #include <errno.h>
+#include <fcntl.h>
 #endif
-#include <stdio.h>
-#include "lpg_win32.h"
 #include "lpg_rename_file.h"
+#include "lpg_win32.h"
+#include <stdio.h>
 #ifdef _WIN32
 #include <Windows.h>
 #endif

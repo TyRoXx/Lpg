@@ -1,6 +1,6 @@
 #pragma once
-#include "lpg_parse_expression.h"
 #include "lpg_find_next_token.h"
+#include "lpg_parse_expression.h"
 
 typedef struct test_parser_user
 {

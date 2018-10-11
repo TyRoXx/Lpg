@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifndef SIZE_MAX
 #define SIZE_MAX ((size_t)-1)

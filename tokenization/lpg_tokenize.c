@@ -1,10 +1,10 @@
-#include <string.h>
 #include "lpg_tokenize.h"
 #include "lpg_assert.h"
 #include "lpg_identifier.h"
-#include "lpg_unicode_view.h"
 #include "lpg_stream_writer.h"
 #include "lpg_string_literal.h"
+#include "lpg_unicode_view.h"
+#include <string.h>
 
 static tokenize_result tokenize_space(const char *input, size_t length);
 static tokenize_result tokenize_identifier(const char *input, size_t length);

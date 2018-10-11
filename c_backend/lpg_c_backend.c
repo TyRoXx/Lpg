@@ -1,6 +1,6 @@
+#include "lpg_c_backend.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
-#include "lpg_c_backend.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 #include <string.h>
@@ -22,8 +22,7 @@ static void standard_library_usage_use_string(standard_library_usage *usage)
     usage->using_string = true;
 }
 
-typedef enum register_meaning
-{
+typedef enum register_meaning {
     register_meaning_nothing = 1,
     register_meaning_global,
     register_meaning_variable,
@@ -43,8 +42,7 @@ typedef enum register_meaning
     register_meaning_fail
 } register_meaning;
 
-typedef enum register_resource_ownership
-{
+typedef enum register_resource_ownership {
     register_resource_ownership_owns = 1,
     register_resource_ownership_borrows
 } register_resource_ownership;
@@ -54,8 +52,7 @@ typedef struct register_state
     register_meaning meaning;
     register_resource_ownership ownership;
     optional_type type_of;
-    union
-    {
+    union {
         value literal;
         capture_index capture;
     };

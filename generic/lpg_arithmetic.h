@@ -1,7 +1,7 @@
 #pragma once
 #include "lpg_optional.h"
-#include <stddef.h>
 #include "lpg_use_result.h"
+#include <stddef.h>
 
 typedef struct optional_size
 {

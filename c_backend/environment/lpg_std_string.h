@@ -1,8 +1,8 @@
 #pragma once
-#include <string.h>
-#include <stdlib.h>
-#include <stdbool.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct string
 {

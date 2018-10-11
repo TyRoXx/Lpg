@@ -1,6 +1,6 @@
 #pragma once
-#include "lpg_stream_writer.h"
 #include "lpg_expression.h"
+#include "lpg_stream_writer.h"
 
 typedef struct whitespace_state
 {

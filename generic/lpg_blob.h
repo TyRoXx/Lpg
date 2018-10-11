@@ -1,8 +1,8 @@
 #pragma once
-#include <stddef.h>
-#include <stdbool.h>
 #include "lpg_non_null.h"
 #include "lpg_use_result.h"
+#include <stdbool.h>
+#include <stddef.h>
 
 typedef struct blob
 {

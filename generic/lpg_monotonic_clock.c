@@ -8,8 +8,8 @@ duration read_monotonic_clock(void)
     return duration_from_milliseconds(GetTickCount64());
 }
 #else
-#include <time.h>
 #include "lpg_assert.h"
+#include <time.h>
 
 duration read_monotonic_clock(void)
 {

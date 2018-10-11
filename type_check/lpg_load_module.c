@@ -1,11 +1,11 @@
 #include "lpg_load_module.h"
-#include "lpg_path.h"
 #include "lpg_array_size.h"
-#include "lpg_read_file.h"
-#include "lpg_parse_expression.h"
-#include "lpg_find_next_token.h"
 #include "lpg_check.h"
+#include "lpg_find_next_token.h"
 #include "lpg_interpret.h"
+#include "lpg_parse_expression.h"
+#include "lpg_path.h"
+#include "lpg_read_file.h"
 
 complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source)
 {

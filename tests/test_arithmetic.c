@@ -1,7 +1,7 @@
 #include "test_arithmetic.h"
-#include "test.h"
-#include "lpg_optional.h"
 #include "lpg_arithmetic.h"
+#include "lpg_optional.h"
+#include "test.h"
 
 void test_arithmetic(void)
 {

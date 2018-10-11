@@ -1,21 +1,21 @@
 #pragma once
 
+#include "lpg_generic_enum.h"
+#include "lpg_generic_enum_id.h"
+#include "lpg_generic_enum_instantiation.h"
+#include "lpg_generic_impl.h"
+#include "lpg_generic_impl_regular_interface.h"
 #include "lpg_generic_interface.h"
 #include "lpg_generic_interface_id.h"
-#include "lpg_generic_enum.h"
-#include "lpg_generic_struct.h"
-#include "lpg_generic_enum_id.h"
-#include "lpg_generic_struct_id.h"
+#include "lpg_generic_interface_instantiation.h"
 #include "lpg_generic_lambda.h"
 #include "lpg_generic_lambda_id.h"
-#include "lpg_generic_enum_instantiation.h"
-#include "lpg_generic_interface_instantiation.h"
-#include "lpg_module.h"
-#include "lpg_load_module.h"
-#include "lpg_generic_impl.h"
 #include "lpg_generic_lambda_instantiation.h"
+#include "lpg_generic_struct.h"
+#include "lpg_generic_struct_id.h"
 #include "lpg_generic_struct_instantiation.h"
-#include "lpg_generic_impl_regular_interface.h"
+#include "lpg_load_module.h"
+#include "lpg_module.h"
 
 typedef struct program_check
 {

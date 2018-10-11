@@ -1,7 +1,7 @@
 #include "lpg_remove_dead_code.h"
-#include "lpg_instruction.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
+#include "lpg_instruction.h"
 #include <string.h>
 
 static register_id const no_register = ~(register_id)0;
@@ -250,11 +250,7 @@ static void change_register_ids_in_sequence(instruction_sequence *const sequence
     sequence->length = used_until;
 }
 
-typedef enum removed_something
-{
-    removed_something_yes = 1,
-    removed_something_no
-} removed_something;
+typedef enum removed_something { removed_something_yes = 1, removed_something_no } removed_something;
 
 static removed_something remove_one_layer_of_dead_code_from_function(checked_function *const from)
 {

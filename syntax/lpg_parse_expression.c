@@ -1,6 +1,6 @@
 #include "lpg_parse_expression.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
 #include "lpg_for.h"
 #include <string.h>
 

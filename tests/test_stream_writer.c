@@ -1,6 +1,6 @@
 #include "test_stream_writer.h"
-#include "test.h"
 #include "lpg_stream_writer.h"
+#include "test.h"
 
 void test_stream_writer(void)
 {

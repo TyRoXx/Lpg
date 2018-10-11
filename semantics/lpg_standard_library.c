@@ -1,7 +1,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_allocate.h"
-#include <string.h>
 #include "lpg_assert.h"
+#include <string.h>
 
 static void standard_library_stable_free(standard_library_stable *stable)
 {

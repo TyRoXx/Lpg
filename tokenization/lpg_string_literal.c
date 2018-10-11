@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include "lpg_string_literal.h"
+#include <stdlib.h>
 
 decode_string_literal_result decode_string_literal(unicode_view source, stream_writer decoded)
 {

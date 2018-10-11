@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdbool.h>
 #include "lpg_try.h"
+#include <stdbool.h>
 
 typedef struct lpg_thread_impl *lpg_thread;
 

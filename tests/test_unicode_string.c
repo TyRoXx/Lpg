@@ -1,8 +1,8 @@
 #include "test_unicode_string.h"
-#include "test.h"
 #include "lpg_unicode_string.h"
-#include <string.h>
 #include "lpg_unicode_view.h"
+#include "test.h"
+#include <string.h>
 
 void test_unicode_string(void)
 {

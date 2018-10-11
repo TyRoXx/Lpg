@@ -1,6 +1,6 @@
 #pragma once
-#include <stddef.h>
 #include <lpg_non_null.h>
+#include <stddef.h>
 
 typedef void (*garbage_collector_destructor)(void *);
 

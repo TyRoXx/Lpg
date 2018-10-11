@@ -3,8 +3,8 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include "lpg_unicode_view.h"
 #include "lpg_try.h"
+#include "lpg_unicode_view.h"
 
 #ifdef _WIN32
 typedef HANDLE file_handle;

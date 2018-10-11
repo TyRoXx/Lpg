@@ -1,7 +1,7 @@
 #pragma once
+#include <lpg_non_null.h>
 #include <stdbool.h>
 #include <stddef.h>
-#include <lpg_non_null.h>
 
 typedef struct instruction instruction;
 

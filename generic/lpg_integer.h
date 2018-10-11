@@ -1,10 +1,10 @@
 #pragma once
-#include <stdint.h>
-#include <stddef.h>
-#include "lpg_unicode_view.h"
-#include <stdbool.h>
-#include "math.h"
 #include "lpg_assert.h"
+#include "lpg_unicode_view.h"
+#include "math.h"
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
 
 typedef struct integer
 {

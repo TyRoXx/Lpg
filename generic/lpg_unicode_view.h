@@ -1,6 +1,6 @@
 #pragma once
-#include "lpg_unicode_string.h"
 #include "lpg_arithmetic.h"
+#include "lpg_unicode_string.h"
 #include <string.h>
 
 typedef struct unicode_view

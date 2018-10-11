@@ -1,8 +1,8 @@
 #include "test_value.h"
-#include "test.h"
-#include "lpg_value.h"
 #include "lpg_array_size.h"
 #include "lpg_standard_library.h"
+#include "lpg_value.h"
+#include "test.h"
 
 static void test_integer_comparison(void);
 

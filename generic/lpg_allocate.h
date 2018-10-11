@@ -1,8 +1,8 @@
 #pragma once
 #include "lpg_array_size.h"
-#include <stddef.h>
 #include "lpg_non_null.h"
 #include "lpg_use_result.h"
+#include <stddef.h>
 
 void *allocate(size_t size) LPG_USE_RESULT;
 void *allocate_array(size_t size, size_t element) LPG_USE_RESULT;

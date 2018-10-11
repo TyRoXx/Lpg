@@ -1,6 +1,6 @@
 #include "lpg_unicode_string.h"
-#include <string.h>
 #include "lpg_allocate.h"
+#include <string.h>
 
 unicode_string unicode_string_from_range(char const *data, size_t length)
 {

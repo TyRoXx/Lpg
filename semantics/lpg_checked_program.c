@@ -1,6 +1,6 @@
 #include "lpg_checked_program.h"
-#include "lpg_for.h"
 #include "lpg_allocate.h"
+#include "lpg_for.h"
 
 void checked_program_free(checked_program const *program)
 {

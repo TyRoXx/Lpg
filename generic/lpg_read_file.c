@@ -1,7 +1,7 @@
 #include "lpg_read_file.h"
-#include <stdio.h>
 #include "lpg_allocate.h"
 #include <stdint.h>
+#include <stdio.h>
 
 blob_or_error make_blob_success(blob success)
 {

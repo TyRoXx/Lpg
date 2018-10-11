@@ -1,6 +1,6 @@
 #pragma once
-#include <stddef.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 typedef size_t line_number;
 typedef size_t column_number;

@@ -1,7 +1,7 @@
 #include "test_thread.h"
-#include "test.h"
-#include "lpg_thread.h"
 #include "lpg_allocate.h"
+#include "lpg_thread.h"
+#include "test.h"
 
 static void trivial_thread_function(void *argument)
 {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "stdbool.h"
-#include "lpg_struct_member_id.h"
 #include "lpg_register.h"
+#include "lpg_struct_member_id.h"
 #include "lpg_type.h"
+#include "stdbool.h"
 
 typedef struct optional_capture_index
 {

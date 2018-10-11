@@ -1,8 +1,8 @@
 #pragma once
 
-#include <stdbool.h>
-#include <lpg_unicode_view.h>
 #include <lpg_stream_writer.h>
+#include <lpg_unicode_view.h>
+#include <stdbool.h>
 
 typedef struct decode_string_literal_result
 {

@@ -1,6 +1,6 @@
 #include "test.h"
-#include <stdio.h>
 #include "lpg_atomic.h"
+#include <stdio.h>
 
 static size_t total_checks;
 static size_t failures;

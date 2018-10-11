@@ -1,9 +1,9 @@
 #pragma once
 
+#include "lpg_checked_program.h"
 #include "lpg_local_variable.h"
 #include "lpg_program_check.h"
 #include "lpg_semantic_error.h"
-#include "lpg_checked_program.h"
 
 typedef void check_error_handler(complete_semantic_error, void *);
 

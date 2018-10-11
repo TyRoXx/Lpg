@@ -1,6 +1,6 @@
 #include "lpg_create_process.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
 #include "lpg_win32.h"
 
 #ifdef _WIN32
@@ -50,10 +50,10 @@ static win32_string build_command_line(unicode_view const executable, unicode_vi
     return result;
 }
 #else
-#include <unistd.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 #ifdef __linux__
 #include <sys/prctl.h>

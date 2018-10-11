@@ -1,5 +1,5 @@
-#include <lpg_allocate.h>
 #include "test_integer_range.h"
+#include <lpg_allocate.h>
 
 static void test_integer_range_size(void);
 static void test_integer_range_equals(void);

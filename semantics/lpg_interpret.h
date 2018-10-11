@@ -1,7 +1,7 @@
 #pragma once
-#include "lpg_value.h"
 #include "lpg_checked_program.h"
 #include "lpg_optional_function_id.h"
+#include "lpg_value.h"
 
 optional_value call_function(function_pointer_value const callee, function_call_arguments const arguments);
 

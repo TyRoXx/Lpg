@@ -4,10 +4,10 @@
 #include "lpg_garbage_collector.h"
 #include "lpg_generic_enum_id.h"
 #include "lpg_generic_interface_id.h"
-#include "lpg_integer.h"
-#include "lpg_type.h"
 #include "lpg_generic_lambda_id.h"
 #include "lpg_generic_struct_id.h"
+#include "lpg_integer.h"
+#include "lpg_type.h"
 
 typedef struct implementation_ref
 {
@@ -43,8 +43,7 @@ function_pointer_value function_pointer_value_from_internal(function_id const co
                                                             size_t const capture_count);
 bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right);
 
-typedef enum value_kind
-{
+typedef enum value_kind {
     value_kind_integer = 1,
     value_kind_string,
     value_kind_function_pointer,
@@ -111,8 +110,7 @@ bool array_value_equals(array_value const left, array_value const right);
 typedef struct value
 {
     value_kind kind;
-    union
-    {
+    union {
         structure_value structure;
         integer integer_;
         unicode_view string;

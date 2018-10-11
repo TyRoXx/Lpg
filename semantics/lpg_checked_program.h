@@ -1,10 +1,10 @@
 #pragma once
 #include "lpg_checked_function.h"
-#include "lpg_garbage_collector.h"
+#include "lpg_enum_id.h"
 #include "lpg_function_id.h"
+#include "lpg_garbage_collector.h"
 #include "lpg_interface_id.h"
 #include "lpg_struct_id.h"
-#include "lpg_enum_id.h"
 
 typedef struct checked_program
 {

@@ -1,6 +1,6 @@
 #include "test_identifier.h"
-#include "test.h"
 #include "lpg_identifier.h"
+#include "test.h"
 
 static int check_identifier(char const *candidate)
 {

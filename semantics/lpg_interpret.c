@@ -1,11 +1,11 @@
 #include "lpg_interpret.h"
-#include "lpg_for.h"
-#include "lpg_assert.h"
 #include "lpg_allocate.h"
+#include "lpg_assert.h"
+#include "lpg_for.h"
 #include "lpg_instruction.h"
-#include <string.h>
 #include "lpg_optional_function_id.h"
 #include "lpg_standard_library.h"
+#include <string.h>
 
 static optional_value call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
                                                 optional_value const self, value *const arguments, value const *globals,
@@ -13,8 +13,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
                                                 checked_function const *const all_functions,
                                                 lpg_interface const *const all_interfaces);
 
-typedef enum run_sequence_result
-{
+typedef enum run_sequence_result {
     run_sequence_result_break = 1,
     run_sequence_result_continue,
     run_sequence_result_return,

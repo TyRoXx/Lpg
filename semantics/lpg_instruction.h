@@ -1,15 +1,14 @@
 #pragma once
-#include "lpg_register.h"
-#include "lpg_struct_member_id.h"
+#include "lpg_function_id.h"
 #include "lpg_instruction_sequence.h"
 #include "lpg_integer.h"
+#include "lpg_register.h"
+#include "lpg_struct_member_id.h"
 #include "lpg_value.h"
-#include "lpg_function_id.h"
 
 typedef struct instruction instruction;
 
-typedef enum instruction_type
-{
+typedef enum instruction_type {
     instruction_call = 1,
     instruction_loop,
     instruction_global,
@@ -195,8 +194,7 @@ bool current_function_instruction_equals(current_function_instruction const left
 struct instruction
 {
     instruction_type type;
-    union
-    {
+    union {
         loop_instruction loop;
         call_instruction call;
         return_instruction return_;
@@ -217,8 +215,7 @@ struct instruction
     };
 };
 
-typedef enum match_instruction_case_kind
-{
+typedef enum match_instruction_case_kind {
     match_instruction_case_kind_value = 1,
     match_instruction_case_kind_stateful_enum
 } match_instruction_case_kind;
@@ -235,8 +232,7 @@ match_instruction_case_stateful_enum match_instruction_case_stateful_enum_create
 struct match_instruction_case
 {
     match_instruction_case_kind kind;
-    union
-    {
+    union {
         register_id key_value;
         match_instruction_case_stateful_enum stateful_enum;
     };

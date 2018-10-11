@@ -1,7 +1,7 @@
 #pragma once
+#include "lpg_std_string.h"
 #include <stdbool.h>
 #include <stdint.h>
-#include "lpg_std_string.h"
 #include <stdio.h>
 
 static size_t integer_equals(uint64_t const left, uint64_t const right)

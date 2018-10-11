@@ -1,15 +1,15 @@
 #include "test_c_backend.h"
-#include "test.h"
-#include "lpg_check.h"
-#include "handle_parse_error.h"
-#include <string.h>
-#include "lpg_standard_library.h"
-#include "lpg_c_backend.h"
-#include "lpg_read_file.h"
-#include "lpg_allocate.h"
-#include <stdio.h>
 #include "find_builtin_module_directory.h"
+#include "handle_parse_error.h"
+#include "lpg_allocate.h"
+#include "lpg_c_backend.h"
+#include "lpg_check.h"
 #include "lpg_optimize.h"
+#include "lpg_read_file.h"
+#include "lpg_standard_library.h"
+#include "test.h"
+#include <stdio.h>
+#include <string.h>
 
 static sequence parse(unicode_view const input)
 {

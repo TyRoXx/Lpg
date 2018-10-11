@@ -1,15 +1,15 @@
 #include "lpg_check.h"
-#include "lpg_for.h"
 #include "lpg_allocate.h"
-#include "lpg_value.h"
-#include "lpg_instruction.h"
-#include "lpg_structure_member.h"
-#include "lpg_string_literal.h"
-#include "lpg_interpret.h"
-#include <string.h>
-#include "lpg_local_variable.h"
-#include "lpg_instruction_checkpoint.h"
+#include "lpg_for.h"
 #include "lpg_function_checking_state.h"
+#include "lpg_instruction.h"
+#include "lpg_instruction_checkpoint.h"
+#include "lpg_interpret.h"
+#include "lpg_local_variable.h"
+#include "lpg_string_literal.h"
+#include "lpg_structure_member.h"
+#include "lpg_value.h"
+#include <string.h>
 
 check_function_result check_function_result_create(checked_function function, capture *captures, size_t capture_count)
 {
@@ -1541,8 +1541,7 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     integer_range_list_deallocate(integer_ranges);
 }
 
-typedef enum pattern_evaluate_result_kind
-{
+typedef enum pattern_evaluate_result_kind {
     pattern_evaluate_result_kind_is_pattern = 1,
     pattern_evaluate_result_kind_no_pattern,
     pattern_evaluate_result_kind_failure

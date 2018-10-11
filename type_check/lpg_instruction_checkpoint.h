@@ -1,7 +1,7 @@
 #pragma once
-#include "lpg_register.h"
-#include "lpg_instruction_sequence.h"
 #include "lpg_function_checking_state.h"
+#include "lpg_instruction_sequence.h"
+#include "lpg_register.h"
 
 typedef struct instruction_checkpoint
 {

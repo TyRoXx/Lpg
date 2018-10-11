@@ -1,6 +1,6 @@
 #pragma once
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 #define LPG_DEBUG_BREAK() __debugbreak()

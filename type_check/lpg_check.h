@@ -1,11 +1,11 @@
 #pragma once
-#include "lpg_parse_expression.h"
 #include "lpg_checked_program.h"
-#include "lpg_semantic_error.h"
-#include "lpg_program_check.h"
-#include "lpg_load_module.h"
 #include "lpg_function_checking_state.h"
+#include "lpg_load_module.h"
 #include "lpg_optional_function_id.h"
+#include "lpg_parse_expression.h"
+#include "lpg_program_check.h"
+#include "lpg_semantic_error.h"
 
 typedef struct check_function_result
 {

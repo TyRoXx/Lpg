@@ -1,7 +1,7 @@
 #include "lpg_instruction_sequence.h"
+#include "lpg_allocate.h"
 #include "lpg_for.h"
 #include "lpg_instruction.h"
-#include "lpg_allocate.h"
 
 instruction_sequence instruction_sequence_create(instruction *elements, size_t length)
 {

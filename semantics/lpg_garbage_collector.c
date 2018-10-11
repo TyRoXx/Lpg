@@ -1,7 +1,7 @@
 #include "lpg_garbage_collector.h"
 #include "lpg_allocate.h"
-#include "lpg_stream_writer.h"
 #include "lpg_assert.h"
+#include "lpg_stream_writer.h"
 
 enum
 {

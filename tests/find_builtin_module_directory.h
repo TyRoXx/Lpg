@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lpg_path.h"
 #include "lpg_array_size.h"
+#include "lpg_path.h"
 
 static unicode_string find_builtin_module_directory(void)
 {

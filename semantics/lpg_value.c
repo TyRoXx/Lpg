@@ -1,6 +1,6 @@
+#include "lpg_value.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
-#include "lpg_value.h"
 
 implementation_ref implementation_ref_create(interface_id const target, size_t implementation_index)
 {

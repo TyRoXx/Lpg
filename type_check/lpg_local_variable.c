@@ -1,9 +1,9 @@
-#include <lpg_source_location.h>
 #include "lpg_local_variable.h"
 #include "lpg_allocate.h"
 #include "lpg_for.h"
-#include "lpg_instruction.h"
 #include "lpg_function_checking_state.h"
+#include "lpg_instruction.h"
+#include <lpg_source_location.h>
 
 local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
                                      optional_value compile_time_value, register_id where,

@@ -1,8 +1,8 @@
-#include <lpg_type.h>
 #include "test_expression.h"
+#include "lpg_allocate.h"
 #include "lpg_expression.h"
 #include "test.h"
-#include "lpg_allocate.h"
+#include <lpg_type.h>
 
 static void test_equal(expression left, expression right)
 {

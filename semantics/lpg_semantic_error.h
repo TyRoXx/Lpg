@@ -2,8 +2,7 @@
 #include "lpg_source_location.h"
 #include "lpg_unicode_view.h"
 
-typedef enum semantic_error_type
-{
+typedef enum semantic_error_type {
     semantic_error_unknown_element = 1,
     semantic_error_expected_compile_time_type,
     semantic_error_no_members_on_enum_elements,

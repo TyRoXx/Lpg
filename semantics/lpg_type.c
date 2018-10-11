@@ -1,9 +1,9 @@
 #include "lpg_type.h"
-#include "lpg_for.h"
 #include "lpg_allocate.h"
-#include "lpg_structure_member.h"
 #include "lpg_assert.h"
 #include "lpg_expression.h"
+#include "lpg_for.h"
+#include "lpg_structure_member.h"
 
 structure structure_create(structure_member *members, struct_member_id count)
 {

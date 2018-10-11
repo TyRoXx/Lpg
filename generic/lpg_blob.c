@@ -1,6 +1,6 @@
 #include "lpg_blob.h"
-#include <string.h>
 #include "lpg_allocate.h"
+#include <string.h>
 
 blob blob_from_range(char const *data, size_t length)
 {

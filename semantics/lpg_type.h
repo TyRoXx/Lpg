@@ -1,15 +1,15 @@
 #pragma once
 
-#include "lpg_unicode_string.h"
-#include "lpg_struct_member_id.h"
 #include "lpg_enum_element_id.h"
-#include "lpg_integer.h"
-#include "lpg_garbage_collector.h"
+#include "lpg_enum_id.h"
 #include "lpg_function_id.h"
+#include "lpg_garbage_collector.h"
+#include "lpg_integer.h"
+#include "lpg_integer_range.h"
 #include "lpg_interface_id.h"
 #include "lpg_struct_id.h"
-#include "lpg_integer_range.h"
-#include "lpg_enum_id.h"
+#include "lpg_struct_member_id.h"
+#include "lpg_unicode_string.h"
 
 typedef struct structure_member structure_member;
 
@@ -60,8 +60,7 @@ lpg_interface interface_create(method_description *methods, function_id method_c
                                implementation_entry *implementations, size_t implementation_count);
 void interface_free(lpg_interface const value);
 
-typedef enum type_kind
-{
+typedef enum type_kind {
     type_kind_structure = 1,
     type_kind_function_pointer,
     type_kind_unit,
@@ -104,8 +103,7 @@ bool method_pointer_type_equals(method_pointer_type const left, method_pointer_t
 struct type
 {
     type_kind kind;
-    union
-    {
+    union {
         struct_id structure_;
         function_pointer const *function_pointer_;
         enum_id enum_;

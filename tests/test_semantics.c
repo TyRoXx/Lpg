@@ -1,16 +1,16 @@
 #include "test_semantics.h"
-#include "test.h"
-#include "lpg_check.h"
-#include "lpg_allocate.h"
-#include <string.h>
+#include "find_builtin_module_directory.h"
 #include "handle_parse_error.h"
+#include "lpg_allocate.h"
+#include "lpg_check.h"
 #include "lpg_for.h"
 #include "lpg_instruction.h"
-#include "lpg_structure_member.h"
 #include "lpg_standard_library.h"
-#include <stdio.h>
+#include "lpg_structure_member.h"
 #include "print_instruction.h"
-#include "find_builtin_module_directory.h"
+#include "test.h"
+#include <stdio.h>
+#include <string.h>
 
 static sequence parse(char const *input)
 {

@@ -1,7 +1,7 @@
-#include <lpg_string_literal.h>
-#include <string.h>
 #include "test_decode_string_literal.h"
 #include "test.h"
+#include <lpg_string_literal.h>
+#include <string.h>
 
 static decode_string_literal_result expect_decoded_content(char const *string, char const *expected_content)
 {

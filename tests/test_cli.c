@@ -1,11 +1,11 @@
 #include "test_cli.h"
-#include "test.h"
-#include "lpg_cli.h"
-#include "lpg_array_size.h"
+#include "find_builtin_module_directory.h"
 #include "lpg_allocate.h"
+#include "lpg_array_size.h"
+#include "lpg_cli.h"
 #include "lpg_read_file.h"
 #include "lpg_write_file.h"
-#include "find_builtin_module_directory.h"
+#include "test.h"
 #include <stdio.h>
 #include <string.h>
 #ifndef _WIN32

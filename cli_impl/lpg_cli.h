@@ -1,9 +1,8 @@
 #pragma once
-#include <stdbool.h>
 #include "lpg_stream_writer.h"
+#include <stdbool.h>
 
-typedef enum compiler_command
-{
+typedef enum compiler_command {
     compiler_command_run = 1,
     compiler_command_compile,
     compiler_command_format,

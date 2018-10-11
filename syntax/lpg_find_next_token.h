@@ -1,6 +1,6 @@
 #pragma once
-#include "lpg_source_location.h"
 #include "lpg_parse_expression.h"
+#include "lpg_source_location.h"
 
 typedef struct parser_user
 {

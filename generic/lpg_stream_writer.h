@@ -1,12 +1,12 @@
 #pragma once
 
+#include "lpg_integer.h"
+#include "lpg_non_null.h"
 #include "lpg_try.h"
 #include "lpg_unicode_string.h"
-#include <stdbool.h>
 #include "lpg_unicode_view.h"
-#include "lpg_non_null.h"
 #include "lpg_use_result.h"
-#include "lpg_integer.h"
+#include <stdbool.h>
 
 typedef struct stream_writer
 {

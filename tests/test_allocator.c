@@ -1,6 +1,6 @@
 #include "test_allocator.h"
-#include "test.h"
 #include "lpg_allocate.h"
+#include "test.h"
 #include <string.h>
 
 void test_allocator(void)

@@ -1,15 +1,15 @@
 #include "test_remove_dead_code.h"
-#include "test.h"
-#include "print_instruction.h"
-#include "lpg_remove_dead_code.h"
-#include <string.h>
-#include <stdio.h>
-#include "lpg_check.h"
-#include "handle_parse_error.h"
-#include "lpg_standard_library.h"
-#include "lpg_instruction.h"
-#include "lpg_allocate.h"
 #include "find_builtin_module_directory.h"
+#include "handle_parse_error.h"
+#include "lpg_allocate.h"
+#include "lpg_check.h"
+#include "lpg_instruction.h"
+#include "lpg_remove_dead_code.h"
+#include "lpg_standard_library.h"
+#include "print_instruction.h"
+#include "test.h"
+#include <stdio.h>
+#include <string.h>
 
 static sequence parse(char const *input)
 {

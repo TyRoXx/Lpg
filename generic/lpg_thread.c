@@ -3,8 +3,8 @@
 #include "lpg_assert.h"
 #ifdef _WIN32
 #include <Windows.h>
-#include <process.h>
 #include <handleapi.h>
+#include <process.h>
 
 typedef struct lpg_thread_impl
 {
