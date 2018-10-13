@@ -150,6 +150,25 @@ static success_indicator generate_lambda_value_from_values(checked_function cons
     return success_yes;
 }
 
+static success_indicator generate_array_value(array_value const generated, checked_function const *all_functions,
+                                              function_id const function_count,
+                                              lpg_interface const *const all_interfaces,
+                                              structure const *const all_structs, stream_writer const ecmascript_output)
+{
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "new new_array(["));
+    for (size_t i = 0; i < generated.count; ++i)
+    {
+        if (i > 0)
+        {
+            LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+        }
+        LPG_TRY(generate_value(generated.elements[i], generated.element_type, all_functions, function_count,
+                               all_interfaces, all_structs, ecmascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "])"));
+    return success_yes;
+}
+
 static success_indicator generate_value(value const generated, type const type_of,
                                         checked_function const *all_functions, function_id const function_count,
                                         lpg_interface const *const all_interfaces, structure const *const all_structs,
@@ -158,6 +177,9 @@ static success_indicator generate_value(value const generated, type const type_o
     switch (generated.kind)
     {
     case value_kind_array:
+        return generate_array_value(
+            *generated.array, all_functions, function_count, all_interfaces, all_structs, ecmascript_output);
+
     case value_kind_pattern:
         LPG_TO_DO();
 
@@ -1127,8 +1149,8 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                            " var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"
                            " var side_effect = function () {};\n"
                            " var integer_to_string = function (input) { return \"\" + input; };\n"
-                           " var new_array = function () {\n"
-                           "     this.content = [];\n"
+                           " var new_array = function (initial_content) {\n"
+                           "     this.content = initial_content || [];\n"
                            " };\n"
                            /* size()*/
                            " new_array.prototype.call_method_0 = function () {\n"

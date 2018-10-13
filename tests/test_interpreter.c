@@ -474,6 +474,7 @@ void test_interpreter(void)
                                                  "raw-string-literal.lpg",
                                                  "recursion.lpg",
                                                  "return.lpg",
+                                                 "set.lpg",
                                                  "std.lpg",
                                                  "string-equals.lpg",
                                                  "struct-compile-time.lpg",

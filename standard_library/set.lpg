@@ -1,0 +1,44 @@
+let std = import std
+
+let set = interface[T]
+    contains(key: T): std.boolean
+
+let set-mutator = interface[T]
+    remove(key: T): std.boolean
+    add(key: T): std.boolean
+    clear(): std.unit
+
+let set-created = struct[T]
+    read: set[T]
+    write: set-mutator[T]
+
+let linear-set = struct[T]
+    elements: std.array[T]
+
+impl[T] set[T] for linear-set[T]
+    contains(key: T): std.boolean
+        //TODO
+
+impl[T] set-mutator[T] for linear-set[T]
+    remove(key: T): std.boolean
+        //TODO
+    add(key: T): std.boolean
+        let reader : set[T] = self
+        match reader.contains(key)
+            case std.boolean.true:
+                std.boolean.false
+            case std.boolean.false:
+                assert(self.elements.push(key))
+                std.boolean.true
+    clear(): std.unit
+        self.elements.clear()
+
+let make-linear-set = [T](): set-created[T]
+    let content = linear-set[T]{new-array(T)}
+    set-created[T]{content, content}
+
+let export = struct
+    set: type-of(set)
+    set-mutator: type-of(set-mutator)
+    make-linear-set: type-of(make-linear-set)
+export{set, set-mutator, make-linear-set}
