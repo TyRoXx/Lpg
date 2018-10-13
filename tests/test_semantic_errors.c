@@ -755,6 +755,48 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_method, source_location_create(3, 0))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "impl i for std.unit\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_method, source_location_create(4, 0))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "    g(): std.unit\n"
+                                               "impl i for std.unit\n"
+                                               "    f(): std.unit\n"
+                                               "        fail()\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_method, source_location_create(4, 0))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    f(): std.unit\n"
+                                               "    g(): std.unit\n"
+                                               "impl i for std.unit\n"
+                                               "    g(): std.unit\n"
+                                               "        fail()\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
             semantic_error_create(semantic_error_expected_interface, source_location_create(1, 5))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"

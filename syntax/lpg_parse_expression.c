@@ -1348,7 +1348,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
     }
 }
 
-static expression_parser_result parse_impl(expression_parser *const parser, size_t const indentation)
+static expression_parser_result parse_impl(expression_parser *const parser, size_t const indentation,
+                                           source_location const impl_keyword)
 {
     generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
 
@@ -1482,7 +1483,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         ++method_count;
     }
     impl_expression const impl =
-        impl_expression_create(generic_parameters, expression_allocate(implemented_interface.success),
+        impl_expression_create(impl_keyword, generic_parameters, expression_allocate(implemented_interface.success),
                                expression_allocate(self.success), methods, method_count);
     if (is_success)
     {
@@ -1588,7 +1589,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
         if (head.token == token_impl)
         {
             pop(parser);
-            return parse_impl(parser, indentation);
+            return parse_impl(parser, indentation, head.where);
         }
     }
     return parse_returnable(parser, indentation, true);

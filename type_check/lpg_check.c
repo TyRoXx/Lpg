@@ -964,9 +964,10 @@ static optional_size find_implementation(lpg_interface const *const in, type con
 }
 
 static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
-                                        impl_expression_method const *const method_trees, size_t const method_count,
-                                        type const self, interface_id const target_interface,
-                                        source_location const self_source);
+                                        impl_expression_method const *const method_trees,
+                                        size_t const defined_method_count, type const self,
+                                        interface_id const target_interface, source_location const self_source,
+                                        source_location const impl_begin);
 
 static void use_generic_closures(function_checking_state *const state, generic_closures const closures)
 {
@@ -1004,7 +1005,7 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
     use_generic_closures(&interface_checking, closures);
     optional_size const evaluated =
         evaluate_impl_core(&interface_checking, &ignored_instructions, tree.methods, tree.method_count, self,
-                           target_interface, expression_source_begin(*tree.self));
+                           target_interface, expression_source_begin(*tree.self), tree.begin);
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(interface_checking.local_variables);
     if (interface_checking.register_compile_time_values)
@@ -2961,9 +2962,10 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
 }
 
 static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
-                                        impl_expression_method const *const method_trees, size_t const method_count,
-                                        type const self, interface_id const target_interface,
-                                        source_location const self_source)
+                                        impl_expression_method const *const method_trees,
+                                        size_t const defined_method_count, type const self,
+                                        interface_id const target_interface, source_location const self_source,
+                                        source_location const impl_begin)
 {
     size_t impl_id;
     {
@@ -2979,8 +2981,8 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
         impl_id = begin_implementation(implemented_interface, self);
     }
 
-    function_pointer_value *const methods = allocate_array(method_count, sizeof(*methods));
-    for (size_t i = 0; i < method_count; ++i)
+    function_pointer_value *const methods = allocate_array(defined_method_count, sizeof(*methods));
+    for (size_t i = 0; i < defined_method_count; ++i)
     {
         method_evaluation_result const method = evaluate_method_definition(
             state, function, method_trees[i], self, state->program->interfaces[target_interface].methods[i].result);
@@ -2992,8 +2994,18 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
         methods[i] = method.success;
     }
 
+    if (defined_method_count < state->program->interfaces[target_interface].method_count)
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_method, impl_begin));
+        if (methods)
+        {
+            deallocate(methods);
+        }
+        return optional_size_empty;
+    }
+
     lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
-    finish_implementation(implemented_interface, impl_id, implementation_create(methods, method_count));
+    finish_implementation(implemented_interface, impl_id, implementation_create(methods, defined_method_count));
     return make_optional_size(impl_id);
 }
 
@@ -3030,7 +3042,8 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
 
     restore(previous_code);
     evaluate_impl_core(state, function, element.methods, element.method_count, self,
-                       interface_evaluated.compile_time_value.interface_, expression_source_begin(*element.self));
+                       interface_evaluated.compile_time_value.interface_, expression_source_begin(*element.self),
+                       element.begin);
     return make_unit(&state->used_registers, function);
 }
 

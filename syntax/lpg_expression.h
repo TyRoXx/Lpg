@@ -261,6 +261,7 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
 
 typedef struct impl_expression
 {
+    source_location begin;
     generic_parameter_list generic_parameters;
     expression *interface_;
     expression *self;
@@ -268,8 +269,9 @@ typedef struct impl_expression
     size_t method_count;
 } impl_expression;
 
-impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface_,
-                                       expression *self, impl_expression_method *methods, size_t method_count);
+impl_expression impl_expression_create(source_location begin, generic_parameter_list generic_parameters,
+                                       expression *interface_, expression *self, impl_expression_method *methods,
+                                       size_t method_count);
 void impl_expression_free(impl_expression value);
 bool impl_expression_equals(impl_expression const left, impl_expression const right);
 impl_expression impl_expression_clone(impl_expression const original);

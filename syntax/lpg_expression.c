@@ -433,10 +433,11 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
                                          function_header_tree_clone(original.header), sequence_clone(original.body));
 }
 
-impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface_,
-                                       expression *self, impl_expression_method *methods, size_t method_count)
+impl_expression impl_expression_create(source_location begin, generic_parameter_list generic_parameters,
+                                       expression *interface_, expression *self, impl_expression_method *methods,
+                                       size_t method_count)
 {
-    impl_expression const result = {generic_parameters, interface_, self, methods, method_count};
+    impl_expression const result = {begin, generic_parameters, interface_, self, methods, method_count};
     return result;
 }
 
@@ -483,7 +484,7 @@ impl_expression impl_expression_clone(impl_expression const original)
     {
         methods[i] = impl_expression_method_clone(original.methods[i]);
     }
-    return impl_expression_create(generic_parameter_list_clone(original.generic_parameters),
+    return impl_expression_create(original.begin, generic_parameter_list_clone(original.generic_parameters),
                                   expression_allocate(expression_clone(*original.interface_)),
                                   expression_allocate(expression_clone(*original.self)), methods,
                                   original.method_count);
