@@ -295,7 +295,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_impl:
     {
         LPG_TRY(stream_writer_write_string(to, "impl "));
-        LPG_TRY(save_expression(to, value->impl.interface, whitespace));
+        LPG_TRY(save_expression(to, value->impl.interface_, whitespace));
         LPG_TRY(stream_writer_write_string(to, " for "));
         LPG_TRY(save_expression(to, value->impl.self, whitespace));
         whitespace_state in_impl = go_deeper(whitespace, 1);
@@ -357,13 +357,13 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     {
         LPG_TRY(stream_writer_write_string(to, "interface"));
         whitespace_state in_interface = go_deeper(whitespace, 1);
-        for (size_t i = 0; i < value->interface.method_count; ++i)
+        for (size_t i = 0; i < value->interface_.method_count; ++i)
         {
             LPG_TRY(stream_writer_write_string(to, "\n"));
             LPG_TRY(indent(to, in_interface));
-            LPG_TRY(
-                stream_writer_write_unicode_view(to, unicode_view_from_string(value->interface.methods[i].name.value)));
-            LPG_TRY(save_function_header(to, value->interface.methods[i].header, whitespace));
+            LPG_TRY(stream_writer_write_unicode_view(
+                to, unicode_view_from_string(value->interface_.methods[i].name.value)));
+            LPG_TRY(save_function_header(to, value->interface_.methods[i].header, whitespace));
         }
         return success_yes;
     }

@@ -265,13 +265,13 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
 typedef struct impl_expression
 {
     generic_parameter_list generic_parameters;
-    expression *interface;
+    expression *interface_;
     expression *self;
     impl_expression_method *methods;
     size_t method_count;
 } impl_expression;
 
-impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface,
+impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface_,
                                        expression *self, impl_expression_method *methods, size_t method_count);
 void impl_expression_free(impl_expression value);
 bool impl_expression_equals(impl_expression const left, impl_expression const right);
@@ -432,7 +432,7 @@ struct expression
         declare declare;
         tuple tuple;
         comment_expression comment;
-        interface_expression interface;
+        interface_expression interface_;
         struct_expression struct_;
         impl_expression impl;
         /*for monostate expressions like break:*/

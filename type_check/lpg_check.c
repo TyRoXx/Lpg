@@ -2334,9 +2334,9 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         break;
 
     case expression_type_interface:
-        for (size_t i = 0; i < from.interface.method_count; ++i)
+        for (size_t i = 0; i < from.interface_.method_count; ++i)
         {
-            find_generic_closures_in_function_header(closures, state, from.interface.methods[i].header);
+            find_generic_closures_in_function_header(closures, state, from.interface_.methods[i].header);
         }
         break;
 
@@ -2348,7 +2348,7 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         break;
 
     case expression_type_impl:
-        find_generic_closures_in_expression(closures, state, *from.impl.interface);
+        find_generic_closures_in_expression(closures, state, *from.impl.interface_);
         find_generic_closures_in_expression(closures, state, *from.impl.self);
         for (size_t i = 0; i < from.impl.method_count; ++i)
         {
@@ -2388,7 +2388,7 @@ static void find_generic_closures_in_expression(generic_closures *const closures
 static generic_closures find_generic_closures_in_impl(function_checking_state *const state, impl_expression const from)
 {
     generic_closures result = {NULL, 0};
-    find_generic_closures_in_expression(&result, state, *from.interface);
+    find_generic_closures_in_expression(&result, state, *from.interface_);
     find_generic_closures_in_expression(&result, state, *from.self);
     for (size_t i = 0; i < from.method_count; ++i)
     {
@@ -2686,7 +2686,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
                                                                      instruction_sequence *const function,
                                                                      impl_expression const element)
 {
-    generic_instantiation_expression const interface_instantiation = element.interface->generic_instantiation;
+    generic_instantiation_expression const interface_instantiation = element.interface_->generic_instantiation;
     if (interface_instantiation.count != element.generic_parameters.count)
     {
         LPG_TO_DO();
@@ -2844,20 +2844,20 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
 {
     if (element.self->type == expression_type_generic_instantiation)
     {
-        if (element.interface->type == expression_type_generic_instantiation)
+        if (element.interface_->type == expression_type_generic_instantiation)
         {
-            return evaluate_fully_generic_impl(state, function, element.interface->generic_instantiation,
+            return evaluate_fully_generic_impl(state, function, element.interface_->generic_instantiation,
                                                element.self->generic_instantiation, element);
         }
         else
         {
             return evaluate_generic_impl_regular_interface(
-                state, function, *element.interface, element.self->generic_instantiation, element);
+                state, function, *element.interface_, element.self->generic_instantiation, element);
         }
     }
     else
     {
-        if (element.interface->type == expression_type_generic_instantiation)
+        if (element.interface_->type == expression_type_generic_instantiation)
         {
             return evaluate_generic_impl_regular_self(state, function, element);
         }
@@ -2911,15 +2911,15 @@ static evaluate_expression_result evaluate_impl(function_checking_state *state, 
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
 
     compile_time_type_expression_result const interface_evaluated =
-        expect_compile_time_type(state, function, *element.interface);
+        expect_compile_time_type(state, function, *element.interface_);
     if (!interface_evaluated.has_value)
     {
         return evaluate_expression_result_empty;
     }
     if (interface_evaluated.compile_time_value.kind != type_kind_interface)
     {
-        emit_semantic_error(state, semantic_error_create(
-                                       semantic_error_expected_interface, expression_source_begin(*element.interface)));
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_interface,
+                                                         expression_source_begin(*element.interface_)));
         return evaluate_expression_result_empty;
     }
 
@@ -4047,7 +4047,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         return evaluate_instantiate_struct(state, function, element.instantiate_struct);
 
     case expression_type_interface:
-        return evaluate_interface(state, function, element.interface, early_initialized_variable);
+        return evaluate_interface(state, function, element.interface_, early_initialized_variable);
 
     case expression_type_impl:
         return evaluate_impl(state, function, element.impl);

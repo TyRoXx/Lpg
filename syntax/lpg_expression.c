@@ -433,17 +433,17 @@ impl_expression_method impl_expression_method_clone(impl_expression_method const
                                          function_header_tree_clone(original.header), sequence_clone(original.body));
 }
 
-impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface,
+impl_expression impl_expression_create(generic_parameter_list generic_parameters, expression *interface_,
                                        expression *self, impl_expression_method *methods, size_t method_count)
 {
-    impl_expression const result = {generic_parameters, interface, self, methods, method_count};
+    impl_expression const result = {generic_parameters, interface_, self, methods, method_count};
     return result;
 }
 
 void impl_expression_free(impl_expression value)
 {
     generic_parameter_list_free(value.generic_parameters);
-    expression_deallocate(value.interface);
+    expression_deallocate(value.interface_);
     expression_deallocate(value.self);
     for (size_t i = 0; i < value.method_count; ++i)
     {
@@ -461,7 +461,7 @@ bool impl_expression_equals(impl_expression const left, impl_expression const ri
     {
         return false;
     }
-    if (!expression_equals(left.interface, right.interface) || !expression_equals(left.self, right.self) ||
+    if (!expression_equals(left.interface_, right.interface_) || !expression_equals(left.self, right.self) ||
         (left.method_count != right.method_count))
     {
         return false;
@@ -484,7 +484,7 @@ impl_expression impl_expression_clone(impl_expression const original)
         methods[i] = impl_expression_method_clone(original.methods[i]);
     }
     return impl_expression_create(generic_parameter_list_clone(original.generic_parameters),
-                                  expression_allocate(expression_clone(*original.interface)),
+                                  expression_allocate(expression_clone(*original.interface_)),
                                   expression_allocate(expression_clone(*original.self)), methods,
                                   original.method_count);
 }
@@ -688,7 +688,7 @@ source_location expression_source_begin(expression const value)
         return expression_source_begin(*value.instantiate_struct.type);
 
     case expression_type_interface:
-        return value.interface.source;
+        return value.interface_.source;
 
     case expression_type_call:
         return expression_source_begin(*value.call.callee);
@@ -1132,7 +1132,7 @@ expression expression_from_interface(interface_expression value)
 {
     expression result;
     result.type = expression_type_interface;
-    result.interface = value;
+    result.interface_ = value;
     return result;
 }
 
@@ -1302,7 +1302,7 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_interface:
-        interface_expression_free(this->interface);
+        interface_expression_free(this->interface_);
         break;
 
     case expression_type_impl:
@@ -1378,7 +1378,7 @@ expression expression_clone(expression const original)
         return expression_from_not(not_clone(original.not));
 
     case expression_type_interface:
-        return expression_from_interface(interface_expression_clone(original.interface));
+        return expression_from_interface(interface_expression_clone(original.interface_));
 
     case expression_type_impl:
         return expression_from_impl(impl_expression_clone(original.impl));
@@ -1482,7 +1482,7 @@ bool expression_equals(expression const *left, expression const *right)
         return instantiate_struct_expression_equals(left->instantiate_struct, right->instantiate_struct);
 
     case expression_type_interface:
-        return interface_expression_equals(left->interface, right->interface);
+        return interface_expression_equals(left->interface_, right->interface_);
 
     case expression_type_lambda:
         return lambda_equals(left->lambda, right->lambda);
