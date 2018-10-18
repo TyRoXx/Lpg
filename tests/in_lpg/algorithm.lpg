@@ -1,0 +1,9 @@
+let algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer-equals(0, element))
+//TODO
+//algorithm.enumerate[type-of(handler_a)](0, 0, handler_a)

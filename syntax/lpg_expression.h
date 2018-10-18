@@ -401,6 +401,7 @@ typedef struct type_of_expression
 type_of_expression type_of_expression_create(source_location begin, expression *target);
 void type_of_expression_free(type_of_expression const freed);
 bool type_of_expression_equals(type_of_expression const left, type_of_expression const right);
+type_of_expression type_of_expression_clone(type_of_expression const original);
 
 typedef struct import_expression
 {

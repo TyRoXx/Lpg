@@ -431,7 +431,8 @@ void test_interpreter(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&executable_path);
 
-        static char const *const test_files[] = {"array-boolean.lpg",
+        static char const *const test_files[] = {"algorithm.lpg",
+                                                 "array-boolean.lpg",
                                                  "array-nesting.lpg",
                                                  "array-string.lpg",
                                                  "boolean.lpg",
@@ -443,6 +444,7 @@ void test_interpreter(void)
                                                  "enum-generic.lpg",
                                                  "enum-stateful.lpg",
                                                  "enum-stateless.lpg",
+                                                 "equality.lpg",
                                                  "fail.lpg",
                                                  "function-pointer.lpg",
                                                  "generic-impl-generic-self.lpg",

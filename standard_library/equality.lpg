@@ -1,0 +1,17 @@
+let equality_comparison = interface[T]
+    equals(other: T): boolean
+
+let integers = import integer
+let integer = integers.integer
+impl equality_comparison[integer] for integer
+    equals(other: integer): boolean
+        integer-equals(other, self)
+
+let equals = [T](first: T, second: T): boolean
+    let comparison : equality_comparison[T] = first
+    comparison.equals(second)
+
+let export = struct
+    equality_comparison: type-of(equality_comparison)
+    equals: type-of(equals)
+export{equality_comparison, equals}

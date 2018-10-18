@@ -1,0 +1,4 @@
+let integer = int(0, 340282366920938463463374607431768211455)
+let export = struct
+    integer: type-of(integer)
+export{integer}

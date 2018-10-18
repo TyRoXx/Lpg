@@ -941,6 +941,12 @@ bool type_of_expression_equals(type_of_expression const left, type_of_expression
     return source_location_equals(left.begin, right.begin) && expression_equals(left.target, right.target);
 }
 
+type_of_expression type_of_expression_clone(type_of_expression const original)
+{
+    ASSUME(original.target);
+    return type_of_expression_create(original.begin, expression_allocate(expression_clone(*original.target)));
+}
+
 import_expression import_expression_create(source_location begin, identifier_expression name)
 {
     import_expression const result = {begin, name};
@@ -1386,9 +1392,11 @@ expression expression_clone(expression const original)
     case expression_type_placeholder:
         return expression_from_placeholder(placeholder_expression_clone(original.placeholder));
 
+    case expression_type_type_of:
+        return expression_from_type_of(type_of_expression_clone(original.type_of));
+
     case expression_type_binary:
     case expression_type_return:
-    case expression_type_type_of:
     case expression_type_import:
         LPG_TO_DO();
     }

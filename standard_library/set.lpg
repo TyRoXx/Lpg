@@ -1,4 +1,6 @@
 let std = import std
+let algorithm = import algorithm
+let equality = import equality
 
 let set = interface[T]
     contains(key: T): std.boolean
@@ -11,7 +13,9 @@ let linear-set = struct[T]
 
 impl[T] set[T] for linear-set[T]
     contains(key: T): std.boolean
-        //TODO
+        let test_element = (element: T): boolean
+            equality.equals[T](element, key)
+        algorithm.any_of[T, type-of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
         //TODO
     add(key: T): std.boolean

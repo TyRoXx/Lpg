@@ -2257,6 +2257,9 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         break;
 
     case expression_type_type_of:
+        find_generic_closures_in_expression(closures, state, *from.type_of.target);
+        break;
+
     case expression_type_import:
     case expression_type_binary:
         LPG_TO_DO();
