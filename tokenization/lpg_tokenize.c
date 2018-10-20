@@ -348,11 +348,10 @@ static tokenize_result tokenize_space(const char *input, size_t length)
         {
             ++i;
         }
-        if (i < spaces_for_indentation)
+        if (i >= spaces_for_indentation)
         {
-            return make_success(token_space, 1);
+            return make_success(token_indentation, (i - (i % spaces_for_indentation)));
         }
-        return make_success(token_indentation, (i - (i % spaces_for_indentation)));
     }
     return make_success(token_space, 1);
 }
