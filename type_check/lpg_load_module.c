@@ -67,13 +67,13 @@ static void translate_semantic_error(complete_semantic_error const error, void *
 }
 
 static load_module_result type_check_module(function_checking_state *const state, sequence const parsed,
-                                            unicode_view const file_name, unicode_view const source)
+                                            source_file const source)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
     check_function_result const checked = check_function(
         state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
-        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), file_name,
-        source, NULL, optional_function_id_empty());
+        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), source, NULL,
+        optional_function_id_empty());
     if (!checked.success)
     {
         load_module_result const failure = {optional_value_empty, type_from_unit()};
@@ -151,9 +151,10 @@ load_module_result load_module(function_checking_state *state, unicode_view name
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const result =
-        type_check_module(state, parsed, unicode_view_from_string(full_module_path),
-                          unicode_view_create(module_source.success.data, module_source.success.length));
+    load_module_result const result = type_check_module(
+        state, parsed,
+        source_file_create(unicode_view_from_string(full_module_path),
+                           unicode_view_create(module_source.success.data, module_source.success.length)));
     sequence_free(&parsed);
     unicode_string_free(&full_module_path);
     blob_free(&module_source.success);

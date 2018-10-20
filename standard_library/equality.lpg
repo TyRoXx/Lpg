@@ -7,6 +7,14 @@ impl equality_comparison[integer] for integer
     equals(other: integer): boolean
         integer-equals(other, self)
 
+impl equality_comparison[boolean] for boolean
+    equals(other: boolean): boolean
+        match self
+            case boolean.true:
+                other
+            case boolean.false:
+                not(other)
+
 let equals = [T](first: T, second: T): boolean
     let comparison : equality_comparison[T] = first
     comparison.equals(second)

@@ -144,8 +144,8 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         }
     }
     unicode_view const source_pieces[] = {c_test_dir, unicode_view_from_c_str("generated_test.c")};
-    unicode_string const source_file = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
-    write_file_if_necessary(unicode_view_from_string(source_file), c_source);
+    unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+    write_file_if_necessary(unicode_view_from_string(source_file_path), c_source);
     {
         unicode_view const cmakelists_pieces[] = {c_test_dir, unicode_view_from_c_str("CMakeLists.txt")};
         unicode_string const cmakelists = path_combine(cmakelists_pieces, LPG_ARRAY_SIZE(cmakelists_pieces));
@@ -228,9 +228,9 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_string_free(&test_executable);
         REQUIRE(process.success == success_yes);
         REQUIRE(0 == wait_for_process_exit(process.created));
-        REQUIRE(rename_file(unicode_view_from_string(source_file), unicode_view_from_string(last_success)));
+        REQUIRE(rename_file(unicode_view_from_string(source_file_path), unicode_view_from_string(last_success)));
     }
-    unicode_string_free(&source_file);
+    unicode_string_free(&source_file_path);
 out:
     unicode_string_free(&last_success);
 }
@@ -334,7 +334,8 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
-    checked_program checked = check(root, global_object, expect_no_errors, &loader, test_name, source, NULL);
+    checked_program checked =
+        check(root, global_object, expect_no_errors, &loader, source_file_create(test_name, source), NULL);
     sequence_free(&root);
 
     // not optimized
@@ -367,10 +368,11 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     checked_program_free(&checked);
 }
 
-static void run_file(char const *const source_file, structure const global_object, unicode_view const in_lpg_directory)
+static void run_file(char const *const source_file_name, structure const global_object,
+                     unicode_view const in_lpg_directory)
 {
     unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
-                                   unicode_view_from_c_str("in_lpg"), unicode_view_from_c_str(source_file)};
+                                   unicode_view_from_c_str("in_lpg"), unicode_view_from_c_str(source_file_name)};
     unicode_string const full_expected_file_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     blob_or_error const expected_or_error = read_file(full_expected_file_path.data);
     unicode_string_free(&full_expected_file_path);
@@ -378,7 +380,7 @@ static void run_file(char const *const source_file, structure const global_objec
     unicode_string const expected = unicode_string_validate(expected_or_error.success);
 
     expect_output_impl(
-        unicode_view_from_c_str(source_file), unicode_view_from_string(expected), global_object, in_lpg_directory);
+        unicode_view_from_c_str(source_file_name), unicode_view_from_string(expected), global_object, in_lpg_directory);
     unicode_string_free(&expected);
 }
 

@@ -41,8 +41,9 @@ static void check_single_wellformed_function(char const *const source, structure
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
-    checked_program checked = check(root, non_empty_global, expect_no_errors, &loader,
-                                    unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source), NULL);
+    checked_program checked =
+        check(root, non_empty_global, expect_no_errors, &loader,
+              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)), NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
     remove_dead_code(&checked);

@@ -292,7 +292,7 @@ static void handle_semantic_error(complete_semantic_error const error, void *use
     ASSERT(line.begin);
     ASSERT(success_yes == stream_writer_write_unicode_view(context->diagnostics, line));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, ":\n"));
-    print_source_location_hint(error.source, context->diagnostics, error.relative.where);
+    print_source_location_hint(error.source.content, context->diagnostics, error.relative.where);
 }
 
 static compiler_command parse_compiler_command(char const *const command, bool *const valid)
@@ -471,9 +471,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {diagnostics, false};
     module_loader loader = module_loader_create(module_directory, handle_parse_error, &user);
-    checked_program checked =
-        check(root.value, standard_library.globals, handle_semantic_error, &loader,
-              unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source), &context);
+    checked_program checked = check(
+        root.value, standard_library.globals, handle_semantic_error, &loader,
+        source_file_create(unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source)), &context);
     sequence_free(&root.value);
     switch (arguments.command)
     {

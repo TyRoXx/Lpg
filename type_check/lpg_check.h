@@ -24,8 +24,8 @@ check_function(program_check *const root, function_checking_state *const parent,
                structure const global, check_error_handler *const on_error, void *const user,
                checked_program *const program, type const *const parameter_types, unicode_string *const parameter_names,
                size_t const parameter_count, optional_type const self, bool const may_capture_runtime_variables,
-               optional_type const explicit_return_type, unicode_view const file_name, unicode_view const source,
+               optional_type const explicit_return_type, source_file const source,
                unicode_view const *const early_initialized_variable, optional_function_id const current_function_id);
 
 checked_program check(sequence const root, structure const global, LPG_NON_NULL(check_error_handler *on_error),
-                      LPG_NON_NULL(module_loader *loader), unicode_view file_name, unicode_view source, void *user);
+                      LPG_NON_NULL(module_loader *loader), source_file source, void *user);

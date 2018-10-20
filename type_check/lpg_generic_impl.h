@@ -3,6 +3,7 @@
 #include "lpg_expression.h"
 #include "lpg_type.h"
 #include "lpg_value.h"
+#include "lpg_source_file.h"
 
 typedef struct generic_closure
 {
@@ -39,7 +40,9 @@ typedef struct generic_impl
     impl_expression tree;
     generic_closures closures;
     generic_impl_self self;
+    source_file_owning source;
 } generic_impl;
 
-generic_impl generic_impl_create(impl_expression tree, generic_closures closures, generic_impl_self self);
+generic_impl generic_impl_create(impl_expression tree, generic_closures closures, generic_impl_self self,
+                                 source_file_owning source);
 void generic_impl_free(generic_impl const freed);

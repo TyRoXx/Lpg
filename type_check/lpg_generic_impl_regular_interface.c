@@ -3,9 +3,10 @@
 
 generic_impl_regular_interface generic_impl_regular_interface_create(interface_id interface_, impl_expression tree,
                                                                      generic_closures closures,
-                                                                     generic_instantiation_expression self)
+                                                                     generic_instantiation_expression self,
+                                                                     source_file source)
 {
-    generic_impl_regular_interface const result = {interface_, tree, closures, self, NULL, 0};
+    generic_impl_regular_interface const result = {interface_, tree, closures, self, NULL, 0, source};
     return result;
 }
 

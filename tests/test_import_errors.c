@@ -50,11 +50,10 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 
 static checked_program simple_check(sequence const root, structure const global, check_error_handler *on_error,
                                     void *user, unicode_view const module_directory,
-                                    expected_parse_errors expected_errors, unicode_view const file_name,
-                                    unicode_view const source)
+                                    expected_parse_errors expected_errors, source_file const source)
 {
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, &expected_errors);
-    return check(root, global, on_error, &loader, file_name, source, user);
+    return check(root, global, on_error, &loader, source, user);
 }
 
 void test_import_errors(void)
@@ -68,8 +67,8 @@ void test_import_errors(void)
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
         complete_semantic_error const semantic_errors[] = {complete_semantic_error_create(
-            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)), importing_file,
-            importing_file_content)};
+            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
+            source_file_create(importing_file, importing_file_content))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         unicode_view const expected_file_name_pieces[] = {
             module_directory_view, unicode_view_from_c_str("syntaxerror.lpg")};
@@ -89,7 +88,7 @@ void test_import_errors(void)
         expected_parse_errors const expected_parse_errors_ = {parse_errors, LPG_ARRAY_SIZE(parse_errors)};
         checked_program checked =
             simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, importing_file, importing_file_content);
+                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -109,15 +108,15 @@ void test_import_errors(void)
         complete_semantic_error const semantic_errors[] = {
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8)),
-                unicode_view_from_string(imported_file), imported_file_content),
+                source_file_create(unicode_view_from_string(imported_file), imported_file_content)),
             complete_semantic_error_create(
-                semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)), importing_file,
-                importing_file_content)};
+                semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
+                source_file_create(importing_file, importing_file_content))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
         checked_program checked =
             simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, importing_file, importing_file_content);
+                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -130,13 +129,13 @@ void test_import_errors(void)
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
         complete_semantic_error const semantic_errors[] = {complete_semantic_error_create(
-            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)), importing_file,
-            importing_file_content)};
+            semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
+            source_file_create(importing_file, importing_file_content))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
         checked_program checked =
             simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, importing_file, importing_file_content);
+                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -155,15 +154,15 @@ void test_import_errors(void)
         complete_semantic_error const semantic_errors[] = {
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_import_failed, source_location_create(0, 11)),
-                unicode_view_from_string(imported_file), imported_file_content),
+                source_file_create(unicode_view_from_string(imported_file), imported_file_content)),
             complete_semantic_error_create(
-                semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)), importing_file,
-                importing_file_content)};
+                semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
+                source_file_create(importing_file, importing_file_content))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
         checked_program checked =
             simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, importing_file, importing_file_content);
+                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);

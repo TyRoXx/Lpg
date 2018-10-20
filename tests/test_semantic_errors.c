@@ -21,13 +21,13 @@ typedef struct expected_errors
 {
     semantic_error const *errors;
     size_t count;
-    unicode_view file_name;
-    unicode_view source;
+    source_file source;
 } expected_errors;
 
 static expected_errors make_expected_errors(semantic_error const *const errors, size_t const count)
 {
-    expected_errors const result = {errors, count, unicode_view_from_c_str(""), unicode_view_from_c_str("")};
+    expected_errors const result = {
+        errors, count, source_file_create(unicode_view_from_c_str(""), unicode_view_from_c_str(""))};
     return result;
 }
 
@@ -36,8 +36,7 @@ static void expect_errors(complete_semantic_error const error, void *user)
     expected_errors *expected = user;
     REQUIRE(expected->count >= 1);
     semantic_error const expected_error = expected->errors[0];
-    REQUIRE(complete_semantic_error_equals(
-        error, complete_semantic_error_create(expected_error, expected->file_name, expected->source)));
+    REQUIRE(complete_semantic_error_equals(error, complete_semantic_error_create(expected_error, expected->source)));
     ++expected->errors;
     --expected->count;
 }
@@ -52,11 +51,10 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 static checked_program simple_check(char const *const source, structure const global, expected_errors *const user,
                                     unicode_view const module_directory)
 {
-    user->file_name = unicode_view_from_c_str("test.lpg");
-    user->source = unicode_view_from_c_str(source);
+    user->source = source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source));
     sequence const root = parse(source);
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, NULL);
-    checked_program const result = check(root, global, expect_errors, &loader, user->file_name, user->source, user);
+    checked_program const result = check(root, global, expect_errors, &loader, user->source, user);
     sequence_free(&root);
     return result;
 }

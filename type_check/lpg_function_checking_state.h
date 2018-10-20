@@ -28,8 +28,7 @@ typedef struct function_checking_state
     bool has_declared_return_type;
     optional_value *register_compile_time_values;
     register_id register_compile_time_value_count;
-    unicode_view file_name;
-    unicode_view source;
+    source_file source;
 } function_checking_state;
 
 optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which);

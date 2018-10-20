@@ -34,5 +34,5 @@ void write_register_compile_time_value(function_checking_state *const state, reg
 
 void emit_semantic_error(function_checking_state const *const state, semantic_error const error)
 {
-    state->on_error(complete_semantic_error_create(error, state->file_name, state->source), state->user);
+    state->on_error(complete_semantic_error_create(error, state->source), state->user);
 }
