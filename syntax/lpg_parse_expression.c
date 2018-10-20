@@ -87,6 +87,10 @@ static void pop(expression_parser *parser)
 
 static bool is_same_indentation_level(rich_token const found, size_t const expected)
 {
+    if(expected == 0 && found.token != token_indentation) {
+        return true;
+    }
+
     size_t indentation_level = 0;
     for(size_t i = 0; i < found.content.length; i++){
         char currentCharacter = *(found.content.begin + i);
@@ -158,16 +162,16 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         {
             break;
         }
-        if ((indentation == 0) || is_same_indentation_level(indentation_token, indentation))
+
+        if (line_is_empty(parser))
+        {
+            continue;
+        }
+        if (is_same_indentation_level(indentation_token, indentation))
         {
             if (indentation > 0)
             {
                 pop(parser);
-            }
-
-            if (line_is_empty(parser))
-            {
-                continue;
             }
             expression_parser_result const element = parse_expression(parser, indentation, 1);
             if (element.is_success)

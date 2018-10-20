@@ -91,19 +91,21 @@ static void test_formatting_tool()
                     "match a\n"
                     "    case 1: 2\n",
                     false, "");
-    formatting_tool("match a\n"
-                    "\tcase 1:2\n"
-                    "    case 2:5\n",
-                    "match a\n"
-                    "    case 1: 2\n"
-                    "    case 2: 5\n",
-                    false, "");
     formatting_tool("let s=import s", "let s = import s", false, "");
     formatting_tool("loop\n"
                     "\tbreak\n",
                     "loop\n"
                     "    break",
                     false, "");
+//    formatting_tool("loop\n"
+//                    "\tbreak\n"
+//                    "    match a\n"
+//                    "\t    case 1: 1",
+//                    "loop\n"
+//                    "    break\n"
+//                    "    match a:\n"
+//                    "        case 1: 1",
+//                    false, "");
 }
 
 void test_cli(void)
