@@ -38,7 +38,8 @@ void local_variable_container_free(local_variable_container const freed);
 
 typedef enum read_local_variable_status
 {
-    read_local_variable_status_ok = 1,
+    read_local_variable_status_at_address = 1,
+    read_local_variable_status_compile_time_value,
     read_local_variable_status_unknown,
     read_local_variable_status_forbidden
 } read_local_variable_status;
@@ -65,12 +66,12 @@ static read_local_variable_result const read_local_variable_result_forbidden = {
                                                                                 {false, {value_kind_unit, {{NULL, 0}}}},
                                                                                 false};
 
-read_local_variable_result read_local_variable_result_create(variable_address where, type what,
-                                                             optional_value compile_time_value, bool is_pure);
+read_local_variable_result read_local_variable_result_create(read_local_variable_status status, variable_address where,
+                                                             type what, optional_value compile_time_value,
+                                                             bool is_pure);
 
 struct function_checking_state;
 read_local_variable_result read_local_variable(LPG_NON_NULL(struct function_checking_state *const state),
-                                               instruction_sequence *const body_of_lambda_using_the_variable,
                                                unicode_view const name,
                                                source_location const original_reference_location);
 

@@ -418,10 +418,10 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
 {
     ASSUME(to);
     instruction_checkpoint const previous_code = make_checkpoint(state, to);
-    read_local_variable_result const local = read_local_variable(state, to, name, where);
+    read_local_variable_result const local = read_local_variable(state, name, where);
     switch (local.status)
     {
-    case read_local_variable_status_ok:
+    case read_local_variable_status_at_address:
         if (local.where.captured_in_current_lambda.has_value)
         {
             register_id const captures = allocate_register(&state->used_registers);
@@ -434,6 +434,17 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         }
         return evaluate_expression_result_create(
             true, local.where.local_address, local.what, local.compile_time_value, local.is_pure, false);
+
+    case read_local_variable_status_compile_time_value:
+    {
+        register_id const into = allocate_register(&state->used_registers);
+        ASSUME(local.compile_time_value.is_set);
+        add_instruction(to, instruction_create_literal(
+                                literal_instruction_create(into, local.compile_time_value.value_, local.what)));
+        write_register_compile_time_value(state, into, local.compile_time_value.value_);
+        return evaluate_expression_result_create(
+            true, into, local.what, local.compile_time_value, local.is_pure, false);
+    }
 
     case read_local_variable_status_unknown:
         break;

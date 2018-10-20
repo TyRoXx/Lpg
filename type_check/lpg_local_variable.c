@@ -125,10 +125,10 @@ bool local_variable_name_exists(local_variable_container const variables, unicod
     return false;
 }
 
-read_local_variable_result read_local_variable_result_create(variable_address where, type what,
-                                                             optional_value compile_time_value, bool is_pure)
+read_local_variable_result read_local_variable_result_create(read_local_variable_status status, variable_address where,
+                                                             type what, optional_value compile_time_value, bool is_pure)
 {
-    read_local_variable_result const result = {read_local_variable_status_ok, where, what, compile_time_value, is_pure};
+    read_local_variable_result const result = {status, where, what, compile_time_value, is_pure};
     return result;
 }
 
@@ -145,12 +145,11 @@ static read_local_variable_result read_lambda_being_checked(LPG_NON_NULL(functio
     register_id const into = allocate_register(&lambda_origin->used_registers);
     add_instruction(
         lambda_origin->body, instruction_create_current_function(current_function_instruction_create(into)));
-    return read_local_variable_result_create(
-        variable_address_from_local(into), what, /*TODO*/ optional_value_empty, true);
+    return read_local_variable_result_create(read_local_variable_status_at_address, variable_address_from_local(into),
+                                             what, /*TODO*/ optional_value_empty, true);
 }
 
 read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_state *const state),
-                                               instruction_sequence *const body_of_lambda_using_the_variable,
                                                unicode_view const name,
                                                source_location const original_reference_location)
 {
@@ -165,9 +164,9 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
 
             case local_variable_phase_early_initialized:
             case local_variable_phase_initialized:
-                return read_local_variable_result_create(variable_address_from_local(existing_variable->where),
-                                                         existing_variable->type_,
-                                                         existing_variable->compile_time_value, true);
+                return read_local_variable_result_create(
+                    read_local_variable_status_at_address, variable_address_from_local(existing_variable->where),
+                    existing_variable->type_, existing_variable->compile_time_value, true);
 
             case local_variable_phase_lambda_being_checked:
                 return read_lambda_being_checked(existing_variable->lambda_origin, existing_variable->type_);
@@ -179,24 +178,23 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
         return read_local_variable_result_unknown;
     }
     read_local_variable_result const outer_variable =
-        read_local_variable(state->parent, NULL, name, original_reference_location);
+        read_local_variable(state->parent, name, original_reference_location);
     switch (outer_variable.status)
     {
     case read_local_variable_status_forbidden:
     case read_local_variable_status_unknown:
         return outer_variable;
 
-    case read_local_variable_status_ok:
+    case read_local_variable_status_at_address:
         break;
+
+    case read_local_variable_status_compile_time_value:
+        return outer_variable;
     }
-    if (outer_variable.compile_time_value.is_set && body_of_lambda_using_the_variable)
+    if (outer_variable.compile_time_value.is_set)
     {
-        register_id const where = allocate_register(&state->used_registers);
-        add_instruction(body_of_lambda_using_the_variable,
-                        instruction_create_literal(literal_instruction_create(
-                            where, outer_variable.compile_time_value.value_, outer_variable.what)));
-        write_register_compile_time_value(state, where, outer_variable.compile_time_value.value_);
-        return read_local_variable_result_create(variable_address_from_local(where), outer_variable.what,
+        return read_local_variable_result_create(read_local_variable_status_compile_time_value,
+                                                 variable_address_from_local(~(register_id)0), outer_variable.what,
                                                  outer_variable.compile_time_value, outer_variable.is_pure);
     }
     if (!state->may_capture_runtime_variables)
@@ -206,6 +204,7 @@ read_local_variable_result read_local_variable(LPG_NON_NULL(function_checking_st
         return read_local_variable_result_forbidden;
     }
     capture_index const existing_capture = require_capture(state, outer_variable.where, outer_variable.what);
-    return read_local_variable_result_create(variable_address_from_capture(existing_capture), outer_variable.what,
+    return read_local_variable_result_create(read_local_variable_status_at_address,
+                                             variable_address_from_capture(existing_capture), outer_variable.what,
                                              outer_variable.compile_time_value, outer_variable.is_pure);
 }
