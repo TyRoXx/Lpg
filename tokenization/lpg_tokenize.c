@@ -68,6 +68,10 @@ tokenize_result tokenize(char const *input, size_t length)
     {
         return tokenize_space(input, length);
     }
+    if(*input == '\t') {
+        tokenize_result const result = {tokenize_success, token_indentation, 1};
+        return result;
+    }
     if (*input == '/')
     {
         if (length == 1)
