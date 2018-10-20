@@ -71,10 +71,10 @@ static void test_formatting_tool()
     formatting_tool("loop\n"
                     "    break\n"
                     "match x\n"
-                    "    case 1: 0\n"
+                    "    case 1 : 0\n"
                     "    case 2:\n"
                     "        1\n"
-                    "let s = struct\n"
+                    "let s= struct\n"
                     "    i: unit",
                     "loop\n"
                     "    break\n"
@@ -90,6 +90,19 @@ static void test_formatting_tool()
                     "    case 1:2\n",
                     "match a\n"
                     "    case 1: 2\n",
+                    false, "");
+    formatting_tool("match a\n"
+                    "\tcase 1:2\n"
+                    "    case 2:5\n",
+                    "match a\n"
+                    "    case 1: 2\n"
+                    "    case 2: 5\n",
+                    false, "");
+    formatting_tool("let s=import s", "let s = import s", false, "");
+    formatting_tool("loop\n"
+                    "\tbreak\n",
+                    "loop\n"
+                    "    break",
                     false, "");
 }
 
