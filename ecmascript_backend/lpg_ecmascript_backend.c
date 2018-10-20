@@ -772,11 +772,12 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
-        LPG_TRY(indent(indentation + 1, ecmascript_output));
+
         switch (generated.cases[i].kind)
         {
         case match_instruction_case_kind_stateful_enum:
         {
+            LPG_TRY(indent(indentation + 1, ecmascript_output));
             ASSUME(state->registers[generated.key].type_of.kind == type_kind_enumeration);
             optional_type const enum_state = state->all_enums[state->registers[generated.key].type_of.enum_]
                                                  .elements[generated.cases[i].stateful_enum.element]
