@@ -1,6 +1,8 @@
 let std = import std
+let integers = import integer
+let integer = integers.integer
 
-match subtract(0, 0)
+match subtract(std.runtime-value[integer](0), 0)
     case subtract_result.ok(let result):
         assert(integer-equals(0, result))
     case subtract_result.underflow:
