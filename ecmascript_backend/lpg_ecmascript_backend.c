@@ -510,6 +510,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 12:
             return stream_writer_write_string(ecmascript_output, "fail");
 
+        case 16:
+            return stream_writer_write_string(ecmascript_output, "integer_add");
+
         default:
             LPG_TO_DO();
         }
@@ -1146,6 +1149,7 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                            " var string_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"
                            " var integer_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"
                            " var integer_less = function (left, right) { return (left < right) ? 1.0 : 0.0; };\n"
+                           " var integer_add = function (left, right) { return [0, (left + right)]; };\n"
                            " var concat = function (left, right) { return (left + right); };\n"
                            " var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"
                            " var side_effect = function () {};\n"

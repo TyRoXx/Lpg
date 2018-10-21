@@ -263,8 +263,10 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*11 host-value*/ value_from_type(type_from_host_value()),
             /*12 fail*/ value_from_function_pointer(function_pointer_value_from_external(
                 fail_impl, NULL, NULL, *global_object.members[12].what.function_pointer_)),
-            /*13 boolean*/ global_object.members[13].compile_time_value.value_,
-            /*14 subtract_result*/ global_object.members[14].compile_time_value.value_};
+            /*13 subtract_result*/ global_object.members[13].compile_time_value.value_,
+            /*14 subtract*/ global_object.members[14].compile_time_value.value_,
+            /*15 add_result*/ global_object.members[15].compile_time_value.value_,
+            /*16 add*/ global_object.members[16].compile_time_value.value_};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = {NULL};
         interpret(program, globals_values, &gc);
@@ -435,7 +437,8 @@ void test_interpreter(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&executable_path);
 
-        static char const *const test_files[] = {"algorithm.lpg",
+        static char const *const test_files[] = {"add.lpg",
+                                                 "algorithm.lpg",
                                                  "array-boolean.lpg",
                                                  "array-nesting.lpg",
                                                  "array-string.lpg",

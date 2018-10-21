@@ -52,6 +52,10 @@ let make-mutable = [T](value: T): mutable[T]
     assert(integer-equals(1, content.size()))
     mutable-content[T]{content}
 
+let runtime-value = [T](value: T): T
+    side-effect()
+    value
+
 let export = struct
     and: type-of(and)
     or: type-of(or)
@@ -65,4 +69,5 @@ let export = struct
     array: type-of(array)
     mutable: type-of(mutable)
     make-mutable: type-of(make-mutable)
-export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable}
+    runtime-value: type-of(runtime-value)
+export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable, runtime-value}

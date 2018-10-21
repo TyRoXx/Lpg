@@ -18,6 +18,7 @@ impl[T] set[T] for linear-set[T]
         algorithm.any_of[T, type-of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
         //TODO
+        std.boolean.false
     add(key: T): std.boolean
         let reader : set[T] = self
         match reader.contains(key)

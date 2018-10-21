@@ -14,9 +14,9 @@ let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
             case boolean.false:
                 std.unit_value
         match add(i.load(), 1)
-            case std.option[integer].some(let next):
+            case add_result.ok(let next):
                 i.store(next)
-            case std.option[integer].none:
+            case add_result.overflow:
                 fail()
 
 let any_of = [E, P](elements: array[E], test_element: P): boolean

@@ -3,6 +3,7 @@
 #include "lpg_assert.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
+#include "lpg_standard_library.h"
 #include <string.h>
 
 typedef struct standard_library_usage
@@ -40,7 +41,8 @@ typedef enum register_meaning
     register_meaning_side_effect,
     register_meaning_unit,
     register_meaning_host_value,
-    register_meaning_fail
+    register_meaning_fail,
+    register_meaning_add
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -1027,6 +1029,10 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_unit:
         state->standard_library.using_unit = true;
         return stream_writer_write_string(c_output, "unit_impl");
+
+    case register_meaning_add:
+        state->standard_library.using_integer = true;
+        return stream_writer_write_string(c_output, "integer_add");
     }
     LPG_UNREACHABLE();
 }
@@ -1177,6 +1183,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_unit:
     case register_meaning_host_value:
     case register_meaning_fail:
+    case register_meaning_add:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1758,6 +1765,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_host_value:
         case register_meaning_unit:
         case register_meaning_fail:
+        case register_meaning_add:
             break;
         }
         LPG_TRY(indent(indentation, c_output));
@@ -1881,6 +1889,22 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             ASSERT(input.call.argument_count == 1);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success_yes;
+
+        case register_meaning_add:
+            state->standard_library.using_integer = true;
+            set_register_variable(state, input.call.result, register_resource_ownership_owns,
+                                  type_from_enumeration(standard_library_enum_add_result));
+            LPG_TRY(generate_type(type_from_enumeration(standard_library_enum_add_result), &state->standard_library,
+                                  state->definitions, state->program, additional_memory, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " const "));
+            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = {0, "));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " + "));
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "};\n"));
             return success_yes;
 
         case register_meaning_concat:
@@ -2134,6 +2158,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_fail);
                 return success_yes;
 
+            case 16:
+                set_register_meaning(state, input.read_struct.into, optional_type_create_empty(), register_meaning_add);
+                return success_yes;
+
             default:
                 printf("%u\n", input.read_struct.member);
                 LPG_TO_DO();
@@ -2212,6 +2240,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_integer_to_string:
         case register_meaning_concat:
         case register_meaning_side_effect:
+        case register_meaning_add:
             LPG_UNREACHABLE();
 
         case register_meaning_captures:
