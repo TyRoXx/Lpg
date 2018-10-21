@@ -68,3 +68,4 @@ typedef struct tokenize_result
 } tokenize_result;
 
 tokenize_result tokenize(char const *input, size_t length);
+

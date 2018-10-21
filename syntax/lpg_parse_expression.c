@@ -4,85 +4,9 @@
 #include "lpg_for.h"
 #include <string.h>
 
-rich_token rich_token_create(tokenize_status status, token_type token, unicode_view content, source_location where)
-{
-    rich_token const result = {status, token, content, where};
-    return result;
-}
-
 bool is_end_of_file(rich_token const *token)
 {
     return (token->status == tokenize_success) && (token->content.length == 0);
-}
-
-parse_error parse_error_create(parse_error_type type, source_location where)
-{
-    parse_error const result = {type, where};
-    return result;
-}
-
-bool parse_error_equals(parse_error left, parse_error right)
-{
-    return (left.type == right.type) && source_location_equals(left.where, right.where);
-}
-
-expression_parser expression_parser_create(rich_token_producer find_next_token, callback_user find_next_token_user,
-                                           parse_error_handler on_error, callback_user on_error_user)
-{
-    expression_parser const result = {
-        find_next_token,
-        find_next_token_user,
-        on_error,
-        on_error_user,
-        {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
-        0};
-    return result;
-}
-
-bool expression_parser_has_remaining_non_empty_tokens(expression_parser const *const parser)
-{
-    return (parser->cached_token_count > 0) && (parser->cached_tokens[0].content.length > 0);
-}
-
-static rich_token peek_at(expression_parser *parser, size_t const offset)
-{
-    ASSUME(offset < LPG_ARRAY_SIZE(parser->cached_tokens));
-    while (parser->cached_token_count <= offset)
-    {
-        parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->find_next_token_user);
-        switch (parser->cached_tokens[parser->cached_token_count].status)
-        {
-        case tokenize_success:
-            parser->cached_token_count += 1;
-            break;
-
-        case tokenize_invalid:
-            parser->on_error(
-                parse_error_create(parse_error_invalid_token, parser->cached_tokens[parser->cached_token_count].where),
-                parser->on_error_user);
-            break;
-        }
-    }
-    ASSUME(parser->cached_tokens[offset].status == tokenize_success);
-    return parser->cached_tokens[offset];
-}
-
-static rich_token peek(expression_parser *parser)
-{
-    return peek_at(parser, 0);
-}
-
-static void pop_n(expression_parser *parser, size_t const count)
-{
-    ASSUME(parser->cached_token_count >= count);
-    parser->cached_token_count -= count;
-    memmove(parser->cached_tokens, parser->cached_tokens + count,
-            (sizeof(*parser->cached_tokens) * parser->cached_token_count));
-}
-
-static void pop(expression_parser *parser)
-{
-    pop_n(parser, 1);
 }
 
 static bool is_same_indentation_level(rich_token const found, size_t const expected)
