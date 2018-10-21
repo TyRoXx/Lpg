@@ -20,6 +20,8 @@ value integer_less_impl(function_call_arguments const arguments, struct value co
 value integer_to_string_impl(function_call_arguments const arguments, struct value const *const captures,
                              void *environment);
 
+value subtract_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+
 value side_effect_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
 
 typedef struct standard_library_stable
@@ -35,11 +37,14 @@ typedef struct standard_library_stable
     function_pointer side_effect;
     function_pointer type_equals;
     function_pointer fail;
+    function_pointer subtract;
 } standard_library_stable;
 
 enum
 {
-    standard_library_element_count = 13
+    standard_library_enum_boolean = 0,
+    standard_library_enum_subtract_result = 1,
+    standard_library_element_count = 15
 };
 
 typedef struct standard_library_description

@@ -7,6 +7,11 @@ integer_range integer_range_create(integer const minimum, integer const maximum)
     return result;
 }
 
+integer_range integer_range_max(void)
+{
+    return integer_range_create(integer_create(0, 0), integer_max());
+}
+
 bool integer_range_equals(integer_range const left, integer_range const right)
 {
     return integer_equal(left.minimum, right.minimum) && integer_equal(left.maximum, right.maximum);
@@ -32,7 +37,9 @@ void integer_range_list_deallocate(integer_range_list value)
 
 integer integer_range_size(integer_range const value)
 {
-    integer range_size_zero_based = integer_subtract(value.maximum, value.minimum);
+    integer_difference const difference = integer_subtract(value.maximum, value.minimum);
+    ASSUME(difference.is_positive);
+    integer range_size_zero_based = difference.value_if_positive;
     ASSUME(integer_add(&range_size_zero_based, integer_create(0, 1)));
     return range_size_zero_based;
 }
@@ -127,7 +134,9 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
         {
             bool not_overflown = integer_add(&needle_copy.maximum, integer_create(0, 1));
             ASSUME(not_overflown);
-            needle_copy.minimum = integer_subtract(needle.minimum, integer_create(0, 1));
+            integer_difference const difference = integer_subtract(needle.minimum, integer_create(0, 1));
+            ASSUME(difference.is_positive);
+            needle_copy.minimum = difference.value_if_positive;
             haystack->elements[i].maximum = needle_copy.minimum;
 
             haystack->elements = reallocate(haystack->elements, haystack->length + 1);

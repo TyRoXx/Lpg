@@ -1377,7 +1377,6 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expression_recursion_limit_reached, source_location_create(1, 4)),
             semantic_error_create(semantic_error_expression_recursion_limit_reached, source_location_create(2, 4))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = [T]()\n"

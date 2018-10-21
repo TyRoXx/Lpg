@@ -15,6 +15,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->integer_to_string);
     function_pointer_free(&stable->type_equals);
     function_pointer_free(&stable->side_effect);
+    function_pointer_free(&stable->subtract);
 }
 
 value not_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
@@ -110,6 +111,22 @@ value integer_to_string_impl(function_call_arguments const arguments, struct val
     return value_from_string(buffer_begin);
 }
 
+value subtract_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
+{
+    (void)environment;
+    (void)captures;
+    integer const left = arguments.arguments[0].integer_;
+    integer const right = arguments.arguments[1].integer_;
+    integer_difference const difference = integer_subtract(left, right);
+    if (difference.is_positive)
+    {
+        value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
+        *state = value_from_integer(difference.value_if_positive);
+        return value_from_enum_element(0, type_from_integer_range(integer_range_max()), state);
+    }
+    return value_from_enum_element(1, type_from_unit(), NULL);
+}
+
 value side_effect_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
 {
     (void)arguments;
@@ -122,7 +139,8 @@ standard_library_description describe_standard_library(void)
 {
     standard_library_stable *const stable = allocate(sizeof(*stable));
 
-    type const boolean = type_from_enumeration(0);
+    type const boolean = type_from_enumeration(standard_library_enum_boolean);
+    type const subtract_result = type_from_enumeration(standard_library_enum_subtract_result);
 
     stable->assert_ = function_pointer_create(optional_type_create_set(type_from_unit()),
                                               tuple_type_create(type_allocate(boolean), 1), tuple_type_create(NULL, 0),
@@ -179,6 +197,14 @@ standard_library_description describe_standard_library(void)
 
         stable->integer_to_string =
             function_pointer_create(optional_type_create_set(type_from_string()), tuple_type_create(parameters, 1),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
+    }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = type_from_integer_range(integer_range_max());
+        parameters[1] = parameters[0];
+        stable->subtract =
+            function_pointer_create(optional_type_create_set(subtract_result), tuple_type_create(parameters, 2),
                                     tuple_type_create(NULL, 0), optional_type_create_empty());
     }
 
@@ -254,7 +280,15 @@ standard_library_description describe_standard_library(void)
     globals[12] = structure_member_create(
         type_from_function_pointer(&stable->fail), unicode_string_from_c_str("fail"), optional_value_empty);
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 13);
+    globals[13] = structure_member_create(type_from_type(), unicode_string_from_c_str("subtract_result"),
+                                          optional_value_create(value_from_type(subtract_result)));
+
+    globals[14] =
+        structure_member_create(type_from_function_pointer(&stable->subtract), unicode_string_from_c_str("subtract"),
+                                optional_value_create(value_from_function_pointer(function_pointer_value_from_external(
+                                    subtract_impl, NULL, NULL, stable->subtract))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 15);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

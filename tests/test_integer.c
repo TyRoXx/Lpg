@@ -79,13 +79,16 @@ void test_integer(void)
     REQUIRE(integer_equal(integer_shift_left_truncate(integer_create(0, 1), 1), integer_create(0, 2)));
     REQUIRE(integer_equal(integer_shift_left_truncate(integer_create(0, 1), 64), integer_create(1, 0)));
 
-    REQUIRE(integer_equal(integer_create(0, 0), integer_subtract(integer_create(0, 0), integer_create(0, 0))));
-    REQUIRE(integer_equal(integer_create(0, 1), integer_subtract(integer_create(0, 1), integer_create(0, 0))));
-    REQUIRE(integer_equal(integer_create(0, 0), integer_subtract(integer_create(1, 0), integer_create(1, 0))));
-    REQUIRE(integer_equal(
-        integer_create(~(uint64_t)0, ~(uint64_t)0), integer_subtract(integer_create(0, 0), integer_create(0, 1))));
-    REQUIRE(integer_equal(
-        integer_create(~(uint64_t)0, ~(uint64_t)0 - 1u), integer_subtract(integer_create(0, 0), integer_create(0, 2))));
+    REQUIRE(integer_difference_equals(
+        integer_difference_create(integer_create(0, 0)), integer_subtract(integer_create(0, 0), integer_create(0, 0))));
+    REQUIRE(integer_difference_equals(
+        integer_difference_create(integer_create(0, 1)), integer_subtract(integer_create(0, 1), integer_create(0, 0))));
+    REQUIRE(integer_difference_equals(
+        integer_difference_create(integer_create(0, 0)), integer_subtract(integer_create(1, 0), integer_create(1, 0))));
+    REQUIRE(integer_difference_equals(
+        integer_difference_negative(), integer_subtract(integer_create(0, 0), integer_create(0, 1))));
+    REQUIRE(integer_difference_equals(
+        integer_difference_negative(), integer_subtract(integer_create(0, 0), integer_create(0, 2))));
 
     test_integer_divide();
 

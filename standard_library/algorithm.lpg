@@ -21,7 +21,7 @@ let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
 
 let any_of = [E, P](elements: array[E], test_element: P): boolean
     match subtract(elements.size(), 1)
-        case std.option[integer].some(let last):
+        case subtract_result.ok(let last):
             let found = std.make-mutable[boolean](boolean.false)
             let on_element = (index: integer): std.unit
                 match elements.load(index)
@@ -35,7 +35,7 @@ let any_of = [E, P](elements: array[E], test_element: P): boolean
                         fail()
             enumerate[type-of(on_element)](0, last, on_element)
             found.load()
-        case std.option[integer].none:
+        case subtract_result.underflow:
             boolean.false
 
 let export = struct

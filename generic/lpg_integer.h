@@ -29,7 +29,17 @@ integer integer_maximum(integer const first, integer const second);
 integer integer_minimum(integer const first, integer const second);
 
 bool integer_add(LPG_NON_NULL(integer *left), integer right) LPG_USE_RESULT;
-integer integer_subtract(integer minuend, integer subtrahend) LPG_USE_RESULT;
+
+typedef struct integer_difference
+{
+    bool is_positive;
+    integer value_if_positive;
+} integer_difference;
+
+integer_difference integer_difference_create(integer value) LPG_USE_RESULT;
+integer_difference integer_difference_negative(void) LPG_USE_RESULT;
+bool integer_difference_equals(integer_difference const left, integer_difference const right) LPG_USE_RESULT;
+integer_difference integer_subtract(integer minuend, integer subtrahend) LPG_USE_RESULT;
 bool integer_multiply(LPG_NON_NULL(integer *left), integer right) LPG_USE_RESULT;
 
 bool integer_parse(LPG_NON_NULL(integer *into), unicode_view from) LPG_USE_RESULT;

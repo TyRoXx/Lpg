@@ -8,6 +8,7 @@
 #include "lpg_local_variable.h"
 #include "lpg_string_literal.h"
 #include "lpg_structure_member.h"
+#include "lpg_standard_library.h"
 #include "lpg_value.h"
 #include <string.h>
 
@@ -4217,7 +4218,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
                                                       instruction_sequence *const function, expression const element,
                                                       unicode_view const *const early_initialized_variable)
 {
-    size_t const expression_recursion_limit = 20;
+    size_t const expression_recursion_limit = 30;
     if (state->root->expression_recursion_depth >= expression_recursion_limit)
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_expression_recursion_limit_reached,
@@ -4297,13 +4298,20 @@ checked_program check(sequence const root, structure const global, check_error_h
     checked_program program = {NULL,       0,
                                structures, 1,
                                {NULL},     allocate_array(1, sizeof(*program.functions)),
-                               1,          allocate_array(1, sizeof(*program.enums)),
-                               1};
+                               1,          allocate_array(2, sizeof(*program.enums)),
+                               2};
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));
         elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), optional_type_create_empty());
         elements[1] = enumeration_element_create(unicode_string_from_c_str("true"), optional_type_create_empty());
-        program.enums[0] = enumeration_create(elements, 2);
+        program.enums[standard_library_enum_boolean] = enumeration_create(elements, 2);
+    }
+    {
+        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = enumeration_element_create(
+            unicode_string_from_c_str("ok"), optional_type_create_set(type_from_integer_range(integer_range_max())));
+        elements[1] = enumeration_element_create(unicode_string_from_c_str("underflow"), optional_type_create_empty());
+        program.enums[standard_library_enum_subtract_result] = enumeration_create(elements, 2);
     }
     size_t const globals_count = global.count;
     value *const globals = allocate_array(globals_count, sizeof(*globals));

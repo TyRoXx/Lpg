@@ -1,0 +1,26 @@
+let std = import std
+
+match subtract(0, 0)
+    case subtract_result.ok(let result):
+        assert(integer-equals(0, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtract_result.ok(let result):
+        assert(integer-equals(8, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(1000000000000000, 1)
+    case subtract_result.ok(let result):
+        assert(integer-equals(999999999999999, result))
+    case subtract_result.underflow:
+        fail()
+
+assert(match subtract(0, 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtract_result.underflow:
+        boolean.true
+)

@@ -103,8 +103,33 @@ bool integer_less_or_equals(integer left, integer right)
     return !integer_less(right, left);
 }
 
-integer integer_subtract(integer minuend, integer subtrahend)
+integer_difference integer_difference_create(integer value)
 {
+    integer_difference const result = {true, value};
+    return result;
+}
+
+integer_difference integer_difference_negative(void)
+{
+    integer_difference const result = {false, integer_create(0, 0)};
+    return result;
+}
+
+bool integer_difference_equals(integer_difference const left, integer_difference const right)
+{
+    if (left.is_positive && right.is_positive)
+    {
+        return integer_equal(left.value_if_positive, right.value_if_positive);
+    }
+    return (left.is_positive == right.is_positive);
+}
+
+integer_difference integer_subtract(integer minuend, integer subtrahend)
+{
+    if (integer_less(minuend, subtrahend))
+    {
+        return integer_difference_negative();
+    }
     integer result
 #ifndef _MSC_VER
         =
@@ -120,7 +145,7 @@ integer integer_subtract(integer minuend, integer subtrahend)
         --minuend.high;
     }
     result.high = (minuend.high - subtrahend.high);
-    return result;
+    return integer_difference_create(result);
 }
 
 bool integer_multiply(integer *left, integer right)
@@ -220,7 +245,9 @@ integer_division integer_divide(integer numerator, integer denominator)
         result.remainder.low |= integer_bit(numerator, 127u - i);
         if (!integer_less(result.remainder, denominator))
         {
-            result.remainder = integer_subtract(result.remainder, denominator);
+            integer_difference const difference = integer_subtract(result.remainder, denominator);
+            ASSUME(difference.is_positive);
+            result.remainder = difference.value_if_positive;
             integer_set_bit(&result.quotient, 127u - i, 1);
         }
     }
