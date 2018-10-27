@@ -87,7 +87,18 @@ static void pop(expression_parser *parser)
 
 static bool is_same_indentation_level(rich_token const found, size_t const expected)
 {
-    return (found.token == token_indentation) && (found.content.length == (expected * spaces_for_indentation));
+    if (expected == 0 && found.token != token_indentation)
+    {
+        return true;
+    }
+
+    size_t indentation_level = 0;
+    for (size_t i = 0; i < found.content.length; i++)
+    {
+        char currentCharacter = *(found.content.begin + i);
+        indentation_level += ((currentCharacter == ' ') ? 1 : spaces_for_indentation);
+    }
+    return (found.token == token_indentation) && ((indentation_level / spaces_for_indentation) == expected);
 }
 
 static bool line_is_empty(expression_parser *parser)
@@ -153,16 +164,16 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         {
             break;
         }
-        if ((indentation == 0) || is_same_indentation_level(indentation_token, indentation))
+
+        if (line_is_empty(parser))
+        {
+            continue;
+        }
+        if (is_same_indentation_level(indentation_token, indentation))
         {
             if (indentation > 0)
             {
                 pop(parser);
-            }
-
-            if (line_is_empty(parser))
-            {
-                continue;
             }
             expression_parser_result const element = parse_expression(parser, indentation, 1);
             if (element.is_success)
@@ -204,41 +215,41 @@ static expression_parser_result parse_loop(expression_parser *parser, size_t ind
     return result;
 }
 
-static int parse_match_cases(expression_parser *parser, size_t const indentation, match_case **cases,
-                             size_t *case_count)
+static bool parse_match_cases(expression_parser *parser, size_t const indentation, match_case **cases,
+                              size_t *case_count)
 {
     for (;;)
     {
         rich_token const indentation_token = peek(parser);
-        if ((indentation_token.token != token_indentation) ||
-            (indentation_token.content.length != (indentation * spaces_for_indentation)))
+        if (!is_same_indentation_level(indentation_token, indentation))
         {
-            return 1;
+            return true;
         }
         pop(parser);
         rich_token const expected_case = peek(parser);
         if (expected_case.token != token_case)
         {
             parser->on_error(parse_error_create(parse_error_expected_case, expected_case.where), parser->on_error_user);
-            return 0;
+            return false;
         }
         pop(parser);
         if (!parse_space(parser))
         {
-            return 0;
+            return false;
         }
         expression_parser_result const key = parse_expression(parser, indentation, 0);
         if (!key.is_success)
         {
-            return 0;
+            return false;
         }
         {
+            parse_optional_space(parser);
             rich_token const colon = peek(parser);
             pop(parser);
             if (colon.token != token_colon)
             {
                 parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
-                return 0;
+                return false;
             }
         }
         rich_token const space = peek(parser);
@@ -250,7 +261,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
             {
                 parser->on_error(
                     parse_error_create(parse_error_expected_expression, peek(parser).where), parser->on_error_user);
-                return 0;
+                return false;
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
             (*cases)[*case_count] = match_case_create(
@@ -263,7 +274,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
             expression_parser_result const value = parse_expression(parser, indentation, 0);
             if (!value.is_success)
             {
-                return 0;
+                return false;
             }
             {
                 rich_token const newline = peek(parser);
@@ -272,7 +283,7 @@ static int parse_match_cases(expression_parser *parser, size_t const indentation
                 {
                     parser->on_error(
                         parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
-                    return 0;
+                    return false;
                 }
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
