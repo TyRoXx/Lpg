@@ -87,12 +87,14 @@ static void pop(expression_parser *parser)
 
 static bool is_same_indentation_level(rich_token const found, size_t const expected)
 {
-    if(expected == 0 && found.token != token_indentation) {
+    if (expected == 0 && found.token != token_indentation)
+    {
         return true;
     }
 
     size_t indentation_level = 0;
-    for(size_t i = 0; i < found.content.length; i++){
+    for (size_t i = 0; i < found.content.length; i++)
+    {
         char currentCharacter = *(found.content.begin + i);
         indentation_level += ((currentCharacter == ' ') ? 1 : spaces_for_indentation);
     }
@@ -214,7 +216,7 @@ static expression_parser_result parse_loop(expression_parser *parser, size_t ind
 }
 
 static bool parse_match_cases(expression_parser *parser, size_t const indentation, match_case **cases,
-                             size_t *case_count)
+                              size_t *case_count)
 {
     for (;;)
     {

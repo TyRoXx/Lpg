@@ -97,15 +97,15 @@ static void test_formatting_tool()
                     "loop\n"
                     "    break",
                     false, "");
-//    formatting_tool("loop\n"
-//                    "\tbreak\n"
-//                    "    match a\n"
-//                    "\t    case 1: 1",
-//                    "loop\n"
-//                    "    break\n"
-//                    "    match a:\n"
-//                    "        case 1: 1",
-//                    false, "");
+    //    formatting_tool("loop\n"
+    //                    "\tbreak\n"
+    //                    "    match a\n"
+    //                    "\t    case 1: 1",
+    //                    "loop\n"
+    //                    "    break\n"
+    //                    "    match a:\n"
+    //                    "        case 1: 1",
+    //                    false, "");
 }
 
 void test_cli(void)
