@@ -106,3 +106,6 @@ let append-4096 = ()
     append-1024()
 append-4096()
 assert(integer-equals(4096, big.size()))
+
+big.clear()
+assert(integer-equals(0, big.size()))

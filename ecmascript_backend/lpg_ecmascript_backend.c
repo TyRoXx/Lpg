@@ -486,6 +486,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 1:
             return stream_writer_write_string(ecmascript_output, "integer_to_string");
 
+        case 3:
+            return stream_writer_write_string(ecmascript_output, "undefined");
+
         case 4:
             return stream_writer_write_string(ecmascript_output, "assert");
 
@@ -1185,6 +1188,10 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                            " new_array.prototype.call_method_3 = function (element) {\n"
                            "     this.content.push(element);\n"
                            "     return 1;\n"
+                           "};\n"
+                           /* clear()*/
+                           " new_array.prototype.call_method_4 = function () {\n"
+                           "     this.content.length = 0;\n"
                            "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {

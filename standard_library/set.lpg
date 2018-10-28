@@ -13,7 +13,7 @@ let linear-set = struct[T]
 
 impl[T] set[T] for linear-set[T]
     contains(key: T): std.boolean
-        let test_element = (element: T): boolean
+        let test_element = (element: T): std.boolean
             equality.equals[T](element, key)
         algorithm.any_of[T, type-of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
@@ -25,12 +25,15 @@ impl[T] set[T] for linear-set[T]
             case std.boolean.true:
                 std.boolean.false
             case std.boolean.false:
-                assert(self.elements.push(key))
+                assert(self.elements.append(key))
                 std.boolean.true
     clear(): std.unit
         self.elements.clear()
 
 let make-linear-set = [T](): set[T]
+    //TODO: remove side-effect(). It's here because there is a bug in the C backend.
+    side-effect()
+
     let content = linear-set[T]{new-array(T)}
     content
 

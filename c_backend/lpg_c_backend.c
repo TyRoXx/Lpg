@@ -43,7 +43,8 @@ typedef enum register_meaning
     register_meaning_host_value,
     register_meaning_fail,
     register_meaning_subtract,
-    register_meaning_add
+    register_meaning_add,
+    register_meaning_boolean
 } register_meaning;
 
 typedef enum register_resource_ownership
@@ -325,6 +326,22 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    return 1;\n"
                                                  "}\n"));
 
+    LPG_TRY(stream_writer_write_string(c_output, "static unit "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_clear(void *self)\n"
+                                                 "{\n"
+                                                 "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    for (size_t i = 0; i < impl->used; ++i)\n"
+                                                 "    {\n"));
+    LPG_TRY(generate_free(
+        standard_library, unicode_view_from_c_str("(impl->elements[i])"), element_type, program, 2, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"
+                                                 "    impl->used = 0;\n"
+                                                 "    return unit_impl;\n"
+                                                 "}\n"));
+
     LPG_TRY(stream_writer_write_string(c_output, "static "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const "));
@@ -344,7 +361,10 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(stream_writer_write_string(c_output, "_store, "));
 
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_append"));
+    LPG_TRY(stream_writer_write_string(c_output, "_append, "));
+
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_clear"));
 
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     return success_yes;
@@ -1008,6 +1028,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_integer_to_string:
     case register_meaning_host_value:
     case register_meaning_fail:
+    case register_meaning_boolean:
         LPG_TO_DO();
 
     case register_meaning_not:
@@ -1188,6 +1209,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_fail:
     case register_meaning_add:
     case register_meaning_subtract:
+    case register_meaning_boolean:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1771,6 +1793,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_fail:
         case register_meaning_add:
         case register_meaning_subtract:
+        case register_meaning_boolean:
             break;
         }
         LPG_TRY(indent(indentation, c_output));
@@ -1822,6 +1845,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_global:
         case register_meaning_unit:
         case register_meaning_host_value:
+        case register_meaning_boolean:
             LPG_UNREACHABLE();
 
         case register_meaning_side_effect:
@@ -2130,6 +2154,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
         case register_meaning_capture:
         case register_meaning_fail:
+        case register_meaning_boolean:
             LPG_TO_DO();
 
         case register_meaning_global:
@@ -2143,6 +2168,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 1:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_integer_to_string);
+                return success_yes;
+
+            case 3:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_boolean);
                 return success_yes;
 
             case 4:

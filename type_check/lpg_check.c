@@ -2690,14 +2690,21 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     return method_evaluation_result_create(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
 }
 
-static size_t add_implementation(lpg_interface *const to, implementation_entry const added)
+static size_t begin_implementation(lpg_interface *const to, type const self)
 {
     size_t const new_impl_id = to->implementation_count;
     size_t const new_impl_count = to->implementation_count + 1;
     to->implementations = reallocate_array(to->implementations, new_impl_count, sizeof(*to->implementations));
-    to->implementations[to->implementation_count] = added;
+    to->implementations[to->implementation_count] = implementation_entry_create(self, implementation_create(NULL, 0));
     to->implementation_count = new_impl_count;
     return new_impl_id;
+}
+
+static void finish_implementation(lpg_interface *const to, size_t const impl_index, implementation const methods)
+{
+    ASSUME(impl_index < to->implementation_count);
+    ASSUME(to->implementations[impl_index].target.method_count == 0);
+    to->implementations[impl_index].target = methods;
 }
 
 static evaluate_expression_result evaluate_generic_impl_regular_self(function_checking_state *state,
@@ -2892,6 +2899,20 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
                                         type const self, interface_id const target_interface,
                                         source_location const self_source)
 {
+    size_t impl_id;
+    {
+        lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
+        for (size_t i = 0; i < implemented_interface->implementation_count; ++i)
+        {
+            if (type_equals(self, implemented_interface->implementations[i].self))
+            {
+                emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_impl, self_source));
+                return optional_size_empty;
+            }
+        }
+        impl_id = begin_implementation(implemented_interface, self);
+    }
+
     function_pointer_value *const methods = allocate_array(method_count, sizeof(*methods));
     for (size_t i = 0; i < method_count; ++i)
     {
@@ -2904,18 +2925,9 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
         }
         methods[i] = method.success;
     }
+
     lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
-    for (size_t i = 0; i < implemented_interface->implementation_count; ++i)
-    {
-        if (type_equals(self, implemented_interface->implementations[i].self))
-        {
-            emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_impl, self_source));
-            deallocate(methods);
-            return optional_size_empty;
-        }
-    }
-    size_t const impl_id = add_implementation(
-        implemented_interface, implementation_entry_create(self, implementation_create(methods, method_count)));
+    finish_implementation(implemented_interface, impl_id, implementation_create(methods, method_count));
     return make_optional_size(impl_id);
 }
 

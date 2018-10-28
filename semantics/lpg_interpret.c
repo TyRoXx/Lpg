@@ -138,6 +138,12 @@ static value invoke_method(function_call_arguments const arguments, value const 
             return value_from_enum_element(1, type_from_unit(), NULL);
         }
 
+        case 4: // clear
+        {
+            from.array->count = 0;
+            return value_from_unit();
+        }
+
         default:
             LPG_UNREACHABLE();
         }

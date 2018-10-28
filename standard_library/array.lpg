@@ -3,11 +3,15 @@ let option = options.option
 
 let any-integer = int(0, 340282366920938463463374607431768211455)
 
+let units = import unit
+let unit = units.unit
+
 let array = interface[T]
     size(): any-integer
     load(index: any-integer): option[T]
     store(index: any-integer, element: T): boolean
     append(element: T): boolean
+    clear(): unit
 
 let export = struct
     array: type-of(array)
