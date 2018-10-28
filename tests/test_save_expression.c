@@ -7,7 +7,13 @@
 #include <stdio.h>
 #include <string.h>
 
-static void testing_comment_expressions();
+static void testing_comment_expressions(void);
+static void test_integer_saving(void);
+static expression expression_from_integer(const integer number);
+static identifier_expression identifier_expression_from_c_string(const char* c_string) 
+{
+    return identifier_expression_create(unicode_string_from_c_str(c_string), source_location_create(0, 0));
+}
 
 static void check_expression_rendering(expression tree, char const *expected)
 {
@@ -31,43 +37,19 @@ void test_save_expression(void)
     check_expression_rendering(
         expression_from_string(string_expression_create(unicode_string_from_c_str(""), source_location_create(0, 0))),
         "\"\"");
-    check_expression_rendering(expression_from_string(string_expression_create(
+    check_expression_rendering(
+        expression_from_string(string_expression_create(
                                    unicode_string_from_c_str("abc"), source_location_create(0, 0))),
                                "\"abc\"");
     check_expression_rendering(expression_from_string(string_expression_create(
                                    unicode_string_from_c_str("\"\'\\"), source_location_create(0, 0))),
                                "\"\\\"\\\'\\\\\"");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 0), source_location_create(0, 0))),
-                               "0");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 1), source_location_create(0, 0))),
-                               "1");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 9), source_location_create(0, 0))),
-                               "9");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 10), source_location_create(0, 0))),
-                               "10");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 11), source_location_create(0, 0))),
-                               "11");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(0, 1000), source_location_create(0, 0))),
-                               "1000");
-    check_expression_rendering(expression_from_integer_literal(integer_literal_expression_create(
-                                   integer_create(1, 0), source_location_create(0, 0))),
-                               "18446744073709551616");
-    check_expression_rendering(
-        expression_from_integer_literal(integer_literal_expression_create(
-            integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu), source_location_create(0, 0))),
-        "340282366920938463463374607431768211455");
+    test_integer_saving();
     {
         expression *const arguments = allocate_array(2, sizeof(*arguments));
         arguments[0] = expression_from_string(
             string_expression_create(unicode_string_from_c_str("test"), source_location_create(0, 0)));
-        arguments[1] = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
+        arguments[1] = expression_from_identifier(identifier_expression_from_c_string("a"));
         check_expression_rendering(
             expression_from_call(
                 call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
@@ -78,49 +60,46 @@ void test_save_expression(void)
     {
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] =
-            parameter_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
+            parameter_create(identifier_expression_from_c_string("a"),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("uint32"), source_location_create(0, 0)))));
         check_expression_rendering(
             expression_from_lambda(
-                lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 1, NULL),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 1234), source_location_create(0, 0)))),
-                              source_location_create(0, 0))),
+                lambda_create(
+                    generic_parameter_list_create(NULL, 0),
+                    function_header_tree_create(parameters, 1, NULL),
+                    expression_allocate(expression_from_integer(integer_create(0, 1234))),
+                    source_location_create(0, 0)
+                )
+            ),
             "(a: uint32) 1234");
     }
 
     {
         expression *arguments = allocate_array(2, sizeof(*arguments));
-        arguments[0] = expression_from_integer_literal(
-            integer_literal_expression_create(integer_create(0, 0), source_location_create(0, 0)));
-        arguments[1] = expression_from_integer_literal(
-            integer_literal_expression_create(integer_create(0, 10), source_location_create(0, 0)));
+        arguments[0] = expression_from_integer(integer_create(0, 0));
+        arguments[1] = expression_from_integer(integer_create(0, 10));
         check_expression_rendering(
             expression_from_declare(declare_create(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
+                identifier_expression_from_c_string("a"),
                 expression_allocate(expression_from_call(call_create(
                     expression_allocate(expression_from_identifier(identifier_expression_create(
                         unicode_string_from_c_str("integer"), source_location_create(0, 0)))),
                     tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 0)))),
-                expression_allocate(expression_from_integer_literal(
-                    integer_literal_expression_create(integer_create(0, 6), source_location_create(0, 0)))))),
+                expression_allocate(expression_from_integer(integer_create(0, 6))))),
             "let a : integer(0, 10) = 6");
     }
 
     check_expression_rendering(
         expression_from_declare(
-            declare_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
-                           NULL, expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                     integer_create(0, 6), source_location_create(0, 0)))))),
+            declare_create(identifier_expression_from_c_string("a"),
+                           NULL, expression_allocate(expression_from_integer(integer_create(0, 6))))),
         "let a = 6");
 
     check_expression_rendering(
         expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+            expression_allocate(expression_from_identifier(identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals)),
         "a == 123");
 
@@ -128,25 +107,23 @@ void test_save_expression(void)
         expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_access_structure(access_structure_create(
                 expression_allocate(expression_from_identifier(
-                    identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
+                    identifier_expression_from_c_string("a"))),
                 identifier_expression_create(unicode_string_from_c_str("m"), source_location_create(0, 0))))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals)),
         "a.m == 123");
 
     check_expression_rendering(
         expression_from_return(expression_allocate(expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0))))),
+            identifier_expression_from_c_string("a")))),
         "return a");
 
     {
         expression *loop_body = allocate_array(1, sizeof(*loop_body));
         loop_body[0] = expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+                identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals));
         check_expression_rendering(expression_from_loop(sequence_create(loop_body, 1)), "loop\n"
                                                                                         "    a == 123");
@@ -156,9 +133,8 @@ void test_save_expression(void)
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
         inner_loop[0] = expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+                identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals));
         expression *outer_loop = allocate_array(1, sizeof(*outer_loop));
         outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
@@ -171,9 +147,8 @@ void test_save_expression(void)
         expression *body = allocate_array(2, sizeof(*body));
         body[0] = expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+                identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals));
         body[1] = expression_from_break(source_location_create(0, 0));
         check_expression_rendering(expression_from_loop(sequence_create(body, 2)), "loop\n"
@@ -185,10 +160,8 @@ void test_save_expression(void)
         inner_loop[0] = expression_from_break(source_location_create(0, 0));
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+            expression_allocate(expression_from_identifier(identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals));
         outer_loop[1] = expression_from_loop(sequence_create(inner_loop, 1));
         check_expression_rendering(expression_from_loop(sequence_create(outer_loop, 2)), "loop\n"
@@ -205,16 +178,14 @@ void test_save_expression(void)
 
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)))),
+            expression_allocate(expression_from_identifier( identifier_expression_from_c_string("a"))),
+            expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals));
         outer_loop[1] = expression_from_loop(sequence_create(inner_loop, 1));
 
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] =
-            parameter_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
+            parameter_create(identifier_expression_from_c_string("a"),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("uint32"), source_location_create(0, 0)))));
 
@@ -232,7 +203,7 @@ void test_save_expression(void)
     {
         parameter *parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] =
-            parameter_create(identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)),
+            parameter_create(identifier_expression_from_c_string("a"),
                              expression_allocate(expression_from_identifier(identifier_expression_create(
                                  unicode_string_from_c_str("float"), source_location_create(0, 0)))));
         parameters[1] =
@@ -242,9 +213,10 @@ void test_save_expression(void)
 
         check_expression_rendering(
             expression_from_lambda(
-                lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 2, NULL),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 123), source_location_create(0, 0)))),
+                lambda_create(
+                    generic_parameter_list_create(NULL, 0),
+                    function_header_tree_create(parameters, 2, NULL),
+                              expression_allocate(expression_from_integer(integer_create(0, 123))),
                               source_location_create(0, 0))),
             "(a: float, b: string) 123");
     }
@@ -254,7 +226,7 @@ void test_save_expression(void)
     {
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
+            identifier_expression_from_c_string("a"));
         check_expression_rendering(
             expression_from_tuple(tuple_create(elements, 1, source_location_create(0, 0))), "{a}");
     }
@@ -262,9 +234,8 @@ void test_save_expression(void)
     {
         expression *elements = allocate_array(2, sizeof(*elements));
         elements[0] = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 0)));
-        elements[1] = expression_from_integer_literal(
-            integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0)));
+            identifier_expression_from_c_string("a"));
+        elements[1] = expression_from_integer(integer_create(0, 123));
         check_expression_rendering(
             expression_from_tuple(tuple_create(elements, 2, source_location_create(0, 0))), "{a, 123}");
     }
@@ -272,15 +243,12 @@ void test_save_expression(void)
     {
         match_case *cases = allocate_array(1, sizeof(*cases));
         cases[0] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 123), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 456), source_location_create(0, 0)))));
+            match_case_create(expression_allocate(expression_from_integer(integer_create(0, 123))),
+                              expression_allocate(expression_from_integer(integer_create(0, 456))));
         check_expression_rendering(
             expression_from_match(
                 match_create(source_location_create(0, 0),
-                             expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                 integer_create(0, 123), source_location_create(0, 0)))),
+                             expression_allocate(expression_from_integer(integer_create(0, 123))),
                              cases, 1)),
             "match 123\n"
             "    case 123: 456\n");
@@ -289,20 +257,15 @@ void test_save_expression(void)
     {
         match_case *cases = allocate_array(2, sizeof(*cases));
         cases[0] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 123), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 456), source_location_create(0, 0)))));
+            match_case_create(expression_allocate(expression_from_integer(integer_create(0, 123))),
+                              expression_allocate(expression_from_integer(integer_create(0, 456))));
         cases[1] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 124), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 457), source_location_create(0, 0)))));
+            match_case_create(expression_allocate(expression_from_integer(integer_create(0, 124))),
+                              expression_allocate(expression_from_integer(integer_create(0, 457))));
         check_expression_rendering(
             expression_from_match(
                 match_create(source_location_create(0, 0),
-                             expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                 integer_create(0, 123), source_location_create(0, 0)))),
+                             expression_allocate(expression_from_integer(integer_create(0, 123))),
                              cases, 2)),
             "match 123\n"
             "    case 123: 456\n"
@@ -312,22 +275,22 @@ void test_save_expression(void)
     {
         match_case *cases = allocate_array(2, sizeof(*cases));
         cases[0] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 123), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 456), source_location_create(0, 0)))));
+            match_case_create(expression_allocate(expression_from_integer(integer_create(0, 123))),
+                              expression_allocate(expression_from_integer(integer_create(0, 456))));
         expression *const case_1 = allocate_array(2, sizeof(*case_1));
         case_1[0] = expression_from_break(source_location_create(0, 0));
         case_1[1] = expression_from_break(source_location_create(0, 0));
         cases[1] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 124), source_location_create(0, 0)))),
-                              expression_allocate(expression_from_sequence(sequence_create(case_1, 2))));
+            match_case_create(expression_allocate(expression_from_integer(integer_create(0, 124))),
+                              expression_allocate(expression_from_sequence(sequence_create(case_1, 2)))
+                              );
+        
         check_expression_rendering(
             expression_from_match(
                 match_create(source_location_create(0, 0),
-                             expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                 integer_create(0, 123), source_location_create(0, 0)))),
+                             expression_allocate(
+                                 expression_from_integer(integer_create(0, 123))
+                             ),
                              cases, 2)),
             "match 123\n"
             "    case 123: 456\n"
@@ -339,7 +302,7 @@ void test_save_expression(void)
     testing_comment_expressions();
 }
 
-static void testing_comment_expressions()
+static void testing_comment_expressions(void)
 {
     {
         unicode_string const content = unicode_string_from_c_str("Test");
@@ -354,4 +317,22 @@ static void testing_comment_expressions()
             expression_from_comment(comment_expression_create(content, source_location_create(0, 0)));
         check_expression_rendering(comment, "/*Test\nTesting*/");
     }
+}
+
+static expression expression_from_integer(const integer number)
+{
+    return expression_from_integer_literal(integer_literal_expression_create(number, source_location_create(0, 0)));
+}
+
+static void test_integer_saving(void) {
+    check_expression_rendering(expression_from_integer(integer_create(0, 0)), "0");
+    check_expression_rendering(expression_from_integer(integer_create(0, 1)), "1");
+    check_expression_rendering(expression_from_integer(integer_create(0, 9)), "9");
+    check_expression_rendering(expression_from_integer(integer_create(0, 10)),"10");
+    check_expression_rendering(expression_from_integer(integer_create(0, 11)), "11");
+    check_expression_rendering(expression_from_integer(integer_create(0, 1000)), "1000");
+    check_expression_rendering(expression_from_integer(integer_create(1, 0)), "18446744073709551616");
+
+    check_expression_rendering(expression_from_integer(integer_create(0xFFFFFFFFFFFFFFFFu, 0xFFFFFFFFFFFFFFFFu)),
+        "340282366920938463463374607431768211455");
 }
