@@ -75,7 +75,6 @@ static duk_ret_t ecmascript_fail(duk_context *const duktape)
 {
     (void)duktape;
     FAIL();
-    return 0;
 }
 
 static void *duktape_allocate(void *udata, duk_size_t size)
