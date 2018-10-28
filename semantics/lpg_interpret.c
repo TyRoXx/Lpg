@@ -153,7 +153,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
             {
                 return value_from_enum_element(0, type_from_unit(), NULL);
             }
-            from.array->count -= count.integer_.low;
+            from.array->count -= (size_t)count.integer_.low;
             return value_from_enum_element(1, type_from_unit(), NULL);
         }
 
