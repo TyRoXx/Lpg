@@ -2,8 +2,9 @@
 #include "lpg_assert.h"
 #include "lpg_array_size.h"
 
-expression_parser expression_parser_create(rich_token_producer rich_token_producer_argument, callback_user find_next_token_user,
-                                           parse_error_handler on_error, callback_user on_error_user)
+expression_parser expression_parser_create(rich_token_producer rich_token_producer_argument,
+                                           callback_user find_next_token_user, parse_error_handler on_error,
+                                           callback_user on_error_user)
 {
     expression_parser const result = {
         rich_token_producer_argument,

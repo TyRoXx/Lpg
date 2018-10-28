@@ -1,7 +1,8 @@
 #include "lpg_find_next_token.h"
 #include "lpg_assert.h"
 
-static rich_token rich_token_create(tokenize_status status, token_type token, unicode_view content, source_location where)
+static rich_token rich_token_create(tokenize_status status, token_type token, unicode_view content,
+                                    source_location where)
 {
     rich_token const result = {status, token, content, where};
     return result;

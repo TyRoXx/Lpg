@@ -18,6 +18,5 @@ typedef struct rich_token
     source_location where;
 } rich_token;
 
-
 typedef void *callback_user;
 rich_token find_next_token(callback_user user);
