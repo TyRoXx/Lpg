@@ -148,8 +148,7 @@ typedef struct match
     size_t number_of_cases;
 } match;
 
-match match_create(source_location begin, LPG_NON_NULL(expression *input), LPG_NON_NULL(match_case *cases),
-                   size_t number_of_cases);
+match match_create(source_location begin, LPG_NON_NULL(expression *input), match_case *cases, size_t number_of_cases);
 match match_clone(match const original);
 
 typedef struct not
