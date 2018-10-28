@@ -41,3 +41,16 @@ int lpg_print_test_summary(void);
             FAIL();                                                                                                    \
         }                                                                                                              \
     } while ((void)0, 0)
+
+#define REQUIRE_WITH_MESSAGE(x, ...)                                                                                   \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        bool const lpg_require_local_variable = !!(x);                                                                 \
+        lpg_check(lpg_require_local_variable);                                                                         \
+        if (!lpg_require_local_variable)                                                                               \
+        {                                                                                                              \
+            fprintf(stderr, "REQUIRE(" LPG_STRINGIZE(x) ") failed\n");                                                 \
+            fprintf(stderr, __VA_ARGS__);                                                                              \
+            FAIL();                                                                                                    \
+        }                                                                                                              \
+    } while ((void)0, 0)

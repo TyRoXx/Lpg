@@ -66,8 +66,13 @@ static bool from_ecmascript_bool(double const input)
 static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
     duk_int_t const argument_type = duk_get_type(duktape, 0);
-    REQUIRE(argument_type == DUK_TYPE_NUMBER);
-    REQUIRE(from_ecmascript_bool(duk_get_number(duktape, 0)));
+    duk_inspect_callstack_entry(duktape, -2);
+    duk_get_prop_string(duktape, -1, "lineNumber");
+    long const line = (long)duk_to_int(duktape, -1);
+    duk_pop_2(duktape);
+    REQUIRE_WITH_MESSAGE((argument_type == DUK_TYPE_NUMBER), "immediate caller is executing on line %ld\n", line);
+    REQUIRE_WITH_MESSAGE(
+        from_ecmascript_bool(duk_get_number(duktape, 0)), "immediate caller is executing on line %ld\n", line);
     return 0;
 }
 
@@ -302,6 +307,13 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         duk_push_c_function(duktape, ecmascript_fail, 1);
         duk_put_global_string(duktape, "fail");
 
+        {
+            unicode_view const source_pieces[] = {c_test_dir, unicode_view_from_c_str("generated.js")};
+            unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+            write_file_if_necessary(
+                unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
+            unicode_string_free(&source_file_path);
+        }
         // fwrite(generated.data, generated.used, 1, stdout);
         // fflush(stdout);
 

@@ -26,3 +26,10 @@ assert(match subtract(0, 1)
     case subtract_result.underflow:
         boolean.true
 )
+
+assert(match subtract(std.runtime-value[integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtract_result.underflow:
+        boolean.true
+)

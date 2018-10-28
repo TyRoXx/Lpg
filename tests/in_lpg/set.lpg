@@ -5,7 +5,7 @@ let s = sets.make-linear-set[std.boolean]()
 assert(not(s.contains(std.boolean.false)))
 assert(not(s.contains(std.boolean.true)))
 
-/*assert(s.add(std.boolean.false))
+assert(s.add(std.boolean.false))
 assert(s.contains(std.boolean.false))
 assert(not(s.contains(std.boolean.true)))
 
@@ -24,4 +24,3 @@ assert(s.contains(std.boolean.true))
 s.clear()
 assert(not(s.contains(std.boolean.false)))
 assert(not(s.contains(std.boolean.true)))
-*/
