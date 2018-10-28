@@ -16,6 +16,7 @@ addons:
     - gcc-7
     - clang-3.8
     - valgrind
+    - ninja-build
 
 env:
  - MYCC=gcc-7     BUILD_TYPE=Debug          COVERAGE=YES UB_SANITIZER=OFF MEMORY_SANITIZER=OFF ADDRESS_SANITIZER=OFF THREAD_SANITIZER=OFF
