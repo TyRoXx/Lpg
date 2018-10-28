@@ -52,8 +52,7 @@ void test_save_expression(void)
         arguments[1] = expression_from_identifier(identifier_expression_from_c_string("a"));
         check_expression_rendering(
             expression_from_call(
-                call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                                unicode_string_from_c_str("f"), source_location_create(0, 0)))),
+                call_create(expression_allocate(expression_from_identifier(identifier_expression_from_c_string("f"))),
                             tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 0))),
             "f(\"test\", a)");
     }
@@ -61,8 +60,7 @@ void test_save_expression(void)
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] =
             parameter_create(identifier_expression_from_c_string("a"),
-                             expression_allocate(expression_from_identifier(identifier_expression_create(
-                                 unicode_string_from_c_str("uint32"), source_location_create(0, 0)))));
+                             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("uint32"))));
         check_expression_rendering(
             expression_from_lambda(
                 lambda_create(
@@ -83,8 +81,7 @@ void test_save_expression(void)
             expression_from_declare(declare_create(
                 identifier_expression_from_c_string("a"),
                 expression_allocate(expression_from_call(call_create(
-                    expression_allocate(expression_from_identifier(identifier_expression_create(
-                        unicode_string_from_c_str("integer"), source_location_create(0, 0)))),
+                    expression_allocate(expression_from_identifier(identifier_expression_from_c_string("integer"))),
                     tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 0)))),
                 expression_allocate(expression_from_integer(integer_create(0, 6))))),
             "let a : integer(0, 10) = 6");
@@ -105,10 +102,18 @@ void test_save_expression(void)
 
     check_expression_rendering(
         expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_access_structure(access_structure_create(
-                expression_allocate(expression_from_identifier(
-                    identifier_expression_from_c_string("a"))),
-                identifier_expression_create(unicode_string_from_c_str("m"), source_location_create(0, 0))))),
+            expression_allocate(
+                expression_from_access_structure(
+                    access_structure_create(
+                        expression_allocate(
+                            expression_from_identifier(
+                                identifier_expression_from_c_string("a")
+                            )
+                        ),
+                    identifier_expression_from_c_string("m")
+                    )
+                )
+            ),
             expression_allocate(expression_from_integer(integer_create(0, 123))),
             equals)),
         "a.m == 123");
@@ -186,8 +191,7 @@ void test_save_expression(void)
         parameter *parameters = allocate_array(1, sizeof(*parameters));
         parameters[0] =
             parameter_create(identifier_expression_from_c_string("a"),
-                             expression_allocate(expression_from_identifier(identifier_expression_create(
-                                 unicode_string_from_c_str("uint32"), source_location_create(0, 0)))));
+                             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("uint32"))));
 
         check_expression_rendering(
             expression_from_lambda(
@@ -204,12 +208,10 @@ void test_save_expression(void)
         parameter *parameters = allocate_array(2, sizeof(*parameters));
         parameters[0] =
             parameter_create(identifier_expression_from_c_string("a"),
-                             expression_allocate(expression_from_identifier(identifier_expression_create(
-                                 unicode_string_from_c_str("float"), source_location_create(0, 0)))));
+                             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("float"))));
         parameters[1] =
-            parameter_create(identifier_expression_create(unicode_string_from_c_str("b"), source_location_create(0, 0)),
-                             expression_allocate(expression_from_identifier(identifier_expression_create(
-                                 unicode_string_from_c_str("string"), source_location_create(0, 0)))));
+            parameter_create(identifier_expression_from_c_string("b"),
+                             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("string"))));
 
         check_expression_rendering(
             expression_from_lambda(
