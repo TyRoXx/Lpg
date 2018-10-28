@@ -136,7 +136,6 @@ static void write_file_if_necessary(unicode_view const path, unicode_view const 
 static void run_c_test(unicode_view const test_name, unicode_view const c_source, unicode_view const c_test_dir)
 {
     ASSUME(test_name.length > 0);
-    REQUIRE(success_yes == create_directory(c_test_dir));
     unicode_view const last_success_pieces[] = {c_test_dir, unicode_view_from_c_str("last_success.c")};
     unicode_string const last_success = path_combine(last_success_pieces, LPG_ARRAY_SIZE(last_success_pieces));
     {
@@ -250,6 +249,7 @@ out:
 static void test_all_backends(unicode_view const test_name, checked_program const program,
                               structure const global_object, unicode_view const c_test_dir)
 {
+    REQUIRE(success_yes == create_directory(c_test_dir));
     {
         value const globals_values[] = {
             /*0 side-effect*/ value_from_function_pointer(function_pointer_value_from_external(
