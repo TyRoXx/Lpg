@@ -1395,8 +1395,10 @@ expression expression_clone(expression const original)
     case expression_type_type_of:
         return expression_from_type_of(type_of_expression_clone(original.type_of));
 
-    case expression_type_binary:
     case expression_type_return:
+        return expression_from_return(expression_allocate(expression_clone(*original.return_)));
+
+    case expression_type_binary:
     case expression_type_import:
         LPG_TO_DO();
     }

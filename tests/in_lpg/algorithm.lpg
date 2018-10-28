@@ -5,5 +5,16 @@ let integer = integers.integer
 
 let handler_a = (element: integer): std.unit
     assert(integer-equals(0, element))
-//TODO
-//algorithm.enumerate[type-of(handler_a)](0, 0, handler_a)
+algorithm.enumerate[type-of(handler_a)](0, 0, handler_a)
+
+let true-predicate = (element: boolean): boolean
+    boolean.true
+let false-predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type-of(true-predicate)](new-array(boolean), true-predicate)))
+assert(not(algorithm.any_of[boolean, type-of(false-predicate)](new-array(boolean), false-predicate)))
+
+let non-empty = new-array(boolean)
+assert(non-empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type-of(true-predicate)](non-empty, true-predicate))
+assert(not(algorithm.any_of[boolean, type-of(false-predicate)](non-empty, false-predicate)))

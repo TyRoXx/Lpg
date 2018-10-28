@@ -17,7 +17,7 @@ assert(s.add(std.boolean.true))
 assert(s.contains(std.boolean.false))
 assert(s.contains(std.boolean.true))
 
-assert(s.add(std.boolean.true))
+assert(not(s.add(std.boolean.true)))
 assert(s.contains(std.boolean.false))
 assert(s.contains(std.boolean.true))
 

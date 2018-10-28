@@ -71,6 +71,13 @@ static duk_ret_t ecmascript_assert(duk_context *const duktape)
     return 0;
 }
 
+static duk_ret_t ecmascript_fail(duk_context *const duktape)
+{
+    (void)duktape;
+    FAIL();
+    return 0;
+}
+
 static void *duktape_allocate(void *udata, duk_size_t size)
 {
     (void)udata;
@@ -292,6 +299,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
 
         duk_push_c_function(duktape, ecmascript_assert, 1);
         duk_put_global_string(duktape, "assert");
+
+        duk_push_c_function(duktape, ecmascript_fail, 1);
+        duk_put_global_string(duktape, "fail");
 
         // fwrite(generated.data, generated.used, 1, stdout);
         // fflush(stdout);
