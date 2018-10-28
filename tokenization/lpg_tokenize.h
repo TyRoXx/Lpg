@@ -3,8 +3,7 @@
 
 static size_t const spaces_for_indentation = 4;
 
-typedef enum token_type
-{
+typedef enum token_type {
     token_newline = 1,
     token_comment,
     token_space,
@@ -54,11 +53,7 @@ typedef enum token_type
     token_new_array
 } token_type;
 
-typedef enum tokenize_status
-{
-    tokenize_success = 1,
-    tokenize_invalid
-} tokenize_status;
+typedef enum tokenize_status { tokenize_success = 1, tokenize_invalid } tokenize_status;
 
 typedef struct tokenize_result
 {

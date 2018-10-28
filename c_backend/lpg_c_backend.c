@@ -2,8 +2,8 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_instruction.h"
-#include "lpg_structure_member.h"
 #include "lpg_standard_library.h"
+#include "lpg_structure_member.h"
 #include <string.h>
 
 typedef struct standard_library_usage
@@ -23,8 +23,7 @@ static void standard_library_usage_use_string(standard_library_usage *usage)
     usage->using_string = true;
 }
 
-typedef enum register_meaning
-{
+typedef enum register_meaning {
     register_meaning_nothing = 1,
     register_meaning_global,
     register_meaning_variable,
@@ -47,8 +46,7 @@ typedef enum register_meaning
     register_meaning_boolean
 } register_meaning;
 
-typedef enum register_resource_ownership
-{
+typedef enum register_resource_ownership {
     register_resource_ownership_owns = 1,
     register_resource_ownership_borrows
 } register_resource_ownership;
@@ -298,29 +296,29 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "{\n"
                                                  "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(
-        c_output, " * const impl = self;\n"
-                  "    if (impl->allocated == impl->used)\n"
-                  "    {\n"
-                  "        if ((SIZE_MAX / 2) < impl->used)\n"
-                  "        {\n"
-                  "            // overflow\n"
-                  "            return 0;\n"
-                  "        }\n"
-                  "        size_t new_capacity = (impl->used * 2);\n"
-                  "        if (new_capacity == 0)\n"
-                  "        {\n"
-                  "            new_capacity = 1;\n"
-                  "        }\n"
-                  "        if ((SIZE_MAX / sizeof(*impl->elements)) < new_capacity)\n"
-                  "        {\n"
-                  "            // overflow\n"
-                  "            return 0;\n"
-                  "        }\n"
-                  "        impl->elements = realloc(impl->elements, (new_capacity * sizeof(*impl->elements)));\n"
-                  "        impl->allocated = new_capacity;\n"
-                  "    }\n"
-                  "    impl->elements[impl->used] = element;\n"));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    if (impl->allocated == impl->used)\n"
+                                                 "    {\n"
+                                                 "        if ((SIZE_MAX / 2) < impl->used)\n"
+                                                 "        {\n"
+                                                 "            // overflow\n"
+                                                 "            return 0;\n"
+                                                 "        }\n"
+                                                 "        size_t new_capacity = (impl->used * 2);\n"
+                                                 "        if (new_capacity == 0)\n"
+                                                 "        {\n"
+                                                 "            new_capacity = 1;\n"
+                                                 "        }\n"
+                                                 "        if ((SIZE_MAX / sizeof(*impl->elements)) < new_capacity)\n"
+                                                 "        {\n"
+                                                 "            // overflow\n"
+                                                 "            return 0;\n"
+                                                 "        }\n"
+                                                 "        impl->elements = realloc(impl->elements, (new_capacity * "
+                                                 "sizeof(*impl->elements)));\n"
+                                                 "        impl->allocated = new_capacity;\n"
+                                                 "    }\n"
+                                                 "    impl->elements[impl->used] = element;\n"));
     LPG_TRY(generate_add_reference(unicode_view_from_c_str("element"), element_type, 1, program, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "    impl->used += 1;\n"
                                                  "    return 1;\n"
@@ -746,8 +744,9 @@ generate_interface_impl_definition(implementation_ref const generated, type_defi
     LPG_TRY(stream_writer_write_string(c_output, "{\n"));
 
     LPG_TRY(indent(1, c_output));
-    LPG_TRY(
-        stream_writer_write_string(c_output, "size_t *const counter = (size_t *)((char *)self - sizeof(*counter));\n"));
+    LPG_TRY(stream_writer_write_string(c_output, "size_t *const counter = "
+                                                 "(size_t *)((char *)self - "
+                                                 "sizeof(*counter));\n"));
     LPG_TRY(indent(1, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "*counter = (size_t)((ptrdiff_t)*counter + difference);\n"));
     LPG_TRY(indent(1, c_output));

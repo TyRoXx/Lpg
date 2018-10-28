@@ -155,8 +155,10 @@ void test_cli(void)
         "", "unknown", true, "Arguments: [run|format|compile|web] filename [web output file]\n");
 
     expect_output_with_source_flags("print(\"Hello World)\n", "compile", true,
-                                    "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected expression "
-                                    "in line 1:\nprint(\"Hello World)\n                   ^\nExpected expression "
+                                    "Invalid token in line 1:\nprint(\"Hello World)\n      ^\nExpected "
+                                    "expression "
+                                    "in line 1:\nprint(\"Hello World)\n                   ^\nExpected "
+                                    "expression "
                                     "in line 2:\n\n^\nExpected arguments in line 2:\n\n^\n");
 
     expect_output_with_source("print(\"\")\n"

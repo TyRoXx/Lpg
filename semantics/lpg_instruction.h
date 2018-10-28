@@ -8,8 +8,7 @@
 
 typedef struct instruction instruction;
 
-typedef enum instruction_type
-{
+typedef enum instruction_type {
     instruction_call = 1,
     instruction_loop,
     instruction_global,
@@ -217,8 +216,7 @@ struct instruction
     };
 };
 
-typedef enum match_instruction_case_kind
-{
+typedef enum match_instruction_case_kind {
     match_instruction_case_kind_value = 1,
     match_instruction_case_kind_stateful_enum
 } match_instruction_case_kind;

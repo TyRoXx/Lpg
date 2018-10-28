@@ -13,8 +13,7 @@ static optional_value call_interpreted_function(checked_function const callee, o
                                                 checked_function const *const all_functions,
                                                 lpg_interface const *const all_interfaces);
 
-typedef enum run_sequence_result
-{
+typedef enum run_sequence_result {
     run_sequence_result_break = 1,
     run_sequence_result_continue,
     run_sequence_result_return,

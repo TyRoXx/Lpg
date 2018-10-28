@@ -1,6 +1,6 @@
 #include "lpg_expression_parser.h"
-#include "lpg_assert.h"
 #include "lpg_array_size.h"
+#include "lpg_assert.h"
 
 expression_parser expression_parser_create(rich_token_producer rich_token_producer_argument,
                                            callback_user find_next_token_user, parse_error_handler on_error,

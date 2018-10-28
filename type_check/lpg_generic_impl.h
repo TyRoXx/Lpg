@@ -1,9 +1,9 @@
 #pragma once
 
 #include "lpg_expression.h"
+#include "lpg_source_file.h"
 #include "lpg_type.h"
 #include "lpg_value.h"
-#include "lpg_source_file.h"
 
 typedef struct generic_closure
 {

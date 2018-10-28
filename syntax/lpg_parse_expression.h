@@ -1,9 +1,9 @@
 #pragma once
 #include "lpg_expression.h"
+#include "lpg_expression_parser.h"
 #include "lpg_source_location.h"
 #include "lpg_tokenize.h"
 #include "lpg_unicode_view.h"
-#include "lpg_expression_parser.h"
 
 bool is_end_of_file(LPG_NON_NULL(rich_token const *token));
 

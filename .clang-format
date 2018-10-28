@@ -17,7 +17,7 @@ AlwaysBreakBeforeMultilineStrings: false
 BreakBeforeBinaryOperators: None
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: true
-BreakBeforeBraces: Allman
+BreakBeforeBraces: Custom
 BinPackParameters: true
 BinPackArguments: true
 ColumnLimit:     120
@@ -60,3 +60,13 @@ CommentPragmas:  '^ IWYU pragma:'
 ForEachMacros:   [ foreach, Q_FOREACH, BOOST_FOREACH ]
 SpaceBeforeParens: ControlStatements
 DisableFormat:   false
+BraceWrapping:
+  AfterEnum: true
+  AfterStruct: true
+  AfterNamespace: true
+  AfterUnion: true
+  AfterClass: true
+  AfterFunction: true
+  AfterControlStatement: true
+  IndentBraces: false
+  BeforeElse: true

@@ -359,12 +359,13 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
 
 static success_indicator generate_main_html(checked_program const program, stream_writer const destination)
 {
-    LPG_TRY(stream_writer_write_string(
-        destination, "<!DOCTYPE html><html><head> <meta charset=\"UTF-8\"><title>LPG web</title>"
-                     "<script type=\"text/javascript\">"
-                     "\"use strict\";\n"
-                     "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
-                     "var main = "));
+    LPG_TRY(stream_writer_write_string(destination, "<!DOCTYPE html><html><head> <meta "
+                                                    "charset=\"UTF-8\"><title>LPG web</title>"
+                                                    "<script type=\"text/javascript\">"
+                                                    "\"use strict\";\n"
+                                                    "var assert = function (condition) { if (!condition) { "
+                                                    "alert(\"Assertion failed\"); } }\n"
+                                                    "var main = "));
     LPG_TRY(generate_ecmascript(program, destination));
     LPG_TRY(generate_host_class(destination));
     LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
@@ -393,8 +394,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     if (!arguments.valid)
     {
-        ASSERT(success_yes == stream_writer_write_string(
-                                  diagnostics, "Arguments: [run|format|compile|web] filename [web output file]\n"));
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, "Arguments: [run|format|compile|web] "
+                                                                      "filename [web output file]\n"));
         return true;
     }
 

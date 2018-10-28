@@ -43,8 +43,7 @@ function_pointer_value function_pointer_value_from_internal(function_id const co
                                                             size_t const capture_count);
 bool function_pointer_value_equals(function_pointer_value const left, function_pointer_value const right);
 
-typedef enum value_kind
-{
+typedef enum value_kind {
     value_kind_integer = 1,
     value_kind_string,
     value_kind_function_pointer,
@@ -188,7 +187,8 @@ typedef struct function_call_arguments
     value const *globals;
     garbage_collector *const gc;
 
-    /*TODO are all_functions and all_interfaces safe to use? Can't they change whenever a new function or interface is
+    /*TODO are all_functions and all_interfaces safe to use? Can't they change
+     * whenever a new function or interface is
      * defined?*/
     checked_function const *const all_functions;
     lpg_interface const *all_interfaces;

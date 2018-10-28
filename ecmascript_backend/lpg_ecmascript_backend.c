@@ -290,8 +290,7 @@ static success_indicator generate_var(register_id const id, stream_writer const 
     return success_yes;
 }
 
-typedef enum register_type
-{
+typedef enum register_type {
     register_type_none = 1,
     register_type_variable,
     register_type_global,
@@ -1148,57 +1147,63 @@ static success_indicator define_interface(interface_id const id, lpg_interface c
 
 success_indicator generate_ecmascript(checked_program const program, stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(
-        ecmascript_output, "(function ()\n"
-                           "{\n"
-                           " \"use strict\";\n"
-                           " var string_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"
-                           " var integer_equals = function (left, right) { return (left === right) ? 1.0 : 0.0; };\n"
-                           " var integer_less = function (left, right) { return (left < right) ? 1.0 : 0.0; };\n"
-                           " var integer_subtract = function (left, right) { var difference = (left - right); return "
-                           "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
-                           " var integer_add = function (left, right) { return [0, (left + right)]; };\n"
-                           " var concat = function (left, right) { return (left + right); };\n"
-                           " var not = function (argument) { return ((argument === 1.0) ? 0.0 : 1.0); };\n"
-                           " var side_effect = function () {};\n"
-                           " var integer_to_string = function (input) { return \"\" + input; };\n"
-                           " var new_array = function (initial_content) {\n"
-                           "     this.content = initial_content || [];\n"
-                           " };\n"
-                           /* size()*/
-                           " new_array.prototype.call_method_0 = function () {\n"
-                           "     return this.content.length;\n"
-                           " };\n"
-                           /* load()*/
-                           " new_array.prototype.call_method_1 = function (index) {\n"
-                           "     if (index < this.content.length) {\n"
-                           "         return [0, this.content[index]];\n"
-                           "     }\n"
-                           "     return 1;\n"
-                           " };\n"
-                           /* store()*/
-                           " new_array.prototype.call_method_2 = function (index, element) {\n"
-                           "     if (index >= this.content.length) {\n"
-                           "         return 0;\n"
-                           "     }\n"
-                           "     this.content[index] = element;\n"
-                           "     return 1;\n"
-                           " };\n"
-                           /* append()*/
-                           " new_array.prototype.call_method_3 = function (element) {\n"
-                           "     this.content.push(element);\n"
-                           "     return 1;\n"
-                           "};\n"
-                           /* clear()*/
-                           " new_array.prototype.call_method_4 = function () {\n"
-                           "     this.content.length = 0;\n"
-                           "};\n"
-                           /* pop()*/
-                           " new_array.prototype.call_method_5 = function (count) {\n"
-                           "    if (count > this.content.length) { return 0.0; }\n"
-                           "    this.content.length -= count;\n"
-                           "    return 1.0;\n"
-                           "};\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output,
+                                       "(function ()\n"
+                                       "{\n"
+                                       " \"use strict\";\n"
+                                       " var string_equals = function (left, right) { return (left === right) ? "
+                                       "1.0 : 0.0; };\n"
+                                       " var integer_equals = function (left, right) { return (left === right) "
+                                       "? 1.0 : 0.0; };\n"
+                                       " var integer_less = function (left, right) { return (left < right) ? "
+                                       "1.0 : 0.0; };\n"
+                                       " var integer_subtract = function (left, right) { var difference = (left "
+                                       "- right); return "
+                                       "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
+                                       " var integer_add = function (left, right) { return [0, (left + right)]; "
+                                       "};\n"
+                                       " var concat = function (left, right) { return (left + right); };\n"
+                                       " var not = function (argument) { return ((argument === 1.0) ? 0.0 : "
+                                       "1.0); };\n"
+                                       " var side_effect = function () {};\n"
+                                       " var integer_to_string = function (input) { return \"\" + input; };\n"
+                                       " var new_array = function (initial_content) {\n"
+                                       "     this.content = initial_content || [];\n"
+                                       " };\n"
+                                       /* size()*/
+                                       " new_array.prototype.call_method_0 = function () {\n"
+                                       "     return this.content.length;\n"
+                                       " };\n"
+                                       /* load()*/
+                                       " new_array.prototype.call_method_1 = function (index) {\n"
+                                       "     if (index < this.content.length) {\n"
+                                       "         return [0, this.content[index]];\n"
+                                       "     }\n"
+                                       "     return 1;\n"
+                                       " };\n"
+                                       /* store()*/
+                                       " new_array.prototype.call_method_2 = function (index, element) {\n"
+                                       "     if (index >= this.content.length) {\n"
+                                       "         return 0;\n"
+                                       "     }\n"
+                                       "     this.content[index] = element;\n"
+                                       "     return 1;\n"
+                                       " };\n"
+                                       /* append()*/
+                                       " new_array.prototype.call_method_3 = function (element) {\n"
+                                       "     this.content.push(element);\n"
+                                       "     return 1;\n"
+                                       "};\n"
+                                       /* clear()*/
+                                       " new_array.prototype.call_method_4 = function () {\n"
+                                       "     this.content.length = 0;\n"
+                                       "};\n"
+                                       /* pop()*/
+                                       " new_array.prototype.call_method_5 = function (count) {\n"
+                                       "    if (count > this.content.length) { return 0.0; }\n"
+                                       "    this.content.length -= count;\n"
+                                       "    return 1.0;\n"
+                                       "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));

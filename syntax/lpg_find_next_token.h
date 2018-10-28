@@ -1,7 +1,7 @@
 #pragma once
-#include "lpg_unicode_view.h"
-#include "lpg_tokenize.h"
 #include "lpg_source_location.h"
+#include "lpg_tokenize.h"
+#include "lpg_unicode_view.h"
 
 typedef struct parser_user
 {

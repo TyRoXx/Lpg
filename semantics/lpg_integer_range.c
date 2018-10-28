@@ -105,7 +105,8 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
             i--;
         }
         /*
-         * NOTE: if the integer overflows when adding one then it will not be in the range anymore
+         * NOTE: if the integer overflows when adding one then it will not be in the
+         * range anymore
          *
          * Remove left edge:
          *  needle.max inside element && needle.min <= element.min
@@ -118,7 +119,8 @@ void integer_range_list_remove(integer_range_list *const haystack, integer_range
             haystack->elements[i].minimum = needle_copy.maximum;
         }
         /*
-         * NOTE: if the integer overflows when adding one then it will not be in the range anymore
+         * NOTE: if the integer overflows when adding one then it will not be in the
+         * range anymore
          *
          * Remove right edge:
          *   needle.min inside element && needle.max >= element.max

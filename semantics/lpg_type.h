@@ -60,8 +60,7 @@ lpg_interface interface_create(method_description *methods, function_id method_c
                                implementation_entry *implementations, size_t implementation_count);
 void interface_free(lpg_interface const value);
 
-typedef enum type_kind
-{
+typedef enum type_kind {
     type_kind_structure = 1,
     type_kind_function_pointer,
     type_kind_unit,

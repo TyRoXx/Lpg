@@ -72,9 +72,11 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_match:
-            /*Prevent removal of match expression because they might contain return or break even though the result is
+            /*Prevent removal of match expression because they might contain return or
+             * break even though the result is
              * not used.*/
-            /*TODO: Check whether removal of match is safe and remove it if possible.*/
+            /*TODO: Check whether removal of match is safe and remove it if
+             * possible.*/
             registers_read_from[current_instruction.match.result] = true;
 
             registers_read_from[current_instruction.match.key] = true;
@@ -250,11 +252,7 @@ static void change_register_ids_in_sequence(instruction_sequence *const sequence
     sequence->length = used_until;
 }
 
-typedef enum removed_something
-{
-    removed_something_yes = 1,
-    removed_something_no
-} removed_something;
+typedef enum removed_something { removed_something_yes = 1, removed_something_no } removed_something;
 
 static removed_something remove_one_layer_of_dead_code_from_function(checked_function *const from)
 {

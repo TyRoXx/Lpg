@@ -2,8 +2,7 @@
 
 #include "lpg_find_next_token.h"
 
-typedef enum parse_error_type
-{
+typedef enum parse_error_type {
     parse_error_invalid_token = 1,
     parse_error_expected_expression,
     parse_error_expected_arguments,

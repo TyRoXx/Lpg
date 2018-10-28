@@ -6,9 +6,9 @@
 #include "lpg_instruction_checkpoint.h"
 #include "lpg_interpret.h"
 #include "lpg_local_variable.h"
+#include "lpg_standard_library.h"
 #include "lpg_string_literal.h"
 #include "lpg_structure_member.h"
-#include "lpg_standard_library.h"
 #include "lpg_value.h"
 #include <string.h>
 
@@ -1381,7 +1381,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     (state->program->functions[callee.compile_time_value.value_.function_pointer.code].body.length ==
                      0))
                 {
-                    // This function has no body which means it is currently being type checked and can't be called yet.
+                    // This function has no body which means it is currently being type
+                    // checked and can't be called yet.
                     break;
                 }
                 compile_time_result =
@@ -1556,8 +1557,7 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     integer_range_list_deallocate(integer_ranges);
 }
 
-typedef enum pattern_evaluate_result_kind
-{
+typedef enum pattern_evaluate_result_kind {
     pattern_evaluate_result_kind_is_pattern = 1,
     pattern_evaluate_result_kind_no_pattern,
     pattern_evaluate_result_kind_failure
@@ -2534,7 +2534,8 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
 
     state->root->interfaces_defined[id] = true;
     state->program->interfaces[id].methods = methods;
-    state->program->interfaces[id].method_count = /*TODO avoid truncation safely*/ (function_id)element.method_count;
+    state->program->interfaces[id].method_count =
+        /*TODO avoid truncation safely*/ (function_id)element.method_count;
 
     value const result = value_from_type(type_from_interface(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
@@ -2611,8 +2612,8 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     }
     struct_id const id = state->program->struct_count;
     state->program->structs = reallocate_array(state->program->structs, (id + 1), sizeof(*state->program->structs));
-    state->program->structs[id] =
-        structure_create(elements, /*TODO avoid truncation safely*/ (struct_id)evaluated.element_count);
+    state->program->structs[id] = structure_create(elements,
+                                                   /*TODO avoid truncation safely*/ (struct_id)evaluated.element_count);
     state->program->struct_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     value const result = value_from_type(type_from_struct(id));

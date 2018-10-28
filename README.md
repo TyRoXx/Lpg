@@ -58,15 +58,14 @@ It will run the tests, generate an HTML coverage report and open it in Firefox.
 ### Code formatting
 Install `clang-format` like this on Ubuntu:
 ```bash
-sudo apt-get install clang-format-3.7
+sudo apt-get install clang-format-3.9
 ```
 
 On Windows, you can get clang-format by installing Clang for Windows:
 
-* http://releases.llvm.org/3.7.1/LLVM-3.7.1-win64.exe
-* http://releases.llvm.org/download.html#3.7.1
+* http://releases.llvm.org/3.9.1/LLVM-3.9.1-win64.exe
 
-You have to use clang-format 3.7 or otherwise the formatting will be inconsistent.
+You have to use clang-format 3.9 or otherwise the formatting will be inconsistent.
 
 Re-run `cmake` in the build directory to make it will look for `clang-format`:
 ```bash
