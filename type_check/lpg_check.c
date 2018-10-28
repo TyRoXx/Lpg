@@ -968,6 +968,20 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
                                         type const self, interface_id const target_interface,
                                         source_location const self_source);
 
+static void use_generic_closures(function_checking_state *const state, generic_closures const closures)
+{
+    for (size_t i = 0; i < closures.count; ++i)
+    {
+        register_id const closure_register = allocate_register(&state->used_registers);
+        add_local_variable(
+            &state->local_variables,
+            local_variable_create(unicode_view_copy(unicode_view_from_string(closures.elements[i].name)),
+                                  local_variable_phase_initialized, closures.elements[i].what,
+                                  optional_value_create(closures.elements[i].content), closure_register, NULL));
+        write_register_compile_time_value(state, closure_register, closures.elements[i].content);
+    }
+}
+
 static optional_size instantiate_generic_impl(function_checking_state *const state, interface_id const target_interface,
                                               impl_expression const tree, generic_closures const closures,
                                               type const *const argument_types, value *const arguments, type const self,
@@ -987,16 +1001,7 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
                                   optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < closures.count; ++i)
-    {
-        register_id const closure_register = allocate_register(&interface_checking.used_registers);
-        add_local_variable(
-            &interface_checking.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(closures.elements[i].name)),
-                                  local_variable_phase_initialized, closures.elements[i].what,
-                                  optional_value_create(closures.elements[i].content), closure_register, NULL));
-        write_register_compile_time_value(&interface_checking, closure_register, closures.elements[i].content);
-    }
+    use_generic_closures(&interface_checking, closures);
     optional_size const evaluated =
         evaluate_impl_core(&interface_checking, &ignored_instructions, tree.methods, tree.method_count, self,
                            target_interface, expression_source_begin(*tree.self));
@@ -1025,14 +1030,18 @@ static void infer_generic_arguments_result_free(infer_generic_arguments_result c
 static infer_generic_arguments_result infer_generic_arguments(function_checking_state *const state,
                                                               instruction_sequence *const function,
                                                               generic_instantiation_expression const self_tree,
-                                                              type const self)
+                                                              type const self, source_file const source,
+                                                              generic_closures const closures)
 {
-    (void)self_tree;
-    if (self.kind != type_kind_structure)
-    {
-        LPG_TO_DO();
-    }
-    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *self_tree.generic, NULL);
+    instruction_sequence ignored = {NULL, 0};
+    function_checking_state inference_state =
+        function_checking_state_create(state->root, NULL, false, state->global, state->on_error, state->user,
+                                       state->program, &ignored, optional_type_create_empty(), false, source);
+    use_generic_closures(&inference_state, closures);
+    evaluate_expression_result const generic_evaluated =
+        evaluate_expression(&inference_state, function, *self_tree.generic, NULL);
+    instruction_sequence_free(&ignored);
+    function_checking_state_free(inference_state);
     if (!generic_evaluated.has_value)
     {
         LPG_TO_DO();
@@ -1041,31 +1050,86 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     {
         LPG_TO_DO();
     }
-    if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_struct)
+    switch (self.kind)
     {
-        LPG_TO_DO();
+    case type_kind_structure:
+    {
+        if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_struct)
+        {
+            LPG_TO_DO();
+        }
+        program_check *const root = state->root;
+        for (size_t i = 0; i < root->struct_instantiation_count; ++i)
+        {
+            generic_struct_instantiation *const instantiation = root->struct_instantiations + i;
+            if (self.structure_ != instantiation->instantiated)
+            {
+                continue;
+            }
+            value *const arguments = allocate_array(instantiation->argument_count, sizeof(*arguments));
+            if (instantiation->argument_count)
+            {
+                memcpy(arguments, instantiation->arguments, sizeof(*arguments) * instantiation->argument_count);
+            }
+            type *const argument_types = allocate_array(instantiation->argument_count, sizeof(*argument_types));
+            if (instantiation->argument_count)
+            {
+                memcpy(argument_types, instantiation->argument_types,
+                       sizeof(*argument_types) * instantiation->argument_count);
+            }
+            infer_generic_arguments_result const result = {true, argument_types, arguments};
+            return result;
+        }
+        break;
     }
-    program_check *const root = state->root;
-    for (size_t i = 0; i < root->struct_instantiation_count; ++i)
+
+    case type_kind_interface:
     {
-        generic_struct_instantiation *const instantiation = root->struct_instantiations + i;
-        if (self.structure_ != instantiation->instantiated)
+        if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_interface)
         {
-            continue;
+            LPG_TO_DO();
         }
-        value *const arguments = allocate_array(instantiation->argument_count, sizeof(*arguments));
-        if (instantiation->argument_count)
+        program_check *const root = state->root;
+        for (size_t i = 0; i < root->interface_instantiation_count; ++i)
         {
-            memcpy(arguments, instantiation->arguments, sizeof(*arguments) * instantiation->argument_count);
+            generic_interface_instantiation *const instantiation = root->interface_instantiations + i;
+            if (self.interface_ != instantiation->instantiated)
+            {
+                continue;
+            }
+            value *const arguments = allocate_array(instantiation->argument_count, sizeof(*arguments));
+            if (instantiation->argument_count)
+            {
+                memcpy(arguments, instantiation->arguments, sizeof(*arguments) * instantiation->argument_count);
+            }
+            type *const argument_types = allocate_array(instantiation->argument_count, sizeof(*argument_types));
+            if (instantiation->argument_count)
+            {
+                memcpy(argument_types, instantiation->argument_types,
+                       sizeof(*argument_types) * instantiation->argument_count);
+            }
+            infer_generic_arguments_result const result = {true, argument_types, arguments};
+            return result;
         }
-        type *const argument_types = allocate_array(instantiation->argument_count, sizeof(*argument_types));
-        if (instantiation->argument_count)
-        {
-            memcpy(
-                argument_types, instantiation->argument_types, sizeof(*argument_types) * instantiation->argument_count);
-        }
-        infer_generic_arguments_result const result = {true, argument_types, arguments};
-        return result;
+        break;
+    }
+
+    case type_kind_enum_constructor:
+    case type_kind_enumeration:
+    case type_kind_function_pointer:
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
+    case type_kind_generic_lambda:
+    case type_kind_generic_struct:
+    case type_kind_host_value:
+    case type_kind_integer_range:
+    case type_kind_lambda:
+    case type_kind_method_pointer:
+    case type_kind_string:
+    case type_kind_tuple:
+    case type_kind_type:
+    case type_kind_unit:
+        LPG_TO_DO();
     }
     infer_generic_arguments_result const result = {false, NULL, NULL};
     return result;
@@ -1091,8 +1155,8 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
         else
         {
             instruction_sequence ignored = instruction_sequence_create(NULL, 0);
-            infer_generic_arguments_result const inferred =
-                infer_generic_arguments(state, &ignored, impl->self.generic, self);
+            infer_generic_arguments_result const inferred = infer_generic_arguments(
+                state, &ignored, impl->self.generic, self, source_file_from_owning(impl->source), impl->closures);
             instruction_sequence_free(&ignored);
             if (!inferred.can_be_inferred)
             {
@@ -1152,7 +1216,8 @@ static optional_size require_implementation(function_checking_state *const state
         {
             continue;
         }
-        infer_generic_arguments_result const inferred = infer_generic_arguments(state, function, impl->self, self);
+        infer_generic_arguments_result const inferred =
+            infer_generic_arguments(state, function, impl->self, self, impl->source, impl->closures);
         if (!inferred.can_be_inferred)
         {
             continue;
@@ -3261,18 +3326,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                                argument_register, NULL));
         write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < instantiated_enum.closures.count; ++i)
-    {
-        register_id const closure_register = allocate_register(&enum_checking.used_registers);
-        add_local_variable(
-            &enum_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_enum.closures.elements[i].name)),
-                local_variable_phase_initialized, instantiated_enum.closures.elements[i].what,
-                optional_value_create(instantiated_enum.closures.elements[i].content), closure_register, NULL));
-        write_register_compile_time_value(
-            &enum_checking, closure_register, instantiated_enum.closures.elements[i].content);
-    }
+    use_generic_closures(&enum_checking, instantiated_enum.closures);
     evaluate_expression_result const evaluated =
         evaluate_enum_expression(&enum_checking, &ignored_instructions,
                                  enum_expression_create(original.begin, generic_parameter_list_create(NULL, 0),
@@ -3405,18 +3459,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
                 argument_register, NULL));
         write_register_compile_time_value(&struct_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < instantiated_struct.closures.count; ++i)
-    {
-        register_id const closure_register = allocate_register(&struct_checking.used_registers);
-        add_local_variable(
-            &struct_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_struct.closures.elements[i].name)),
-                local_variable_phase_initialized, instantiated_struct.closures.elements[i].what,
-                optional_value_create(instantiated_struct.closures.elements[i].content), closure_register, NULL));
-        write_register_compile_time_value(
-            &struct_checking, closure_register, instantiated_struct.closures.elements[i].content);
-    }
+    use_generic_closures(&struct_checking, instantiated_struct.closures);
     evaluate_expression_result const evaluated =
         evaluate_struct(&struct_checking, &ignored_instructions,
                         struct_expression_create(generic_parameter_list_create(NULL, 0), original.source,
@@ -3546,18 +3589,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
                 argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < instantiated_interface.closures.count; ++i)
-    {
-        register_id const closure_register = allocate_register(&interface_checking.used_registers);
-        add_local_variable(
-            &interface_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_interface.closures.elements[i].name)),
-                local_variable_phase_initialized, instantiated_interface.closures.elements[i].what,
-                optional_value_create(instantiated_interface.closures.elements[i].content), closure_register, NULL));
-        write_register_compile_time_value(
-            &interface_checking, closure_register, instantiated_interface.closures.elements[i].content);
-    }
+    use_generic_closures(&interface_checking, instantiated_interface.closures);
     evaluate_expression_result const evaluated =
         evaluate_interface(&interface_checking, &ignored_instructions,
                            interface_expression_create(generic_parameter_list_create(NULL, 0), original.source,
@@ -3689,18 +3721,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
                 argument_register, NULL));
         write_register_compile_time_value(&lambda_checking, argument_register, arguments[i]);
     }
-    for (size_t i = 0; i < instantiated_lambda.closures.count; ++i)
-    {
-        register_id const closure_register = allocate_register(&lambda_checking.used_registers);
-        add_local_variable(
-            &lambda_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_lambda.closures.elements[i].name)),
-                local_variable_phase_initialized, instantiated_lambda.closures.elements[i].what,
-                optional_value_create(instantiated_lambda.closures.elements[i].content), closure_register, NULL));
-        write_register_compile_time_value(
-            &lambda_checking, closure_register, instantiated_lambda.closures.elements[i].content);
-    }
+    use_generic_closures(&lambda_checking, instantiated_lambda.closures);
 
     function_id const this_lambda_id = reserve_function_id(state);
     {

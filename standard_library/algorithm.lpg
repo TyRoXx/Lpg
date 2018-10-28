@@ -4,6 +4,7 @@ let integers = import integer
 let integer = integers.integer
 let std = import std
 let equality = import equality
+let ranges = import ranges
 
 let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
     let i = std.make-mutable[integer](first)
@@ -20,7 +21,7 @@ let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
             case add_result.overflow:
                 fail()
 
-let any_of = [E, P](elements: array[E], test_element: P): boolean
+let any_of = [E, P](elements: ranges.random_access[E], test_element: P): boolean
     match subtract(elements.size(), 1)
         case subtract_result.ok(let last):
             let found = std.make-mutable[boolean](boolean.false)
@@ -39,7 +40,7 @@ let any_of = [E, P](elements: array[E], test_element: P): boolean
         case subtract_result.underflow:
             boolean.false
 
-let find = [E](haystack: array[E], needle: E): std.option[integer]
+let find = [E](haystack: ranges.random_access[E], needle: E): std.option[integer]
     let i = std.make-mutable[integer](0)
     loop
         match haystack.load(i.load())

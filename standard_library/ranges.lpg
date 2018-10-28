@@ -1,0 +1,22 @@
+let arrays = import array
+let options = import option
+let option = options.option
+let integers = import integer
+let integer = integers.integer
+
+let random_access = interface[T]
+    size(): integer
+    load(index: integer): option[T]
+    store(index: integer, element: T): boolean
+
+impl[T] random_access[T] for arrays.array[T]
+    size(): integer
+        self.size()
+    load(index: integer): option[T]
+        self.load(index)
+    store(index: integer, element: T): boolean
+        self.store(index, element)
+
+let export = struct
+    random_access: type-of(random_access)
+export{random_access}

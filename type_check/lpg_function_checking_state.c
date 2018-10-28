@@ -1,6 +1,15 @@
 #include "lpg_function_checking_state.h"
 #include "lpg_allocate.h"
 
+void function_checking_state_free(function_checking_state const freed)
+{
+    local_variable_container_free(freed.local_variables);
+    if (freed.register_compile_time_values)
+    {
+        deallocate(freed.register_compile_time_values);
+    }
+}
+
 optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which)
 {
     if (which >= state->register_compile_time_value_count)

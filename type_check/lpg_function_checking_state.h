@@ -31,6 +31,7 @@ typedef struct function_checking_state
     source_file source;
 } function_checking_state;
 
+void function_checking_state_free(function_checking_state const freed);
 optional_value read_register_compile_time_value(function_checking_state const *const state, register_id const which);
 void write_register_compile_time_value(function_checking_state *const state, register_id const which,
                                        value const compile_time_value);
