@@ -346,10 +346,11 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "{\n"
                                                  "    "));
     LPG_TRY(generate_array_impl_name(c_output, array_interface));
-    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
-                                                 "    if (count > impl->used) { return 0; }\n"
-                                                 "    for (size_t i = (impl->used - count); i < impl->used; ++i)\n"
-                                                 "    {\n"));
+    LPG_TRY(stream_writer_write_string(c_output,
+                                       " * const impl = self;\n"
+                                       "    if (count > impl->used) { return 0; }\n"
+                                       "    for (size_t i = (impl->used - (size_t)count); i < impl->used; ++i)\n"
+                                       "    {\n"));
     LPG_TRY(generate_free(
         standard_library, unicode_view_from_c_str("(impl->elements[i])"), element_type, program, 2, c_output));
     LPG_TRY(stream_writer_write_string(c_output, "    }\n"
