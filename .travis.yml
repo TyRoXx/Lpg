@@ -38,7 +38,7 @@ script:
  - export UBSAN_OPTIONS=print_stacktrace=1:exitcode=55
  - export MSAN_OPTIONS=poison_in_dtor=1:exitcode=55
  - export ASAN_OPTIONS=check_initialization_order=1:exitcode=55
- - export TSAN_OPTIONS=exitcode=55
+ - export TSAN_OPTIONS=exitcode=55:halt_on_error=1
  - export LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/
  - if [ "$UB_SANITIZER" == "ON" ] || [ "$MEMORY_SANITIZER" == "ON" ] || [ "$ADDRESS_SANITIZER" == "ON" ] || [ "$THREAD_SANITIZER" == "ON" ]; then
      tests/tests || exit 1;
