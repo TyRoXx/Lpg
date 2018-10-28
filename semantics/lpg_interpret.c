@@ -144,6 +144,19 @@ static value invoke_method(function_call_arguments const arguments, value const 
             return value_from_unit();
         }
 
+        case 5: // pop
+        {
+            ASSUME(from.array->count > 0);
+            value const count = arguments.arguments[0];
+            ASSUME(count.kind == value_kind_integer);
+            if (integer_less(integer_create(0, from.array->count), count.integer_))
+            {
+                return value_from_enum_element(0, type_from_unit(), NULL);
+            }
+            from.array->count -= count.integer_.low;
+            return value_from_enum_element(1, type_from_unit(), NULL);
+        }
+
         default:
             LPG_UNREACHABLE();
         }

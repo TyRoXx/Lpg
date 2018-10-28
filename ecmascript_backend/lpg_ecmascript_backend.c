@@ -1192,6 +1192,12 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                            /* clear()*/
                            " new_array.prototype.call_method_4 = function () {\n"
                            "     this.content.length = 0;\n"
+                           "};\n"
+                           /* pop()*/
+                           " new_array.prototype.call_method_5 = function (count) {\n"
+                           "    if (count > this.content.length) { return 0.0; }\n"
+                           "    this.content.length -= count;\n"
+                           "    return 1.0;\n"
                            "};\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {

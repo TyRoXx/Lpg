@@ -1,6 +1,8 @@
 let std = import std
 let algorithm = import algorithm
 let equality = import equality
+let integers = import integer
+let integer = integers.integer
 
 let set = interface[T]
     contains(key: T): std.boolean
@@ -11,14 +13,34 @@ let set = interface[T]
 let linear-set = struct[T]
     elements: std.array[T]
 
+let array-back = [T](elements: std.array[T]): std.option[T]
+    match subtract(elements.size(), 1)
+        case subtract_result.ok(let index):
+            match elements.load(index)
+                case std.option[T].some(let back):
+                    std.option[T].some(back)
+                case std.option[T].none:
+                    std.option[T].none
+        case subtract_result.underflow:
+            std.option[T].none
+
 impl[T] set[T] for linear-set[T]
     contains(key: T): std.boolean
         let test_element = (element: T): std.boolean
             equality.equals[T](element, key)
         algorithm.any_of[T, type-of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
-        //TODO
-        std.boolean.false
+        match algorithm.find[T](self.elements, key)
+            case std.option[integer].some(let found-at):
+                match array-back[T](self.elements)
+                    case std.option[T].some(let back):
+                        assert(self.elements.store(found-at, back))
+                    case std.option[T].none:
+                        fail()
+                assert(self.elements.pop(1))
+                std.boolean.true
+            case std.option[integer].none:
+                std.boolean.false
     add(key: T): std.boolean
         let reader : set[T] = self
         match reader.contains(key)

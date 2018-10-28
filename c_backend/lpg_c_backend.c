@@ -342,6 +342,23 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
                                                  "    return unit_impl;\n"
                                                  "}\n"));
 
+    LPG_TRY(stream_writer_write_string(c_output, "static stateless_enum "));
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_pop(void *self, uint64_t const count)\n"
+                                                 "{\n"
+                                                 "    "));
+    LPG_TRY(generate_array_impl_name(c_output, array_interface));
+    LPG_TRY(stream_writer_write_string(c_output, " * const impl = self;\n"
+                                                 "    if (count > impl->used) { return 0; }\n"
+                                                 "    for (size_t i = (impl->used - count); i < impl->used; ++i)\n"
+                                                 "    {\n"));
+    LPG_TRY(generate_free(
+        standard_library, unicode_view_from_c_str("(impl->elements[i])"), element_type, program, 2, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "    }\n"
+                                                 "    impl->used -= (size_t)count;\n"
+                                                 "    return 1;\n"
+                                                 "}\n"));
+
     LPG_TRY(stream_writer_write_string(c_output, "static "));
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
     LPG_TRY(stream_writer_write_string(c_output, " const "));
@@ -364,7 +381,10 @@ static success_indicator generate_array_vtable(stream_writer const c_output, int
     LPG_TRY(stream_writer_write_string(c_output, "_append, "));
 
     LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "_clear"));
+    LPG_TRY(stream_writer_write_string(c_output, "_clear, "));
+
+    LPG_TRY(generate_interface_vtable_name(array_interface, c_output));
+    LPG_TRY(stream_writer_write_string(c_output, "_pop"));
 
     LPG_TRY(stream_writer_write_string(c_output, "};\n"));
     return success_yes;

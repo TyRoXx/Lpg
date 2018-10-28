@@ -12,6 +12,7 @@ let array = interface[T]
     store(index: any-integer, element: T): boolean
     append(element: T): boolean
     clear(): unit
+    pop(count: any-integer): boolean
 
 let export = struct
     array: type-of(array)

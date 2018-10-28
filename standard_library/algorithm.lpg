@@ -3,6 +3,7 @@ let array = arrays.array
 let integers = import integer
 let integer = integers.integer
 let std = import std
+let equality = import equality
 
 let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
     let i = std.make-mutable[integer](first)
@@ -38,7 +39,26 @@ let any_of = [E, P](elements: array[E], test_element: P): boolean
         case subtract_result.underflow:
             boolean.false
 
+let find = [E](haystack: array[E], needle: E): std.option[integer]
+    let i = std.make-mutable[integer](0)
+    loop
+        match haystack.load(i.load())
+            case std.option[E].some(let element):
+                match equality.equals[E](element, needle)
+                    case boolean.true:
+                        return std.option[integer].some(i.load())
+                    case boolean.false:
+                        match add(i.load(), 1)
+                            case add_result.ok(let next):
+                                i.store(next)
+                            case add_result.overflow:
+                                return std.option[integer].none
+            case std.option[E].none:
+                break 
+    std.option[integer].none
+
 let export = struct
     enumerate: type-of(enumerate)
     any_of: type-of(any_of)
-export{enumerate, any_of}
+    find: type-of(find)
+export{enumerate, any_of, find}
