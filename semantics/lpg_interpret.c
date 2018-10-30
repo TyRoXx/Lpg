@@ -62,7 +62,8 @@ static value invoke_method(function_call_arguments const arguments, value const 
 
     case value_kind_type_erased:
     {
-        implementation *const impl = implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl);
+        implementation *const impl =
+            &implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl)->target;
         ASSUME(impl);
         ASSUME(parameters->method < impl->method_count);
         size_t const method_parameter_count = parameters->parameter_count;

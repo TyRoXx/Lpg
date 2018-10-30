@@ -13,9 +13,9 @@ bool implementation_ref_equals(implementation_ref const left, implementation_ref
     return (left.target == right.target) && (left.implementation_index == right.implementation_index);
 }
 
-implementation *implementation_ref_resolve(lpg_interface const *const interfaces, implementation_ref const ref)
+implementation_entry *implementation_ref_resolve(lpg_interface const *const interfaces, implementation_ref const ref)
 {
-    return &interfaces[ref.target].implementations[ref.implementation_index].target;
+    return &interfaces[ref.target].implementations[ref.implementation_index];
 }
 
 function_pointer_value function_pointer_value_from_external(external_function *external, void *environment,
@@ -362,6 +362,7 @@ bool value_is_valid(value const checked)
 bool value_conforms_to_type(value const instance, type const expected)
 {
     ASSUME(value_is_valid(instance));
+    ASSUME(type_is_valid(expected));
     switch (expected.kind)
     {
     case type_kind_host_value:

@@ -1500,6 +1500,7 @@ static success_indicator generate_type_erased_value(type_erased_value const gene
 static success_indicator generate_value(value const generated, type const type_of, c_backend_state *state,
                                         stream_writer const c_output)
 {
+    ASSUME(value_conforms_to_type(generated, type_of));
     switch (generated.kind)
     {
     case value_kind_integer:
@@ -2437,8 +2438,12 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             set_register_variable(state, input.literal.into, register_resource_ownership_owns, input.literal.type_of);
             ASSUME(input.literal.type_of.kind == type_kind_interface);
             memory_writer self = {NULL, 0, 0};
-            LPG_TRY(generate_value(
-                *input.literal.value_.type_erased.self, input.literal.type_of, state, memory_writer_erase(&self)));
+            ASSUME(input.literal.value_.type_erased.self);
+            value const self_value = *input.literal.value_.type_erased.self;
+            type const self_type =
+                implementation_ref_resolve(state->program->interfaces, input.literal.value_.type_erased.impl)->self;
+            ASSUME(value_conforms_to_type(self_value, self_type));
+            LPG_TRY(generate_value(self_value, self_type, state, memory_writer_erase(&self)));
             LPG_TRY(generate_erase_type(&state->standard_library, state->definitions, state->program,
                                         input.literal.into, input.literal.value_.type_erased.impl,
                                         unicode_view_create(self.data, self.used), false, current_function, indentation,
