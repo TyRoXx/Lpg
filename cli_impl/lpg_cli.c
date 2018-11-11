@@ -372,35 +372,81 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
-static success_indicator generate_main_html(checked_program const program, stream_writer const destination)
+static optional_size find_template_marker(unicode_view const template)
 {
-    LPG_TRY(stream_writer_write_string(destination, "<!DOCTYPE html><html><head> <meta "
-                                                    "charset=\"UTF-8\"><title>LPG web</title>"
-                                                    "<script type=\"text/javascript\">"
-                                                    "\"use strict\";\n"
-                                                    "var assert = function (condition) { if (!condition) { "
-                                                    "alert(\"Assertion failed\"); } }\n"
-                                                    "var main = "));
-    LPG_TRY(generate_ecmascript(program, destination));
-    LPG_TRY(generate_host_class(destination));
-    LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
-                                                    "</script>"
-                                                    "</head>"
-                                                    "<body>"
-                                                    "</body></html>"));
+    for (size_t i = 0; i <= template.length; i++)
+    {
+        const char *index = template.begin + i;
+        char c = *index;
+        if (c == '|' && !memcmp(index + 1, "LPG|", 4))
+        {
+            return make_optional_size(i);
+        }
+    }
+    return optional_size_empty;
+}
+
+static success_indicator generate_main_html(checked_program const program, unicode_view const template,
+                                            stream_writer const destination)
+{
+    optional_size marker_point = find_template_marker(template);
+    if (marker_point.state == optional_empty)
+    {
+        return success_no;
+    }
+    else
+    {
+        LPG_TRY(stream_writer_write_unicode_view(
+            destination, unicode_view_create(template.begin, marker_point.value_if_set)));
+
+        LPG_TRY(stream_writer_write_string(
+            destination, "<script type=\"text/javascript\">"
+                         "\"use strict\";\n"
+                         "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
+                         "var main = "));
+        LPG_TRY(generate_ecmascript(program, destination));
+        LPG_TRY(generate_host_class(destination));
+        LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
+                                                        "</script>"));
+
+        size_t offset = marker_point.value_if_set + strlen("|LPG|");
+        LPG_TRY(stream_writer_write_unicode_view(
+            destination, unicode_view_create(template.begin + offset, template.length - offset)));
+    }
     return success_yes;
 }
 
-static success_indicator generate_ecmascript_web_site(checked_program const program, unicode_view const html_file)
+static success_indicator generate_ecmascript_web_site(checked_program const program, unicode_view template,
+                                                      unicode_view const html_file)
 {
     memory_writer buffer = {NULL, 0, 0};
-    success_indicator result = generate_main_html(program, memory_writer_erase(&buffer));
+    success_indicator result = generate_main_html(program, template, memory_writer_erase(&buffer));
     if (result == success_yes)
     {
         result = write_file(html_file, unicode_view_create(buffer.data, buffer.used));
     }
     memory_writer_free(&buffer);
     return result;
+}
+
+static unicode_view generate_template(stream_writer diagnostics, const char *file_name)
+{
+    unicode_string new_string =
+        unicode_view_concat(unicode_view_from_c_str(file_name), unicode_view_from_c_str(".lpg"));
+    blob_or_error content = read_file(unicode_string_c_str(&new_string));
+
+    if (content.error)
+    {
+        stream_writer_write_string(diagnostics, "Could not find template. Using default template.");
+        return unicode_view_from_c_str("<!DOCTYPE html><html>"
+                                       "<head> <meta charset=\"UTF-8\"><title>LPG web</title>"
+                                       "|LPG|"
+                                       "</head>"
+                                       "<body>"
+                                       "</body></html>");
+    }
+
+    return unicode_view_from_string(unicode_string_validate(content.success));
 }
 
 bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, unicode_view const module_directory)
@@ -507,7 +553,8 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         {
             optimize(&checked);
             unicode_view const output_file_name = unicode_view_from_c_str(arguments.output_file_name);
-            generate_ecmascript_web_site(checked, output_file_name);
+            unicode_view const template = generate_template(diagnostics, arguments.file_name);
+            generate_ecmascript_web_site(checked, template, output_file_name);
         }
         break;
 
