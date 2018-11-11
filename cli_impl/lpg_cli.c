@@ -439,16 +439,19 @@ static unicode_string generate_template(stream_writer diagnostics, const char *f
     {
         stream_writer_write_string(diagnostics, content.error);
         stream_writer_write_string(diagnostics, "Could not find template. Using default template.");
-        
+
         unicode_view first_part = unicode_view_from_c_str("<!DOCTYPE html><html>"
                                                           "<head> <meta charset=\"UTF-8\"><title>LPG web</title>");
         unicode_view last_part = unicode_view_from_c_str("</head>"
                                                          "<body>"
                                                          "</body></html>");
 
-        return unicode_view_concat(
-            first_part, unicode_view_from_string(unicode_view_concat(
-                            unicode_view_create(web_template_marker, strlen(web_template_marker)), last_part)));
+        const unicode_string end_of_string =
+            unicode_view_concat(unicode_view_create(web_template_marker, strlen(web_template_marker)), last_part);
+        const unicode_string template = unicode_view_concat(first_part, unicode_view_from_string(end_of_string));
+        unicode_string_free(&end_of_string);
+
+        return template;
     }
 
     return unicode_string_validate(content.success);
@@ -560,6 +563,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
             unicode_view const output_file_name = unicode_view_from_c_str(arguments.output_file_name);
             unicode_string const template = generate_template(diagnostics, arguments.file_name);
             generate_ecmascript_web_site(checked, template, output_file_name);
+            unicode_string_free(&template);
         }
         break;
 
