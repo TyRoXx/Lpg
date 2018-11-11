@@ -377,7 +377,7 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
 static optional_size find_template_marker(unicode_string const template)
 {
     const size_t marker_length = strlen(web_template_marker);
-    for (size_t i = 0; i < template.length - marker_length; i++)
+    for (size_t i = 0; i <= template.length - marker_length; i++)
     {
         const char *index = template.data + i;
         if (!memcmp(index, web_template_marker, marker_length))
@@ -432,7 +432,7 @@ static success_indicator generate_ecmascript_web_site(checked_program const prog
 static unicode_string generate_template(stream_writer diagnostics, const char *file_name)
 {
     unicode_string new_string =
-        unicode_view_concat(unicode_view_from_c_str(file_name), unicode_view_from_c_str(".lpg"));
+        unicode_view_concat(unicode_view_from_c_str(file_name), unicode_view_from_c_str(".html"));
     blob_or_error content = read_file(unicode_string_c_str(&new_string));
     unicode_string_free(&new_string);
     if (content.error)
