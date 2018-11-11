@@ -50,19 +50,6 @@ static value assert_impl(function_call_arguments const arguments, struct value c
     return value_from_unit();
 }
 
-static bool from_ecmascript_bool(double const input)
-{
-    if (input == 0.0)
-    {
-        return false;
-    }
-    if (input == 1.0)
-    {
-        return true;
-    }
-    FAIL();
-}
-
 static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
     duk_int_t const argument_type = duk_get_type(duktape, 0);
@@ -70,9 +57,8 @@ static duk_ret_t ecmascript_assert(duk_context *const duktape)
     duk_get_prop_string(duktape, -1, "lineNumber");
     long const line = (long)duk_to_int(duktape, -1);
     duk_pop_2(duktape);
-    REQUIRE_WITH_MESSAGE((argument_type == DUK_TYPE_NUMBER), "immediate caller is executing on line %ld\n", line);
-    REQUIRE_WITH_MESSAGE(
-        from_ecmascript_bool(duk_get_number(duktape, 0)), "immediate caller is executing on line %ld\n", line);
+    REQUIRE_WITH_MESSAGE((argument_type == DUK_TYPE_BOOLEAN), "immediate caller is executing on line %ld\n", line);
+    REQUIRE_WITH_MESSAGE(duk_get_boolean(duktape, 0), "immediate caller is executing on line %ld\n", line);
     return 0;
 }
 
