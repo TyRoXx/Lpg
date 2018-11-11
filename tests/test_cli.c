@@ -142,7 +142,7 @@ void test_cli(void)
         unicode_string input = write_temporary_file("");
         unicode_string output = write_temporary_file("");
         char *arguments[] = {"lpg", "web", unicode_string_c_str(&input), unicode_string_c_str(&output)};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, false, "");
+        expect_output(LPG_ARRAY_SIZE(arguments), arguments, false, "Could not find template. Using default template.");
         REQUIRE(0 == remove(unicode_string_c_str(&input)));
         unicode_string_free(&input);
         REQUIRE(0 == remove(unicode_string_c_str(&output)));
