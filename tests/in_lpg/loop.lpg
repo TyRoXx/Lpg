@@ -1,4 +1,5 @@
 let std = import std
+let integers = import integer
 
 loop
     side-effect()
@@ -16,3 +17,17 @@ loop
         assert(boolean.false)
     break
     assert(boolean.false)
+
+let i = std.make-mutable[integers.integer](0)
+loop
+    match integer-equals(i.load(), 10000)
+        case boolean.true:
+            break
+        case boolean.false:
+            std.unit_value
+    match add(i.load(), 1)
+        case add_result.ok(let next):
+            i.store(next)
+        case add_result.overflow:
+            fail()
+
