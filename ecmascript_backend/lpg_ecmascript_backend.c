@@ -406,19 +406,22 @@ static success_indicator generate_register_read(function_generation *const state
 static success_indicator generate_lambda_value_from_registers(function_generation *const state,
                                                               function_id const lambda,
                                                               register_id const *const captures,
-                                                              size_t const capture_count,
+                                                              size_t const capture_count, size_t const indentation,
                                                               stream_writer const ecmascript_output)
 {
     LPG_TRY(stream_writer_write_string(ecmascript_output, "(function () { "));
     for (register_id i = 0; i < capture_count; ++i)
     {
-        LPG_TRY(indent(1, ecmascript_output));
+        LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
+        LPG_TRY(indent((indentation + 1), ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "var "));
         LPG_TRY(generate_capture_alias(i, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
         LPG_TRY(generate_register_read(state, captures[i], ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+        LPG_TRY(stream_writer_write_string(ecmascript_output, ";"));
     }
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
+    LPG_TRY(indent((indentation + 1), ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "return function ("));
     checked_function const *const function = &state->all_functions[lambda];
     for (register_id i = 0; i < function->signature->parameters.length; ++i)
@@ -451,7 +454,9 @@ static success_indicator generate_lambda_value_from_registers(function_generatio
         LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
         LPG_TRY(generate_register_name(i, ecmascript_output));
     }
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "); }; })()"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "); };\n"));
+    LPG_TRY(indent(indentation, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "})()"));
     return success_yes;
 }
 
@@ -660,9 +665,12 @@ static success_indicator generate_loop(function_generation *const state, loop_in
 {
     LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "for (;;)\n"));
+    LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
     LPG_TRY(generate_sequence(state, generated.body, indentation + 1, ecmascript_output));
+    LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
+    LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(state, generated.unit_goes_into, type_from_unit(), optional_value_empty, ecmascript_output));
     LPG_TRY(generate_value(value_from_unit(), type_from_unit(), state->all_functions, state->function_count,
                            state->all_interfaces, state->all_structs, state->all_enums, ecmascript_output));
@@ -830,9 +838,9 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
             LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
             LPG_TRY(generate_register_read(state, generated.cases[i].value.value, ecmascript_output));
             LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
-            LPG_TRY(indent(indentation, ecmascript_output));
         }
 
+        LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     }
     return success_yes;
@@ -889,7 +897,7 @@ static success_indicator generate_lambda_with_captures(function_generation *cons
     LPG_TRY(write_register(state, generated.into, type_from_lambda(lambda_type_create(generated.lambda)),
                            optional_value_empty, ecmascript_output));
     LPG_TRY(generate_lambda_value_from_registers(
-        state, generated.lambda, generated.captures, generated.capture_count, ecmascript_output));
+        state, generated.lambda, generated.captures, generated.capture_count, indentation, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success_yes;
 }
@@ -928,8 +936,9 @@ static success_indicator generate_current_function(function_generation *const st
 }
 
 static success_indicator generate_erase_type(function_generation *const state, erase_type_instruction const generated,
-                                             stream_writer const ecmascript_output)
+                                             const size_t indentation, stream_writer const ecmascript_output)
 {
+    LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(
         state, generated.into, type_from_interface(generated.impl.target), optional_value_empty, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "new "));
@@ -984,9 +993,11 @@ static success_indicator generate_instruction(function_generation *const state, 
         return generate_read_struct(state, generated.read_struct, indentation, ecmascript_output);
 
     case instruction_break:
+        LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(write_register(state, generated.break_into, type_from_unit(), optional_value_create(value_from_unit()),
                                ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "undefined;\n"));
+        LPG_TRY(indent(indentation, ecmascript_output));
         return stream_writer_write_string(ecmascript_output, "break;\n");
 
     case instruction_literal:
@@ -1017,7 +1028,7 @@ static success_indicator generate_instruction(function_generation *const state, 
         return generate_lambda_with_captures(state, generated.lambda_with_captures, indentation, ecmascript_output);
 
     case instruction_erase_type:
-        return generate_erase_type(state, generated.erase_type, ecmascript_output);
+        return generate_erase_type(state, generated.erase_type, indentation, ecmascript_output);
     }
     LPG_UNREACHABLE();
 }
