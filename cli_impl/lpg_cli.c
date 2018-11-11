@@ -26,6 +26,8 @@
 #include <Windows.h>
 #endif
 
+static char const *const web_template_marker = "|LPG|";
+
 typedef struct cli_parser_user
 {
     stream_writer diagnostics;
@@ -372,13 +374,13 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
     return result;
 }
 
-static optional_size find_template_marker(unicode_view const template)
+static optional_size find_template_marker(unicode_string const template)
 {
-    for (size_t i = 0; i <= template.length; i++)
+    const size_t marker_length = strlen(web_template_marker);
+    for (size_t i = 0; i < template.length - marker_length; i++)
     {
-        const char *index = template.begin + i;
-        char c = *index;
-        if (c == '|' && !memcmp(index + 1, "LPG|", 4))
+        const char *index = template.data + i;
+        if (!memcmp(index, web_template_marker, marker_length))
         {
             return make_optional_size(i);
         }
@@ -386,37 +388,35 @@ static optional_size find_template_marker(unicode_view const template)
     return optional_size_empty;
 }
 
-static success_indicator generate_main_html(checked_program const program, unicode_view const template,
+static success_indicator generate_main_html(checked_program const program, unicode_string const template,
                                             stream_writer const destination)
 {
-    optional_size marker_point = find_template_marker(template);
+    const optional_size marker_point = find_template_marker(template);
     if (marker_point.state == optional_empty)
     {
         return success_no;
     }
-    else
-    {
-        LPG_TRY(stream_writer_write_unicode_view(
-            destination, unicode_view_create(template.begin, marker_point.value_if_set)));
 
-        LPG_TRY(stream_writer_write_string(
-            destination, "<script type=\"text/javascript\">"
-                         "\"use strict\";\n"
-                         "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
-                         "var main = "));
-        LPG_TRY(generate_ecmascript(program, destination));
-        LPG_TRY(generate_host_class(destination));
-        LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
-                                                        "</script>"));
+    LPG_TRY(
+        stream_writer_write_unicode_view(destination, unicode_view_create(template.data, marker_point.value_if_set)));
 
-        size_t offset = marker_point.value_if_set + strlen("|LPG|");
-        LPG_TRY(stream_writer_write_unicode_view(
-            destination, unicode_view_create(template.begin + offset, template.length - offset)));
-    }
+    LPG_TRY(stream_writer_write_string(
+        destination, "<script type=\"text/javascript\">"
+                     "\"use strict\";\n"
+                     "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
+                     "var main = "));
+    LPG_TRY(generate_ecmascript(program, destination));
+    LPG_TRY(generate_host_class(destination));
+    LPG_TRY(stream_writer_write_string(destination, "main(window, new Host());\n"
+                                                    "</script>"));
+
+    const size_t offset = marker_point.value_if_set + strlen(web_template_marker);
+    LPG_TRY(stream_writer_write_unicode_view(
+        destination, unicode_view_create(template.data + offset, template.length - offset)));
     return success_yes;
 }
 
-static success_indicator generate_ecmascript_web_site(checked_program const program, unicode_view template,
+static success_indicator generate_ecmascript_web_site(checked_program const program, unicode_string template,
                                                       unicode_view const html_file)
 {
     memory_writer buffer = {NULL, 0, 0};
@@ -429,7 +429,7 @@ static success_indicator generate_ecmascript_web_site(checked_program const prog
     return result;
 }
 
-static unicode_view generate_template(stream_writer diagnostics, const char *file_name)
+static unicode_string generate_template(stream_writer diagnostics, const char *file_name)
 {
     unicode_string new_string =
         unicode_view_concat(unicode_view_from_c_str(file_name), unicode_view_from_c_str(".lpg"));
@@ -437,16 +437,21 @@ static unicode_view generate_template(stream_writer diagnostics, const char *fil
     unicode_string_free(&new_string);
     if (content.error)
     {
+        stream_writer_write_string(diagnostics, content.error);
         stream_writer_write_string(diagnostics, "Could not find template. Using default template.");
-        return unicode_view_from_c_str("<!DOCTYPE html><html>"
-                                       "<head> <meta charset=\"UTF-8\"><title>LPG web</title>"
-                                       "|LPG|"
-                                       "</head>"
-                                       "<body>"
-                                       "</body></html>");
+        
+        unicode_view first_part = unicode_view_from_c_str("<!DOCTYPE html><html>"
+                                                          "<head> <meta charset=\"UTF-8\"><title>LPG web</title>");
+        unicode_view last_part = unicode_view_from_c_str("</head>"
+                                                         "<body>"
+                                                         "</body></html>");
+
+        return unicode_view_concat(
+            first_part, unicode_view_from_string(unicode_view_concat(
+                            unicode_view_create(web_template_marker, strlen(web_template_marker)), last_part)));
     }
 
-    return unicode_view_from_string(unicode_string_validate(content.success));
+    return unicode_string_validate(content.success);
 }
 
 bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, unicode_view const module_directory)
@@ -553,7 +558,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         {
             optimize(&checked);
             unicode_view const output_file_name = unicode_view_from_c_str(arguments.output_file_name);
-            unicode_view const template = generate_template(diagnostics, arguments.file_name);
+            unicode_string const template = generate_template(diagnostics, arguments.file_name);
             generate_ecmascript_web_site(checked, template, output_file_name);
         }
         break;
