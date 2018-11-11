@@ -434,7 +434,7 @@ static unicode_view generate_template(stream_writer diagnostics, const char *fil
     unicode_string new_string =
         unicode_view_concat(unicode_view_from_c_str(file_name), unicode_view_from_c_str(".lpg"));
     blob_or_error content = read_file(unicode_string_c_str(&new_string));
-
+    unicode_string_free(&new_string);
     if (content.error)
     {
         stream_writer_write_string(diagnostics, "Could not find template. Using default template.");
