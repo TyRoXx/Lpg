@@ -169,6 +169,8 @@ typedef struct c_backend_state
     type_definitions *definitions;
     checked_program const *program;
     array_vtable_cache *array_vtables;
+    size_t *number_of_registers_before_loops;
+    size_t number_of_nested_loops;
 } c_backend_state;
 
 static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
@@ -1685,6 +1687,15 @@ static success_indicator generate_free_registers(c_backend_state *state, size_t 
         }
         LPG_TRY(generate_free_register(state, which, current_function, indentation, c_output));
     }
+    return success_yes;
+}
+
+static success_indicator free_registers(c_backend_state *state, size_t const previously_active_registers,
+                                        size_t const indentation, checked_function const *const current_function,
+                                        register_id const current_function_result, stream_writer const c_output)
+{
+    LPG_TRY(generate_free_registers(
+        state, previously_active_registers, indentation, current_function, current_function_result, c_output));
     state->active_register_count = previously_active_registers;
     return success_yes;
 }
@@ -1844,8 +1855,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
     case instruction_return:
         set_register_variable(state, input.return_.unit_goes_into, register_resource_ownership_owns, type_from_unit());
-        LPG_TRY(
-            generate_free_registers(state, 0, indentation, current_function, input.return_.returned_value, c_output));
+        LPG_TRY(free_registers(state, 0, indentation, current_function, input.return_.returned_value, c_output));
         LPG_TRY(generate_add_reference_for_return_value(
             state, current_function, input.return_.returned_value, indentation, c_output));
         LPG_TRY(indent(indentation, c_output));
@@ -2147,8 +2157,15 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "for (;;)\n"));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+        state->number_of_registers_before_loops =
+            reallocate_array(state->number_of_registers_before_loops, (state->number_of_nested_loops + 1),
+                             sizeof(*state->number_of_registers_before_loops));
+        state->number_of_registers_before_loops[state->number_of_nested_loops] = state->active_register_count;
+        state->number_of_nested_loops += 1;
         LPG_TRY(generate_sequence(state, current_function, current_function_id, input.loop.body, indentation + 1,
                                   additional_memory, c_output));
+        ASSUME(state->number_of_nested_loops > 0);
+        state->number_of_nested_loops -= 1;
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "}\n"));
         state->standard_library.using_unit = true;
@@ -2344,6 +2361,10 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         LPG_TRY(stream_writer_write_string(c_output, "unit const "));
         LPG_TRY(generate_register_name(input.break_into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
+        ASSUME(state->number_of_nested_loops > 0);
+        LPG_TRY(generate_free_registers(state,
+                                        state->number_of_registers_before_loops[state->number_of_nested_loops - 1],
+                                        indentation, current_function, ~(register_id)0, c_output));
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "break;\n"));
         return success_yes;
@@ -2627,7 +2648,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(generate_sequence(state, current_function, current_function_id, input.match.cases[i].action,
                                       (indentation + 1), additional_memory, c_output));
 
-            LPG_TRY(generate_free_registers(
+            LPG_TRY(free_registers(
                 state, previous_register_count, indentation + 1, current_function, ~(register_id)0, c_output));
 
             if (input.match.cases[i].value.is_set)
@@ -2815,8 +2836,7 @@ static success_indicator generate_sequence(c_backend_state *state, checked_funct
         LPG_TRY(generate_instruction(state, current_function, current_function_id, sequence.elements[i], indentation,
                                      additional_memory, c_output));
     }
-    return generate_free_registers(
-        state, previously_active_registers, indentation, current_function, ~(register_id)0, c_output);
+    return free_registers(state, previously_active_registers, indentation, current_function, ~(register_id)0, c_output);
 }
 
 static success_indicator
@@ -2833,7 +2853,9 @@ generate_function_body(checked_function const current_function, function_id cons
                              0,
                              definitions,
                              program,
-                             array_vtables};
+                             array_vtables,
+                             NULL,
+                             0};
     for (size_t j = 0; j < current_function.number_of_registers; ++j)
     {
         state.registers[j].meaning = register_meaning_nothing;
@@ -2871,6 +2893,10 @@ generate_function_body(checked_function const current_function, function_id cons
     if (state.active_registers)
     {
         deallocate(state.active_registers);
+    }
+    if (state.number_of_registers_before_loops)
+    {
+        deallocate(state.number_of_registers_before_loops);
     }
     return success_yes;
 }

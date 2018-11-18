@@ -31,3 +31,21 @@ loop
         case add_result.overflow:
             fail()
 
+loop
+    let no_leak = new-array(boolean)
+    break
+
+loop
+    loop
+        let no_leak = new-array(boolean)
+        break
+    let no_leak_either = new-array(boolean)
+    break
+
+loop
+    let no_leak = new-array(boolean)
+    match std.runtime-value[boolean](boolean.true)
+        case boolean.true:
+            break
+        case boolean.false:
+            fail()
