@@ -453,6 +453,7 @@ void test_interpreter(void)
                                                  "array-boolean.lpg",
                                                  "array-nesting.lpg",
                                                  "array-string.lpg",
+                                                 "backend_reserved_names.lpg",
                                                  "boolean.lpg",
                                                  "concat.lpg",
                                                  "comment-multi.lpg",

@@ -516,16 +516,27 @@ static success_indicator escape_identifier(unicode_view const original, stream_w
 {
     for (size_t i = 0; i < original.length; ++i)
     {
-        if (original.begin[i] == '-')
+        switch (original.begin[i])
         {
-            LPG_TRY(stream_writer_write_string(c_output, "_"));
-        }
-        else
-        {
+        case '-':
+        case '_':
+            /*Any identifier containing two consecutive underscores is reserved in C. This encoding ensures that we
+             * don't generate reserved identifiers.*/
+            LPG_TRY(stream_writer_write_string(c_output, "Z_"));
+            break;
+
+        default:
             LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(original.begin + i, 1)));
+            break;
         }
     }
     return success_yes;
+}
+
+static success_indicator generate_method_name(unicode_view const original, stream_writer const c_output)
+{
+    LPG_TRY(stream_writer_write_string(c_output, "m_"));
+    return escape_identifier(original, c_output);
 }
 
 static success_indicator generate_register_name(register_id const id, checked_function const *const current_function,
@@ -663,7 +674,7 @@ generate_interface_vtable_definition(interface_id const generated, standard_libr
         method_description const method = our_interface.methods[i];
         LPG_TRY(generate_type(method.result, standard_library, definitions, program, additional_memory, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " (*"));
-        LPG_TRY(escape_identifier(unicode_view_from_string(method.name), c_output));
+        LPG_TRY(generate_method_name(unicode_view_from_string(method.name), c_output));
         LPG_TRY(stream_writer_write_string(c_output, ")(void *"));
         for (size_t k = 0; k < method.parameters.length; ++k)
         {
@@ -790,18 +801,7 @@ generate_interface_impl_definition(implementation_ref const generated, type_defi
 static success_indicator generate_struct_member_name(unicode_view const name, stream_writer const c_output)
 {
     LPG_TRY(stream_writer_write_string(c_output, "e_"));
-    for (size_t i = 0; i < name.length; ++i)
-    {
-        if (name.begin[i] == '-')
-        {
-            LPG_TRY(stream_writer_write_string(c_output, "_"));
-        }
-        else
-        {
-            LPG_TRY(stream_writer_write_unicode_view(c_output, unicode_view_create(name.begin + i, 1)));
-        }
-    }
-    return success_yes;
+    return escape_identifier(name, c_output);
 }
 
 static success_indicator generate_stateful_enum_name(enum_id const generated, stream_writer const c_output)
@@ -2021,7 +2021,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, " = "));
                 LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ".e_0.vtable->"));
-                LPG_TRY(escape_identifier(unicode_view_from_string(called_method.name), c_output));
+                LPG_TRY(generate_method_name(unicode_view_from_string(called_method.name), c_output));
                 LPG_TRY(stream_writer_write_string(c_output, "("));
                 LPG_TRY(generate_c_read_access(state, current_function, input.call.callee, c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ".e_0.self"));
