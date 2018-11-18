@@ -285,6 +285,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_compile_time_memory_limit_reached:
         return "Compile time memory limit reached";
+
+    case semantic_error_stack_overflow:
+        return "Call stack overflow";
     }
     LPG_UNREACHABLE();
 }

@@ -89,10 +89,12 @@ static load_module_result type_check_module(function_checking_state *const state
     external_function_result const module_value = call_checked_function(
         checked.function, optional_function_id_empty(), NULL,
         function_call_arguments_create(optional_value_empty, NULL, state->root->globals, &state->program->memory,
-                                       state->program->functions, state->program->interfaces));
+                                       state->program->functions, state->program->interfaces,
+                                       state->root->max_recursion, state->root->current_recursion));
     switch (module_value.code)
     {
     case external_function_result_out_of_memory:
+    case external_function_result_stack_overflow:
         LPG_TO_DO();
 
     case external_function_result_success:

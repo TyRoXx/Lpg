@@ -1455,7 +1455,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     call_function(callee.compile_time_value.value_.function_pointer,
                                   function_call_arguments_create(
                                       optional_value_empty, compile_time_arguments, state->root->globals,
-                                      &state->program->memory, state->program->functions, state->program->interfaces));
+                                      &state->program->memory, state->program->functions, state->program->interfaces,
+                                      state->root->max_recursion, state->root->current_recursion));
                 switch (call_result.code)
                 {
                 case external_function_result_out_of_memory:
@@ -1470,6 +1471,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     break;
 
                 case external_function_result_unavailable:
+                    ASSUME(!compile_time_result.is_set);
+                    break;
+
+                case external_function_result_stack_overflow:
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_stack_overflow,
+                                                     expression_source_begin(expression_from_tuple(called.arguments))));
                     ASSUME(!compile_time_result.is_set);
                     break;
                 }
@@ -4387,6 +4395,7 @@ checked_program check(sequence const root, structure const global, check_error_h
                       source_file source, void *user)
 {
     size_t const max_compile_time_heap = 100000;
+    size_t const max_recursion = 100;
     structure *const structures = allocate_array(1, sizeof(*structures));
     structures[0] = clone_structure(global);
     checked_program program = {NULL,
@@ -4433,8 +4442,34 @@ checked_program check(sequence const root, structure const global, check_error_h
             globals[i] = value_from_unit();
         }
     }
-    program_check check_root = {NULL, 0,    NULL, 0,    NULL, 0,      NULL,   0,       NULL, 0,    NULL, 0, NULL,
-                                0,    NULL, 0,    NULL, 0,    loader, global, globals, NULL, NULL, 0,    0};
+    size_t current_recursion = 0;
+    program_check check_root = {NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                NULL,
+                                0,
+                                loader,
+                                global,
+                                globals,
+                                NULL,
+                                NULL,
+                                0,
+                                0,
+                                max_recursion,
+                                &current_recursion};
     check_function_result const checked = check_function(
         &check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
         optional_type_create_empty(), true, optional_type_create_empty(), source, NULL, optional_function_id_create(0));

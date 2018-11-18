@@ -482,3 +482,9 @@ external_function_result external_function_result_create_unavailable(void)
     external_function_result const result = {external_function_result_unavailable, value_create_invalid()};
     return result;
 }
+
+external_function_result external_function_result_create_stack_overflow(void)
+{
+    external_function_result const result = {external_function_result_stack_overflow, value_create_invalid()};
+    return result;
+}

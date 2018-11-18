@@ -7,18 +7,18 @@
 #include "lpg_standard_library.h"
 #include <string.h>
 
-static external_function_result
-call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
-                          optional_value const self, value *const arguments, value const *globals,
-                          value const *const captures, garbage_collector *const gc,
-                          checked_function const *const all_functions, lpg_interface const *const all_interfaces);
+static external_function_result call_interpreted_function(checked_function const callee,
+                                                          optional_function_id const callee_id,
+                                                          value const *const captures,
+                                                          function_call_arguments const arguments);
 
 typedef enum run_sequence_result {
     run_sequence_result_break = 1,
     run_sequence_result_continue,
     run_sequence_result_return,
     run_sequence_result_unavailable_at_this_time,
-    run_sequence_result_out_of_memory
+    run_sequence_result_out_of_memory,
+    run_sequence_result_stack_overflow
 } run_sequence_result;
 
 external_function_result call_function(function_pointer_value const callee, function_call_arguments const arguments)
@@ -28,8 +28,14 @@ external_function_result call_function(function_pointer_value const callee, func
     ASSUME(arguments.all_functions);
     if (callee.external)
     {
+        if (*arguments.current_recursion == arguments.max_recursion)
+        {
+            return external_function_result_create_stack_overflow();
+        }
+        *arguments.current_recursion += 1;
         external_function_result const return_value =
             callee.external(arguments, callee.captures, callee.external_environment);
+        *arguments.current_recursion -= 1;
         if (!callee.external_signature.result.is_set)
         {
             LPG_TO_DO();
@@ -38,6 +44,7 @@ external_function_result call_function(function_pointer_value const callee, func
         {
         case external_function_result_out_of_memory:
         case external_function_result_unavailable:
+        case external_function_result_stack_overflow:
             break;
 
         case external_function_result_success:
@@ -46,9 +53,8 @@ external_function_result call_function(function_pointer_value const callee, func
         }
         return return_value;
     }
-    return call_interpreted_function(arguments.all_functions[callee.code], optional_function_id_create(callee.code),
-                                     arguments.self, arguments.arguments, arguments.globals, callee.captures,
-                                     arguments.gc, arguments.all_functions, arguments.all_interfaces);
+    return call_interpreted_function(
+        arguments.all_functions[callee.code], optional_function_id_create(callee.code), callee.captures, arguments);
 }
 
 typedef struct invoke_method_parameters
@@ -85,7 +91,8 @@ static external_function_result invoke_method(function_call_arguments const argu
         external_function_result const result = call_function(
             *function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
                                                       arguments.arguments, arguments.globals, arguments.gc,
-                                                      arguments.all_functions, arguments.all_interfaces));
+                                                      arguments.all_functions, arguments.all_interfaces,
+                                                      arguments.max_recursion, arguments.current_recursion));
         return result;
     }
 
@@ -192,7 +199,8 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                                         value const *globals, value *const registers, structure_value const captures,
                                         garbage_collector *const gc, checked_function const *const all_functions,
                                         lpg_interface const *const all_interfaces,
-                                        optional_function_id const current_function);
+                                        optional_function_id const current_function, size_t const max_recursion,
+                                        LPG_NON_NULL(size_t *current_recursion));
 
 static void run_new_array(new_array_instruction const new_array, garbage_collector *const gc, value *const registers)
 {
@@ -232,7 +240,8 @@ static void run_erase_type(erase_type_instruction const erase_type, garbage_coll
 
 static run_sequence_result run_call(call_instruction const call, garbage_collector *const gc, value const *globals,
                                     value *const registers, checked_function const *const all_functions,
-                                    lpg_interface const *const all_interfaces)
+                                    lpg_interface const *const all_interfaces, size_t max_recursion,
+                                    LPG_NON_NULL(size_t *current_recursion))
 {
     value const callee = registers[call.callee];
     if (callee.kind == value_kind_unit)
@@ -248,9 +257,10 @@ static run_sequence_result run_call(call_instruction const call, garbage_collect
     {
     case value_kind_function_pointer:
     {
-        external_function_result const result = call_function(
-            callee.function_pointer, function_call_arguments_create(
-                                         optional_value_empty, arguments, globals, gc, all_functions, all_interfaces));
+        external_function_result const result =
+            call_function(callee.function_pointer,
+                          function_call_arguments_create(optional_value_empty, arguments, globals, gc, all_functions,
+                                                         all_interfaces, max_recursion, current_recursion));
         deallocate(arguments);
         switch (result.code)
         {
@@ -264,6 +274,9 @@ static run_sequence_result run_call(call_instruction const call, garbage_collect
 
         case external_function_result_unavailable:
             return run_sequence_result_unavailable_at_this_time;
+
+        case external_function_result_stack_overflow:
+            return run_sequence_result_stack_overflow;
         }
         break;
     }
@@ -294,14 +307,15 @@ static run_sequence_result run_loop(loop_instruction const loop, value *const re
                                     value *const registers, structure_value const captures, garbage_collector *const gc,
                                     checked_function const *const all_functions,
                                     lpg_interface const *const all_interfaces,
-                                    optional_function_id const current_function)
+                                    optional_function_id const current_function, size_t const max_recursion,
+                                    LPG_NON_NULL(size_t *current_recursion))
 {
     bool is_running = true;
     registers[loop.unit_goes_into] = value_from_unit();
     while (is_running)
     {
-        switch (run_sequence(
-            loop.body, return_value, globals, registers, captures, gc, all_functions, all_interfaces, current_function))
+        switch (run_sequence(loop.body, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
+                             current_function, max_recursion, current_recursion))
         {
         case run_sequence_result_break:
             is_running = false;
@@ -318,6 +332,9 @@ static run_sequence_result run_loop(loop_instruction const loop, value *const re
 
         case run_sequence_result_out_of_memory:
             return run_sequence_result_out_of_memory;
+
+        case run_sequence_result_stack_overflow:
+            return run_sequence_result_stack_overflow;
         }
     }
     return run_sequence_result_continue;
@@ -364,7 +381,8 @@ static run_sequence_result run_match(match_instruction const match, value *const
                                      value *const registers, structure_value const captures,
                                      garbage_collector *const gc, checked_function const *const all_functions,
                                      lpg_interface const *const all_interfaces,
-                                     optional_function_id const current_function)
+                                     optional_function_id const current_function, size_t const max_recursion,
+                                     LPG_NON_NULL(size_t *current_recursion))
 {
     value const key = registers[match.key];
     ASSUME(value_is_valid(key));
@@ -394,7 +412,7 @@ static run_sequence_result run_match(match_instruction const match, value *const
         }
         found_match = true;
         switch (run_sequence(this_case->action, return_value, globals, registers, captures, gc, all_functions,
-                             all_interfaces, current_function))
+                             all_interfaces, current_function, max_recursion, current_recursion))
         {
         case run_sequence_result_break:
             return run_sequence_result_break;
@@ -410,6 +428,9 @@ static run_sequence_result run_match(match_instruction const match, value *const
 
         case run_sequence_result_out_of_memory:
             return run_sequence_result_out_of_memory;
+
+        case run_sequence_result_stack_overflow:
+            return run_sequence_result_stack_overflow;
         }
         if (this_case->value.is_set)
         {
@@ -458,7 +479,8 @@ static run_sequence_result run_instruction(value *const return_value, value cons
                                            structure_value const captures, garbage_collector *const gc,
                                            checked_function const *const all_functions,
                                            lpg_interface const *const all_interfaces,
-                                           optional_function_id const current_function, instruction const element)
+                                           optional_function_id const current_function, instruction const element,
+                                           size_t const max_recursion, size_t *current_recursion)
 {
     switch (element.type)
     {
@@ -475,7 +497,8 @@ static run_sequence_result run_instruction(value *const return_value, value cons
         break;
 
     case instruction_call:
-        return run_call(element.call, gc, globals, registers, all_functions, all_interfaces);
+        return run_call(
+            element.call, gc, globals, registers, all_functions, all_interfaces, max_recursion, current_recursion);
 
     case instruction_return:
         *return_value = registers[element.return_.returned_value];
@@ -485,7 +508,7 @@ static run_sequence_result run_instruction(value *const return_value, value cons
 
     case instruction_loop:
         return run_loop(element.loop, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                        current_function);
+                        current_function, max_recursion, current_recursion);
 
     case instruction_global:
         registers[element.global_into] =
@@ -525,7 +548,7 @@ static run_sequence_result run_instruction(value *const return_value, value cons
 
     case instruction_match:
         return run_match(element.match, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                         current_function);
+                         current_function, max_recursion, current_recursion);
 
     case instruction_get_captures:
         registers[element.captures] = value_from_structure(captures);
@@ -546,13 +569,14 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                                         value const *globals, value *const registers, structure_value const captures,
                                         garbage_collector *const gc, checked_function const *const all_functions,
                                         lpg_interface const *const all_interfaces,
-                                        optional_function_id const current_function)
+                                        optional_function_id const current_function, size_t const max_recursion,
+                                        LPG_NON_NULL(size_t *current_recursion))
 {
     LPG_FOR(size_t, i, sequence.length)
     {
         instruction const element = sequence.elements[i];
-        switch (run_instruction(
-            return_value, globals, registers, captures, gc, all_functions, all_interfaces, current_function, element))
+        switch (run_instruction(return_value, globals, registers, captures, gc, all_functions, all_interfaces,
+                                current_function, element, max_recursion, current_recursion))
         {
         case run_sequence_result_break:
             return run_sequence_result_break;
@@ -568,6 +592,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case run_sequence_result_out_of_memory:
             return run_sequence_result_out_of_memory;
+
+        case run_sequence_result_stack_overflow:
+            return run_sequence_result_stack_overflow;
         }
     }
     return run_sequence_result_continue;
@@ -576,45 +603,52 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 external_function_result call_checked_function(checked_function const callee, optional_function_id const callee_id,
                                                value const *const captures, function_call_arguments arguments)
 {
-    return call_interpreted_function(callee, callee_id, arguments.self, arguments.arguments, arguments.globals,
-                                     captures, arguments.gc, arguments.all_functions, arguments.all_interfaces);
+    return call_interpreted_function(callee, callee_id, captures, arguments);
 }
 
-static external_function_result
-call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
-                          optional_value const self, value *const arguments, value const *globals,
-                          value const *const captures, garbage_collector *const gc,
-                          checked_function const *const all_functions, lpg_interface const *const all_interfaces)
+static external_function_result call_interpreted_function(checked_function const callee,
+                                                          optional_function_id const callee_id,
+                                                          value const *const captures,
+                                                          function_call_arguments const arguments)
 {
     /*there has to be at least one register for the return value, even if it is
      * unit*/
     ASSUME(callee.number_of_registers >= 1);
-    ASSUME(globals);
-    ASSUME(gc);
-    ASSUME(all_functions);
+    ASSUME(arguments.globals);
+    ASSUME(arguments.gc);
+    ASSUME(arguments.all_functions);
+    ASSUME(arguments.current_recursion);
+    if (*arguments.current_recursion == arguments.max_recursion)
+    {
+        return external_function_result_create_stack_overflow();
+    }
     value *const registers = allocate_array(callee.number_of_registers, sizeof(*registers));
     register_id next_register = 0;
     if (callee.signature->self.is_set)
     {
-        ASSUME(self.is_set);
-        registers[next_register] = self.value_;
+        ASSUME(arguments.self.is_set);
+        registers[next_register] = arguments.self.value_;
         ++next_register;
     }
     else
     {
-        ASSUME(!self.is_set);
+        ASSUME(!arguments.self.is_set);
     }
     for (size_t i = 0; i < callee.signature->parameters.length; ++i)
     {
         type const parameter = callee.signature->parameters.elements[i];
-        ASSUME(value_conforms_to_type(arguments[i], parameter));
-        registers[next_register] = arguments[i];
+        ASSUME(value_conforms_to_type(arguments.arguments[i], parameter));
+        registers[next_register] = arguments.arguments[i];
         ++next_register;
     }
     value return_value = value_from_unit();
-    switch (run_sequence(callee.body, &return_value, globals, registers,
-                         structure_value_create(captures, callee.signature->captures.length), gc, all_functions,
-                         all_interfaces, callee_id))
+    *arguments.current_recursion += 1;
+    run_sequence_result const result = run_sequence(callee.body, &return_value, arguments.globals, registers,
+                                                    structure_value_create(captures, callee.signature->captures.length),
+                                                    arguments.gc, arguments.all_functions, arguments.all_interfaces,
+                                                    callee_id, arguments.max_recursion, arguments.current_recursion);
+    *arguments.current_recursion -= 1;
+    switch (result)
     {
     case run_sequence_result_break:
         LPG_UNREACHABLE();
@@ -636,6 +670,10 @@ call_interpreted_function(checked_function const callee, optional_function_id co
     case run_sequence_result_out_of_memory:
         deallocate(registers);
         return external_function_result_create_out_of_memory();
+
+    case run_sequence_result_stack_overflow:
+        deallocate(registers);
+        return external_function_result_create_stack_overflow();
     }
     LPG_UNREACHABLE();
 }
@@ -643,6 +681,9 @@ call_interpreted_function(checked_function const callee, optional_function_id co
 void interpret(checked_program const program, value const *globals, garbage_collector *const gc)
 {
     function_id const entry_point_id = 0;
-    call_interpreted_function(program.functions[entry_point_id], optional_function_id_create(entry_point_id),
-                              optional_value_empty, NULL, globals, NULL, gc, program.functions, program.interfaces);
+    size_t current_recursion = 0;
+    size_t const max_recursion = 200;
+    call_interpreted_function(program.functions[entry_point_id], optional_function_id_create(entry_point_id), NULL,
+                              function_call_arguments_create(optional_value_empty, NULL, globals, gc, program.functions,
+                                                             program.interfaces, max_recursion, &current_recursion));
 }

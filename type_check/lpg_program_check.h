@@ -44,6 +44,8 @@ typedef struct program_check
     generic_impl_regular_interface *generic_impls_for_regular_interfaces;
     size_t generic_impls_for_regular_interfaces_count;
     size_t expression_recursion_depth;
+    size_t max_recursion;
+    size_t *current_recursion;
 } program_check;
 
 void program_check_free(program_check const freed);

@@ -195,16 +195,20 @@ typedef struct function_call_arguments
      * defined?*/
     checked_function const *const all_functions;
     lpg_interface const *all_interfaces;
+    size_t max_recursion;
+    size_t *current_recursion;
 } function_call_arguments;
 
 static inline function_call_arguments function_call_arguments_create(
     optional_value const self, value *const arguments, value const *globals, LPG_NON_NULL(garbage_collector *const gc),
-    LPG_NON_NULL(checked_function const *const all_functions), lpg_interface const *all_interfaces)
+    LPG_NON_NULL(checked_function const *const all_functions), lpg_interface const *all_interfaces,
+    size_t max_recursion, LPG_NON_NULL(size_t *current_recursion))
 {
     ASSUME(globals);
     ASSUME(gc);
     ASSUME(all_functions);
-    function_call_arguments const result = {self, arguments, globals, gc, all_functions, all_interfaces};
+    function_call_arguments const result = {
+        self, arguments, globals, gc, all_functions, all_interfaces, max_recursion, current_recursion};
     return result;
 }
 
@@ -213,7 +217,8 @@ bool value_conforms_to_type(value const instance, type const expected);
 typedef enum external_function_result_code {
     external_function_result_success = 1,
     external_function_result_out_of_memory,
-    external_function_result_unavailable
+    external_function_result_unavailable,
+    external_function_result_stack_overflow
 } external_function_result_code;
 
 typedef struct external_function_result
@@ -225,3 +230,4 @@ typedef struct external_function_result
 external_function_result external_function_result_from_success(value success);
 external_function_result external_function_result_create_out_of_memory(void);
 external_function_result external_function_result_create_unavailable(void);
+external_function_result external_function_result_create_stack_overflow(void);
