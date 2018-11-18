@@ -544,17 +544,15 @@ static success_indicator generate_method_name(unicode_view const original, strea
 static success_indicator generate_register_name(register_id const id, checked_function const *const current_function,
                                                 stream_writer const c_output)
 {
+    LPG_TRY(stream_writer_write_string(c_output, "r"));
     unicode_view const original_name = unicode_view_from_string(current_function->register_debug_names[id]);
+    LPG_TRY(generate_integer(integer_create(0, id), c_output));
     if (original_name.length > 0)
     {
-        LPG_TRY(escape_identifier(original_name, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "_"));
+        LPG_TRY(escape_identifier(original_name, c_output));
     }
-    else
-    {
-        LPG_TRY(stream_writer_write_string(c_output, "r_"));
-    }
-    return generate_integer(integer_create(0, id), c_output);
+    return success_yes;
 }
 
 static success_indicator generate_tuple_element_name(struct_member_id const element, stream_writer const c_output)
