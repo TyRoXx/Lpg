@@ -32,4 +32,37 @@ void test_arithmetic(void)
         optional_size const product = size_multiply(SIZE_MAX, SIZE_MAX);
         REQUIRE(product.state == optional_empty);
     }
+    {
+        optional_size const sum = size_add(0, 0);
+        REQUIRE(sum.state == optional_set);
+        REQUIRE(sum.value_if_set == 0);
+    }
+    {
+        optional_size const sum = size_add(1, 0);
+        REQUIRE(sum.state == optional_set);
+        REQUIRE(sum.value_if_set == 1);
+    }
+    {
+        optional_size const sum = size_add(0, 1);
+        REQUIRE(sum.state == optional_set);
+        REQUIRE(sum.value_if_set == 1);
+    }
+    {
+        optional_size const sum = size_add(SIZE_MAX, 0);
+        REQUIRE(sum.state == optional_set);
+        REQUIRE(sum.value_if_set == SIZE_MAX);
+    }
+    {
+        optional_size const sum = size_add(SIZE_MAX - 1, 1);
+        REQUIRE(sum.state == optional_set);
+        REQUIRE(sum.value_if_set == SIZE_MAX);
+    }
+    {
+        optional_size const sum = size_add(SIZE_MAX, 1);
+        REQUIRE(sum.state == optional_empty);
+    }
+    {
+        optional_size const sum = size_add(SIZE_MAX, SIZE_MAX);
+        REQUIRE(sum.state == optional_empty);
+    }
 }

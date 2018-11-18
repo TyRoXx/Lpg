@@ -4295,7 +4295,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
                                                       instruction_sequence *const function, expression const element,
                                                       unicode_view const *const early_initialized_variable)
 {
-    size_t const expression_recursion_limit = 30;
+    size_t const expression_recursion_limit = 100;
     if (state->root->expression_recursion_depth >= expression_recursion_limit)
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_expression_recursion_limit_reached,
@@ -4370,12 +4370,17 @@ static structure clone_structure(structure const original)
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, module_loader *loader,
                       source_file source, void *user)
 {
+    size_t const max_compile_time_heap = 100000;
     structure *const structures = allocate_array(1, sizeof(*structures));
     structures[0] = clone_structure(global);
-    checked_program program = {NULL,       0,
-                               structures, 1,
-                               {NULL},     allocate_array(1, sizeof(*program.functions)),
-                               1,          allocate_array(3, sizeof(*program.enums)),
+    checked_program program = {NULL,
+                               0,
+                               structures,
+                               1,
+                               garbage_collector_create(max_compile_time_heap),
+                               allocate_array(1, sizeof(*program.functions)),
+                               1,
+                               allocate_array(3, sizeof(*program.enums)),
                                3};
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));

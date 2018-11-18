@@ -15,3 +15,18 @@ optional_size size_multiply(size_t const first, size_t const second)
     }
     return make_optional_size(product);
 }
+
+optional_size size_add(size_t const first, size_t const second)
+{
+
+    size_t const sum = (first + second);
+    if (sum < first)
+    {
+        return optional_size_empty;
+    }
+    if (sum < second)
+    {
+        return optional_size_empty;
+    }
+    return make_optional_size(sum);
+}

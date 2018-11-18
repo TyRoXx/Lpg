@@ -282,6 +282,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_extra_method:
         return "Extra method in impl";
+
+    case semantic_error_compile_time_memory_limit_reached:
+        return "Compile time memory limit reached";
     }
     LPG_UNREACHABLE();
 }
@@ -487,7 +490,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     case compiler_command_run:
         if (!context.has_error)
         {
-            garbage_collector gc = {NULL};
+            garbage_collector gc = garbage_collector_create(SIZE_MAX);
             interpret(checked, globals_values, &gc);
             garbage_collector_free(gc);
         }

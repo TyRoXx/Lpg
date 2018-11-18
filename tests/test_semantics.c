@@ -199,7 +199,8 @@ static void test_functions(const standard_library_description *std_library)
                 0, value_from_integer(integer_create(0, 123)), make_integer_constant_type(integer_create(0, 123)))),
             instruction_create_return(return_instruction_create(0, 1))};
         checked_program const expected = {
-            NULL, 0, NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2, NULL, 0};
+            NULL, 0,    NULL, 0, garbage_collector_create(SIZE_MAX), allocate_array(2, sizeof(*expected.functions)),
+            2,    NULL, 0};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature = function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
@@ -236,7 +237,8 @@ static void test_functions(const standard_library_description *std_library)
         instruction const expected_lambda[] = {
             instruction_create_literal(literal), instruction_create_return(return_instruction_create(literal.into, 1))};
         checked_program const expected = {
-            NULL, 0, NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2, NULL, 0};
+            NULL, 0,    NULL, 0, garbage_collector_create(SIZE_MAX), allocate_array(2, sizeof(*expected.functions)),
+            2,    NULL, 0};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature = function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
@@ -278,7 +280,8 @@ static void test_functions(const standard_library_description *std_library)
             instruction_create_call(call_instruction_create(1, arguments, 1, 3)),
             instruction_create_return(return_instruction_create(3, 4))};
         checked_program const expected = {
-            NULL, 0, NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2, NULL, 0};
+            NULL, 0,    NULL, 0, garbage_collector_create(SIZE_MAX), allocate_array(2, sizeof(*expected.functions)),
+            2,    NULL, 0};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature = function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
@@ -322,7 +325,8 @@ static void test_functions(const standard_library_description *std_library)
                 1, value_from_integer(integer_create(0, 123)), make_integer_constant_type(integer_create(0, 123)))),
             instruction_create_return(return_instruction_create(1, 2))};
         checked_program const expected = {
-            NULL, 0, NULL, 0, {NULL}, allocate_array(2, sizeof(*expected.functions)), 2, NULL, 0};
+            NULL, 0,    NULL, 0, garbage_collector_create(SIZE_MAX), allocate_array(2, sizeof(*expected.functions)),
+            2,    NULL, 0};
         {
             function_pointer *const signature = allocate(sizeof(*signature));
             *signature = function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),

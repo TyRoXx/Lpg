@@ -1448,7 +1448,7 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_expression_recursion_limit_reached, source_location_create(2, 4))};
+            semantic_error_create(semantic_error_expression_recursion_limit_reached, source_location_create(2, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = [T]()\n"
                                                "    side-effect()\n"
@@ -1458,6 +1458,20 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+#if 0
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(0, 10))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let f = [S]()\n"
+                                               "    f[concat(S, S)]()\n"
+                                               "f[\"x\"]()",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
+#endif
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

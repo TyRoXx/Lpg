@@ -269,7 +269,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*15 add_result*/ global_object.members[15].compile_time_value.value_,
             /*16 add*/ global_object.members[16].compile_time_value.value_};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
-        garbage_collector gc = {NULL};
+        garbage_collector gc = garbage_collector_create(SIZE_MAX);
         interpret(program, globals_values, &gc);
         garbage_collector_free(gc);
     }
@@ -316,7 +316,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
     {
         memory_writer generated = {NULL, 0, 0};
         {
-            garbage_collector additional_memory = {NULL};
+            garbage_collector additional_memory = garbage_collector_create(SIZE_MAX);
             REQUIRE(success_yes == generate_c(program, &additional_memory, memory_writer_erase(&generated)));
             garbage_collector_free(additional_memory);
         }

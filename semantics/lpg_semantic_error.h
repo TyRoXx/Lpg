@@ -27,7 +27,8 @@ typedef enum semantic_error_type {
     semantic_error_import_failed,
     semantic_error_expression_recursion_limit_reached,
     semantic_error_missing_method,
-    semantic_error_extra_method
+    semantic_error_extra_method,
+    semantic_error_compile_time_memory_limit_reached
 } semantic_error_type;
 
 typedef struct semantic_error

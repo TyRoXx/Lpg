@@ -49,7 +49,7 @@ static void check_generated_c_code(char const *const source, standard_library_de
 
     memory_writer generated = {NULL, 0, 0};
     {
-        garbage_collector additional_memory = {NULL};
+        garbage_collector additional_memory = garbage_collector_create(SIZE_MAX);
         REQUIRE(success_yes == generate_c(checked, &additional_memory, memory_writer_erase(&generated)));
         garbage_collector_free(additional_memory);
     }
