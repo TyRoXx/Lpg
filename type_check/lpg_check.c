@@ -2961,6 +2961,18 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
     }
 }
 
+static optional_size find_method(lpg_interface const *const in, unicode_view const name)
+{
+    for (size_t i = 0; i < in->method_count; ++i)
+    {
+        if (unicode_view_equals(unicode_view_from_string(in->methods[i].name), name))
+        {
+            return make_optional_size(i);
+        }
+    }
+    return optional_size_empty;
+}
+
 static optional_size evaluate_impl_core(function_checking_state *state, instruction_sequence *const function,
                                         impl_expression_method const *const method_trees,
                                         size_t const defined_method_count, type const self,
@@ -2981,20 +2993,30 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
         impl_id = begin_implementation(implemented_interface, self);
     }
 
-    function_pointer_value *const methods = allocate_array(defined_method_count, sizeof(*methods));
+    function_pointer_value *const methods =
+        allocate_array(state->program->interfaces[target_interface].method_count, sizeof(*methods));
     for (size_t i = 0; i < defined_method_count; ++i)
     {
-        method_evaluation_result const method = evaluate_method_definition(
-            state, function, method_trees[i], self, state->program->interfaces[target_interface].methods[i].result);
+        lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
+        optional_size const canonical_method_index =
+            find_method(implemented_interface, unicode_view_from_string(method_trees[i].name.value));
+        if (canonical_method_index.state == optional_empty)
+        {
+            LPG_TO_DO();
+        }
+        method_evaluation_result const method =
+            evaluate_method_definition(state, function, method_trees[i], self,
+                                       implemented_interface->methods[canonical_method_index.value_if_set].result);
         if (!method.is_success)
         {
             deallocate(methods);
             return optional_size_empty;
         }
-        methods[i] = method.success;
+        methods[canonical_method_index.value_if_set] = method.success;
     }
 
-    if (defined_method_count < state->program->interfaces[target_interface].method_count)
+    lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
+    if (defined_method_count < implemented_interface->method_count)
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_missing_method, impl_begin));
         if (methods)
@@ -3004,8 +3026,8 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
         return optional_size_empty;
     }
 
-    lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
-    finish_implementation(implemented_interface, impl_id, implementation_create(methods, defined_method_count));
+    finish_implementation(
+        implemented_interface, impl_id, implementation_create(methods, implemented_interface->method_count));
     return make_optional_size(impl_id);
 }
 

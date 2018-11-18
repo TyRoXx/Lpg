@@ -98,3 +98,13 @@ captures-impl()()
 let nested = interface
     m(): interface
         f(): boolean
+
+let different_method_order = struct
+impl printable2 for different_method_order
+    other-method(): std.unit
+        std.unit_value
+    print(): std.string
+        "123"
+let h : printable2 = different_method_order{}
+h.other-method()
+assert(string-equals("123", h.print()))
