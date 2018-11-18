@@ -1,38 +1,40 @@
 #pragma once
+#include "lpg_interpret.h"
 #include "lpg_structure_member.h"
 
-external_function_result not_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment);
+external_function_result not_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context);
 
-external_function_result concat_impl(function_call_arguments const arguments, struct value const *const captures,
-                                     void *environment);
+external_function_result concat_impl(value const *const captures, void *environment, optional_value const self,
+                                     value *const arguments, interpreter *const context);
 
-external_function_result string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
-                                            void *environment);
+external_function_result string_equals_impl(value const *const captures, void *environment, optional_value const self,
+                                            value *const arguments, interpreter *const context);
 
-external_function_result int_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment);
+external_function_result int_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context);
 
-external_function_result fail_impl(function_call_arguments const arguments, struct value const *const captures,
-                                   void *environment);
+external_function_result fail_impl(value const *const captures, void *environment, optional_value const self,
+                                   value *const arguments, interpreter *const context);
 
-external_function_result integer_equals_impl(function_call_arguments const arguments,
-                                             struct value const *const captures, void *environment);
+external_function_result integer_equals_impl(value const *const captures, void *environment, optional_value const self,
+                                             value *const arguments, interpreter *const context);
 
-external_function_result integer_less_impl(function_call_arguments const arguments, struct value const *const captures,
-                                           void *environment);
+external_function_result integer_less_impl(value const *const captures, void *environment, optional_value const self,
+                                           value *const arguments, interpreter *const context);
 
-external_function_result integer_to_string_impl(function_call_arguments const arguments,
-                                                struct value const *const captures, void *environment);
+external_function_result integer_to_string_impl(value const *const captures, void *environment,
+                                                optional_value const self, value *const arguments,
+                                                interpreter *const context);
 
-external_function_result subtract_impl(function_call_arguments const arguments, struct value const *const captures,
-                                       void *environment);
+external_function_result subtract_impl(value const *const captures, void *environment, optional_value const self,
+                                       value *const arguments, interpreter *const context);
 
-external_function_result add_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment);
+external_function_result add_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context);
 
-external_function_result side_effect_impl(function_call_arguments const arguments, struct value const *const captures,
-                                          void *environment);
+external_function_result side_effect_impl(value const *const captures, void *environment, optional_value const self,
+                                          value *const arguments, interpreter *const context);
 
 typedef struct standard_library_stable
 {

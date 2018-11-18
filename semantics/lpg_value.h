@@ -21,12 +21,14 @@ implementation_entry *implementation_ref_resolve(lpg_interface const *const inte
 
 typedef struct enumeration enumeration;
 
-struct function_call_arguments;
-
 struct value;
+struct interpreter;
+struct optional_value;
 
-typedef struct external_function_result external_function(struct function_call_arguments const arguments,
-                                                          struct value const *const captures, void *environment);
+typedef struct external_function_result external_function(struct value const *const captures, void *environment,
+                                                          struct optional_value const self,
+                                                          struct value *const arguments,
+                                                          struct interpreter *const context);
 
 typedef struct function_pointer_value
 {
@@ -182,35 +184,6 @@ static inline optional_value optional_value_create(value v)
 }
 
 static optional_value const optional_value_empty = {false, {(value_kind)0, {{NULL, 0}}}};
-
-typedef struct function_call_arguments
-{
-    optional_value const self;
-    value *const arguments;
-    value const *globals;
-    garbage_collector *const gc;
-
-    /*TODO are all_functions and all_interfaces safe to use? Can't they change
-     * whenever a new function or interface is
-     * defined?*/
-    checked_function const *const all_functions;
-    lpg_interface const *all_interfaces;
-    size_t max_recursion;
-    size_t *current_recursion;
-} function_call_arguments;
-
-static inline function_call_arguments function_call_arguments_create(
-    optional_value const self, value *const arguments, value const *globals, LPG_NON_NULL(garbage_collector *const gc),
-    LPG_NON_NULL(checked_function const *const all_functions), lpg_interface const *all_interfaces,
-    size_t max_recursion, LPG_NON_NULL(size_t *current_recursion))
-{
-    ASSUME(globals);
-    ASSUME(gc);
-    ASSUME(all_functions);
-    function_call_arguments const result = {
-        self, arguments, globals, gc, all_functions, all_interfaces, max_recursion, current_recursion};
-    return result;
-}
 
 bool value_conforms_to_type(value const instance, type const expected);
 

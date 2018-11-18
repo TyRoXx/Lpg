@@ -86,11 +86,11 @@ static load_module_result type_check_module(function_checking_state *const state
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
+    interpreter context =
+        interpreter_create(state->root->globals, &state->program->memory, state->program->functions,
+                           state->program->interfaces, state->root->max_recursion, state->root->current_recursion);
     external_function_result const module_value = call_checked_function(
-        checked.function, optional_function_id_empty(), NULL,
-        function_call_arguments_create(optional_value_empty, NULL, state->root->globals, &state->program->memory,
-                                       state->program->functions, state->program->interfaces,
-                                       state->root->max_recursion, state->root->current_recursion));
+        checked.function, optional_function_id_empty(), NULL, optional_value_empty, NULL, &context);
     switch (module_value.code)
     {
     case external_function_result_out_of_memory:

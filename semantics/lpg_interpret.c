@@ -9,8 +9,8 @@
 
 static external_function_result call_interpreted_function(checked_function const callee,
                                                           optional_function_id const callee_id,
-                                                          value const *const captures,
-                                                          function_call_arguments const arguments);
+                                                          value const *const captures, optional_value const self,
+                                                          value *const arguments, interpreter *const context);
 
 typedef enum run_sequence_result {
     run_sequence_result_break = 1,
@@ -21,21 +21,28 @@ typedef enum run_sequence_result {
     run_sequence_result_stack_overflow
 } run_sequence_result;
 
-external_function_result call_function(function_pointer_value const callee, function_call_arguments const arguments)
+interpreter interpreter_create(value const *globals, garbage_collector *const gc,
+                               checked_function const *const all_functions, lpg_interface const *all_interfaces,
+                               size_t max_recursion, size_t *current_recursion)
 {
-    ASSUME(arguments.globals);
-    ASSUME(arguments.gc);
-    ASSUME(arguments.all_functions);
+    interpreter const result = {globals, gc, all_functions, all_interfaces, max_recursion, current_recursion};
+    return result;
+}
+
+external_function_result call_function(function_pointer_value const callee, optional_value const self,
+                                       value *const arguments, interpreter *const context)
+{
+    ASSUME(context);
     if (callee.external)
     {
-        if (*arguments.current_recursion == arguments.max_recursion)
+        if (*context->current_recursion == context->max_recursion)
         {
             return external_function_result_create_stack_overflow();
         }
-        *arguments.current_recursion += 1;
+        *context->current_recursion += 1;
         external_function_result const return_value =
-            callee.external(arguments, callee.captures, callee.external_environment);
-        *arguments.current_recursion -= 1;
+            callee.external(callee.captures, callee.external_environment, self, arguments, context);
+        *context->current_recursion -= 1;
         if (!callee.external_signature.result.is_set)
         {
             LPG_TO_DO();
@@ -53,8 +60,8 @@ external_function_result call_function(function_pointer_value const callee, func
         }
         return return_value;
     }
-    return call_interpreted_function(
-        arguments.all_functions[callee.code], optional_function_id_create(callee.code), callee.captures, arguments);
+    return call_interpreted_function(context->all_functions[callee.code], optional_function_id_create(callee.code),
+                                     callee.captures, self, arguments, context);
 }
 
 typedef struct invoke_method_parameters
@@ -63,8 +70,8 @@ typedef struct invoke_method_parameters
     size_t parameter_count;
 } invoke_method_parameters;
 
-static external_function_result invoke_method(function_call_arguments const arguments, value const *const captures,
-                                              void *environment)
+static external_function_result invoke_method(value const *const captures, void *environment, optional_value const self,
+                                              value *const arguments, interpreter *const context)
 {
     (void)environment;
     ASSUME(captures);
@@ -81,18 +88,15 @@ static external_function_result invoke_method(function_call_arguments const argu
     case value_kind_type_erased:
     {
         implementation *const impl =
-            &implementation_ref_resolve(arguments.all_interfaces, from.type_erased.impl)->target;
+            &implementation_ref_resolve(context->all_interfaces, from.type_erased.impl)->target;
         ASSUME(impl);
         ASSUME(parameters->method < impl->method_count);
         size_t const method_parameter_count = parameters->parameter_count;
         function_pointer_value const *const function = &impl->methods[parameters->method];
         ASSUME(method_parameter_count < SIZE_MAX);
-        ASSUME(!arguments.self.is_set);
-        external_function_result const result = call_function(
-            *function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
-                                                      arguments.arguments, arguments.globals, arguments.gc,
-                                                      arguments.all_functions, arguments.all_interfaces,
-                                                      arguments.max_recursion, arguments.current_recursion));
+        ASSUME(!self.is_set);
+        external_function_result const result =
+            call_function(*function, optional_value_create(*from.type_erased.self), arguments, context);
         return result;
     }
 
@@ -105,11 +109,11 @@ static external_function_result invoke_method(function_call_arguments const argu
 
         case 1: // load
         {
-            value const index = arguments.arguments[0];
+            value const index = arguments[0];
             ASSUME(index.kind == value_kind_integer);
             if (integer_less(index.integer_, integer_create(0, from.array->count)))
             {
-                value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
+                value *const state = garbage_collector_allocate(context->gc, sizeof(*state));
                 *state = from.array->elements[index.integer_.low];
                 return external_function_result_from_success(
                     value_from_enum_element(0, from.array->element_type, state));
@@ -119,20 +123,20 @@ static external_function_result invoke_method(function_call_arguments const argu
 
         case 2: // store
         {
-            value const index = arguments.arguments[0];
+            value const index = arguments[0];
             ASSUME(index.kind == value_kind_integer);
             if (!integer_less(index.integer_, integer_create(0, from.array->count)))
             {
                 return external_function_result_from_success(value_from_enum_element(0, type_from_unit(), NULL));
             }
-            value const new_element = arguments.arguments[1];
+            value const new_element = arguments[1];
             from.array->elements[index.integer_.low] = new_element;
             return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 
         case 3: // append
         {
-            value const new_element = arguments.arguments[0];
+            value const new_element = arguments[0];
             if (from.array->count == from.array->allocated)
             {
                 size_t new_capacity = (from.array->count * 2);
@@ -141,7 +145,7 @@ static external_function_result invoke_method(function_call_arguments const argu
                     new_capacity = 1;
                 }
                 value *const new_elements =
-                    garbage_collector_allocate_array(arguments.gc, new_capacity, sizeof(*new_elements));
+                    garbage_collector_allocate_array(context->gc, new_capacity, sizeof(*new_elements));
                 if (from.array->count > 0)
                 {
                     memcpy(new_elements, from.array->elements, sizeof(*new_elements) * from.array->count);
@@ -163,7 +167,7 @@ static external_function_result invoke_method(function_call_arguments const argu
         case 5: // pop
         {
             ASSUME(from.array->count > 0);
-            value const count = arguments.arguments[0];
+            value const count = arguments[0];
             ASSUME(count.kind == value_kind_integer);
             if (integer_less(integer_create(0, from.array->count), count.integer_))
             {
@@ -196,11 +200,8 @@ static external_function_result invoke_method(function_call_arguments const argu
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
-                                        value const *globals, value *const registers, structure_value const captures,
-                                        garbage_collector *const gc, checked_function const *const all_functions,
-                                        lpg_interface const *const all_interfaces,
-                                        optional_function_id const current_function, size_t const max_recursion,
-                                        LPG_NON_NULL(size_t *current_recursion));
+                                        value *const registers, structure_value const captures,
+                                        optional_function_id const current_function, interpreter *const context);
 
 static void run_new_array(new_array_instruction const new_array, garbage_collector *const gc, value *const registers)
 {
@@ -238,10 +239,7 @@ static void run_erase_type(erase_type_instruction const erase_type, garbage_coll
     registers[erase_type.into] = value_from_type_erased(type_erased_value_create(erase_type.impl, self));
 }
 
-static run_sequence_result run_call(call_instruction const call, garbage_collector *const gc, value const *globals,
-                                    value *const registers, checked_function const *const all_functions,
-                                    lpg_interface const *const all_interfaces, size_t max_recursion,
-                                    LPG_NON_NULL(size_t *current_recursion))
+static run_sequence_result run_call(call_instruction const call, value *const registers, interpreter *const context)
 {
     value const callee = registers[call.callee];
     if (callee.kind == value_kind_unit)
@@ -258,9 +256,7 @@ static run_sequence_result run_call(call_instruction const call, garbage_collect
     case value_kind_function_pointer:
     {
         external_function_result const result =
-            call_function(callee.function_pointer,
-                          function_call_arguments_create(optional_value_empty, arguments, globals, gc, all_functions,
-                                                         all_interfaces, max_recursion, current_recursion));
+            call_function(callee.function_pointer, optional_value_empty, arguments, context);
         deallocate(arguments);
         switch (result.code)
         {
@@ -303,19 +299,15 @@ static run_sequence_result run_call(call_instruction const call, garbage_collect
     return run_sequence_result_continue;
 }
 
-static run_sequence_result run_loop(loop_instruction const loop, value *const return_value, value const *globals,
-                                    value *const registers, structure_value const captures, garbage_collector *const gc,
-                                    checked_function const *const all_functions,
-                                    lpg_interface const *const all_interfaces,
-                                    optional_function_id const current_function, size_t const max_recursion,
-                                    LPG_NON_NULL(size_t *current_recursion))
+static run_sequence_result run_loop(loop_instruction const loop, value *const return_value, value *const registers,
+                                    structure_value const captures, optional_function_id const current_function,
+                                    interpreter *const context)
 {
     bool is_running = true;
     registers[loop.unit_goes_into] = value_from_unit();
     while (is_running)
     {
-        switch (run_sequence(loop.body, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                             current_function, max_recursion, current_recursion))
+        switch (run_sequence(loop.body, return_value, registers, captures, current_function, context))
         {
         case run_sequence_result_break:
             is_running = false;
@@ -377,12 +369,9 @@ static void run_enum_construct(enum_construct_instruction const enum_construct, 
         value_from_enum_element(enum_construct.which.which, enum_construct.state_type, state);
 }
 
-static run_sequence_result run_match(match_instruction const match, value *const return_value, value const *globals,
-                                     value *const registers, structure_value const captures,
-                                     garbage_collector *const gc, checked_function const *const all_functions,
-                                     lpg_interface const *const all_interfaces,
-                                     optional_function_id const current_function, size_t const max_recursion,
-                                     LPG_NON_NULL(size_t *current_recursion))
+static run_sequence_result run_match(match_instruction const match, value *const return_value, value *const registers,
+                                     structure_value const captures, optional_function_id const current_function,
+                                     interpreter *const context)
 {
     value const key = registers[match.key];
     ASSUME(value_is_valid(key));
@@ -411,8 +400,7 @@ static run_sequence_result run_match(match_instruction const match, value *const
             continue;
         }
         found_match = true;
-        switch (run_sequence(this_case->action, return_value, globals, registers, captures, gc, all_functions,
-                             all_interfaces, current_function, max_recursion, current_recursion))
+        switch (run_sequence(this_case->action, return_value, registers, captures, current_function, context))
         {
         case run_sequence_result_break:
             return run_sequence_result_break;
@@ -475,30 +463,26 @@ static void run_current_function(current_function_instruction const current_func
         function_pointer_value_from_internal(current_function.value, inner_captures, captures.count));
 }
 
-static run_sequence_result run_instruction(value *const return_value, value const *globals, value *const registers,
-                                           structure_value const captures, garbage_collector *const gc,
-                                           checked_function const *const all_functions,
-                                           lpg_interface const *const all_interfaces,
-                                           optional_function_id const current_function, instruction const element,
-                                           size_t const max_recursion, size_t *current_recursion)
+static run_sequence_result run_instruction(value *const return_value, value *const registers,
+                                           structure_value const captures, optional_function_id const current_function,
+                                           instruction const element, interpreter *const context)
 {
     switch (element.type)
     {
     case instruction_new_array:
-        run_new_array(element.new_array, gc, registers);
+        run_new_array(element.new_array, context->gc, registers);
         break;
 
     case instruction_get_method:
-        run_get_method(element.get_method, gc, registers, all_interfaces);
+        run_get_method(element.get_method, context->gc, registers, context->all_interfaces);
         break;
 
     case instruction_erase_type:
-        run_erase_type(element.erase_type, gc, registers);
+        run_erase_type(element.erase_type, context->gc, registers);
         break;
 
     case instruction_call:
-        return run_call(
-            element.call, gc, globals, registers, all_functions, all_interfaces, max_recursion, current_recursion);
+        return run_call(element.call, registers, context);
 
     case instruction_return:
         *return_value = registers[element.return_.returned_value];
@@ -507,12 +491,11 @@ static run_sequence_result run_instruction(value *const return_value, value cons
         return run_sequence_result_return;
 
     case instruction_loop:
-        return run_loop(element.loop, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                        current_function, max_recursion, current_recursion);
+        return run_loop(element.loop, return_value, registers, captures, current_function, context);
 
     case instruction_global:
         registers[element.global_into] =
-            value_from_structure(structure_value_create(globals, standard_library_element_count));
+            value_from_structure(structure_value_create(context->globals, standard_library_element_count));
         break;
 
     case instruction_read_struct:
@@ -535,48 +518,43 @@ static run_sequence_result run_instruction(value *const return_value, value cons
         break;
 
     case instruction_tuple:
-        run_tuple(element.tuple_, gc, registers);
+        run_tuple(element.tuple_, context->gc, registers);
         break;
 
     case instruction_instantiate_struct:
-        run_instantiate_struct(element.instantiate_struct, gc, registers);
+        run_instantiate_struct(element.instantiate_struct, context->gc, registers);
         break;
 
     case instruction_enum_construct:
-        run_enum_construct(element.enum_construct, gc, registers);
+        run_enum_construct(element.enum_construct, context->gc, registers);
         break;
 
     case instruction_match:
-        return run_match(element.match, return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                         current_function, max_recursion, current_recursion);
+        return run_match(element.match, return_value, registers, captures, current_function, context);
 
     case instruction_get_captures:
         registers[element.captures] = value_from_structure(captures);
         break;
 
     case instruction_lambda_with_captures:
-        run_lambda_with_captures(element.lambda_with_captures, gc, registers);
+        run_lambda_with_captures(element.lambda_with_captures, context->gc, registers);
         break;
 
     case instruction_current_function:
-        run_current_function(element.current_function, captures, registers, gc, current_function);
+        run_current_function(element.current_function, captures, registers, context->gc, current_function);
         break;
     }
     return run_sequence_result_continue;
 }
 
 static run_sequence_result run_sequence(instruction_sequence const sequence, value *const return_value,
-                                        value const *globals, value *const registers, structure_value const captures,
-                                        garbage_collector *const gc, checked_function const *const all_functions,
-                                        lpg_interface const *const all_interfaces,
-                                        optional_function_id const current_function, size_t const max_recursion,
-                                        LPG_NON_NULL(size_t *current_recursion))
+                                        value *const registers, structure_value const captures,
+                                        optional_function_id const current_function, interpreter *const context)
 {
     LPG_FOR(size_t, i, sequence.length)
     {
         instruction const element = sequence.elements[i];
-        switch (run_instruction(return_value, globals, registers, captures, gc, all_functions, all_interfaces,
-                                current_function, element, max_recursion, current_recursion))
+        switch (run_instruction(return_value, registers, captures, current_function, element, context))
         {
         case run_sequence_result_break:
             return run_sequence_result_break;
@@ -601,24 +579,21 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 }
 
 external_function_result call_checked_function(checked_function const callee, optional_function_id const callee_id,
-                                               value const *const captures, function_call_arguments arguments)
+                                               value const *const captures, optional_value const self,
+                                               value *const arguments, interpreter *const context)
 {
-    return call_interpreted_function(callee, callee_id, captures, arguments);
+    return call_interpreted_function(callee, callee_id, captures, self, arguments, context);
 }
 
 static external_function_result call_interpreted_function(checked_function const callee,
                                                           optional_function_id const callee_id,
-                                                          value const *const captures,
-                                                          function_call_arguments const arguments)
+                                                          value const *const captures, optional_value const self,
+                                                          value *const arguments, interpreter *const context)
 {
     /*there has to be at least one register for the return value, even if it is
      * unit*/
     ASSUME(callee.number_of_registers >= 1);
-    ASSUME(arguments.globals);
-    ASSUME(arguments.gc);
-    ASSUME(arguments.all_functions);
-    ASSUME(arguments.current_recursion);
-    if (*arguments.current_recursion == arguments.max_recursion)
+    if (*context->current_recursion == context->max_recursion)
     {
         return external_function_result_create_stack_overflow();
     }
@@ -626,28 +601,27 @@ static external_function_result call_interpreted_function(checked_function const
     register_id next_register = 0;
     if (callee.signature->self.is_set)
     {
-        ASSUME(arguments.self.is_set);
-        registers[next_register] = arguments.self.value_;
+        ASSUME(self.is_set);
+        registers[next_register] = self.value_;
         ++next_register;
     }
     else
     {
-        ASSUME(!arguments.self.is_set);
+        ASSUME(!self.is_set);
     }
     for (size_t i = 0; i < callee.signature->parameters.length; ++i)
     {
         type const parameter = callee.signature->parameters.elements[i];
-        ASSUME(value_conforms_to_type(arguments.arguments[i], parameter));
-        registers[next_register] = arguments.arguments[i];
+        ASSUME(value_conforms_to_type(arguments[i], parameter));
+        registers[next_register] = arguments[i];
         ++next_register;
     }
     value return_value = value_from_unit();
-    *arguments.current_recursion += 1;
-    run_sequence_result const result = run_sequence(callee.body, &return_value, arguments.globals, registers,
-                                                    structure_value_create(captures, callee.signature->captures.length),
-                                                    arguments.gc, arguments.all_functions, arguments.all_interfaces,
-                                                    callee_id, arguments.max_recursion, arguments.current_recursion);
-    *arguments.current_recursion -= 1;
+    *context->current_recursion += 1;
+    run_sequence_result const result =
+        run_sequence(callee.body, &return_value, registers,
+                     structure_value_create(captures, callee.signature->captures.length), callee_id, context);
+    *context->current_recursion -= 1;
     switch (result)
     {
     case run_sequence_result_break:
@@ -683,7 +657,8 @@ void interpret(checked_program const program, value const *globals, garbage_coll
     function_id const entry_point_id = 0;
     size_t current_recursion = 0;
     size_t const max_recursion = 200;
+    interpreter context =
+        interpreter_create(globals, gc, program.functions, program.interfaces, max_recursion, &current_recursion);
     call_interpreted_function(program.functions[entry_point_id], optional_function_id_create(entry_point_id), NULL,
-                              function_call_arguments_create(optional_value_empty, NULL, globals, gc, program.functions,
-                                                             program.interfaces, max_recursion, &current_recursion));
+                              optional_value_empty, NULL, &context);
 }

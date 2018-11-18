@@ -19,24 +19,27 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->add);
 }
 
-external_function_result not_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment)
+external_function_result not_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    enum_element_id const argument = arguments.arguments[0].enum_element.which;
+    enum_element_id const argument = arguments[0].enum_element.which;
     return external_function_result_from_success(value_from_enum_element(!argument, type_from_unit(), NULL));
 }
 
-external_function_result concat_impl(function_call_arguments const arguments, struct value const *const captures,
-                                     void *environment)
+external_function_result concat_impl(value const *const captures, void *environment, optional_value const self,
+                                     value *const arguments, interpreter *const context)
 {
+    (void)self;
     (void)environment;
     (void)captures;
-    unicode_view const left = arguments.arguments[0].string;
-    unicode_view const right = arguments.arguments[1].string;
+    unicode_view const left = arguments[0].string;
+    unicode_view const right = arguments[1].string;
     size_t const result_length = left.length + right.length;
-    char *const result = garbage_collector_try_allocate(arguments.gc, result_length);
+    char *const result = garbage_collector_try_allocate(context->gc, result_length);
     if (!result)
     {
         return external_function_result_create_out_of_memory();
@@ -46,35 +49,41 @@ external_function_result concat_impl(function_call_arguments const arguments, st
     return external_function_result_from_success(value_from_string(unicode_view_create(result, result_length)));
 }
 
-external_function_result string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
-                                            void *environment)
+external_function_result string_equals_impl(value const *const captures, void *environment, optional_value const self,
+                                            value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    unicode_view const left = arguments.arguments[0].string;
-    unicode_view const right = arguments.arguments[1].string;
+    unicode_view const left = arguments[0].string;
+    unicode_view const right = arguments[1].string;
     return external_function_result_from_success(
         value_from_enum_element(unicode_view_equals(left, right), type_from_unit(), NULL));
 }
 
-external_function_result type_equals_impl(function_call_arguments const arguments, struct value const *const captures,
-                                          void *environment)
+external_function_result type_equals_impl(value const *const captures, void *environment, optional_value const self,
+                                          value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    type const left = arguments.arguments[0].type_;
-    type const right = arguments.arguments[1].type_;
+    type const left = arguments[0].type_;
+    type const right = arguments[1].type_;
     return external_function_result_from_success(
         value_from_enum_element(type_equals(left, right), type_from_unit(), NULL));
 }
 
-external_function_result int_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment)
+external_function_result int_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    integer const first = arguments.arguments[0].integer_;
-    integer const second = arguments.arguments[1].integer_;
+    integer const first = arguments[0].integer_;
+    integer const second = arguments[1].integer_;
     if (integer_less(first, second))
     {
         return external_function_result_from_success(
@@ -84,62 +93,71 @@ external_function_result int_impl(function_call_arguments const arguments, struc
         value_from_type(type_from_integer_range(integer_range_create(second, first))));
 }
 
-external_function_result fail_impl(function_call_arguments const arguments, struct value const *const captures,
-                                   void *environment)
+external_function_result fail_impl(value const *const captures, void *environment, optional_value const self,
+                                   value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)arguments;
     (void)environment;
     (void)captures;
     LPG_TO_DO();
 }
 
-external_function_result integer_equals_impl(function_call_arguments const arguments,
-                                             struct value const *const captures, void *environment)
+external_function_result integer_equals_impl(value const *const captures, void *environment, optional_value const self,
+                                             value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    integer const left = arguments.arguments[0].integer_;
-    integer const right = arguments.arguments[1].integer_;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
     return external_function_result_from_success(
         value_from_enum_element(integer_equal(left, right), type_from_unit(), NULL));
 }
 
-external_function_result integer_less_impl(function_call_arguments const arguments, struct value const *const captures,
-                                           void *environment)
+external_function_result integer_less_impl(value const *const captures, void *environment, optional_value const self,
+                                           value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)environment;
     (void)captures;
-    integer const left = arguments.arguments[0].integer_;
-    integer const right = arguments.arguments[1].integer_;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
     return external_function_result_from_success(
         value_from_enum_element(integer_less(left, right), type_from_unit(), NULL));
 }
 
-external_function_result integer_to_string_impl(function_call_arguments const arguments,
-                                                struct value const *const captures, void *environment)
+external_function_result integer_to_string_impl(value const *const captures, void *environment,
+                                                optional_value const self, value *const arguments,
+                                                interpreter *const context)
 {
+    (void)self;
     (void)environment;
     (void)captures;
 
-    integer const left = arguments.arguments[0].integer_;
+    integer const left = arguments[0].integer_;
     const unsigned int printing_base = 10;
     const size_t buffer_max_size = 20;
-    char *buffer = garbage_collector_allocate(arguments.gc, buffer_max_size);
+    char *buffer = garbage_collector_allocate(context->gc, buffer_max_size);
     unicode_view const buffer_begin = integer_format(left, lower_case_digits, printing_base, buffer, buffer_max_size);
     return external_function_result_from_success(value_from_string(buffer_begin));
 }
 
-external_function_result subtract_impl(function_call_arguments const arguments, struct value const *const captures,
-                                       void *environment)
+external_function_result subtract_impl(value const *const captures, void *environment, optional_value const self,
+                                       value *const arguments, interpreter *const context)
 {
+    (void)self;
     (void)environment;
     (void)captures;
-    integer const left = arguments.arguments[0].integer_;
-    integer const right = arguments.arguments[1].integer_;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
     integer_difference const difference = integer_subtract(left, right);
     if (difference.is_positive)
     {
-        value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
+        value *const state = garbage_collector_allocate(context->gc, sizeof(*state));
         *state = value_from_integer(difference.value_if_positive);
         return external_function_result_from_success(
             value_from_enum_element(0, type_from_integer_range(integer_range_max()), state));
@@ -147,16 +165,17 @@ external_function_result subtract_impl(function_call_arguments const arguments, 
     return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
 }
 
-external_function_result add_impl(function_call_arguments const arguments, struct value const *const captures,
-                                  void *environment)
+external_function_result add_impl(value const *const captures, void *environment, optional_value const self,
+                                  value *const arguments, interpreter *const context)
 {
+    (void)self;
     (void)environment;
     (void)captures;
-    integer left = arguments.arguments[0].integer_;
-    integer const right = arguments.arguments[1].integer_;
+    integer left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
     if (integer_add(&left, right))
     {
-        value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
+        value *const state = garbage_collector_allocate(context->gc, sizeof(*state));
         *state = value_from_integer(left);
         return external_function_result_from_success(
             value_from_enum_element(0, type_from_integer_range(integer_range_max()), state));
@@ -164,9 +183,11 @@ external_function_result add_impl(function_call_arguments const arguments, struc
     return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
 }
 
-external_function_result side_effect_impl(function_call_arguments const arguments, struct value const *const captures,
-                                          void *environment)
+external_function_result side_effect_impl(value const *const captures, void *environment, optional_value const self,
+                                          value *const arguments, interpreter *const context)
 {
+    (void)self;
+    (void)context;
     (void)arguments;
     (void)captures;
     (void)environment;

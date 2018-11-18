@@ -1451,12 +1451,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     // checked and can't be called yet.
                     break;
                 }
+                interpreter context = interpreter_create(state->root->globals, &state->program->memory,
+                                                         state->program->functions, state->program->interfaces,
+                                                         state->root->max_recursion, state->root->current_recursion);
                 external_function_result const call_result =
-                    call_function(callee.compile_time_value.value_.function_pointer,
-                                  function_call_arguments_create(
-                                      optional_value_empty, compile_time_arguments, state->root->globals,
-                                      &state->program->memory, state->program->functions, state->program->interfaces,
-                                      state->root->max_recursion, state->root->current_recursion));
+                    call_function(callee.compile_time_value.value_.function_pointer, optional_value_empty,
+                                  compile_time_arguments, &context);
                 switch (call_result.code)
                 {
                 case external_function_result_out_of_memory:
