@@ -1498,10 +1498,9 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#if 0
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_stack_overflow, source_location_create(3, 9))};
+            semantic_error_create(semantic_error_instruction_limit_reached, source_location_create(4, 1))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let f = ()\n"
@@ -1512,7 +1511,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#endif
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

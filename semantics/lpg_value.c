@@ -488,3 +488,10 @@ external_function_result external_function_result_create_stack_overflow(void)
     external_function_result const result = {external_function_result_stack_overflow, value_create_invalid()};
     return result;
 }
+
+external_function_result external_function_result_create_instruction_limit_reached(void)
+{
+    external_function_result const result = {
+        external_function_result_instruction_limit_reached, value_create_invalid()};
+    return result;
+}

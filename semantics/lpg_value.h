@@ -191,7 +191,8 @@ typedef enum external_function_result_code {
     external_function_result_success = 1,
     external_function_result_out_of_memory,
     external_function_result_unavailable,
-    external_function_result_stack_overflow
+    external_function_result_stack_overflow,
+    external_function_result_instruction_limit_reached
 } external_function_result_code;
 
 typedef struct external_function_result
@@ -204,3 +205,4 @@ external_function_result external_function_result_from_success(value success);
 external_function_result external_function_result_create_out_of_memory(void);
 external_function_result external_function_result_create_unavailable(void);
 external_function_result external_function_result_create_stack_overflow(void);
+external_function_result external_function_result_create_instruction_limit_reached(void);

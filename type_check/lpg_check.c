@@ -1451,12 +1451,9 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     // checked and can't be called yet.
                     break;
                 }
-                interpreter context = interpreter_create(state->root->globals, &state->program->memory,
-                                                         state->program->functions, state->program->interfaces,
-                                                         state->root->max_recursion, state->root->current_recursion);
                 external_function_result const call_result =
                     call_function(callee.compile_time_value.value_.function_pointer, optional_value_empty,
-                                  compile_time_arguments, &context);
+                                  compile_time_arguments, &state->root->compile_time_interpreter);
                 switch (call_result.code)
                 {
                 case external_function_result_out_of_memory:
@@ -1477,6 +1474,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 case external_function_result_stack_overflow:
                     emit_semantic_error(
                         state, semantic_error_create(semantic_error_stack_overflow,
+                                                     expression_source_begin(expression_from_tuple(called.arguments))));
+                    ASSUME(!compile_time_result.is_set);
+                    break;
+
+                case external_function_result_instruction_limit_reached:
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_instruction_limit_reached,
                                                      expression_source_begin(expression_from_tuple(called.arguments))));
                     ASSUME(!compile_time_result.is_set);
                     break;
@@ -4443,33 +4447,12 @@ checked_program check(sequence const root, structure const global, check_error_h
         }
     }
     size_t current_recursion = 0;
-    program_check check_root = {NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                NULL,
-                                0,
-                                loader,
-                                global,
-                                globals,
-                                NULL,
-                                NULL,
-                                0,
-                                0,
-                                max_recursion,
-                                &current_recursion};
+    uint64_t const max_executed_instructions = 10000;
+    uint64_t executed_instructions = 0;
+    program_check check_root = {
+        NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL,
+        NULL, 0, 0, interpreter_create(globals, &program.memory, &program.functions, &program.interfaces, max_recursion,
+                                       &current_recursion, max_executed_instructions, &executed_instructions)};
     check_function_result const checked = check_function(
         &check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
         optional_type_create_empty(), true, optional_type_create_empty(), source, NULL, optional_function_id_create(0));

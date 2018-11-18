@@ -18,14 +18,23 @@ typedef enum run_sequence_result {
     run_sequence_result_return,
     run_sequence_result_unavailable_at_this_time,
     run_sequence_result_out_of_memory,
-    run_sequence_result_stack_overflow
+    run_sequence_result_stack_overflow,
+    run_sequence_result_instruction_limit_reached
 } run_sequence_result;
 
 interpreter interpreter_create(value const *globals, garbage_collector *const gc,
-                               checked_function const *const all_functions, lpg_interface const *all_interfaces,
-                               size_t max_recursion, size_t *current_recursion)
+                               checked_function *const *const all_functions, lpg_interface *const *const all_interfaces,
+                               size_t max_recursion, size_t *current_recursion, uint64_t max_executed_instructions,
+                               uint64_t *executed_instructions)
 {
-    interpreter const result = {globals, gc, all_functions, all_interfaces, max_recursion, current_recursion};
+    interpreter const result = {globals,
+                                gc,
+                                all_functions,
+                                all_interfaces,
+                                max_recursion,
+                                current_recursion,
+                                max_executed_instructions,
+                                executed_instructions};
     return result;
 }
 
@@ -52,6 +61,7 @@ external_function_result call_function(function_pointer_value const callee, opti
         case external_function_result_out_of_memory:
         case external_function_result_unavailable:
         case external_function_result_stack_overflow:
+        case external_function_result_instruction_limit_reached:
             break;
 
         case external_function_result_success:
@@ -60,7 +70,7 @@ external_function_result call_function(function_pointer_value const callee, opti
         }
         return return_value;
     }
-    return call_interpreted_function(context->all_functions[callee.code], optional_function_id_create(callee.code),
+    return call_interpreted_function((*context->all_functions)[callee.code], optional_function_id_create(callee.code),
                                      callee.captures, self, arguments, context);
 }
 
@@ -88,7 +98,7 @@ static external_function_result invoke_method(value const *const captures, void 
     case value_kind_type_erased:
     {
         implementation *const impl =
-            &implementation_ref_resolve(context->all_interfaces, from.type_erased.impl)->target;
+            &implementation_ref_resolve(*context->all_interfaces, from.type_erased.impl)->target;
         ASSUME(impl);
         ASSUME(parameters->method < impl->method_count);
         size_t const method_parameter_count = parameters->parameter_count;
@@ -273,6 +283,9 @@ static run_sequence_result run_call(call_instruction const call, value *const re
 
         case external_function_result_stack_overflow:
             return run_sequence_result_stack_overflow;
+
+        case external_function_result_instruction_limit_reached:
+            return run_sequence_result_instruction_limit_reached;
         }
         break;
     }
@@ -327,6 +340,9 @@ static run_sequence_result run_loop(loop_instruction const loop, value *const re
 
         case run_sequence_result_stack_overflow:
             return run_sequence_result_stack_overflow;
+
+        case run_sequence_result_instruction_limit_reached:
+            return run_sequence_result_instruction_limit_reached;
         }
     }
     return run_sequence_result_continue;
@@ -419,6 +435,9 @@ static run_sequence_result run_match(match_instruction const match, value *const
 
         case run_sequence_result_stack_overflow:
             return run_sequence_result_stack_overflow;
+
+        case run_sequence_result_instruction_limit_reached:
+            return run_sequence_result_instruction_limit_reached;
         }
         if (this_case->value.is_set)
         {
@@ -467,6 +486,11 @@ static run_sequence_result run_instruction(value *const return_value, value *con
                                            structure_value const captures, optional_function_id const current_function,
                                            instruction const element, interpreter *const context)
 {
+    if (*context->executed_instructions == context->max_executed_instructions)
+    {
+        return run_sequence_result_instruction_limit_reached;
+    }
+    *context->executed_instructions += 1;
     switch (element.type)
     {
     case instruction_new_array:
@@ -474,7 +498,7 @@ static run_sequence_result run_instruction(value *const return_value, value *con
         break;
 
     case instruction_get_method:
-        run_get_method(element.get_method, context->gc, registers, context->all_interfaces);
+        run_get_method(element.get_method, context->gc, registers, *context->all_interfaces);
         break;
 
     case instruction_erase_type:
@@ -573,6 +597,9 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case run_sequence_result_stack_overflow:
             return run_sequence_result_stack_overflow;
+
+        case run_sequence_result_instruction_limit_reached:
+            return run_sequence_result_instruction_limit_reached;
         }
     }
     return run_sequence_result_continue;
@@ -648,6 +675,10 @@ static external_function_result call_interpreted_function(checked_function const
     case run_sequence_result_stack_overflow:
         deallocate(registers);
         return external_function_result_create_stack_overflow();
+
+    case run_sequence_result_instruction_limit_reached:
+        deallocate(registers);
+        return external_function_result_create_instruction_limit_reached();
     }
     LPG_UNREACHABLE();
 }
@@ -657,8 +688,10 @@ void interpret(checked_program const program, value const *globals, garbage_coll
     function_id const entry_point_id = 0;
     size_t current_recursion = 0;
     size_t const max_recursion = 200;
-    interpreter context =
-        interpreter_create(globals, gc, program.functions, program.interfaces, max_recursion, &current_recursion);
+    uint64_t const max_executed_instructions = 10000;
+    uint64_t executed_instructions = 0;
+    interpreter context = interpreter_create(globals, gc, &program.functions, &program.interfaces, max_recursion,
+                                             &current_recursion, max_executed_instructions, &executed_instructions);
     call_interpreted_function(program.functions[entry_point_id], optional_function_id_create(entry_point_id), NULL,
                               optional_value_empty, NULL, &context);
 }

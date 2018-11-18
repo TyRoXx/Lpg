@@ -7,19 +7,18 @@ typedef struct interpreter
 {
     value const *globals;
     garbage_collector *const gc;
-
-    /*TODO are all_functions and all_interfaces safe to use? Can't they change
-     * whenever a new function or interface is
-     * defined?*/
-    checked_function const *const all_functions;
-    lpg_interface const *all_interfaces;
+    checked_function *const *all_functions;
+    lpg_interface *const *all_interfaces;
     size_t max_recursion;
     size_t *current_recursion;
+    uint64_t max_executed_instructions;
+    uint64_t *executed_instructions;
 } interpreter;
 
 interpreter interpreter_create(value const *globals, garbage_collector *const gc,
-                               checked_function const *const all_functions, lpg_interface const *all_interfaces,
-                               size_t max_recursion, size_t *current_recursion) LPG_USE_RESULT;
+                               checked_function *const *const all_functions, lpg_interface *const *const all_interfaces,
+                               size_t max_recursion, size_t *current_recursion, uint64_t max_executed_instructions,
+                               uint64_t *executed_instructions) LPG_USE_RESULT;
 
 external_function_result call_function(function_pointer_value const callee, optional_value const self,
                                        value *const arguments, interpreter *const context);
