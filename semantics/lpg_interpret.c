@@ -7,33 +7,44 @@
 #include "lpg_standard_library.h"
 #include <string.h>
 
-static optional_value call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
-                                                optional_value const self, value *const arguments, value const *globals,
-                                                value const *const captures, garbage_collector *const gc,
-                                                checked_function const *const all_functions,
-                                                lpg_interface const *const all_interfaces);
+static external_function_result
+call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
+                          optional_value const self, value *const arguments, value const *globals,
+                          value const *const captures, garbage_collector *const gc,
+                          checked_function const *const all_functions, lpg_interface const *const all_interfaces);
 
 typedef enum run_sequence_result {
     run_sequence_result_break = 1,
     run_sequence_result_continue,
     run_sequence_result_return,
-    run_sequence_result_unavailable_at_this_time
+    run_sequence_result_unavailable_at_this_time,
+    run_sequence_result_out_of_memory
 } run_sequence_result;
 
-optional_value call_function(function_pointer_value const callee, function_call_arguments const arguments)
+external_function_result call_function(function_pointer_value const callee, function_call_arguments const arguments)
 {
     ASSUME(arguments.globals);
     ASSUME(arguments.gc);
     ASSUME(arguments.all_functions);
     if (callee.external)
     {
-        value const return_value = callee.external(arguments, callee.captures, callee.external_environment);
+        external_function_result const return_value =
+            callee.external(arguments, callee.captures, callee.external_environment);
         if (!callee.external_signature.result.is_set)
         {
             LPG_TO_DO();
         }
-        ASSUME(value_conforms_to_type(return_value, callee.external_signature.result.value));
-        return optional_value_create(return_value);
+        switch (return_value.code)
+        {
+        case external_function_result_out_of_memory:
+        case external_function_result_unavailable:
+            break;
+
+        case external_function_result_success:
+            ASSUME(value_conforms_to_type(return_value.if_success, callee.external_signature.result.value));
+            break;
+        }
+        return return_value;
     }
     return call_interpreted_function(arguments.all_functions[callee.code], optional_function_id_create(callee.code),
                                      arguments.self, arguments.arguments, arguments.globals, callee.captures,
@@ -46,7 +57,8 @@ typedef struct invoke_method_parameters
     size_t parameter_count;
 } invoke_method_parameters;
 
-static value invoke_method(function_call_arguments const arguments, value const *const captures, void *environment)
+static external_function_result invoke_method(function_call_arguments const arguments, value const *const captures,
+                                              void *environment)
 {
     (void)environment;
     ASSUME(captures);
@@ -70,15 +82,11 @@ static value invoke_method(function_call_arguments const arguments, value const 
         function_pointer_value const *const function = &impl->methods[parameters->method];
         ASSUME(method_parameter_count < SIZE_MAX);
         ASSUME(!arguments.self.is_set);
-        optional_value const result = call_function(
+        external_function_result const result = call_function(
             *function, function_call_arguments_create(optional_value_create(*from.type_erased.self),
                                                       arguments.arguments, arguments.globals, arguments.gc,
                                                       arguments.all_functions, arguments.all_interfaces));
-        if (!result.is_set)
-        {
-            LPG_TO_DO();
-        }
-        return result.value_;
+        return result;
     }
 
     case value_kind_array:
@@ -86,7 +94,7 @@ static value invoke_method(function_call_arguments const arguments, value const 
         switch (parameters->method)
         {
         case 0: // size
-            return value_from_integer(integer_create(0, from.array->count));
+            return external_function_result_from_success(value_from_integer(integer_create(0, from.array->count)));
 
         case 1: // load
         {
@@ -96,9 +104,10 @@ static value invoke_method(function_call_arguments const arguments, value const 
             {
                 value *const state = garbage_collector_allocate(arguments.gc, sizeof(*state));
                 *state = from.array->elements[index.integer_.low];
-                return value_from_enum_element(0, from.array->element_type, state);
+                return external_function_result_from_success(
+                    value_from_enum_element(0, from.array->element_type, state));
             }
-            return value_from_enum_element(1, type_from_unit(), NULL);
+            return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 
         case 2: // store
@@ -107,11 +116,11 @@ static value invoke_method(function_call_arguments const arguments, value const 
             ASSUME(index.kind == value_kind_integer);
             if (!integer_less(index.integer_, integer_create(0, from.array->count)))
             {
-                return value_from_enum_element(0, type_from_unit(), NULL);
+                return external_function_result_from_success(value_from_enum_element(0, type_from_unit(), NULL));
             }
             value const new_element = arguments.arguments[1];
             from.array->elements[index.integer_.low] = new_element;
-            return value_from_enum_element(1, type_from_unit(), NULL);
+            return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 
         case 3: // append
@@ -135,13 +144,13 @@ static value invoke_method(function_call_arguments const arguments, value const 
             }
             from.array->elements[from.array->count] = new_element;
             from.array->count += 1;
-            return value_from_enum_element(1, type_from_unit(), NULL);
+            return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 
         case 4: // clear
         {
             from.array->count = 0;
-            return value_from_unit();
+            return external_function_result_from_success(value_from_unit());
         }
 
         case 5: // pop
@@ -151,10 +160,10 @@ static value invoke_method(function_call_arguments const arguments, value const 
             ASSUME(count.kind == value_kind_integer);
             if (integer_less(integer_create(0, from.array->count), count.integer_))
             {
-                return value_from_enum_element(0, type_from_unit(), NULL);
+                return external_function_result_from_success(value_from_enum_element(0, type_from_unit(), NULL));
             }
             from.array->count -= (size_t)count.integer_.low;
-            return value_from_enum_element(1, type_from_unit(), NULL);
+            return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 
         default:
@@ -239,16 +248,23 @@ static run_sequence_result run_call(call_instruction const call, garbage_collect
     {
     case value_kind_function_pointer:
     {
-        optional_value const result = call_function(
+        external_function_result const result = call_function(
             callee.function_pointer, function_call_arguments_create(
                                          optional_value_empty, arguments, globals, gc, all_functions, all_interfaces));
         deallocate(arguments);
-        if (!result.is_set)
+        switch (result.code)
         {
+        case external_function_result_out_of_memory:
+            return run_sequence_result_out_of_memory;
+
+        case external_function_result_success:
+            ASSUME(value_is_valid(result.if_success));
+            registers[call.result] = result.if_success;
+            break;
+
+        case external_function_result_unavailable:
             return run_sequence_result_unavailable_at_this_time;
         }
-        ASSUME(value_is_valid(result.value_));
-        registers[call.result] = result.value_;
         break;
     }
 
@@ -299,6 +315,9 @@ static run_sequence_result run_loop(loop_instruction const loop, value *const re
 
         case run_sequence_result_return:
             return run_sequence_result_return;
+
+        case run_sequence_result_out_of_memory:
+            return run_sequence_result_out_of_memory;
         }
     }
     return run_sequence_result_continue;
@@ -388,6 +407,9 @@ static run_sequence_result run_match(match_instruction const match, value *const
 
         case run_sequence_result_return:
             return run_sequence_result_return;
+
+        case run_sequence_result_out_of_memory:
+            return run_sequence_result_out_of_memory;
         }
         if (this_case->value.is_set)
         {
@@ -543,23 +565,26 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
 
         case run_sequence_result_unavailable_at_this_time:
             return run_sequence_result_unavailable_at_this_time;
+
+        case run_sequence_result_out_of_memory:
+            return run_sequence_result_out_of_memory;
         }
     }
     return run_sequence_result_continue;
 }
 
-optional_value call_checked_function(checked_function const callee, optional_function_id const callee_id,
-                                     value const *const captures, function_call_arguments arguments)
+external_function_result call_checked_function(checked_function const callee, optional_function_id const callee_id,
+                                               value const *const captures, function_call_arguments arguments)
 {
     return call_interpreted_function(callee, callee_id, arguments.self, arguments.arguments, arguments.globals,
                                      captures, arguments.gc, arguments.all_functions, arguments.all_interfaces);
 }
 
-static optional_value call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
-                                                optional_value const self, value *const arguments, value const *globals,
-                                                value const *const captures, garbage_collector *const gc,
-                                                checked_function const *const all_functions,
-                                                lpg_interface const *const all_interfaces)
+static external_function_result
+call_interpreted_function(checked_function const callee, optional_function_id const callee_id,
+                          optional_value const self, value *const arguments, value const *globals,
+                          value const *const captures, garbage_collector *const gc,
+                          checked_function const *const all_functions, lpg_interface const *const all_interfaces)
 {
     /*there has to be at least one register for the return value, even if it is
      * unit*/
@@ -602,11 +627,15 @@ static optional_value call_interpreted_function(checked_function const callee, o
             LPG_TO_DO();
         }
         ASSUME(value_conforms_to_type(return_value, callee.signature->result.value));
-        return optional_value_create(return_value);
+        return external_function_result_from_success(return_value);
 
     case run_sequence_result_unavailable_at_this_time:
         deallocate(registers);
-        return optional_value_empty;
+        return external_function_result_create_unavailable();
+
+    case run_sequence_result_out_of_memory:
+        deallocate(registers);
+        return external_function_result_create_out_of_memory();
     }
     LPG_UNREACHABLE();
 }

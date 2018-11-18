@@ -1451,11 +1451,28 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                     // checked and can't be called yet.
                     break;
                 }
-                compile_time_result =
+                external_function_result const call_result =
                     call_function(callee.compile_time_value.value_.function_pointer,
                                   function_call_arguments_create(
                                       optional_value_empty, compile_time_arguments, state->root->globals,
                                       &state->program->memory, state->program->functions, state->program->interfaces));
+                switch (call_result.code)
+                {
+                case external_function_result_out_of_memory:
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_compile_time_memory_limit_reached,
+                                                     expression_source_begin(expression_from_tuple(called.arguments))));
+                    ASSUME(!compile_time_result.is_set);
+                    break;
+
+                case external_function_result_success:
+                    compile_time_result = optional_value_create(call_result.if_success);
+                    break;
+
+                case external_function_result_unavailable:
+                    ASSUME(!compile_time_result.is_set);
+                    break;
+                }
                 break;
             }
 
@@ -3220,16 +3237,15 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         optional_type element_state = optional_type_create_empty();
         if (element.elements[i].state)
         {
-            evaluate_expression_result const state_evaluated =
-                evaluate_expression(state, function, *element.elements[i].state, NULL);
+            expression const state_expr = *element.elements[i].state;
+            evaluate_expression_result const state_evaluated = evaluate_expression(state, function, state_expr, NULL);
             if (state_evaluated.has_value)
             {
                 if (!state_evaluated.compile_time_value.is_set ||
                     (state_evaluated.compile_time_value.value_.kind != value_kind_type))
                 {
-                    emit_semantic_error(
-                        state, semantic_error_create(semantic_error_expected_compile_time_type,
-                                                     expression_source_begin(*element.elements[i].state)));
+                    emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                                     expression_source_begin(state_expr)));
                     for (size_t m = 0; m < i; ++m)
                     {
                         enumeration_element_free(elements + m);

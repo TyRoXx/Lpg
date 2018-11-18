@@ -86,23 +86,35 @@ static load_module_result type_check_module(function_checking_state *const state
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    optional_value const module_value = call_checked_function(
+    external_function_result const module_value = call_checked_function(
         checked.function, optional_function_id_empty(), NULL,
         function_call_arguments_create(optional_value_empty, NULL, state->root->globals, &state->program->memory,
                                        state->program->functions, state->program->interfaces));
-    if (!module_value.is_set)
+    switch (module_value.code)
+    {
+    case external_function_result_out_of_memory:
+        LPG_TO_DO();
+
+    case external_function_result_success:
+    {
+        if (!checked.function.signature->result.is_set)
+        {
+            LPG_TO_DO();
+        }
+        load_module_result const success = {
+            optional_value_create(module_value.if_success), checked.function.signature->result.value};
+        checked_function_free(&checked.function);
+        return success;
+    }
+
+    case external_function_result_unavailable:
     {
         checked_function_free(&checked.function);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    if (!checked.function.signature->result.is_set)
-    {
-        LPG_TO_DO();
     }
-    load_module_result const success = {module_value, checked.function.signature->result.value};
-    checked_function_free(&checked.function);
-    return success;
+    LPG_UNREACHABLE();
 }
 
 static size_t remove_carriage_returns(char *const from, size_t const length)

@@ -40,14 +40,15 @@ static void expect_no_errors(complete_semantic_error const error, void *user)
     FAIL();
 }
 
-static value assert_impl(function_call_arguments const arguments, struct value const *const captures, void *environment)
+static external_function_result assert_impl(function_call_arguments const arguments, struct value const *const captures,
+                                            void *environment)
 {
     (void)captures;
     (void)environment;
     ASSUME(arguments.arguments[0].kind == value_kind_enum_element);
     enum_element_id const argument = arguments.arguments[0].enum_element.which;
     REQUIRE(argument == 1);
-    return value_from_unit();
+    return external_function_result_from_success(value_from_unit());
 }
 
 static duk_ret_t ecmascript_assert(duk_context *const duktape)

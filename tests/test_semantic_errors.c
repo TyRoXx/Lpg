@@ -1458,10 +1458,25 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#if 0
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(0, 10))};
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 12)),
+            semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(2, 6)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
+            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(3, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let f = [S]()\n"
@@ -1471,7 +1486,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#endif
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

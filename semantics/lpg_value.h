@@ -23,8 +23,10 @@ typedef struct enumeration enumeration;
 
 struct function_call_arguments;
 
-typedef struct value external_function(struct function_call_arguments const arguments,
-                                       struct value const *const captures, void *environment);
+struct value;
+
+typedef struct external_function_result external_function(struct function_call_arguments const arguments,
+                                                          struct value const *const captures, void *environment);
 
 typedef struct function_pointer_value
 {
@@ -160,6 +162,7 @@ value value_from_array(array_value *content);
 value value_from_generic_lambda(generic_lambda_id content);
 value value_or_unit(value const *const maybe);
 value value_from_generic_struct(generic_struct_id content);
+value value_create_invalid(void);
 bool value_equals(value const left, value const right);
 bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);
@@ -206,3 +209,19 @@ static inline function_call_arguments function_call_arguments_create(
 }
 
 bool value_conforms_to_type(value const instance, type const expected);
+
+typedef enum external_function_result_code {
+    external_function_result_success = 1,
+    external_function_result_out_of_memory,
+    external_function_result_unavailable
+} external_function_result_code;
+
+typedef struct external_function_result
+{
+    external_function_result_code code;
+    value if_success;
+} external_function_result;
+
+external_function_result external_function_result_from_success(value success);
+external_function_result external_function_result_create_out_of_memory(void);
+external_function_result external_function_result_create_unavailable(void);

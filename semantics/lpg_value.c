@@ -227,6 +227,14 @@ value value_from_generic_struct(generic_struct_id content)
     return result;
 }
 
+value value_create_invalid(void)
+{
+    value result;
+    result.kind = (value_kind)0;
+    ASSUME(!value_is_valid(result));
+    return result;
+}
+
 bool value_equals(value const left, value const right)
 {
     ASSUME(value_is_valid(left));
@@ -455,4 +463,22 @@ bool value_conforms_to_type(value const instance, type const expected)
     }
     }
     LPG_UNREACHABLE();
+}
+
+external_function_result external_function_result_from_success(value success)
+{
+    external_function_result const result = {external_function_result_success, success};
+    return result;
+}
+
+external_function_result external_function_result_create_out_of_memory(void)
+{
+    external_function_result const result = {external_function_result_out_of_memory, value_create_invalid()};
+    return result;
+}
+
+external_function_result external_function_result_create_unavailable(void)
+{
+    external_function_result const result = {external_function_result_unavailable, value_create_invalid()};
+    return result;
 }

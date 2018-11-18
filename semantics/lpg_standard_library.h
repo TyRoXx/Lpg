@@ -1,30 +1,38 @@
 #pragma once
 #include "lpg_structure_member.h"
 
-value not_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result not_impl(function_call_arguments const arguments, struct value const *const captures,
+                                  void *environment);
 
-value concat_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result concat_impl(function_call_arguments const arguments, struct value const *const captures,
+                                     void *environment);
 
-value string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
-                         void *environment);
+external_function_result string_equals_impl(function_call_arguments const arguments, struct value const *const captures,
+                                            void *environment);
 
-value int_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result int_impl(function_call_arguments const arguments, struct value const *const captures,
+                                  void *environment);
 
-value fail_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result fail_impl(function_call_arguments const arguments, struct value const *const captures,
+                                   void *environment);
 
-value integer_equals_impl(function_call_arguments const arguments, struct value const *const captures,
-                          void *environment);
+external_function_result integer_equals_impl(function_call_arguments const arguments,
+                                             struct value const *const captures, void *environment);
 
-value integer_less_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result integer_less_impl(function_call_arguments const arguments, struct value const *const captures,
+                                           void *environment);
 
-value integer_to_string_impl(function_call_arguments const arguments, struct value const *const captures,
-                             void *environment);
+external_function_result integer_to_string_impl(function_call_arguments const arguments,
+                                                struct value const *const captures, void *environment);
 
-value subtract_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result subtract_impl(function_call_arguments const arguments, struct value const *const captures,
+                                       void *environment);
 
-value add_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result add_impl(function_call_arguments const arguments, struct value const *const captures,
+                                  void *environment);
 
-value side_effect_impl(function_call_arguments const arguments, struct value const *const captures, void *environment);
+external_function_result side_effect_impl(function_call_arguments const arguments, struct value const *const captures,
+                                          void *environment);
 
 typedef struct standard_library_stable
 {
