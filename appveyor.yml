@@ -33,9 +33,6 @@ before_test:
 
 test_script:
   - cd build
-  - cd tests
-  - .\%BUILD_TYPE%\tests.exe
-  - cd ..
   - cd cli
   - .\%BUILD_TYPE%\lpg.exe run ../../tests/in_lpg/interface.lpg
   - cd ..
