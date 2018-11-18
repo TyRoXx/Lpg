@@ -279,6 +279,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_missing_method:
         return "Missing method in impl";
+
+    case semantic_error_extra_method:
+        return "Extra method in impl";
     }
     LPG_UNREACHABLE();
 }

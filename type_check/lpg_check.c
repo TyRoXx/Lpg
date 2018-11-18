@@ -3002,14 +3002,22 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
             find_method(implemented_interface, unicode_view_from_string(method_trees[i].name.value));
         if (canonical_method_index.state == optional_empty)
         {
-            LPG_TO_DO();
+            emit_semantic_error(state, semantic_error_create(semantic_error_extra_method, method_trees[i].name.source));
+            if (methods)
+            {
+                deallocate(methods);
+            }
+            return optional_size_empty;
         }
         method_evaluation_result const method =
             evaluate_method_definition(state, function, method_trees[i], self,
                                        implemented_interface->methods[canonical_method_index.value_if_set].result);
         if (!method.is_success)
         {
-            deallocate(methods);
+            if (methods)
+            {
+                deallocate(methods);
+            }
             return optional_size_empty;
         }
         methods[canonical_method_index.value_if_set] = method.success;
