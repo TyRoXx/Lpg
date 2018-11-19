@@ -108,6 +108,19 @@ static void test_formatting_tool()
     //                    false, "");
 }
 
+static void test_web_cli(void)
+{
+    unicode_string input = write_temporary_file("");
+    unicode_string output = write_temporary_file("");
+    char *arguments[] = {"lpg", "web", unicode_string_c_str(&input), unicode_string_c_str(&output)};
+    expect_output(LPG_ARRAY_SIZE(arguments), arguments, false,
+                  "Could not open source file\nCould not find template. Using default template.");
+    REQUIRE(0 == remove(unicode_string_c_str(&input)));
+    unicode_string_free(&input);
+    REQUIRE(0 == remove(unicode_string_c_str(&output)));
+    unicode_string_free(&output);
+}
+
 void test_cli(void)
 {
     {
@@ -138,17 +151,7 @@ void test_cli(void)
         char *arguments[] = {"lpg", "web", "input.lpg", "output.html"};
         expect_output(LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n");
     }
-    {
-        unicode_string input = write_temporary_file("");
-        unicode_string output = write_temporary_file("");
-        char *arguments[] = {"lpg", "web", unicode_string_c_str(&input), unicode_string_c_str(&output)};
-        expect_output(LPG_ARRAY_SIZE(arguments), arguments, false,
-                      "Could not open source file\nCould not find template. Using default template.");
-        REQUIRE(0 == remove(unicode_string_c_str(&input)));
-        unicode_string_free(&input);
-        REQUIRE(0 == remove(unicode_string_c_str(&output)));
-        unicode_string_free(&output);
-    }
+    test_web_cli();
 
     expect_output_with_source_flags("assert(boolean.true)\n", "compile", false, "");
     expect_output_with_source_flags("assert(boolean.true)\n", "run", false, "");

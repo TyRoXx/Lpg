@@ -29,6 +29,7 @@
 #include "test_unicode_string.h"
 #include "test_unicode_view.h"
 #include "test_value.h"
+#include "test_web.h"
 #include <inttypes.h>
 #include <stdio.h>
 #if LPG_WITH_VLD
@@ -66,7 +67,8 @@ int main(void)
                                     test_interpreter,
                                     test_value,
                                     test_remove_dead_code,
-                                    test_type};
+                                    test_type,
+                                    test_web};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();
