@@ -64,11 +64,12 @@ file(GLOB_RECURSE formatted
     syntax/**.c syntax/**.h
     tests/**.c tests/**.h
     tokenization/**.c tokenization/**.h
+    web/**.c web/**.h
 )
 
 option(LPG_WITH_CLANG_FORMAT "use clang-format to format the source code" ON)
 if(LPG_WITH_CLANG_FORMAT)
-    find_program(LPG_CLANG_FORMAT NAMES clang-format-3.7 clang-format PATHS "C:/Program Files/LLVM/bin")
+    find_program(LPG_CLANG_FORMAT NAMES clang-format-3.9 clang-format PATHS "C:/Program Files/LLVM/bin")
     if(LPG_CLANG_FORMAT)
         add_custom_target(clang-format COMMAND "${LPG_CLANG_FORMAT}" -i ${formatted} WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
         option(LPG_WITH_CLANG_FORMAT_AUTO "format the code automatically before the build" OFF)
@@ -128,3 +129,4 @@ add_subdirectory(c_backend)
 add_subdirectory(ecmascript_backend)
 add_subdirectory(tests)
 add_subdirectory(cli)
+add_subdirectory(web)
