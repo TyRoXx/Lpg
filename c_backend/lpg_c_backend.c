@@ -1180,14 +1180,13 @@ static success_indicator generate_add_reference(unicode_view const pointer_name,
     LPG_UNREACHABLE();
 }
 
-static success_indicator generate_add_reference_to_register(checked_function const *const current_function,
-                                                            register_id const where, type const what,
-                                                            size_t const indentation,
-                                                            checked_program const *const program,
-                                                            stream_writer const c_output)
+static success_indicator
+generate_add_reference_to_register(c_backend_state *state, checked_function const *const current_function,
+                                   register_id const where, type const what, size_t const indentation,
+                                   checked_program const *const program, stream_writer const c_output)
 {
     memory_writer name_buffer = {NULL, 0, 0};
-    LPG_TRY(generate_register_name(where, current_function, memory_writer_erase(&name_buffer)));
+    LPG_TRY(generate_c_read_access(state, current_function, where, memory_writer_erase(&name_buffer)));
     ASSUME(type_is_valid(what));
     success_indicator const result =
         generate_add_reference(memory_writer_content(name_buffer), what, indentation, program, c_output);
@@ -1212,8 +1211,9 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
 
         case register_resource_ownership_borrows:
             ASSUME(state->registers[from].type_of.is_set);
-            return generate_add_reference_to_register(
-                current_function, from, state->registers[from].type_of.value, indentation, state->program, c_output);
+            return generate_add_reference_to_register(state, current_function, from,
+                                                      state->registers[from].type_of.value, indentation, state->program,
+                                                      c_output);
         }
 
     case register_meaning_assert:
@@ -1335,7 +1335,7 @@ static success_indicator generate_tuple_variable(c_backend_state *state, checked
     {
         ASSUME(type_is_valid(tuple.elements[i]));
         LPG_TRY(generate_add_reference_to_register(
-            current_function, elements[i], tuple.elements[i], indentation, state->program, c_output));
+            state, current_function, elements[i], tuple.elements[i], indentation, state->program, c_output));
     }
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(generate_type(type_from_tuple_type(tuple), &state->standard_library, state->definitions, state->program,
@@ -1359,8 +1359,9 @@ generate_instantiate_struct(c_backend_state *state, checked_function const *cons
     {
         register_id const argument = generated.arguments[i];
         ASSUME(state->registers[argument].type_of.is_set);
-        LPG_TRY(generate_add_reference_to_register(current_function, argument, state->registers[argument].type_of.value,
-                                                   indentation, state->program, c_output));
+        LPG_TRY(generate_add_reference_to_register(state, current_function, argument,
+                                                   state->registers[argument].type_of.value, indentation,
+                                                   state->program, c_output));
     }
     LPG_TRY(indent(indentation, c_output));
     LPG_TRY(generate_type(type_from_struct(generated.instantiated), &state->standard_library, state->definitions,
@@ -2547,8 +2548,8 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         optional_type const enum_state = enum_.elements[input.enum_construct.which.which].state;
         if (enum_state.is_set)
         {
-            LPG_TRY(generate_add_reference_to_register(
-                current_function, input.enum_construct.state, enum_state.value, indentation, state->program, c_output));
+            LPG_TRY(generate_add_reference_to_register(state, current_function, input.enum_construct.state,
+                                                       enum_state.value, indentation, state->program, c_output));
         }
         return success_yes;
     }
@@ -2634,8 +2635,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     unicode_view_from_string(enum_.elements[input.match.cases[i].stateful_enum.element].name),
                     c_output));
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-                LPG_TRY(generate_add_reference_to_register(current_function, input.match.cases[i].stateful_enum.where,
-                                                           state_type, indentation + 1, state->program, c_output));
+                LPG_TRY(generate_add_reference_to_register(state, current_function,
+                                                           input.match.cases[i].stateful_enum.where, state_type,
+                                                           indentation + 1, state->program, c_output));
                 ASSUME(state->active_register_count == (previous_register_count + 1));
                 break;
             }
@@ -2658,8 +2660,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             }
 
-            LPG_TRY(generate_add_reference_to_register(current_function, input.match.result, input.match.result_type,
-                                                       indentation + 1, state->program, c_output));
+            LPG_TRY(generate_add_reference_to_register(state, current_function, input.match.result,
+                                                       input.match.result_type, indentation + 1, state->program,
+                                                       c_output));
 
             LPG_TRY(indent(indentation, c_output));
             LPG_TRY(stream_writer_write_string(c_output, "}\n"));
@@ -2680,7 +2683,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         tuple_type const captures = state->program->functions[input.lambda_with_captures.lambda].signature->captures;
         for (size_t i = 0; i < captures.length; ++i)
         {
-            LPG_TRY(generate_add_reference_to_register(current_function, input.lambda_with_captures.captures[i],
+            LPG_TRY(generate_add_reference_to_register(state, current_function, input.lambda_with_captures.captures[i],
                                                        captures.elements[i], indentation, state->program, c_output));
         }
         LPG_TRY(indent(indentation, c_output));

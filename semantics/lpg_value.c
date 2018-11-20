@@ -252,6 +252,8 @@ bool value_equals(value const left, value const right)
         return (left.generic_lambda == right.generic_lambda);
 
     case value_kind_array:
+        return array_value_equals(*left.array, *right.array);
+
     case value_kind_type_erased:
     case value_kind_pattern:
     case value_kind_generic_enum:
@@ -365,6 +367,72 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
 bool value_is_valid(value const checked)
 {
     return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_struct);
+}
+
+bool value_is_mutable(value const original)
+{
+    switch (original.kind)
+    {
+    case value_kind_array:
+        return (original.array->count > 0);
+
+    case value_kind_type:
+    case value_kind_unit:
+    case value_kind_generic_enum:
+    case value_kind_generic_interface:
+    case value_kind_generic_lambda:
+    case value_kind_generic_struct:
+    case value_kind_integer:
+    case value_kind_string:
+    case value_kind_enum_constructor:
+        return false;
+
+    case value_kind_enum_element:
+        return original.enum_element.state && value_is_mutable(*original.enum_element.state);
+
+    case value_kind_structure:
+    {
+        for (size_t i = 0; i < original.structure.count; ++i)
+        {
+            if (value_is_mutable(original.structure.members[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    case value_kind_tuple:
+    {
+        for (size_t i = 0; i < original.tuple_.element_count; ++i)
+        {
+            if (value_is_mutable(original.tuple_.elements[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    case value_kind_function_pointer:
+    {
+        for (size_t i = 0; i < original.function_pointer.capture_count; ++i)
+        {
+            if (value_is_mutable(original.function_pointer.captures[i]))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    case value_kind_pattern:
+        LPG_TO_DO();
+
+    case value_kind_type_erased:
+        return value_is_mutable(*original.type_erased.self);
+    }
+    LPG_UNREACHABLE();
 }
 
 bool value_conforms_to_type(value const instance, type const expected)

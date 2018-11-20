@@ -147,6 +147,7 @@ static external_function_result invoke_method(value const *const captures, void 
         case 3: // append
         {
             value const new_element = arguments[0];
+            ASSUME(value_is_valid(new_element));
             if (from.array->count == from.array->allocated)
             {
                 size_t new_capacity = (from.array->count * 2);
@@ -165,6 +166,10 @@ static external_function_result invoke_method(value const *const captures, void 
             }
             from.array->elements[from.array->count] = new_element;
             from.array->count += 1;
+            for (size_t i = 0; i < from.array->count; ++i)
+            {
+                ASSUME(value_is_valid(from.array->elements[i]));
+            }
             return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
         }
 

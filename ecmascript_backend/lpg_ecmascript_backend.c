@@ -192,6 +192,8 @@ static success_indicator generate_value(value const generated, type const type_o
                                         lpg_interface const *const all_interfaces, structure const *const all_structs,
                                         enumeration const *const all_enums, stream_writer const ecmascript_output)
 {
+    ASSUME(value_conforms_to_type(generated, type_of));
+    ASSUME(value_is_valid(generated));
     switch (generated.kind)
     {
     case value_kind_array:
