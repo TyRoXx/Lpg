@@ -34,11 +34,11 @@ You can declare a constant with `let a = 10`. This will implicitly set the type 
 
 In order to make a constant mutable you need to define it as mutable:
 ```lpg
-let i: integer = 5;
+let i: integer = 5
 let some-int: std.mutable[integer] = make-mutable[integer](i)
 
 // Set variable content
-some-int.store(10);
+some-int.store(10)
 
 // Load content
 some-int.load()
@@ -85,9 +85,9 @@ let tuple = {10, std.boolean.true, "Hello", () std.boolean}
 The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string "Hello"`.
 
 ### Arrays
-Oppsite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
+Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
 ```lpg
-let strig-list : array[std.string] = new-array(std.string)
+let string-list : array[std.string] = new-array(std.string)
 
 // Adding elements
 string-list.append("something")
@@ -228,8 +228,6 @@ Most of the functions can be found in the standard libary and have to be importe
 ```lpg
 let handle = import module_name
 ```
-
-If you want to import a file inside itself, this is possible with `let self = import importsitself`
 
 #### Writing modules
 
