@@ -33,6 +33,9 @@ external_function_result subtract_impl(value const *const captures, void *enviro
 external_function_result add_impl(value const *const captures, void *environment, optional_value const self,
                                   value *const arguments, interpreter *const context);
 
+external_function_result add_u32_impl(value const *const captures, void *environment, optional_value const self,
+                                      value *const arguments, interpreter *const context);
+
 external_function_result side_effect_impl(value const *const captures, void *environment, optional_value const self,
                                           value *const arguments, interpreter *const context);
 
@@ -51,6 +54,7 @@ typedef struct standard_library_stable
     function_pointer fail;
     function_pointer subtract;
     function_pointer add;
+    function_pointer add_u32;
 } standard_library_stable;
 
 enum
@@ -58,7 +62,8 @@ enum
     standard_library_enum_boolean = 0,
     standard_library_enum_subtract_result = 1,
     standard_library_enum_add_result = 2,
-    standard_library_element_count = 17
+    standard_library_enum_add_u32_result = 3,
+    standard_library_element_count = 19
 };
 
 typedef struct standard_library_description

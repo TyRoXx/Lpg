@@ -274,7 +274,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*13 subtract_result*/ global_object.members[13].compile_time_value.value_,
             /*14 subtract*/ global_object.members[14].compile_time_value.value_,
             /*15 add_result*/ global_object.members[15].compile_time_value.value_,
-            /*16 add*/ global_object.members[16].compile_time_value.value_};
+            /*16 add*/ global_object.members[16].compile_time_value.value_,
+            /*17 add_u32_result*/ global_object.members[17].compile_time_value.value_,
+            /*18 add_u32*/ global_object.members[18].compile_time_value.value_};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = garbage_collector_create(SIZE_MAX);
         interpret(program, globals_values, &gc);

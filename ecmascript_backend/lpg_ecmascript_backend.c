@@ -546,6 +546,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 16:
             return stream_writer_write_string(ecmascript_output, "integer_add");
 
+        case 18:
+            return stream_writer_write_string(ecmascript_output, "integer_add_u32");
+
         default:
             LPG_TO_DO();
         }
@@ -1193,6 +1196,9 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                                        "- right); return "
                                        "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
                                        "    var integer_add = function (left, right) { return [0, (left + right)]; "
+                                       "};\n"
+                                       "    var integer_add_u32 = function (left, right) { var sum = (left + right); "
+                                       "return (sum <= 0xffffffff) ? [0, sum] : 1; "
                                        "};\n"
                                        "    var concat = function (left, right) { return (left + right); };\n"
                                        "    var not = function (argument) { return !argument; };\n"

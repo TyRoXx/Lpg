@@ -4418,8 +4418,8 @@ checked_program check(sequence const root, structure const global, check_error_h
                                garbage_collector_create(max_compile_time_heap),
                                allocate_array(1, sizeof(*program.functions)),
                                1,
-                               allocate_array(3, sizeof(*program.enums)),
-                               3};
+                               allocate_array(4, sizeof(*program.enums)),
+                               4};
     {
         enumeration_element *const elements = allocate_array(2, sizeof(*elements));
         elements[0] = enumeration_element_create(unicode_string_from_c_str("false"), optional_type_create_empty());
@@ -4439,6 +4439,14 @@ checked_program check(sequence const root, structure const global, check_error_h
             unicode_string_from_c_str("ok"), optional_type_create_set(type_from_integer_range(integer_range_max())));
         elements[1] = enumeration_element_create(unicode_string_from_c_str("overflow"), optional_type_create_empty());
         program.enums[standard_library_enum_add_result] = enumeration_create(elements, 2);
+    }
+    {
+        enumeration_element *const elements = allocate_array(2, sizeof(*elements));
+        elements[0] = enumeration_element_create(
+            unicode_string_from_c_str("ok"), optional_type_create_set(type_from_integer_range(integer_range_create(
+                                                 integer_create(0, 0), integer_create(0, UINT32_MAX)))));
+        elements[1] = enumeration_element_create(unicode_string_from_c_str("overflow"), optional_type_create_empty());
+        program.enums[standard_library_enum_add_u32_result] = enumeration_create(elements, 2);
     }
     size_t const globals_count = global.count;
     value *const globals = allocate_array(globals_count, sizeof(*globals));
