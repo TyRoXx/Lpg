@@ -1704,8 +1704,10 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
         {
             return pattern_evaluate_result_no;
         }
+        instruction_checkpoint const before_pattern = make_checkpoint(state, function);
         evaluate_expression_result const enum_element_evaluated =
             evaluate_expression(state, function, *root.call.callee, NULL);
+        restore(before_pattern);
         if (!enum_element_evaluated.has_value)
         {
             return pattern_evaluate_result_failure;
