@@ -1,6 +1,7 @@
 #include "lpg_ecmascript_backend.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_enum_encoding.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 
@@ -70,12 +71,10 @@ static success_indicator generate_enum_element(enum_element_value const element,
 {
     if (element.state)
     {
-        LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
-        LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, element.which)));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+        LPG_TRY(enum_construct_stateful_begin(element.which, ecmascript_output));
         LPG_TRY(generate_value(*element.state, element.state_type, all_functions, function_count, all_interfaces,
                                all_structs, all_enums, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
+        LPG_TRY(enum_construct_stateful_end(ecmascript_output));
         return success_yes;
     }
     if (!has_stateful_element(*enum_))
@@ -102,9 +101,11 @@ static success_indicator generate_enum_element(enum_element_value const element,
 static success_indicator generate_enum_constructor(enum_constructor_type const constructor,
                                                    stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "function (state) { return ["));
-    LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, constructor.which)));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ", state]; }"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "function (state) { return "));
+    LPG_TRY(enum_construct_stateful_begin(constructor.which, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "state"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "; }"));
     return success_yes;
 }
 
@@ -690,11 +691,10 @@ static success_indicator generate_enum_construct(function_generation *const stat
     LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(state, construct.into, type_from_enumeration(construct.which.enumeration),
                            optional_value_empty, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
-    LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, construct.which.which)));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+    LPG_TRY(enum_construct_stateful_begin(construct.which.which, ecmascript_output));
     LPG_TRY(generate_register_read(state, construct.state, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "];\n"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success_yes;
 }
 
