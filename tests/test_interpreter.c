@@ -454,6 +454,7 @@ void test_interpreter(void)
         static char const *const test_files[] = {"add.lpg",
                                                  "algorithm.lpg",
                                                  "array-boolean.lpg",
+                                                 "array-capture.lpg",
                                                  "array-nesting.lpg",
                                                  "array-string.lpg",
                                                  "backend_reserved_names.lpg",

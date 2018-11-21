@@ -170,6 +170,7 @@ bool value_less_than(value const left, value const right);
 bool value_greater_than(value const left, value const right);
 bool enum_less_than(enum_element_value const left, enum_element_value const right);
 bool value_is_valid(value const checked);
+bool value_is_mutable(value const original);
 
 typedef struct optional_value
 {

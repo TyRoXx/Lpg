@@ -74,6 +74,7 @@ bool read_struct_instruction_equals(read_struct_instruction const left, read_str
 
 literal_instruction literal_instruction_create(register_id into, value value_, type type_of)
 {
+    ASSUME(!value_is_mutable(value_));
     ASSUME(value_conforms_to_type(value_, type_of));
     literal_instruction const result = {into, value_, type_of};
     return result;

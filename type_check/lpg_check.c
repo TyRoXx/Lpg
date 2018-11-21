@@ -1518,30 +1518,37 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         }
         if (compile_time_result.is_set)
         {
-            deallocate(arguments);
-            restore(previous_code);
-            result = allocate_register(&state->used_registers);
-            if (!return_type.is_set)
+            if (value_is_mutable(compile_time_result.value_))
             {
-                LPG_TO_DO();
-            }
-            if (return_type.value.kind == type_kind_string)
-            {
-                size_t const length = compile_time_result.value_.string.length;
-                char *const copy = garbage_collector_allocate(&state->program->memory, length);
-                memcpy(copy, compile_time_result.value_.string.begin, length);
-                add_instruction(
-                    function, instruction_create_literal(literal_instruction_create(
-                                  result, value_from_string(unicode_view_create(copy, length)), type_from_string())));
+                compile_time_result = optional_value_empty;
             }
             else
             {
+                deallocate(arguments);
+                restore(previous_code);
+                result = allocate_register(&state->used_registers);
                 if (!return_type.is_set)
                 {
                     LPG_TO_DO();
                 }
-                add_instruction(function, instruction_create_literal(literal_instruction_create(
-                                              result, compile_time_result.value_, return_type.value)));
+                if (return_type.value.kind == type_kind_string)
+                {
+                    size_t const length = compile_time_result.value_.string.length;
+                    char *const copy = garbage_collector_allocate(&state->program->memory, length);
+                    memcpy(copy, compile_time_result.value_.string.begin, length);
+                    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                                  result, value_from_string(unicode_view_create(copy, length)),
+                                                  type_from_string())));
+                }
+                else
+                {
+                    if (!return_type.is_set)
+                    {
+                        LPG_TO_DO();
+                    }
+                    add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                                  result, compile_time_result.value_, return_type.value)));
+                }
             }
         }
     }

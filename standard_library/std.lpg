@@ -56,6 +56,9 @@ let runtime-value = [T](value: T): T
     side-effect()
     value
 
+let compile_time = [T]()
+    T
+
 let export = struct
     and: type-of(and)
     or: type-of(or)
@@ -70,4 +73,5 @@ let export = struct
     mutable: type-of(mutable)
     make-mutable: type-of(make-mutable)
     runtime-value: type-of(runtime-value)
-export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable, runtime-value}
+    compile_time: type-of(compile_time)
+export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable, runtime-value, compile_time}
