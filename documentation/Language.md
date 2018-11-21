@@ -34,8 +34,12 @@ You can declare a constant with `let a = 10`. This will implicitly set the type 
 
 In order to make a constant mutable you need to define it as mutable:
 ```lpg
-let i: integer = 5
-let some-int: std.mutable[integer] = make-mutable[integer](i)
+let integers = import integer
+let integer = integers.integer
+let std = import std
+
+let i: int(5, 5) = 5
+let some-int: std.mutable[integer] = std.make-mutable[integer](i)
 
 // Set variable content
 some-int.store(10)
@@ -87,6 +91,7 @@ The type of the variable is then automatically derived. In order to access an el
 ### Arrays
 Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
 ```lpg
+let std = import std 
 let string-list : array[std.string] = new-array(std.string)
 
 // Adding elements
