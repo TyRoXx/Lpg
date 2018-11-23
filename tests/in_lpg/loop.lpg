@@ -18,17 +18,17 @@ loop
     break
     assert(boolean.false)
 
-let i = std.make-mutable[integers.integer](0)
+let i = std.make-mutable[integers.u32](0)
 loop
     match integer-equals(i.load(), 10000)
         case boolean.true:
             break
         case boolean.false:
             std.unit_value
-    match add(i.load(), 1)
-        case add_result.ok(let next):
+    match add_u32(i.load(), 1)
+        case add_u32_result.ok(let next):
             i.store(next)
-        case add_result.overflow:
+        case add_u32_result.overflow:
             fail()
 
 loop

@@ -7,6 +7,7 @@
 #include "test_c_backend.h"
 #include "test_cli.h"
 #include "test_decode_string_literal.h"
+#include "test_enum_encoding.h"
 #include "test_expression.h"
 #include "test_identifier.h"
 #include "test_implicitly_convertible.h"
@@ -68,7 +69,8 @@ int main(void)
                                     test_value,
                                     test_remove_dead_code,
                                     test_type,
-                                    test_web};
+                                    test_web,
+                                    test_enum_encoding};
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();

@@ -1,6 +1,7 @@
 #include "lpg_ecmascript_backend.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_enum_encoding.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 
@@ -70,12 +71,10 @@ static success_indicator generate_enum_element(enum_element_value const element,
 {
     if (element.state)
     {
-        LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
-        LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, element.which)));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+        LPG_TRY(enum_construct_stateful_begin(element.which, ecmascript_output));
         LPG_TRY(generate_value(*element.state, element.state_type, all_functions, function_count, all_interfaces,
                                all_structs, all_enums, ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, "]"));
+        LPG_TRY(enum_construct_stateful_end(ecmascript_output));
         return success_yes;
     }
     if (!has_stateful_element(*enum_))
@@ -102,9 +101,11 @@ static success_indicator generate_enum_element(enum_element_value const element,
 static success_indicator generate_enum_constructor(enum_constructor_type const constructor,
                                                    stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "function (state) { return ["));
-    LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, constructor.which)));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ", state]; }"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "function (state) { return "));
+    LPG_TRY(enum_construct_stateful_begin(constructor.which, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "state"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "; }"));
     return success_yes;
 }
 
@@ -546,6 +547,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 16:
             return stream_writer_write_string(ecmascript_output, "integer_add");
 
+        case 18:
+            return stream_writer_write_string(ecmascript_output, "integer_add_u32");
+
         default:
             LPG_TO_DO();
         }
@@ -687,11 +691,10 @@ static success_indicator generate_enum_construct(function_generation *const stat
     LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(state, construct.into, type_from_enumeration(construct.which.enumeration),
                            optional_value_empty, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
-    LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, construct.which.which)));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+    LPG_TRY(enum_construct_stateful_begin(construct.which.which, ecmascript_output));
     LPG_TRY(generate_register_read(state, construct.state, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "];\n"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success_yes;
 }
 
@@ -1182,59 +1185,62 @@ static success_indicator define_interface(interface_id const id, lpg_interface c
 
 success_indicator generate_ecmascript(checked_program const program, stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(ecmascript_output,
-                                       "(function ()\n"
-                                       "{\n"
-                                       "    \"use strict\";\n"
-                                       "    var string_equals = function (left, right) { return (left === right); };\n"
-                                       "    var integer_equals = function (left, right) { return (left === right); };\n"
-                                       "    var integer_less = function (left, right) { return (left < right); };\n"
-                                       "    var integer_subtract = function (left, right) { var difference = (left "
-                                       "- right); return "
-                                       "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
-                                       "    var integer_add = function (left, right) { return [0, (left + right)]; "
-                                       "};\n"
-                                       "    var concat = function (left, right) { return (left + right); };\n"
-                                       "    var not = function (argument) { return !argument; };\n"
-                                       "    var side_effect = function () {};\n"
-                                       "    var integer_to_string = function (input) { return \"\" + input; };\n"
-                                       "    var new_array = function (initial_content) {\n"
-                                       "        this.content = initial_content || [];\n"
-                                       "    };\n"
-                                       /* size()*/
-                                       "    new_array.prototype.call_method_0 = function () {\n"
-                                       "        return this.content.length;\n"
-                                       "    };\n"
-                                       /* load()*/
-                                       "    new_array.prototype.call_method_1 = function (index) {\n"
-                                       "        if (index < this.content.length) {\n"
-                                       "            return [0, this.content[index]];\n"
-                                       "        }\n"
-                                       "        return 1;\n"
-                                       "    };\n"
-                                       /* store()*/
-                                       "    new_array.prototype.call_method_2 = function (index, element) {\n"
-                                       "        if (index >= this.content.length) {\n"
-                                       "            return false;\n"
-                                       "        }\n"
-                                       "        this.content[index] = element;\n"
-                                       "        return true;\n"
-                                       "    };\n"
-                                       /* append()*/
-                                       "    new_array.prototype.call_method_3 = function (element) {\n"
-                                       "        this.content.push(element);\n"
-                                       "        return true;\n"
-                                       "    };\n"
-                                       /* clear()*/
-                                       "    new_array.prototype.call_method_4 = function () {\n"
-                                       "        this.content.length = 0;\n"
-                                       "    };\n"
-                                       /* pop()*/
-                                       "    new_array.prototype.call_method_5 = function (count) {\n"
-                                       "        if (count > this.content.length) { return false; }\n"
-                                       "        this.content.length -= count;\n"
-                                       "        return true;\n"
-                                       "    };\n"));
+    char const *const preparation = //
+        "(function ()\n"
+        "{\n"
+        "    \"use strict\";\n"
+        "    var string_equals = function (left, right) { return (left === right); };\n"
+        "    var integer_equals = function (left, right) { return (left === right); };\n"
+        "    var integer_less = function (left, right) { return (left < right); };\n"
+        "    var integer_subtract = function (left, right) { var difference = (left - right); return "
+        "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
+        "    var integer_add = function (left, right) { return [0, (left + right)]; "
+        "};\n"
+        "    var integer_add_u32 = function (left, right) { var sum = (left + right); return (sum <= 0xffffffff) ? [0, "
+        "sum] : 1; "
+        "};\n"
+        "    var concat = function (left, right) { return (left + right); };\n"
+        "    var not = function (argument) { return !argument; };\n"
+        "    var side_effect = function () {};\n"
+        "    var integer_to_string = function (input) { return \"\" + input; };\n"
+        "    var new_array = function (initial_content) {\n"
+        "        this.content = initial_content || [];\n"
+        "    };\n"
+        /* size()*/
+        "    new_array.prototype.call_method_0 = function () {\n"
+        "        return this.content.length;\n"
+        "    };\n"
+        /* load()*/
+        "    new_array.prototype.call_method_1 = function (index) {\n"
+        "        if (index < this.content.length) {\n"
+        "            return [0, this.content[index]];\n"
+        "        }\n"
+        "        return 1;\n"
+        "    };\n"
+        /* store()*/
+        "    new_array.prototype.call_method_2 = function (index, element) {\n"
+        "        if (index >= this.content.length) {\n"
+        "            return false;\n"
+        "        }\n"
+        "        this.content[index] = element;\n"
+        "        return true;\n"
+        "    };\n"
+        /* append()*/
+        "    new_array.prototype.call_method_3 = function (element) {\n"
+        "        this.content.push(element);\n"
+        "        return true;\n"
+        "    };\n"
+        /* clear()*/
+        "    new_array.prototype.call_method_4 = function () {\n"
+        "        this.content.length = 0;\n"
+        "    };\n"
+        /* pop()*/
+        "    new_array.prototype.call_method_5 = function (count) {\n"
+        "        if (count > this.content.length) { return false; }\n"
+        "        this.content.length -= count;\n"
+        "        return true;\n"
+        "    };\n";
+    LPG_TRY(stream_writer_write_string(ecmascript_output, preparation));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));

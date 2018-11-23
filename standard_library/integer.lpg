@@ -1,4 +1,12 @@
 let integer = int(0, 340282366920938463463374607431768211455)
+let u8 = int(0, 255)
+let u16 = int(0, 65535)
+let u32 = int(0, 4294967295)
+let u64 = int(0, 18446744073709551615)
 let export = struct
     integer: type-of(integer)
-export{integer}
+    u8: type-of(u8)
+    u16: type-of(u16)
+    u32: type-of(u32)
+    u64: type-of(u64)
+export{integer, u8, u16, u32, u64}

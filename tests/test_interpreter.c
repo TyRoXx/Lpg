@@ -1,5 +1,4 @@
 #include "test_interpreter.h"
-#include "duktape.h"
 #include "find_builtin_module_directory.h"
 #include "handle_parse_error.h"
 #include "lpg_allocate.h"
@@ -23,6 +22,9 @@
 #include "test.h"
 #include <inttypes.h>
 #include <string.h>
+#ifdef LPG_WITH_DUKTAPE
+#include "duktape.h"
+#endif
 
 static sequence parse(unicode_view const input)
 {
@@ -53,6 +55,7 @@ static external_function_result assert_impl(value const *const captures, void *e
     return external_function_result_from_success(value_from_unit());
 }
 
+#ifdef LPG_WITH_DUKTAPE
 static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
     duk_int_t const argument_type = duk_get_type(duktape, 0);
@@ -108,6 +111,7 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     fprintf(stderr, "\n%s\n", msg);
     FAIL();
 }
+#endif
 
 static void write_file_if_necessary(unicode_view const path, unicode_view const content)
 {
@@ -270,7 +274,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*13 subtract_result*/ global_object.members[13].compile_time_value.value_,
             /*14 subtract*/ global_object.members[14].compile_time_value.value_,
             /*15 add_result*/ global_object.members[15].compile_time_value.value_,
-            /*16 add*/ global_object.members[16].compile_time_value.value_};
+            /*16 add*/ global_object.members[16].compile_time_value.value_,
+            /*17 add_u32_result*/ global_object.members[17].compile_time_value.value_,
+            /*18 add_u32*/ global_object.members[18].compile_time_value.value_};
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = garbage_collector_create(SIZE_MAX);
         interpret(program, globals_values, &gc);
@@ -290,6 +296,17 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             REQUIRE(success_yes == generate_host_class(memory_writer_erase(&generated)));
             REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
         }
+        {
+            unicode_view const source_pieces[] = {c_test_dir, unicode_view_from_c_str("generated.js")};
+            unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+            write_file_if_necessary(
+                unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
+            unicode_string_free(&source_file_path);
+        }
+// fwrite(generated.data, generated.used, 1, stdout);
+// fflush(stdout);
+
+#ifdef LPG_WITH_DUKTAPE
         duk_context *const duktape =
             duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, &generated, duktake_handle_fatal);
         REQUIRE(duktape);
@@ -300,20 +317,11 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         duk_push_c_function(duktape, ecmascript_fail, 1);
         duk_put_global_string(duktape, "fail");
 
-        {
-            unicode_view const source_pieces[] = {c_test_dir, unicode_view_from_c_str("generated.js")};
-            unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
-            write_file_if_necessary(
-                unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
-            unicode_string_free(&source_file_path);
-        }
-        // fwrite(generated.data, generated.used, 1, stdout);
-        // fflush(stdout);
-
         duk_eval_lstring(duktape, generated.data, generated.used);
 
-        memory_writer_free(&generated);
         duk_destroy_heap(duktape);
+#endif
+        memory_writer_free(&generated);
     }
 
     {

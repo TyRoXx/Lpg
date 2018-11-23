@@ -76,28 +76,37 @@ if(LPG_WITH_CLANG_FORMAT)
     endif()
 endif()
 
-set(LPG_DUKTAPE_VERSION 2.3.0)
-set(LPG_DOWNLOAD_PATH ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz)
-set(LPG_DUKTAPE ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION})
+option(LPG_WITH_DUKTAPE "use the duktape Javascript interpreter to test generated code" ON)
+if(LPG_WITH_DUKTAPE)
+    set(LPG_DUKTAPE_VERSION 2.3.0)
+    set(LPG_DOWNLOAD_PATH ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz)
+    set(LPG_DUKTAPE ${CMAKE_BINARY_DIR}/duktape-${LPG_DUKTAPE_VERSION})
 
-if(NOT EXISTS ${LPG_DUKTAPE})
-    file(DOWNLOAD "https://github.com/svaarala/duktape/releases/download/v${LPG_DUKTAPE_VERSION}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz" ${LPG_DOWNLOAD_PATH})
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xzf ${LPG_DOWNLOAD_PATH}
-        WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    )
-    file(REMOVE ${LPG_DOWNLOAD_PATH})
+    if(NOT EXISTS ${LPG_DUKTAPE})
+        file(DOWNLOAD "https://github.com/svaarala/duktape/releases/download/v${LPG_DUKTAPE_VERSION}/duktape-${LPG_DUKTAPE_VERSION}.tar.xz" ${LPG_DOWNLOAD_PATH})
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xzf ${LPG_DOWNLOAD_PATH}
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+        file(REMOVE ${LPG_DOWNLOAD_PATH})
+    endif()
+
+    file(GLOB duktape_sources ${LPG_DUKTAPE}/src/*.h ${LPG_DUKTAPE}/src/*.c)
+    add_library(duktape STATIC ${duktape_sources})
+    target_include_directories(duktape PUBLIC ${LPG_DUKTAPE}/src)
+    if(NOT MSVC)
+        target_link_libraries(duktape m)
+    endif()
 endif()
 
-file(GLOB duktape_sources ${LPG_DUKTAPE}/src/*.h ${LPG_DUKTAPE}/src/*.c)
-add_library(duktape STATIC ${duktape_sources})
-target_include_directories(duktape PUBLIC ${LPG_DUKTAPE}/src)
-if(NOT MSVC)
-    target_link_libraries(duktape m)
+if(LPG_WITH_DUKTAPE)
+    target_compile_options(duktape PUBLIC -DLPG_WITH_DUKTAPE)
 endif()
 
 if(MSVC)
-    target_compile_options(duktape PUBLIC /DDUK_USE_DATE_NOW_WINDOWS)
+    if(LPG_WITH_DUKTAPE)
+        target_compile_options(duktape PUBLIC /DDUK_USE_DATE_NOW_WINDOWS)
+    endif()
     if(MSVC_VERSION LESS 1911)
         add_definitions(/D_WIN32_WINNT_WINTHRESHOLD=0)
     endif()
