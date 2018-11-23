@@ -49,10 +49,16 @@ static unicode_string generate_ecmascript_code(checked_program const program)
                 "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
                 "var main = ");
     generate_ecmascript(program, writer);
-    generate_host_class(writer);
 
-    stream_writer_write_string(writer, "main(window, new Host());\n"
-                                       "</script>");
+    {
+        lpg_interface const *const host = get_host_interface(program);
+        if (host)
+        {
+            generate_host_class(host, writer);
+            stream_writer_write_string(writer, "main(window, new Host());\n");
+        }
+        stream_writer_write_string(writer, "</script>");
+    }
 
     unicode_string result = {buffer.data, buffer.used};
     return result;

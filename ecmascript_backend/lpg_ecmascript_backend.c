@@ -529,10 +529,32 @@ static success_indicator generate_read_struct(function_generation *const state, 
     return success_yes;
 }
 
-static success_indicator generate_method_name(size_t const method_index, stream_writer const ecmascript_output)
+static success_indicator escape_identifier_character(char const c, stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "call_method_"));
+    if (c == '-')
+    {
+        return stream_writer_write_bytes(ecmascript_output, "_", 1);
+    }
+    return stream_writer_write_bytes(ecmascript_output, &c, 1);
+}
+
+static success_indicator escape_identifier(unicode_view const identifier, stream_writer const ecmascript_output)
+{
+    for (size_t i = 0; i < identifier.length; ++i)
+    {
+        LPG_TRY(escape_identifier_character(identifier.begin[i], ecmascript_output));
+    }
+    return success_yes;
+}
+
+static success_indicator generate_method_name(size_t const method_index, lpg_interface const *const interface_,
+                                              stream_writer const ecmascript_output)
+{
+    ASSUME(interface_);
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "m"));
     LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, method_index)));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "_"));
+    LPG_TRY(escape_identifier(unicode_view_from_string(interface_->methods[method_index].name), ecmascript_output));
     return success_yes;
 }
 
@@ -554,7 +576,8 @@ static success_indicator generate_call(function_generation *const state, call_in
 
     case type_kind_method_pointer:
         LPG_TRY(stream_writer_write_string(ecmascript_output, "."));
-        LPG_TRY(generate_method_name(callee_type.method_pointer.method_index, ecmascript_output));
+        LPG_TRY(generate_method_name(callee_type.method_pointer.method_index,
+                                     state->all_interfaces + callee_type.method_pointer.interface_, ecmascript_output));
         break;
 
     case type_kind_function_pointer:
@@ -1075,7 +1098,7 @@ static success_indicator define_implementation(LPG_NON_NULL(lpg_interface const 
         ASSUME(!current_method.external);
         LPG_TRY(generate_implementation_name(implemented_id, implementation_index, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ".prototype."));
-        LPG_TRY(generate_method_name(i, ecmascript_output));
+        LPG_TRY(generate_method_name(i, implemented_interface, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, " = function ("));
         LPG_TRY(generate_argument_list(parameter_count, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ") {\n"));
@@ -1104,6 +1127,30 @@ static success_indicator define_interface(interface_id const id, lpg_interface c
     return success_yes;
 }
 
+static unicode_string wrap_c_str_in_unicode_string(char const *const c_str)
+{
+    unicode_string const result = {(char *)c_str, strlen(c_str)};
+    return result;
+}
+
+lpg_interface make_array_interface(method_description array_methods[6])
+{
+    array_methods[0] =
+        method_description_create(wrap_c_str_in_unicode_string("size"), tuple_type_create(NULL, 0), type_from_unit());
+    array_methods[1] =
+        method_description_create(wrap_c_str_in_unicode_string("load"), tuple_type_create(NULL, 0), type_from_unit());
+    array_methods[2] =
+        method_description_create(wrap_c_str_in_unicode_string("store"), tuple_type_create(NULL, 0), type_from_unit());
+    array_methods[3] =
+        method_description_create(wrap_c_str_in_unicode_string("append"), tuple_type_create(NULL, 0), type_from_unit());
+    array_methods[4] =
+        method_description_create(wrap_c_str_in_unicode_string("clear"), tuple_type_create(NULL, 0), type_from_unit());
+    array_methods[5] =
+        method_description_create(wrap_c_str_in_unicode_string("pop"), tuple_type_create(NULL, 0), type_from_unit());
+    lpg_interface const array_interface = interface_create(array_methods, 6, NULL, 0);
+    return array_interface;
+}
+
 success_indicator generate_ecmascript(checked_program const program, stream_writer const ecmascript_output)
 {
     LPG_TRY(stream_writer_write_string(
@@ -1130,13 +1177,15 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
         "    };\n"
         /* size()*/
         "    new_array.prototype."));
-    LPG_TRY(generate_method_name(0, ecmascript_output));
+    method_description array_methods[6];
+    lpg_interface const array_interface = make_array_interface(array_methods);
+    LPG_TRY(generate_method_name(0, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function () {\n"
                                                           "        return this.content.length;\n"
                                                           "    };\n"
                                                           /* load()*/
                                                           "    new_array.prototype."));
-    LPG_TRY(generate_method_name(1, ecmascript_output));
+    LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (index) {\n"
                                                           "        if (index < this.content.length) {\n"
                                                           "            return "));
@@ -1151,7 +1200,7 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                                                           "    };\n"
                                                           /* store()*/
                                                           "    new_array.prototype."));
-    LPG_TRY(generate_method_name(2, ecmascript_output));
+    LPG_TRY(generate_method_name(2, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (index, element) {\n"
                                                           "        if (index >= this.content.length) {\n"
                                                           "            return false;\n"
@@ -1161,20 +1210,20 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
                                                           "    };\n"
                                                           /* append()*/
                                                           "    new_array.prototype."));
-    LPG_TRY(generate_method_name(3, ecmascript_output));
+    LPG_TRY(generate_method_name(3, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (element) {\n"
                                                           "        this.content.push(element);\n"
                                                           "        return true;\n"
                                                           "    };\n"
                                                           /* clear()*/
                                                           "    new_array.prototype."));
-    LPG_TRY(generate_method_name(4, ecmascript_output));
+    LPG_TRY(generate_method_name(4, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function () {\n"
                                                           "        this.content.length = 0;\n"
                                                           "    };\n"
                                                           /* pop()*/
                                                           "    new_array.prototype."));
-    LPG_TRY(generate_method_name(5, ecmascript_output));
+    LPG_TRY(generate_method_name(5, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (count) {\n"
                                                           "        if (count > this.content.length) { return false; }\n"
                                                           "        this.content.length -= count;\n"
@@ -1200,14 +1249,15 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     return success_yes;
 }
 
-success_indicator generate_host_class(stream_writer const ecmascript_output)
+success_indicator generate_host_class(lpg_interface const *const host, stream_writer const ecmascript_output)
 {
+    ASSUME(host);
     LPG_TRY(stream_writer_write_string(ecmascript_output, "\
 var Host = function ()\n\
 {\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(0, ecmascript_output));
+    LPG_TRY(generate_method_name(0, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from, name)\n\
 {\n\
    return "));
@@ -1217,28 +1267,30 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(1, ecmascript_output));
+    LPG_TRY(generate_method_name(1, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (this_, method, arguments_)\n\
 {\n\
    var convertedArguments = [];\n\
    for (var i = 0, c = arguments_."));
-    LPG_TRY(generate_method_name(0, ecmascript_output));
+    method_description array_methods[6];
+    lpg_interface const array_interface = make_array_interface(array_methods);
+    LPG_TRY(generate_method_name(0, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "(); i < c; ++i)\n\
    {\n\
        convertedArguments.push(arguments_."));
-    LPG_TRY(generate_method_name(1, ecmascript_output));
+    LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "(i)[1]);\n\
    }\n\
    return this_[method].apply(this_, convertedArguments);\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(2, ecmascript_output));
+    LPG_TRY(generate_method_name(2, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (content)\n\
 {\n\
    return content;\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(3, ecmascript_output));
+    LPG_TRY(generate_method_name(3, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from)\n\
 {\n\
    return ((typeof from) === \"string\") ? "));
@@ -1250,25 +1302,25 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(4, ecmascript_output));
+    LPG_TRY(generate_method_name(4, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function ()\n\
 {\n\
    return undefined;\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(5, ecmascript_output));
+    LPG_TRY(generate_method_name(5, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (value)\n\
 {\n\
    return value;\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(6, ecmascript_output));
+    LPG_TRY(generate_method_name(6, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (left, right)\n\
 {\n\
    return (left === right);\n\
 };\n\
 Host.prototype."));
-    LPG_TRY(generate_method_name(7, ecmascript_output));
+    LPG_TRY(generate_method_name(7, host, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from)\n\
 {\n\
    return ((typeof from === 'number') && \
@@ -1283,4 +1335,26 @@ Host.prototype."));
 };\n\
 "));
     return success_yes;
+}
+
+lpg_interface const *get_host_interface(checked_program const program)
+{
+    checked_function const main_ = program.functions[0];
+    ASSUME(main_.signature->result.is_set);
+    type const main_result = main_.signature->result.value;
+    if (main_result.kind != type_kind_lambda)
+    {
+        return NULL;
+    }
+    checked_function const entry_point = program.functions[main_result.lambda.lambda];
+    if (entry_point.signature->parameters.length != 1)
+    {
+        return NULL;
+    }
+    type const host_parameter = entry_point.signature->parameters.elements[0];
+    if (host_parameter.kind != type_kind_interface)
+    {
+        return NULL;
+    }
+    return program.interfaces + host_parameter.interface_;
 }

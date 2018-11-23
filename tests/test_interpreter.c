@@ -293,7 +293,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         REQUIRE(success_yes == generate_ecmascript(program, memory_writer_erase(&generated)));
         if (is_ecmascript_specific)
         {
-            REQUIRE(success_yes == generate_host_class(memory_writer_erase(&generated)));
+            REQUIRE(success_yes == generate_host_class(get_host_interface(program), memory_writer_erase(&generated)));
             REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
         }
         {
