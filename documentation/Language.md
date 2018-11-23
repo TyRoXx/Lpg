@@ -92,7 +92,7 @@ The type of the variable is then automatically derived. In order to access an el
 Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
 ```lpg
 let std = import std 
-let string-list : array[std.string] = new-array(std.string)
+let string-list : std.array[std.string] = new-array(std.string)
 
 // Adding elements
 string-list.append("something")
@@ -107,7 +107,7 @@ Those are the basic functions of an array. Loading from the array is a little mo
 ```lpg
 let std = import std
 
-let strig-list : array[std.string] = new-array(std.string)
+let string-list : std.array[std.string] = new-array(std.string)
 string-list.append("something")
 
 match a.load(0)
