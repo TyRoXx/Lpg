@@ -1279,7 +1279,9 @@ Host.prototype."));
    {\n\
        convertedArguments.push(arguments_."));
     LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "(i)[1]);\n\
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "(i)"));
+    LPG_TRY(stateful_enum_get_state(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
    }\n\
    return this_[method].apply(this_, convertedArguments);\n\
 };\n\
