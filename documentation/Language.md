@@ -106,14 +106,15 @@ string-list.store(0, "hello")
 Those are the basic functions of an array. Loading from the array is a little more complicated because it returns a `std.option` which has either a value if the index exists or none if the index does not exist.
 ```lpg
 let std = import std
+let string = std.string
 
-let string-list : std.array[std.string] = new-array(std.string)
+let string-list : std.array[string] = new-array(string)
 string-list.append("something")
 
-match a.load(0)
-    case std.option[string].some(let element): 
+match string-list.load(0)
+    case std.option[string].some(let element):
         string-equals(element, "something")
-    case std.option[string].none: 
+    case std.option[string].none:
         boolean.false
 ```
 
@@ -233,7 +234,7 @@ End something */
 #### Importing modules
 Most of the functions can be found in the standard libary and have to be imported when used in the current LPG file. To import a module you need to specify the module name and the handle.
 ```lpg
-let handle = import module_name
+let handle = import std
 ```
 
 #### Writing modules
