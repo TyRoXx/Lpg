@@ -34,7 +34,7 @@ static void test_generate_with_customized_template(void)
                                                         "\t<title>Hello I am a custom template</title>\n"
                                                         "</head>\n"
                                                         "<body>\n"
-                                                        "\tVery custom\t\n"
+                                                        "\tVery custom\n"
                                                         "</body>\n"
                                                         "</html>")));
 
