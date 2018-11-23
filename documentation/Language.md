@@ -34,8 +34,7 @@ You can declare a constant with `let a = 10`. This will implicitly set the type 
 
 In order to make a constant mutable you need to define it as mutable:
 ```lpg
-let integers = import integer
-let integer = integers.integer
+let integer = import integer.integer
 let std = import std
 
 let i: int(5, 5) = 5
@@ -83,8 +82,9 @@ xor(std.boolean.true, std.boolean.false)
 ### Tuples
 Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
 ```lpg
-let std = import std
-let tuple = {10, std.boolean.true, "Hello", () std.boolean}
+let bool = import std.boolean
+
+let tuple = {10, bool.true, "Hello", () bool}
 ```
 The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string "Hello"`.
 
@@ -127,13 +127,13 @@ let make-percent = interface
 
 And this is how you implement this:
 ```lpg
-let std = import std
+let string = import std.string
 
 let printable = interface
-    print(): std.string
+    print(): string
 
-impl printable for std.string
-    print(): std.string
+impl printable for string
+    print(): string
         self
 ```
 
@@ -178,13 +178,13 @@ The match expression works similar to the switch statement in other languages.
 Currently it only supports stateless enumerations, for example `boolean`.
 
 ```
-let std = import std
+let bool = import std.boolean
 
-let a = std.boolean.true
+let a = bool.true
 let result : int(1, 2) = match a
-    case std.boolean.false:
+    case bool.false:
         1
-    case std.boolean.true:
+    case bool.true:
         2
 
 assert(integer-equals(2, result))
@@ -197,24 +197,25 @@ The result can be `unit` if you don't want to return anything.
 ### Loops
 You can create a loop with the simple loop key word. By default all loops will run infinitely long if there is no break. So this will print "Hello World" for ever:
 ```lpg
-let std = import std
+let bool = import std.boolean
 
 loop
-    assert(std.boolean.true)
+    assert(bool.true)
 ```
 If you don't want to have an infinite loop, you can exit the loop at any time with the `break` keyword. Like for example this loop runs as long as the function returns true:
 ```lpg
 let std = import std
+let bool = std.boolean
 
-let a = std.boolean.true
+let a = bool.true
 loop
     let still-running = match a
-        case std.boolean.false:
+        case bool.false:
             break
             std.unit
-        case std.boolean.true:
+        case bool.true:
             std.unit
-assert(std.boolean.true)
+assert(bool.true)
 ```
 
 ### Comments
@@ -235,6 +236,10 @@ End something */
 Most of the functions can be found in the standard libary and have to be imported when used in the current LPG file. To import a module you need to specify the module name and the handle.
 ```lpg
 let handle = import std
+```
+For importing only parts of the modules you can use the dot syntax
+```lpg
+let string = import std.string
 ```
 
 #### Writing modules
