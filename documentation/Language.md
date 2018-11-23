@@ -105,6 +105,8 @@ string-list.store(0, "hello")
 ```
 Those are the basic functions of an array. Loading from the array is a little more complicated because it returns a `std.option` which has either a value if the index exists or none if the index does not exist.
 ```lpg
+let std = import std
+
 let strig-list : array[std.string] = new-array(std.string)
 string-list.append("something")
 
