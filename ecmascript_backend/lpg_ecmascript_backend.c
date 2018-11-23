@@ -669,17 +669,16 @@ static success_indicator generate_equality_comparable_match_cases(function_gener
             LPG_TRY(stream_writer_write_string(ecmascript_output, "else "));
         }
         LPG_TRY(stream_writer_write_string(ecmascript_output, "if ("));
-        LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
         switch (generated.cases[i].kind)
         {
         case match_instruction_case_kind_stateful_enum:
             LPG_UNREACHABLE();
 
         case match_instruction_case_kind_value:
-            LPG_TRY(stream_writer_write_string(ecmascript_output, " === "));
-            LPG_TRY(generate_register_read(state, generated.cases[i].key_value, ecmascript_output));
             break;
         }
+        LPG_TRY(
+            generate_stateless_enum_case_check(state, generated.key, generated.cases[i].key_value, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
@@ -721,9 +720,8 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         }
 
         case match_instruction_case_kind_value:
-            LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
-            LPG_TRY(stream_writer_write_string(ecmascript_output, " === "));
-            LPG_TRY(generate_register_read(state, generated.cases[i].key_value, ecmascript_output));
+            LPG_TRY(generate_stateless_enum_case_check(
+                state, generated.key, generated.cases[i].key_value, ecmascript_output));
             break;
         }
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));

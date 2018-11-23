@@ -28,6 +28,15 @@ success_indicator stateful_enum_case_check(function_generation *const state, reg
     return success_yes;
 }
 
+success_indicator generate_stateless_enum_case_check(function_generation *const state, register_id const input,
+                                                     register_id const case_key, stream_writer const ecmascript_output)
+{
+    LPG_TRY(generate_register_read(state, input, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " === "));
+    LPG_TRY(generate_register_read(state, case_key, ecmascript_output));
+    return success_yes;
+}
+
 success_indicator stateful_enum_get_state(stream_writer const ecmascript_output)
 {
     LPG_TRY(stream_writer_write_string(ecmascript_output, "[1]"));
