@@ -84,6 +84,8 @@ typedef struct enum_element_value
     type state_type;
 } enum_element_value;
 
+enum_element_value enum_element_value_create(enum_element_id which, struct value *state, type state_type);
+
 typedef struct type_erased_value
 {
     implementation_ref impl;

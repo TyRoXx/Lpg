@@ -4,6 +4,7 @@
 #include "lpg_enum_encoding.h"
 #include "lpg_function_generation.h"
 #include "lpg_instruction.h"
+#include "lpg_standard_library.h"
 #include "lpg_structure_member.h"
 
 static success_indicator indent(size_t const indentation, stream_writer const c_output)
@@ -1099,7 +1100,8 @@ static success_indicator define_interface(interface_id const id, lpg_interface c
 
 success_indicator generate_ecmascript(checked_program const program, stream_writer const ecmascript_output)
 {
-    char const *const preparation = //
+    LPG_TRY(stream_writer_write_string(
+        ecmascript_output,
         "(function ()\n"
         "{\n"
         "    \"use strict\";\n"
@@ -1127,34 +1129,40 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
         /* load()*/
         "    new_array.prototype.call_method_1 = function (index) {\n"
         "        if (index < this.content.length) {\n"
-        "            return [0, this.content[index]];\n"
-        "        }\n"
-        "        return 1;\n"
-        "    };\n"
-        /* store()*/
-        "    new_array.prototype.call_method_2 = function (index, element) {\n"
-        "        if (index >= this.content.length) {\n"
-        "            return false;\n"
-        "        }\n"
-        "        this.content[index] = element;\n"
-        "        return true;\n"
-        "    };\n"
-        /* append()*/
-        "    new_array.prototype.call_method_3 = function (element) {\n"
-        "        this.content.push(element);\n"
-        "        return true;\n"
-        "    };\n"
-        /* clear()*/
-        "    new_array.prototype.call_method_4 = function () {\n"
-        "        this.content.length = 0;\n"
-        "    };\n"
-        /* pop()*/
-        "    new_array.prototype.call_method_5 = function (count) {\n"
-        "        if (count > this.content.length) { return false; }\n"
-        "        this.content.length -= count;\n"
-        "        return true;\n"
-        "    };\n";
-    LPG_TRY(stream_writer_write_string(ecmascript_output, preparation));
+        "            return "));
+    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "this.content[index]"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"
+                                                          "        }\n"
+                                                          "        return "));
+    LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output,
+                                       ";\n"
+                                       "    };\n"
+                                       /* store()*/
+                                       "    new_array.prototype.call_method_2 = function (index, element) {\n"
+                                       "        if (index >= this.content.length) {\n"
+                                       "            return false;\n"
+                                       "        }\n"
+                                       "        this.content[index] = element;\n"
+                                       "        return true;\n"
+                                       "    };\n"
+                                       /* append()*/
+                                       "    new_array.prototype.call_method_3 = function (element) {\n"
+                                       "        this.content.push(element);\n"
+                                       "        return true;\n"
+                                       "    };\n"
+                                       /* clear()*/
+                                       "    new_array.prototype.call_method_4 = function () {\n"
+                                       "        this.content.length = 0;\n"
+                                       "    };\n"
+                                       /* pop()*/
+                                       "    new_array.prototype.call_method_5 = function (count) {\n"
+                                       "        if (count > this.content.length) { return false; }\n"
+                                       "        this.content.length -= count;\n"
+                                       "        return true;\n"
+                                       "    };\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
         LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));
@@ -1175,15 +1183,19 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     return success_yes;
 }
 
-success_indicator generate_host_class(stream_writer const destination)
+success_indicator generate_host_class(stream_writer const ecmascript_output)
 {
-    LPG_TRY(stream_writer_write_string(destination, "\
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\
 var Host = function ()\n\
 {\n\
 };\n\
 Host.prototype.call_method_0 = function (from, name)\n\
 {\n\
-   return [0, from[name]];\n\
+   return "));
+    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "from[name]"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 Host.prototype.call_method_1 = function (this_, method, arguments_)\n\
 {\n\
@@ -1200,7 +1212,13 @@ Host.prototype.call_method_2 = function (content)\n\
 };\n\
 Host.prototype.call_method_3 = function (from)\n\
 {\n\
-   return ((typeof from) === \"string\") ? [0, from] : 1;\n\
+   return ((typeof from) === \"string\") ? "));
+    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
+    LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 Host.prototype.call_method_4 = function ()\n\
 {\n\
@@ -1218,7 +1236,13 @@ Host.prototype.call_method_7 = function (from)\n\
 {\n\
    return ((typeof from === 'number') && \
        isFinite(from) && \
-       (Math.floor(from) === from)) ? [0, from] : 1;\n\
+       (Math.floor(from) === from)) ? "));
+    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
+    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
+    LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 "));
     return success_yes;

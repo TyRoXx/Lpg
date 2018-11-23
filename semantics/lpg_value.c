@@ -74,6 +74,12 @@ value_tuple value_tuple_create(struct value *elements, size_t element_count)
     return result;
 }
 
+enum_element_value enum_element_value_create(enum_element_id which, struct value *state, type state_type)
+{
+    enum_element_value const result = {which, state, state_type};
+    return result;
+}
+
 type_erased_value type_erased_value_create(implementation_ref impl, LPG_NON_NULL(struct value *self))
 {
     type_erased_value const result = {impl, self};

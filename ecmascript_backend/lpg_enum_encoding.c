@@ -43,6 +43,11 @@ success_indicator stateful_enum_get_state(stream_writer const ecmascript_output)
     return success_yes;
 }
 
+success_indicator generate_stateless_enum_element(enum_element_id const which, stream_writer const ecmascript_output)
+{
+    return stream_writer_write_integer(ecmascript_output, integer_create(0, which));
+}
+
 success_indicator generate_enum_element(enum_element_value const element, enumeration const *const enum_,
                                         checked_function const *all_functions, function_id const function_count,
                                         lpg_interface const *const all_interfaces, structure const *const all_structs,
@@ -74,5 +79,5 @@ success_indicator generate_enum_element(enum_element_value const element, enumer
             break;
         }
     }
-    return stream_writer_write_integer(ecmascript_output, integer_create(0, element.which));
+    return generate_stateless_enum_element(element.which, ecmascript_output);
 }
