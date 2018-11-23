@@ -783,7 +783,8 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
             LPG_TRY(write_register(state, generated.cases[i].stateful_enum.where, enum_state.value,
                                    optional_value_empty, ecmascript_output));
             LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
-            LPG_TRY(stream_writer_write_string(ecmascript_output, "[1];\n"));
+            LPG_TRY(stateful_enum_get_state(ecmascript_output));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
             break;
         }
 

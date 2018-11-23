@@ -27,3 +27,9 @@ success_indicator stateful_enum_case_check(function_generation *const state, reg
     LPG_TRY(stream_writer_write_string(ecmascript_output, ")"));
     return success_yes;
 }
+
+success_indicator stateful_enum_get_state(stream_writer const ecmascript_output)
+{
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "[1]"));
+    return success_yes;
+}
