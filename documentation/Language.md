@@ -10,6 +10,7 @@
     1. [Match](#Match)
     1. [Loops](#Loops)
     1. [Comments](#Comments)
+    1. [Modules](#Modules)
 1. [Standard Library Functions](#Standard-library-functions)
 1. [Standard Library Constants](#Standard-library-constants)
 1. [Built-in global functions](#Built-in-global-functions)
@@ -18,26 +19,34 @@
 ## Hello World
 The first thing in every programming language is the "Hello World"-program. This is the code you need to write in lpg: **It does not exist yet.**
 
-## Types
+## Built-in types
 
 | Type            | Explanation                                      | Example values                                   |
 |-----------------|--------------------------------------------------|--------------------------------------------------|
 | unit            | A nothing like type "void"                       | `unit_value`                                     |
-| type            | A type of a variable / constant                  | `unit`, `boolean`, `int(0, 0)`                   |
-| boolean         | A logical value (either true or false)           | `boolean.true` or `boolean.false`                |
 | int(low, high)  | A whole number within a certain range            | `int(0, 100)` or `int(33, 100)`                  |
-| string          | A reference to a string that is a string literal | `"Hello"` or `"\n"`                              |
+| string          | A reference to a string that is a string literal | `"Hello"` or raw string: `'\n'`                  |
 | *no syntax yet* | Contains a fixed number of elements              | `{"Hello"}` or `{}` or `{boolean.true, 123, {}}` |
 
 
 ### Variables and constants
-* Variables
-
-**Currently there all variables are constants.**
-
-* Constants
-
 You can declare a constant with `let a = 10`. This will implicitly set the type of the constant to be an integer. If you want to have a specific type of constant use `let a: int(0, 0) = 0`. This creates a constant with a type of integer with the range between 0 and 0.
+
+In order to make a constant mutable you need to define it as mutable:
+```lpg
+let integers = import integer
+let integer = integers.integer
+let std = import std
+
+let i: int(5, 5) = 5
+let some-int: std.mutable[integer] = std.make-mutable[integer](i)
+
+// Set variable content
+some-int.store(10)
+
+// Load content
+some-int.load()
+```
 
 ### Function Syntax
 Functions can be implemented like this. Currently all functions are lambda (nameless) functions:
@@ -78,6 +87,36 @@ let std = import std
 let tuple = {10, std.boolean.true, "Hello", () std.boolean}
 ```
 The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string "Hello"`.
+
+### Arrays
+Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
+```lpg
+let std = import std 
+let string-list : std.array[std.string] = new-array(std.string)
+
+// Adding elements
+string-list.append("something")
+
+// Getting the size of the array
+string-list.size()
+
+// Setting element at index 0, it returns true on sucess
+string-list.store(0, "hello")
+```
+Those are the basic functions of an array. Loading from the array is a little more complicated because it returns a `std.option` which has either a value if the index exists or none if the index does not exist.
+```lpg
+let std = import std
+let string = std.string
+
+let string-list : std.array[string] = new-array(string)
+string-list.append("something")
+
+match string-list.load(0)
+    case std.option[string].some(let element):
+        string-equals(element, "something")
+    case std.option[string].none:
+        boolean.false
+```
 
 ### Interfaces
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
@@ -190,47 +229,70 @@ End something */
 // Some comment
 ```
 
+### Modules
+
+#### Importing modules
+Most of the functions can be found in the standard libary and have to be imported when used in the current LPG file. To import a module you need to specify the module name and the handle.
+```lpg
+let handle = import std
+```
+
+#### Writing modules
+
+When writing a file that should expose functions or types to other files the syntax is:
+```lpg
+let fav_num = 7
+
+// Define structure of exported value
+let export_struct = struct
+    fav_num: type-of(fav_num)
+
+// Instanciate exported value
+export_struct{fav_num}
+```
+which basically is the return value of the whole file.
+
 ## Standard library functions
 The standard library also includes some functions to work with the types.
 ```lpg
 let std = import std
 ```
 
-| Name              | Inputs                 | Explanation                                          | Output     |
-|-------------------|------------------------|------------------------------------------------------|------------|
-| and               | boolean, boolean       | Implementation of logical and                        | boolean    |
-| or                | boolean, boolean       | Implementation of logical or                         | boolean    |
-| not               | boolean                | Flips the value of the boolean                       | boolean    |
+| Name | Inputs           | Explanation                    | Output  |
+|------|------------------|--------------------------------|---------|
+| and  | boolean, boolean | Implementation of logical and  | boolean |
+| or   | boolean, boolean | Implementation of logical or   | boolean |
+| not  | boolean          | Flips the value of the boolean | boolean |
 
 ## Standard library constants
 ```lpg
 let std = import std
 ```
 
-| Name              | Explanation                                                                                |
-|-------------------|--------------------------------------------------------------------------------------------|
-| type              | type of all types                                                                          |
-| string            | name of the string type                                                                    |
-| boolean           | an enum with two states: false, true                                                       |
-| unit              | type with a single value that can be used to model the absence of a return value for example |
-| unit_value        | the single possible value of type unit                                                     |
-| option[T]         | enum with two states: `some(T)` and `none` |
-| option-int        | deprecated |
-| array[T]          | generic interface for arrays of type T. Create array instances with the `new-array` keyword, e.g. `new-array(std.string)` |
+| Name       | Explanation                                                                                  |
+|------------|----------------------------------------------------------------------------------------------|
+| type       | type of all types                                                                            |
+| string     | name of the string type                                                                      |
+| boolean    | an enum with two states: false, true                                                         |
+| unit       | type with a single value that can be used to model the absence of a return value for example |
+| unit_value | the single possible value of type unit                                                       |
+| option[T]  | enum with two states: `some(T)` and `none`                                                   |
+| option-int | deprecated                                                                                   |
+| array[T]   | generic interface for arrays of type T                                                       |
 
 ## Built-in global functions
 ```lpg
 assert(boolean.true)
 ```
 
-| Name              | Inputs                 | Explanation                                          | Output     |
-|-------------------|------------------------|------------------------------------------------------|------------|
-| assert            | boolean                | Ends the program if the input is `boolean.false`     | unit       |
-| concat            | string, string | Returns the two strings together                     | string |
-| string-equals     | string, string | Returns if two strings are equal                     | boolean    |
-| integer-equals    | integer, integer       | Returns if two integers are equals                   | boolean    |
-| integer-less      | integer, integer       | Returns if the first integer is less than the second | boolean    |
-| integer-to-string | integer                | Turns an integer to a string                         | string |
+| Name              | Inputs           | Explanation                                          | Output  |
+|-------------------|------------------|------------------------------------------------------|---------|
+| assert            | boolean          | Ends the program if the input is `boolean.false`     | unit    |
+| concat            | string, string   | Returns the two strings together                     | string  |
+| string-equals     | string, string   | Returns if two strings are equal                     | boolean |
+| integer-equals    | integer, integer | Returns if two integers are equals                   | boolean |
+| integer-less      | integer, integer | Returns if the first integer is less than the second | boolean |
+| integer-to-string | integer          | Turns an integer to a string                         | string  |
 
 ## Optimizations
 There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:
