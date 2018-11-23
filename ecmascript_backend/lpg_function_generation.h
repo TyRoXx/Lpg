@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lpg_enum_encoding_strategy.h"
 #include "lpg_value.h"
 
 typedef enum register_type {
@@ -27,9 +28,11 @@ typedef struct function_generation
     enumeration const *all_enums;
     structure const *all_structs;
     checked_function const *current_function;
+    enum_encoding_strategy_cache *strategy_cache;
 } function_generation;
 
 function_generation function_generation_create(register_info *registers, checked_function const *all_functions,
                                                function_id const function_count, lpg_interface const *all_interfaces,
                                                enumeration const *all_enums, structure const *all_structs,
-                                               checked_function const *current_function);
+                                               checked_function const *current_function,
+                                               enum_encoding_strategy_cache *strategy_cache);

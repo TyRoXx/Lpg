@@ -1,9 +1,11 @@
 #pragma once
 #include "lpg_checked_program.h"
+#include "lpg_enum_encoding_strategy.h"
 #include "lpg_function_generation.h"
 #include "lpg_stream_writer.h"
 
-success_indicator generate_value(value const generated, type const type_of, checked_function const *all_functions,
+success_indicator generate_value(enum_encoding_strategy_cache *const strategy_cache, value const generated,
+                                 type const type_of, checked_function const *all_functions,
                                  function_id const function_count, lpg_interface const *const all_interfaces,
                                  structure const *const all_structs, enumeration const *const all_enums,
                                  stream_writer const ecmascript_output);
