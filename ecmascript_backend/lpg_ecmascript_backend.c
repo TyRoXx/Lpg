@@ -2,6 +2,7 @@
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
 #include "lpg_enum_encoding.h"
+#include "lpg_function_generation.h"
 #include "lpg_instruction.h"
 #include "lpg_structure_member.h"
 
@@ -313,48 +314,6 @@ static success_indicator generate_var(register_id const id, stream_writer const 
     return success_yes;
 }
 
-typedef enum register_type {
-    register_type_none = 1,
-    register_type_variable,
-    register_type_global,
-    register_type_captures
-} register_type;
-
-typedef struct register_info
-{
-    register_type kind;
-    type type_of;
-    optional_value known_value;
-} register_info;
-
-static register_info register_info_create(register_type kind, type type_of, optional_value known_value)
-{
-    register_info const result = {kind, type_of, known_value};
-    return result;
-}
-
-typedef struct function_generation
-{
-    register_info *registers;
-    checked_function const *all_functions;
-    function_id function_count;
-    lpg_interface const *all_interfaces;
-    enumeration const *all_enums;
-    structure const *all_structs;
-    checked_function const *current_function;
-} function_generation;
-
-static function_generation function_generation_create(register_info *registers, checked_function const *all_functions,
-                                                      function_id const function_count,
-                                                      lpg_interface const *all_interfaces, enumeration const *all_enums,
-                                                      structure const *all_structs,
-                                                      checked_function const *current_function)
-{
-    function_generation const result = {
-        registers, all_functions, function_count, all_interfaces, all_enums, all_structs, current_function};
-    return result;
-}
-
 static success_indicator write_register(function_generation *const state, register_id const which, type const type_of,
                                         optional_value const known_value, stream_writer const ecmascript_output)
 {
@@ -365,8 +324,8 @@ static success_indicator write_register(function_generation *const state, regist
     return success_yes;
 }
 
-static success_indicator generate_register_read(function_generation *const state, register_id const id,
-                                                stream_writer const ecmascript_output)
+success_indicator generate_register_read(function_generation *const state, register_id const id,
+                                         stream_writer const ecmascript_output)
 {
     register_info const info = state->registers[id];
     if (!info.known_value.is_set)
@@ -795,15 +754,11 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         switch (generated.cases[i].kind)
         {
         case match_instruction_case_kind_stateful_enum:
-            LPG_TRY(stream_writer_write_string(ecmascript_output, "(typeof "));
-            LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
-            LPG_TRY(stream_writer_write_string(ecmascript_output, " !== \"number\") && ("));
-            LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
-            LPG_TRY(stream_writer_write_string(ecmascript_output, "[0] === "));
-            LPG_TRY(stream_writer_write_integer(
-                ecmascript_output, integer_create(0, generated.cases[i].stateful_enum.element)));
-            LPG_TRY(stream_writer_write_string(ecmascript_output, ")"));
+        {
+            LPG_TRY(stateful_enum_case_check(
+                state, generated.key, generated.cases[i].stateful_enum.element, ecmascript_output));
             break;
+        }
 
         case match_instruction_case_kind_value:
             LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
