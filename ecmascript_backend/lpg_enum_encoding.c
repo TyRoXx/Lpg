@@ -33,3 +33,37 @@ success_indicator stateful_enum_get_state(stream_writer const ecmascript_output)
     LPG_TRY(stream_writer_write_string(ecmascript_output, "[1]"));
     return success_yes;
 }
+
+success_indicator generate_enum_element(enum_element_value const element, enumeration const *const enum_,
+                                        checked_function const *all_functions, function_id const function_count,
+                                        lpg_interface const *const all_interfaces, structure const *const all_structs,
+                                        enumeration const *const all_enums, stream_writer const ecmascript_output)
+{
+    if (element.state)
+    {
+        LPG_TRY(enum_construct_stateful_begin(element.which, ecmascript_output));
+        LPG_TRY(generate_value(*element.state, element.state_type, all_functions, function_count, all_interfaces,
+                               all_structs, all_enums, ecmascript_output));
+        LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+        return success_yes;
+    }
+    if (!has_stateful_element(*enum_))
+    {
+        switch (enum_->size)
+        {
+        case 2:
+            switch (element.which)
+            {
+            case 0:
+                return stream_writer_write_string(ecmascript_output, "false");
+            case 1:
+                return stream_writer_write_string(ecmascript_output, "true");
+            }
+            LPG_UNREACHABLE();
+
+        default:
+            break;
+        }
+    }
+    return stream_writer_write_integer(ecmascript_output, integer_create(0, element.which));
+}

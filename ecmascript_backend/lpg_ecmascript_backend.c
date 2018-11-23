@@ -59,46 +59,6 @@ static success_indicator encode_string_literal(unicode_view const content, strea
     return success_yes;
 }
 
-static success_indicator generate_value(value const generated, type const type_of,
-                                        checked_function const *all_functions, function_id const function_count,
-                                        lpg_interface const *const all_interfaces, structure const *const all_structs,
-                                        enumeration const *const all_enums, stream_writer const ecmascript_output);
-
-static success_indicator generate_enum_element(enum_element_value const element, enumeration const *const enum_,
-                                               checked_function const *all_functions, function_id const function_count,
-                                               lpg_interface const *const all_interfaces,
-                                               structure const *const all_structs, enumeration const *const all_enums,
-                                               stream_writer const ecmascript_output)
-{
-    if (element.state)
-    {
-        LPG_TRY(enum_construct_stateful_begin(element.which, ecmascript_output));
-        LPG_TRY(generate_value(*element.state, element.state_type, all_functions, function_count, all_interfaces,
-                               all_structs, all_enums, ecmascript_output));
-        LPG_TRY(enum_construct_stateful_end(ecmascript_output));
-        return success_yes;
-    }
-    if (!has_stateful_element(*enum_))
-    {
-        switch (enum_->size)
-        {
-        case 2:
-            switch (element.which)
-            {
-            case 0:
-                return stream_writer_write_string(ecmascript_output, "false");
-            case 1:
-                return stream_writer_write_string(ecmascript_output, "true");
-            }
-            LPG_UNREACHABLE();
-
-        default:
-            break;
-        }
-    }
-    return stream_writer_write_integer(ecmascript_output, integer_create(0, element.which));
-}
-
 static success_indicator generate_enum_constructor(enum_constructor_type const constructor,
                                                    stream_writer const ecmascript_output)
 {
@@ -189,10 +149,10 @@ static success_indicator generate_array_value(array_value const generated, check
     return success_yes;
 }
 
-static success_indicator generate_value(value const generated, type const type_of,
-                                        checked_function const *all_functions, function_id const function_count,
-                                        lpg_interface const *const all_interfaces, structure const *const all_structs,
-                                        enumeration const *const all_enums, stream_writer const ecmascript_output)
+success_indicator generate_value(value const generated, type const type_of, checked_function const *all_functions,
+                                 function_id const function_count, lpg_interface const *const all_interfaces,
+                                 structure const *const all_structs, enumeration const *const all_enums,
+                                 stream_writer const ecmascript_output)
 {
     ASSUME(value_conforms_to_type(generated, type_of));
     ASSUME(value_is_valid(generated));
