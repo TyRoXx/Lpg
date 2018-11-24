@@ -60,13 +60,18 @@ static success_indicator encode_string_literal(unicode_view const content, strea
     return success_yes;
 }
 
-static success_indicator generate_enum_constructor(enum_constructor_type const constructor,
+static success_indicator generate_enum_constructor(enum_encoding_strategy_cache *const strategy_cache,
+                                                   enum_constructor_type const constructor,
                                                    stream_writer const ecmascript_output)
 {
+    enum_encoding_strategy *const strategy =
+        enum_encoding_strategy_cache_require(strategy_cache, constructor.enumeration);
+    enum_encoding_element const element = strategy->elements[constructor.which];
+    ASSUME(element.has_state);
     LPG_TRY(stream_writer_write_string(ecmascript_output, "function (state) { return "));
-    LPG_TRY(enum_construct_stateful_begin(constructor.which, ecmascript_output));
+    LPG_TRY(enum_construct_stateful_begin(element.stateful, constructor.which, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "state"));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(element.stateful, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "; }"));
     return success_yes;
 }
@@ -268,7 +273,7 @@ success_indicator generate_value(enum_encoding_strategy_cache *const strategy_ca
     }
 
     case value_kind_enum_constructor:
-        return generate_enum_constructor(*type_of.enum_constructor, ecmascript_output);
+        return generate_enum_constructor(strategy_cache, *type_of.enum_constructor, ecmascript_output);
     }
     LPG_UNREACHABLE();
 }
@@ -646,12 +651,16 @@ static success_indicator generate_enum_construct(function_generation *const stat
                                                  enum_construct_instruction const construct, const size_t indentation,
                                                  stream_writer const ecmascript_output)
 {
+    enum_encoding_strategy *const strategy =
+        enum_encoding_strategy_cache_require(state->strategy_cache, construct.which.enumeration);
+    enum_encoding_element const element = strategy->elements[construct.which.which];
+    ASSUME(element.has_state);
     LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(state, construct.into, type_from_enumeration(construct.which.enumeration),
                            optional_value_empty, ecmascript_output));
-    LPG_TRY(enum_construct_stateful_begin(construct.which.which, ecmascript_output));
+    LPG_TRY(enum_construct_stateful_begin(element.stateful, construct.which.which, ecmascript_output));
     LPG_TRY(generate_register_read(state, construct.state, ecmascript_output));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(element.stateful, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
     return success_yes;
 }
@@ -734,13 +743,17 @@ static success_indicator generate_equality_comparable_match_cases(function_gener
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     }
+    LPG_TRY(indent(indentation, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "else { fail(); }\n"));
     return success_yes;
 }
 
 static success_indicator generate_stateful_enum_match_cases(function_generation *const state,
-                                                            match_instruction const generated, const size_t indentation,
+                                                            match_instruction const generated, enum_id const enum_,
+                                                            const size_t indentation,
                                                             stream_writer const ecmascript_output)
 {
+    enum_encoding_strategy const *const strategy = enum_encoding_strategy_cache_require(state->strategy_cache, enum_);
     for (size_t i = 0; i < generated.count; ++i)
     {
         LPG_TRY(indent(indentation, ecmascript_output));
@@ -753,8 +766,11 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         {
         case match_instruction_case_kind_stateful_enum:
         {
-            LPG_TRY(stateful_enum_case_check(
-                state, generated.key, generated.cases[i].stateful_enum.element, ecmascript_output));
+            enum_element_id which = generated.cases[i].stateful_enum.element;
+            enum_encoding_element const element_strategy = strategy->elements[which];
+            ASSUME(element_strategy.has_state);
+            LPG_TRY(
+                stateful_enum_case_check(state, generated.key, element_strategy.stateful, which, ecmascript_output));
             break;
         }
 
@@ -773,14 +789,14 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         {
             LPG_TRY(indent(indentation + 1, ecmascript_output));
             ASSUME(state->registers[generated.key].type_of.kind == type_kind_enumeration);
-            optional_type const enum_state = state->all_enums[state->registers[generated.key].type_of.enum_]
-                                                 .elements[generated.cases[i].stateful_enum.element]
-                                                 .state;
+            enum_id const enumeration_id = state->registers[generated.key].type_of.enum_;
+            enum_element_id const which = generated.cases[i].stateful_enum.element;
+            optional_type const enum_state = state->all_enums[enumeration_id].elements[which].state;
             ASSUME(enum_state.is_set);
             LPG_TRY(write_register(state, generated.cases[i].stateful_enum.where, enum_state.value,
                                    optional_value_empty, ecmascript_output));
             LPG_TRY(generate_register_read(state, generated.key, ecmascript_output));
-            LPG_TRY(stateful_enum_get_state(ecmascript_output));
+            LPG_TRY(stateful_enum_get_state(state->strategy_cache, enumeration_id, which, ecmascript_output));
             LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
             break;
         }
@@ -801,6 +817,8 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "}\n"));
     }
+    LPG_TRY(indent(indentation, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "else { fail(); }\n"));
     return success_yes;
 }
 
@@ -823,7 +841,7 @@ static success_indicator generate_match(function_generation *const state, match_
     {
         if (has_stateful_element(state->all_enums[key_type.enum_]))
         {
-            return generate_stateful_enum_match_cases(state, generated, indentation, ecmascript_output);
+            return generate_stateful_enum_match_cases(state, generated, key_type.enum_, indentation, ecmascript_output);
         }
         return generate_equality_comparable_match_cases(state, generated, indentation, ecmascript_output);
     }
@@ -878,7 +896,17 @@ static success_indicator generate_new_array(function_generation *const state, ne
     LPG_TRY(indent(indentation, ecmascript_output));
     LPG_TRY(write_register(
         state, generated.into, type_from_interface(generated.result_type), optional_value_empty, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "new new_array();\n"));
+    lpg_interface const *const array = state->all_interfaces + generated.result_type;
+    method_description const load = array->methods[1];
+    ASSUME(load.result.kind == type_kind_enumeration);
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "new new_array([], "));
+    LPG_TRY(generate_enum_constructor(
+        state->strategy_cache, enum_constructor_type_create(load.result.enum_, 0), ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+    LPG_TRY(generate_enum_element(state->strategy_cache, enum_element_value_create(1, NULL, type_from_unit()),
+                                  state->all_enums + load.result.enum_, state->all_functions, state->function_count,
+                                  state->all_interfaces, state->all_structs, state->all_enums, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n"));
     return success_yes;
 }
 
@@ -1160,13 +1188,20 @@ lpg_interface make_array_interface(method_description array_methods[6])
     return array_interface;
 }
 
-success_indicator generate_ecmascript(checked_program const program, stream_writer const ecmascript_output)
+success_indicator generate_ecmascript(checked_program const program, enum_encoding_strategy_cache *strategy_cache,
+                                      stream_writer const ecmascript_output)
 {
     LPG_TRY(stream_writer_write_string(
         ecmascript_output,
         "(function ()\n"
         "{\n"
         "    \"use strict\";\n"
+        "    var globalObject = new Function('return this;')();\n"
+        "    var fail = function (condition) { if (globalObject.builtin_fail) { builtin_fail(); } else { throw "
+        "\"fail\"; } };\n"
+        "    var assert = function (condition) { if (globalObject.builtin_assert) { builtin_assert(condition); } else "
+        "if "
+        "(!condition) { fail(); } };\n"
         "    var string_equals = function (left, right) { return (left === right); };\n"
         "    var integer_equals = function (left, right) { return (left === right); };\n"
         "    var integer_less = function (left, right) { return (left < right); };\n"
@@ -1181,8 +1216,10 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
         "    var not = function (argument) { return !argument; };\n"
         "    var side_effect = function () {};\n"
         "    var integer_to_string = function (input) { return \"\" + input; };\n"
-        "    var new_array = function (initial_content) {\n"
+        "    var new_array = function (initial_content, make_some, none) {\n"
         "        this.content = initial_content || [];\n"
+        "        this.make_some = make_some;\n"
+        "        this.none = none;\n"
         "    };\n"
         /* size()*/
         "    new_array.prototype."));
@@ -1197,15 +1234,9 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (index) {\n"
                                                           "        if (index < this.content.length) {\n"
-                                                          "            return "));
-    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "this.content[index]"));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"
+                                                          "            return this.make_some(this.content[index]);\n"
                                                           "        }\n"
-                                                          "        return "));
-    LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"
+                                                          "        return this.none;\n"
                                                           "    };\n"
                                                           /* store()*/
                                                           "    new_array.prototype."));
@@ -1246,23 +1277,21 @@ success_indicator generate_ecmascript(checked_program const program, stream_writ
     {
         LPG_TRY(declare_function(i, program.function_count, ecmascript_output));
     }
+    for (function_id i = 1; i < program.function_count; ++i)
     {
-        enum_encoding_strategy_cache strategy_cache = enum_encoding_strategy_cache_create(program.enums);
-        for (function_id i = 1; i < program.function_count; ++i)
-        {
-            LPG_TRY(define_function(&strategy_cache, i, program.functions[i], program.functions, program.function_count,
-                                    program.interfaces, program.enums, program.structs, ecmascript_output));
-        }
-        ASSUME(program.functions[0].signature->parameters.length == 0);
-        LPG_TRY(generate_function_body(&strategy_cache, program.functions[0], program.functions, program.function_count,
-                                       program.interfaces, program.enums, program.structs, 0, ecmascript_output));
-        enum_encoding_strategy_cache_free(strategy_cache);
+        LPG_TRY(define_function(strategy_cache, i, program.functions[i], program.functions, program.function_count,
+                                program.interfaces, program.enums, program.structs, ecmascript_output));
     }
+    ASSUME(program.functions[0].signature->parameters.length == 0);
+    LPG_TRY(generate_function_body(strategy_cache, program.functions[0], program.functions, program.function_count,
+                                   program.interfaces, program.enums, program.structs, 0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "})();\n"));
     return success_yes;
 }
 
-success_indicator generate_host_class(lpg_interface const *const host, stream_writer const ecmascript_output)
+success_indicator generate_host_class(enum_encoding_strategy_cache *const strategy_cache,
+                                      lpg_interface const *const host, lpg_interface const *const all_interfaces,
+                                      stream_writer const ecmascript_output)
 {
     ASSUME(host);
     LPG_TRY(stream_writer_write_string(ecmascript_output, "\
@@ -1274,9 +1303,9 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from, name)\n\
 {\n\
    return "));
-    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(enum_construct_stateful_begin(enum_encoding_element_stateful_from_indirect(), 0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "from[name]"));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(enum_encoding_element_stateful_from_indirect(), ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
 Host.prototype."));
@@ -1293,7 +1322,18 @@ Host.prototype."));
        convertedArguments.push(arguments_."));
     LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "(i)"));
-    LPG_TRY(stateful_enum_get_state(ecmascript_output));
+    {
+        method_description const call_method = host->methods[1];
+        ASSUME(call_method.parameters.length == 3);
+        type const arguments = call_method.parameters.elements[2];
+        ASSUME(arguments.kind == type_kind_interface);
+        lpg_interface const *const array_of_host_value = all_interfaces + arguments.interface_;
+        method_description const load = array_of_host_value->methods[1];
+        ASSUME(load.parameters.length == 1);
+        type const load_result = load.result;
+        ASSUME(load_result.kind == type_kind_enumeration);
+        LPG_TRY(stateful_enum_get_state(strategy_cache, load_result.enum_, 0, ecmascript_output));
+    }
     LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
    }\n\
    return this_[method].apply(this_, convertedArguments);\n\
@@ -1309,9 +1349,11 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from)\n\
 {\n\
    return ((typeof from) === \"string\") ? "));
-    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(enum_construct_stateful_begin(
+        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_string()), 0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(
+        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_string()), ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
@@ -1341,9 +1383,9 @@ Host.prototype."));
    return ((typeof from === 'number') && \
        isFinite(from) && \
        (Math.floor(from) === from)) ? "));
-    LPG_TRY(enum_construct_stateful_begin(0, ecmascript_output));
+    LPG_TRY(enum_construct_stateful_begin(enum_encoding_element_stateful_from_indirect(), 0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
-    LPG_TRY(enum_construct_stateful_end(ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(enum_encoding_element_stateful_from_indirect(), ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\

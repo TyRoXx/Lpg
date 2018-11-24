@@ -18,6 +18,7 @@ integer_range integer_range_create(integer const minimum, integer const maximum)
 integer_range integer_range_max(void);
 bool integer_range_equals(integer_range const left, integer_range const right);
 bool integer_range_contains(integer_range const haystack, integer_range const needle);
+bool integer_range_overlaps(integer_range const first, integer_range const second);
 bool integer_range_contains_integer(integer_range const haystack, integer const needle);
 integer_range integer_range_combine(integer_range const left, integer_range const right);
 
@@ -30,3 +31,4 @@ void integer_range_list_merge(integer_range_list *const unmerged_list);
 void integer_range_list_remove(integer_range_list *const haystack, integer_range const needle);
 integer integer_range_list_size(integer_range_list const list);
 integer integer_range_size(integer_range const value);
+bool integer_range_list_overlaps(integer_range_list const first, integer_range const second);

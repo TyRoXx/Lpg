@@ -44,10 +44,35 @@ integer integer_range_size(integer_range const value)
     return range_size_zero_based;
 }
 
+bool integer_range_list_overlaps(integer_range_list const first, integer_range const second)
+{
+    for (size_t i = 0; i < first.length; ++i)
+    {
+        if (integer_range_overlaps(first.elements[i], second))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool integer_range_contains(integer_range const haystack, integer_range const needle)
 {
     return integer_less_or_equals(haystack.minimum, needle.minimum) &&
            integer_less_or_equals(needle.maximum, haystack.maximum);
+}
+
+bool integer_range_overlaps(integer_range const first, integer_range const second)
+{
+    if (integer_less_or_equals(first.maximum, second.maximum) && integer_less_or_equals(second.minimum, first.maximum))
+    {
+        return true;
+    }
+    if (integer_less_or_equals(second.maximum, first.maximum) && integer_less_or_equals(first.minimum, second.maximum))
+    {
+        return true;
+    }
+    return false;
 }
 
 bool integer_range_contains_integer(const integer_range haystack, integer const needle)

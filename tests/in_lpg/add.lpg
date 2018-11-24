@@ -2,9 +2,9 @@ let std = import std
 let integers = import integer
 let integer = integers.integer
 
-match add(0, 0)
+match add(123, 0)
     case add_result.ok(let result):
-        assert(integer-equals(0, result))
+        assert(integer-equals(123, result))
     case add_result.overflow:
         fail()
 

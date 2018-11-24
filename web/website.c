@@ -48,18 +48,21 @@ static unicode_string generate_ecmascript_code(checked_program const program)
                 "\"use strict\";\n"
                 "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
                 "var main = ");
-    generate_ecmascript(program, writer);
+    enum_encoding_strategy_cache strategy_cache =
+        enum_encoding_strategy_cache_create(program.enums, program.enum_count);
+    generate_ecmascript(program, &strategy_cache, writer);
 
     {
         lpg_interface const *const host = get_host_interface(program);
         if (host)
         {
-            generate_host_class(host, writer);
+            generate_host_class(&strategy_cache, host, program.interfaces, writer);
             stream_writer_write_string(writer, "main(window, new Host());\n");
         }
         stream_writer_write_string(writer, "</script>");
     }
 
+    enum_encoding_strategy_cache_free(strategy_cache);
     unicode_string result = {buffer.data, buffer.used};
     return result;
 }

@@ -8,6 +8,7 @@ static void test_integer_range_list_contains(void);
 static void test_integer_range_list_merge(void);
 static void test_integer_range_remove(void);
 static void test_integer_range_list_size(void);
+static void test_integer_range_overlaps(void);
 
 void test_integer_range(void)
 {
@@ -19,6 +20,27 @@ void test_integer_range(void)
     test_integer_range_list_merge();
     test_integer_range_list_size();
     test_integer_range_remove();
+    test_integer_range_overlaps();
+}
+
+static void test_integer_range_overlaps(void)
+{
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 0)),
+                                   integer_range_create(integer_create(0, 0), integer_create(0, 0))));
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 0)),
+                                   integer_range_create(integer_create(0, 0), integer_create(0, 10))));
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                   integer_range_create(integer_create(0, 0), integer_create(0, 0))));
+    REQUIRE(!integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 0)),
+                                    integer_range_create(integer_create(0, 10), integer_create(0, 10))));
+    REQUIRE(!integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                    integer_range_create(integer_create(0, 11), integer_create(0, 20))));
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                   integer_range_create(integer_create(0, 10), integer_create(0, 20))));
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                   integer_range_create(integer_create(0, 5), integer_create(0, 20))));
+    REQUIRE(integer_range_overlaps(integer_range_create(integer_create(0, 0), integer_create(0, 10)),
+                                   integer_range_create(integer_create(0, 0), integer_create(0, 20))));
 }
 
 static void test_integer_range_list_contains(void)

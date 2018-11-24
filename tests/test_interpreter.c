@@ -59,7 +59,7 @@ static external_function_result assert_impl(value const *const captures, void *e
 static duk_ret_t ecmascript_assert(duk_context *const duktape)
 {
     duk_int_t const argument_type = duk_get_type(duktape, 0);
-    duk_inspect_callstack_entry(duktape, -2);
+    duk_inspect_callstack_entry(duktape, -3);
     duk_get_prop_string(duktape, -1, "lineNumber");
     long const line = (long)duk_to_int(duktape, -1);
     duk_pop_2(duktape);
@@ -70,7 +70,11 @@ static duk_ret_t ecmascript_assert(duk_context *const duktape)
 
 static duk_ret_t ecmascript_fail(duk_context *const duktape)
 {
-    (void)duktape;
+    duk_inspect_callstack_entry(duktape, -3);
+    duk_get_prop_string(duktape, -1, "lineNumber");
+    long const line = (long)duk_to_int(duktape, -1);
+    duk_pop_2(duktape);
+    fprintf(stderr, "failure on line %ld\n", line);
     FAIL();
 }
 
@@ -290,12 +294,16 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         {
             REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "var main = "));
         }
-        REQUIRE(success_yes == generate_ecmascript(program, memory_writer_erase(&generated)));
+        enum_encoding_strategy_cache strategy_cache =
+            enum_encoding_strategy_cache_create(program.enums, program.enum_count);
+        REQUIRE(success_yes == generate_ecmascript(program, &strategy_cache, memory_writer_erase(&generated)));
         if (is_ecmascript_specific)
         {
-            REQUIRE(success_yes == generate_host_class(get_host_interface(program), memory_writer_erase(&generated)));
+            REQUIRE(success_yes == generate_host_class(&strategy_cache, get_host_interface(program), program.interfaces,
+                                                       memory_writer_erase(&generated)));
             REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
         }
+        enum_encoding_strategy_cache_free(strategy_cache);
         {
             unicode_view const source_pieces[] = {c_test_dir, unicode_view_from_c_str("generated.js")};
             unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
@@ -312,10 +320,10 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         REQUIRE(duktape);
 
         duk_push_c_function(duktape, ecmascript_assert, 1);
-        duk_put_global_string(duktape, "assert");
+        duk_put_global_string(duktape, "builtin_assert");
 
         duk_push_c_function(duktape, ecmascript_fail, 1);
-        duk_put_global_string(duktape, "fail");
+        duk_put_global_string(duktape, "builtin_fail");
 
         duk_eval_lstring(duktape, generated.data, generated.used);
 
@@ -529,9 +537,9 @@ void test_interpreter(void)
             REQUIRE(created.is_success == success_yes);
             state->thread = created.success;
             size_t const max_concurrency = 6;
-            if (i >= max_concurrency)
+            if ((i + 1) >= max_concurrency)
             {
-                joined_until = (i - max_concurrency);
+                joined_until = (i + 1 - max_concurrency);
                 join_thread(threads[joined_until].thread);
             }
         }
