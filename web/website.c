@@ -50,7 +50,7 @@ static unicode_string generate_ecmascript_code(checked_program const program)
                 "var main = ");
     enum_encoding_strategy_cache strategy_cache =
         enum_encoding_strategy_cache_create(program.enums, program.enum_count);
-    generate_ecmascript(program, &strategy_cache, writer);
+    generate_ecmascript(program, &strategy_cache, &buffer);
 
     {
         lpg_interface const *const host = get_host_interface(program);

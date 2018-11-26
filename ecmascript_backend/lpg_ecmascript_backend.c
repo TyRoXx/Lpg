@@ -291,9 +291,17 @@ static success_indicator write_register(function_generation *const state, regist
 {
     ASSUME(which < state->current_function->number_of_registers);
     ASSUME(state->registers[which].kind == register_type_none);
-    state->registers[which] = register_info_create(register_type_variable, type_of, known_value);
+    size_t const declaration_begin = *state->current_output_position;
     LPG_TRY(generate_var(which, ecmascript_output));
+    size_t const declaration_end = *state->current_output_position;
+    state->registers[which] =
+        register_info_create(register_type_variable, type_of, known_value, declaration_begin, declaration_end, false);
     return success_yes;
+}
+
+static void mark_register_as_used(function_generation *const state, register_id const id)
+{
+    state->registers[id].is_ever_used = true;
 }
 
 success_indicator generate_register_read(function_generation *const state, register_id const id,
@@ -302,6 +310,7 @@ success_indicator generate_register_read(function_generation *const state, regis
     register_info const info = state->registers[id];
     if (!info.known_value.is_set)
     {
+        mark_register_as_used(state, id);
         return generate_register_name(id, ecmascript_output);
     }
     switch (info.known_value.value_.kind)
@@ -315,6 +324,7 @@ success_indicator generate_register_read(function_generation *const state, regis
     case value_kind_type:
     case value_kind_unit:
     case value_kind_pattern:
+    case value_kind_enum_element:
         return generate_value(state->strategy_cache, info.known_value.value_, info.type_of, state->all_functions,
                               state->function_count, state->all_interfaces, state->all_structs, state->all_enums,
                               ecmascript_output);
@@ -322,6 +332,7 @@ success_indicator generate_register_read(function_generation *const state, regis
     case value_kind_function_pointer:
         if (info.known_value.value_.function_pointer.capture_count > 0)
         {
+            mark_register_as_used(state, id);
             return generate_register_name(id, ecmascript_output);
         }
         return generate_value(state->strategy_cache, info.known_value.value_, info.type_of, state->all_functions,
@@ -329,11 +340,11 @@ success_indicator generate_register_read(function_generation *const state, regis
                               ecmascript_output);
 
     case value_kind_structure:
-    case value_kind_enum_element:
     case value_kind_tuple:
     case value_kind_enum_constructor:
     case value_kind_type_erased:
     case value_kind_array:
+        mark_register_as_used(state, id);
         return generate_register_name(id, ecmascript_output);
     }
     LPG_UNREACHABLE();
@@ -407,7 +418,9 @@ static success_indicator generate_literal(function_generation *const state, lite
         state, generated.into, generated.type_of, optional_value_create(generated.value_), ecmascript_output));
     LPG_TRY(generate_value(state->strategy_cache, generated.value_, generated.type_of, all_functions, function_count,
                            all_interfaces, all_structs, all_enums, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";"));
+    state->registers[generated.into].declaration_end = *state->current_output_position;
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
     return success_yes;
 }
 
@@ -735,6 +748,7 @@ static success_indicator generate_equality_comparable_match_cases(function_gener
         if (generated.cases[i].value.is_set)
         {
             LPG_TRY(indent(indentation + 1, ecmascript_output));
+            mark_register_as_used(state, generated.result);
             LPG_TRY(generate_register_name(generated.result, ecmascript_output));
             LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
             LPG_TRY(generate_register_read(state, generated.cases[i].value.value, ecmascript_output));
@@ -808,6 +822,7 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
         if (generated.cases[i].value.is_set)
         {
             LPG_TRY(indent(indentation + 1, ecmascript_output));
+            mark_register_as_used(state, generated.result);
             LPG_TRY(generate_register_name(generated.result, ecmascript_output));
             LPG_TRY(stream_writer_write_string(ecmascript_output, " = "));
             LPG_TRY(generate_register_read(state, generated.cases[i].value.value, ecmascript_output));
@@ -971,8 +986,8 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_global:
         ASSUME(state->registers[generated.global_into].kind == register_type_none);
-        state->registers[generated.global_into] =
-            register_info_create(register_type_global, type_from_struct(0), optional_value_empty);
+        state->registers[generated.global_into] = register_info_create(
+            register_type_global, type_from_struct(0), optional_value_empty, ~(size_t)0, ~(size_t)0, false);
         return success_yes;
 
     case instruction_read_struct:
@@ -1007,7 +1022,7 @@ static success_indicator generate_instruction(function_generation *const state, 
         ASSUME(state->registers[generated.global_into].kind == register_type_none);
         state->registers[generated.global_into] = register_info_create(
             register_type_captures, type_from_tuple_type(state->current_function->signature->captures),
-            optional_value_empty);
+            optional_value_empty, ~(size_t)0, ~(size_t)0, false);
         return success_yes;
 
     case instruction_lambda_with_captures:
@@ -1033,27 +1048,54 @@ static success_indicator
 generate_function_body(enum_encoding_strategy_cache *strategy_cache, checked_function const function,
                        checked_function const *const all_functions, function_id const function_count,
                        lpg_interface const *const all_interfaces, enumeration const *all_enums,
-                       structure const *all_structs, const size_t indentation, stream_writer const ecmascript_output)
+                       structure const *all_structs, const size_t indentation, memory_writer *const ecmascript_output,
+                       size_t *const current_output_position)
 {
     function_generation state = function_generation_create(
         allocate_array(function.number_of_registers, sizeof(*state.registers)), all_functions, function_count,
-        all_interfaces, all_enums, all_structs, &function, strategy_cache);
+        all_interfaces, all_enums, all_structs, &function, strategy_cache, current_output_position);
     for (register_id i = 0; i < function.number_of_registers; ++i)
     {
-        state.registers[i] = register_info_create(register_type_none, type_from_unit(), optional_value_empty);
+        state.registers[i] = register_info_create(
+            register_type_none, type_from_unit(), optional_value_empty, ~(size_t)0, ~(size_t)0, false);
     }
     ASSUME(function.number_of_registers >= (function.signature->self.is_set + function.signature->parameters.length));
     if (function.signature->self.is_set)
     {
-        state.registers[0] =
-            register_info_create(register_type_variable, function.signature->self.value, optional_value_empty);
+        state.registers[0] = register_info_create(
+            register_type_variable, function.signature->self.value, optional_value_empty, ~(size_t)0, ~(size_t)0, true);
     }
     for (register_id i = 0; i < function.signature->parameters.length; ++i)
     {
-        state.registers[function.signature->self.is_set + i] = register_info_create(
-            register_type_variable, function.signature->parameters.elements[i], optional_value_empty);
+        state.registers[function.signature->self.is_set + i] =
+            register_info_create(register_type_variable, function.signature->parameters.elements[i],
+                                 optional_value_empty, ~(size_t)0, ~(size_t)0, true);
     }
-    success_indicator const result = generate_sequence(&state, function.body, indentation + 1, ecmascript_output);
+    success_indicator const result =
+        generate_sequence(&state, function.body, indentation + 1, memory_writer_erase(ecmascript_output));
+    for (register_id i = 0; i < function.number_of_registers; ++i)
+    {
+        register_info *const register_ = state.registers + i;
+        if (register_->is_ever_used)
+        {
+            continue;
+        }
+        switch (register_->kind)
+        {
+        case register_type_captures:
+        case register_type_global:
+        case register_type_none:
+            break;
+
+        case register_type_variable:
+        {
+            // we will later remove all zero characters from the generated source
+            memset((ecmascript_output->data + register_->declaration_begin), 0,
+                   (register_->declaration_end - register_->declaration_begin));
+            break;
+        }
+        }
+    }
     deallocate(state.registers);
     return result;
 }
@@ -1080,40 +1122,41 @@ static success_indicator define_function(enum_encoding_strategy_cache *strategy_
                                          checked_function const function, checked_function const *const all_functions,
                                          function_id const function_count, lpg_interface const *const all_interfaces,
                                          enumeration const *all_enums, structure const *all_structs,
-                                         stream_writer const ecmascript_output)
+                                         memory_writer *const ecmascript_output, size_t *const current_output_position)
 {
-    LPG_TRY(generate_function_name(id, function_count, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function ("));
+    stream_writer const writer = memory_writer_erase(ecmascript_output);
+    LPG_TRY(generate_function_name(id, function_count, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function ("));
     bool comma = false;
     for (register_id i = 0; i < function.signature->captures.length; ++i)
     {
         if (comma)
         {
-            LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+            LPG_TRY(stream_writer_write_string(writer, ", "));
         }
         else
         {
             comma = true;
         }
-        LPG_TRY(generate_capture_name(i, ecmascript_output));
+        LPG_TRY(generate_capture_name(i, writer));
     }
     size_t const total_parameters = (function.signature->parameters.length + function.signature->self.is_set);
     if (total_parameters > 0)
     {
         if (comma)
         {
-            LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+            LPG_TRY(stream_writer_write_string(writer, ", "));
         }
-        LPG_TRY(generate_argument_list(total_parameters, ecmascript_output));
+        LPG_TRY(generate_argument_list(total_parameters, writer));
     }
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "    var current_function = "));
-    LPG_TRY(generate_function_name(id, function_count, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(writer, ")\n"));
+    LPG_TRY(stream_writer_write_string(writer, "{\n"));
+    LPG_TRY(stream_writer_write_string(writer, "    var current_function = "));
+    LPG_TRY(generate_function_name(id, function_count, writer));
+    LPG_TRY(stream_writer_write_string(writer, ";\n"));
     LPG_TRY(generate_function_body(strategy_cache, function, all_functions, function_count, all_interfaces, all_enums,
-                                   all_structs, 0, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "};\n"));
+                                   all_structs, 0, ecmascript_output, current_output_position));
+    LPG_TRY(stream_writer_write_string(writer, "};\n"));
     return success_yes;
 }
 
@@ -1188,11 +1231,50 @@ lpg_interface make_array_interface(method_description array_methods[6])
     return array_interface;
 }
 
-success_indicator generate_ecmascript(checked_program const program, enum_encoding_strategy_cache *strategy_cache,
-                                      stream_writer const ecmascript_output)
+static void remove_unnecessary_code(memory_writer *const ecmascript_output)
 {
+    size_t non_zeroes = 0;
+    char *const data = ecmascript_output->data;
+    size_t const original_size = ecmascript_output->used;
+    for (size_t i = 0; i < original_size;)
+    {
+        char const c = data[i];
+        if (c)
+        {
+            data[non_zeroes] = c;
+            ++non_zeroes;
+            ++i;
+        }
+        else
+        {
+            ++i;
+            while ((i < original_size) && (data[i] == '\0'))
+            {
+                ++i;
+            }
+            if (i < original_size)
+            {
+                // if we remove the whole line's content, we should remove the line feed and the indentation as well
+                if (data[i] == '\n')
+                {
+                    ++i;
+                    while ((i < original_size) && (data[i] == ' '))
+                    {
+                        ++i;
+                    }
+                }
+            }
+        }
+    }
+    ecmascript_output->used = non_zeroes;
+}
+
+success_indicator generate_ecmascript(checked_program const program, enum_encoding_strategy_cache *strategy_cache,
+                                      memory_writer *const ecmascript_output)
+{
+    stream_writer const writer = memory_writer_erase(ecmascript_output);
     LPG_TRY(stream_writer_write_string(
-        ecmascript_output,
+        writer,
         "(function ()\n"
         "{\n"
         "    \"use strict\";\n"
@@ -1225,67 +1307,70 @@ success_indicator generate_ecmascript(checked_program const program, enum_encodi
         "    new_array.prototype."));
     method_description array_methods[6];
     lpg_interface const array_interface = make_array_interface(array_methods);
-    LPG_TRY(generate_method_name(0, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function () {\n"
-                                                          "        return this.content.length;\n"
-                                                          "    };\n"
-                                                          /* load()*/
-                                                          "    new_array.prototype."));
-    LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (index) {\n"
-                                                          "        if (index < this.content.length) {\n"
-                                                          "            return this.make_some(this.content[index]);\n"
-                                                          "        }\n"
-                                                          "        return this.none;\n"
-                                                          "    };\n"
-                                                          /* store()*/
-                                                          "    new_array.prototype."));
-    LPG_TRY(generate_method_name(2, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (index, element) {\n"
-                                                          "        if (index >= this.content.length) {\n"
-                                                          "            return false;\n"
-                                                          "        }\n"
-                                                          "        this.content[index] = element;\n"
-                                                          "        return true;\n"
-                                                          "    };\n"
-                                                          /* append()*/
-                                                          "    new_array.prototype."));
-    LPG_TRY(generate_method_name(3, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (element) {\n"
-                                                          "        this.content.push(element);\n"
-                                                          "        return true;\n"
-                                                          "    };\n"
-                                                          /* clear()*/
-                                                          "    new_array.prototype."));
-    LPG_TRY(generate_method_name(4, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function () {\n"
-                                                          "        this.content.length = 0;\n"
-                                                          "    };\n"
-                                                          /* pop()*/
-                                                          "    new_array.prototype."));
-    LPG_TRY(generate_method_name(5, &array_interface, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (count) {\n"
-                                                          "        if (count > this.content.length) { return false; }\n"
-                                                          "        this.content.length -= count;\n"
-                                                          "        return true;\n"
-                                                          "    };\n"));
+    LPG_TRY(generate_method_name(0, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function () {\n"
+                                               "        return this.content.length;\n"
+                                               "    };\n"
+                                               /* load()*/
+                                               "    new_array.prototype."));
+    LPG_TRY(generate_method_name(1, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function (index) {\n"
+                                               "        if (index < this.content.length) {\n"
+                                               "            return this.make_some(this.content[index]);\n"
+                                               "        }\n"
+                                               "        return this.none;\n"
+                                               "    };\n"
+                                               /* store()*/
+                                               "    new_array.prototype."));
+    LPG_TRY(generate_method_name(2, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function (index, element) {\n"
+                                               "        if (index >= this.content.length) {\n"
+                                               "            return false;\n"
+                                               "        }\n"
+                                               "        this.content[index] = element;\n"
+                                               "        return true;\n"
+                                               "    };\n"
+                                               /* append()*/
+                                               "    new_array.prototype."));
+    LPG_TRY(generate_method_name(3, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function (element) {\n"
+                                               "        this.content.push(element);\n"
+                                               "        return true;\n"
+                                               "    };\n"
+                                               /* clear()*/
+                                               "    new_array.prototype."));
+    LPG_TRY(generate_method_name(4, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function () {\n"
+                                               "        this.content.length = 0;\n"
+                                               "    };\n"
+                                               /* pop()*/
+                                               "    new_array.prototype."));
+    LPG_TRY(generate_method_name(5, &array_interface, writer));
+    LPG_TRY(stream_writer_write_string(writer, " = function (count) {\n"
+                                               "        if (count > this.content.length) { return false; }\n"
+                                               "        this.content.length -= count;\n"
+                                               "        return true;\n"
+                                               "    };\n"));
     for (interface_id i = 0; i < program.interface_count; ++i)
     {
-        LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, ecmascript_output));
+        LPG_TRY(define_interface(i, program.interfaces[i], program.function_count, writer));
     }
     for (function_id i = 1; i < program.function_count; ++i)
     {
-        LPG_TRY(declare_function(i, program.function_count, ecmascript_output));
+        LPG_TRY(declare_function(i, program.function_count, writer));
     }
     for (function_id i = 1; i < program.function_count; ++i)
     {
         LPG_TRY(define_function(strategy_cache, i, program.functions[i], program.functions, program.function_count,
-                                program.interfaces, program.enums, program.structs, ecmascript_output));
+                                program.interfaces, program.enums, program.structs, ecmascript_output,
+                                &ecmascript_output->used));
     }
     ASSUME(program.functions[0].signature->parameters.length == 0);
     LPG_TRY(generate_function_body(strategy_cache, program.functions[0], program.functions, program.function_count,
-                                   program.interfaces, program.enums, program.structs, 0, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, "})();\n"));
+                                   program.interfaces, program.enums, program.structs, 0, ecmascript_output,
+                                   &ecmascript_output->used));
+    LPG_TRY(stream_writer_write_string(writer, "})();\n"));
+    remove_unnecessary_code(ecmascript_output);
     return success_yes;
 }
 
