@@ -177,6 +177,31 @@ static ecmascript_value_set how_is_type_encoded(enum_encoding_strategy_cache *co
     LPG_UNREACHABLE();
 }
 
+static bool try_integer(enum_encoding_element *const element, ecmascript_value_set *const used_values,
+                        enum_element_id const integer_)
+{
+    if (!ecmascript_value_set_merge_without_intersection(
+            used_values,
+            ecmascript_value_set_create_integer_range(ecmascript_integer_range_create(integer_, integer_))))
+    {
+        return false;
+    }
+    *element = enum_encoding_element_from_stateless(
+        enum_encoding_element_stateless_create(ecmascript_value_create_integer(integer_)));
+    return true;
+}
+
+static bool try_undefined(enum_encoding_element *const element, ecmascript_value_set *const used_values)
+{
+    if (!ecmascript_value_set_merge_without_intersection(used_values, ecmascript_value_set_create_undefined()))
+    {
+        return false;
+    }
+    *element = enum_encoding_element_from_stateless(
+        enum_encoding_element_stateless_create(ecmascript_value_create_undefined()));
+    return true;
+}
+
 static void define_stateful_enum_strategy(enum_encoding_strategy *const strategy, enum_encoding_strategy_cache *cache,
                                           enumeration const description)
 {
@@ -208,14 +233,12 @@ static void define_stateful_enum_strategy(enum_encoding_strategy *const strategy
             {
                 continue;
             }
-            if (!ecmascript_value_set_merge_without_intersection(
-                    &used_values, ecmascript_value_set_create_integer_range(ecmascript_integer_range_create(i, i))))
+            enum_encoding_element *const encoding = strategy->elements + i;
+            if (!try_integer(encoding, &used_values, i) && !try_undefined(encoding, &used_values))
             {
                 use_fallback = true;
                 break;
             }
-            strategy->elements[i] = enum_encoding_element_from_stateless(
-                enum_encoding_element_stateless_create(ecmascript_value_create_integer(i)));
         }
     }
     if (use_fallback)

@@ -1206,11 +1206,11 @@ success_indicator generate_ecmascript(checked_program const program, enum_encodi
         "    var integer_equals = function (left, right) { return (left === right); };\n"
         "    var integer_less = function (left, right) { return (left < right); };\n"
         "    var integer_subtract = function (left, right) { var difference = (left - right); return "
-        "(difference < 0) ? 1.0 : [0.0, difference]; };\n"
-        "    var integer_add = function (left, right) { return [0, (left + right)]; "
+        "(difference < 0) ? undefined : difference; };\n"
+        "    var integer_add = function (left, right) { return (left + right); "
         "};\n"
-        "    var integer_add_u32 = function (left, right) { var sum = (left + right); return (sum <= 0xffffffff) ? [0, "
-        "sum] : 1; "
+        "    var integer_add_u32 = function (left, right) { var sum = (left + right); return (sum <= 0xffffffff) ? "
+        "sum : undefined; "
         "};\n"
         "    var concat = function (left, right) { return (left + right); };\n"
         "    var not = function (argument) { return !argument; };\n"
@@ -1381,11 +1381,17 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from)\n\
 {\n\
    return ((typeof from === 'number') && \
-       isFinite(from) && \
-       (Math.floor(from) === from)) ? "));
-    LPG_TRY(enum_construct_stateful_begin(enum_encoding_element_stateful_from_indirect(), 0, ecmascript_output));
+isFinite(from) && \
+(Math.floor(from) === from)) ? "));
+    LPG_TRY(enum_construct_stateful_begin(
+        enum_encoding_element_stateful_from_direct(
+            ecmascript_value_set_create_integer_range(ecmascript_integer_range_create_any())),
+        0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
-    LPG_TRY(enum_construct_stateful_end(enum_encoding_element_stateful_from_indirect(), ecmascript_output));
+    LPG_TRY(enum_construct_stateful_end(
+        enum_encoding_element_stateful_from_direct(
+            ecmascript_value_set_create_integer_range(ecmascript_integer_range_create_any())),
+        ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\

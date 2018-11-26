@@ -16,6 +16,13 @@ ecmascript_value ecmascript_value_create_boolean(bool value)
     return result;
 }
 
+ecmascript_value ecmascript_value_create_undefined(void)
+{
+    ecmascript_value result;
+    result.type = ecmascript_value_undefined;
+    return result;
+}
+
 success_indicator generate_ecmascript_value(ecmascript_value const value, stream_writer const ecmascript_output)
 {
     switch (value.type)

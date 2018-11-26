@@ -21,4 +21,5 @@ typedef struct ecmascript_value
 
 ecmascript_value ecmascript_value_create_integer(uint64_t value);
 ecmascript_value ecmascript_value_create_boolean(bool value);
+ecmascript_value ecmascript_value_create_undefined(void);
 success_indicator generate_ecmascript_value(ecmascript_value const value, stream_writer const ecmascript_output);
