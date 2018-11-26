@@ -177,6 +177,53 @@ static ecmascript_value_set how_is_type_encoded(enum_encoding_strategy_cache *co
     LPG_UNREACHABLE();
 }
 
+static void define_stateful_enum_strategy(enum_encoding_strategy *const strategy, enum_encoding_strategy_cache *cache,
+                                          enumeration const description)
+{
+    ecmascript_value_set used_values = ecmascript_value_set_create_empty();
+    bool use_fallback = false;
+    for (enum_element_id i = 0; i < description.size; ++i)
+    {
+        enumeration_element const element = description.elements[i];
+        if (!element.state.is_set)
+        {
+            continue;
+        }
+        ecmascript_value_set const state_encoding = how_is_type_encoded(cache, element.state.value);
+        ASSUME(!ecmascript_value_set_is_empty(state_encoding));
+        if (!ecmascript_value_set_merge_without_intersection(&used_values, state_encoding))
+        {
+            use_fallback = true;
+            break;
+        }
+        strategy->elements[i] =
+            enum_encoding_element_from_stateful(enum_encoding_element_stateful_from_direct(state_encoding));
+    }
+    if (!use_fallback)
+    {
+        for (enum_element_id i = 0; i < description.size; ++i)
+        {
+            enumeration_element const element = description.elements[i];
+            if (element.state.is_set)
+            {
+                continue;
+            }
+            if (!ecmascript_value_set_merge_without_intersection(
+                    &used_values, ecmascript_value_set_create_integer_range(ecmascript_integer_range_create(i, i))))
+            {
+                use_fallback = true;
+                break;
+            }
+            strategy->elements[i] = enum_encoding_element_from_stateless(
+                enum_encoding_element_stateless_create(ecmascript_value_create_integer(i)));
+        }
+    }
+    if (use_fallback)
+    {
+        set_stateful_enum_fallback_strategy(strategy, description);
+    }
+}
+
 static void define_strategy(enum_encoding_strategy *const strategy, enum_encoding_strategy_cache *cache,
                             enum_id const defining)
 {
@@ -187,65 +234,21 @@ static void define_strategy(enum_encoding_strategy *const strategy, enum_encodin
     strategy->count = description.size;
     if (has_stateful_element(description))
     {
-        ecmascript_value_set used_values = ecmascript_value_set_create_empty();
-        bool use_fallback = false;
-        for (enum_element_id i = 0; i < description.size; ++i)
-        {
-            enumeration_element const element = description.elements[i];
-            if (!element.state.is_set)
-            {
-                continue;
-            }
-            ecmascript_value_set const state_encoding = how_is_type_encoded(cache, element.state.value);
-            ASSUME(!ecmascript_value_set_is_empty(state_encoding));
-            if (!ecmascript_value_set_merge_without_intersection(&used_values, state_encoding))
-            {
-                use_fallback = true;
-                break;
-            }
-            strategy->elements[i] =
-                enum_encoding_element_from_stateful(enum_encoding_element_stateful_from_direct(state_encoding));
-        }
-        if (!use_fallback)
-        {
-            for (enum_element_id i = 0; i < description.size; ++i)
-            {
-                enumeration_element const element = description.elements[i];
-                if (element.state.is_set)
-                {
-                    continue;
-                }
-                if (!ecmascript_value_set_merge_without_intersection(
-                        &used_values, ecmascript_value_set_create_integer_range(ecmascript_integer_range_create(i, i))))
-                {
-                    use_fallback = true;
-                    break;
-                }
-                strategy->elements[i] = enum_encoding_element_from_stateless(
-                    enum_encoding_element_stateless_create(ecmascript_value_create_integer(i)));
-            }
-        }
-        if (use_fallback)
-        {
-            set_stateful_enum_fallback_strategy(strategy, description);
-        }
+        define_stateful_enum_strategy(strategy, cache, description);
+    }
+    else if (description.size == 2)
+    {
+        strategy->elements[0] = enum_encoding_element_from_stateless(
+            enum_encoding_element_stateless_create(ecmascript_value_create_boolean(false)));
+        strategy->elements[1] = enum_encoding_element_from_stateless(
+            enum_encoding_element_stateless_create(ecmascript_value_create_boolean(true)));
     }
     else
     {
-        if (description.size == 2)
+        for (enum_element_id i = 0; i < description.size; ++i)
         {
-            strategy->elements[0] = enum_encoding_element_from_stateless(
-                enum_encoding_element_stateless_create(ecmascript_value_create_boolean(false)));
-            strategy->elements[1] = enum_encoding_element_from_stateless(
-                enum_encoding_element_stateless_create(ecmascript_value_create_boolean(true)));
-        }
-        else
-        {
-            for (enum_element_id i = 0; i < description.size; ++i)
-            {
-                strategy->elements[i] = enum_encoding_element_from_stateless(
-                    enum_encoding_element_stateless_create(ecmascript_value_create_integer(i)));
-            }
+            strategy->elements[i] = enum_encoding_element_from_stateless(
+                enum_encoding_element_stateless_create(ecmascript_value_create_integer(i)));
         }
     }
 }
