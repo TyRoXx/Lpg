@@ -18,7 +18,8 @@ success_indicator generate_stateless_enum_case_check(function_generation *const 
 success_indicator stateful_enum_get_state(enum_encoding_strategy_cache *const strategy_cache, enum_id const enum_,
                                           enum_element_id const which, stream_writer const ecmascript_output);
 success_indicator generate_stateless_enum_element(enum_element_id const which, stream_writer const ecmascript_output);
-success_indicator generate_enum_element(enum_encoding_strategy_cache *const strategy_cache,
+success_indicator generate_enum_element(checked_function const *const current_function,
+                                        enum_encoding_strategy_cache *const strategy_cache,
                                         enum_element_value const element, enumeration const *const enum_,
                                         checked_function const *all_functions, function_id const function_count,
                                         lpg_interface const *const all_interfaces, structure const *const all_structs,

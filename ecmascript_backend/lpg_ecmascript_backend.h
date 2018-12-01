@@ -4,7 +4,8 @@
 #include "lpg_function_generation.h"
 #include "lpg_stream_writer.h"
 
-success_indicator generate_value(enum_encoding_strategy_cache *const strategy_cache, value const generated,
+success_indicator generate_value(checked_function const *const current_function,
+                                 enum_encoding_strategy_cache *const strategy_cache, value const generated,
                                  type const type_of, checked_function const *all_functions,
                                  function_id const function_count, lpg_interface const *const all_interfaces,
                                  structure const *const all_structs, enumeration const *const all_enums,

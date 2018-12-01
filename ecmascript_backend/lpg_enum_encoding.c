@@ -162,7 +162,8 @@ success_indicator generate_stateless_enum_element(enum_element_id const which, s
     return stream_writer_write_integer(ecmascript_output, integer_create(0, which));
 }
 
-success_indicator generate_enum_element(enum_encoding_strategy_cache *const strategy_cache,
+success_indicator generate_enum_element(checked_function const *const current_function,
+                                        enum_encoding_strategy_cache *const strategy_cache,
                                         enum_element_value const element, enumeration const *const enum_,
                                         checked_function const *all_functions, function_id const function_count,
                                         lpg_interface const *const all_interfaces, structure const *const all_structs,
@@ -176,8 +177,8 @@ success_indicator generate_enum_element(enum_encoding_strategy_cache *const stra
     if (element.state)
     {
         LPG_TRY(enum_construct_stateful_begin(strategy_element.stateful, element.which, ecmascript_output));
-        LPG_TRY(generate_value(strategy_cache, *element.state, element.state_type, all_functions, function_count,
-                               all_interfaces, all_structs, all_enums, ecmascript_output));
+        LPG_TRY(generate_value(current_function, strategy_cache, *element.state, element.state_type, all_functions,
+                               function_count, all_interfaces, all_structs, all_enums, ecmascript_output));
         LPG_TRY(enum_construct_stateful_end(strategy_element.stateful, ecmascript_output));
         return success_yes;
     }
