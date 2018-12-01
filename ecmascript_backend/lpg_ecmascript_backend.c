@@ -86,6 +86,7 @@ static success_indicator encode_string_literal(unicode_view const content, strea
 
         default:
             LPG_TRY(stream_writer_write_bytes(ecmascript_output, content.begin + i, 1));
+            break;
         }
     }
     LPG_TRY(stream_writer_write_string(ecmascript_output, "\""));
