@@ -230,8 +230,10 @@ success_indicator generate_value(enum_encoding_strategy_cache *const strategy_ca
                                      function_count, all_interfaces, all_structs, all_enums, ecmascript_output);
 
     case value_kind_unit:
+        return stream_writer_write_string(ecmascript_output, "/*unit*/ undefined");
+
     case value_kind_generic_lambda:
-        return stream_writer_write_string(ecmascript_output, "undefined");
+        return stream_writer_write_string(ecmascript_output, "/*generic lambda*/ undefined");
 
     case value_kind_structure:
     {
@@ -461,7 +463,7 @@ static success_indicator generate_read_struct_value(function_generation *const s
             return stream_writer_write_string(ecmascript_output, "integer_to_string");
 
         case 3:
-            return stream_writer_write_string(ecmascript_output, "undefined");
+            return stream_writer_write_string(ecmascript_output, "/*boolean*/ undefined");
 
         case 4:
             return stream_writer_write_string(ecmascript_output, "assert");
@@ -513,8 +515,6 @@ static success_indicator generate_read_struct(function_generation *const state, 
     switch (kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
     case type_kind_generic_lambda:
         LPG_TO_DO();
@@ -551,7 +551,9 @@ static success_indicator generate_read_struct(function_generation *const state, 
         LPG_UNREACHABLE();
     }
     LPG_TRY(generate_read_struct_value(state, generated, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";"));
+    state->registers[generated.into].declaration_end = *state->current_output_position;
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
     return success_yes;
 }
 
@@ -656,7 +658,9 @@ static success_indicator generate_loop(function_generation *const state, loop_in
     LPG_TRY(generate_value(state->strategy_cache, value_from_unit(), type_from_unit(), state->all_functions,
                            state->function_count, state->all_interfaces, state->all_structs, state->all_enums,
                            ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ";"));
+    state->registers[generated.unit_goes_into].declaration_end = *state->current_output_position;
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
     return success_yes;
 }
 
@@ -921,7 +925,9 @@ static success_indicator generate_new_array(function_generation *const state, ne
     LPG_TRY(generate_enum_element(state->strategy_cache, enum_element_value_create(1, NULL, type_from_unit()),
                                   state->all_enums + load.result.enum_, state->all_functions, state->function_count,
                                   state->all_interfaces, state->all_structs, state->all_enums, ecmascript_output));
-    LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ");"));
+    state->registers[generated.into].declaration_end = *state->current_output_position;
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
     return success_yes;
 }
 
@@ -997,7 +1003,9 @@ static success_indicator generate_instruction(function_generation *const state, 
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(write_register(state, generated.break_into, type_from_unit(), optional_value_create(value_from_unit()),
                                ecmascript_output));
-        LPG_TRY(stream_writer_write_string(ecmascript_output, "undefined;\n"));
+        LPG_TRY(stream_writer_write_string(ecmascript_output, "undefined;"));
+        state->registers[generated.break_into].declaration_end = *state->current_output_position;
+        LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
         return stream_writer_write_string(ecmascript_output, "break;\n");
 
