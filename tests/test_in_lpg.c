@@ -1,4 +1,4 @@
-#include "test_interpreter.h"
+#include "test_in_lpg.h"
 #include "find_builtin_module_directory.h"
 #include "handle_parse_error.h"
 #include "lpg_allocate.h"
@@ -452,7 +452,7 @@ static int compare_threads_by_how_long_they_took(void const *const left, void co
     return 0;
 }
 
-void test_interpreter(void)
+void test_in_lpg(void)
 {
     standard_library_description const std_library = describe_standard_library();
 

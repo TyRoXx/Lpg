@@ -12,10 +12,10 @@
 #include "test_identifier.h"
 #include "test_implicitly_convertible.h"
 #include "test_import_errors.h"
+#include "test_in_lpg.h"
 #include "test_instruction.h"
 #include "test_integer.h"
 #include "test_integer_range.h"
-#include "test_interpreter.h"
 #include "test_parse_expression_success.h"
 #include "test_parse_expression_syntax_error.h"
 #include "test_path.h"
@@ -65,7 +65,7 @@ int main(void)
                                     test_cli,
                                     test_blob,
                                     test_c_backend,
-                                    test_interpreter,
+                                    test_in_lpg,
                                     test_value,
                                     test_remove_dead_code,
                                     test_type,
