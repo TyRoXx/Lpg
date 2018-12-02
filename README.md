@@ -27,7 +27,7 @@ Currently supported operating systems are:
 ### Build and run on Ubuntu
 Install at least the following tools:
 ```bash
-sudo apt-get install git cmake gcc valgrind
+sudo apt-get install git cmake gcc valgrind ninja-build
 ```
 
 How to build and run the tests:
