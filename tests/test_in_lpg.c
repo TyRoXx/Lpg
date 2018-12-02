@@ -311,23 +311,38 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
             unicode_string_free(&source_file_path);
         }
-// fwrite(generated.data, generated.used, 1, stdout);
-// fflush(stdout);
 
 #ifdef LPG_WITH_DUKTAPE
-        duk_context *const duktape =
-            duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, &generated, duktake_handle_fatal);
-        REQUIRE(duktape);
+        {
+            duk_context *const duktape =
+                duk_create_heap(duktape_allocate, duktape_realloc, duktape_free, &generated, duktake_handle_fatal);
+            REQUIRE(duktape);
 
-        duk_push_c_function(duktape, ecmascript_assert, 1);
-        duk_put_global_string(duktape, "builtin_assert");
+            duk_push_c_function(duktape, ecmascript_assert, 1);
+            duk_put_global_string(duktape, "builtin_assert");
 
-        duk_push_c_function(duktape, ecmascript_fail, 1);
-        duk_put_global_string(duktape, "builtin_fail");
+            duk_push_c_function(duktape, ecmascript_fail, 1);
+            duk_put_global_string(duktape, "builtin_fail");
 
-        duk_eval_lstring(duktape, generated.data, generated.used);
+            duk_eval_lstring(duktape, generated.data, generated.used);
 
-        duk_destroy_heap(duktape);
+            duk_destroy_heap(duktape);
+        }
+#endif
+
+#if LPG_WITH_NODEJS
+        {
+            unicode_view const node = unicode_view_from_c_str(LPG_NODEJS);
+            REQUIRE(success_yes == memory_writer_write(&generated, "", 1));
+            unicode_string source_file_name = write_temporary_file(generated.data);
+            unicode_view const argument = unicode_view_from_string(source_file_name);
+            create_process_result const process_created = create_process(
+                node, &argument, 1, c_test_dir, get_standard_input(), get_standard_output(), get_standard_error());
+            REQUIRE(process_created.success == success_yes);
+            REQUIRE(0 == wait_for_process_exit(process_created.created));
+            REQUIRE(0 == remove(unicode_string_c_str(&source_file_name)));
+            unicode_string_free(&source_file_name);
+        }
 #endif
         memory_writer_free(&generated);
     }

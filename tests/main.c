@@ -6,6 +6,7 @@
 #include "test_blob.h"
 #include "test_c_backend.h"
 #include "test_cli.h"
+#include "test_create_process.h"
 #include "test_decode_string_literal.h"
 #include "test_enum_encoding.h"
 #include "test_expression.h"
@@ -65,6 +66,7 @@ int main(void)
                                     test_cli,
                                     test_blob,
                                     test_c_backend,
+                                    test_create_process,
                                     test_in_lpg,
                                     test_value,
                                     test_remove_dead_code,

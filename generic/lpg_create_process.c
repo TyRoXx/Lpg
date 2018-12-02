@@ -50,6 +50,7 @@ static win32_string build_command_line(unicode_view const executable, unicode_vi
     return result;
 }
 #else
+#include <errno.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -92,16 +93,40 @@ create_process_result create_process_result_create(success_indicator is_success,
     return result;
 }
 
+#ifndef _WIN32
+typedef struct pipe_handle
+{
+    file_handle read;
+    file_handle write;
+} pipe_handle;
+
+static pipe_handle make_pipe(void)
+{
+    int fds[2];
+    if (pipe(fds) != 0)
+    {
+        LPG_TO_DO();
+    }
+    pipe_handle const result = {fds[0], fds[1]};
+    return result;
+}
+
+static void ignore_ssize(ssize_t ignored)
+{
+    (void)ignored;
+}
+#endif
+
 create_process_result create_process(unicode_view const executable, unicode_view const *const arguments,
                                      size_t const argument_count, unicode_view const current_path,
-                                     file_handle const input, file_handle const output, file_handle const error)
+                                     file_handle const input, file_handle const output, file_handle const error_output)
 {
 #ifdef _WIN32
     STARTUPINFOW startup;
     memset(&startup, 0, sizeof(startup));
     startup.cb = sizeof(startup);
     startup.dwFlags |= STARTF_USESTDHANDLES;
-    startup.hStdError = error;
+    startup.hStdError = error_output;
     startup.hStdInput = input;
     startup.hStdOutput = output;
     const DWORD flags = CREATE_NO_WINDOW;
@@ -133,24 +158,33 @@ create_process_result create_process(unicode_view const executable, unicode_view
         exec_arguments[1 + i] = argument_zero_terminated.data;
     }
     exec_arguments[argument_count + 1] = NULL;
+    pipe_handle const error_pipe = make_pipe();
     pid_t const forked = fork();
     if (forked == 0)
     {
         if (dup2(output, STDOUT_FILENO) < 0)
         {
+            int const error = errno;
+            ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
             exit(1);
         }
-        if (dup2(error, STDERR_FILENO) < 0)
+        if (dup2(error_output, STDERR_FILENO) < 0)
         {
+            int const error = errno;
+            ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
             exit(1);
         }
         if (dup2(input, STDIN_FILENO) < 0)
         {
+            int const error = errno;
+            ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
             exit(1);
         }
 
         if (chdir(current_path_zero_terminated.data) < 0)
         {
+            int const error = errno;
+            ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
             exit(1);
         }
 
@@ -158,6 +192,10 @@ create_process_result create_process(unicode_view const executable, unicode_view
         long max_fd = sysconf(_SC_OPEN_MAX);
         for (int i = 3; i < max_fd; ++i)
         {
+            if (i == error_pipe.write)
+            {
+                continue;
+            }
             close(i); // ignore errors because we will close many non-file-descriptors
         }
 
@@ -165,20 +203,29 @@ create_process_result create_process(unicode_view const executable, unicode_view
         // kill the child when the parent exits
         if (prctl(PR_SET_PDEATHSIG, SIGHUP) < 0)
         {
+            int const error = errno;
+            ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
             exit(1);
         }
 #endif
 
         execvp(executable_zero_terminated.data, exec_arguments);
-        LPG_UNREACHABLE();
+        int const error = errno;
+        ignore_ssize(write(error_pipe.write, &error, sizeof(error)));
+        exit(1);
     }
+    close(error_pipe.write);
+    int child_error = 0;
+    // result if read is irrelevant here
+    ignore_ssize(read(error_pipe.read, &child_error, sizeof(child_error)));
+    close(error_pipe.read);
     unicode_string_free(&current_path_zero_terminated);
     for (size_t i = 0; i <= argument_count; ++i)
     {
         deallocate(exec_arguments[i]);
     }
     deallocate(exec_arguments);
-    if (forked < 0)
+    if ((forked < 0) || (child_error != 0))
     {
         child_process const created = {-1};
         return create_process_result_create(success_no, created);
