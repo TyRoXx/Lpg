@@ -13,6 +13,7 @@
 #include "lpg_save_expression.h"
 #include "lpg_standard_library.h"
 #include "lpg_write_file.h"
+#include "lpg_write_file_if_necessary.h"
 #include <stdio.h>
 #include <string.h>
 #ifdef __linux__
@@ -328,6 +329,12 @@ static compiler_command parse_compiler_command(char const *const command, bool *
     {
         return compiler_command_web;
     }
+#ifdef LPG_NODEJS
+    else if (!strcmp(command, "node"))
+    {
+        return compiler_command_node;
+    }
+#endif
     else
     {
         *valid = false;
@@ -368,12 +375,26 @@ static compiler_arguments parse_compiler_arguments(int const argument_count, cha
         }
         result.output_file_name = arguments[3];
         break;
+
+#ifdef LPG_NODEJS
+    case compiler_command_node:
+        if (argument_count != 3)
+        {
+            result.valid = false;
+            return result;
+        }
+        break;
+#endif
     }
     return result;
 }
 
-bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, unicode_view const module_directory)
+bool run_cli(int const argc, char **const argv, stream_writer const diagnostics, unicode_view const current_directory,
+             unicode_view const module_directory)
 {
+#ifndef LPG_NODEJS
+    (void)current_directory;
+#endif
     compiler_arguments arguments = parse_compiler_arguments(argc, argv);
 
     if (!arguments.valid)
@@ -443,6 +464,9 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     case compiler_command_compile:
     case compiler_command_run:
+#ifdef LPG_NODEJS
+    case compiler_command_node:
+#endif
     case compiler_command_web:
         break;
     }
@@ -487,6 +511,71 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     case compiler_command_format:
         LPG_UNREACHABLE();
+
+#ifdef LPG_NODEJS
+    case compiler_command_node:
+    {
+        memory_writer generated = {NULL, 0, 0};
+        if (success_yes != stream_writer_write_string(memory_writer_erase(&generated), "var main = "))
+        {
+            LPG_TO_DO();
+        }
+        {
+            enum_encoding_strategy_cache strategy_cache =
+                enum_encoding_strategy_cache_create(checked.enums, checked.enum_count);
+            if (success_yes != generate_ecmascript(checked, &strategy_cache, &generated))
+            {
+                LPG_TO_DO();
+            }
+            if (success_yes != generate_host_class(&strategy_cache, get_host_interface(checked), checked.interfaces,
+                                                   memory_writer_erase(&generated)))
+            {
+                LPG_TO_DO();
+            }
+            enum_encoding_strategy_cache_free(strategy_cache);
+        }
+        if (success_yes != stream_writer_write_string(
+                               memory_writer_erase(&generated), "main(new Function('return this;')(), new Host());\n"))
+        {
+            LPG_TO_DO();
+        }
+        {
+            unicode_view const source_pieces[] = {current_directory, unicode_view_from_c_str("generated.js")};
+            unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+            write_file_if_necessary(
+                unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
+            unicode_string_free(&source_file_path);
+        }
+
+        {
+            unicode_view const node = unicode_view_from_c_str(LPG_NODEJS);
+            if (success_yes != memory_writer_write(&generated, "", 1))
+            {
+                LPG_TO_DO();
+            }
+            unicode_string source_file_name = write_temporary_file(generated.data);
+            unicode_view const argument = unicode_view_from_string(source_file_name);
+            create_process_result const process_created =
+                create_process(node, &argument, 1, current_directory, get_standard_input(), get_standard_output(),
+                               get_standard_error());
+            if (process_created.success != success_yes)
+            {
+                LPG_TO_DO();
+            }
+            if (0 != wait_for_process_exit(process_created.created))
+            {
+                LPG_TO_DO();
+            }
+            if (0 != remove(unicode_string_c_str(&source_file_name)))
+            {
+                LPG_TO_DO();
+            }
+            unicode_string_free(&source_file_name);
+        }
+        memory_writer_free(&generated);
+        break;
+    }
+#endif
     }
     checked_program_free(&checked);
     standard_library_description_free(&standard_library);

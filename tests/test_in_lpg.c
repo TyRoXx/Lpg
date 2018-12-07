@@ -19,6 +19,7 @@
 #include "lpg_stream_writer.h"
 #include "lpg_thread.h"
 #include "lpg_write_file.h"
+#include "lpg_write_file_if_necessary.h"
 #include "test.h"
 #include <inttypes.h>
 #include <string.h>
@@ -116,19 +117,6 @@ static void duktake_handle_fatal(void *udata, const char *msg)
     FAIL();
 }
 #endif
-
-static void write_file_if_necessary(unicode_view const path, unicode_view const content)
-{
-    unicode_string const source_file_zero_terminated = unicode_view_zero_terminate(path);
-    blob_or_error const existing = read_file(source_file_zero_terminated.data);
-    if ((existing.error != NULL) ||
-        !unicode_view_equals(unicode_view_create(existing.success.data, existing.success.length), content))
-    {
-        REQUIRE(success_yes == write_file(path, content));
-    }
-    blob_free(&existing.success);
-    unicode_string_free(&source_file_zero_terminated);
-}
 
 static void run_c_test(unicode_view const test_name, unicode_view const c_source, unicode_view const c_test_dir)
 {
@@ -301,7 +289,8 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         {
             REQUIRE(success_yes == generate_host_class(&strategy_cache, get_host_interface(program), program.interfaces,
                                                        memory_writer_erase(&generated)));
-            REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated), "main(new Host());\n"));
+            REQUIRE(success_yes == stream_writer_write_string(memory_writer_erase(&generated),
+                                                              "main(new Function('return this;')(), new Host());\n"));
         }
         enum_encoding_strategy_cache_free(strategy_cache);
         {

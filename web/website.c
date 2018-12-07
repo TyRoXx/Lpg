@@ -43,11 +43,11 @@ static unicode_string generate_ecmascript_code(checked_program const program)
     memory_writer buffer = {NULL, 0, 0};
     stream_writer writer = memory_writer_erase(&buffer);
 
-    stream_writer_write_string(
-        writer, "<script type=\"text/javascript\">"
-                "\"use strict\";\n"
-                "var assert = function (condition) { if (!condition) { alert(\"Assertion failed\"); } }\n"
-                "var main = ");
+    stream_writer_write_string(writer, "<script type=\"text/javascript\">"
+                                       "\"use strict\";\n"
+                                       "var assert = function (condition) { if "
+                                       "(!condition) { alert(\"Assertion failed\"); } }\n"
+                                       "var main = ");
     enum_encoding_strategy_cache strategy_cache =
         enum_encoding_strategy_cache_create(program.enums, program.enum_count);
     generate_ecmascript(program, &strategy_cache, &buffer);

@@ -1303,7 +1303,8 @@ static void remove_unnecessary_code(memory_writer *const ecmascript_output)
             }
             if (i < original_size)
             {
-                // if we remove the whole line's content, we should remove the line feed and the indentation as well
+                // if we remove the whole line's content, we should remove the line feed
+                // and the indentation as well
                 if (data[i] == '\n')
                 {
                     ++i;
@@ -1322,38 +1323,44 @@ success_indicator generate_ecmascript(checked_program const program, enum_encodi
                                       memory_writer *const ecmascript_output)
 {
     stream_writer const writer = memory_writer_erase(ecmascript_output);
-    LPG_TRY(stream_writer_write_string(
-        writer,
-        "(function ()\n"
-        "{\n"
-        "    \"use strict\";\n"
-        "    var globalObject = new Function('return this;')();\n"
-        "    var fail = function (condition) { if (globalObject.builtin_fail) { builtin_fail(); } else { throw "
-        "\"fail\"; } };\n"
-        "    var assert = function (condition) { if (globalObject.builtin_assert) { builtin_assert(condition); } else "
-        "if "
-        "(!condition) { fail(); } };\n"
-        "    var string_equals = function (left, right) { return (left === right); };\n"
-        "    var integer_equals = function (left, right) { return (left === right); };\n"
-        "    var integer_less = function (left, right) { return (left < right); };\n"
-        "    var integer_subtract = function (left, right) { var difference = (left - right); return "
-        "(difference < 0) ? undefined : difference; };\n"
-        "    var integer_add = function (left, right) { return (left + right); "
-        "};\n"
-        "    var integer_add_u32 = function (left, right) { var sum = (left + right); return (sum <= 0xffffffff) ? "
-        "sum : undefined; "
-        "};\n"
-        "    var concat = function (left, right) { return (left + right); };\n"
-        "    var not = function (argument) { return !argument; };\n"
-        "    var side_effect = function () {};\n"
-        "    var integer_to_string = function (input) { return \"\" + input; };\n"
-        "    var new_array = function (initial_content, make_some, none) {\n"
-        "        this.content = initial_content || [];\n"
-        "        this.make_some = make_some;\n"
-        "        this.none = none;\n"
-        "    };\n"
-        /* size()*/
-        "    new_array.prototype."));
+    LPG_TRY(stream_writer_write_string(writer,
+                                       "(function ()\n"
+                                       "{\n"
+                                       "    \"use strict\";\n"
+                                       "    var globalObject = new Function('return this;')();\n"
+                                       "    var fail = function (condition) { if (globalObject.builtin_fail) { "
+                                       "builtin_fail(); } else { throw "
+                                       "\"fail\"; } };\n"
+                                       "    var assert = function (condition) { if "
+                                       "(globalObject.builtin_assert) { builtin_assert(condition); } else "
+                                       "if "
+                                       "(!condition) { fail(); } };\n"
+                                       "    var string_equals = function (left, right) { return (left === "
+                                       "right); };\n"
+                                       "    var integer_equals = function (left, right) { return (left === "
+                                       "right); };\n"
+                                       "    var integer_less = function (left, right) { return (left < right); "
+                                       "};\n"
+                                       "    var integer_subtract = function (left, right) { var difference = "
+                                       "(left - right); return "
+                                       "(difference < 0) ? undefined : difference; };\n"
+                                       "    var integer_add = function (left, right) { return (left + right); "
+                                       "};\n"
+                                       "    var integer_add_u32 = function (left, right) { var sum = (left + "
+                                       "right); return (sum <= 0xffffffff) ? "
+                                       "sum : undefined; "
+                                       "};\n"
+                                       "    var concat = function (left, right) { return (left + right); };\n"
+                                       "    var not = function (argument) { return !argument; };\n"
+                                       "    var side_effect = function () {};\n"
+                                       "    var integer_to_string = function (input) { return \"\" + input; };\n"
+                                       "    var new_array = function (initial_content, make_some, none) {\n"
+                                       "        this.content = initial_content || [];\n"
+                                       "        this.make_some = make_some;\n"
+                                       "        this.none = none;\n"
+                                       "    };\n"
+                                       /* size()*/
+                                       "    new_array.prototype."));
     method_description array_methods[6];
     lpg_interface const array_interface = make_array_interface(array_methods);
     LPG_TRY(generate_method_name(0, &array_interface, writer));
@@ -1544,11 +1551,11 @@ lpg_interface const *get_host_interface(checked_program const program)
         return NULL;
     }
     checked_function const entry_point = program.functions[main_result.lambda.lambda];
-    if (entry_point.signature->parameters.length != 1)
+    if (entry_point.signature->parameters.length != 2)
     {
         return NULL;
     }
-    type const host_parameter = entry_point.signature->parameters.elements[0];
+    type const host_parameter = entry_point.signature->parameters.elements[1];
     if (host_parameter.kind != type_kind_interface)
     {
         return NULL;

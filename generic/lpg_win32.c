@@ -5,6 +5,12 @@
 #ifdef _WIN32
 #include <Windows.h>
 
+win32_string win32_string_create(wchar_t *c_str, size_t size)
+{
+    win32_string const result = {c_str, size};
+    return result;
+}
+
 void win32_string_free(win32_string const freed)
 {
     if (freed.c_str)
@@ -29,6 +35,17 @@ win32_string to_win32_path(unicode_view const original)
         }
     }
     result.c_str[result.size] = L'\0';
+    return result;
+}
+
+unicode_string from_win32_string(win32_string const original)
+{
+    ASSERT(original.size <= (size_t)INT_MAX);
+    int const output_size = WideCharToMultiByte(CP_UTF8, 0, original.c_str, (int)original.size, NULL, 0, NULL, NULL);
+    ASSERT((original.size == 0) || (output_size != 0));
+    unicode_string const result = {allocate(output_size), output_size};
+    ASSERT(WideCharToMultiByte(CP_UTF8, 0, original.c_str, (int)original.size, result.data, (int)result.length, NULL,
+                               NULL) == output_size);
     return result;
 }
 #endif

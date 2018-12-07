@@ -81,7 +81,7 @@ let test-equals = (host: es.host)
     assert(not(host.equals(host.export-integer(0), host.export-string("0"))))
 
 //
-(host: es.host)
+(global: host-value, host: es.host)
     test-string(host)
     test-read-property(host)
     test-export-integer(host)

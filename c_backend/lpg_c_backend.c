@@ -523,7 +523,8 @@ static success_indicator escape_identifier(unicode_view const original, stream_w
         {
         case '-':
         case '_':
-            /*Any identifier containing two consecutive underscores is reserved in C. This encoding ensures that we
+            /*Any identifier containing two consecutive underscores is reserved in C.
+             * This encoding ensures that we
              * don't generate reserved identifiers.*/
             LPG_TRY(stream_writer_write_string(c_output, "Z_"));
             break;

@@ -8,7 +8,9 @@ typedef struct win32_string
     size_t size;
 } win32_string;
 
+win32_string win32_string_create(wchar_t *c_str, size_t size);
 void win32_string_free(win32_string const freed);
 win32_string to_win32_path(unicode_view const original);
+unicode_string from_win32_string(win32_string const original);
 
 #endif
