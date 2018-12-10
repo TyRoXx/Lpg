@@ -126,6 +126,12 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(stream_writer_write_string(to, ")"));
         return success_yes;
 
+    case expression_type_eval:
+        LPG_TRY(stream_writer_write_string(to, "eval("));
+        LPG_TRY(save_expression(to, value->eval.element, whitespace));
+        LPG_TRY(stream_writer_write_string(to, ")"));
+        return success_yes;
+
     case expression_type_import:
         LPG_TRY(stream_writer_write_string(to, "import "));
         return stream_writer_write_unicode_view(to, unicode_view_from_string(value->import.name.value));

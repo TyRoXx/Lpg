@@ -1,5 +1,6 @@
 #include "lpg_check.h"
 #include "lpg_allocate.h"
+#include "lpg_expression_parser.h"
 #include "lpg_for.h"
 #include "lpg_function_checking_state.h"
 #include "lpg_instruction.h"
@@ -1696,6 +1697,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
     case expression_type_new_array:
     case expression_type_import:
     case expression_type_generic_instantiation:
+    case expression_type_eval:
         LPG_TO_DO();
 
     case expression_type_call:
@@ -2381,6 +2383,7 @@ static void find_generic_closures_in_expression(generic_closures *const closures
 
     case expression_type_import:
     case expression_type_binary:
+    case expression_type_eval:
         LPG_TO_DO();
 
     case expression_type_lambda:
@@ -4071,6 +4074,27 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
         true, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false, false);
 }
 
+static evaluate_expression_result evaluate_eval(function_checking_state *const state,
+                                                instruction_sequence *const function, eval_expression const element)
+{
+    evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element, NULL);
+    if (!element_evaluated.has_value)
+    {
+        return element_evaluated;
+    }
+    if (!element_evaluated.compile_time_value.is_set)
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_value,
+                                                         expression_source_begin(*element.element)));
+        return evaluate_expression_result_empty;
+    }
+    if (element_evaluated.type_.kind != type_kind_string)
+    {
+        LPG_TO_DO();
+    }
+    LPG_TO_DO();
+}
+
 static evaluate_expression_result evaluate_declare(function_checking_state *const state,
                                                    instruction_sequence *const function, declare const element)
 {
@@ -4164,6 +4188,9 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
 {
     switch (element.type)
     {
+    case expression_type_eval:
+        return evaluate_eval(state, function, element.eval);
+
     case expression_type_new_array:
         return evaluate_new_array(state, function, element.new_array);
 

@@ -1,0 +1,4 @@
+let std = import std
+
+let i = eval("123")
+assert(integer-equals(123, i))

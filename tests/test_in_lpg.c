@@ -488,6 +488,7 @@ void test_in_lpg(void)
                                                  "enum-stateful.lpg",
                                                  "enum-stateless.lpg",
                                                  "equality.lpg",
+                                                 "eval.lpg",
                                                  "fail.lpg",
                                                  "function-pointer.lpg",
                                                  "generic-impl-generic-self.lpg",

@@ -533,6 +533,28 @@ new_array_expression new_array_expression_clone(new_array_expression const origi
     return new_array_expression_create(expression_allocate(expression_clone(*original.element)));
 }
 
+eval_expression eval_expression_create(expression *element)
+{
+    eval_expression const result = {element};
+    return result;
+}
+
+void eval_expression_free(eval_expression const freed)
+{
+    expression_deallocate(freed.element);
+}
+
+bool eval_expression_equals(eval_expression const left, eval_expression const right)
+{
+    return expression_equals(left.element, right.element);
+}
+
+eval_expression eval_expression_clone(eval_expression const original)
+{
+    ASSUME(original.element);
+    return eval_expression_create(expression_allocate(expression_clone(*original.element)));
+}
+
 sequence sequence_create(expression *elements, size_t length)
 {
     sequence const result = {elements, length};
@@ -672,6 +694,9 @@ source_location expression_source_begin(expression const value)
     {
     case expression_type_new_array:
         return expression_source_begin(*value.new_array.element);
+
+    case expression_type_eval:
+        return expression_source_begin(*value.eval.element);
 
     case expression_type_import:
         LPG_TO_DO();
@@ -1207,6 +1232,14 @@ expression expression_from_new_array(new_array_expression const content)
     return result;
 }
 
+expression expression_from_eval(eval_expression const content)
+{
+    expression result;
+    result.type = expression_type_eval;
+    result.eval = content;
+    return result;
+}
+
 expression *expression_allocate(expression value)
 {
     expression *result = allocate(sizeof(*result));
@@ -1220,6 +1253,10 @@ void expression_free(expression const *this)
     {
     case expression_type_new_array:
         new_array_expression_free(this->new_array);
+        break;
+
+    case expression_type_eval:
+        eval_expression_free(this->eval);
         break;
 
     case expression_type_import:
@@ -1328,6 +1365,9 @@ expression expression_clone(expression const original)
     {
     case expression_type_new_array:
         return expression_from_new_array(new_array_expression_clone(original.new_array));
+
+    case expression_type_eval:
+        return expression_from_eval(eval_expression_clone(original.eval));
 
     case expression_type_identifier:
         return expression_from_identifier(identifier_expression_clone(original.identifier));
@@ -1472,16 +1512,13 @@ bool expression_equals(expression const *left, expression const *right)
     switch (left->type)
     {
     case expression_type_new_array:
-        LPG_TO_DO();
-
+    case expression_type_eval:
     case expression_type_import:
+    case expression_type_type_of:
         LPG_TO_DO();
 
     case expression_type_generic_instantiation:
         return generic_instantiation_expression_equals(left->generic_instantiation, right->generic_instantiation);
-
-    case expression_type_type_of:
-        LPG_TO_DO();
 
     case expression_type_placeholder:
         return placeholder_expression_equals(left->placeholder, right->placeholder);

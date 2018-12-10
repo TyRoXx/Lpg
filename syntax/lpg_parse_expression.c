@@ -782,6 +782,46 @@ static expression_parser_result parse_new_array(expression_parser *const parser,
     return result;
 }
 
+static expression_parser_result parse_eval(expression_parser *const parser, size_t indentation)
+{
+    parse_optional_space(parser);
+
+    {
+        rich_token const left_parenthesis = peek(parser);
+        if (left_parenthesis.token != token_left_parenthesis)
+        {
+            parser->on_error(parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where),
+                             parser->on_error_user);
+            return expression_parser_result_failure;
+        }
+        pop(parser);
+    }
+
+    expression_parser_result const argument = parse_expression(parser, indentation, false);
+    if (!argument.is_success)
+    {
+        return expression_parser_result_failure;
+    }
+
+    parse_optional_space(parser);
+
+    {
+        rich_token const right_parenthesis = peek(parser);
+        if (right_parenthesis.token != token_right_parenthesis)
+        {
+            expression_free(&argument.success);
+            parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where),
+                             parser->on_error_user);
+            return expression_parser_result_failure;
+        }
+        pop(parser);
+    }
+
+    expression_parser_result const result = {
+        1, expression_from_eval(eval_expression_create(expression_allocate(argument.success)))};
+    return result;
+}
+
 typedef struct parse_callable_result
 {
     expression_parser_result content;
@@ -820,6 +860,12 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
             pop(parser);
             expression_parser_result const result = {1, expression_from_break(head.where)};
             return parse_callable_result_create(result, true);
+        }
+
+        case token_eval:
+        {
+            pop(parser);
+            return parse_callable_result_create(parse_eval(parser, indentation), true);
         }
 
         case token_loop:

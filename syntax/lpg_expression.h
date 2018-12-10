@@ -69,7 +69,8 @@ typedef enum expression_type {
     expression_type_generic_instantiation,
     expression_type_type_of,
     expression_type_import,
-    expression_type_new_array
+    expression_type_new_array,
+    expression_type_eval
 } expression_type;
 
 typedef struct tuple
@@ -297,6 +298,16 @@ void new_array_expression_free(new_array_expression const freed);
 bool new_array_expression_equals(new_array_expression const left, new_array_expression const right);
 new_array_expression new_array_expression_clone(new_array_expression const original);
 
+typedef struct eval_expression
+{
+    expression *element;
+} eval_expression;
+
+eval_expression eval_expression_create(expression *element);
+void eval_expression_free(eval_expression const freed);
+bool eval_expression_equals(eval_expression const left, eval_expression const right);
+eval_expression eval_expression_clone(eval_expression const original);
+
 sequence sequence_create(expression *elements, size_t length);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
@@ -444,6 +455,7 @@ struct expression
         type_of_expression type_of;
         import_expression import;
         new_array_expression new_array;
+        eval_expression eval;
     };
 };
 
@@ -478,6 +490,7 @@ expression expression_from_generic_instantiation(generic_instantiation_expressio
 expression expression_from_type_of(type_of_expression const content);
 expression expression_from_import(import_expression const content);
 expression expression_from_new_array(new_array_expression const content);
+expression expression_from_eval(eval_expression const content);
 expression *expression_allocate(expression content);
 void expression_free(LPG_NON_NULL(expression const *this));
 expression expression_clone(expression const original);

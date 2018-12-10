@@ -50,7 +50,8 @@ typedef enum token_type {
     token_enum,
     token_type_of,
     token_import,
-    token_new_array
+    token_new_array,
+    token_eval
 } token_type;
 
 typedef enum tokenize_status { tokenize_success = 1, tokenize_invalid } tokenize_status;
