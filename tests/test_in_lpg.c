@@ -328,7 +328,8 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             create_process_result const process_created = create_process(
                 node, &argument, 1, c_test_dir, get_standard_input(), get_standard_output(), get_standard_error());
             REQUIRE(process_created.success == success_yes);
-            REQUIRE(0 == wait_for_process_exit(process_created.created));
+            int const exit_code = wait_for_process_exit(process_created.created);
+            REQUIRE(0 == exit_code);
             REQUIRE(0 == remove(unicode_string_c_str(&source_file_name)));
             unicode_string_free(&source_file_name);
         }

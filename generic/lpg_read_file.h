@@ -15,3 +15,5 @@ blob_or_error make_blob_error(LPG_NON_NULL(char const *const error)) LPG_USE_RES
 blob_or_error read_file(LPG_NON_NULL(char const *const name)) LPG_USE_RESULT;
 
 blob_or_error read_file_unicode_view_name(unicode_view const name) LPG_USE_RESULT;
+
+size_t remove_carriage_returns(char *const from, size_t const length);

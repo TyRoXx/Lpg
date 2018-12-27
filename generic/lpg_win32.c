@@ -48,4 +48,12 @@ unicode_string from_win32_string(win32_string const original)
                                NULL) == output_size);
     return result;
 }
+
+wchar_t *win32_string_two_null_c_str(win32_string *const string)
+{
+    string->c_str = reallocate(string->c_str, (string->size + 2) * sizeof(*string->c_str));
+    string->c_str[string->size] = 0;
+    string->c_str[string->size + 1] = 0;
+    return string->c_str;
+}
 #endif

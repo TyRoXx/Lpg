@@ -27,16 +27,16 @@ static void test_generate_with_customized_template(void)
     unicode_string template_content = generate_template(writer, unicode_string_c_str(&filepath));
     REQUIRE(buffer.used == 0);
 
-    REQUIRE(unicode_view_equals(unicode_view_from_string(template_content),
-                                unicode_view_from_c_str("<!DOCTYPE html>\n"
-                                                        "<html>\n"
-                                                        "<head>\n"
-                                                        "\t<title>Hello I am a custom template</title>\n"
-                                                        "</head>\n"
-                                                        "<body>\n"
-                                                        "\tVery custom\n"
-                                                        "</body>\n"
-                                                        "</html>")));
+    unicode_view const expected = unicode_view_from_c_str("<!DOCTYPE html>\n"
+                                                          "<html>\n"
+                                                          "<head>\n"
+                                                          "\t<title>Hello I am a custom template</title>\n"
+                                                          "</head>\n"
+                                                          "<body>\n"
+                                                          "\tVery custom\n"
+                                                          "</body>\n"
+                                                          "</html>");
+    REQUIRE(unicode_view_equals(unicode_view_from_string(template_content), expected));
 
     unicode_string_free(&filepath);
     unicode_string_free(&template_content);

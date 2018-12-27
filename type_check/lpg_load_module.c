@@ -118,21 +118,6 @@ static load_module_result type_check_module(function_checking_state *const state
     LPG_UNREACHABLE();
 }
 
-static size_t remove_carriage_returns(char *const from, size_t const length)
-{
-    size_t new_length = 0;
-    for (size_t i = 0; i < length; ++i)
-    {
-        if (from[i] == '\r')
-        {
-            continue;
-        }
-        from[new_length] = from[i];
-        ++new_length;
-    }
-    return new_length;
-}
-
 load_module_result load_module(function_checking_state *state, unicode_view name)
 {
     unicode_string const file_name = unicode_view_concat(name, unicode_view_from_c_str(".lpg"));

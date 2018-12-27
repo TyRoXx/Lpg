@@ -72,3 +72,18 @@ blob_or_error read_file_unicode_view_name(unicode_view const name)
     unicode_string_free(&zero_name);
     return result;
 }
+
+size_t remove_carriage_returns(char *const from, size_t const length)
+{
+    size_t new_length = 0;
+    for (size_t i = 0; i < length; ++i)
+    {
+        if (from[i] == '\r')
+        {
+            continue;
+        }
+        from[new_length] = from[i];
+        ++new_length;
+    }
+    return new_length;
+}

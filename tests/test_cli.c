@@ -4,6 +4,7 @@
 #include "lpg_array_size.h"
 #include "lpg_cli.h"
 #include "lpg_read_file.h"
+#include "lpg_win32.h"
 #include "lpg_write_file.h"
 #include "test.h"
 #include <stdio.h>
@@ -142,6 +143,14 @@ static unicode_string create_temporary_directory(void)
         LPG_TO_DO();
     }
     result.length = strlen(result.data);
+    switch (create_directory(unicode_view_from_string(result)))
+    {
+    case success_no:
+        LPG_TO_DO();
+
+    case success_yes:
+        break;
+    }
     return result;
 #else
     unicode_string result = unicode_string_from_c_str("/tmp/lpg-test-XXXXXX");
@@ -155,6 +164,23 @@ static unicode_string create_temporary_directory(void)
 
 static void remove_directory(unicode_view const removed)
 {
+#ifdef _WIN32
+    win32_string removed_win32 = to_win32_path(removed);
+    SHFILEOPSTRUCTW operation = {NULL,
+                                 FO_DELETE,
+                                 win32_string_two_null_c_str(&removed_win32),
+                                 L"",
+                                 FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT,
+                                 false,
+                                 0,
+                                 L""};
+    int const result = SHFileOperationW(&operation);
+    if (result)
+    {
+        LPG_TO_DO();
+    }
+    win32_string_free(removed_win32);
+#else
     unicode_view const arguments[] = {unicode_view_from_c_str("-rf"), removed};
     create_process_result process =
         create_process(unicode_view_from_c_str("/bin/rm"), arguments, LPG_ARRAY_SIZE(arguments),
@@ -167,6 +193,7 @@ static void remove_directory(unicode_view const removed)
     {
         LPG_TO_DO();
     }
+#endif
 }
 
 void test_cli(void)
