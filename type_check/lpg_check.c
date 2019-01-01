@@ -1846,10 +1846,12 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
                                                                         evaluate_expression_result const input)
 {
     ASSUME(input.type_.kind == type_kind_string);
+    instruction_checkpoint const before = make_checkpoint(state, function);
     type result_type = type_from_unit();
     bool all_cases_return = true;
     match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
     bool has_default = false;
+    optional_value compile_time_result = optional_value_empty;
     for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
     {
         match_case const case_tree = (*element).match.cases[i];
@@ -1921,6 +1923,13 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             return evaluate_expression_result_empty;
         }
 
+        if (!compile_time_result.is_set && input.compile_time_value.is_set && input.is_pure &&
+            value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
+            action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
+        {
+            compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
+        }
+
         if (key)
         {
             cases[i] = match_instruction_case_create_value(
@@ -1939,6 +1948,17 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             state, semantic_error_create(semantic_error_missing_default, expression_source_begin(*element)));
         deallocate_cases(cases, (*element).match.number_of_cases);
         return evaluate_expression_result_empty;
+    }
+
+    if (compile_time_result.is_set)
+    {
+        deallocate_cases(cases, (*element).match.number_of_cases);
+        restore(before);
+        register_id const result_register = allocate_register(&state->used_registers);
+        add_instruction(function, instruction_create_literal(literal_instruction_create(
+                                      result_register, compile_time_result.value_, result_type)));
+        return evaluate_expression_result_create(
+            true, result_register, result_type, compile_time_result, true, all_cases_return);
     }
 
     register_id const result_register = allocate_register(&state->used_registers);
