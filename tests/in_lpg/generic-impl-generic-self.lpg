@@ -18,13 +18,13 @@ impl[T] mutable[T] for mutable-content[T]
     store(value: T): std.unit
         assert(self.content.store(0, value))
 
-let make-mutable = [T](value: T): mutable[T]
+let make_mutable = [T](value: T): mutable[T]
     let content = new-array(T)
     assert(content.append(value))
     assert(integer-equals(1, content.size()))
     mutable-content[T]{content}
 
-let construct = make-mutable[int(0, 3)]
+let construct = make_mutable[int(0, 3)]
 let m : mutable[int(0, 3)] = construct(0)
 assert(integer-equals(0, m.load()))
 m.store(1)
@@ -34,18 +34,18 @@ assert(integer-equals(3, m.load()))
 m.store(2)
 assert(integer-equals(2, m.load()))
 
-let n : mutable[int(0, 3)] = make-mutable[int(0, 3)](3)
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
 assert(integer-equals(3, n.load()))
 n.store(0)
 assert(integer-equals(0, n.load()))
 
-let o = make-mutable[std.string]
+let o = make_mutable[std.string]
 let p = o("test")
 assert(string-equals("test", p.load()))
 p.store("123")
 assert(string-equals("123", p.load()))
 
-let p2 = make-mutable[std.string]("test")
+let p2 = make_mutable[std.string]("test")
 assert(string-equals("test", p2.load()))
 p2.store("123")
 assert(string-equals("123", p2.load()))

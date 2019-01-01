@@ -18,7 +18,7 @@ loop
     break
     assert(boolean.false)
 
-let i = std.make-mutable[integers.u32](0)
+let i = std.make_mutable[integers.u32](0)
 loop
     match integer-equals(i.load(), 10000)
         case boolean.true:
