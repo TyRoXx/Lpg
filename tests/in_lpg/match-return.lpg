@@ -5,5 +5,5 @@ let always-return-from-match = (arg: boolean)
         case boolean.true:
             return 2
     assert(boolean.false)
-assert(integer-equals(1, always-return-from-match(boolean.false)))
-assert(integer-equals(2, always-return-from-match(boolean.true)))
+assert(integer_equals(1, always-return-from-match(boolean.false)))
+assert(integer_equals(2, always-return-from-match(boolean.true)))

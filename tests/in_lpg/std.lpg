@@ -17,16 +17,16 @@ p.store("123")
 assert(string-equals("123", p.load()))
 
 let a = std.make_mutable[int(0, 3)](0)
-assert(integer-equals(0, a.load()))
+assert(integer_equals(0, a.load()))
 a.store(3)
-assert(integer-equals(3, a.load()))
+assert(integer_equals(3, a.load()))
 let b = std.make_mutable[int(0, 3)](3)
 a.store(0)
-assert(integer-equals(0, a.load()))
-assert(integer-equals(3, b.load()))
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
 b.store(2)
-assert(integer-equals(0, a.load()))
-assert(integer-equals(2, b.load()))
+assert(integer_equals(0, a.load()))
+assert(integer_equals(2, b.load()))
 
 assert(match std.option[std.unit].some(std.unit_value)
     case std.option[std.unit].some(let s):
@@ -40,9 +40,9 @@ u.store(u.load())
 
 let d = std.make_mutable[std.array[std.unit]](new-array(std.unit))
 d.load().append(std.unit_value)
-assert(integer-equals(1, d.load().size()))
+assert(integer_equals(1, d.load().size()))
 d.store(new-array(std.unit))
-assert(integer-equals(0, d.load().size()))
+assert(integer_equals(0, d.load().size()))
 
 let s = struct
     member: std.boolean

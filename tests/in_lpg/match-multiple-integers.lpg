@@ -4,7 +4,7 @@ let result : int(1, 2) = match a
         1
     case boolean.true:
         2
-assert(integer-equals(2, result))
+assert(integer_equals(2, result))
 
 let runtime-var = ()
     side-effect()
@@ -16,4 +16,4 @@ let something: int(1, 40) = match runtime-var()
     case boolean.false:
         1
 
-assert(integer-equals(40, something))
+assert(integer_equals(40, something))

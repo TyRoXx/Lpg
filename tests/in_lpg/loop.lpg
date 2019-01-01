@@ -20,7 +20,7 @@ loop
 
 let i = std.make_mutable[integers.u32](0)
 loop
-    match integer-equals(i.load(), 10000)
+    match integer_equals(i.load(), 10000)
         case boolean.true:
             break
         case boolean.false:

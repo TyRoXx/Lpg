@@ -4,7 +4,7 @@ let integers = import integer
 let integer = integers.integer
 
 let handler_a = (element: integer): std.unit
-    assert(integer-equals(0, element))
+    assert(integer_equals(0, element))
 algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
 
 let true-predicate = (element: boolean): boolean

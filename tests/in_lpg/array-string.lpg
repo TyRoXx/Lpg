@@ -4,7 +4,7 @@ let string = std.string
 
 let array-type = std.array[string]
 let a : array-type = new-array(string)
-assert(integer-equals(0, a.size()))
+assert(integer_equals(0, a.size()))
 assert(not(a.store(0, "")))
 assert(not(a.store(1, "")))
 assert(not(a.store(2, "")))
@@ -15,7 +15,7 @@ assert(match a.load(0)
 )
 
 assert(a.append("abc"))
-assert(integer-equals(1, a.size()))
+assert(integer_equals(1, a.size()))
 
 assert(match a.load(0)
     case std.option[string].some(let element): string-equals(element, "abc")
@@ -28,7 +28,7 @@ assert(match a.load(1)
 )
 
 assert(a.append("456"))
-assert(integer-equals(2, a.size()))
+assert(integer_equals(2, a.size()))
 
 assert(match a.load(0)
     case std.option[string].some(let element): string-equals(element, "abc")
@@ -105,7 +105,7 @@ let append-4096 = ()
     append-1024()
     append-1024()
 append-4096()
-assert(integer-equals(4096, big.size()))
+assert(integer_equals(4096, big.size()))
 
 big.clear()
-assert(integer-equals(0, big.size()))
+assert(integer_equals(0, big.size()))

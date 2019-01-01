@@ -1,8 +1,8 @@
-assert(integer-equals(20, 20))
-assert(not(integer-equals(100, 20)))
+assert(integer_equals(20, 20))
+assert(not(integer_equals(100, 20)))
 
 let runtime-zero = ()
     side-effect()
     0
-assert(integer-equals(runtime-zero(), 0))
-assert(not(integer-equals(1, runtime-zero())))
+assert(integer_equals(runtime-zero(), 0))
+assert(not(integer_equals(1, runtime-zero())))

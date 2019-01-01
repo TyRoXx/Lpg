@@ -12,7 +12,7 @@ impl printable2 for std.string
 
 let explicit-return-type = (): int(1, 1)
     1
-assert(integer-equals(1, explicit-return-type()))
+assert(integer_equals(1, explicit-return-type()))
 
 let convert-on-return = (): printable2
     side-effect()

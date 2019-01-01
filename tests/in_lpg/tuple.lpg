@@ -3,21 +3,21 @@ let s = {}
 let t = {std.unit}
 let u = {1, 2, 3, 4, 5, 6}
 let v5 = {123, "abc"}
-assert(integer-equals(123, v5.0))
+assert(integer_equals(123, v5.0))
 assert(string-equals("abc", v5.1))
 
-assert(integer-equals(123, {v5}.0.0))
+assert(integer_equals(123, {v5}.0.0))
 
 let w = {{{{123}}}}
-assert(integer-equals(123, w.0.0.0.0))
+assert(integer_equals(123, w.0.0.0.0))
 
 let y = w.0.0.0.0
-assert(integer-equals(123, y))
+assert(integer_equals(123, y))
 
 let runtime-tuple = ()
     side-effect()
     {123, "test"}
-assert(integer-equals(123, runtime-tuple().0))
+assert(integer_equals(123, runtime-tuple().0))
 assert(string-equals("test", runtime-tuple().1))
 
 let require-compile-time = enum[CompileTimeValue]

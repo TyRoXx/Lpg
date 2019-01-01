@@ -42,8 +42,8 @@ let return-integer-implicit = (arg: boolean)
             return 1
         case boolean.true:
             return 2
-assert(integer-equals(1, return-integer-implicit(boolean.false)))
-assert(integer-equals(2, return-integer-implicit(boolean.true)))
+assert(integer_equals(1, return-integer-implicit(boolean.false)))
+assert(integer_equals(2, return-integer-implicit(boolean.true)))
 
 let return-integer-explicit = (arg: boolean): int(1, 2)
     match arg
@@ -51,8 +51,8 @@ let return-integer-explicit = (arg: boolean): int(1, 2)
             return 1
         case boolean.true:
             return 2
-assert(integer-equals(1, return-integer-explicit(boolean.false)))
-assert(integer-equals(2, return-integer-explicit(boolean.true)))
+assert(integer_equals(1, return-integer-explicit(boolean.false)))
+assert(integer_equals(2, return-integer-explicit(boolean.true)))
 
 let return-runtime-string = (arg: std.string)
     side-effect()

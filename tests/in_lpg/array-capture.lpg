@@ -7,22 +7,22 @@ let make_array = ()
     result
 
 let a = make_array()
-assert(integer-equals(2, a.size()))
+assert(integer_equals(2, a.size()))
 assert(a.append(std.boolean.true))
-assert(integer-equals(3, a.size()))
+assert(integer_equals(3, a.size()))
 
-assert(integer-equals(3, a.size()))
-assert(integer-equals(3, a.size()))
+assert(integer_equals(3, a.size()))
+assert(integer_equals(3, a.size()))
 a.clear()
-assert(integer-equals(0, a.size()))
-assert(integer-equals(0, a.size()))
+assert(integer_equals(0, a.size()))
+assert(integer_equals(0, a.size()))
 
 let capture_array = ()
     a
 
 let c = capture_array()
-assert(integer-equals(0, a.size()))
-assert(integer-equals(0, c.size()))
+assert(integer_equals(0, a.size()))
+assert(integer_equals(0, c.size()))
 assert(c.append(std.boolean.true))
-assert(integer-equals(1, a.size()))
-assert(integer-equals(1, c.size()))
+assert(integer_equals(1, a.size()))
+assert(integer_equals(1, c.size()))

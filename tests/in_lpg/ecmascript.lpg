@@ -52,21 +52,21 @@ let test-import-integer = (host: es.host)
     let zero = host.export-integer(0)
     assert(match host.import-integer(zero)
         case option[es.integer].some(let value):
-            integer-equals(value, 0)
+            integer_equals(value, 0)
         case option[es.integer].none:
             boolean.false
 )
     let one = host.export-integer(1)
     assert(match host.import-integer(one)
         case option[es.integer].some(let value):
-            integer-equals(value, 1)
+            integer_equals(value, 1)
         case option[es.integer].none:
             boolean.false
 )
     let max = host.export-integer(9007199254740991)
     assert(match host.import-integer(max)
         case option[es.integer].some(let value):
-            integer-equals(value, 9007199254740991)
+            integer_equals(value, 9007199254740991)
         case option[es.integer].none:
             boolean.false
 )

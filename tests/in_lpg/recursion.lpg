@@ -24,7 +24,7 @@ assert(string-equals("3", k(std.boolean.true)))
 assert(string-equals("3", k(std.boolean.false)))
 
 let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
-    match integer-equals(from.size(), to.size())
+    match integer_equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value
         case std.boolean.false:
@@ -41,7 +41,7 @@ let original = new-array(std.boolean)
 assert(original.append(std.boolean.true))
 let into = new-array(std.boolean)
 copy-array-boolean(original, into)
-assert(integer-equals(1, into.size()))
+assert(integer_equals(1, into.size()))
 match into.load(0)
     case std.option[std.boolean].some(let value):
         assert(value)
@@ -49,7 +49,7 @@ match into.load(0)
         fail()
 
 let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
-    match integer-equals(from.size(), to.size())
+    match integer_equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value
         case std.boolean.false:

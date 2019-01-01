@@ -4,7 +4,7 @@ let g = (arg: option)
     match arg
         case option.some(let state):
             side-effect()
-            integer-equals(123, state)
+            integer_equals(123, state)
         case option.none:
             side-effect()
             boolean.false
@@ -19,7 +19,7 @@ let f = (arg: option)
             boolean.false
         case option.some(let state):
             side-effect()
-            integer-equals(123, state)
+            integer_equals(123, state)
 assert(f(option.some(123)))
 assert(not(f(option.none)))
 assert(not(f(option.some(124))))

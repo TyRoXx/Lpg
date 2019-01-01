@@ -49,7 +49,7 @@ impl[T] mutable[T] for mutable_content[T]
 let make_mutable = [T](value: T): mutable[T]
     let content = new-array(T)
     assert(content.append(value))
-    assert(integer-equals(1, content.size()))
+    assert(integer_equals(1, content.size()))
     mutable_content[T]{content}
 
 let runtime-value = [T](value: T): T

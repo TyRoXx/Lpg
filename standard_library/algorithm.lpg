@@ -10,7 +10,7 @@ let enumerate = [H](first: integer, last: integer, on_element: H): std.unit
     let i = std.make_mutable[integer](first)
     loop
         on_element(i.load())
-        match integer-equals(i.load(), last)
+        match integer_equals(i.load(), last)
             case boolean.true:
                 break
             case boolean.false:

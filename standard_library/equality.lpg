@@ -5,7 +5,7 @@ let integers = import integer
 let integer = integers.integer
 impl equality_comparison[integer] for integer
     equals(other: integer): boolean
-        integer-equals(other, self)
+        integer_equals(other, self)
 
 impl equality_comparison[boolean] for boolean
     equals(other: boolean): boolean

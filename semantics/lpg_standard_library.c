@@ -346,7 +346,7 @@ standard_library_description describe_standard_library(void)
             function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
 
     globals[6] = structure_member_create(
-        type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer-equals"),
+        type_from_function_pointer(&stable->integer_equals), unicode_string_from_c_str("integer_equals"),
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_equals_impl, NULL, NULL, stable->integer_equals))));
 

@@ -250,7 +250,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 assert_impl, NULL, NULL, *global_object.members[4].what.function_pointer_)),
             /*5 integer-less*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_less_impl, NULL, NULL, *global_object.members[5].what.function_pointer_)),
-            /*6 integer-equals*/ value_from_function_pointer(function_pointer_value_from_external(
+            /*6 integer_equals*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_equals_impl, NULL, NULL, *global_object.members[6].what.function_pointer_)),
             /*7 not*/ value_from_function_pointer(function_pointer_value_from_external(
                 not_impl, NULL, NULL, *global_object.members[7].what.function_pointer_)),
