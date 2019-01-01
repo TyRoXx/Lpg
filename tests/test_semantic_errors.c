@@ -886,10 +886,10 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
                                                "    f(): std.unit\n"
-                                               "let runtime-value = side_effect()\n"
+                                               "let runtime_value = side_effect()\n"
                                                "impl i for std.unit\n"
                                                "    f(): std.unit\n"
-                                               "        let captured = runtime-value\n"
+                                               "        let captured = runtime_value\n"
                                                "        std.unit_value\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);

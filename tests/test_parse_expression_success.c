@@ -90,11 +90,11 @@ void test_parse_expression_success(void)
             identifier_expression_create(unicode_string_from_c_str("method"), source_location_create(1, 4)),
             function_header_tree_create(
                 NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
-                             unicode_string_from_c_str("return-type"), source_location_create(1, 14))))));
+                             unicode_string_from_c_str("return_type"), source_location_create(1, 14))))));
         test_successful_parse(expression_from_interface(interface_expression_create(
                                   generic_parameter_list_create(NULL, 0), source_location_create(0, 0), methods, 1)),
                               unicode_string_from_c_str("interface\n"
-                                                        "    method(): return-type"),
+                                                        "    method(): return_type"),
                               false);
     }
 
