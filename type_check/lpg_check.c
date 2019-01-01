@@ -1858,7 +1858,12 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
     {
         match_case const case_tree = (*element).match.cases[i];
         expression *const key = case_tree.key_or_default;
-        evaluate_expression_result key_evaluated;
+        evaluate_expression_result key_evaluated
+#ifdef _MSC_VER
+            // avoid false positive warning about uninitialized variable
+            = evaluate_expression_result_empty
+#endif
+            ;
         if (key)
         {
             key_evaluated = evaluate_expression(state, function, *key, NULL);
