@@ -341,7 +341,7 @@ standard_library_description describe_standard_library(void)
         type_from_function_pointer(&stable->assert_), unicode_string_from_c_str("assert"), optional_value_empty);
 
     globals[5] = structure_member_create(
-        type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer-less"),
+        type_from_function_pointer(&stable->integer_less), unicode_string_from_c_str("integer_less"),
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_less_impl, NULL, NULL, stable->integer_less))));
 

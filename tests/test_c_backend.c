@@ -116,7 +116,7 @@ void test_c_backend(void)
     check_generated_c_code("let f = ()\n"
                            "    side-effect()\n"
                            "    123\n"
-                           "assert(integer-less(122, f()))\n",
+                           "assert(integer_less(122, f()))\n",
                            std_library);
 
     check_generated_c_code("let f = ()\n"

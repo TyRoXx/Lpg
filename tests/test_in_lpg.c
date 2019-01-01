@@ -248,7 +248,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*3 boolean*/ global_object.members[3].compile_time_value.value_,
             /*4 assert*/ value_from_function_pointer(function_pointer_value_from_external(
                 assert_impl, NULL, NULL, *global_object.members[4].what.function_pointer_)),
-            /*5 integer-less*/ value_from_function_pointer(function_pointer_value_from_external(
+            /*5 integer_less*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_less_impl, NULL, NULL, *global_object.members[5].what.function_pointer_)),
             /*6 integer_equals*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_equals_impl, NULL, NULL, *global_object.members[6].what.function_pointer_)),
