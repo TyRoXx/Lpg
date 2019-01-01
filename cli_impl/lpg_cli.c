@@ -13,7 +13,9 @@
 #include "lpg_save_expression.h"
 #include "lpg_standard_library.h"
 #include "lpg_write_file.h"
+#if LPG_WITH_NODEJS
 #include "lpg_write_file_if_necessary.h"
+#endif
 #include <stdio.h>
 #include <string.h>
 #ifdef __linux__

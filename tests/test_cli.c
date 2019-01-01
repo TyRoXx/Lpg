@@ -126,6 +126,7 @@ static void test_web_cli(unicode_view const current_directory)
     unicode_string_free(&output);
 }
 
+#if LPG_WITH_NODEJS
 static unicode_string find_node_test_main(void)
 {
     unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)), unicode_view_from_c_str("node"),
@@ -195,6 +196,7 @@ static void remove_directory(unicode_view const removed)
     }
 #endif
 }
+#endif
 
 void test_cli(void)
 {
@@ -229,6 +231,7 @@ void test_cli(void)
         expect_output(
             LPG_ARRAY_SIZE(arguments), arguments, true, "Could not open source file\n", current_directory_not_used);
     }
+#if LPG_WITH_NODEJS
     {
         unicode_string project = find_node_test_main();
         char *arguments[] = {"lpg", "node", unicode_string_c_str(&project)};
@@ -238,6 +241,7 @@ void test_cli(void)
         unicode_string_free(&project);
         unicode_string_free(&working_directory);
     }
+#endif
     test_web_cli(current_directory_not_used);
 
     expect_output_with_source_flags("assert(boolean.true)\n", "compile", false, "", current_directory_not_used);
