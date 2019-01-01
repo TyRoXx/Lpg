@@ -3,7 +3,7 @@ let es = import ecmascript
 let option = std.option
 
 let test-string = (host: es.host)
-    let exported : host-value = host.export-string("hello")
+    let exported : host_value = host.export-string("hello")
     assert(match host.import-string(exported)
         case option[std.string].some(let content):
             string_equals("hello", content)
@@ -18,11 +18,11 @@ let test-string = (host: es.host)
 )
 
 let test-read-property = (host: es.host)
-    let object : host-value = host.export-string("hello")
+    let object : host_value = host.export-string("hello")
     assert(match host.read-property(object, "length")
-        case option[host-value].some(let length):
+        case option[host_value].some(let length):
             host.equals(host.export-integer(5), length)
-        case option[host-value].none:
+        case option[host_value].none:
             boolean.false
 )
 
@@ -42,8 +42,8 @@ let test-undefined = (host: es.host)
     assert(host.equals(u0, u1))
 
 let test-call-method = (host: es.host)
-    let object : host-value = host.export-string("hello")
-    let arguments = new-array(host-value)
+    let object : host_value = host.export-string("hello")
+    let arguments = new-array(host_value)
     assert(arguments.append(host.export-integer(0)))
     let charCode = host.call-method(object, "charCodeAt", arguments)
     assert(host.equals(charCode, host.export-integer(104)))
@@ -81,7 +81,7 @@ let test-equals = (host: es.host)
     assert(not(host.equals(host.export-integer(0), host.export-string("0"))))
 
 //
-(global: host-value, host: es.host)
+(global: host_value, host: es.host)
     test-string(host)
     test-read-property(host)
     test-export-integer(host)

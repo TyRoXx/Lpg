@@ -52,7 +52,7 @@ f.store(s{std.boolean.false})
 assert(not(f.load().member))
 
 std.make_mutable[std.type](std.boolean)
-(a: host-value) std.make_mutable[host-value](a)
+(a: host_value) std.make_mutable[host_value](a)
 std.make_mutable[type_of(interface[T])](interface[T])
 std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
 std.make_mutable[type_of(struct[T])](struct[T])

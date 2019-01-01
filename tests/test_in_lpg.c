@@ -260,7 +260,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 string_equals_impl, NULL, NULL, *global_object.members[9].what.function_pointer_)),
             /*10 int*/ value_from_function_pointer(function_pointer_value_from_external(
                 int_impl, NULL, NULL, *global_object.members[10].what.function_pointer_)),
-            /*11 host-value*/ value_from_type(type_from_host_value()),
+            /*11 host_value*/ value_from_type(type_from_host_value()),
             /*12 fail*/ value_from_function_pointer(function_pointer_value_from_external(
                 fail_impl, NULL, NULL, *global_object.members[12].what.function_pointer_)),
             /*13 subtract_result*/ global_object.members[13].compile_time_value.value_,

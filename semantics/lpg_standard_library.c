@@ -370,7 +370,7 @@ standard_library_description describe_standard_library(void)
         optional_value_create(
             value_from_function_pointer(function_pointer_value_from_external(int_impl, NULL, NULL, stable->int_))));
 
-    globals[11] = structure_member_create(type_from_type(), unicode_string_from_c_str("host-value"),
+    globals[11] = structure_member_create(type_from_type(), unicode_string_from_c_str("host_value"),
                                           optional_value_create(value_from_type(type_from_host_value())));
 
     globals[12] = structure_member_create(

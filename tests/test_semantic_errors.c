@@ -1393,7 +1393,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_extraneous_argument, source_location_create(1, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = [T]()\n"
-                                               "f[host-value, host-value]\n",
+                                               "f[host_value, host_value]\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);

@@ -2,13 +2,13 @@ let std = import std
 let es = import ecmascript
 let option = std.option
 
-(window: host-value, host: es.host)
-    let arguments = new-array(host-value)
+(window: host_value, host: es.host)
+    let arguments = new-array(host_value)
     assert(arguments.append(host.export-string("Hello, world!")))
     match host.read-property(window, "document")
-        case option[host-value].some(let console):
+        case option[host_value].some(let console):
             host.call-method(console, "write", arguments)
             std.unit_value
-        case option[host-value].none:
+        case option[host_value].none:
             assert(boolean.false)
             std.unit_value
