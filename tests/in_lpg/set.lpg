@@ -1,7 +1,7 @@
 let sets = import set
 let std = import std
 
-let s = sets.make-linear-set[std.boolean]()
+let s = sets.make_linear_set[std.boolean]()
 assert(not(s.contains(std.boolean.false)))
 assert(not(s.contains(std.boolean.true)))
 

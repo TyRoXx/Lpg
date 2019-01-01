@@ -27,8 +27,6 @@ let make_unit_value = ()
 let unit_value = make_unit_value()
 let unit = type_of(unit_value)
 
-let any-integer = int(0, 340282366920938463463374607431768211455)
-
 let mutable = interface[T]
     load(): T
     store(value: T): unit

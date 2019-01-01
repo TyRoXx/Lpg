@@ -10,10 +10,10 @@ let set = interface[T]
     add(key: T): std.boolean
     clear(): std.unit
 
-let linear-set = struct[T]
+let linear_set = struct[T]
     elements: std.array[T]
 
-let array-back = [T](elements: std.array[T]): std.option[T]
+let array_back = [T](elements: std.array[T]): std.option[T]
     match subtract(elements.size(), 1)
         case subtract_result.ok(let index):
             match elements.load(index)
@@ -24,17 +24,17 @@ let array-back = [T](elements: std.array[T]): std.option[T]
         case subtract_result.underflow:
             std.option[T].none
 
-impl[T] set[T] for linear-set[T]
+impl[T] set[T] for linear_set[T]
     contains(key: T): std.boolean
         let test_element = (element: T): std.boolean
             equality.equals[T](element, key)
         algorithm.any_of[T, type_of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
         match algorithm.find[T](self.elements, key)
-            case std.option[integer].some(let found-at):
-                match array-back[T](self.elements)
+            case std.option[integer].some(let found_at):
+                match array_back[T](self.elements)
                     case std.option[T].some(let back):
-                        assert(self.elements.store(found-at, back))
+                        assert(self.elements.store(found_at, back))
                     case std.option[T].none:
                         fail()
                 assert(self.elements.pop(1))
@@ -52,14 +52,14 @@ impl[T] set[T] for linear-set[T]
     clear(): std.unit
         self.elements.clear()
 
-let make-linear-set = [T](): set[T]
+let make_linear_set = [T](): set[T]
     //TODO: remove side_effect(). It's here because there is a bug in the C backend.
     side_effect()
 
-    let content = linear-set[T]{new-array(T)}
+    let content = linear_set[T]{new-array(T)}
     content
 
 let export = struct
     set: type_of(set)
-    make-linear-set: type_of(make-linear-set)
-export{set, make-linear-set}
+    make_linear_set: type_of(make_linear_set)
+export{set, make_linear_set}

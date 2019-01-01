@@ -1,18 +1,18 @@
 let options = import option
 let option = options.option
 
-let any-integer = int(0, 340282366920938463463374607431768211455)
+let any_integer = int(0, 340282366920938463463374607431768211455)
 
 let units = import unit
 let unit = units.unit
 
 let array = interface[T]
-    size(): any-integer
-    load(index: any-integer): option[T]
-    store(index: any-integer, element: T): boolean
+    size(): any_integer
+    load(index: any_integer): option[T]
+    store(index: any_integer, element: T): boolean
     append(element: T): boolean
     clear(): unit
-    pop(count: any-integer): boolean
+    pop(count: any_integer): boolean
 
 let export = struct
     array: type_of(array)
