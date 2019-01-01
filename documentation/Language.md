@@ -175,7 +175,7 @@ let u_instance = u{t{std.boolean.true}, "abc"}
 
 ### Match
 The match expression works similar to the switch statement in other languages.
-Currently it only supports stateless enumerations, for example `boolean`.
+Match supports enumerations, integers and strings.
 
 ```
 let bool = import std.boolean
@@ -190,7 +190,34 @@ let result : int(1, 2) = match a
 assert(integer_equals(2, result))
 ```
 
-`match` does not support `break` or fall-through yet.
+(Note that LPG does not currently support default cases for enums.)
+
+Matching stateful enums works like this:
+```
+let option = import std.option
+let result : int(1, 2) = match option[boolean].some(boolean.true)
+    case option[boolean].some(let e):
+        assert(e)
+        1
+    case option[boolean].none:
+        2
+assert(integer_equals(1, result))
+```
+
+Example for match with a string:
+
+```
+let result : int(1, 3) = match "a"
+    case "a":
+        1
+    case "b":
+        2
+    default: // a match has to be exhaustive therefore strings always need a default case
+        3
+assert(integer_equals(1, result))
+```
+
+`match` does not support `break` or fall-through.
 The last expression in a `case` is returned as the result of the `match` expression.
 The result can be `unit` if you don't want to return anything.
 
