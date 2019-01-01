@@ -401,6 +401,13 @@ bool match_instruction_case_equals(match_instruction_case const left, match_inst
            optional_register_id_equals(left.value, right.value);
 }
 
+void match_instruction_case_swap(match_instruction_case *const first, match_instruction_case *const second)
+{
+    match_instruction_case const temp = *first;
+    *first = *second;
+    *second = temp;
+}
+
 instruction instruction_create_call(call_instruction argument)
 {
     instruction result;

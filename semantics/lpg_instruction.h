@@ -253,6 +253,7 @@ match_instruction_case match_instruction_case_create_default(instruction_sequenc
 
 void match_instruction_case_free(match_instruction_case freed);
 bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right);
+void match_instruction_case_swap(match_instruction_case *const first, match_instruction_case *const second);
 
 instruction instruction_create_call(call_instruction argument);
 instruction instruction_create_return(return_instruction argument);

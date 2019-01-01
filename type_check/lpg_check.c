@@ -1819,10 +1819,10 @@ static bool check_for_duplicate_string_case(function_checking_state *const state
         switch (cases[i].kind)
         {
         case match_instruction_case_kind_default:
-            LPG_TO_DO();
+            break;
 
         case match_instruction_case_kind_stateful_enum:
-            LPG_TO_DO();
+            LPG_UNREACHABLE();
 
         case match_instruction_case_kind_value:
         {
@@ -1850,7 +1850,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
     type result_type = type_from_unit();
     bool all_cases_return = true;
     match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
-    bool has_default = false;
+    optional_size default_index = optional_size_empty;
     optional_value compile_time_result = optional_value_empty;
     optional_value default_compile_time_result = optional_value_empty;
     bool can_have_compile_time_result = true;
@@ -1889,14 +1889,14 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         }
         else
         {
-            if (has_default)
+            if (default_index.state == optional_set)
             {
                 emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_default_case,
                                                                  expression_source_begin(*case_tree.action)));
                 deallocate_cases(cases, i);
                 return evaluate_expression_result_empty;
             }
-            has_default = true;
+            default_index = make_optional_size(i);
         }
 
         instruction_sequence action = instruction_sequence_create(NULL, 0);
@@ -1950,7 +1950,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         }
     }
 
-    if (!has_default)
+    if (default_index.state == optional_empty)
     {
         emit_semantic_error(
             state, semantic_error_create(semantic_error_missing_default, expression_source_begin(*element)));
@@ -1973,6 +1973,10 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         return evaluate_expression_result_create(
             true, result_register, result_type, compile_time_result, true, all_cases_return);
     }
+
+    /* The default case is always the last case in order to save work in the backends. */
+    ASSUME(default_index.state == optional_set);
+    match_instruction_case_swap((cases + default_index.value_if_set), (cases + (*element).match.number_of_cases - 1));
 
     register_id const result_register = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_match(match_instruction_create(
