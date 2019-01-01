@@ -7,7 +7,7 @@ let result : int(1, 2) = match a
 assert(integer_equals(2, result))
 
 let runtime-var = ()
-    side-effect()
+    side_effect()
     boolean.true
 
 let something: int(1, 40) = match runtime-var()

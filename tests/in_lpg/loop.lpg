@@ -2,7 +2,7 @@ let std = import std
 let integers = import integer
 
 loop
-    side-effect()
+    side_effect()
     break
 
 loop

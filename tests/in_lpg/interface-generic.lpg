@@ -40,7 +40,7 @@ impl access-parameter[access-parameter-struct{std.boolean}] for dummy
         std.unit_value
 
 /*let runtime-value = ()
-    side-effect()
+    side_effect()
     12
 let arg = runtime-value()
 let test-generic-capture-resolution = [T](arg: T)

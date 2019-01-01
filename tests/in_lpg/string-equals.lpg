@@ -1,6 +1,6 @@
 let std = import std
 let runtime-string = (a: std.string)
-    side-effect()
+    side_effect()
     a
 
 assert(string-equals("", ""))

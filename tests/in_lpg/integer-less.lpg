@@ -7,7 +7,7 @@ assert(not(integer_less(0, 0)))
 assert(not(integer_less(10000, 10000)))
 
 let runtime-zero = ()
-    side-effect()
+    side_effect()
     0
 assert(integer_less(runtime-zero(), 1))
 assert(not(integer_less(runtime-zero(), runtime-zero())))

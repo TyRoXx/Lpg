@@ -240,7 +240,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
     REQUIRE(success_yes == create_directory(c_test_dir));
     {
         value const globals_values[] = {
-            /*0 side-effect*/ value_from_function_pointer(function_pointer_value_from_external(
+            /*0 side_effect*/ value_from_function_pointer(function_pointer_value_from_external(
                 side_effect_impl, NULL, NULL, *global_object.members[0].what.function_pointer_)),
             /*1 integer-to-string*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_to_string_impl, NULL, NULL, *global_object.members[1].what.function_pointer_)),

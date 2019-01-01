@@ -55,7 +55,7 @@ assert(integer_equals(1, return-integer-explicit(boolean.false)))
 assert(integer_equals(2, return-integer-explicit(boolean.true)))
 
 let return-runtime-string = (arg: std.string)
-    side-effect()
+    side_effect()
     return concat("abc", arg)
 assert(string-equals("abcdef", return-runtime-string("def")))
 
@@ -65,6 +65,6 @@ impl test-interface for std.string
     m(): boolean
         return boolean.true
 let return-interface = (arg: std.string): test-interface
-    side-effect()
+    side_effect()
     return arg
 assert(return-interface("abc").m())

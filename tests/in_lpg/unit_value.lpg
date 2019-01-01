@@ -1,5 +1,5 @@
 let std = import std
 let runtime-unit = ()
-    side-effect()
+    side_effect()
     std.unit_value
 let u : std.unit = runtime-unit()

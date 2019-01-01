@@ -23,7 +23,7 @@ assert(not(b))
 
 //runtime evaluation
 let make-runtime-key = ()
-    side-effect()
+    side_effect()
     integer_to_match
 
 assert(match make-runtime-key()

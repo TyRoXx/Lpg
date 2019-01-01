@@ -2,7 +2,7 @@ assert(integer_equals(20, 20))
 assert(not(integer_equals(100, 20)))
 
 let runtime-zero = ()
-    side-effect()
+    side_effect()
     0
 assert(integer_equals(runtime-zero(), 0))
 assert(not(integer_equals(1, runtime-zero())))

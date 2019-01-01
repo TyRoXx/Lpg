@@ -72,7 +72,7 @@ void test_c_backend(void)
     check_generated_c_code("assert(boolean.true)\n", std_library);
 
     check_generated_c_code("let read = ()\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    \"\"\n"
                            "assert(string-equals(read(), \"\"))\n",
                            std_library);
@@ -83,7 +83,7 @@ void test_c_backend(void)
 
     check_generated_c_code("let std = import std\n"
                            "let read = ()\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    \"\"\n"
                            "let s = (a: std.string) a\n"
                            "let t = s(concat(read(), \"\"))\n"
@@ -91,7 +91,7 @@ void test_c_backend(void)
                            std_library);
 
     check_generated_c_code("let read = ()\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    \"b\"\n"
                            "assert(match string-equals(read(), \"a\")\n"
                            "    case boolean.false: boolean.true\n"
@@ -104,23 +104,23 @@ void test_c_backend(void)
                            "    print(): std.string\n"
                            "impl printable for std.string\n"
                            "    print()\n"
-                           "        side-effect()\n"
+                           "        side_effect()\n"
                            "        self\n"
                            "let f = (printed: printable)\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    printed.print()\n"
                            "assert(string-equals(\"a\", f(\"a\")))\n"
                            "assert(string-equals(\"a\", f(f(\"a\"))))\n",
                            std_library);
 
     check_generated_c_code("let f = ()\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    123\n"
                            "assert(integer_less(122, f()))\n",
                            std_library);
 
     check_generated_c_code("let f = ()\n"
-                           "    side-effect()\n"
+                           "    side_effect()\n"
                            "    123\n"
                            "assert(string-equals(\"123\", integer-to-string(f())))\n",
                            std_library);

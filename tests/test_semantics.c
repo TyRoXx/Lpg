@@ -359,7 +359,7 @@ static void test_loops(const standard_library_description *std_library)
             instruction_create_loop(loop_instruction_create(3, instruction_sequence_create(LPG_COPY_ARRAY(loop_body))));
         expected_body_elements[1] = instruction_create_return(return_instruction_create(3, 4));
         check_single_wellformed_function("loop\n"
-                                         "    side-effect()",
+                                         "    side_effect()",
                                          (*std_library).globals, expected_body_elements, 2);
     }
     {
@@ -373,8 +373,8 @@ static void test_loops(const standard_library_description *std_library)
             instruction_create_loop(loop_instruction_create(6, instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))),
             instruction_create_return(return_instruction_create(6, 7))};
         check_single_wellformed_function("loop\n"
-                                         "    side-effect()\n"
-                                         "    side-effect()",
+                                         "    side_effect()\n"
+                                         "    side_effect()",
                                          (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {

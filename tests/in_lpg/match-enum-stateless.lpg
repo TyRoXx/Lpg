@@ -14,7 +14,7 @@ assert(match boolean.true
 //runtime evaluation
 assert(match boolean.true
     case boolean.true:
-        side-effect()
+        side_effect()
         boolean.true
     case boolean.false: boolean.false
 )
@@ -22,6 +22,6 @@ assert(match boolean.true
 assert(match boolean.true
     case boolean.false: boolean.false
     case boolean.true:
-        side-effect()
+        side_effect()
         boolean.true
 )

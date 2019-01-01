@@ -322,7 +322,7 @@ standard_library_description describe_standard_library(void)
 
     structure_member *globals = allocate_array(standard_library_element_count, sizeof(*globals));
     globals[0] = structure_member_create(type_from_function_pointer(&stable->side_effect),
-                                         unicode_string_from_c_str("side-effect"), optional_value_empty);
+                                         unicode_string_from_c_str("side_effect"), optional_value_empty);
 
     globals[1] = structure_member_create(
         type_from_function_pointer(&stable->integer_to_string), unicode_string_from_c_str("integer-to-string"),

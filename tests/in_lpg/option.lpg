@@ -2,7 +2,7 @@ let std = import std
 let option = std.option
 
 let runtime = (arg: std.boolean)
-    side-effect()
+    side_effect()
     option[std.boolean].some(arg)
 runtime(std.boolean.true)
 

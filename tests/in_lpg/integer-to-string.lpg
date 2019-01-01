@@ -6,7 +6,7 @@ assert(string-equals("2147483647", integer-to-string(2147483647)))
 
 //run-time evaluation:
 let test-integer-to-string = (input: int(0, 2147483647))
-    side-effect()
+    side_effect()
     integer-to-string(input)
 assert(string-equals("0", test-integer-to-string(0)))
 assert(string-equals("2", test-integer-to-string(2)))

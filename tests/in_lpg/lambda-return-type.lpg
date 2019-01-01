@@ -15,6 +15,6 @@ let explicit-return-type = (): int(1, 1)
 assert(integer_equals(1, explicit-return-type()))
 
 let convert-on-return = (): printable2
-    side-effect()
+    side_effect()
     "aa"
 assert(string-equals("aa", convert-on-return().print()))

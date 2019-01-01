@@ -10,7 +10,7 @@ assert(match a
 )
 
 let runtime-string = (arg: std.string)
-    side-effect()
+    side_effect()
     concat("", arg)
 
 let b = single-parameter[std.string].a(runtime-string("abc"))

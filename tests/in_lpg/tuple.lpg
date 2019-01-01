@@ -15,7 +15,7 @@ let y = w.0.0.0.0
 assert(integer_equals(123, y))
 
 let runtime-tuple = ()
-    side-effect()
+    side_effect()
     {123, "test"}
 assert(integer_equals(123, runtime-tuple().0))
 assert(string-equals("test", runtime-tuple().1))

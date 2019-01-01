@@ -12,7 +12,7 @@ assert(f5())
 
 /*use a runtime variable in a runtime context*/
 let f = ()
-    side-effect()
+    side_effect()
     23
 require-compile-time[f]
 let c = f()
@@ -23,7 +23,7 @@ g()
 /*use a constant in a runtime context*/
 let b = 23
 let h = ()
-    side-effect()
+    side_effect()
     assert(integer_equals(b, 23))
 require-compile-time[h]
 h()
@@ -32,16 +32,16 @@ h()
 let f6 = (a: boolean, b: boolean)
     let indirection = () a
     (c: std.unit, d: std.unit)
-        side-effect()
+        side_effect()
         std.and(indirection(), b)
 assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 
 /*capture an argument at runtime*/
 let f7 = (a: boolean, b: boolean)
-    side-effect()
+    side_effect()
     let indirection = () a
     (c: std.unit, d: std.unit)
-        side-effect()
+        side_effect()
         std.and(indirection(), b)
 assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 
@@ -54,7 +54,7 @@ assert(t())
 
 /*function with multiple parameters captures something*/
 let z = (a: boolean, d: boolean)
-    side-effect()
+    side_effect()
     std.and(a, std.and(d, integer_equals(c, 23)))
 assert(z(boolean.true, boolean.true))
 

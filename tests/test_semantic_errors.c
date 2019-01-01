@@ -229,7 +229,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(4, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = ()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    boolean\n"
                                                "let e = enum\n"
                                                "    a(f())\n",
@@ -280,7 +280,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(5, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = ()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    boolean\n"
                                                "let g = f()\n"
                                                "let e = enum[A]\n"
@@ -295,7 +295,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(3, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = ()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    1\n"
                                                "let x = f()[boolean]\n",
                                                std_library.globals, &expected, module_directory_view);
@@ -329,7 +329,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(1, 10))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let e = enum[X]\n"
-                                               "let x = e[side-effect()]\n",
+                                               "let x = e[side_effect()]\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
@@ -386,7 +386,7 @@ void test_semantic_errors(void)
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("side-effect()\n"
+        checked_program checked = simple_check("side_effect()\n"
                                                "h()",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
@@ -414,7 +414,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check(
-            "let v : side-effect() = boolean.true\n", std_library.globals, &expected, module_directory_view);
+            "let v : side_effect() = boolean.true\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
@@ -434,7 +434,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 18))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked =
-            simple_check("let v : boolean = side-effect()\n", std_library.globals, &expected, module_directory_view);
+            simple_check("let v : boolean = side_effect()\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
@@ -444,7 +444,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 20))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked =
-            simple_check("let v : int(0, 1) = side-effect()\n", std_library.globals, &expected, module_directory_view);
+            simple_check("let v : int(0, 1) = side_effect()\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
@@ -718,7 +718,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let i = interface\n"
-                                               "    f(): side-effect()\n",
+                                               "    f(): side_effect()\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
@@ -886,7 +886,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"
                                                "    f(): std.unit\n"
-                                               "let runtime-value = side-effect()\n"
+                                               "let runtime-value = side_effect()\n"
                                                "impl i for std.unit\n"
                                                "    f(): std.unit\n"
                                                "        let captured = runtime-value\n"
@@ -959,7 +959,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(4, 8))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = ()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    1\n"
                                                "let s = f()\n"
                                                "let v = s{}\n",
@@ -1055,7 +1055,7 @@ void test_semantic_errors(void)
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let f = ()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    1\n"
                                                "let t = f()\n"
                                                "let s = struct\n"
@@ -1312,7 +1312,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_type_mismatch, source_location_create(0, 7))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked =
-            simple_check("assert(side-effect())", std_library.globals, &expected, module_directory_view);
+            simple_check("assert(side_effect())", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
         REQUIRE(checked.functions[0].body.length == 0);
@@ -1453,7 +1453,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expression_recursion_limit_reached, source_location_create(2, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let f = [T]()\n"
-                                               "    side-effect()\n"
+                                               "    side_effect()\n"
                                                "    f[f[T]]()\n"
                                                "f[0]()\n",
                                                std_library.globals, &expected, module_directory_view);

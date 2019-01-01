@@ -16,7 +16,7 @@ let pure = (a: printable2)
     s
 
 let runtime = (a: printable2)
-    side-effect()
+    side_effect()
     let print = a.print
     let s = print()
     s
@@ -90,7 +90,7 @@ let compile-time-impl = create-impl()
 assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
 
 let captures-impl = ()
-    side-effect()
+    side_effect()
     ()
         assert(string-equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
 captures-impl()()
