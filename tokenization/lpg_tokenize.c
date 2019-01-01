@@ -325,7 +325,7 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     {
         return make_success(token_enum, content.length);
     }
-    if (unicode_view_equals_c_str(content, "type-of"))
+    if (unicode_view_equals_c_str(content, "type_of"))
     {
         return make_success(token_type_of, content.length);
     }

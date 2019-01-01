@@ -3,5 +3,5 @@ let option = enum[T]
     none
 
 let export = struct
-    option: type-of(option)
+    option: type_of(option)
 export{option}

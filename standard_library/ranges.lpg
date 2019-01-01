@@ -18,5 +18,5 @@ impl[T] random_access[T] for arrays.array[T]
         self.store(index, element)
 
 let export = struct
-    random_access: type-of(random_access)
+    random_access: type_of(random_access)
 export{random_access}

@@ -28,7 +28,7 @@ impl[T] set[T] for linear-set[T]
     contains(key: T): std.boolean
         let test_element = (element: T): std.boolean
             equality.equals[T](element, key)
-        algorithm.any_of[T, type-of(test_element)](self.elements, test_element)
+        algorithm.any_of[T, type_of(test_element)](self.elements, test_element)
     remove(key: T): std.boolean
         match algorithm.find[T](self.elements, key)
             case std.option[integer].some(let found-at):
@@ -60,6 +60,6 @@ let make-linear-set = [T](): set[T]
     content
 
 let export = struct
-    set: type-of(set)
-    make-linear-set: type-of(make-linear-set)
+    set: type_of(set)
+    make-linear-set: type_of(make-linear-set)
 export{set, make-linear-set}

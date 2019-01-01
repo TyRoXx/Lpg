@@ -21,11 +21,11 @@ let not = (input: boolean)
         case boolean.true: boolean.false
         case boolean.false: boolean.true
 
-let type = type-of(type-of(0))
-let string = type-of("")
+let type = type_of(type_of(0))
+let string = type_of("")
 let make_unit_value = ()
 let unit_value = make_unit_value()
-let unit = type-of(unit_value)
+let unit = type_of(unit_value)
 
 let any-integer = int(0, 340282366920938463463374607431768211455)
 
@@ -60,18 +60,18 @@ let compile_time = [T]()
     T
 
 let export = struct
-    and: type-of(and)
-    or: type-of(or)
-    not: type-of(not)
+    and: type_of(and)
+    or: type_of(or)
+    not: type_of(not)
     type: type
     string: type
     boolean: type
     unit: type
     unit_value: unit
-    option: type-of(option)
-    array: type-of(array)
-    mutable: type-of(mutable)
-    make-mutable: type-of(make-mutable)
-    runtime-value: type-of(runtime-value)
-    compile_time: type-of(compile_time)
+    option: type_of(option)
+    array: type_of(array)
+    mutable: type_of(mutable)
+    make-mutable: type_of(make-mutable)
+    runtime-value: type_of(runtime-value)
+    compile_time: type_of(compile_time)
 export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make-mutable, runtime-value, compile_time}

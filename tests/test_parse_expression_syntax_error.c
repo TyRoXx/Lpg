@@ -180,21 +180,21 @@ void test_parse_expression_syntax_error(void)
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_left_parenthesis, source_location_create(0, 7))};
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of "));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type_of "));
     }
 
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_expression, source_location_create(0, 8))};
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of("));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type_of("));
     }
 
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_right_parenthesis, source_location_create(0, 9))};
         test_syntax_error(
-            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type-of(0"));
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("type_of(0"));
     }
 
     {

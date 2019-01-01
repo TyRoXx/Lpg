@@ -16,6 +16,6 @@ let host = interface
     import-integer(from: host-value): option[integer]
 
 let export = struct
-    integer: type-of(integer)
-    host: type-of(host)
+    integer: type_of(integer)
+    host: type_of(host)
 export{integer, host}

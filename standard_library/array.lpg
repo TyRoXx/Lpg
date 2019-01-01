@@ -15,5 +15,5 @@ let array = interface[T]
     pop(count: any-integer): boolean
 
 let export = struct
-    array: type-of(array)
+    array: type_of(array)
 export{array}

@@ -1,8 +1,8 @@
 let make_unit_value = ()
 let unit_value = make_unit_value()
-let unit = type-of(unit_value)
+let unit = type_of(unit_value)
 
 let export = struct
-    unit: type-of(unit)
+    unit: type_of(unit)
     unit_value: unit
 export{unit, unit_value}

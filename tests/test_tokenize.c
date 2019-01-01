@@ -85,7 +85,7 @@ void test_tokenize(void)
     test_single_token(token_interface, 9, "interface");
     test_single_token(token_struct, 6, "struct");
     test_single_token(token_impl, 4, "impl");
-    test_single_token(token_type_of, 7, "type-of");
+    test_single_token(token_type_of, 7, "type_of");
     test_single_token(token_import, 6, "import");
     test_single_token(token_new_array, 9, "new-array");
     test_single_token(token_string, 2, "\"\"");

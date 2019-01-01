@@ -20,6 +20,6 @@ let equals = [T](first: T, second: T): boolean
     comparison.equals(second)
 
 let export = struct
-    equality_comparison: type-of(equality_comparison)
-    equals: type-of(equals)
+    equality_comparison: type_of(equality_comparison)
+    equals: type_of(equals)
 export{equality_comparison, equals}

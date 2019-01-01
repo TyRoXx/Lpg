@@ -35,7 +35,7 @@ let any_of = [E, P](elements: ranges.random_access[E], test_element: P): boolean
                                 std.unit_value
                     case std.option[E].none:
                         fail()
-            enumerate[type-of(on_element)](0, last, on_element)
+            enumerate[type_of(on_element)](0, last, on_element)
             found.load()
         case subtract_result.underflow:
             boolean.false
@@ -59,7 +59,7 @@ let find = [E](haystack: ranges.random_access[E], needle: E): std.option[integer
     std.option[integer].none
 
 let export = struct
-    enumerate: type-of(enumerate)
-    any_of: type-of(any_of)
-    find: type-of(find)
+    enumerate: type_of(enumerate)
+    any_of: type_of(any_of)
+    find: type_of(find)
 export{enumerate, any_of, find}

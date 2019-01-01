@@ -3,7 +3,7 @@ let test-type = enum
     b
 
 let compile-time-test = struct
-    t: type-of(test-type)
+    t: type_of(test-type)
 let instance = compile-time-test{test-type}
 let t = instance.t
 let x : t = t.a
