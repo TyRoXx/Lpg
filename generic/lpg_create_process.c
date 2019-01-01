@@ -129,7 +129,7 @@ create_process_result create_process(unicode_view const executable, unicode_view
     startup.hStdError = error_output;
     startup.hStdInput = input;
     startup.hStdOutput = output;
-    const DWORD flags = CREATE_NO_WINDOW;
+    const DWORD flags = 0;
     PROCESS_INFORMATION process;
     win32_string const executable_converted = to_win32_path(executable);
     win32_string const current_path_converted = to_win32_path(current_path);

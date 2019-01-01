@@ -193,23 +193,6 @@ void test_save_expression(void)
             "(a: float, b: string) 123");
     }
 
-    check_expression_rendering(expression_from_tuple(tuple_create(NULL, 0, source_location_create(0, 0))), "{}");
-
-    {
-        expression *elements = allocate_array(1, sizeof(*elements));
-        elements[0] = expression_from_identifier(identifier_expression_from_c_string("a"));
-        check_expression_rendering(
-            expression_from_tuple(tuple_create(elements, 1, source_location_create(0, 0))), "{a}");
-    }
-
-    {
-        expression *elements = allocate_array(2, sizeof(*elements));
-        elements[0] = expression_from_identifier(identifier_expression_from_c_string("a"));
-        elements[1] = expression_from_integer(integer_create(0, 123));
-        check_expression_rendering(
-            expression_from_tuple(tuple_create(elements, 2, source_location_create(0, 0))), "{a, 123}");
-    }
-
     {
         match_case *cases = allocate_array(1, sizeof(*cases));
         cases[0] = match_case_create(expression_allocate(expression_from_integer(integer_create(0, 123))),

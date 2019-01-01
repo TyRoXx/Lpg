@@ -4,7 +4,6 @@
 1. Types and syntax
     1. [Variables and constants](#Variables-and-constants)
     1. [Functions](#Function-Syntax)
-    1. [Tuple](#Tuples)
     1. [Interfaces](#Interfaces)
 1. Concepts
     1. [Match](#Match)
@@ -59,8 +58,8 @@ If a line just consists of one value that is not assigned to anything and it is 
 If you want to give the function a name, you have to save this in a constant. Like so:
 ```lpg
 let std = import std
-let duplicate = (message: std.string)
-    {message, message}
+let return_argument = (message: std.string)
+    message
 ```
 
 If the **functions just consists of a return statement**, you can also abbreviate it like that:
@@ -78,15 +77,6 @@ let xor = (left: std.boolean, right: std.boolean) std.and(std.or(left, right), s
 
 xor(std.boolean.true, std.boolean.false)
 ```
-
-### Tuples
-Tuples are a collection of values. They do not have to have the same type to be stored together. An example of a tuple would be:
-```lpg
-let bool = import std.boolean
-
-let tuple = {10, bool.true, "Hello", () bool}
-```
-The type of the variable is then automatically derived. In order to access an element of a tuple you write the tuple's name and the index you want to access. Like for example `tuple.2` would give you the `string "Hello"`.
 
 ### Arrays
 Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:

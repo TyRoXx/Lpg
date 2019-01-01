@@ -1,6 +1,6 @@
 let std = import std
 let f = ()
     side_effect()
-    {std.and, std.or, not, assert, integer_equals}
+    std.and
 let g = f()
-assert(g.0(boolean.true, boolean.true))
+assert(g(boolean.true, boolean.true))

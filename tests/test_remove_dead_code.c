@@ -69,9 +69,13 @@ void test_remove_dead_code(void)
         instruction const expected_main_function[] = {
             instruction_create_literal(literal_instruction_create(0, value_from_unit(), type_from_unit())),
             instruction_create_return(return_instruction_create(0, 1))};
-        check_single_wellformed_function("let t = 1\n"
-                                         "let v = {t}\n"
-                                         "let w = {{{v}}}\n",
+        check_single_wellformed_function("let s = struct\n"
+                                         "    i: int(1, 1)\n"
+                                         "let r = struct\n"
+                                         "    s: s\n"
+                                         "let t = 1\n"
+                                         "let v = s{t}\n"
+                                         "let w = r{v}\n",
                                          std_library.globals, LPG_COPY_ARRAY(expected_main_function));
     }
 

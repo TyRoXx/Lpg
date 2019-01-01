@@ -453,47 +453,6 @@ void test_semantic_errors(void)
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let v = {}.0\n", std_library.globals, &expected, module_directory_view);
-        REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
-        checked_program_free(&checked);
-    }
-    {
-        semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
-        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let v = {}.a\n", std_library.globals, &expected, module_directory_view);
-        REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
-        checked_program_free(&checked);
-    }
-    {
-        semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
-        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let v = {}.9999999999999999999999999999999999999999\n",
-                                               std_library.globals, &expected, module_directory_view);
-        REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
-        checked_program_free(&checked);
-    }
-    {
-        semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 9))};
-        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let v = {a}\n", std_library.globals, &expected, module_directory_view);
-        REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
-        checked_program_free(&checked);
-    }
-    {
-        semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(0, 11))};
-        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let v = () a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 2);
@@ -933,15 +892,6 @@ void test_semantic_errors(void)
                                                "    f(): std.unit\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
-        checked_program_free(&checked);
-    }
-    {
-        semantic_error const errors[] = {
-            semantic_error_create(semantic_error_not_callable, source_location_create(0, 8))};
-        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("let v = {}()\n", std_library.globals, &expected, module_directory_view);
-        REQUIRE(expected.count == 0);
-        REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
     }
     {

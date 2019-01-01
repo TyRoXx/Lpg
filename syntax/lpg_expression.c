@@ -757,9 +757,6 @@ source_location expression_source_begin(expression const value)
     case expression_type_binary:
         return expression_source_begin(*value.binary.left);
 
-    case expression_type_tuple:
-        return value.tuple.opening_brace;
-
     case expression_type_not:
         return expression_source_begin(*value.not.expr);
 
@@ -1138,14 +1135,6 @@ expression expression_from_identifier(identifier_expression identifier)
     return result;
 }
 
-expression expression_from_tuple(tuple value)
-{
-    expression result;
-    result.type = expression_type_tuple;
-    result.tuple = value;
-    return result;
-}
-
 expression expression_from_break(source_location source)
 {
     expression result;
@@ -1315,10 +1304,6 @@ void expression_free(expression const *this)
         declare_free(&this->declare);
         break;
 
-    case expression_type_tuple:
-        tuple_free(&this->tuple);
-        break;
-
     case expression_type_comment:
         comment_expression_free(&this->comment);
         break;
@@ -1375,9 +1360,6 @@ expression expression_clone(expression const original)
 
     case expression_type_string:
         return expression_from_string(string_expression_clone(original.string));
-
-    case expression_type_tuple:
-        return expression_from_tuple(tuple_clone(original.tuple));
 
     case expression_type_struct:
         return expression_from_struct(struct_expression_clone(original.struct_));
@@ -1575,9 +1557,6 @@ bool expression_equals(expression const *left, expression const *right)
 
     case expression_type_declare:
         return declare_equals(left->declare, right->declare);
-
-    case expression_type_tuple:
-        return tuple_equals(&left->tuple, &right->tuple);
 
     case expression_type_comment:
         return comment_equals(left->comment, right->comment);

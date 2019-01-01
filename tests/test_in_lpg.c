@@ -518,7 +518,6 @@ void test_in_lpg(void)
                                                  "match-string-case-first.lpg",
                                                  "match-string-default-first.lpg",
                                                  "option.lpg",
-                                                 "parsing-edgecase.lpg",
                                                  "raw-string-literal.lpg",
                                                  "recursion.lpg",
                                                  "return.lpg",
@@ -528,7 +527,6 @@ void test_in_lpg(void)
                                                  "struct-compile-time.lpg",
                                                  "struct.lpg",
                                                  "subtract.lpg",
-                                                 "tuple.lpg",
                                                  "type-of.lpg",
                                                  "unit_value.lpg",
                                                  "web.lpg"};

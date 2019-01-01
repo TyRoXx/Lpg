@@ -59,7 +59,6 @@ std.make_mutable[type_of(struct[T])](struct[T])
 std.make_mutable[type_of([T]() T)]([T]() T)
 std.make_mutable[type_of(enum[T])](enum[T])
 std.make_mutable[std.string]("test")
-std.make_mutable[type_of({})]({})
 std.make_mutable[type_of(assert)](assert)
 let f_load : type_of(f.load) = f.load
 std.make_mutable[type_of(f_load)](f_load)

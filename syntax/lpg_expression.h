@@ -58,7 +58,6 @@ typedef enum expression_type {
     expression_type_break,
     expression_type_sequence,
     expression_type_declare,
-    expression_type_tuple,
     expression_type_comment,
     expression_type_interface,
     expression_type_struct,
@@ -431,7 +430,6 @@ struct expression
         sequence loop_body;
         sequence sequence;
         declare declare;
-        tuple tuple;
         comment_expression comment;
         interface_expression interface_;
         struct_expression struct_;
@@ -468,7 +466,6 @@ expression expression_from_string(string_expression content);
 expression expression_from_comment(comment_expression content);
 expression expression_from_call(call content);
 expression expression_from_identifier(identifier_expression identifier);
-expression expression_from_tuple(tuple content);
 expression expression_from_break(source_location source);
 expression expression_from_interface(interface_expression content);
 expression expression_from_struct(struct_expression content);

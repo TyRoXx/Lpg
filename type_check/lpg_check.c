@@ -1457,9 +1457,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                 switch (call_result.code)
                 {
                 case external_function_result_out_of_memory:
-                    emit_semantic_error(
-                        state, semantic_error_create(semantic_error_compile_time_memory_limit_reached,
-                                                     expression_source_begin(expression_from_tuple(called.arguments))));
+                    emit_semantic_error(state, semantic_error_create(semantic_error_compile_time_memory_limit_reached,
+                                                                     called.arguments.opening_brace));
                     ASSUME(!compile_time_result.is_set);
                     break;
 
@@ -1473,15 +1472,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
                 case external_function_result_stack_overflow:
                     emit_semantic_error(
-                        state, semantic_error_create(semantic_error_stack_overflow,
-                                                     expression_source_begin(expression_from_tuple(called.arguments))));
+                        state, semantic_error_create(semantic_error_stack_overflow, called.arguments.opening_brace));
                     ASSUME(!compile_time_result.is_set);
                     break;
 
                 case external_function_result_instruction_limit_reached:
-                    emit_semantic_error(
-                        state, semantic_error_create(semantic_error_instruction_limit_reached,
-                                                     expression_source_begin(expression_from_tuple(called.arguments))));
+                    emit_semantic_error(state, semantic_error_create(semantic_error_instruction_limit_reached,
+                                                                     called.arguments.opening_brace));
                     ASSUME(!compile_time_result.is_set);
                     break;
                 }
@@ -1747,7 +1744,6 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
     case expression_type_break:
     case expression_type_sequence:
     case expression_type_declare:
-    case expression_type_tuple:
     case expression_type_comment:
     case expression_type_interface:
     case expression_type_struct:
@@ -2395,42 +2391,6 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     LPG_UNREACHABLE();
 }
 
-typedef struct evaluate_arguments_result
-{
-    register_id *registers;
-    tuple_type tuple_type_for_instruction;
-    tuple_type tuple_type_for_result;
-} evaluate_arguments_result;
-
-static evaluate_arguments_result evaluate_arguments(function_checking_state *const state,
-                                                    instruction_sequence *const function,
-                                                    expression const *const arguments, size_t const argument_count)
-{
-    register_id *registers = allocate_array(argument_count, sizeof(*registers));
-    tuple_type const tuple_type_for_instruction = {
-        allocate_array(argument_count, sizeof(*tuple_type_for_instruction.elements)), argument_count};
-    tuple_type const tuple_type_for_result = {
-        garbage_collector_allocate_array(
-            &state->program->memory, argument_count, sizeof(*tuple_type_for_instruction.elements)),
-        argument_count};
-    for (size_t i = 0; i < argument_count; ++i)
-    {
-        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i], NULL);
-        if (!argument_evaluated.has_value)
-        {
-            deallocate(registers);
-            deallocate(tuple_type_for_instruction.elements);
-            evaluate_arguments_result const result = {NULL, tuple_type_create(NULL, 0), tuple_type_create(NULL, 0)};
-            return result;
-        }
-        registers[i] = argument_evaluated.where;
-        tuple_type_for_instruction.elements[i] = argument_evaluated.type_;
-        tuple_type_for_result.elements[i] = argument_evaluated.type_;
-    }
-    evaluate_arguments_result const result = {registers, tuple_type_for_instruction, tuple_type_for_result};
-    return result;
-}
-
 typedef struct evaluate_struct_arguments_result
 {
     register_id *registers;
@@ -2479,50 +2439,6 @@ static evaluate_struct_arguments_result evaluate_struct_arguments(function_check
     }
     evaluate_struct_arguments_result const result = {registers};
     return result;
-}
-
-evaluate_expression_result evaluate_tuple_expression(function_checking_state *state, instruction_sequence *function,
-                                                     const tuple element)
-{
-    evaluate_arguments_result const arguments = evaluate_arguments(state, function, element.elements, element.length);
-    if (!arguments.registers)
-    {
-        return evaluate_expression_result_empty;
-    }
-    register_id const result_register = allocate_register(&state->used_registers);
-    add_instruction(
-        function, instruction_create_tuple(tuple_instruction_create(
-                      arguments.registers, element.length, result_register, arguments.tuple_type_for_instruction)));
-
-    value *compile_time_arguments =
-        garbage_collector_allocate_array(&state->program->memory, element.length, sizeof(*compile_time_arguments));
-    for (size_t i = 0; i < element.length; ++i)
-    {
-        register_id const argument = arguments.registers[i];
-        optional_value const argument_value = read_register_compile_time_value(state, argument);
-        if (argument_value.is_set)
-        {
-            compile_time_arguments[i] = argument_value.value_;
-        }
-        else
-        {
-            compile_time_arguments = NULL;
-            break;
-        }
-    }
-
-    if (compile_time_arguments || (element.length == 0))
-    {
-        value const compile_time_value = value_from_tuple(value_tuple_create(compile_time_arguments, element.length));
-        write_register_compile_time_value(state, result_register, compile_time_value);
-        return evaluate_expression_result_create(true, result_register,
-                                                 type_from_tuple_type(arguments.tuple_type_for_result),
-                                                 optional_value_create(compile_time_value), true, false);
-    }
-
-    return evaluate_expression_result_create(true, result_register,
-                                             type_from_tuple_type(arguments.tuple_type_for_result),
-                                             optional_value_empty, false, false);
 }
 
 static void find_generic_closures_in_function_header(generic_closures *const closures,
@@ -2657,13 +2573,6 @@ static void find_generic_closures_in_expression(generic_closures *const closures
             find_generic_closures_in_expression(closures, state, *from.declare.optional_type);
         }
         find_generic_closures_in_expression(closures, state, *from.declare.initializer);
-        break;
-
-    case expression_type_tuple:
-        for (size_t i = 0; i < from.tuple.length; ++i)
-        {
-            find_generic_closures_in_expression(closures, state, from.tuple.elements[i]);
-        }
         break;
 
     case expression_type_interface:
@@ -4525,9 +4434,6 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
 
     case expression_type_declare:
         return evaluate_declare(state, function, element.declare);
-
-    case expression_type_tuple:
-        return evaluate_tuple_expression(state, function, element.tuple);
 
     case expression_type_struct:
         return evaluate_struct(state, function, element.struct_, early_initialized_variable);

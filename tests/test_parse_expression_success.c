@@ -5,8 +5,6 @@
 #include "lpg_save_expression.h"
 #include "test.h"
 
-static void test_tuples(void);
-
 static void test_loops(void);
 
 static void test_comment(void);
@@ -201,7 +199,6 @@ void test_parse_expression_success(void)
     test_assignments();
     test_match_cases();
     test_lambdas();
-    test_tuples();
     test_new_lines();
 }
 
@@ -479,20 +476,6 @@ static void test_assignments(void)
             expression_allocate(expression_from_integer_literal(
                 integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 14)))))),
         unicode_string_from_c_str("let a : int = 1"), true);
-
-    {
-        expression *const elements = allocate_array(2, sizeof(*elements));
-        elements[0] = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)));
-        elements[1] = expression_from_identifier(
-            identifier_expression_create(unicode_string_from_c_str("a"), source_location_create(0, 4)));
-
-        test_successful_parse(
-            expression_from_declare(declare_create(
-                identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
-                expression_allocate(expression_from_tuple(tuple_create(elements, 2, source_location_create(0, 14)))))),
-            unicode_string_from_c_str("let f = {a,a}"), true);
-    }
 }
 
 static void test_match_cases(void)
@@ -686,25 +669,4 @@ static void test_loops(void)
                                                         "    break\n"),
                               false);
     }
-}
-
-static void test_tuples(void)
-{
-    expression *const tuple_elements = expression_allocate(expression_from_string(
-        string_expression_create(unicode_string_from_c_str("Test"), source_location_create(0, 0))));
-
-    expression *const tuple_expression =
-        expression_allocate(expression_from_tuple(tuple_create(tuple_elements, 1, source_location_create(0, 23))));
-
-    expression *const tuple_type_expression = expression_allocate(
-        expression_from_tuple(tuple_create(expression_allocate(expression_from_identifier(identifier_expression_create(
-                                               unicode_string_from_c_str("string"), source_location_create(0, 9)))),
-                                           1, source_location_create(0, 8))));
-
-    identifier_expression const variable_name =
-        identifier_expression_create(unicode_string_from_c_str("t"), source_location_create(0, 4));
-
-    expression const assign =
-        expression_from_declare(declare_create(variable_name, tuple_type_expression, tuple_expression));
-    test_successful_parse(assign, unicode_string_from_c_str("let t : {string} = {\"Test\"}"), true);
 }

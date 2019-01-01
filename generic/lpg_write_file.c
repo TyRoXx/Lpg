@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <Windows.h>
+#else
 #include <unistd.h>
 #endif
 
@@ -45,11 +47,26 @@ unicode_string write_temporary_file(char const *const content)
     size_t const name_length = strlen(name);
     unicode_string const result = {allocate(name_length), name_length};
     memcpy(result.data, name, name_length);
-    FILE *file = NULL;
-    fopen_s(&file, name, "wb");
-    ASSERT(file);
-    ASSERT(strlen(content) == fwrite(content, 1, strlen(content), file));
-    fclose(file);
+    {
+        FILE *file = NULL;
+        fopen_s(&file, name, "wb");
+        ASSERT(file);
+        ASSERT(strlen(content) == fwrite(content, 1, strlen(content), file));
+        fflush(file);
+        fclose(file);
+    }
+    // For some reason the file we just created, flush and closed cannot always be opened for reading immediately.
+    for (int i = 0; i < 10; ++i)
+    {
+        FILE *file = NULL;
+        fopen_s(&file, name, "rb");
+        if (file)
+        {
+            fclose(file);
+            break;
+        }
+        Sleep(i * 10);
+    }
     free(name);
     return result;
 #else

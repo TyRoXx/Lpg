@@ -248,9 +248,6 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(save_expression(to, value->declare.initializer, whitespace));
         return success_yes;
 
-    case expression_type_tuple:
-        return save_tuple_expression(to, value->tuple, whitespace);
-
     case expression_type_comment:
     {
         unicode_view view = unicode_view_from_string(value->comment.value);

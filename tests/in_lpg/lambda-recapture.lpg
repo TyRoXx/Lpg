@@ -1,3 +1,4 @@
+let std = import std
 
 /*use a captured variable in a compile_time context*/
 let m = boolean
@@ -33,10 +34,13 @@ let f6 = (a: boolean)
 assert(f6(boolean.true)()())
 
 /*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
 let x = 2
 let y = "2"
 let t = ()
     let u = ()
-        {integer_to_string(x), y}
-    string_equals(u().0, u().1)
+        helper{integer_to_string(x), y}
+    string_equals(u().a, u().b)
 assert(t())

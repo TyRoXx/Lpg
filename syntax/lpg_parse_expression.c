@@ -120,8 +120,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
 static expression_parser_result const expression_parser_result_failure = {
     0, {expression_type_lambda, {{{NULL, 0}, {NULL, 0, NULL}, NULL, {0, 0}}}}};
 
-static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
-                                            source_location const opening_brace);
+static tuple parse_tuple(expression_parser *parser, size_t indentation, source_location const opening_brace);
 
 static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
                                                  bool const may_be_binary);
@@ -855,13 +854,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         case token_left_parenthesis:
             pop(parser);
             return parse_callable_result_create(
-                parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where), false);
-
-        case token_left_curly_brace:
-        {
-            pop(parser);
-            return parse_callable_result_create(parse_tuple(parser, indentation, head.where), true);
-        }
+                parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where), true);
 
         case token_left_bracket:
         {
@@ -897,6 +890,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         case token_less_than_or_equals:
         case token_greater_than:
         case token_greater_than_or_equals:
+        case token_left_curly_brace:
             pop(parser);
             parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
             break;
@@ -996,16 +990,13 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
     }
 }
 
-static expression_parser_result parse_tuple(expression_parser *parser, size_t indentation,
-                                            source_location const opening_brace)
+static tuple parse_tuple(expression_parser *parser, size_t indentation, source_location const opening_brace)
 {
     rich_token next = peek(parser);
     if (next.token == token_right_curly_brace)
     {
         pop(parser);
-        expression_parser_result const parser_result = {
-            true, expression_from_tuple(tuple_create(NULL, 0, opening_brace))};
-        return parser_result;
+        return tuple_create(NULL, 0, opening_brace);
     }
 
     size_t element_count = 0;
@@ -1038,14 +1029,12 @@ static expression_parser_result parse_tuple(expression_parser *parser, size_t in
             {
                 deallocate(tuple_elements);
             }
-            return parser_result;
+            return tuple_create(NULL, 0, opening_brace);
         }
         next = peek(parser);
     }
     pop(parser);
-    expression_parser_result const tuple_result = {
-        true, expression_from_tuple(tuple_create(tuple_elements, element_count, opening_brace))};
-    return tuple_result;
+    return tuple_create(tuple_elements, element_count, opening_brace);
 }
 
 static int parse_call(expression_parser *parser, size_t indentation, expression *result,
@@ -1132,14 +1121,9 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
 static bool parse_instantiate_struct(expression_parser *parser, size_t indentation, expression *result,
                                      source_location const opening_brace)
 {
-    expression_parser_result const arguments = parse_tuple(parser, indentation, opening_brace);
-    if (!arguments.is_success)
-    {
-        return false;
-    }
-    ASSUME(arguments.success.type == expression_type_tuple);
+    tuple const arguments = parse_tuple(parser, indentation, opening_brace);
     *result = expression_from_instantiate_struct(
-        instantiate_struct_expression_create(expression_allocate(*result), arguments.success.tuple));
+        instantiate_struct_expression_create(expression_allocate(*result), arguments));
     return true;
 }
 
