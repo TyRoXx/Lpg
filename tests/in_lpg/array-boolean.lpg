@@ -1,7 +1,7 @@
 let std = import std
 
 let array-type = std.array[std.boolean]
-let a : array-type = new-array(std.boolean)
+let a : array-type = new_array(std.boolean)
 assert(integer_equals(0, a.size()))
 assert(not(a.store(0, std.boolean.true)))
 assert(not(a.store(1, std.boolean.true)))
@@ -69,7 +69,7 @@ assert(match a.load(1)
     case std.option[std.boolean].none: std.boolean.false
 )
 
-let big = new-array(std.boolean)
+let big = new_array(std.boolean)
 let append-1 = ()
     assert(big.append(std.boolean.true))
 let append-4 = ()

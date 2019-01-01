@@ -19,7 +19,7 @@ impl[T] mutable[T] for mutable-content[T]
         assert(self.content.store(0, value))
 
 let make_mutable = [T](value: T): mutable[T]
-    let content = new-array(T)
+    let content = new_array(T)
     assert(content.append(value))
     assert(integer_equals(1, content.size()))
     mutable-content[T]{content}

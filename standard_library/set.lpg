@@ -56,7 +56,7 @@ let make_linear_set = [T](): set[T]
     //TODO: remove side_effect(). It's here because there is a bug in the C backend.
     side_effect()
 
-    let content = linear_set[T]{new-array(T)}
+    let content = linear_set[T]{new_array(T)}
     content
 
 let export = struct

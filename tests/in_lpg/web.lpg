@@ -3,7 +3,7 @@ let es = import ecmascript
 let option = std.option
 
 (window: host_value, host: es.host)
-    let arguments = new-array(host_value)
+    let arguments = new_array(host_value)
     assert(arguments.append(host.export-string("Hello, world!")))
     match host.read-property(window, "document")
         case option[host_value].some(let console):

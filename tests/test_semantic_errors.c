@@ -1423,7 +1423,7 @@ void test_semantic_errors(void)
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(0, 10))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
-        checked_program checked = simple_check("new-array(u)\n", std_library.globals, &expected, module_directory_view);
+        checked_program checked = simple_check("new_array(u)\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
@@ -1432,7 +1432,7 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(0, 10))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked =
-            simple_check("new-array(assert(boolean.true))\n", std_library.globals, &expected, module_directory_view);
+            simple_check("new_array(assert(boolean.true))\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }

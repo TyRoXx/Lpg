@@ -121,7 +121,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     switch (value->type)
     {
     case expression_type_new_array:
-        LPG_TRY(stream_writer_write_string(to, "new-array("));
+        LPG_TRY(stream_writer_write_string(to, "new_array("));
         LPG_TRY(save_expression(to, value->new_array.element, whitespace));
         LPG_TRY(stream_writer_write_string(to, ")"));
         return success_yes;

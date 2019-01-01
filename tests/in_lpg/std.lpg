@@ -38,10 +38,10 @@ assert(match std.option[std.unit].some(std.unit_value)
 let u = std.make_mutable[std.unit](std.unit_value)
 u.store(u.load())
 
-let d = std.make_mutable[std.array[std.unit]](new-array(std.unit))
+let d = std.make_mutable[std.array[std.unit]](new_array(std.unit))
 d.load().append(std.unit_value)
 assert(integer_equals(1, d.load().size()))
-d.store(new-array(std.unit))
+d.store(new_array(std.unit))
 assert(integer_equals(0, d.load().size()))
 
 let s = struct

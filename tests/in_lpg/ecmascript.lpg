@@ -43,7 +43,7 @@ let test-undefined = (host: es.host)
 
 let test-call-method = (host: es.host)
     let object : host_value = host.export-string("hello")
-    let arguments = new-array(host_value)
+    let arguments = new_array(host_value)
     assert(arguments.append(host.export-integer(0)))
     let charCode = host.call-method(object, "charCodeAt", arguments)
     assert(host.equals(charCode, host.export-integer(104)))

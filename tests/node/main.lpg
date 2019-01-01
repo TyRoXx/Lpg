@@ -9,7 +9,7 @@ let option = std.option
         case option[host_value].none:
             fail()
     let log = (message: std.string)
-        let arguments = new-array(host_value)
+        let arguments = new_array(host_value)
         arguments.append(host.export-string(message))
         host.call-method(console, "log", arguments)
     log("Hello from Node.JS!")

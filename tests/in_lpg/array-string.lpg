@@ -3,7 +3,7 @@ let std = import std
 let string = std.string
 
 let array-type = std.array[string]
-let a : array-type = new-array(string)
+let a : array-type = new_array(string)
 assert(integer_equals(0, a.size()))
 assert(not(a.store(0, "")))
 assert(not(a.store(1, "")))
@@ -71,7 +71,7 @@ assert(match a.load(1)
     case std.option[string].none: boolean.false
 )
 
-let big = new-array(string)
+let big = new_array(string)
 let append-1 = ()
     assert(big.append("test"))
 let append-4 = ()

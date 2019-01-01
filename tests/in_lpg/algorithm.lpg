@@ -11,15 +11,15 @@ let true-predicate = (element: boolean): boolean
     boolean.true
 let false-predicate = (element: boolean): boolean
     boolean.false
-assert(not(algorithm.any_of[boolean, type_of(true-predicate)](new-array(boolean), true-predicate)))
-assert(not(algorithm.any_of[boolean, type_of(false-predicate)](new-array(boolean), false-predicate)))
+assert(not(algorithm.any_of[boolean, type_of(true-predicate)](new_array(boolean), true-predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false-predicate)](new_array(boolean), false-predicate)))
 
-let non-empty = new-array(boolean)
+let non-empty = new_array(boolean)
 assert(non-empty.append(boolean.true))
 assert(algorithm.any_of[boolean, type_of(true-predicate)](non-empty, true-predicate))
 assert(not(algorithm.any_of[boolean, type_of(false-predicate)](non-empty, false-predicate)))
 
-let empty = new-array(boolean)
+let empty = new_array(boolean)
 match algorithm.find[boolean](empty, boolean.true)
     case std.option[integer].some(let e):
         fail()

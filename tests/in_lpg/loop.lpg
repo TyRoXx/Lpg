@@ -32,18 +32,18 @@ loop
             fail()
 
 loop
-    let no_leak = new-array(boolean)
+    let no_leak = new_array(boolean)
     break
 
 loop
     loop
-        let no_leak = new-array(boolean)
+        let no_leak = new_array(boolean)
         break
-    let no_leak_either = new-array(boolean)
+    let no_leak_either = new_array(boolean)
     break
 
 loop
-    let no_leak = new-array(boolean)
+    let no_leak = new_array(boolean)
     match std.runtime-value[boolean](boolean.true)
         case boolean.true:
             break

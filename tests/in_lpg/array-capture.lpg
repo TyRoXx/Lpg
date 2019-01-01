@@ -1,7 +1,7 @@
 let std = import std
 
 let make_array = ()
-    let result = new-array(std.boolean)
+    let result = new_array(std.boolean)
     result.append(std.boolean.true)
     result.append(std.boolean.false)
     result

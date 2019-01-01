@@ -87,7 +87,7 @@ void test_tokenize(void)
     test_single_token(token_impl, 4, "impl");
     test_single_token(token_type_of, 7, "type_of");
     test_single_token(token_import, 6, "import");
-    test_single_token(token_new_array, 9, "new-array");
+    test_single_token(token_new_array, 9, "new_array");
     test_single_token(token_string, 2, "\"\"");
     test_single_token(token_string, 3, "\"a\"");
     test_single_token(token_string, 5, "\"abc\"");

@@ -333,7 +333,7 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     {
         return make_success(token_import, content.length);
     }
-    if (unicode_view_equals_c_str(content, "new-array"))
+    if (unicode_view_equals_c_str(content, "new_array"))
     {
         return make_success(token_new_array, content.length);
     }

@@ -1,9 +1,9 @@
 let std = import std
 let string = std.string
 let option = std.option
-let a = new-array(std.array[std.array[string]])
-let b = new-array(std.array[string])
-let c = new-array(string)
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
 assert(b.append(c))
 assert(integer_equals(0, a.size()))
 assert(a.append(b))
