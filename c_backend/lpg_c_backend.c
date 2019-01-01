@@ -44,6 +44,7 @@ typedef enum register_meaning {
     register_meaning_subtract,
     register_meaning_add,
     register_meaning_add_u32,
+    register_meaning_add_u64,
     register_meaning_boolean
 } register_meaning;
 
@@ -1052,6 +1053,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_fail:
     case register_meaning_boolean:
     case register_meaning_add_u32:
+    case register_meaning_add_u64:
         LPG_TO_DO();
 
     case register_meaning_not:
@@ -1234,6 +1236,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_subtract:
     case register_meaning_boolean:
     case register_meaning_add_u32:
+    case register_meaning_add_u64:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1830,6 +1833,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_subtract:
         case register_meaning_boolean:
         case register_meaning_add_u32:
+        case register_meaning_add_u64:
             break;
         }
         LPG_TRY(indent(indentation, c_output));
@@ -1979,7 +1983,23 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                                   state->definitions, state->program, additional_memory, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " = {0, "));
+            LPG_TRY(stream_writer_write_string(c_output, " = {0 /*TODO implement overflow detection*/, "));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " + "));
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, "};\n"));
+            return success_yes;
+
+        case register_meaning_add_u64:
+            state->standard_library.using_integer = true;
+            set_register_variable(state, input.call.result, register_resource_ownership_owns,
+                type_from_enumeration(standard_library_enum_add_u64_result));
+            LPG_TRY(generate_type(type_from_enumeration(standard_library_enum_add_u64_result), &state->standard_library,
+                state->definitions, state->program, additional_memory, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " const "));
+            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = {0 /*TODO implement overflow detection*/, "));
             ASSERT(input.call.argument_count == 2);
             LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
             LPG_TRY(stream_writer_write_string(c_output, " + "));
@@ -2214,6 +2234,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_fail:
         case register_meaning_boolean:
         case register_meaning_add_u32:
+        case register_meaning_add_u64:
             LPG_TO_DO();
 
         case register_meaning_global:
@@ -2285,6 +2306,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 18:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_add_u32);
+                return success_yes;
+
+            case 20:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_add_u64);
                 return success_yes;
 
             default:
