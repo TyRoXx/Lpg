@@ -325,7 +325,7 @@ standard_library_description describe_standard_library(void)
                                          unicode_string_from_c_str("side_effect"), optional_value_empty);
 
     globals[1] = structure_member_create(
-        type_from_function_pointer(&stable->integer_to_string), unicode_string_from_c_str("integer-to-string"),
+        type_from_function_pointer(&stable->integer_to_string), unicode_string_from_c_str("integer_to_string"),
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(integer_to_string_impl, NULL, NULL, stable->integer_to_string))));
 

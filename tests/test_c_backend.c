@@ -122,7 +122,7 @@ void test_c_backend(void)
     check_generated_c_code("let f = ()\n"
                            "    side_effect()\n"
                            "    123\n"
-                           "assert(string-equals(\"123\", integer-to-string(f())))\n",
+                           "assert(string-equals(\"123\", integer_to_string(f())))\n",
                            std_library);
 
     standard_library_description_free(&std_library);

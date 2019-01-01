@@ -49,7 +49,7 @@ assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
 let x = 2
 let y = "2"
 let t = ()
-    string-equals(y, integer-to-string(x))
+    string-equals(y, integer_to_string(x))
 assert(t())
 
 /*function with multiple parameters captures something*/
