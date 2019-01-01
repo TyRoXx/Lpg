@@ -8,7 +8,7 @@ match add(123, 0)
     case add_result.overflow:
         fail()
 
-match add(std.runtime-value[integer](0), 0)
+match add(std.runtime_value[integer](0), 0)
     case add_result.ok(let result):
         assert(integer_equals(0, result))
     case add_result.overflow:

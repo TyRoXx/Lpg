@@ -11,10 +11,10 @@ assert(integer_equals(123, tuple.1))
 assert(string_equals("test", tuple.2))
 
 //Generic types are not necessarily the same even though they are defined the same:
-let make-enum = [T]()
+let make_enum = [T]()
     enum[U]
         a(U)
 //The enums are considered different even though U is the same because T is not the same.
-assert(not(type_equals(make-enum[1]()[std.unit], make-enum[2]()[std.unit])))
-assert(type_equals(make-enum[1]()[std.unit], make-enum[1]()[std.unit]))
-assert(type_equals(make-enum[2]()[std.unit], make-enum[2]()[std.unit]))
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.unit]))

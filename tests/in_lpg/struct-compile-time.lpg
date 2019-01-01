@@ -1,10 +1,10 @@
-let test-type = enum
+let test_type = enum
     a
     b
 
-let compile-time-test = struct
-    t: type_of(test-type)
-let instance = compile-time-test{test-type}
+let compile_time_test = struct
+    t: type_of(test_type)
+let instance = compile_time_test{test_type}
 let t = instance.t
 let x : t = t.a
 assert(match x

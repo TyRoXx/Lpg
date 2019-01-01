@@ -1,13 +1,13 @@
 // test integer_to_string
-// compile-time evaluation:
+// compile_time evaluation:
 assert(string_equals("0", integer_to_string(0)))
 assert(string_equals("2", integer_to_string(2)))
 assert(string_equals("2147483647", integer_to_string(2147483647)))
 
-//run-time evaluation:
-let test-integer_to_string = (input: int(0, 2147483647))
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
     side_effect()
     integer_to_string(input)
-assert(string_equals("0", test-integer_to_string(0)))
-assert(string_equals("2", test-integer_to_string(2)))
-assert(string_equals("2147483647", test-integer_to_string(2147483647)))
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))

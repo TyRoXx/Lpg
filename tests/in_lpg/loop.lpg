@@ -44,7 +44,7 @@ loop
 
 loop
     let no_leak = new_array(boolean)
-    match std.runtime-value[boolean](boolean.true)
+    match std.runtime_value[boolean](boolean.true)
         case boolean.true:
             break
         case boolean.false:

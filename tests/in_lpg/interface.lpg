@@ -8,7 +8,7 @@ let f4 = (printed: printable)
 
 let printable2 = interface
     print(): std.string
-    other-method(): std.unit
+    other_method(): std.unit
 
 let pure = (a: printable2)
     let print = a.print
@@ -24,25 +24,25 @@ let runtime = (a: printable2)
 impl printable2 for std.string
     print(): std.string
         self
-    other-method(): std.unit
+    other_method(): std.unit
         std.unit_value
 
 impl printable2 for std.unit
     print()
         "unit"
-    other-method()
+    other_method()
         std.unit_value
 
 impl printable2 for int(0, 0)
     print()
         "0"
-    other-method()
+    other_method()
         std.unit_value
 
 impl printable2 for int(1, 1)
     print()
         "1"
-    other-method()
+    other_method()
         std.unit_value
 
 impl printable2 for boolean
@@ -50,7 +50,7 @@ impl printable2 for boolean
         match self
             case boolean.true: "true"
             case boolean.false: "false"
-    other-method()
+    other_method()
         std.unit_value
 
 assert(string_equals("", pure("")))
@@ -72,28 +72,28 @@ assert(string_equals("false", runtime(boolean.false)))
 let a2 : printable2 = "abc"
 assert(string_equals("abc", a2.print()))
 
-let test-interface = interface
+let test_interface = interface
     method(a: boolean, b: boolean): printable2
 
-impl test-interface for std.unit
+impl test_interface for std.unit
     method(a: boolean, b: boolean)
         assert(a)
         assert(not(b))
         "test"
 
-let g : test-interface = std.unit_value
+let g : test_interface = std.unit_value
 assert(string_equals("test", g.method(boolean.true, boolean.false).print()))
 
-let create-impl = (): test-interface
+let create_impl = (): test_interface
     std.unit_value
-let compile-time-impl = create-impl()
-assert(string_equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
+let compile_time_impl = create_impl()
+assert(string_equals("test", compile_time_impl.method(boolean.true, boolean.false).print()))
 
-let captures-impl = ()
+let captures_impl = ()
     side_effect()
     ()
-        assert(string_equals("test", compile-time-impl.method(boolean.true, boolean.false).print()))
-captures-impl()()
+        assert(string_equals("test", compile_time_impl.method(boolean.true, boolean.false).print()))
+captures_impl()()
 
 let nested = interface
     m(): interface
@@ -101,10 +101,10 @@ let nested = interface
 
 let different_method_order = struct
 impl printable2 for different_method_order
-    other-method(): std.unit
+    other_method(): std.unit
         std.unit_value
     print(): std.string
         "123"
 let h : printable2 = different_method_order{}
-h.other-method()
+h.other_method()
 assert(string_equals("123", h.print()))

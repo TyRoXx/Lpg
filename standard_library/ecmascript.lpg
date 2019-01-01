@@ -6,14 +6,14 @@ let string = std.string
 let array = std.array
 
 let host = interface
-    read-property(from: host_value, name: string): option[host_value]
-    call-method(this: host_value, method: string, arguments: array[host_value]): host_value
-    export-string(content: string): host_value
-    import-string(from: host_value): option[string]
+    read_property(from: host_value, name: string): option[host_value]
+    call_method(this: host_value, method: string, arguments: array[host_value]): host_value
+    export_string(content: string): host_value
+    import_string(from: host_value): option[string]
     undefined(): host_value
-    export-integer(value: integer): host_value
+    export_integer(value: integer): host_value
     equals(left: host_value, right: host_value): boolean
-    import-integer(from: host_value): option[integer]
+    import_integer(from: host_value): option[integer]
 
 let export = struct
     integer: type_of(integer)

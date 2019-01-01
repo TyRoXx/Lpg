@@ -2,7 +2,7 @@ let std = import std
 let integers = import integer
 let integer = integers.integer
 
-match subtract(std.runtime-value[integer](0), 0)
+match subtract(std.runtime_value[integer](0), 0)
     case subtract_result.ok(let result):
         assert(integer_equals(0, result))
     case subtract_result.underflow:
@@ -27,7 +27,7 @@ assert(match subtract(0, 1)
         boolean.true
 )
 
-assert(match subtract(std.runtime-value[integer](0), 1)
+assert(match subtract(std.runtime_value[integer](0), 1)
     case subtract_result.ok(let result):
         boolean.false
     case subtract_result.underflow:

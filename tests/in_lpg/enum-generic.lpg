@@ -1,99 +1,99 @@
 let std = import std
 
-let single-parameter = enum[T]
+let single_parameter = enum[T]
     a(T)
 
-let a = single-parameter[boolean].a(boolean.true)
+let a = single_parameter[boolean].a(boolean.true)
 assert(match a
-    case single-parameter[boolean].a(let s):
+    case single_parameter[boolean].a(let s):
         s
 )
 
-let runtime-string = (arg: std.string)
+let runtime_string = (arg: std.string)
     side_effect()
     concat("", arg)
 
-let b = single-parameter[std.string].a(runtime-string("abc"))
+let b = single_parameter[std.string].a(runtime_string("abc"))
 assert(match b
-    case single-parameter[std.string].a(let s):
+    case single_parameter[std.string].a(let s):
         string_equals("abc", s)
 )
 
-let two-parameters = enum[First, Second]
+let two_parameters = enum[First, Second]
     first(First)
     second(Second)
 
-let c = two-parameters[boolean, std.string].second(runtime-string("abc"))
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
 assert(match c
-    case two-parameters[boolean, std.string].first(let s):
+    case two_parameters[boolean, std.string].first(let s):
         boolean.false
-    case two-parameters[boolean, std.string].second(let s):
+    case two_parameters[boolean, std.string].second(let s):
         string_equals("abc", s)
 )
 
-let using-global = enum[T]
+let using_global = enum[T]
     a(T)
     b(boolean)
-assert(match using-global[boolean].b(boolean.true)
-    case using-global[boolean].a(let s):
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
         boolean.false
-    case using-global[boolean].b(let s):
+    case using_global[boolean].b(let s):
         s
 )
 
-let accessing-struct = enum[T]
+let accessing_struct = enum[T]
     a(T)
     b(std.boolean)
-assert(match using-global[boolean].b(boolean.true)
-    case using-global[boolean].a(let s):
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
         boolean.false
-    case using-global[boolean].b(let s):
+    case using_global[boolean].b(let s):
         s
 )
 
 let local = struct
     m: std.boolean
-let using-local = enum[T]
+let using_local = enum[T]
     a(T)
     b(local)
     c({()
-        let cover-integer-literal = 3
-        let cover-string-literal = "abc"
-        let cover-tuple = {local}
-        let cover-struct = struct
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_tuple = {local}
+        let cover_struct = struct
             m: boolean
-        let cover-struct-var = cover-struct{boolean.true}
-        let access-struct = cover-struct-var.m
+        let cover_struct_var = cover_struct{boolean.true}
+        let access_struct = cover_struct_var.m
         //comment
         loop
             break
-        let cover-enum = enum
+        let cover_enum = enum
             x
-        let cover-enum-var = cover-enum.x
-        match cover-enum-var
-            case cover-enum.x: std.unit
-        let cover-not = !boolean.true
-        let cover-interface = interface
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
             m(): boolean
-        impl cover-interface for boolean
+        impl cover_interface for boolean
             m(): boolean
                 self
-        let cover-instantiation = single-parameter[boolean].a(boolean.true)
-        match cover-instantiation
-            case single-parameter[boolean].a(let s): s
+        let cover_instantiation = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
         local
 }.0())
-assert(match using-local[boolean].b(local{boolean.true})
-    case using-local[boolean].a(let s):
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
         boolean.false
-    case using-local[boolean].b(let s):
+    case using_local[boolean].b(let s):
         s.m
-    case using-local[boolean].c(let s):
+    case using_local[boolean].c(let s):
         boolean.false
 )
 
-let access-parameter = enum[Struct]
+let access_parameter = enum[Struct]
     e(Struct.element)
-let access-parameter-struct = struct
+let access_parameter_struct = struct
     element: std.type
-let x = access-parameter[access-parameter-struct{std.boolean}].e(std.boolean.true)
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)

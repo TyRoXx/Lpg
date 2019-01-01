@@ -1,21 +1,21 @@
 let std = import std
 
 let s = struct
-let s-instance = s{}
+let s_instance = s{}
 
 let t = struct
     a: boolean
-let t-instance = t{boolean.true}
-assert(t-instance.a)
+let t_instance = t{boolean.true}
+assert(t_instance.a)
 
 let u = struct
     a: t
     b: std.string
     c: int(0, 1)
-let u-instance = u{t{boolean.true}, "abc", 0}
-assert(u-instance.a.a)
-assert(string_equals("abc", u-instance.b))
-assert(integer_equals(0, u-instance.c))
+let u_instance = u{t{boolean.true}, "abc", 0}
+assert(u_instance.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
 
 let f = (arg: u): boolean
     arg.a.a
@@ -25,13 +25,13 @@ let nested = struct
     a: struct
         b: boolean
 
-let conversion-test-interface = interface
+let conversion_test_interface = interface
     method(): std.boolean
-impl conversion-test-interface for std.unit
+impl conversion_test_interface for std.unit
     method(): std.boolean
         std.boolean.true
-let conversion-test = struct
-    i: conversion-test-interface
+let conversion_test = struct
+    i: conversion_test_interface
 
-let conversion = conversion-test{std.unit_value}
+let conversion = conversion_test{std.unit_value}
 assert(conversion.i.method())

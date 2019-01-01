@@ -10,11 +10,11 @@ let f2 = [T](a: T): T
 let g2 = f2[std.boolean]
 assert(g2(std.boolean.true))
 
-let instantiate-again = f[std.boolean]
-assert(instantiate-again(std.boolean.true))
+let instantiate_again = f[std.boolean]
+assert(instantiate_again(std.boolean.true))
 
-let other-argument = f[int(0, 3)]
-assert(integer_equals(2, other-argument(2)))
+let other_argument = f[int(0, 3)]
+assert(integer_equals(2, other_argument(2)))
 
 let h = [T, U](a: T, b: U)
     f[T](a)

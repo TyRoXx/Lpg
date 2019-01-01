@@ -50,7 +50,7 @@ let make_mutable = [T](value: T): mutable[T]
     assert(integer_equals(1, content.size()))
     mutable_content[T]{content}
 
-let runtime-value = [T](value: T): T
+let runtime_value = [T](value: T): T
     side_effect()
     value
 
@@ -70,6 +70,6 @@ let export = struct
     array: type_of(array)
     mutable: type_of(mutable)
     make_mutable: type_of(make_mutable)
-    runtime-value: type_of(runtime-value)
+    runtime_value: type_of(runtime_value)
     compile_time: type_of(compile_time)
-export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make_mutable, runtime-value, compile_time}
+export{and, or, not, type, string, boolean, unit, unit_value, option, array, mutable, make_mutable, runtime_value, compile_time}

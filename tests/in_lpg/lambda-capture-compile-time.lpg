@@ -1,18 +1,18 @@
 let std = import std
 
-let require-compile-time = enum[CompileTimeValue]
+let require_compile_time = enum[CompileTimeValue]
 
 let and = std.and
-require-compile-time[and]
+require_compile_time[and]
 
 let f = ()
     let result = ()
         and(boolean.true, boolean.true)
-    require-compile-time[result]
+    require_compile_time[result]
     result
-require-compile-time[f]
+require_compile_time[f]
 
 let g = f()
-require-compile-time[g]
+require_compile_time[g]
 
 assert(g())

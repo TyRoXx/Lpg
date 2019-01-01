@@ -1,5 +1,5 @@
 let std = import std
 
-let fail-exists = (): std.string
+let fail_exists = (): std.string
     //Fail doesn't return anything. It just halts the program.
     fail()

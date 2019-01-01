@@ -6,6 +6,6 @@ let runtime = (arg: std.boolean)
     option[std.boolean].some(arg)
 runtime(std.boolean.true)
 
-let compile-time = (arg: std.boolean)
+let compile_time = (arg: std.boolean)
     option[std.boolean].some(arg)
-compile-time(std.boolean.false)
+compile_time(std.boolean.false)

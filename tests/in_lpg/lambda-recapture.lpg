@@ -1,5 +1,5 @@
 
-/*use a captured variable in a compile-time context*/
+/*use a captured variable in a compile_time context*/
 let m = boolean
 let f5 = ()
     let f6 = ()

@@ -5,10 +5,10 @@ let mutable = interface[T]
     load(): T
     store(value: T): std.unit
 
-let mutable-content = struct[T]
+let mutable_content = struct[T]
     content: std.array[T]
 
-impl[T] mutable[T] for mutable-content[T]
+impl[T] mutable[T] for mutable_content[T]
     load(): T
         match self.content.load(0)
             case std.option[T].some(let value):
@@ -22,7 +22,7 @@ let make_mutable = [T](value: T): mutable[T]
     let content = new_array(T)
     assert(content.append(value))
     assert(integer_equals(1, content.size()))
-    mutable-content[T]{content}
+    mutable_content[T]{content}
 
 let construct = make_mutable[int(0, 3)]
 let m : mutable[int(0, 3)] = construct(0)

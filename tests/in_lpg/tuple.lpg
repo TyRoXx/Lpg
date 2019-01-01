@@ -14,15 +14,15 @@ assert(integer_equals(123, w.0.0.0.0))
 let y = w.0.0.0.0
 assert(integer_equals(123, y))
 
-let runtime-tuple = ()
+let runtime_tuple = ()
     side_effect()
     {123, "test"}
-assert(integer_equals(123, runtime-tuple().0))
-assert(string_equals("test", runtime-tuple().1))
+assert(integer_equals(123, runtime_tuple().0))
+assert(string_equals("test", runtime_tuple().1))
 
-let require-compile-time = enum[CompileTimeValue]
-require-compile-time[{}]
-require-compile-time[{boolean.true}]
-require-compile-time[{boolean.true}.0]
+let require_compile_time = enum[CompileTimeValue]
+require_compile_time[{}]
+require_compile_time[{boolean.true}]
+require_compile_time[{boolean.true}.0]
 
 //

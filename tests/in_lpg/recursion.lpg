@@ -23,7 +23,7 @@ let k = (a: std.boolean): std.string
 assert(string_equals("3", k(std.boolean.true)))
 assert(string_equals("3", k(std.boolean.false)))
 
-let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
+let copy_array_boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
     match integer_equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value
@@ -31,16 +31,16 @@ let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolea
             match from.load(to.size())
                 case std.option[std.boolean].some(let element):
                     assert(to.append(element))
-                    copy-array-boolean(from, to)
+                    copy_array_boolean(from, to)
                 case std.option[std.boolean].none:
                     fail()
 
-copy-array-boolean(new_array(std.boolean), new_array(std.boolean))
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
 
 let original = new_array(std.boolean)
 assert(original.append(std.boolean.true))
 let into = new_array(std.boolean)
-copy-array-boolean(original, into)
+copy_array_boolean(original, into)
 assert(integer_equals(1, into.size()))
 match into.load(0)
     case std.option[std.boolean].some(let value):
@@ -48,7 +48,7 @@ match into.load(0)
     case std.option[std.boolean].none:
         fail()
 
-let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
+let copy_array = [T](from: std.array[T], to: std.array[T]): std.unit
     match integer_equals(from.size(), to.size())
         case std.boolean.true:
             std.unit_value
@@ -56,7 +56,7 @@ let copy-array = [T](from: std.array[T], to: std.array[T]): std.unit
             match from.load(to.size())
                 case std.option[T].some(let element):
                     assert(to.append(element))
-                    copy-array[T](from, to)
+                    copy_array[T](from, to)
                 case std.option[T].none:
                     fail()
-copy-array[std.boolean](new_array(std.boolean), new_array(std.boolean))
+copy_array[std.boolean](new_array(std.boolean), new_array(std.boolean))
