@@ -1659,6 +1659,18 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     integer_range_list_deallocate(integer_ranges);
 }
 
+static void deallocate_cases(match_instruction_case *cases, size_t const case_count)
+{
+    for (size_t j = 0; j < case_count; ++j)
+    {
+        match_instruction_case_free(cases[j]);
+    }
+    if (cases)
+    {
+        deallocate(cases);
+    }
+}
+
 typedef enum pattern_evaluate_result_kind {
     pattern_evaluate_result_kind_is_pattern = 1,
     pattern_evaluate_result_kind_no_pattern,
@@ -1820,6 +1832,13 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             {
                 return key_evaluated;
             }
+            if (key_evaluated.type_.kind != type_kind_string)
+            {
+                emit_semantic_error(
+                    state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
+                deallocate_cases(cases, i);
+                return evaluate_expression_result_empty;
+            }
         }
 
         instruction_sequence action = instruction_sequence_create(NULL, 0);
@@ -1828,6 +1847,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         if (!action_evaluated.has_value)
         {
             instruction_sequence_free(&action);
+            deallocate_cases(cases, i);
             return action_evaluated;
         }
 
@@ -1843,6 +1863,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             emit_semantic_error(
                 state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)));
             instruction_sequence_free(&action);
+            deallocate_cases(cases, i);
             return evaluate_expression_result_empty;
         }
 
