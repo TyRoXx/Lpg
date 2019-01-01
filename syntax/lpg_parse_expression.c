@@ -151,20 +151,37 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
         }
         pop(parser);
         rich_token const expected_case = peek(parser);
-        if (expected_case.token != token_case)
+        bool is_default = false;
+        if (expected_case.token == token_identifier)
+        {
+            if (!unicode_view_equals_c_str(expected_case.content, "default"))
+            {
+                LPG_TO_DO();
+            }
+            is_default = true;
+            pop(parser);
+        }
+        else if (expected_case.token == token_case)
+        {
+            pop(parser);
+            if (!parse_space(parser))
+            {
+                return false;
+            }
+        }
+        else
         {
             parser->on_error(parse_error_create(parse_error_expected_case, expected_case.where), parser->on_error_user);
             return false;
         }
-        pop(parser);
-        if (!parse_space(parser))
+        expression_parser_result key;
+        if (!is_default)
         {
-            return false;
-        }
-        expression_parser_result const key = parse_expression(parser, indentation, 0);
-        if (!key.is_success)
-        {
-            return false;
+            key = parse_expression(parser, indentation, 0);
+            if (!key.is_success)
+            {
+                return false;
+            }
         }
         {
             parse_optional_space(parser);
@@ -188,8 +205,8 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 return false;
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
-            (*cases)[*case_count] = match_case_create(
-                expression_allocate(key.success), expression_allocate(expression_from_sequence(value)));
+            (*cases)[*case_count] = match_case_create(is_default ? NULL : expression_allocate(key.success),
+                                                      expression_allocate(expression_from_sequence(value)));
         }
         else
         {
@@ -211,8 +228,8 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 }
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
-            (*cases)[*case_count] =
-                match_case_create(expression_allocate(key.success), expression_allocate(value.success));
+            (*cases)[*case_count] = match_case_create(
+                is_default ? NULL : expression_allocate(key.success), expression_allocate(value.success));
         }
         ++(*case_count);
     }

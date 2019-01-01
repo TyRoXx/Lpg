@@ -91,6 +91,9 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
                 case match_instruction_case_kind_value:
                     registers_read_from[current_instruction.match.cases[j].key_value] = true;
                     break;
+
+                case match_instruction_case_kind_default:
+                    break;
                 }
                 if (current_instruction.match.cases[j].value.is_set)
                 {
@@ -206,6 +209,9 @@ static bool change_register_ids(instruction *const where, register_id const *con
 
             case match_instruction_case_kind_value:
                 ASSERT(update_register_id(&where->match.cases[j].key_value, new_register_ids));
+                break;
+
+            case match_instruction_case_kind_default:
                 break;
             }
             if (where->match.cases[j].value.is_set)

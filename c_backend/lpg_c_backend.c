@@ -2604,15 +2604,18 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                     LPG_TRY(stream_writer_write_string(c_output, " "));
                 }
                 LPG_TRY(stream_writer_write_string(c_output, "if ("));
-                LPG_TRY(generate_c_read_access(state, current_function, input.match.key, c_output));
                 ASSUME(state->registers[input.match.key].type_of.is_set);
                 type const key_type = state->registers[input.match.key].type_of.value;
                 if ((key_type.kind == type_kind_enumeration) &&
                     has_stateful_element(state->program->enums[key_type.enum_]))
                 {
+                    LPG_TRY(generate_c_read_access(state, current_function, input.match.key, c_output));
                     LPG_TRY(stream_writer_write_string(c_output, ".which == "));
                     switch (input.match.cases[i].kind)
                     {
+                    case match_instruction_case_kind_default:
+                        LPG_TO_DO();
+
                     case match_instruction_case_kind_value:
                         LPG_TRY(
                             generate_c_read_access(state, current_function, input.match.cases[i].key_value, c_output));
@@ -2628,8 +2631,23 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 else
                 {
                     ASSUME(input.match.cases[i].kind == match_instruction_case_kind_value);
-                    LPG_TRY(stream_writer_write_string(c_output, " == "));
-                    LPG_TRY(generate_c_read_access(state, current_function, input.match.cases[i].key_value, c_output));
+                    if (key_type.kind == type_kind_string)
+                    {
+                        state->standard_library.using_string = true;
+                        LPG_TRY(stream_writer_write_string(c_output, "string_equals("));
+                        LPG_TRY(generate_c_read_access(state, current_function, input.match.key, c_output));
+                        LPG_TRY(stream_writer_write_string(c_output, ", "));
+                        LPG_TRY(
+                            generate_c_read_access(state, current_function, input.match.cases[i].key_value, c_output));
+                        LPG_TRY(stream_writer_write_string(c_output, ")"));
+                    }
+                    else
+                    {
+                        LPG_TRY(generate_c_read_access(state, current_function, input.match.key, c_output));
+                        LPG_TRY(stream_writer_write_string(c_output, " == "));
+                        LPG_TRY(
+                            generate_c_read_access(state, current_function, input.match.cases[i].key_value, c_output));
+                    }
                 }
                 LPG_TRY(stream_writer_write_string(c_output, ")"));
             }
@@ -2669,6 +2687,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
                 break;
             }
 
+            case match_instruction_case_kind_default:
             case match_instruction_case_kind_value:
                 break;
             }

@@ -171,8 +171,16 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_FOR(size_t, i, value->match.number_of_cases)
         {
             LPG_TRY(indent(to, go_deeper(whitespace, 1)));
-            LPG_TRY(stream_writer_write_string(to, "case"));
-            LPG_TRY(save_expression(to, value->match.cases[i].key, add_space_or_newline(go_deeper(whitespace, 1))));
+            if (value->match.cases[i].key_or_default)
+            {
+                LPG_TRY(stream_writer_write_string(to, "case"));
+                LPG_TRY(save_expression(
+                    to, value->match.cases[i].key_or_default, add_space_or_newline(go_deeper(whitespace, 1))));
+            }
+            else
+            {
+                LPG_TRY(stream_writer_write_string(to, "default"));
+            }
             LPG_TRY(stream_writer_write_string(to, ":"));
             LPG_TRY(save_expression(to, value->match.cases[i].action, add_space_or_newline(go_deeper(whitespace, 1))));
             LPG_TRY(stream_writer_write_string(to, "\n"));

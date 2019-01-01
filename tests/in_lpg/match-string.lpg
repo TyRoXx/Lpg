@@ -1,0 +1,9 @@
+let std = import std
+let boolean = std.boolean
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(a)

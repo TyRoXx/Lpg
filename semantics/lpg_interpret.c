@@ -415,6 +415,9 @@ static run_sequence_result run_match(match_instruction const match, value *const
         case match_instruction_case_kind_value:
             matches = value_equals(registers[this_case->key_value], key);
             break;
+
+        case match_instruction_case_kind_default:
+            LPG_TO_DO();
         }
         if (!matches)
         {

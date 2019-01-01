@@ -180,6 +180,9 @@ void print_instruction(instruction const printed, size_t const indentation)
         {
             switch (printed.match.cases[i].kind)
             {
+            case match_instruction_case_kind_default:
+                LPG_TO_DO();
+
             case match_instruction_case_kind_stateful_enum:
                 printf("case %u(let %u) {\n", printed.match.cases[i].stateful_enum.element,
                        printed.match.cases[i].stateful_enum.where);

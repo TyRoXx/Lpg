@@ -1799,16 +1799,82 @@ static bool merge_types(type *result_type, const type evaluated_type)
     return true;
 }
 
+static evaluate_expression_result evaluate_match_expression_with_string(function_checking_state *const state,
+                                                                        instruction_sequence *const function,
+                                                                        expression const *const element,
+                                                                        evaluate_expression_result const input)
+{
+    ASSUME(input.type_.kind == type_kind_string);
+    type result_type = type_from_unit();
+    bool all_cases_return = true;
+    match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
+    for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+    {
+        match_case const case_tree = (*element).match.cases[i];
+        expression *const key = case_tree.key_or_default;
+        evaluate_expression_result key_evaluated;
+        if (key)
+        {
+            key_evaluated = evaluate_expression(state, function, *key, NULL);
+            if (!key_evaluated.has_value)
+            {
+                return key_evaluated;
+            }
+        }
+
+        instruction_sequence action = instruction_sequence_create(NULL, 0);
+        evaluate_expression_result const action_evaluated =
+            evaluate_expression(state, &action, *case_tree.action, NULL);
+        if (!action_evaluated.has_value)
+        {
+            instruction_sequence_free(&action);
+            return action_evaluated;
+        }
+
+        all_cases_return = (all_cases_return && action_evaluated.always_returns);
+
+        if (i == 0)
+        {
+            result_type = action_evaluated.type_;
+        }
+        else if (!type_equals(result_type, action_evaluated.type_))
+        {
+            /*TODO: support types that are not the same, but still comparable*/
+            emit_semantic_error(
+                state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*case_tree.action)));
+            instruction_sequence_free(&action);
+            return evaluate_expression_result_empty;
+        }
+
+        if (key)
+        {
+            cases[i] = match_instruction_case_create_value(
+                key_evaluated.where, action, optional_register_id_create_set(action_evaluated.where));
+        }
+        else
+        {
+            cases[i] =
+                match_instruction_case_create_default(action, optional_register_id_create_set(action_evaluated.where));
+        }
+    }
+
+    register_id const result_register = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_match(match_instruction_create(
+                                  input.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+    return evaluate_expression_result_create(
+        true, result_register, result_type, optional_value_empty, false, all_cases_return);
+}
+
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
                                                      const expression *element)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const key = evaluate_expression(state, function, *(*element).match.input, NULL);
-    if (!key.has_value)
+    evaluate_expression_result const input = evaluate_expression(state, function, *(*element).match.input, NULL);
+    if (!input.has_value)
     {
-        return key;
+        return input;
     }
-    switch (key.type_.kind)
+    switch (input.type_.kind)
     {
     case type_kind_generic_struct:
     case type_kind_host_value:
@@ -1817,7 +1883,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
     case type_kind_enumeration:
     {
-        enumeration const *const enum_ = state->program->enums + key.type_.enum_;
+        enumeration const *const enum_ = state->program->enums + input.type_.enum_;
         if (enum_->size == 0)
         {
             emit_semantic_error(
@@ -1847,15 +1913,20 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             instruction_sequence action = instruction_sequence_create(NULL, 0);
             evaluate_expression_result action_evaluated;
             register_id placeholder_where = ~(register_id)0;
-            pattern_evaluate_result const maybe_pattern = check_for_pattern(state, function, *case_tree.key);
+            if (!case_tree.key_or_default)
+            {
+                LPG_TO_DO();
+            }
+            expression *const key = case_tree.key_or_default;
+            pattern_evaluate_result const maybe_pattern = check_for_pattern(state, function, *key);
             switch (maybe_pattern.kind)
             {
             case pattern_evaluate_result_kind_is_pattern:
             {
-                if (maybe_pattern.stateful_enum_element.enumeration != key.type_.enum_)
+                if (maybe_pattern.stateful_enum_element.enumeration != input.type_.enum_)
                 {
-                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
-                                                                     expression_source_begin(*case_tree.key)));
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
@@ -1865,7 +1936,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     if (*case_handled)
                     {
                         emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
-                                                                         expression_source_begin(*case_tree.key)));
+                                                                         expression_source_begin(*key)));
                         deallocate_boolean_cases(cases, enum_elements_handled, i);
                         return evaluate_expression_result_empty;
                     }
@@ -1900,18 +1971,17 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             case pattern_evaluate_result_kind_no_pattern:
             {
-                evaluate_expression_result const key_evaluated =
-                    evaluate_expression(state, function, *case_tree.key, NULL);
+                evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
                 if (!key_evaluated.has_value)
                 {
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return key_evaluated;
                 }
 
-                if (!type_equals(key.type_, key_evaluated.type_))
+                if (!type_equals(input.type_, key_evaluated.type_))
                 {
-                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
-                                                                     expression_source_begin(*case_tree.key)));
+                    emit_semantic_error(
+                        state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return evaluate_expression_result_empty;
                 }
@@ -1929,7 +1999,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     if (*case_handled)
                     {
                         emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
-                                                                         expression_source_begin(*case_tree.key)));
+                                                                         expression_source_begin(*key)));
                         deallocate_boolean_cases(cases, enum_elements_handled, i);
                         return evaluate_expression_result_empty;
                     }
@@ -1940,8 +2010,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 ASSERT(key_evaluated.compile_time_value.is_set);
 
                 is_always_this_case =
-                    key.compile_time_value.is_set && key.is_pure &&
-                    value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_);
+                    input.compile_time_value.is_set && input.is_pure &&
+                    value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_);
                 key_value = key_evaluated.where;
 
                 action_evaluated = evaluate_expression(state, &action, *case_tree.action, NULL);
@@ -2012,6 +2082,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             ASSUME(enum_elements_handled[i]);
             switch (cases[i].kind)
             {
+            case match_instruction_case_kind_default:
+                LPG_TO_DO();
+
             case match_instruction_case_kind_stateful_enum:
                 break;
 
@@ -2033,6 +2106,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                         }
                         break;
                     }
+
+                    case match_instruction_case_kind_default:
+                        LPG_TO_DO();
                     }
                 }
                 break;
@@ -2041,7 +2117,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         register_id result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_match(match_instruction_create(
-                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+                          input.where, cases, (*element).match.number_of_cases, result_register, result_type)));
         deallocate(enum_elements_handled);
         if (compile_time_result.is_set)
         {
@@ -2059,7 +2135,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
     case type_kind_integer_range:
     {
-        integer const expected_cases = integer_range_size(key.type_.integer_range_);
+        integer const expected_cases = integer_range_size(input.type_.integer_range_);
 
         if (!integer_equal(expected_cases, integer_create(0, (*element).match.number_of_cases)))
         {
@@ -2071,7 +2147,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
 
         integer_range_list integer_ranges_unhandled =
-            integer_range_list_create_from_integer_range(key.type_.integer_range_);
+            integer_range_list_create_from_integer_range(input.type_.integer_range_);
 
         type result_type = type_from_unit();
         optional_value compile_time_result = optional_value_empty;
@@ -2080,7 +2156,12 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
         {
             match_case const case_tree = (*element).match.cases[i];
-            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *case_tree.key, NULL);
+            if (!case_tree.key_or_default)
+            {
+                LPG_TO_DO();
+            }
+            expression *const key = case_tree.key_or_default;
+            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
             if (!key_evaluated.has_value)
             {
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
@@ -2089,8 +2170,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             if (key_evaluated.type_.kind != type_kind_integer_range)
             {
-                emit_semantic_error(state, semantic_error_create(
-                                               semantic_error_type_mismatch, expression_source_begin(*case_tree.key)));
+                emit_semantic_error(
+                    state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
                 deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                 return evaluate_expression_result_empty;
             }
@@ -2103,8 +2184,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 else
                 {
                     // TODO: Better error description
-                    emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_match_case,
-                                                                     expression_source_begin(*case_tree.key)));
+                    emit_semantic_error(state, semantic_error_create(
+                                                   semantic_error_duplicate_match_case, expression_source_begin(*key)));
                     deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
                     return evaluate_expression_result_empty;
                 }
@@ -2139,8 +2220,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 return evaluate_expression_result_empty;
             }
 
-            if (!compile_time_result.is_set && key.compile_time_value.is_set && key.is_pure &&
-                value_equals(key.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
+            if (!compile_time_result.is_set && input.compile_time_value.is_set && input.is_pure &&
+                value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
                 action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
             {
                 compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
@@ -2165,16 +2246,18 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         register_id const result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_match(match_instruction_create(
-                          key.where, cases, (*element).match.number_of_cases, result_register, result_type)));
+                          input.where, cases, (*element).match.number_of_cases, result_register, result_type)));
         return evaluate_expression_result_create(
             true, result_register, result_type, optional_value_empty, false, all_cases_return);
     }
+
+    case type_kind_string:
+        return evaluate_match_expression_with_string(state, function, element, input);
 
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string:
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_type:
@@ -2404,7 +2487,10 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         find_generic_closures_in_expression(closures, state, *from.match.input);
         for (size_t i = 0; i < from.match.number_of_cases; ++i)
         {
-            find_generic_closures_in_expression(closures, state, *from.match.cases[i].key);
+            if (from.match.cases[i].key_or_default)
+            {
+                find_generic_closures_in_expression(closures, state, *from.match.cases[i].key_or_default);
+            }
             find_generic_closures_in_expression(closures, state, *from.match.cases[i].action);
         }
         break;

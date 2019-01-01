@@ -353,6 +353,16 @@ match_instruction_case match_instruction_case_create_stateful_enum(match_instruc
     return result;
 }
 
+match_instruction_case match_instruction_case_create_default(instruction_sequence action, optional_register_id returned)
+{
+    match_instruction_case result;
+    result.kind = match_instruction_case_kind_default;
+    result.key_value = ~(register_id)0;
+    result.action = action;
+    result.value = returned;
+    return result;
+}
+
 void match_instruction_case_free(match_instruction_case freed)
 {
     instruction_sequence_free(&freed.action);
@@ -383,6 +393,9 @@ bool match_instruction_case_equals(match_instruction_case const left, match_inst
             return false;
         }
         break;
+
+    case match_instruction_case_kind_default:
+        LPG_TO_DO();
     }
     return instruction_sequence_equals(&left.action, &right.action) &&
            optional_register_id_equals(left.value, right.value);

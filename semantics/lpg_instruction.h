@@ -218,7 +218,8 @@ struct instruction
 
 typedef enum match_instruction_case_kind {
     match_instruction_case_kind_value = 1,
-    match_instruction_case_kind_stateful_enum
+    match_instruction_case_kind_stateful_enum,
+    match_instruction_case_kind_default
 } match_instruction_case_kind;
 
 typedef struct match_instruction_case_stateful_enum
@@ -247,6 +248,9 @@ match_instruction_case match_instruction_case_create_value(register_id key_value
 match_instruction_case match_instruction_case_create_stateful_enum(match_instruction_case_stateful_enum stateful_enum,
                                                                    instruction_sequence action,
                                                                    optional_register_id returned);
+match_instruction_case match_instruction_case_create_default(instruction_sequence action,
+                                                             optional_register_id returned);
+
 void match_instruction_case_free(match_instruction_case freed);
 bool match_instruction_case_equals(match_instruction_case const left, match_instruction_case const right);
 

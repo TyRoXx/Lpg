@@ -130,11 +130,12 @@ bool access_structure_equals(access_structure const left, access_structure const
 
 typedef struct match_case
 {
-    expression *key;
+    /*key_or_default==NULL for default*/
+    expression *key_or_default;
     expression *action;
 } match_case;
 
-match_case match_case_create(LPG_NON_NULL(expression *key), LPG_NON_NULL(expression *action));
+match_case match_case_create(expression *key_or_default, LPG_NON_NULL(expression *action));
 void match_case_free(LPG_NON_NULL(match_case *value));
 bool match_case_equals(match_case const left, match_case const right);
 match_case match_case_clone(match_case const original);

@@ -760,10 +760,15 @@ static success_indicator generate_equality_comparable_match_cases(function_gener
             LPG_UNREACHABLE();
 
         case match_instruction_case_kind_value:
+            LPG_TRY(generate_stateless_enum_case_check(
+                state, generated.key, generated.cases[i].key_value, ecmascript_output));
+            break;
+
+        case match_instruction_case_kind_default:
+            ASSUME(i == (generated.count - 1));
+            LPG_TRY(stream_writer_write_string(ecmascript_output, "true /*default*/"));
             break;
         }
-        LPG_TRY(
-            generate_stateless_enum_case_check(state, generated.key, generated.cases[i].key_value, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "{\n"));
@@ -816,6 +821,9 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
             LPG_TRY(generate_stateless_enum_case_check(
                 state, generated.key, generated.cases[i].key_value, ecmascript_output));
             break;
+
+        case match_instruction_case_kind_default:
+            LPG_TO_DO();
         }
         LPG_TRY(stream_writer_write_string(ecmascript_output, ")\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
@@ -841,6 +849,9 @@ static success_indicator generate_stateful_enum_match_cases(function_generation 
 
         case match_instruction_case_kind_value:
             break;
+
+        case match_instruction_case_kind_default:
+            LPG_TO_DO();
         }
         LPG_TRY(generate_sequence(state, generated.cases[i].action, indentation + 1, ecmascript_output));
         if (generated.cases[i].value.is_set)
@@ -870,10 +881,8 @@ static success_indicator generate_match(function_generation *const state, match_
     type const key_type = state->registers[generated.key].type_of;
     switch (key_type.kind)
     {
-    case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_integer_range:
+    case type_kind_string:
         return generate_equality_comparable_match_cases(state, generated, indentation, ecmascript_output);
 
     case type_kind_enumeration:
@@ -885,12 +894,12 @@ static success_indicator generate_match(function_generation *const state, match_
         return generate_equality_comparable_match_cases(state, generated, indentation, ecmascript_output);
     }
 
+    case type_kind_generic_struct:
     case type_kind_host_value:
     case type_kind_generic_lambda:
     case type_kind_structure:
     case type_kind_function_pointer:
     case type_kind_unit:
-    case type_kind_string:
     case type_kind_tuple:
     case type_kind_type:
     case type_kind_enum_constructor:

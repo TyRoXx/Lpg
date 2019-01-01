@@ -167,27 +167,46 @@ bool access_structure_equals(access_structure const left, access_structure const
     return expression_equals(left.object, right.object) && identifier_expression_equals(left.member, right.member);
 }
 
-match_case match_case_create(expression *key, expression *action)
+match_case match_case_create(expression *key_or_default, expression *action)
 {
-    match_case const result = {key, action};
+    match_case const result = {key_or_default, action};
     return result;
 }
 
 void match_case_free(match_case *value)
 {
-    expression_deallocate(value->key);
+    if (value->key_or_default)
+    {
+        expression_deallocate(value->key_or_default);
+    }
     expression_deallocate(value->action);
 }
 
 bool match_case_equals(match_case const left, match_case const right)
 {
-    return expression_equals(left.key, right.key) && expression_equals(left.action, right.action);
+    if (left.key_or_default)
+    {
+        if (!right.key_or_default)
+        {
+            return false;
+        }
+        if (!expression_equals(left.key_or_default, right.key_or_default))
+        {
+            return false;
+        }
+    }
+    else if (right.key_or_default)
+    {
+        return false;
+    }
+    return expression_equals(left.action, right.action);
 }
 
 match_case match_case_clone(match_case const original)
 {
     return match_case_create(
-        expression_allocate(expression_clone(*original.key)), expression_allocate(expression_clone(*original.action)));
+        original.key_or_default ? expression_allocate(expression_clone(*original.key_or_default)) : NULL,
+        expression_allocate(expression_clone(*original.action)));
 }
 
 match match_create(source_location begin, expression *input, match_case *cases, size_t number_of_cases)

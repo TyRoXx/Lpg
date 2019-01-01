@@ -515,6 +515,7 @@ void test_in_lpg(void)
                                                  "match-integer.lpg",
                                                  "match-multiple-integers.lpg",
                                                  "match-return.lpg",
+                                                 "match-string.lpg",
                                                  "option.lpg",
                                                  "parsing-edgecase.lpg",
                                                  "raw-string-literal.lpg",
