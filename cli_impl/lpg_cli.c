@@ -294,6 +294,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_instruction_limit_reached:
         return "Executed too many instructions at compile time";
+
+    case semantic_error_missing_default:
+        return "Default case is required for this type";
     }
     LPG_UNREACHABLE();
 }

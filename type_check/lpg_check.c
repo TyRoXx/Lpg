@@ -1820,6 +1820,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
     type result_type = type_from_unit();
     bool all_cases_return = true;
     match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
+    bool has_default = false;
     for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
     {
         match_case const case_tree = (*element).match.cases[i];
@@ -1839,6 +1840,14 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
                 deallocate_cases(cases, i);
                 return evaluate_expression_result_empty;
             }
+        }
+        else
+        {
+            if (has_default)
+            {
+                LPG_TO_DO();
+            }
+            has_default = true;
         }
 
         instruction_sequence action = instruction_sequence_create(NULL, 0);
@@ -1877,6 +1886,14 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             cases[i] =
                 match_instruction_case_create_default(action, optional_register_id_create_set(action_evaluated.where));
         }
+    }
+
+    if (!has_default)
+    {
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_missing_default, expression_source_begin(*element)));
+        deallocate_cases(cases, (*element).match.number_of_cases);
+        return evaluate_expression_result_empty;
     }
 
     register_id const result_register = allocate_register(&state->used_registers);
