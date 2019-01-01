@@ -396,7 +396,8 @@ static run_sequence_result run_match(match_instruction const match, value *const
 {
     value const key = registers[match.key];
     ASSUME(value_is_valid(key));
-    bool found_match = false;
+    match_instruction_case *matching_case = NULL;
+    match_instruction_case *default_case = NULL;
     for (size_t j = 0; j < match.count; ++j)
     {
         match_instruction_case *const this_case = match.cases + j;
@@ -417,45 +418,50 @@ static run_sequence_result run_match(match_instruction const match, value *const
             break;
 
         case match_instruction_case_kind_default:
-            LPG_TO_DO();
+            default_case = this_case;
+            break;
         }
         if (!matches)
         {
             continue;
         }
-        found_match = true;
-        switch (run_sequence(this_case->action, return_value, registers, captures, current_function, context))
-        {
-        case run_sequence_result_break:
-            return run_sequence_result_break;
-
-        case run_sequence_result_continue:
-            break;
-
-        case run_sequence_result_unavailable_at_this_time:
-            return run_sequence_result_unavailable_at_this_time;
-
-        case run_sequence_result_return:
-            return run_sequence_result_return;
-
-        case run_sequence_result_out_of_memory:
-            return run_sequence_result_out_of_memory;
-
-        case run_sequence_result_stack_overflow:
-            return run_sequence_result_stack_overflow;
-
-        case run_sequence_result_instruction_limit_reached:
-            return run_sequence_result_instruction_limit_reached;
-        }
-        if (this_case->value.is_set)
-        {
-            ASSUME(value_is_valid(registers[this_case->value.value]));
-            ASSUME(value_conforms_to_type(registers[this_case->value.value], match.result_type));
-            registers[match.result] = registers[this_case->value.value];
-        }
+        matching_case = this_case;
         break;
     }
-    ASSUME(found_match);
+    if (!matching_case)
+    {
+        matching_case = default_case;
+    }
+    ASSUME(matching_case);
+    switch (run_sequence(matching_case->action, return_value, registers, captures, current_function, context))
+    {
+    case run_sequence_result_break:
+        return run_sequence_result_break;
+
+    case run_sequence_result_continue:
+        break;
+
+    case run_sequence_result_unavailable_at_this_time:
+        return run_sequence_result_unavailable_at_this_time;
+
+    case run_sequence_result_return:
+        return run_sequence_result_return;
+
+    case run_sequence_result_out_of_memory:
+        return run_sequence_result_out_of_memory;
+
+    case run_sequence_result_stack_overflow:
+        return run_sequence_result_stack_overflow;
+
+    case run_sequence_result_instruction_limit_reached:
+        return run_sequence_result_instruction_limit_reached;
+    }
+    if (matching_case->value.is_set)
+    {
+        ASSUME(value_is_valid(registers[matching_case->value.value]));
+        ASSUME(value_conforms_to_type(registers[matching_case->value.value], match.result_type));
+        registers[match.result] = registers[matching_case->value.value];
+    }
     return run_sequence_result_continue;
 }
 

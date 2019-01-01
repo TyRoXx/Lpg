@@ -1852,6 +1852,8 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
     match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
     bool has_default = false;
     optional_value compile_time_result = optional_value_empty;
+    optional_value default_compile_time_result = optional_value_empty;
+    bool can_have_compile_time_result = true;
     for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
     {
         match_case const case_tree = (*element).match.cases[i];
@@ -1923,20 +1925,26 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             return evaluate_expression_result_empty;
         }
 
-        if (!compile_time_result.is_set && input.compile_time_value.is_set && input.is_pure &&
-            value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_) &&
-            action_evaluated.compile_time_value.is_set && action_evaluated.is_pure)
-        {
-            compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
-        }
-
+        can_have_compile_time_result =
+            (can_have_compile_time_result && input.compile_time_value.is_set && input.is_pure &&
+             action_evaluated.compile_time_value.is_set && action_evaluated.is_pure);
         if (key)
         {
+            if (can_have_compile_time_result &&
+                value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_))
+            {
+                ASSUME(!compile_time_result.is_set);
+                compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
+            }
             cases[i] = match_instruction_case_create_value(
                 key_evaluated.where, action, optional_register_id_create_set(action_evaluated.where));
         }
         else
         {
+            if (can_have_compile_time_result)
+            {
+                default_compile_time_result = action_evaluated.compile_time_value;
+            }
             cases[i] =
                 match_instruction_case_create_default(action, optional_register_id_create_set(action_evaluated.where));
         }
@@ -1948,6 +1956,11 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             state, semantic_error_create(semantic_error_missing_default, expression_source_begin(*element)));
         deallocate_cases(cases, (*element).match.number_of_cases);
         return evaluate_expression_result_empty;
+    }
+
+    if (can_have_compile_time_result && !compile_time_result.is_set)
+    {
+        compile_time_result = default_compile_time_result;
     }
 
     if (compile_time_result.is_set)
