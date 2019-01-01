@@ -6,7 +6,7 @@ let f = [T]()
         [V]()
             {T, U, V}
 let tuple = f[std.boolean]()[123]()["test"]()
-assert(type-equals(std.boolean, tuple.0))
+assert(type_equals(std.boolean, tuple.0))
 assert(integer_equals(123, tuple.1))
 assert(string-equals("test", tuple.2))
 
@@ -15,6 +15,6 @@ let make-enum = [T]()
     enum[U]
         a(U)
 //The enums are considered different even though U is the same because T is not the same.
-assert(not(type-equals(make-enum[1]()[std.unit], make-enum[2]()[std.unit])))
-assert(type-equals(make-enum[1]()[std.unit], make-enum[1]()[std.unit]))
-assert(type-equals(make-enum[2]()[std.unit], make-enum[2]()[std.unit]))
+assert(not(type_equals(make-enum[1]()[std.unit], make-enum[2]()[std.unit])))
+assert(type_equals(make-enum[1]()[std.unit], make-enum[1]()[std.unit]))
+assert(type_equals(make-enum[2]()[std.unit], make-enum[2]()[std.unit]))

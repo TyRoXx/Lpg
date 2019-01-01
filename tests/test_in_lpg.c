@@ -244,7 +244,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 side_effect_impl, NULL, NULL, *global_object.members[0].what.function_pointer_)),
             /*1 integer_to_string*/ value_from_function_pointer(function_pointer_value_from_external(
                 integer_to_string_impl, NULL, NULL, *global_object.members[1].what.function_pointer_)),
-            /*2 type-equals*/ value_from_unit(),
+            /*2 type_equals*/ value_from_unit(),
             /*3 boolean*/ global_object.members[3].compile_time_value.value_,
             /*4 assert*/ value_from_function_pointer(function_pointer_value_from_external(
                 assert_impl, NULL, NULL, *global_object.members[4].what.function_pointer_)),
