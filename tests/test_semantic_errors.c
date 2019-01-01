@@ -1160,6 +1160,19 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_default_case, source_location_create(3, 13))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let i = match \"\"\n"
+                                               "    case \"\": 0\n"
+                                               "    default: 0\n"
+                                               "    default: 0\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
             semantic_error_create(semantic_error_duplicate_match_case, source_location_create(4, 9))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"

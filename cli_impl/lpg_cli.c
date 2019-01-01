@@ -297,6 +297,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_missing_default:
         return "Default case is required for this type";
+
+    case semantic_error_duplicate_default_case:
+        return "A match must not have more than one default case";
     }
     LPG_UNREACHABLE();
 }

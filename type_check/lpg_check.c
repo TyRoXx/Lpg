@@ -1845,7 +1845,10 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         {
             if (has_default)
             {
-                LPG_TO_DO();
+                emit_semantic_error(state, semantic_error_create(semantic_error_duplicate_default_case,
+                                                                 expression_source_begin(*case_tree.action)));
+                deallocate_cases(cases, i);
+                return evaluate_expression_result_empty;
             }
             has_default = true;
         }
