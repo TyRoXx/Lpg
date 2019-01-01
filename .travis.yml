@@ -34,10 +34,8 @@ script:
  - mkdir build
  - cd build
  - CC=$MYCC cmake .. -DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_BUILD_TYPE=$BUILD_TYPE -DLPG_WITH_NODEJS=$LPG_WITH_NODEJS -DLPG_WITH_CLANG_FORMAT=OFF -DLPG_WITH_UB_SANITIZER=$UB_SANITIZER -DLPG_WITH_MEMORY_SANITIZER=$MEMORY_SANITIZER -DLPG_WITH_ADDRESS_SANITIZER=$ADDRESS_SANITIZER -DLPG_WITH_THREAD_SANITIZER=$THREAD_SANITIZER || exit 1
- - echo "Building the project travis_fold:start:cmake"
  - cmake -LA . || exit 1
  - cmake --build . -- -j2 || exit 1
- - echo "travis_fold:end:cmake"
  - export UBSAN_OPTIONS=print_stacktrace=1:exitcode=55
  - export MSAN_OPTIONS=poison_in_dtor=1:exitcode=55
  - export ASAN_OPTIONS=check_initialization_order=1:exitcode=55
@@ -52,6 +50,4 @@ script:
    fi
  - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
  - cd ..
- - echo "travis_fold:start:documentation"
  - python documentation/compile_documentation.py
- - echo "travis_fold:end:documentation"
