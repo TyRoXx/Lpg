@@ -20,8 +20,8 @@ let k = (a: std.boolean): std.string
             k(std.boolean.false)
         case std.boolean.false:
             "3"
-assert(string-equals("3", k(std.boolean.true)))
-assert(string-equals("3", k(std.boolean.false)))
+assert(string_equals("3", k(std.boolean.true)))
+assert(string_equals("3", k(std.boolean.false)))
 
 let copy-array-boolean = (from: std.array[std.boolean], to: std.array[std.boolean]): std.unit
     match integer_equals(from.size(), to.size())

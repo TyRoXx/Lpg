@@ -361,7 +361,7 @@ standard_library_description describe_standard_library(void)
                                     function_pointer_value_from_external(concat_impl, NULL, NULL, stable->concat))));
 
     globals[9] = structure_member_create(
-        type_from_function_pointer(&stable->string_equals), unicode_string_from_c_str("string-equals"),
+        type_from_function_pointer(&stable->string_equals), unicode_string_from_c_str("string_equals"),
         optional_value_create(value_from_function_pointer(
             function_pointer_value_from_external(string_equals_impl, NULL, NULL, stable->string_equals))));
 

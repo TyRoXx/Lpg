@@ -8,7 +8,7 @@ let f = [T]()
 let tuple = f[std.boolean]()[123]()["test"]()
 assert(type_equals(std.boolean, tuple.0))
 assert(integer_equals(123, tuple.1))
-assert(string-equals("test", tuple.2))
+assert(string_equals("test", tuple.2))
 
 //Generic types are not necessarily the same even though they are defined the same:
 let make-enum = [T]()

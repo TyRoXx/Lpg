@@ -256,7 +256,7 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
                 not_impl, NULL, NULL, *global_object.members[7].what.function_pointer_)),
             /*8 concat*/ value_from_function_pointer(function_pointer_value_from_external(
                 concat_impl, NULL, NULL, *global_object.members[8].what.function_pointer_)),
-            /*9 string-equals*/ value_from_function_pointer(function_pointer_value_from_external(
+            /*9 string_equals*/ value_from_function_pointer(function_pointer_value_from_external(
                 string_equals_impl, NULL, NULL, *global_object.members[9].what.function_pointer_)),
             /*10 int*/ value_from_function_pointer(function_pointer_value_from_external(
                 int_impl, NULL, NULL, *global_object.members[10].what.function_pointer_)),

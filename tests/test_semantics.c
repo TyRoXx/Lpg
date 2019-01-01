@@ -437,7 +437,7 @@ static void test_assert(const standard_library_description *std_library)
             instruction_create_call(call_instruction_create(1, arguments, 1, 3)),
             instruction_create_return(return_instruction_create(3, 4))};
         check_single_wellformed_function(
-            "assert(string-equals(\"\", \"\"))", std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
+            "assert(string_equals(\"\", \"\"))", std_library->globals, LPG_COPY_ARRAY(expected_body_elements));
     }
 }
 

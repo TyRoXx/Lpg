@@ -21,8 +21,8 @@ impl transformer[std.boolean, std.string] for dummy
             case std.boolean.false: "false"
 
 let b : transformer[std.boolean, std.string] = dummy{}
-assert(string-equals("true", b.transform(std.boolean.true)))
-assert(string-equals("false", b.transform(std.boolean.false)))
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
 
 let captures-values = interface[T]
     method(arg0: std.string, arg1: T): producer[std.boolean]

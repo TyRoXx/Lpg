@@ -16,7 +16,7 @@ let runtime-string = (arg: std.string)
 let b = single-parameter[std.string].a(runtime-string("abc"))
 assert(match b
     case single-parameter[std.string].a(let s):
-        string-equals("abc", s)
+        string_equals("abc", s)
 )
 
 let two-parameters = enum[First, Second]
@@ -28,7 +28,7 @@ assert(match c
     case two-parameters[boolean, std.string].first(let s):
         boolean.false
     case two-parameters[boolean, std.string].second(let s):
-        string-equals("abc", s)
+        string_equals("abc", s)
 )
 
 let using-global = enum[T]

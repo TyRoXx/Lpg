@@ -14,7 +14,7 @@ let u = struct
     c: int(0, 1)
 let u-instance = u{t{boolean.true}, "abc", 0}
 assert(u-instance.a.a)
-assert(string-equals("abc", u-instance.b))
+assert(string_equals("abc", u-instance.b))
 assert(integer_equals(0, u-instance.c))
 
 let f = (arg: u): boolean

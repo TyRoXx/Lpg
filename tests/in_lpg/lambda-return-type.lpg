@@ -17,4 +17,4 @@ assert(integer_equals(1, explicit-return-type()))
 let convert-on-return = (): printable2
     side_effect()
     "aa"
-assert(string-equals("aa", convert-on-return().print()))
+assert(string_equals("aa", convert-on-return().print()))

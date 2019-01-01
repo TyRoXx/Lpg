@@ -5,21 +5,21 @@ let test-single = (arg: single)
     match arg
         case single.a(let state):
             side_effect()
-            string-equals("abc", state)
+            string_equals("abc", state)
 let make-runtime-string = (value: std.string)
     side_effect()
     concat("", value)
 assert(test-single(single.a(make-runtime-string("abc"))))
 assert(std.not(test-single(single.a("def"))))
 
-assert(string-equals("abc", match single.a(make-runtime-string("abc"))
+assert(string_equals("abc", match single.a(make-runtime-string("abc"))
     case single.a(let state): state
 ))
 
 let return-stateful-enum = ()
     side_effect()
     single.a(make-runtime-string("abc"))
-assert(string-equals("abc", match return-stateful-enum()
+assert(string_equals("abc", match return-stateful-enum()
     case single.a(let state): state
 ))
 
@@ -37,7 +37,7 @@ assert(match multi.b(structure{"abc", boolean.true})
     case multi.a(let state): boolean.false
     case multi.b(let state):
         side_effect()
-        string-equals("abc", state.x)
+        string_equals("abc", state.x)
     case multi.c(let state): boolean.false
     case multi.d(let state): boolean.false
     case multi.e: boolean.false

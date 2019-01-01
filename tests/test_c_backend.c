@@ -74,7 +74,7 @@ void test_c_backend(void)
     check_generated_c_code("let read = ()\n"
                            "    side_effect()\n"
                            "    \"\"\n"
-                           "assert(string-equals(read(), \"\"))\n",
+                           "assert(string_equals(read(), \"\"))\n",
                            std_library);
 
     check_generated_c_code("let f = () assert(boolean.true)\n"
@@ -87,13 +87,13 @@ void test_c_backend(void)
                            "    \"\"\n"
                            "let s = (a: std.string) a\n"
                            "let t = s(concat(read(), \"\"))\n"
-                           "assert(string-equals(\"\", t))\n",
+                           "assert(string_equals(\"\", t))\n",
                            std_library);
 
     check_generated_c_code("let read = ()\n"
                            "    side_effect()\n"
                            "    \"b\"\n"
-                           "assert(match string-equals(read(), \"a\")\n"
+                           "assert(match string_equals(read(), \"a\")\n"
                            "    case boolean.false: boolean.true\n"
                            "    case boolean.true: boolean.false\n"
                            ")\n",
@@ -109,8 +109,8 @@ void test_c_backend(void)
                            "let f = (printed: printable)\n"
                            "    side_effect()\n"
                            "    printed.print()\n"
-                           "assert(string-equals(\"a\", f(\"a\")))\n"
-                           "assert(string-equals(\"a\", f(f(\"a\"))))\n",
+                           "assert(string_equals(\"a\", f(\"a\")))\n"
+                           "assert(string_equals(\"a\", f(f(\"a\"))))\n",
                            std_library);
 
     check_generated_c_code("let f = ()\n"
@@ -122,7 +122,7 @@ void test_c_backend(void)
     check_generated_c_code("let f = ()\n"
                            "    side_effect()\n"
                            "    123\n"
-                           "assert(string-equals(\"123\", integer_to_string(f())))\n",
+                           "assert(string_equals(\"123\", integer_to_string(f())))\n",
                            std_library);
 
     standard_library_description_free(&std_library);

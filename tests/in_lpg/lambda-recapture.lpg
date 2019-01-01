@@ -38,5 +38,5 @@ let y = "2"
 let t = ()
     let u = ()
         {integer_to_string(x), y}
-    string-equals(u().0, u().1)
+    string_equals(u().0, u().1)
 assert(t())

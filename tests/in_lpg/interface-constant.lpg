@@ -13,4 +13,4 @@ impl i for s
 let constant : i = s{"hello"}
 let require-compile-time = enum[CompileTimeValue]
 //require-compile-time[constant]
-assert(string-equals("hello", constant.to-string()))
+assert(string_equals("hello", constant.to-string()))

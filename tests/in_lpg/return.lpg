@@ -15,7 +15,7 @@ let match-return-explicit-type = (arg: boolean): std.string
         case boolean.false:
             std.unit_value
     return "b"
-assert(string-equals("a", match-return-explicit-type(boolean.true)))
+assert(string_equals("a", match-return-explicit-type(boolean.true)))
 
 let match-return-implicit-type = (arg: boolean)
     match arg
@@ -24,7 +24,7 @@ let match-return-implicit-type = (arg: boolean)
         case boolean.false:
             std.unit_value
     return "b"
-assert(string-equals("a", match-return-implicit-type(boolean.true)))
+assert(string_equals("a", match-return-implicit-type(boolean.true)))
 
 let loop-return-explicit-type = (arg: boolean): boolean
     loop
@@ -57,7 +57,7 @@ assert(integer_equals(2, return-integer-explicit(boolean.true)))
 let return-runtime-string = (arg: std.string)
     side_effect()
     return concat("abc", arg)
-assert(string-equals("abcdef", return-runtime-string("def")))
+assert(string_equals("abcdef", return-runtime-string("def")))
 
 let test-interface = interface
     m(): boolean

@@ -1,6 +1,6 @@
-assert(string-equals("123456", concat("123", "456")))
+assert(string_equals("123456", concat("123", "456")))
 
 let runtime-string = ()
     side_effect()
     "456"
-assert(string-equals("123456", concat("123", runtime-string())))
+assert(string_equals("123456", concat("123", runtime-string())))

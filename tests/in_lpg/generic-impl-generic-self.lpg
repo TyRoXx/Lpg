@@ -41,11 +41,11 @@ assert(integer_equals(0, n.load()))
 
 let o = make_mutable[std.string]
 let p = o("test")
-assert(string-equals("test", p.load()))
+assert(string_equals("test", p.load()))
 p.store("123")
-assert(string-equals("123", p.load()))
+assert(string_equals("123", p.load()))
 
 let p2 = make_mutable[std.string]("test")
-assert(string-equals("test", p2.load()))
+assert(string_equals("test", p2.load()))
 p2.store("123")
-assert(string-equals("123", p2.load()))
+assert(string_equals("123", p2.load()))

@@ -18,7 +18,7 @@ assert(a.append("abc"))
 assert(integer_equals(1, a.size()))
 
 assert(match a.load(0)
-    case std.option[string].some(let element): string-equals(element, "abc")
+    case std.option[string].some(let element): string_equals(element, "abc")
     case std.option[string].none: boolean.false
 )
 
@@ -31,12 +31,12 @@ assert(a.append("456"))
 assert(integer_equals(2, a.size()))
 
 assert(match a.load(0)
-    case std.option[string].some(let element): string-equals(element, "abc")
+    case std.option[string].some(let element): string_equals(element, "abc")
     case std.option[string].none: boolean.false
 )
 
 assert(match a.load(1)
-    case std.option[string].some(let element): string-equals(element, "456")
+    case std.option[string].some(let element): string_equals(element, "456")
     case std.option[string].none: boolean.false
 )
 
@@ -47,27 +47,27 @@ assert(match a.load(2)
 
 assert(a.store(0, "123"))
 assert(match a.load(0)
-    case std.option[string].some(let element): string-equals(element, "123")
+    case std.option[string].some(let element): string_equals(element, "123")
     case std.option[string].none: boolean.false
 )
 
 assert(a.store(1, "xyz"))
 assert(match a.load(0)
-    case std.option[string].some(let element): string-equals(element, "123")
+    case std.option[string].some(let element): string_equals(element, "123")
     case std.option[string].none: boolean.false
 )
 assert(match a.load(1)
-    case std.option[string].some(let element): string-equals(element, "xyz")
+    case std.option[string].some(let element): string_equals(element, "xyz")
     case std.option[string].none: boolean.false
 )
 
 assert(not(a.store(2, "???")))
 assert(match a.load(0)
-    case std.option[string].some(let element): string-equals(element, "123")
+    case std.option[string].some(let element): string_equals(element, "123")
     case std.option[string].none: boolean.false
 )
 assert(match a.load(1)
-    case std.option[string].some(let element): string-equals(element, "xyz")
+    case std.option[string].some(let element): string_equals(element, "xyz")
     case std.option[string].none: boolean.false
 )
 

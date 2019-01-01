@@ -12,9 +12,9 @@ assert(to-builtin-boolean(e))
 assert(to-builtin-boolean(std.and(std.boolean.true, std.boolean.true)))
 
 let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
-assert(string-equals("test", p.load()))
+assert(string_equals("test", p.load()))
 p.store("123")
-assert(string-equals("123", p.load()))
+assert(string_equals("123", p.load()))
 
 let a = std.make_mutable[int(0, 3)](0)
 assert(integer_equals(0, a.load()))
