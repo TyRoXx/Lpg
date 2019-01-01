@@ -38,13 +38,13 @@ let integer = import integer.integer
 let std = import std
 
 let i: int(5, 5) = 5
-let some-int: std.mutable[integer] = std.make-mutable[integer](i)
+let some_int: std.mutable[integer] = std.make_mutable[integer](i)
 
 // Set variable content
-some-int.store(10)
+some_int.store(10)
 
 // Load content
-some-int.load()
+some_int.load()
 ```
 
 ### Function Syntax
@@ -92,28 +92,28 @@ The type of the variable is then automatically derived. In order to access an el
 Opposite to tuples arrays are a list of elements with the same type. Arrays have a template type `array[T]` where T is the type of the elements in the array. So a list of integers would have type `array[integer]`. A simple example how to use arrays is here:
 ```lpg
 let std = import std 
-let string-list : std.array[std.string] = new-array(std.string)
+let string_list : std.array[std.string] = new_array(std.string)
 
 // Adding elements
-string-list.append("something")
+string_list.append("something")
 
 // Getting the size of the array
-string-list.size()
+string_list.size()
 
 // Setting element at index 0, it returns true on sucess
-string-list.store(0, "hello")
+string_list.store(0, "hello")
 ```
 Those are the basic functions of an array. Loading from the array is a little more complicated because it returns a `std.option` which has either a value if the index exists or none if the index does not exist.
 ```lpg
 let std = import std
 let string = std.string
 
-let string-list : std.array[string] = new-array(string)
-string-list.append("something")
+let string_list : std.array[string] = new_array(string)
+string_list.append("something")
 
-match string-list.load(0)
+match string_list.load(0)
     case std.option[string].some(let element):
-        string-equals(element, "something")
+        string_equals(element, "something")
     case std.option[string].none:
         boolean.false
 ```
@@ -121,7 +121,7 @@ match string-list.load(0)
 ### Interfaces
 Like in other programming languages LPG also offers the user to define interfaces and implement them later on. Here is an example how to define an interface. However there is no type for this variable.
 ```lpg
-let make-percent = interface
+let make_percent = interface
     percent(): int(0, 100)
 ```
 
@@ -139,11 +139,11 @@ impl printable for string
 
 And this is how you use it:
 ```lpg
-let make-percent = interface
+let make_percent = interface
     percent(): int(0, 100)
 
-let print-percent = (something: make-percent)
-    integer-to-string(something.percent())
+let print_percent = (something: make_percent)
+    integer_to_string(something.percent())
 ```
 
 ### Structures
@@ -154,7 +154,7 @@ let std = import std
 let t : std.type = struct
     a: std.boolean
 
-let t-instance : t = t{std.boolean.true}
+let t_instance : t = t{std.boolean.true}
 ```
 
 When you want to nest a struct inside a struct, you can do this as well.
@@ -168,7 +168,7 @@ let u = struct
     a: t
     b: std.string
 
-let u-instance = u{t{std.boolean.true}, "abc"}
+let u_instance = u{t{std.boolean.true}, "abc"}
 ```
 
 ## Concepts
@@ -187,7 +187,7 @@ let result : int(1, 2) = match a
     case bool.true:
         2
 
-assert(integer-equals(2, result))
+assert(integer_equals(2, result))
 ```
 
 `match` does not support `break` or fall-through yet.
@@ -209,7 +209,7 @@ let bool = std.boolean
 
 let a = bool.true
 loop
-    let still-running = match a
+    let still_running = match a
         case bool.false:
             break
             std.unit
@@ -250,7 +250,7 @@ let fav_num = 7
 
 // Define structure of exported value
 let export_struct = struct
-    fav_num: type-of(fav_num)
+    fav_num: type_of(fav_num)
 
 // Instanciate exported value
 export_struct{fav_num}
@@ -294,10 +294,10 @@ assert(boolean.true)
 |-------------------|------------------|------------------------------------------------------|---------|
 | assert            | boolean          | Ends the program if the input is `boolean.false`     | unit    |
 | concat            | string, string   | Returns the two strings together                     | string  |
-| string-equals     | string, string   | Returns if two strings are equal                     | boolean |
-| integer-equals    | integer, integer | Returns if two integers are equals                   | boolean |
-| integer-less      | integer, integer | Returns if the first integer is less than the second | boolean |
-| integer-to-string | integer          | Turns an integer to a string                         | string  |
+| string_equals     | string, string   | Returns if two strings are equal                     | boolean |
+| integer_equals    | integer, integer | Returns if two integers are equals                   | boolean |
+| integer_less      | integer, integer | Returns if the first integer is less than the second | boolean |
+| integer_to_string | integer          | Turns an integer to a string                         | string  |
 
 ## Optimizations
 There are a few optimizations that LPG does when compiling an LPG files. Here is a list of some of them:
