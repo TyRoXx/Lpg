@@ -1811,6 +1811,35 @@ static bool merge_types(type *result_type, const type evaluated_type)
     return true;
 }
 
+static bool check_for_duplicate_string_case(function_checking_state *const state, match_instruction_case *const cases,
+                                            size_t const existing_case_count, unicode_view const new_case_value)
+{
+    for (size_t i = 0; i < existing_case_count; ++i)
+    {
+        switch (cases[i].kind)
+        {
+        case match_instruction_case_kind_default:
+            LPG_TO_DO();
+
+        case match_instruction_case_kind_stateful_enum:
+            LPG_TO_DO();
+
+        case match_instruction_case_kind_value:
+        {
+            optional_value const key = state->register_compile_time_values[cases[i].key_value];
+            ASSUME(key.is_set);
+            ASSUME(key.value_.kind == value_kind_string);
+            if (unicode_view_equals(key.value_.string, new_case_value))
+            {
+                return true;
+            }
+            break;
+        }
+        }
+    }
+    return false;
+}
+
 static evaluate_expression_result evaluate_match_expression_with_string(function_checking_state *const state,
                                                                         instruction_sequence *const function,
                                                                         expression const *const element,
@@ -1837,6 +1866,19 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             {
                 emit_semantic_error(
                     state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
+                deallocate_cases(cases, i);
+                return evaluate_expression_result_empty;
+            }
+            if (!key_evaluated.compile_time_value.is_set)
+            {
+                LPG_TO_DO();
+            }
+            ASSUME(key_evaluated.compile_time_value.value_.kind == value_kind_string);
+            if (check_for_duplicate_string_case(
+                    state, cases, (*element).match.number_of_cases, key_evaluated.compile_time_value.value_.string))
+            {
+                emit_semantic_error(
+                    state, semantic_error_create(semantic_error_duplicate_match_case, expression_source_begin(*key)));
                 deallocate_cases(cases, i);
                 return evaluate_expression_result_empty;
             }
