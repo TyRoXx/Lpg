@@ -198,6 +198,25 @@ static void remove_directory(unicode_view const removed)
 }
 #endif
 
+static void test_error_output(unicode_view directory)
+{
+
+    expect_output_with_source("let i = new_array\n", true, "Expected left parenthesis in line 1:\n"
+                                                           "let i = new_array\n"
+                                                           "                 ^\n",
+                              directory);
+
+    expect_output_with_source("let i = new_array(int(0, 1)\n", true, "Expected right parenthesis in line 1:\n"
+                                                                     "let i = new_array(int(0, 1)\n"
+                                                                     "                           ^\n",
+                              directory);
+
+    expect_output_with_source("let i = enum[", true, "Expected right bracket in line 1:\n"
+                                                     "let i = enum[\n"
+                                                     "             ^\n",
+                              directory);
+}
+
 void test_cli(void)
 {
     unicode_view const current_directory_not_used = unicode_view_from_c_str("/does-not-exist");
@@ -344,6 +363,8 @@ void test_cli(void)
                               current_directory_not_used);
 
     expect_output_with_source("let std = import std\n", false, "", current_directory_not_used);
+
+    test_error_output(current_directory_not_used);
 
     test_formatting_tool(current_directory_not_used);
 }
