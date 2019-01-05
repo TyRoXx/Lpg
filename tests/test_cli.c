@@ -200,6 +200,14 @@ static void remove_directory(unicode_view const removed)
 
 static void test_error_output(unicode_view directory)
 {
+    expect_output_with_source("let i = 19999999999999999999999999999999999999999999999999999999333333333333", true,
+                              "Integer literal out of range in line 1:\n"
+                              "let i = 19999999999999999999999999999999999999999999999999999999333333333333\n"
+                              "        ^\n"
+                              "Expected expression in line 1:\n"
+                              "let i = 19999999999999999999999999999999999999999999999999999999333333333333\n"
+                              "                                                                            ^\n",
+                              directory);
 
     expect_output_with_source("let i = new_array\n", true, "Expected left parenthesis in line 1:\n"
                                                            "let i = new_array\n"
