@@ -83,7 +83,9 @@ static success_indicator encode_string_literal(unicode_view const content, strea
         case '\n':
             LPG_TRY(stream_writer_write_string(ecmascript_output, "\\n"));
             break;
-
+        case '/':
+            LPG_TRY(stream_writer_write_string(ecmascript_output, "\\/"));
+            break;
         default:
             LPG_TRY(stream_writer_write_bytes(ecmascript_output, content.begin + i, 1));
             break;
