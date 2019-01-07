@@ -541,6 +541,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 20:
             return stream_writer_write_string(ecmascript_output, "integer_add_u64");
 
+        case 21:
+            return stream_writer_write_string(ecmascript_output, "integer_and_u64");
+
         default:
             LPG_TO_DO();
         }
@@ -1366,6 +1369,9 @@ success_indicator generate_ecmascript(checked_program const program, enum_encodi
                                        "};\n"
                                        "    var integer_add_u64 = function (left, right) { var sum = (left + "
                                        "right); return sum /*TODO support more than 53 bits*/; "
+                                       "};\n"
+                                       "    var integer_and_u64 = function (left, right) { var result = (left & "
+                                       "right); return result /*TODO support more than 53 bits*/; "
                                        "};\n"
                                        "    var concat = function (left, right) { return (left + right); };\n"
                                        "    var not = function (argument) { return !argument; };\n"

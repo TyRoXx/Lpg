@@ -19,6 +19,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->add);
     function_pointer_free(&stable->add_u32);
     function_pointer_free(&stable->add_u64);
+    function_pointer_free(&stable->and_u64);
 }
 
 external_function_result not_impl(value const *const captures, void *environment, optional_value const self,
@@ -221,6 +222,18 @@ external_function_result add_u64_impl(value const *const captures, void *environ
     return external_function_result_from_success(value_from_enum_element(1, type_from_unit(), NULL));
 }
 
+external_function_result and_u64_impl(value const *const captures, void *environment, optional_value const self,
+                                      value *const arguments, interpreter *const context)
+{
+    (void)self;
+    (void)environment;
+    (void)captures;
+    (void)context;
+    integer left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
+    return external_function_result_from_success(value_from_integer(integer_create(0, (right.low & left.low))));
+}
+
 external_function_result side_effect_impl(value const *const captures, void *environment, optional_value const self,
                                           value *const arguments, interpreter *const context)
 {
@@ -332,6 +345,15 @@ standard_library_description describe_standard_library(void)
             function_pointer_create(optional_type_create_set(add_u64_result), tuple_type_create(parameters, 2),
                                     tuple_type_create(NULL, 0), optional_type_create_empty());
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] =
+            type_from_integer_range(integer_range_create(integer_create(0, 0), integer_create(0, UINT64_MAX)));
+        parameters[1] = parameters[0];
+        stable->and_u64 =
+            function_pointer_create(optional_type_create_set(parameters[0]), tuple_type_create(parameters, 2),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
+    }
 
     stable->side_effect =
         function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
@@ -437,7 +459,12 @@ standard_library_description describe_standard_library(void)
                                 optional_value_create(value_from_function_pointer(
                                     function_pointer_value_from_external(add_u64_impl, NULL, NULL, stable->add_u64))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 21);
+    globals[21] =
+        structure_member_create(type_from_function_pointer(&stable->and_u64), unicode_string_from_c_str("and_u64"),
+                                optional_value_create(value_from_function_pointer(
+                                    function_pointer_value_from_external(and_u64_impl, NULL, NULL, stable->and_u64))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 22);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

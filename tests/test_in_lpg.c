@@ -270,7 +270,10 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*17 add_u32_result*/ global_object.members[17].compile_time_value.value_,
             /*18 add_u32*/ global_object.members[18].compile_time_value.value_,
             /*19 add_u64_result*/ global_object.members[19].compile_time_value.value_,
-            /*20 add_u64*/ global_object.members[20].compile_time_value.value_};
+            /*20 add_u64*/ global_object.members[20].compile_time_value.value_,
+            /*21 and_u64*/ global_object.members[21].compile_time_value.value_
+            //
+        };
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
         garbage_collector gc = garbage_collector_create(SIZE_MAX);
         interpret(program, globals_values, &gc);
@@ -477,6 +480,7 @@ void test_in_lpg(void)
         static char const *const test_files[] = {"add.lpg",
                                                  "add_u64.lpg",
                                                  "algorithm.lpg",
+                                                 "and_u64.lpg",
                                                  "array-boolean.lpg",
                                                  "array-capture.lpg",
                                                  "array-nesting.lpg",

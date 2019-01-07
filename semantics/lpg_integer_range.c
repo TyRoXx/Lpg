@@ -7,6 +7,11 @@ integer_range integer_range_create(integer const minimum, integer const maximum)
     return result;
 }
 
+integer_range integer_range_create_u64(void)
+{
+    return integer_range_create(integer_create(0, 0), integer_create(0, UINT64_MAX));
+}
+
 integer_range integer_range_max(void)
 {
     return integer_range_create(integer_create(0, 0), integer_max());
