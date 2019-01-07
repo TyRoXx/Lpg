@@ -233,9 +233,21 @@ success_indicator generate_value(checked_function const *const current_function,
         uint64_t const max_ecmascript_int = 9007199254740991;
         if (integer_less(integer_create(0, max_ecmascript_int), generated.integer_))
         {
-            LPG_TRY(stream_writer_write_string(ecmascript_output, "\""));
-            LPG_TRY(stream_writer_write_integer(ecmascript_output, generated.integer_));
-            return stream_writer_write_string(ecmascript_output, "\"");
+            if (generated.integer_.high > 0)
+            {
+                LPG_TO_DO();
+            }
+            else
+            {
+                uint64_t const low = generated.integer_.low;
+                LPG_TRY(stream_writer_write_string(ecmascript_output, "["));
+                uint32_t const bits_per_element = 32;
+                LPG_TRY(stream_writer_write_integer(ecmascript_output, integer_create(0, (low >> bits_per_element))));
+                LPG_TRY(stream_writer_write_string(ecmascript_output, ", "));
+                LPG_TRY(stream_writer_write_integer(
+                    ecmascript_output, integer_create(0, low & ((1ull << bits_per_element) - 1ull))));
+                return stream_writer_write_string(ecmascript_output, "]");
+            }
         }
         return stream_writer_write_integer(ecmascript_output, generated.integer_);
     }
