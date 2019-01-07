@@ -13,6 +13,7 @@ let test_and = [and]()
     assert(integer_equals(max, and(max, max)))
     assert(integer_equals(0, and(0, max)))
     assert(integer_equals(20, and(21, 20)))
+    assert(integer_equals(0, and(1, 2)))
 test_and[and_u64]()
 
 let and_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
