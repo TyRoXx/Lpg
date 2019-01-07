@@ -114,8 +114,6 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Integer literal out of range";
     case parse_error_expected_newline:
         return "Expected new line";
-    case parse_error_expected_assignment:
-        return "Expected assignment";
     case parse_error_expected_declaration_or_assignment:
         return "Expected declaration or assignment";
     case parse_error_expected_space:
@@ -132,8 +130,6 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected comma";
     case parse_error_expected_lambda_body:
         return "Expected lambda body";
-    case parse_error_expected_return_type:
-        return "Expected return type";
     case parse_error_unknown_binary_operator:
         return "Unknown binary operator";
     case parse_error_expected_parameter_list:
