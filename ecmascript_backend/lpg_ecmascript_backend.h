@@ -16,9 +16,11 @@ success_indicator generate_register_read(function_generation *const state, regis
 
 lpg_interface make_array_interface(method_description array_methods[6]);
 success_indicator generate_ecmascript(checked_program const program, enum_encoding_strategy_cache *strategy_cache,
-                                      memory_writer *const ecmascript_output);
+                                      unicode_view const builtins, memory_writer *const ecmascript_output);
 
 success_indicator generate_host_class(enum_encoding_strategy_cache *const strategy_cache,
                                       lpg_interface const *const host, lpg_interface const *const all_interfaces,
                                       stream_writer const ecmascript_output);
 lpg_interface const *get_host_interface(checked_program const program);
+
+unicode_string load_ecmascript_builtins(void);

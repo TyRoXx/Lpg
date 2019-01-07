@@ -4,6 +4,8 @@
 #include "lpg_enum_encoding.h"
 #include "lpg_function_generation.h"
 #include "lpg_instruction.h"
+#include "lpg_path.h"
+#include "lpg_read_file.h"
 #include "lpg_standard_library.h"
 #include "lpg_structure_member.h"
 
@@ -231,7 +233,9 @@ success_indicator generate_value(checked_function const *const current_function,
         uint64_t const max_ecmascript_int = 9007199254740991;
         if (integer_less(integer_create(0, max_ecmascript_int), generated.integer_))
         {
-            LPG_TO_DO();
+            LPG_TRY(stream_writer_write_string(ecmascript_output, "\""));
+            LPG_TRY(stream_writer_write_integer(ecmascript_output, generated.integer_));
+            return stream_writer_write_string(ecmascript_output, "\"");
         }
         return stream_writer_write_integer(ecmascript_output, generated.integer_);
     }
@@ -1337,53 +1341,20 @@ static void remove_unnecessary_code(memory_writer *const ecmascript_output)
 }
 
 success_indicator generate_ecmascript(checked_program const program, enum_encoding_strategy_cache *strategy_cache,
-                                      memory_writer *const ecmascript_output)
+                                      unicode_view const builtins, memory_writer *const ecmascript_output)
 {
     stream_writer const writer = memory_writer_erase(ecmascript_output);
-    LPG_TRY(stream_writer_write_string(writer,
-                                       "(function ()\n"
-                                       "{\n"
-                                       "    \"use strict\";\n"
-                                       "    var globalObject = new Function('return this;')();\n"
-                                       "    var fail = function (condition) { if (globalObject.builtin_fail) { "
-                                       "builtin_fail(); } else { throw "
-                                       "\"fail\"; } };\n"
-                                       "    var assert = function (condition) { if "
-                                       "(globalObject.builtin_assert) { builtin_assert(condition); } else "
-                                       "if "
-                                       "(!condition) { fail(); } };\n"
-                                       "    var string_equals = function (left, right) { return (left === "
-                                       "right); };\n"
-                                       "    var integer_equals = function (left, right) { return (left === "
-                                       "right); };\n"
-                                       "    var integer_less = function (left, right) { return (left < right); "
-                                       "};\n"
-                                       "    var integer_subtract = function (left, right) { var difference = "
-                                       "(left - right); return "
-                                       "(difference < 0) ? undefined : difference; };\n"
-                                       "    var integer_add = function (left, right) { return (left + right); "
-                                       "};\n"
-                                       "    var integer_add_u32 = function (left, right) { var sum = (left + "
-                                       "right); return (sum <= 0xffffffff) ? "
-                                       "sum : undefined; "
-                                       "};\n"
-                                       "    var integer_add_u64 = function (left, right) { var sum = (left + "
-                                       "right); return sum /*TODO support more than 53 bits*/; "
-                                       "};\n"
-                                       "    var integer_and_u64 = function (left, right) { var result = (left & "
-                                       "right); return result /*TODO support more than 53 bits*/; "
-                                       "};\n"
-                                       "    var concat = function (left, right) { return (left + right); };\n"
-                                       "    var not = function (argument) { return !argument; };\n"
-                                       "    var side_effect = function () {};\n"
-                                       "    var integer_to_string = function (input) { return \"\" + input; };\n"
-                                       "    var new_array = function (initial_content, make_some, none) {\n"
-                                       "        this.content = initial_content || [];\n"
-                                       "        this.make_some = make_some;\n"
-                                       "        this.none = none;\n"
-                                       "    };\n"
-                                       /* size()*/
-                                       "    new_array.prototype."));
+    LPG_TRY(stream_writer_write_string(writer, "(function ()\n"
+                                               "{\n"
+                                               "    \"use strict\";\n"));
+    LPG_TRY(stream_writer_write_unicode_view(writer, builtins));
+    LPG_TRY(stream_writer_write_string(writer, "    var new_array = function (initial_content, make_some, none) {\n"
+                                               "        this.content = initial_content || [];\n"
+                                               "        this.make_some = make_some;\n"
+                                               "        this.none = none;\n"
+                                               "    };\n"
+                                               /* size()*/
+                                               "    new_array.prototype."));
     method_description array_methods[6];
     lpg_interface const array_interface = make_array_interface(array_methods);
     LPG_TRY(generate_method_name(0, &array_interface, writer));
@@ -1584,4 +1555,18 @@ lpg_interface const *get_host_interface(checked_program const program)
         return NULL;
     }
     return program.interfaces + host_parameter.interface_;
+}
+
+unicode_string load_ecmascript_builtins(void)
+{
+    unicode_view const directory = path_remove_leaf(unicode_view_from_c_str(__FILE__));
+    unicode_view const parts[] = {directory, unicode_view_from_c_str("builtins.js")};
+    unicode_string builtins_path = path_combine(parts, LPG_ARRAY_SIZE(parts));
+    blob_or_error const read_result = read_file(unicode_string_c_str(&builtins_path));
+    if (read_result.error)
+    {
+        LPG_TO_DO();
+    }
+    unicode_string_free(&builtins_path);
+    return unicode_string_validate(read_result.success);
 }

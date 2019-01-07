@@ -527,10 +527,13 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         {
             enum_encoding_strategy_cache strategy_cache =
                 enum_encoding_strategy_cache_create(checked.enums, checked.enum_count);
-            if (success_yes != generate_ecmascript(checked, &strategy_cache, &generated))
+            unicode_string const builtins = load_ecmascript_builtins();
+            if (success_yes !=
+                generate_ecmascript(checked, &strategy_cache, unicode_view_from_string(builtins), &generated))
             {
                 LPG_TO_DO();
             }
+            unicode_string_free(&builtins);
             if (success_yes != generate_host_class(&strategy_cache, get_host_interface(checked), checked.interfaces,
                                                    memory_writer_erase(&generated)))
             {

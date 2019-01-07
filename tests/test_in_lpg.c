@@ -289,7 +289,10 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
         }
         enum_encoding_strategy_cache strategy_cache =
             enum_encoding_strategy_cache_create(program.enums, program.enum_count);
-        REQUIRE(success_yes == generate_ecmascript(program, &strategy_cache, &generated));
+        unicode_string const builtins = load_ecmascript_builtins();
+        REQUIRE(success_yes ==
+                generate_ecmascript(program, &strategy_cache, unicode_view_from_string(builtins), &generated));
+        unicode_string_free(&builtins);
         if (is_ecmascript_specific)
         {
             REQUIRE(success_yes == generate_host_class(&strategy_cache, get_host_interface(program), program.interfaces,
