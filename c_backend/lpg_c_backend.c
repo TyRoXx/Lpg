@@ -1994,9 +1994,9 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_add_u64:
             state->standard_library.using_integer = true;
             set_register_variable(state, input.call.result, register_resource_ownership_owns,
-                type_from_enumeration(standard_library_enum_add_u64_result));
+                                  type_from_enumeration(standard_library_enum_add_u64_result));
             LPG_TRY(generate_type(type_from_enumeration(standard_library_enum_add_u64_result), &state->standard_library,
-                state->definitions, state->program, additional_memory, c_output));
+                                  state->definitions, state->program, additional_memory, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " const "));
             LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
             LPG_TRY(stream_writer_write_string(c_output, " = {0 /*TODO implement overflow detection*/, "));
