@@ -73,8 +73,8 @@ var integer_add_u64 = function (left, right) {
 };
 var normalize_u32 = function (denormalized) {
     assert(typeof(denormalized) === "number");
-    if(denormalized === -1) {
-        return 0xffffffff;
+    if(denormalized < 0) {
+        return 0x100000000 + denormalized;
     }
     return denormalized;
 }
@@ -90,15 +90,59 @@ var integer_and_u64 = function (left, right) {
             var result = (left & right);
             return result;
         } else if (typeof(right) === "object") {
-            return make_u64((left >> 32) & right[0], left & right[1]);
+            return make_u64(0, left & right[1]);
         } else {
             fail();
         }
     } else if (typeof(left) === "object") {
         if (typeof(right) === "number") {
-            return make_u64(left[0] & (right >> 32), left[1] & right);
+            return make_u64(0, left[1] & right);
         } else if (typeof(right) === "object") {
             return make_u64(left[0] & right[0], left[1] & right[1]);
+        } else {
+            fail();
+        }
+    } else {
+        fail();
+    }
+};
+var integer_or_u64 = function (left, right) {
+    if (typeof(left) === "number") {
+        if (typeof(right) === "number") {
+            var result = (left | right);
+            return result;
+        } else if (typeof(right) === "object") {
+            return make_u64(right[0], left | right[1]);
+        } else {
+            fail();
+        }
+    } else if (typeof(left) === "object") {
+        if (typeof(right) === "number") {
+            return make_u64(left[0], left[1] | right);
+        } else if (typeof(right) === "object") {
+            return make_u64(left[0] | right[0], left[1] | right[1]);
+        } else {
+            fail();
+        }
+    } else {
+        fail();
+    }
+};
+var integer_xor_u64 = function (left, right) {
+    if (typeof(left) === "number") {
+        if (typeof(right) === "number") {
+            var result = (left ^ right);
+            return result;
+        } else if (typeof(right) === "object") {
+            return make_u64(right[0], left ^ right[1]);
+        } else {
+            fail();
+        }
+    } else if (typeof(left) === "object") {
+        if (typeof(right) === "number") {
+            return make_u64(left[0], left[1] ^ right);
+        } else if (typeof(right) === "object") {
+            return make_u64(left[0] ^ right[0], left[1] ^ right[1]);
         } else {
             fail();
         }

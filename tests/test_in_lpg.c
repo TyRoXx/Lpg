@@ -271,7 +271,9 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*18 add_u32*/ global_object.members[18].compile_time_value.value_,
             /*19 add_u64_result*/ global_object.members[19].compile_time_value.value_,
             /*20 add_u64*/ global_object.members[20].compile_time_value.value_,
-            /*21 and_u64*/ global_object.members[21].compile_time_value.value_
+            /*21 and_u64*/ global_object.members[21].compile_time_value.value_,
+            /*22 or_u64*/ global_object.members[22].compile_time_value.value_,
+            /*23 xor_u64*/ global_object.members[23].compile_time_value.value_
             //
         };
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
@@ -528,6 +530,7 @@ void test_in_lpg(void)
                                                  "match-string-case-first.lpg",
                                                  "match-string-default-first.lpg",
                                                  "option.lpg",
+                                                 "or_u64.lpg",
                                                  "raw-string-literal.lpg",
                                                  "recursion.lpg",
                                                  "return.lpg",
@@ -539,7 +542,8 @@ void test_in_lpg(void)
                                                  "subtract.lpg",
                                                  "type-of.lpg",
                                                  "unit_value.lpg",
-                                                 "web.lpg"};
+                                                 "web.lpg",
+                                                 "xor_u64.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
         for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
