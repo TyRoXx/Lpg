@@ -63,6 +63,7 @@ typedef struct standard_library_stable
     function_pointer or_u64;
     function_pointer xor_u64;
     function_pointer not_u64;
+    function_pointer shift_left_u64;
 } standard_library_stable;
 
 enum
@@ -72,7 +73,7 @@ enum
     standard_library_enum_add_result = 2,
     standard_library_enum_add_u32_result = 3,
     standard_library_enum_add_u64_result = 4,
-    standard_library_element_count = 25
+    standard_library_element_count = 26
 };
 
 typedef struct standard_library_description

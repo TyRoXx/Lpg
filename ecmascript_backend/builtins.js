@@ -166,6 +166,28 @@ var integer_not_u64 = function (input) {
         fail();
     }
 };
+var todo = fail;
+var integer_shift_left_u64 = function (left, right) {
+    if (typeof(left) === "number") {
+        if (typeof(right) === "number") {
+            return (left << right);
+        } else if (typeof(right) === "object") {
+            todo();
+        } else {
+            fail();
+        }
+    } else if (typeof(left) === "object") {
+        if (typeof(right) === "number") {
+            return make_u64((left[0] << right) | (left[1] >>> (32 - right)), left[1] << right);
+        } else if (typeof(right) === "object") {
+            todo();
+        } else {
+            fail();
+        }
+    } else {
+        fail();
+    }
+};
 var concat = function (left, right) {
     assert(typeof(left) === "string");
     assert(typeof(right) === "string");

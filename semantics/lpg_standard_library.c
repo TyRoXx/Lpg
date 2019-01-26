@@ -23,6 +23,7 @@ static void standard_library_stable_free(standard_library_stable *stable)
     function_pointer_free(&stable->or_u64);
     function_pointer_free(&stable->xor_u64);
     function_pointer_free(&stable->not_u64);
+    function_pointer_free(&stable->shift_left_u64);
 }
 
 external_function_result not_impl(value const *const captures, void *environment, optional_value const self,
@@ -272,6 +273,20 @@ static external_function_result not_u64_impl(value const *const captures, void *
     return external_function_result_from_success(value_from_integer(integer_create(0, ~input.low)));
 }
 
+static external_function_result shift_left_u64_impl(value const *const captures, void *environment,
+                                                    optional_value const self, value *const arguments,
+                                                    interpreter *const context)
+{
+    (void)self;
+    (void)environment;
+    (void)captures;
+    (void)context;
+    integer const left = arguments[0].integer_;
+    integer const right = arguments[1].integer_;
+    ASSUME(right.low < 64);
+    return external_function_result_from_success(value_from_integer(integer_create(0, (left.low << right.low))));
+}
+
 external_function_result side_effect_impl(value const *const captures, void *environment, optional_value const self,
                                           value *const arguments, interpreter *const context)
 {
@@ -418,6 +433,15 @@ standard_library_description describe_standard_library(void)
             function_pointer_create(optional_type_create_set(parameters[0]), tuple_type_create(parameters, 1),
                                     tuple_type_create(NULL, 0), optional_type_create_empty());
     }
+    {
+        type *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] =
+            type_from_integer_range(integer_range_create(integer_create(0, 0), integer_create(0, UINT64_MAX)));
+        parameters[1] = type_from_integer_range(integer_range_create(integer_create(0, 0), integer_create(0, 63)));
+        stable->shift_left_u64 =
+            function_pointer_create(optional_type_create_set(parameters[0]), tuple_type_create(parameters, 2),
+                                    tuple_type_create(NULL, 0), optional_type_create_empty());
+    }
 
     stable->side_effect =
         function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
@@ -543,7 +567,12 @@ standard_library_description describe_standard_library(void)
                                 optional_value_create(value_from_function_pointer(
                                     function_pointer_value_from_external(not_u64_impl, NULL, NULL, stable->not_u64))));
 
-    LPG_STATIC_ASSERT(standard_library_element_count == 25);
+    globals[25] = structure_member_create(
+        type_from_function_pointer(&stable->shift_left_u64), unicode_string_from_c_str("shift_left_u64"),
+        optional_value_create(value_from_function_pointer(
+            function_pointer_value_from_external(shift_left_u64_impl, NULL, NULL, stable->shift_left_u64))));
+
+    LPG_STATIC_ASSERT(standard_library_element_count == 26);
 
     standard_library_description const result = {structure_create(globals, standard_library_element_count), stable};
     return result;

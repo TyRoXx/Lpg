@@ -49,6 +49,7 @@ typedef enum register_meaning {
     register_meaning_or_u64,
     register_meaning_xor_u64,
     register_meaning_not_u64,
+    register_meaning_shift_left_u64,
     register_meaning_boolean
 } register_meaning;
 
@@ -1062,6 +1063,7 @@ static success_indicator generate_c_read_access(c_backend_state *state, checked_
     case register_meaning_or_u64:
     case register_meaning_xor_u64:
     case register_meaning_not_u64:
+    case register_meaning_shift_left_u64:
         LPG_TO_DO();
 
     case register_meaning_not:
@@ -1249,6 +1251,7 @@ static success_indicator generate_add_reference_for_return_value(c_backend_state
     case register_meaning_or_u64:
     case register_meaning_xor_u64:
     case register_meaning_not_u64:
+    case register_meaning_shift_left_u64:
         return success_yes;
 
     case register_meaning_nothing:
@@ -1850,6 +1853,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_or_u64:
         case register_meaning_xor_u64:
         case register_meaning_not_u64:
+        case register_meaning_shift_left_u64:
             break;
         }
         LPG_TRY(indent(indentation, c_output));
@@ -2085,6 +2089,22 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             LPG_TRY(stream_writer_write_string(c_output, ";\n"));
             return success_yes;
 
+        case register_meaning_shift_left_u64:
+            state->standard_library.using_integer = true;
+            set_register_variable(state, input.call.result, register_resource_ownership_owns,
+                                  type_from_integer_range(integer_range_create_u64()));
+            LPG_TRY(generate_type(type_from_integer_range(integer_range_create_u64()), &state->standard_library,
+                                  state->definitions, state->program, additional_memory, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " const "));
+            LPG_TRY(generate_register_name(input.call.result, current_function, c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " = ("));
+            ASSERT(input.call.argument_count == 2);
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[0], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, " << "));
+            LPG_TRY(generate_c_read_access(state, current_function, input.call.arguments[1], c_output));
+            LPG_TRY(stream_writer_write_string(c_output, ");\n"));
+            return success_yes;
+
         case register_meaning_subtract:
             state->standard_library.using_integer = true;
             set_register_variable(state, input.call.result, register_resource_ownership_owns,
@@ -2317,6 +2337,7 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
         case register_meaning_or_u64:
         case register_meaning_xor_u64:
         case register_meaning_not_u64:
+        case register_meaning_shift_left_u64:
             LPG_TO_DO();
 
         case register_meaning_global:
@@ -2413,6 +2434,11 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
             case 24:
                 set_register_meaning(
                     state, input.read_struct.into, optional_type_create_empty(), register_meaning_not_u64);
+                return success_yes;
+
+            case 25:
+                set_register_meaning(
+                    state, input.read_struct.into, optional_type_create_empty(), register_meaning_shift_left_u64);
                 return success_yes;
 
             default:
