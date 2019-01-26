@@ -188,6 +188,31 @@ var integer_shift_left_u64 = function (left, right) {
         fail();
     }
 };
+var integer_shift_right_u64 = function (left, right) {
+    if (typeof(left) === "number") {
+        if (typeof(right) === "number") {
+            return (left >> right);
+        } else if (typeof(right) === "object") {
+            todo();
+        } else {
+            fail();
+        }
+    } else if (typeof(left) === "object") {
+        if (typeof(right) === "number") {
+            if (right >= 32) {
+                return make_u64(0, (left[1] >>> (right - 32)));
+            } else {
+                return make_u64((left[0] >>> right), (left[1] >>> right) | (left[0] << (32 - right)));
+            }
+        } else if (typeof(right) === "object") {
+            todo();
+        } else {
+            fail();
+        }
+    } else {
+        fail();
+    }
+};
 var concat = function (left, right) {
     assert(typeof(left) === "string");
     assert(typeof(right) === "string");

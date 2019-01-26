@@ -572,6 +572,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 25:
             return stream_writer_write_string(ecmascript_output, "integer_shift_left_u64");
 
+        case 26:
+            return stream_writer_write_string(ecmascript_output, "integer_shift_right_u64");
+
         default:
             LPG_TO_DO();
         }
