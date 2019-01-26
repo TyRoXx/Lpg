@@ -566,6 +566,9 @@ static success_indicator generate_read_struct_value(function_generation *const s
         case 23:
             return stream_writer_write_string(ecmascript_output, "integer_xor_u64");
 
+        case 24:
+            return stream_writer_write_string(ecmascript_output, "integer_not_u64");
+
         default:
             LPG_TO_DO();
         }

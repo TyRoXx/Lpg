@@ -273,7 +273,8 @@ static void test_all_backends(unicode_view const test_name, checked_program cons
             /*20 add_u64*/ global_object.members[20].compile_time_value.value_,
             /*21 and_u64*/ global_object.members[21].compile_time_value.value_,
             /*22 or_u64*/ global_object.members[22].compile_time_value.value_,
-            /*23 xor_u64*/ global_object.members[23].compile_time_value.value_
+            /*23 xor_u64*/ global_object.members[23].compile_time_value.value_,
+            /*24 not_u64*/ global_object.members[24].compile_time_value.value_
             //
         };
         LPG_STATIC_ASSERT(LPG_ARRAY_SIZE(globals_values) == standard_library_element_count);
@@ -529,6 +530,7 @@ void test_in_lpg(void)
                                                  "match-return.lpg",
                                                  "match-string-case-first.lpg",
                                                  "match-string-default-first.lpg",
+                                                 "not_u64.lpg",
                                                  "option.lpg",
                                                  "or_u64.lpg",
                                                  "raw-string-literal.lpg",

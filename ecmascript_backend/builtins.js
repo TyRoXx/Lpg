@@ -78,6 +78,13 @@ var normalize_u32 = function (denormalized) {
     }
     return denormalized;
 }
+var normalize_u64 = function (denormalized) {
+    assert(typeof(denormalized) === "number");
+    if(denormalized < 0) {
+        return [0xffffffff, (denormalized >>> 0)];
+    }
+    return denormalized;
+}
 var make_u64 = function (high, low) {
     if (high === 0) {
         return normalize_u32(low);
@@ -146,6 +153,15 @@ var integer_xor_u64 = function (left, right) {
         } else {
             fail();
         }
+    } else {
+        fail();
+    }
+};
+var integer_not_u64 = function (input) {
+    if (typeof(input) === "number") {
+        return normalize_u64(~input);
+    } else if (typeof(input) === "object") {
+        return make_u64(~input[0], ~input[1]);
     } else {
         fail();
     }
