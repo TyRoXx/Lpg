@@ -182,7 +182,7 @@ assert(integer_equals(2, result))
 
 (Note that LPG does not currently support default cases for enums.)
 
-Matching state-ful enums works like this:
+Matching stateful enums works like this:
 ```
 let option = import std.option
 let result : int(1, 2) = match option[boolean].some(boolean.true)
