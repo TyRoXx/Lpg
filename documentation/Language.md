@@ -237,7 +237,7 @@ assert(bool.true)
 
 ### Comments
 There are two types of comments:
-* mutli-line comment:
+* multi-line comment:
 ```lpg
 /* Starting something 
 End something */
@@ -269,7 +269,7 @@ let fav_num = 7
 let export_struct = struct
     fav_num: type_of(fav_num)
 
-// Instanciate exported value
+// Instantiate exported value
 export_struct{fav_num}
 ```
 which basically is the return value of the whole file.
