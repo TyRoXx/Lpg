@@ -107,6 +107,13 @@ void test_parse_expression_syntax_error(void)
 
     {
         parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_expression, source_location_create(0, 8))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("generic["));
+    }
+
+    {
+        parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_colon, source_location_create(1, 5))};
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let s = struct\n"

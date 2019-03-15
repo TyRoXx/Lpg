@@ -1178,7 +1178,7 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
             {
                 deallocate(arguments);
             }
-            LPG_TO_DO();
+            return false;
         }
         next = peek(parser);
     }
@@ -1260,6 +1260,11 @@ static expression_parser_result parse_returnable(expression_parser *const parser
             if (parse_generic_instantiation(parser, indentation, &result.success))
             {
                 continue;
+            }
+            else
+            {
+                expression_free(&result.success);
+                return expression_parser_result_failure;
             }
         }
         if (may_be_binary)
