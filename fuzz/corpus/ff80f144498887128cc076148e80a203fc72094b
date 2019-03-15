@@ -1,0 +1,49 @@
+d.option[string].snum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let xt conversion_test = struct
+    i: conver sion_test_interface
+
+let convl] e, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer[boolean, tnty_est_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impltat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+assert(match a.load(2)
+    case std.optionrt(string_equals("false", b.transform(std.boolean.f.f: boolean.falsnum
+    a(std.unit)
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolea)
+assert(test_|||||||||||||||||||||||||||||||||an nest generic functions as expected
+let f = [T]()
+    [U]()
+          case  [V](s)te 

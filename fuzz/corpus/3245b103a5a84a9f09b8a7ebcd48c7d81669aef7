@@ -1,0 +1,36 @@
+ake_rutinme_string("abc"))))
+as3       .not(test_std. string
+let option = std.opotin
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+assert(b.append(c))
+assert(intege       c(1, a.size()))
+assert(a.appen_equals("abc", match return_stateful_enum()
+    case singa(lel.et state): state
+))
+
+let structure = struct
+    x: std.slet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostte): state
+))
+
+let structure = struct
+    x: std.slet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+larray[string]].some(let element2):
+                assert(c.append("abc"))
+         arg
+assert(match         match element2.load(pas0)
+  s_bistate(bi st 

@@ -1,0 +1,131 @@
+let  d = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate =r(element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(leTet e):
+        fail()
+    imeV]
+leau//require_compile_time[constantcase std.option[integer].none:
+        std]
+assert(string_equads("hello", cons.utant.to_stringnit_valu())e
+)
+                                                                                                                                     l  et std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_a let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.metho        d()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] flet y >>>>>>>>t: int(0, 2147483647))
+    side_effect()
+ M  integert(): std.unit
+ssert4(std   assert(integer_equal!(3, or(1, 2)))
+test_or[o: gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy:, 1)]{1}
+assert(u2.method())
+std.unit
+    method(): std.strir_u64]()re_ng
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u": std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()esult):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                                 .a(let state): stacompilean(): std.uQ       nit
+//ete_time = enum[CompileTime(Valuete
+))
+
+let return_stateful_enum = ()
+    side_effect()
+    single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case si helper = struct
+    t: std.type
+    u: int:(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [Te same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are cons)))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+  ]
+  //rcase eelotsingle.a(rqui 
+
+_re_let state): state
+))
+
+clet structure = struct
+    x: std.str

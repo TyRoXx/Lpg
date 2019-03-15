@@ -1,0 +1,50 @@
+let std = import std
+let std_again = import let . d = import stse
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean(std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load())t returne("123")
+assert(string_equals("123", p.load()))
+
+lingnget astd.td.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+sert(integer_equals(1, a(2147483647)))
+
+/ad()))
+assert(truct[M])](struct[T])
+std.tmake_mutable[type_of([T]() T)]([T]() Type_of(f.load) = f.load
+std.make_mutable[type_of()](3)
+as   *                                                                                             g_   let std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[ std.arrayd.option
+
+let test_string = (host: es.host)
+    let exported : host_value = host.export_string("hello")
+    assert(match host.import_string(exported)
+        case option[std.string].some(let content):
+            string_equals("hello", content)
+        case optnew_array(string)
+assert(integer_equals(0, a.size()))
+assert(n", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_|||||||||||||||||||||||||||||||||||||single(single.a(mak        e_string("abc")))singleX	      ))))
+
+assert(string_equals(""bc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    ?: std.string                                                                                                                                                     

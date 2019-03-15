@@ -1,0 +1,11 @@
+let                                                                    std = import' Mstd
+
+le                                                                                                          t s = struct
+let s_instance_inbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbt &rface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

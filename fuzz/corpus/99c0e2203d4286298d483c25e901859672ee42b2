@@ -1,0 +1,147 @@
+: boolean
+let const = std):[std.unit
+    assert(integer_equals(0, el!ement))
+algorithm.enumerate[typ                                                                                                                                                              it
+    restrict(): std.unit
+    std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic()  std.unit
+    _Bool(): std.uni.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abs paramea(let state): bo boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once hean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+ tl] e, or(1, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+   auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(boolean
+
+let require_compile_time = [V](olean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////////////////
+
+let cE = ma-tch ""
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+irurqee_compile_time[c]
+assert(c)
+    V
+
+// case taken
+///////////////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[d.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////////////////
+
+let cE = ma-tch ""
+    case "a":
+        boolean.false
+    defauassert(integer_less(40, 100))
+aslt:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.rerent even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[1]()[std.unit], make_enum[1]()                         string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+                      ]
+let v : instantiated = ilet inteo

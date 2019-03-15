@@ -1,0 +1,47 @@
+let std = imro spttd
+
+let f = (): std.unit
+    f()
+
+let g = (): std.un 
+ ti  side_effe   g()
+
+let h = ()ring_equals("4", k(std.booleanM   se)))
+
+let copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match integer_equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                case std.option[std. oolean].some(let element):
+                    aue)
+    case s     assert(to.append(element))
+                    copy_array[T](from, to)
+                case std.option[T].none:
+   atch a
+        case std.boo copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match cnteger_equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.f                                                                                                                                                                  0                                                                       alse:
+            m     *  atch from.load(to.size((): std.unit
+    f()
+
+let g = (): std.unit
+    side_effect()
+    ltein ner = ()
+        side_effect()
+        g()
+
+let h = ()ring_equals("3", k(std.booleanM   se)))
+
+let copy_array_boolean = (from: std.rrrrrrrrrrrrarray[s*d.boolean], to: std.array[std.boolean]): std.uni      Mft
+    match m.load(to.size())
+                case std.option[T].some(let element):
+                    assert(to.append(element))
+                    copy_array[T](from, tolet g = (): std.un 
+ ti  side_effe   g()
+
+let h = ()ring_eq    fail()
+copy_array[std.boolean](new_array(std.boolean), new_array(std.boolean))

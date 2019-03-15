@@ -1,0 +1,15 @@
+let std = import std
+let es = import ecmascript
+let option = std.option
+
+(global: host_value, host: es.host)
+    let console = match host.rconsole")
+        case option[host_value].some(let c):
+            c
+        case option[host_value].none:
+            fail()
+    let log = (message: std.string)
+        let arguments = new_array(host_value)
+        arguments.append(host.export_string(message))
+        host.call_method(console, "log", arguments)
+    log("Hello from Node.JS!")

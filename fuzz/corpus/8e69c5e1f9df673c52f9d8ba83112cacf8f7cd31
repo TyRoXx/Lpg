@@ -1,0 +1,25 @@
+l   p                                qqqqqqqqqqqqqq                                  std = import' std
+
+le                                                                                                          t s = struct
+let s_instance = s{}
+
+let t = struct
+    aF_      n
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+assert(u_instfnce.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg                                                                            std = import' std
+
+le                                                                                                 gle(single.a(mak(("def]s
+arameters[boolean,   f
+assert(match multi.b(structure{"abc", booonlean.t_t

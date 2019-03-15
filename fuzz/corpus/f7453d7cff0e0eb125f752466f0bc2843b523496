@@ -1,0 +1,78 @@
+l  et std = import std
+
+let single_p         = enum[T]
+    a std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.str  enumt std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u61
+
+let test_or = [or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: optio , d: int(0, 2))
+    side_effect()ean true
+    case triYtate.b: booan.false
+    case bista[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[te.b: boolean.true
+)
+
+let tristteger_equals]OS_  _B (a: boolean, b: std.string, c: option, d: int(0, 2))
+    side_effect()ean.true
+    case tristate.b: booan.false
+    case bista[[[[[[[[[[[[[[[[[[[[[[[[[[lL        = import std
+
+let re    quire_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6( require_compile_time = enum[CompileTimeValue]
+
+/*useimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boo  an)
+    side_effect()
+                         let indireuals(c, c)
+assert(capture_twice())
+sert(test_sirint = a.print
+     variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirectionrue)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = XV_ u__Z (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6( require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+  assert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+oo  an)
+    side_effect()
+                         let indirection = () a
+    (c: std.unit, d: std.unit)
+        sire_compile_time = enum[Compi        std.unit_value
+mand[boolean](empty, boolean.false)
+    case std.optione_runtime_s                               first(First)].first(let s):
+        boolean.false
+    case two__refeqng
+   

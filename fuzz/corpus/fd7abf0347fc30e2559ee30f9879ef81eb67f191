@@ -1,0 +1,135 @@
+                          std = import std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boloean
+let t_instance = t)
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boo ean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interfaca: t
+s(min, host.undefined())))
+    assert(not(host.equals(maunit
+
+let pureprint  == a.print
+x, host.undefined())))
+
+let test_undeftch subtract(std.runtim  	  
+ $insert(string_eqtinteger_equals(runtime_zero(), 0))
+assert(not(integer_equals(1, runtime_zero())))
+ let no_leak = new_array(boolean)
+        break
+  ean)
+ass=======================================================================  let no_leak_either = new_array(bt
+    method(): g_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i:
+       breble[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0= new_array(boolean)
+        break
+  ean)
+ass=======================================================================  let no_leak_either = new_array(bt
+    method(): g_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): .dtbosolint
+x, host.undefined())))
+
+let test_undefine   d = (host: es.host)
+     l let u0 = host.undefined()
+    let u1 = host.undefined()
+    asst(string_equals("0", pure(0)))
+assert(string_equals("1", pure(1)))
+assert(string_equals("true", pure(boolean.trueSV)
+assert(string_equals("false%, pure(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+asinteger =10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $insert(string_eqtinteger_equals(runtime_zero(), 0))
+assert(not(integer_equals(1, runtime_zero())))
+ let no_leak = new_array(boolean)
+        break
+  ean)
+ass======================================================================= `    no_|eak_either = new_array(bt
+    method(): g_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): stdt make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because "abc"))))
+as3       .not(test_single(let std = import std
+let single = enum
+   t(integer_equals(bn argum>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ent*/
+let f6 = (a: boolean)!!!!!!!!!!!))!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 1
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{inleX	   ent*/
+let f6 = (a: boolean)!!!!!!!!!!!))!!!!!!!!!!um = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even thoud.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value: std.string)
+    o_leak = new_array(boole============ments.apan
+    an,   et inleo

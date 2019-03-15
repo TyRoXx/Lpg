@@ -1,0 +1,51 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printablelstate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                                                   ass//just a comments("abc", matc    "\""                                                            let a = new_array(std.array[std.art option = std.option
+
+let runent: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                       )                           assert(string_equals("abc", ma()[std.u           case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristatase option[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+         arg
+assert(match         match element2.load(pas0)
+  s_bistan nest generic funcs = pri  e

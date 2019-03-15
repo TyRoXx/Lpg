@@ -1,0 +1,76 @@
+ 	          case boolean.true:
+            return 2
+  )
+    e
+    f
+assert(match _   8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean  s                                   "\""                                                                                                                                                  i___                                                                                                                    i___                                                                                                                                                                                                                                                                                 !                                                                                                                  assert(boolean.false)
+assert(intege6r_equals(1, always_return_from_e.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean                                                                                                                                                                                                                                                                           !                                                                                                                                                                                    !                                                                                         er_Jnstantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    cascase two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enumlet sets = import set
+let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+ te.c: boolean.faing_equals("abc",               g_   let std = import       a      g_   let std = import std
+let string = std.smatch ssea
+r 

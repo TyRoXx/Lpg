@@ -1,0 +1,122 @@
+l      "abc", u_instance.b))
+assert(integer_equals(1, u_;nstance.c))
+
+let f = (arg: u): booleanpend_12 = ()
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()t std = impo
+    append_64()
+    appenrt std
+let d_int6Geger(sc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].sinteger].so}e(let e):
+        fail()
+    case std.option[integer]econd(runtime_string("abc"))
+assert(matchb c
+    case two_parameters[boolean, std.string].        case single_parameter[boolean].a(lgt s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_cocal[boolean].c(let s):
+        int6Geger(sc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].sinteger].so}e(let e):
+        fail()
+    case std.option[integer]econd(runtime_string("abc"))
+assert(matchb c
+    case two_parameters[boolean, std.string].        case single_parameter[boolean].a(lgt s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_cocal[boolean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    elem.noent: std.type
+let x = access_parameter[ne:
+  access an.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+    [boolean].a(let s): s
+        local
+())
+assert(match usoolean.false
+)
+
+aslet equality = import equality
+lesert(nend_4()
+    append_4()
+let append_64 = ()
+    append_16()
+    appeboolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    elem.noent: std.type
+let x = access_parameter[ne:
+  access an.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+    [boolean].a(let s): s
+        local
+())
+assert(match usoolean.false
+)
+
+aslet equality = import equality
+lesert(nend_4()
+    append_4()
+let append_64 = ()
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()t std = impo
+    append_64()
+    appenrt
+let return_runtime_string = (arg: std.string)t()
+    conca;t("", value)
+awsert(test_|||||||||||||||||||||||||||||||||||||single(single.a(mak        e_string("abc")))singleX	      ))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+
+let single_parameter = eport std
+
+//import std
+
+// impl for generic interface
+let gi`B_ nterface[T]
+    method(): std.string
+
+impl[S] gi[S] for stlse)))
+.print()))
+
+let create_impl = (): test_interface
+    std.unit_value
+let compile_time_impl = create_impl()
+assert(string_equals("tering_equast", compile_time_impl    case 

@@ -1,0 +1,91 @@
+l      "?olean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let n.any_of[boolean, type_of(false_prmpiedicate)]y.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string():
+
+impl i for sicante)ifferent_method_order = struct
+impl printable2 for different_me                                                let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[bol  et std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_ import std
+let std_again = import std
+let e : std.boolean = st Q  olean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_bolet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions asagain.boolean = e
+
+let to_builtin_bol(et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/you can nest ge.......................  "unit"
+    other_met)))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_ef   	()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boo]()[stdhad a bug tstd.option[linked_list_nodeEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boolean] for std.unit
+    a(): generic_self_reference[std.boolean]
+        self
+    b(): genetring].some(let element): boolean.false
+    case std.optioce[std.unit] for std.unit
+    a(): generic_self_reference[std.unit]
+        self
+    b(): generic_self_referen.add(std.boolean.false))
+assert(s.contains(std.nt(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type														   *                                                                                             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                             let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

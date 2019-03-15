@@ -1,0 +1,46 @@
+ new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+ass%  te = enlow   *                               ring_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(Fimport             g_   let std = import std
+let string =t()
+    concat("", value)
+assert(test_single(single.a(make_)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: bom
+        b)
+    b
+let n = nestGd_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let    _x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)
+it
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cove     ace = interface
+            m(): b*olean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+       fa       e_paase monrosatlet conversion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_                                                    .a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: strucpe
+    u: int(0, 123)
+    v: stdmascriptlet p can nest generic funcs = pri  e

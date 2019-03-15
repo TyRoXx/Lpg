@@ -1,0 +1,85 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO= (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                                          int(0, 0)
+    print()
+        "0"
+   OOOOOOOO= (printed: printable)
+    let method = printed.print
+    l   _tring = method()
+
+let printable2tpl printable2 for   
+        OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO= (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                                          int(0, 0)
+    print()
+        "0"
+   OOOOOOOO= (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                                          int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable3 for int(1, 1)
+    print()
+      nterface
+    method(a:      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+assert(string_equals("test", g.method(boolean.tru                                                                int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable3 for int(1, 1)
+    print()
+      nterface
+    method(a:      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)let std = import std
+
+let printable = inter other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(stri
+     o  assert(not(bng))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+assert(string_equals("test", g.method(boolean.true, boolean.false).pnt()))_equals("unitYirS_
+  me
+
+(std.unit_value)))le
+a

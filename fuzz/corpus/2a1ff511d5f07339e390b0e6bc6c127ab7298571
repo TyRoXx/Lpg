@@ -1,0 +1,30 @@
+l  et std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(                                                                         inpu): From): To
+
+let dummy =!struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+asse W .produce())
+
+impl transformer[std.boolean, std.sfalse: "false"
+
+let b : transformer[std.boolean, std.string] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.boolean]
+
+impl captures_values[std.unit] for dummy
+   emho td(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_paramete             st_generic_capture_resolution[std.boolean](std.boolean.true)*/

@@ -1,0 +1,42 @@
+a      O>ssert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\let""""""""""""""""""""""""""""""""""" algorithm = import algorithm
+let std = import std
+let integers" )
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = fe_runtime_string("abc"))
+assert(string_equals("abc", match returk_stateful_enum()
+    case sin  e.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet ate):
+            side_eff        ect()
+            strin'g_equ = enum
+let pass_empty = (arg: emptyals("abc", state)
+let make_runtime_stri)
+    arg
+
+let monostatg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = eng = (value: std.string)
+    side_enum
+    a
+  ffe ct( b
+let)
+ p    a

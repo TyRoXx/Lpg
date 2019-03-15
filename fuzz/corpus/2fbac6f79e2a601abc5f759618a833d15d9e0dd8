@@ -1,0 +1,54 @@
+let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: bool(an.false
+)
+
+//the tyat generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)

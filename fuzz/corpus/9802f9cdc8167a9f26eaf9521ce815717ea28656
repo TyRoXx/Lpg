@@ -1,0 +1,36 @@
+let std = import std
+
+let single_'arameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    s):
+        string_equals("abc", s)xs
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean]_global[boolean].b(boolean.true)
+    case using_global[bcove            r_enum_var
+       c     ase cover_enum.x:   std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolealeann
+        impl cover_interface for boolean
+         x:   std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolealeann
+        impl cover_interface for boolean
+            m(): boolean
+                self
+       ): boolean
+    boo letl cover_ean.fa

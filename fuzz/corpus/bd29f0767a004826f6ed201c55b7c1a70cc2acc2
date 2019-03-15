@@ -1,0 +1,100 @@
+l      O> import std
+
+let require_c require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)0000000000000000000000000000000000000000012810238940076077510GJJJ555555555t require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)5555555555555555555555555555555555555555555555555555555555555GJJJ5555555555555555555555555555555555555555555555555555555)55
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+leb runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter.[tsstdring].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTime                            )
+    b(std.boolean)
+assert(match using_global[booleanlet algorithm = import algorithm
+let std = import std
+let ilet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as exntegers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, pected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type																																																																																																																																_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let mak0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](n_of[boolean, type_of(false_predicate)](nassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match ae_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are colgorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        st].b(boolean.true)5555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+ nsidered different even though U is the same because T is not the same.
+assert(not(type_       s
+)
+
+leb runtime_string = (an = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_arra)
+assert(integer_equals(0, d.lert(matstd.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.       >false))
+assert(not(s.contequaains(std.boolean.true)))
+asselsrt(n

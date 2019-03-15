@@ -1,0 +1,41 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = prrint
+   string
+    other_method(): std.un  	  assert(boolean.false)
+asserttd.make_mutlbae[type_of(integer_equals(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enuals("abc", match return_state.a)
+    case monostate.a: boolean.true
+)
+
+let bis     = enum
+    match element2.load(0)
+                            case lern.true)*                      =============ert(match using_globalop
+  [boole      prd.string
+    y: boolean
+let muquals("abc", match return_state.a)
+    case monostate.a: boolean.true
+)
+
+let bis     = enum
+    match element2.load(0)
+                       "\"__                                                                           =============ert(match using_globalop
+  [boole      prd.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structolea                                           assert(str    equals("abc", match return_state.a)
+    case monostate.a: boolean.true
+)
+
+let bis     = enum
+    match e        onostate.a: boolean.true
+)
+
+let bis     = enum
+    match element2.load(0)
+                            case lern.tr e)*a./g_equads("hello

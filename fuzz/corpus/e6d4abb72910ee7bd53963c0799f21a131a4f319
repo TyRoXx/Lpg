@@ -1,0 +1,9 @@
+let std = import std
+
+let printable = interface
+    print().fa                                ^                          =============ert(match using_gllean
+let multi = enumum
+    a(single)
+    b(structure)
+    c(std.unit)
+uads("hello

@@ -1,0 +1,34 @@
+l   std = import std
+let integers = import integer
+let integlet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): = "abc"
+        let cover_struct = struct
+            m: boolean
+        let cover_struct_var mment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum. x
+        match cover_enum_var
+       std = import std
+let string = std.string
+let option = std.option
+let a = new    Wt)
+let b = new_array(std.array[string])
+let c = new_array(string)
+                                        ert(string_equals
+("e)))
+assert(string_equals("faes,l" runtime(boolean.fals123e", h.   WVV))))ssert(string_equals("z", z.method()))
+
+le))
+assert(not(s.c(ntains(std.boolean.truenot(s.r(letlean): boolean, option.sraassert(string_equals("123456",num.b
+

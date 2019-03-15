@@ -1,0 +1,73 @@
+l   p   ^td = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_resultL       result	:
+        assert(intjger_eq  ls(0, result))
+    case subtracRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRt_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZresult.underflow:
+        boolean.trlet std = import stRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRt_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZresult.underflow:
+        boolean.trlet std =(import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unit
+
+let mutable_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutable[T] for mutable_content[T]
+    load(): T
+        match self.content.load(5)
+            case std.option[T].some(let value):
+                value
+            case std.option[T].none:
+                t p = o("test")
+assert(string_equals("test",g p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+assert(string_equd
+
+// impl for, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_ering_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p4.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

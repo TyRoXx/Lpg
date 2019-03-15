@@ -1,0 +1,32 @@
+                                  `__^                                                                                                                                                                                                 port_inte###########################################################################################################################ains(std.boolean.false)))
+assert(not(s.cons(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.containcccccccccccccccccccccccccimpl conversion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: convexsion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a)make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("dstring("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", bo   $   he enums                                                   t                                                                                                                                                                                                                           "                 

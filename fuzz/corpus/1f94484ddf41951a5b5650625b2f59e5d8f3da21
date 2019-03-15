@@ -1,0 +1,14 @@
+let std = import std = (new_array(string)
+assert(integer_equals(0, a.size()))
+assert(n", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")))single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(s tring_equals("abc", match return_stateful_enum(fect()
+            string_equals("abcay_type = std.array[string]
+let a : array_type = (new_array(string) boolean
+let ")))
+assert(not(a.store(1, "")))

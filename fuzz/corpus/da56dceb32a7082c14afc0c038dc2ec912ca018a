@@ -1,0 +1,130 @@
+let std = import std
+
+let string = std.string
+
+let arrlet  = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_etd.runtime_value[integer](0), 1)
+    case subtract_result.ok(let result):
+   *v
+          boolean.false
+ q   case subtractZresult.undeuals("abc", match return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    x: std.strirflow:
+ng
+   c : boolean
+let ")))
+asser        booltean.true
+)(
+non].none: std.boolen.afilse
+)
+
+assert(match a.load(2)
+    case std.opl[boolean].b(let s):
+        s
+)
+
+let accessiuntime_string = (arg: std.str  	  assert(boolean.false)
+assert(integer_eq  ls(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(mLatch pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enu std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runti  _value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_etd.runtime_value[integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+ q   case subtractZresult.undeuals("abc", match return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    x: std.strirflow:
+ng
+   c : boolean
+let ")))
+asser        booltean.true
+)(
+non].none: std.boolen.afilse
+)
+
+assert(match a.load(2)
+    case std.option[svd.boolean].some(let element): std.boolean.false
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: probal[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessiuntime_string = (arg: std.str  	  assert(boolean.false)
+assert(integer_eq  ls(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+asser    case t(match
+  

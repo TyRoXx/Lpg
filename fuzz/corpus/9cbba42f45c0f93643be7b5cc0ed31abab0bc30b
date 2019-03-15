@@ -1,0 +1,109 @@
+l         import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+   a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!let(std = import std
+
+let string = std.svalue)
+assert(test_single(single.a(make_runtime_string(rgum>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ent*/
+let f6 = (a: boolean)!!!!!!!!!!!))!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 1
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{inleX	      ))))
+
+assert(string_equals("abc", match single.ateger_to_string(x)( y}
+    string_equals(u().a(make single.a(make_runtime_, u().b)
+assert(tstring("abc"))
+assert(string_equals("abc", matc())
+h return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let      let a : m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        ass: m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!let(std = import std
+
+let string = std.svalue)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(let std = import std
+let single = enum
+   t(integer_equals(bn argum>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>ent*/
+let f6 = (a: boolean)!!!!!!!!!!!))!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 1
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{inleX	      ))))
+
+assert(string_equals("abc", match single.ateger_to_string(x)( y}
+    string_equals(u().a(make single.a(make_runtime_, u().b)
+assert(tstring("abc"))
+assert(string_equals("abc", matc())
+h tateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    ?: std.string
+    y: boolean
+let ")))
+assert(not(a.store(1, "")))

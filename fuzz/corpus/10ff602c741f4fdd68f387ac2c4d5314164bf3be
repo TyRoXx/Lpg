@@ -1,0 +1,30 @@
+let       et t_instance            )                                                      ("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    arg                                                                               .a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+l _   	 rsion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_                                                    .a.a
+assert(f(u{t{boolean.true}, "", 0}))
+
+let nested = struct
+    a: struct
+  W     b: boolean
+
+let conversion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_inte&rface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

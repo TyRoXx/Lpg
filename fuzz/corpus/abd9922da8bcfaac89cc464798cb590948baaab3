@@ -1,0 +1,19 @@
+l] et st  side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side_effect()
+    let indirection = () '
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, st    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(true, boolean.true))
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(capture_twice())

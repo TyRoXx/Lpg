@@ -1,0 +1,173 @@
+lL       et std = e
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.ic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic              (): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+: std.unit
+    _(): std.unit
+    ___(): std.unit
+letan.false)))
+
+let a2 : printablme2 = "abc"
+assert(string_equals("abic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic              (): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+: std.unit
+    _(): std.unit
+    ___(): std.unit
+letan.false)))
+
+let a2 : printablme2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+ t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+   auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    et producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    tr    as = std.e: booption[string].some(lemlene ett): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+
+assert(a.store(1, "xyz"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equans(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+asser
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+  c", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+ t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+   auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    et producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    tr    as = std.e: boolean.true
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(lemlene ett): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+
+assert(a.store(1, "xyz"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equans(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+asser
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        n): std.string
+        mat       case tristate.b: boolean.falselet std = import std
+
+let s = struct[T]
+    e: T
+let instantiated = s[std.boolean]
+let v : instantiated = instantiated{std.b max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    as
+        std.br(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): tstd.unit
+    do(): std.unit
+    double(): std.unitd_list_no       b)
+    b
+let n = nestGd_enum.b
+

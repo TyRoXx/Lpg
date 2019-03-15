@@ -1,0 +1,70 @@
+l      }? import std
+let std_again = import std
+let e : std.boolng_equals("test", p.load()))
+p.store("123")
+assert(string_equalqs("123", p.load()))
+
+let a = std.make_mutanle[itb(0, 3)](0)
+assert(integer_equals(0, a.      5)load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assassert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u = std.make_mutable[std.unit](std.unit_value)
+u.store(u.load())
+
+let d = std.make_muttd.unit))
+assert(integer_equals(1, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value      :.make_motable[type_of(interface[T])](interface[T]teger_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().mt].some)
+std.make_mutabl)e[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([])eme()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boable[std.array[std.unit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value      :.make_mutable[type_of(interface[T])](interface[T]teger_equals(1, d.load()ad)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.   Zunit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

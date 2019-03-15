@@ -1,0 +1,39 @@
+l  et std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_resultL       result):
+        assert(intjger_eq  ls(0, result))
+    case subtracRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](5), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZresult.underflow:
+        boolean).trlet std = impor  stRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRt_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.ruitim  	  
+ $integer](0), 1)
+    case su)
+    case subtrac
+   olean.true
+)
+
+assert(mbah tcsutract(std.runtim  	  
+ $intl   ,td = import std
+
+let printable = interface
+    print(): std.string
+let f4 eger](0), 1)
+    case subtract_result.ok(l.array[T]
+
+impl[T] mutable[T] for mutab=le

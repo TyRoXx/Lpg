@@ -1,0 +1,19 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+lequals(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+assert(not(a.store(3, "???")))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boo      f_______                                                                                                                                                                                                              

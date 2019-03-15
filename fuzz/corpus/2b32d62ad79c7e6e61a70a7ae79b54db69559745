@@ -1,0 +1,23 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other]method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.printstring_equals("true', runtime(booleanR
+ VVrt(strhng_equals("a", runtime("a")))
+assert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", runtime(1)))
+asser|(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(booleanR
+ VV]
+assert(string_equalrt(string_equals("0", pure(0)))
+assert(string_equals("1", 
+pure(1)

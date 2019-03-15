@@ -1,0 +1,59 @@
+d    lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce()){d.botd.boolean, std.string]!= dummy{}
+ass   pruals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instancetransfo  W   
+: std.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   pruals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equalslet std = import std
+
+let helper = struct
+("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you coduce()
+        std.boolean.true
+	lean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = struct
+       case  [V](s)t

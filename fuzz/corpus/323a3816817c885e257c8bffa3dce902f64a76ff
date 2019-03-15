@@ -1,0 +1,33 @@
+    case olean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case                                                                                                                                                                                                      !                                                                                         using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let  cs):
+         = ()                                                                                            !                                                                                                                                             sert
+        and(boolean.ers[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_gl"abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(matc0h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostatch caover_n

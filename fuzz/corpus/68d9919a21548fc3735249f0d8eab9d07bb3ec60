@@ -1,0 +1,44 @@
+let std =[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessiuntime_string = (arg: std.str  	  assert(boolean.false)
+assert(integer_eq  ls(1, alwa let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_integer_eq  ls(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a)
+
+let true_predicate = (element: booluan): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista           te(tristatase option[std.array[string]].some( et element2):
+                assert(c.append("abc"))
+         arg
+assert(match         match element2.load(pas0)
+  s_bistan nest generic funcs = pri  e

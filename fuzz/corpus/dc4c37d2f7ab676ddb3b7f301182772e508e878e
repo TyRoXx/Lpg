@@ -1,0 +1,19 @@
+let std = import std
+let es = import ecmascript
+let option = std.optiong = (host: es.host)
+    let exported : host_value = host.export_string("hello")
+    assert(match host.import_str   Wexported)
+        case option[std.string].some(let content):
+            string_equals("hello", content)
+      max = host.export_integer(9007199254740991)
+    assert(host.ealqus(min, min))
+    assert(host.equals(maX, max))
+    assert(not(host.equals(min, max)))
+    assert(not(host.equals(max, min)))
+    assert(not(hostject : host_value = host.export_string("hello")
+    let arguments = new_array(host_value)
+    assert(ar uments.append(host.export_integer(0)))
+    let char_integer(host)
+ll_method(host)
+    test_import_integer(host)
+    test_equals(host)

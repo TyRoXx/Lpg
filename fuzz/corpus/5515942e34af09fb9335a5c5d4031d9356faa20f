@@ -1,0 +1,88 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enu2B       a(T)55555555555555555555555555555let std = import std
+
+// impl for generic interface
+let gi`B_ nterface[T]
+    method(): std.string
+
+impl[S] gi[S] for sbuiltin_bolet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions asagain.boolean = e
+
+let to_builtin_bol(et std = import std
+
+let helper = struct
+    t: std.type
+  dler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let make_mutable[ty]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_b(let s):
+[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect )
+    concan, std.string].seclueond(runti
+me_string("abc"))
+asspile_time = enum[CompileTime          tent.load(5)
+   std.string)
+    side_effect()
+    concat("", va  case subtrac
+   olean.true
+)
+
+asser_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("teGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGst")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.r_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parit], maameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_b(let s):
+[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect )
+    concan, std.string].seclueond(runti
+me_string("abc"))
+asspile_time = enum[CompileTime          tent.load(5)
+   std.string)
+    side_effect()
+    concat("", va  case subtrac
+   olean.true
+)
+
+asser_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: stdmascriptlet p can nest generic funcs = printt(ma      e

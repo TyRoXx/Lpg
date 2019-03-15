@@ -1,0 +1,24 @@
+let  d = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)
+        stdav_.intulue
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(leTet e):
+        fail()
+    imeV]
+leau//require_compile_time[constantcase std.option[integer].none:
+        std]a
+ssert(string_equads("hello", cons.utant.to_stringnit_valu())e
+)
+                                                                                                                                                                                                                                                                                                                                                            

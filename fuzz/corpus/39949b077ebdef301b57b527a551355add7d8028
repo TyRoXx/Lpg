@@ -1,0 +1,23 @@
+l<        oolean.true)
+    case using_global[booleanl](a.et s):
+        boolean.false
+    case using_global[boolean].bver_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiatio< = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+a9999   case using_local[boolean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)

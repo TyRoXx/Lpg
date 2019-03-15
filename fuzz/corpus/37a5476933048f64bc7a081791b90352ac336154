@@ -1,0 +1,57 @@
+ake_runtime_string("abc"))))
+as3       .not(testlet std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): tstd.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): st_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let st###################################################################ate): state
+))
+
+let structure = struct
+    x: std.s'ring
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate =d.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std   ___(): std.unit
+let parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = stimpl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std (arg: monostate)
+    arg
+assert(ma.boolean,tch pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate std.string] for dummy
+    t ra

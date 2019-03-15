@@ -1,0 +1,42 @@
+l      O> import std
+
+let require_c require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)000000000000000000ype_ol(false_predicate)](nassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match ae_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are colgorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        st].b(boolean.true)5555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+ nsidered different even though U is the same because T is not the same.
+assert(not(type_       s
+)
+
+leb runtime_string = (an = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_arra)
+assert(integer_equals(0, d.lert(matstd.boolean.false)))
+asserto(tn(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.       >false))
+assert(not(s.contequaains(std.boolean.true)))
+asselsrt(n

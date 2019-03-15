@@ -1,0 +1,30 @@
+let std = import std
+
+let printable = interface
+    print():)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+assert(string_equals("test", g.method(boolean.true, boolean.false).print()))
+
+let create_impl = (): test_interf_value
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()))

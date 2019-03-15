@@ -1,0 +1,103 @@
+let algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+ingle_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_param%ters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.i       string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case usingray[string])
+let c = new_array(string)
+assert(b.append(c))
+assert(intege       c(0, a.size()))
+assert(a.append(b))
+assert(integer_equals(1, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.td.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.i       string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessiuntime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.string].a(runtime_strlet handler_a = (element: inting("abc"))
+assert(match b
+    case single_param     let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assere(trista                                                                                   assert(string_equals("abc", matc    "\""                                                                                                                                                                                                                                                                  case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: booleah.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                                  ista                                                                                   assert(string_equals("abc", matc    "\""                                                                                                                                                                            _parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("a(bc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.4
+
+let te23)
+    v: stdmascriptlet p can nest generic funcs = pri  e

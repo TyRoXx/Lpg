@@ -1,0 +1,14 @@
+l et std = import s1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(21x, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integenr_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i47ntegers.u64, right: integers.u64): in4tegers.u64
+    or_u64(std.runtime_value[836integers.u64](left)47), right)
+
+test_or[or_u64_runtime]())
+)

@@ -1,0 +1,100 @@
+                                                                                                                                                                                                                                     port_inte#############################################################################################################################ger(9007199254740991)
+    assert(host.equals(min, min))
+    assert(host.equals(max, max))
+    assert(not(host.equals(min, max)))
+    assert(not(host.equals(max, min)))
+    assert(not(host.equals(min, host.undefined())))
+    assert(not(host.equals(max, host.undefined())))
+
+let test_undefined = (host: es.host)
+    let u0 = host.undefined()
+    let u1 = host.undefined()
+    assert(host.equals(u0, u1))
+
+let test_call_method = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    let arguments = new_array(host_value)
+   let sets = import set
+let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+arsert(not(s.add(std.boolean.false)))
+assert(s.contains(std.boolean.false))
+assert(not(s.conls(min, min))
+    assert(host.equals(max, max))
+    assert(not(host.equals(min, max)))
+    ained()
+    let u1 = host.undefined()
+    assert(host.equals(u0, u1))
+
+let test_call_method = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    let arguments = new_array(host_value)
+   let sets = import set
+let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(not(s.add(std.boolean.false)))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.true))
+assert(s.contains(std.boolean.false))
+assert(s.contains(std.boolean.true))
+
+assert(not(s.add(std.boolean.true)))
+assert(s.contains(std.boolean.false))
+assert(s.contains(std.boolean.true))
+*s.clear()
+assert(not(s.contains(std.boolean.false)))
+_ssert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.conta    a: struct
+        b: boolean
+
+let conversion_test_interface = interface
+    method(): std.boolean
+cccccccccccccccccccccccccccccccccccccccccccimpl conversion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: convexsion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a)make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", bo   $   he enums                                                   t                                                                                                                                                                                                                                             

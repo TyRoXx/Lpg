@@ -1,0 +1,93 @@
+struct
+        b: boolean
+
+let convera)
+assert(string_equals("abc", u_                          let std = import std
+let std_again = import td.runtime_value[boo   
+](boolean.true)
+        case boolean.true:
+            break
+        caspl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    other_method()
+        std.unit_value
+t], maeu_knem[2]()[std.ufi .t])))
+assert(t                             ______________4<= u{t{boolean.c4, right: int ype_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equarface[Struct]
+    method(a// test inteistate(trista                                                                                   assdrt(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.strin  g
+    t_integer_to_string = (input: int(0, 2147483647))
+    side_n.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builire_compile_time = enum[Copty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_prmpiedicate)]\       ty, false_predicate)))
+
+let empty = new_array(boolean)
+matchcmZresult.underfl~)~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                            l   
+ std = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.un 
+ ti  side_effect()
+    let inner = ()
+        side_effect())
+         std.boolean): std.string
+    side_effect()
+    match a
+        case std.boo copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boan.true:
+            std.unit_value
+        case std.boolean.f                      1                                                       nner = ()
+        side_effect()
+        g()
+
+let h = ()ring_equals("3", k(std.booleanM   se)))
+
+let copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.bo), new_array(std.boole a.boolean
+    print()
+        match self
+            ca               ______________4<= u{t{boolean.c4, right: int ype_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equarface[Struct]
+    method(a// test inteistate(trista         se boolean.true: "true"
+            case boolean.faise: "false"
+    other_                                                                                         method()
+        std.unit_value
+
+assert(string_equals("", purpure(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equsa("sert( gi[int(ferensta  .ii u

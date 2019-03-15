@@ -1,0 +1,123 @@
+[std.unit]))
+assert(type_eqngle = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: lean.true)(std.unit_value, std.unit_value))
+
+std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abclet                                                                    std = import std
+
+let s = struct
+l_t s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+asslet std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+  ert(u_instance.a.a)
+assert(string_equals("abc", u  case single_parameter[boolean]_i stance.b))
+assert(integer_equals(0, u_inst.a(let s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integ   side_effect()
+    concat(std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+        td.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make_runtime_string("abc"))
+    case single.a(let state): state
+))
+
+let return_stateful_enum = ()
+    side_effect()
+    single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case si helper = struct
+    t: std.type
+    u: int:(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [Te same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enue two_parameters[boolean, std.string].second(le_equals(std.boolean, tuple.t))
+assert(integer_equals(t s):
+        string_equals("abc",123, tup s)
+)
+
+let le.u))
+ausissend.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equarface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element: stdse std.boolean.false:
+            match from.load(to.size())
+                case std.option[T].some(let element):
+                    assert(to.append(element))
+                    copy_array[T](from, to)
+                case std.option[T].none:
+              = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+asslet std = impor64, right: int   

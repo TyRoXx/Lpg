@@ -1,0 +1,69 @@
+lL       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long():                                                                                                                             std.unit
+    register()assert(): std.unit
+    _Thread_local(): std.unit
+    _(): std.unit
+    ___(): std.unit
+letan.false)))
+
+let a2 : printablme2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(y = struct
+impl producer[std.boolen] af rodummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = impotassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let Aaccess_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+ass         ert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printablme2 Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(y = struct
+impl producer[std.boolen] af rodummy
+    p= "abc"
+assert(string_equals("abc", *2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

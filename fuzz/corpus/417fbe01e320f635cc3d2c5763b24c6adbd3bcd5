@@ -1,0 +1,5 @@
+let sets = import set
+let std = import std
+
+let s = sets.make_linea   t[std.boolains(std.boolean.false))ae(std.bool.enatrue)))
+assert(not(s.remove(std.boolean.false)9)

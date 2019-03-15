@@ -1,0 +1,130 @@
+let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u31](0)
+loop
+    match integer_one
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_por111equals(i.load(), 10000)
+        case boolean.true:
+            break
+        case boolean.false:
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(boolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolealet st11111111111111111111111111111111111111111111111t std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]let empty = enum
+lett
+    value: boolean
+
+impl linked_listd = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+   ption[.l        inked_list_noempty de]
+
+let final_node == (a struct
+    val          tuple = f[std.boolean]()[123]()["test"](rg)
+assert(type_equals(std.b:ouole_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolesert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.n.true)
+        case boolean.truetruct
+    a: t
+    b: std.string
+    c:std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.booles(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic func     break
+   tions as expected
+let f = [T]()
+    [U]()
+        [     case boolean.false:
+V]()
+            helper{T, U, V}
+        let e_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equ     als(make_enum[2]()[std    .  
+    assert(integer_equals(1844674407370nteger_to_string
+// com"")))
+assert(                  verse)!! = enu!!!!

@@ -1,0 +1,16 @@
+l      5) implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+:et integer = integers.integer
+
+let handler_a = (element: int  er): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(ha[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ something))
+{"hello"}
+let require_compile_time = enum[Copty, true_predica                                                                                   std.boolean.false
+)
+
+assert(not(a.store(2, std.boolean.true)))
+assert(match a.load(0)
+    case std.option[std.boolean].som                            e(let eleme      ) (element)
+    cas   e

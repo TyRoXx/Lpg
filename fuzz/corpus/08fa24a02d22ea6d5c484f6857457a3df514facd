@@ -1,0 +1,50 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)555555555555555555555555555555555555555555555555555555555555555555555555555555555000000000000000000000000000000001184644519
+
+let a = single_parameter[boolean].   _a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+     t sr  ing_equals("abc", s)
+)
+
+let two_parameters = enum[First,                                      Second]
+    first(First)
+    second*Second)
+
+let c)= two_parameters[boolean, std.st      break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+          case cover_enum.x: std.unit
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let ())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    c  _
+  g_local[boolean].c(let s):
+         = ()
+        and(boolean.e_time[g]
+
+asseement)
+let access_parameter_struct = struct
+    element: std.ty,pe
+let x = accrt(gess_parameter[access_parameter_struct{std.boolean}].e(st())d.boolean.true)
+

@@ -1,0 +1,71 @@
+de = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].s                                                                                                                                k                                                                                                                                                                                                                                                                                            let std = i
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    ]ase using_global[bcover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)
+    append_4()
+let append_64 = ()
+    append_16()(let
+    ap s):pend                                                           let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

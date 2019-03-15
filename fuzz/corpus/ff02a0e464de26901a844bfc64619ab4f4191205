@@ -1,0 +1,28 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let me-thod = printed.print
+    let string = method()
+
+t(1, 1)
+    p  nt()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", rsu subt method(a: boolean, b: boolean): printable2
+
+impl tesract_result.underflow:
+        fail()
+
+t_intmaerface ftcoh

@@ -1,0 +1,87 @@
+let std = import std
+
+let array_type = std.array[std.boolean]
+let a                                                                                                        : array_type = new_array(std.boolean)
+assertolean.false))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(2)
+    case (std.option[std.boholean].some(let element): std.boolean.fal 	
+    case std.option[std.boolean].none: std.boolean.atch a.load(0  )  c
+ast): not(element)
+    case std.option[std.booleana : array_type = new_array(std.boolean)
+assert(integer_equals(0, a.size()))
+assert(not(a.store(0, std.boolean.true)))
+assert(not(a.store(1, std.boolean.true)))
+assert(not(a.store(2, std.boolean.true)))
+
+assert(match a.load(0)
+    case std.option[;td.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.true))
+asserp(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.optio                                         n[st                                                  d.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.booleastd.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.let std = import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+        let a : m = boolean.true
+        a
+    f6()
+assert(f5()) 23))
+g()()
+
+/*use a constant in a runtime context*/
+load(1)
+    case std.option[slet b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 2))3
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "2"
+let t = ()
+    let u = ()
+        helper{integer_to_string(x), y}
+    string_equalstd.bool(u().a, u(ean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)).b)
+
+
+let big = newas_arrsert(t())
+ay(std.boo

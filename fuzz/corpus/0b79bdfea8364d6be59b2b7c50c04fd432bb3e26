@@ -1,0 +1,57 @@
+l   p                                qqqqqqqqqqqqqq                                  std = import' std
+
+le                                                                                                          t s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+assert(u_instfnce.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg                                                                            std = import' std
+
+le                                                                                                 gle(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.aer_to_string(input)
+assert(("def]s
+arameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+ let std = import std
+let single = enum
+  t strucrt(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instanck.c))
+
+let f = (arg: u): bo  ean
+    arg    uct
+    a: struct
+        b: boolean
+
+let ture = struct
+    x: std.string
+    y: boolean
+let multi = enum
+   conversi a(single)
+    b(structure)
+    cX$.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", booonlean.t_t

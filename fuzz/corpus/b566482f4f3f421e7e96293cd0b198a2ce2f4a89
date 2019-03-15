@@ -1,0 +1,158 @@
+t     = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(maabc", optionk.some            assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+  tate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.faing_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean           h return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    e.a(make_runtime_    assert(t(integer_equalstring("abc"))))
+assert(std.match single.a(make single.a(maabc", optionk.some            assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+  tate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.faing_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assase single.a(let state): stastruct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(matc9h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: coolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b: boolean.false
+    case tristate.cean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.faing_equals("abc", match single.a(make single.a(make_run||||||||||||||||||||||single(single.a(mak        e_string("abc")))singleX	      ))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtithod()
+        std.unit_value
+
+assert(string_equals("", pure("")))
+assert(string_equals("a", pure("a")))
+assert(strinmatch a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u64, right: int   

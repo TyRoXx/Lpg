@@ -1,0 +1,43 @@
+let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+       : std.string
+    y: boolean
+l<et multi = enum
+    a(single)
+    b(structure)
+    cX$.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+     si   de_effect()
+        trnigs_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(e m
+     e)))
+
+roducer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f0 = (printed: printable)
+    let method = printed.print
+    let stle2 = interface
+    print():'                                                                                                                                                     

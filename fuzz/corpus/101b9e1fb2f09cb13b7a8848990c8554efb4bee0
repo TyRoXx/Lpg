@@ -1,0 +1,144 @@
+let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abclet                                                                    std = import std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+asslet std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+  ert(u_in	tance.a.a)
+assert(string_equals("abc", u  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.a(let s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integ   side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.aer_to_string(input)
+assert(("def]s
+arameters[boolean, std.string].first(lh multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+     si   de_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nestGd_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let    _x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)
+it
+        lettd.and
+require_compile_time[ngle = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abclet                                                                    std = import std
+
+let s = struct
+let s_iand]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+       false", b.transform(std.boolean.false)))
+
+roducer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: d.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()esult):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                lse", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_in                                                                                            

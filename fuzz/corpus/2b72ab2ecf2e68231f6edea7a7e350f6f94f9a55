@@ -1,0 +1,139 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)55555555555555555555555555555let std = import std
+
+// impl for generic interface
+let gi`B_ nterface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.strinals("u", u.method()))
+
+// impl for generic self
+let i = interface
+    method(): std.boolean
+
+let L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u(2 : i = gs[int(0, 1)]{1}
+assert(u2.method())
+case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[F = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_ import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolelet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate3       case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = eunm
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+ uals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolet test_type = enum
+    a
+    b
+
+let compile_time_test = struct
+    t: type_of(test_type)
+let instance = compile_time_test{test_type}
+let t = instance.t
+let x : t = t.a
+assert(match x
+    case t.a: boolean.true
+    case t.b: boolean.false
+)
+ce[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.r_interface for boolean
+            m(): boolean
+     struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_b(let s):
+[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concan, std.string].seclueond(runti
+me_string("abc"))
+asspile_time = enum[CompileTime          tent.load(5)
+   std.string)
+    side_effect()
+    concat("", va  case subtrac
+   olean.true
+)
+
+asser_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: stdmascriptlet p can nest generic funcs = printt(ma      e

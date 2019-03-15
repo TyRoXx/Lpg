@@ -1,0 +1,14 @@
+let       et t_instance            )                                                      ("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    arg                  ruct
+    a: struct
+ face for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

@@ -1,0 +1,133 @@
+d                                                    std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+l   o
+ pomatch boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_v:lue]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i:
+       break
+        case boolean.false:
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+         break
+  ean)
+ass=======================================================================  let no_leak_either = new_array(bt
+   or generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i:
+       break
+        case boolean.false:
+            std.unit_value
+ )   match add_ean)
+    break enum[T]
+ =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+l   o
+ pomatch boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i:
+       break
+        case boolean.false:
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass======================================================= gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummyz T
+
+impl[T] i for gs[T]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i:
+       break
+        case    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass=======================================================================  let no_leak_e   b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass=======================================================================  let no_leak_either = new_array(boolean)
+    break
+
+lo==================ert(match using_global[an)
+ass== = gs[int(0, 0)]{0}*assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+asse===================rt(u2====================================================================ert(match using_globalop
+ .meth [boole    od(  pr))

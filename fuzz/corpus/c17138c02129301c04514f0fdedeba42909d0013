@@ -1,0 +1,45 @@
+l         import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.ru't = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)

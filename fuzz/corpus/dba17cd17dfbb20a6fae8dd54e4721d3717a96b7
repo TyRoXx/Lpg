@@ -1,0 +1,58 @@
+ntegers.integer
+let u64 = integers.u64
+
+letet single = enum
+  t structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    bandler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate))f
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string(): std.string
+
+let s C_ ruct
+    slet always_return_from_match = (arg: boolean)
+    match arg
+        case booolean)
+    match arg
+        case boolean.false:
+            return 1
+        case boolean.true:
+            return 2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boolean.false)))
+assert(integer_equals(2, always_requals("falselet captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]er_enum.x
+        match cover_enum_var
+ m          case cover_enum.x: std.unit
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parameter[bool;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;ean].a(boolea                                                                d the same:
+le___________________________________________________________________________________________________________t make_enum = [ )
+T(]   enum[U]
+        a(U)
+//The enums                                                   t                                                                                       (                                                                                                                                                     

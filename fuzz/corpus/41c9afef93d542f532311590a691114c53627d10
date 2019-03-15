@@ -1,0 +1,117 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)5555555555555555555555555555555555555GJJJ555555555t require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)5555555555555555555555555555555555555555555555555555555555555GJJJ5555555555555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+leb runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter.[tsstdring].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTime                              )
+  b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)5555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+leb runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter.[tsstdring].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTime                            )
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+       5555555555555555555555555555555555555555555555555555555555555GJJJ5555555555555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+leb runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter.[tsstdring].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTime                            )
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_struct = struct
+            m: boolean
+        let cover_struct_var = cover_struct{boolean.true}
+        let access_struct = cover_struct_var.m
+    t{std.boolean}].e(st())d.boolean.true)
+

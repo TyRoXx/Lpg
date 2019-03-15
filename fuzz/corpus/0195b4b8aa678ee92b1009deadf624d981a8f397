@@ -1,0 +1,112 @@
+d.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].noner once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let convl] e, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer[boolean, type_of(fime = [V]()
+    V
+
+// case taake_runtime_string("abc"))))
+ken
+///////////////
+
+let art(string_equals("0", test_integer_to_string(0)))
+assert(stringersion = conversion_test{std.uni", stat\)
+let make_runtime_string = (_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(21x, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integer_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i47ntegers.u64, right: integvalue:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.truet_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+assert(match a.load(2)
+    case std.optionrt(string_equals("false", b.transform(std.boolean.f.f: boolean.falsnum
+    a(std.unit)
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impltat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+assert(match a.load(2)
+    case std.optionrt(string_equals("false", b.transform(std.boolean.f.f: boolean.falsnum
+    a(std.unit)
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match  std
+
+let he conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_strue)
+assert(test_|||||||||||||||||||||||||||||||||an nest generic functions as expected
+let f = [T]()
+    [U]()
+          case  [V](s)te 

@@ -1,0 +1,76 @@
+l  et std = implet algorithm = import ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equse                                                                  lf.string
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[Copty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_prmpiedicate)]\       ty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.)
+
+let empty = new_array(boolean)
+match algorithm_of[blean): boolean
+    b (element: boolean): boole   van
+    boolean.true
+let false_preoolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predi
+ Zet i = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se                  oolean, type_of(true_predort std
+
+liet  = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se   m.)
+
+let empty = new_array(boolean)
+match alg/rithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[bo-       mpty, boolean.f.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+        fail()
+    case st                  oolean, type_of(true_predort std
+
+liet  = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se   m.)
+
+let empty = new_array(boolean)
+match alg/rithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+        fail()
+    case std.option[intege       ty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.)
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+          il()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(leTet e):
+        fail()
+    imele]
+Vau//require_compile_time[constantcase std.option[int eger].none:
+        std]
+assert(string_equads("hello", cons.utant.to_stringnit_valu())e
+)

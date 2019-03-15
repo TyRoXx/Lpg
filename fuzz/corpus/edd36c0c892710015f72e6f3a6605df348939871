@@ -1,0 +1,19 @@
+l    td = importtd
+s let std_again = import std
+let 6 : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_boolean = (a: std.boolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean({{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mut)))
+a.store(3)
+assert(integer_equals(3, a.load()                                                                            ))
+let b = std.make_mutable[int(0, 3assert(string_equals("123", p.load()))
+
+let a = std.make_muta])elba[))))

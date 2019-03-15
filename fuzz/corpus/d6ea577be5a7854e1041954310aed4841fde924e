@@ -1,0 +1,43 @@
+st_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+     string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")))4 = (printed: printable)
+    let method = printed.pr   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:tnteger = integers.integer
+
+let handler_a = (element: integer): std.unit
+    asselet std = import std
+let option = std.option[int(5, 100)]
+let f = (a: boolean, b: std.string, c: option, d: int(0, 2))
+    side_effect()
+    assert(a)
+  t s rase(string_equals("abc", b))
+    assert(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1     std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+   222222222222222222222         case std.boolean.false: "false"
+
+let b : transformer[sct_result.ok(let result):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                                                                                                                                                                                          

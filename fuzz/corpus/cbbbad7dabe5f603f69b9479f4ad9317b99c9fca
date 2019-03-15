@@ -1,0 +1,55 @@
+l  et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                           tuple = f[std.boolean]()[067]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(inte`er_equals(123, tuple.u))
+assert(string_equals( enums are considered different even though U is the same beca                                                                                  use T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+asse(rttype_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                              ]()[std.unmt]))
+assert(type_rt(string_equalsred different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1                                                                ]()[equals(make                                                                                     tuple = f[std.boolean:()[123]()["test"](       :(2B      als(std.boolean, tuple.t))
+assert(inte`er_equals(124, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is tn othe same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.strang
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.uniu], )))

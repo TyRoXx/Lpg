@@ -1,0 +1,39 @@
+let std = impo
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case us  g_llet s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(booles):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case us  g_local[bolet s):
+        boolea))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))n.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let u{ing_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[bcovt)
+    second(S     Vu|let c = two_parameters[boolean, std.string].second(runtime_string("abc"))           self
+        let&cover_instantiation = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_pa(let s): s
+        local
+())
+assert(ma      boolean.false
+)
+
+let access_paramet%r = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)

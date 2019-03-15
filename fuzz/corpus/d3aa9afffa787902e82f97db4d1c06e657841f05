@@ -1,0 +1,84 @@
+let  d = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of*handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, tlet a = boolean.true
+let result : int(1, 2) = match a
+    case boolean.false:
+        1
+    case boolean.true:
+        2
+assert(integer_equals(2  result))
+
+let runtime_var = ()
+    side_effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime_var()
+    case boolean.true:
+        40
+    case boolean.false:
+        1
+
+assert(integer;equals(40, something))
+{"hello"}
+let require_compile_time = enum[Copty, tr[std.unit]))
+assert(type_eqngle = enum
+    a(std.string)
+let test_single = (arg: single)
+    matide_effect()
+            string_equals("abc", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+        td.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make_runtime_string("abc"))
+    case single.a(let state): state
+))
+
+let return_stateful_enum = ()
+    side_effect()
+    single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let let std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = singl                                       case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_efmulti = enum
+    a(sin     se
+
+asser    t  

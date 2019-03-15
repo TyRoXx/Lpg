@@ -1,0 +1,18 @@
+let std = import std
+
+let single_'arameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+     or boolean
+         x:   std.unit
+        let cover_not = !boolean.true
+        let cover_in    ace = interface
+            m(): boolealeann
+        impl cover_interface for boolean
+            m(): boolean
+                self
+       ): boolean
+    boo letl cover_ean.fa

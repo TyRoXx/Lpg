@@ -1,0 +1,100 @@
+l  et std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_resultL       result):
+        assert(intjger_eq  ls(0, result))
+    case subtracRRRRRRRRRRRRRt
+a"ssert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load())RRRRRRRRRRRRRRRt_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZresult.underflow:
+        boolean).trlet std = import s_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+assert(strinw_equd
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    ,load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("t)
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(sFFFFFFFFFFFFFFFFFFFFtring_equals("test",)
+ p2.load()))
+p2tso.re("value: T): st0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert!string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assu e
+ert(string_equals("test",)
+ p1.load()))
+p2tso.re("123")
+assert(strinw_equd
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(valumutable[std. 	string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("t)
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2,load()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p1.store("123")
+assert(string_equals("123", p2.load()))

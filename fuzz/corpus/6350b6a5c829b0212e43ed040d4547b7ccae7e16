@@ -1,0 +1,123 @@
+]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_b(let s):
+[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect )
+    concan, std.string].seclueond(runti
+me_string("abc"))
+asspile_time = enum[CompileTime          tent.load(5)
+   std.string)
+    side_effect()
+    concat("", va  case subtrac
+   olean.true
+)
+
+asser_runtime_string("abc"))))
+assert(slet std = import std
+
+let help(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enu_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match qlgorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(let e):
+        fail()
+    case std>option[integer](3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_eqg = std.string
+let option = std.option
+let a = new_array(std.arr                                                                                                 atch_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boolean.true)))
+
+let loop_return_ex:licit_ty_implicit_type(boolealet a = boolean.true
+let result : int(1, 2) = match a
+    case boolean.false:
+        0
+    case boolean.true:
+        2
+assert(integer_equals(2, result))
+
+let runtime_var = ()
+    side_effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime_var()
+    case boolean.true:
+        40
+    case boolean.false:
+        1
+
+assert(integer_equalrue
+)
+
+asser_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.tyalue]
+
+let and = sert(matchb c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enu_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match qlgorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(let e):
+        fail(et pa, s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    secoestGd_enum.b
+

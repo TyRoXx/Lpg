@@ -1,0 +1,12 @@
+tch
+    case 0: boolean.false
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runtime evaluatioolet std
+
+let re std.option[string].none: boolean.falrray_type = std.array[string]
+let a : array_type = new_a

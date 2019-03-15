@@ -1,0 +1,52 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.unit
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    whiember = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+    await(): std.unit
+    boolean(): std.unit
+//etc..

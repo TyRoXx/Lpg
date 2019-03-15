@@ -1,0 +1,26 @@
+lL        = impor _d
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: b(oo  an)
+    side_effect()
+                         let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolec, 23)))
+assert(z(boolean.true, boolean.true) 
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(capture_twice())

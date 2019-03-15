@@ -1,0 +1,52 @@
+l  et std = import std
+let c_resault(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+as;sert(string_equals("0,1", y.method()))
+
+let z = import std
+
+5/ impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.un std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): stce
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[]]]]]]]]]]]]]]]]int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = in(): std.unit
+    inline(): std.unit
+ er_equals(0, result))
+    case subtract_result.underflow   *                ggggggggggggggggggggggggggggggggggggggggggComplex(         )      e

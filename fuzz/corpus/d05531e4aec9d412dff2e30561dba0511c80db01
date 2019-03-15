@@ -1,0 +1,65 @@
+     assert(boolean.false)ger_equals(0, element))
+algoritOOOOOOOOOOOOOOOOOh = (element: booledicate = (element: boolean)C boolean, option.some(2)
+            t))
+algoritOOOO OOOOOOOOOOOOOhm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+            lse
+)
+assert(match pass_bistate(bistate.b)    4)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u6pile_time = enum[CompileTimeValue]
+
+/*use a captured variable                              in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 - (a: boolean, b: boo  an)
+    side_effect()
+                         let indirection = () a
+    (c: std.uni       std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captures something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true) 
+
+/*capture the same variable twice*/
+let capture_twice = ()
+            integer_equals(c, c)
+assert(capture_twice())
+                                                                  assert(b.append(           c                                    `__U                                    $                                                                                    e single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u65, right: int   t pass_tristate = (arg: tristate)                            
+    arg
+assert(matchlet std = import std
+let integers = impart integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)  assert(intege     eneric_self_reference[std.boolean]
+     

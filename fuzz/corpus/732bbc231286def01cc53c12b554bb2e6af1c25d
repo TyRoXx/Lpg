@@ -1,0 +1,17 @@
+let algorithm = import algorithm
+let std = import  _empty, true_predicate))
+assert(not(algorithm.any_ean, type_  W alse_pred   )icate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[!oolean](empty, boolean*true)
+    case: std.option[integer].some(let e):
+        failarray(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case: std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+matd[boolean](empty, boolean.false)
+    case std.option[integer].some(let e):
+     ase std.option[integer].none:
+        std.unit_value

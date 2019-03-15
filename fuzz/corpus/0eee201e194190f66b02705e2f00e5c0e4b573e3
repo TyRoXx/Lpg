@@ -1,0 +1,80 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTimeValue]
+
+let and = sert(matchb c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(matean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+let access_parameter = enum[Struccase two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(matean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Strt]
+    e(Struct.elre_compile_time[res                                                                                   ult]
+    result
+require_compile_time[f]
+
+let g = f()
+require_compile_time[g]
+
+asseement)
+let access_parameter_struct = struct
+    element: std.type
+let x = accrt(gess_parameter[access_parameter_struct{std.boolean}].e(st())d.boolean.true)
+

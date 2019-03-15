@@ -1,0 +1,7 @@
+l        et std = import std
+let b
+let b = mat
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:assert(d)

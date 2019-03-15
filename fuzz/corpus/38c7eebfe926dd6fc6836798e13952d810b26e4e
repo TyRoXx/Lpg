@@ -1,0 +1,18 @@
+let                                                                    std = import' Mstd
+
+le                                                                                                          t s = struct
+let s_instance = s{}
+
+(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg                                                                               .a.a
+assert(f(u{t{boolean.true}, "ean
+impl conversion_test_inte&rface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

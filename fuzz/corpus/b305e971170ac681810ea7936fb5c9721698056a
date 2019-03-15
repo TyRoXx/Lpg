@@ -1,0 +1,35 @@
+ntegers.integer
+let u64 = integers.u64
+
+letet single =     enum
+  t structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    bandler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_                                                                                = (arg: boolean)
+    match arg
+     c   ase boolean.false:
+          alues[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element: std.type
+impl a                                                                                                                                                                               let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        lettd.and
+require_compile_time[                                                                                                                           

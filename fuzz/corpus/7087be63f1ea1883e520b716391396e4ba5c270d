@@ -1,0 +1,92 @@
+let                                                                    std = import std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boloean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interfaca: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, YYYYYYY  YYYYYYYYYYYYYYYYYYYYYYYYYYY"abc", 0}
+assert(u_instan                 std = implet s_instance = s{}
+
+let t = struct
+    a: boloean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg:   a: struct
+ `      b: boolean
+
+let conversion_test_interfaca: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, YYYYYYYYYYYYY: struct
+        b: boolean
+
+let conversion_test_interface = interface
+    metort std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boloean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = suruct
+    a: struct
+ `      b: boolean
+
+let convers  std.boolean.true
+letce.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(5, u_instance.c))
+
+let f = (arg: u): *boolean
+    arg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

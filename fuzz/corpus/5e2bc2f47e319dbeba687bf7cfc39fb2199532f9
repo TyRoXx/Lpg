@@ -1,0 +1,102 @@
+t     stteger = integers.integce = t{boolean.true}
+assa
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interfaca: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"abc", 0}
+assert(u_instan                 std = import std
+
+let s = struct
+let s_instance = s{  }
+
+let t = struct
+    a: boloean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    instance.b))
+assert(integer_equals(5, u_instance.c))
+
+let f = (arg: u): boolean
+  a.  g!ra.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interfaca: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"abc", 0}
+assert(u_instance.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): *boolean
+    arg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let convarsion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+letce.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integ         return 1
+        case boolean.true:
+            return 2
+assert(integer_equals(1, return_integer_implicit(b    an.false)))
+assert(integer_equals(2, return_integer_implicit(boolean.true)))
+
+let return_integer_explicit = (arg: boolean): int(1, 2)
+    match arg
+        case boolean.false:
+    `g      return 1
+        case boolean.true:
+           g.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interfaca: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY"abc", 0}
+assert(u_instance.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f (arg: u): *boolea u____ g.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+   {"abc", boolean.true}). two_b(let s):
+[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.s   
+tring)
+    side_effect )
+    concan, std.s       b: boolean pa, s)
+)
+
+let two_parameters = enum[First, Secos_parameter[access_parametecoestGd_enum.b
+b
+

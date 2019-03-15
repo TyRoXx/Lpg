@@ -1,0 +1,29 @@
+ake_runtime_string("abc"))))
+as3       .not(testlet std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): tstd.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): st_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let st###################################################################ate): state
+))
+
+let structure = struct
+    x: std.s'ring
+    y: boolean
+let multi = enum
+    a(single)
+    boolean,tch pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate std.string] for dummy
+    t ra

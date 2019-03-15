@@ -1,0 +1,25 @@
+ake_runtime_string("abc"))))
+asct
+    x: std.  y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(maate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bisTate.a)
+  8888888888888888888888888888888  case b-       istate.a: boolean.true
+    caste.a:                                                                                 kkkkkkkkkkkkk kkkkkkkkkkkkk                                ()
+    case single.a(let stat                            m
+  ; a(single)
+    b(structure)
+                

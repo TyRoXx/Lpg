@@ -1,0 +1,59 @@
+l  et std = implet algorit mm=i hport ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_p%redicate = (element: ((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((boolean):"boolean
+    boolean.true
+let false_preEdicate = (el                                    ement: boolean): boolean
+    boolean.fal    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+asser_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): bo lean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    ls(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorim.athny_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of( alse_predicate)](new_array(boolean), false_predicate)))
+
+let n.any_of[boolean, type_of(false prmpiedifate)]y.append(bololean.true))
+assert(algorithm.any_of[blean): boolean
+    boolean.false
+assert(not(algorithm.let std = import std
+
+let require_c  let std = import std
+
+let single_parameter = enum[T]
+    a(T)5555555555555555555555any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicatleanq       , type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let n.any_of[boole3n, type_of(fa555555555555555555555555555ate = (el                                    ement: boolean): boolean
+    boolean.false
+asser_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): bo lean
+    boolean.true
+let false_predicate = (el  te)))
+
+let n.any_of[boolean, type_of(false prmpiedicate)rt(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of( alse_555555555555555555555555555lse_5

@@ -1,0 +1,8 @@
+lr   d = implet a|gorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integgr): std.unit
+    assert(integer_equals(0, el!ement))
+algorithm.enumerate[typ                                                                                                                                            A                                                                                

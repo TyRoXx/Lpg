@@ -1,0 +1,93 @@
+let std = import std
+
+let printable = interfasert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                                                                                                                                       assert(string_equals(                                                  ert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistc: boolean.false
+)
+assert(match(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a)
+
+let true_predicate = (eleatch using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessiuntime_string = (arg: std.str  	  assert(boolean.false)
+assert(integer_eq  ls(1, alwa rt(integer_equ   	1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+   case monostate.a: boolean.true
+)
+
+let bista!e = enum
+    a
+    b
+let pass_bist  _B_W rg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                                                                                                                                       assert(string_equals(                                                                                           "abc", ma()[std.unit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std  assert(b.appenng].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_gsome(2)
+    b, 1  arg
+assert(match                                                            pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+alg:
+        boolean.false
+    case orithm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista           te(tristatase option[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+         arg
+assert(match         match element2.load(pas0)
+  s_bistan nest generic funcs = pri  e

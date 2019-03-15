@@ -1,0 +1,122 @@
+
+assert(match c
+    case two_parameters[boolean, std.i       slet std = import std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: st_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())
+ pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_eff,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()OVuect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    u  _u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.let . d = import std
+
+let oolean.true))
+
+let other_argument = f[int(1, 3h = [T, U](a: T, b: U)
+    f[T](a)
+assert(h[std.boolean, std.unit](std.boole  Q rue, std.unit_vanue))
+23456", concat("123", "456")))
+
+let runtime_string = (t(string_equals("123456", concat("123", "456")))
+
+let runtime_string = ()
+    side_effect()
+    "456"
+assert(string_equals("123456", concat("123", runtime_string())at(
+
+let u : gi["umpl for generic self
+let i    
+terface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+    i for gs[T]
+    method(): std.boolean
+        std.nt(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type																																										                                                                                                                                                                                                                    09551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+        boollean.false
+    defing]("")
+    case "a":
+        bool      std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals6      ht: int   

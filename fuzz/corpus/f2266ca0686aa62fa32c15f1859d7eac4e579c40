@@ -1,0 +1,21 @@
+let std = import std
+
+let 
+ivial match arg case boolean.falssert(striboolean.tr)e))u
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boolean.true)))
+
+let loop_return_explicit_type = (arg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    lo.m())
