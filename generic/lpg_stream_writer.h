@@ -24,6 +24,8 @@ static inline success_indicator stream_writer_write_string(stream_writer writer,
 success_indicator stream_writer_write_bytes(stream_writer writer, char const *data, size_t size) LPG_USE_RESULT;
 success_indicator stream_writer_write_integer(stream_writer writer, integer const value) LPG_USE_RESULT;
 
+stream_writer stream_writer_create_null_writer(void);
+
 typedef struct memory_writer
 {
     char *data;

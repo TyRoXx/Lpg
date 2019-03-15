@@ -1,0 +1,8 @@
+let std = import std
+let option = std.option[int(0, 100)]
+let f = (a: boolean, b: std.string, c: option, d: int(0, 2))
+    side_effect()
+    assert(a)
+    assert(string_equals("abc", b))
+    assert(integer_equals(1, d))
+f(boolean.true, "abc", option.some(2), 1)

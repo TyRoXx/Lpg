@@ -1,0 +1,12 @@
+let std = import std
+
+let call_twice = [F](action: F)
+    action()
+    action()
+
+let counter = new_array(std.unit)
+let test_action = ()
+    assert(counter.append(std.unit_value))
+assert(integer_equals(0, counter.size()))
+call_twice[type_of(test_action)](test_action)
+assert(integer_equals(2, counter.size()))

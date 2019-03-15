@@ -1,6 +1,21 @@
 #pragma once
+#include "lpg_expression.h"
 #include "lpg_stream_writer.h"
 #include <stdbool.h>
+
+typedef struct cli_parser_user
+{
+    stream_writer diagnostics;
+    bool has_error;
+} cli_parser_user;
+
+typedef struct optional_sequence
+{
+    bool has_value;
+    sequence value;
+} optional_sequence;
+
+optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source);
 
 typedef enum compiler_command {
     compiler_command_run = 1,

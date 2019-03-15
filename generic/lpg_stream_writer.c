@@ -19,6 +19,20 @@ success_indicator stream_writer_write_integer(stream_writer writer, integer cons
     return stream_writer_write_unicode_view(writer, formatted);
 }
 
+static success_indicator null_writer_write(void *user, char const *data, size_t length)
+{
+    (void)user;
+    (void)data;
+    (void)length;
+    return success_yes;
+}
+
+stream_writer stream_writer_create_null_writer(void)
+{
+    stream_writer const result = {null_writer_write, NULL};
+    return result;
+}
+
 void memory_writer_free(memory_writer *writer)
 {
     if (writer->data)

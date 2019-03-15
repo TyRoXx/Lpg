@@ -1,0 +1,35 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtract_result.ok(let result):
+        assert(integer_equals(8, result))
+    case subtract_result.underflow:
+        fail()
+
+match subtract(1000000000000000, 1)
+    case subtract_result.ok(let result):
+        assert(integer_equals(999999999999999, result))
+    case subtract_result.underflow:
+        fail()
+
+assert(match subtract(0, 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtract_result.underflow:
+        boolean.true
+)
+
+assert(match subtract(std.runtime_value[integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtract_result.underflow:
+        boolean.true
+)

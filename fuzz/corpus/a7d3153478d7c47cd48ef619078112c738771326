@@ -1,0 +1,15 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_and = [and]()
+    assert(integer_equals(0, and(0, 0)))
+    assert(integer_equals(1, and(1, 1)))
+    assert(integer_equals(0, and(0, 1)))
+    assert(integer_eq()
+
+let and_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    and_u64(std.runtime_value[integers.u64](left), right)
+
+test_and[and_u64_runtime]()

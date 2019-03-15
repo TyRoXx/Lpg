@@ -1,0 +1,32 @@
+let algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predicate)](non_empty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value

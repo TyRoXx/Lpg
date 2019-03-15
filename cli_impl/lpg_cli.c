@@ -29,12 +29,6 @@
 #include <Windows.h>
 #endif
 
-typedef struct cli_parser_user
-{
-    stream_writer diagnostics;
-    bool has_error;
-} cli_parser_user;
-
 typedef struct parse_error_translator
 {
     cli_parser_user *base;
@@ -170,12 +164,6 @@ static void translate_parse_error(parse_error const error, callback_user const u
     handle_parse_error(complete, actual_user->base);
 }
 
-typedef struct optional_sequence
-{
-    bool has_value;
-    sequence value;
-} optional_sequence;
-
 static optional_sequence make_optional_sequence(sequence const content)
 {
     optional_sequence const result = {true, content};
@@ -184,7 +172,7 @@ static optional_sequence make_optional_sequence(sequence const content)
 
 static optional_sequence const optional_sequence_none = {false, {NULL, 0}};
 
-static optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source)
+optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source)
 {
     parser_user parser_state = {source.begin, source.length, source_location_create(0, 0)};
     parse_error_translator translator = {&user, file_name, source};

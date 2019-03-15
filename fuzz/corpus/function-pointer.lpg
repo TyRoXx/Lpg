@@ -1,0 +1,6 @@
+let std = import std
+let f = ()
+    side_effect()
+    std.and
+let g = f()
+assert(g(boolean.true, boolean.true))

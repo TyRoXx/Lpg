@@ -1,0 +1,36 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+match add(123, 0)
+    case add_result.ok(let result):
+        assert(integer_equals(123, result))
+    case add_result.overflow:
+        fail()
+
+match add(std.runtime_value[integer](0), 0)
+    case add_result.ok(let result):
+        assert(integer_equals(0, result))
+    case add_result.overflow:
+        fail()
+
+match add(10, 2)
+    case add_result.ok(let result):
+        assert(integer_equals(12, result))
+    case add_result.overflow:
+        fail()
+
+match add(999999999999999, 1)
+    case add_result.ok(let result):
+        assert(integer_equals(1000000000000000, result))
+    case add_result.overflow:
+        fail()
+
+//TODO: support big number in ES backend
+/*let two127power = 170141183460469231731687303715884105728
+assert(match add(two127power, two127power)
+    case add_result.ok(let result):
+        boolean.false
+    case add_result.overflow:
+        boolean.true
+)*/

@@ -50,6 +50,11 @@ if(UNIX)
         add_definitions(-fsanitize=thread)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=thread")
     endif()
+
+    option(LPG_WITH_CLANG_FUZZER "compile with fuzzing support" OFF)
+    if(LPG_WITH_CLANG_FUZZER)
+        add_definitions(-fsanitize=fuzzer)
+    endif()
 endif()
 
 file(GLOB_RECURSE formatted
@@ -65,6 +70,7 @@ file(GLOB_RECURSE formatted
     tests/**.c tests/**.h
     tokenization/**.c tokenization/**.h
     web/**.c web/**.h
+    fuzz/**.c fuzz/**.h
 )
 
 option(LPG_WITH_CLANG_FORMAT "use clang-format to format the source code" ON)
@@ -145,6 +151,9 @@ add_subdirectory(optimization)
 add_subdirectory(cli_impl)
 add_subdirectory(c_backend)
 add_subdirectory(ecmascript_backend)
-add_subdirectory(tests)
-add_subdirectory(cli)
 add_subdirectory(web)
+if(NOT LPG_WITH_CLANG_FUZZER)
+    add_subdirectory(tests)
+    add_subdirectory(cli)
+endif()
+add_subdirectory(fuzz)

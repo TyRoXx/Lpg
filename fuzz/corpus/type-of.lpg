@@ -1,0 +1,5 @@
+let std = import std
+assert(type_equals(type_of(0), type_of(0)))
+assert(type_equals(type_of(0), int(0, 0)))
+assert(type_equals(type_of(""), std.string))
+assert(type_equals(type_of(std.string), std.type))
