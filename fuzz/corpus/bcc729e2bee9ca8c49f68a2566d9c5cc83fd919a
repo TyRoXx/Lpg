@@ -1,0 +1,40 @@
+l   std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let prin 	ble2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.faise: "false"
+    other_                                                                                   method()
+        le2)
+    let print = a.boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.faise: "false"
+    other_                                                                                   method()
+        std.unit_value
+
+assert(string_equals("", purpure(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equsa("ulnit", runtime(std.unit_value)))
+assert(string_empl for generic interface
+let gi = interface[T]
+    method(): std.strquals("0", runtime(0)))
+asserj(string_equals("1", runtime(1)))
+assert(string_einquagl
+
+impl[S

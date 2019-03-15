@@ -1,0 +1,136 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_string = (value: std.string)
+ l] e, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integ   side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.aer_to_string(input)
+assert(("def]s
+arameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+ let std = import std
+let single = enum
+  t structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    cX$.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+     si   de_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nestGd_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let    _x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)
+it
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+       false", b.transform(std.boolean.false)))
+
+let captures_val                                                                                                                                let self = import importsitself
+              case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()esult):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                                                                                                                                                                                                                             

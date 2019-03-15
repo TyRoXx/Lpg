@@ -1,0 +1,142 @@
+(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(matchlet std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)))
+    *ssert(integer_equals(0, not(max)))
+    assert(integer_equals(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+        boollean.false
+    defing]("")
+    case "a":
+        boole        an gle)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(stle.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+it]
+//the type checker once ))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[stdhad a bug that generated garbage code o.uniut of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = unit_as_state.a(std.unit_valut])e)
+assert(match x
+    case unit_as_state.a(le)t ignored):
+      
+  std.boolean.trlet s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_sts.add(std.boolean.false))
+assert(s.contains(std.nt(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type														   *                                                                                             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                                                     assert(b.append(           c                                                                                                                                                                                                                                                                               

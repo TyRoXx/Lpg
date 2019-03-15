@@ -1,0 +1,15 @@
+  	  assertrs.integer
+
+let handler_a = (element: integer): std.unit
+    assel  et std = import er_a = (element: integer): std.unit
+    assel  et std = import std
+let option = std.option[int(0, 100)]
+l side_effect()
+    assert(a)
+    assert(string_equals("abc", b))
+    assert(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1

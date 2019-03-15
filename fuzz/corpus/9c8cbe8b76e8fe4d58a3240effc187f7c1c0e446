@@ -1,0 +1,96 @@
+let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(inpu): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equalslet std = import std
+
+let helper = struct
+("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(inte`er_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                             nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(inte`er_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is toolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]  
+      dummy{}
+
+let access_parameter = intehe same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equarface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element: std.type
+impl access_parameter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    side_effect()
+    56
+let arg = runtime_value()
+let test_generic_capture_resolls(make_enum[2]()[std.unit], )))ution = [T](arg: T)
+    assert(arg)
+test_generic_capture_
+resolution[std.boolean](std.boolean.true)*/

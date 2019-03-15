@@ -1,0 +1,78 @@
+let std = import std
+let std_again = import td.runtime_value[boolean](boolean.true)
+        case boolean.true:
+            break
+        caspl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    other_method()
+        std.unit_value
+t], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equarface[Struct]
+    method(a// test inteistate(trista                                                                                   assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    t_integer_to_string = (input: int(0, 2147483647))
+    side_n.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_boolean = (a: std.boolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean(std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(booleanR
+ VV]
+assert(string_equals("false", runtime(boolean.false)))
+
+let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

@@ -1,0 +1,35 @@
+let std = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, tlet a = boolean.true
+let result : int(1, 2) = match a
+    case boolean.false:
+        1
+    case boolean.true:
+        2
+assert(integer_equals(2, result))
+
+let runtime_var = ()
+    side_effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime_var()
+    case boolean.true:
+        40
+    case boolean.false:
+        1
+
+assert(integer_equals(40, something))
+{"hello"}
+let re                                                                                                                                                                                                                                                                                                                                    '        Y_______                                                              l                                                                                                                             

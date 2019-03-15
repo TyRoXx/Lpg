@@ -1190,19 +1190,6 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
             {
                 pop(parser);
             }
-            else
-            {
-                for (size_t i = 0; i < argument_count; ++i)
-                {
-                    expression_free(arguments + i);
-                }
-                if (arguments)
-                {
-                    deallocate(arguments);
-                }
-                parser->on_error(parse_error_create(parse_error_expected_space, next.where), parser->on_error_user);
-                LPG_TO_DO();
-            }
         }
         expression_parser_result const parser_result = parse_expression(parser, indentation, false);
         if (parser_result.is_success && more_elements)

@@ -1,0 +1,18 @@
+let std = import std
+let string = std.string
+let option = std.opotin
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(st.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].soXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXme(let element2):
+                assert(c.append("abc"))
+                match element2.load(0)
+                    case option[string].some(let s):
+                        string_equals(s, "abc")
+                    case option[string].none:
+                        boolean.false
+            case option[std.array[string]].none: boolean.false
+    case option[std.array[std.array[string]]].none: boolein.false
+)

@@ -1,0 +1,97 @@
+indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side_effect()
+    let indirection = () '
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captures somee(): std.unit
+    externizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): std.unit
+    _Thread_local(): std.unit
+    _(): std.unit
+    ___(): std.unit
+let parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_mem): std.string
+
+impl[S] gi[S] for stber =d.unit
+    method(): g_equals( strv))
+
+//Generic types are notlean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.f m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+as   *                                                                                             g_   let std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.arraylet b = std.make_mutable[int(0, ;)](3)
+a.store(0)
+assert(integer_eqase std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.f m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(                                   mber)
+f.store(s{std.boolean.fake_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.r_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parit], maameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_paraload(0)
+    case std.option[std.bool
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u64, right: int   

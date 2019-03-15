@@ -1,0 +1,7 @@
+     *                                                                                 *           et std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_arRay(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                    ssert(b.append(           c

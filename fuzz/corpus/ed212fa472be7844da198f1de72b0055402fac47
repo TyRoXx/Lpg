@@ -1,0 +1,24 @@
+let std = import std
+let single = enum
+  t structure = struct
+    x: std.string
+    y: boolean   
+boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nestGd_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let    _x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)                              

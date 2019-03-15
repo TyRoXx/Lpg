@@ -1,0 +1,155 @@
+   default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+    restrmct(   *                                                                                             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                                                     assert(b.append(           c: not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none:  /std.boolean.false
+)
+
+assert(nend_4()
+    append_4()
+let append_64 = ()
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()
+    append_64()
+    append_64()
+    append_64()
+    append_64()
+let append_1024 = ()
+    append_256()
+    append_                                                                                                                                                            eference[T]
+    b(): generic_selfnt(0, 0)
+    pr_referenint()
+        "c0"
+e[ n)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(boolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case boolean.true:
+            break
+        caspl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_met)))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[s
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()
+    append_64()
+    append_64()
+    append_64()
+    append_64()
+let append_1024 = ()
+    append_256()
+    append_                                                                                                                                                            eference[T]
+    b(): generic_selfnt(0, 0)
+    pr_referenint()
+        "c0"
+e[ n)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(boolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case boolean.true:
+            break
+        caspl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_met)))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_ef   	()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+it]
+//the type checker once ))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[stdhad a bug that generated garbage code o.uniut of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = unit_as_state.a(std.unit_valut])e)
+assert(match x
+    case unit_as_stat   other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

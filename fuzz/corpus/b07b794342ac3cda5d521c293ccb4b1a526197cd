@@ -1,0 +1,124 @@
+let std = import std
+
+let require_comlet stins(std.booles("123456", concat("123", "456")))
+
+let runtime_string = (e = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let malet std = import std
+
+let string = std.string
+
+let arrlet std = im (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let ")))
+assert(not(a.store(1, "")))
+ssert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enpe
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions aums expe[Fcted
+lself_reference = interface[T]
+    a(): generic_self_reference[T]
+    b(): generic_self_reference[std.boolean]
+
+impl generic_self_reference[std.boolean] for std.unit
+    a(): generic_self_reference[std.boolean]
+     assert(integer_equals(0,       self
+ of = (a: boolea test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tupgle)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(stle.v))
+
+//Generic types are not necessarily the same even thouolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean(std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.string] = stl.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, ;)](3)
+a.store(0)
+assert(integer_eqase std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.f m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+as   *                                                                                             g_   let std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_arra)
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.trug})
+assert(f.load().me                                                                                                                            mber)
+f.store(s{std.boolean.fake_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.r_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parit], maameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean]ke_enum[1]()[std.unructure{"abc", boolean.true}). two_parameters[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u64, right: int   

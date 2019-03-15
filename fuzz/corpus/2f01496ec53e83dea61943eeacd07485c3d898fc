@@ -1,0 +1,56 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    (fi): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(let std = import std
+let single = enum
+    a(std.string)
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    (fi): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(let std = import std
+let single = enum
+    a(std.string)
+let t   long(let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_s                                        `                                              tring = (value: std.string)
+ l] e, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 1844674407370fect()
+    concat("", value)
+assert(test_singingle.aer_to_string(input)
+assert(("def]s

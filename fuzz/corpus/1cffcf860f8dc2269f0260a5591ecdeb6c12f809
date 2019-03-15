@@ -1,0 +1,12 @@
+let always_return_from_match = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 1
+        case boolean.true:
+            return 2
+    assert(boolean.false)
+assert(intege6r_equals(    case boolean.true:
+            return 2
+    assert(boolean.false)
+assert(intege6r_equals(1, always_return_from_1, always_return_from_match(boolean.false)))
+assert(integ;er_equals(2, always_return_from_match(boolean.true)))

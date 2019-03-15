@@ -1,0 +1,119 @@
+[std.unit]))
+assert(type_eqngle = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(slet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+        td.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make_runtime_string("abc"))
+    case single.a(let state): state
+))
+
+let return_stateful_enum = ()
+    side_effect()
+    single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let let std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_efmulti = enum
+    a(sin    helper{T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tupgle)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(stle.v))
+
+//Generic types are not necessarily the same even thouolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean(std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.string] = stl.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, ;)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(2, b.load()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u = std.makeum_table[std.unit](std.unit_value)
+u.store(u.load())
+
+let d = std.make_mutable[std.array[std.unit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.trug})
+assert(f.load().me                                                                                  al{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean]ke_enum[2]()[std.unructure{"abc", boolean.true}). two_parameters[boorameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u64, right: int   

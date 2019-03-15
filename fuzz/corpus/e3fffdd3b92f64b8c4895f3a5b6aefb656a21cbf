@@ -1,0 +1,60 @@
+l oet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("", pure("")))
+assert(string_equals("a", pure("a")))
+assert(string_equals("unit", pure(std.unit_val}e)))
+assert(string_equalng_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a    case bood_order
+    other_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.   WVV)

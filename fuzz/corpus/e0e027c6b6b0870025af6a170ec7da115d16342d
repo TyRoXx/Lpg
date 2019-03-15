@@ -1,0 +1,141 @@
+   default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+  let std = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    string: std.string
+
+impl i for sicate)](non_em
+    to_string()
+        self.string
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[Copty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_prmpiedicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(leTet e):
+        fail()
+    imeV]
+leau//require_compile_time[constantcase std.option[integer].none:
+        std]
+assert(string_equads("hello", cons.utant.to_stringnit_valu())e
+)
+lue
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_met)))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_ef   	()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+it]
+//the type checker once ))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[stdhad a bug that generated garbage code o.uniut of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = unit_as_state.a(std.unit_valut])e)
+assert(match x
+    case unit_as_state.a(le)t ignored):
+      
+  std.boolean.trlet s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_sts.add(std.boolean.false))
+assert(s.contains(std.nt(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type														   *                                                                                             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                             let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

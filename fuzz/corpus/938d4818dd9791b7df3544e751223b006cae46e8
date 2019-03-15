@@ -1,0 +1,6 @@
+assert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\let algorithm = import algorithm
+let std = import std
+let integers" 

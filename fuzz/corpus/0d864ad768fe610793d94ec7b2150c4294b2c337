@@ -1,0 +1,29 @@
+[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)  enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals(0, 0)
+    pr_referenint()
+        "c0"
+e[ n)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(boolean)
+    break
+
+loop
+    let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taake_runtime_string("abc"))))
+ken
+///////////////
+
+let a

@@ -1,0 +1,5 @@
+let std = import std
+let integers = ubtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow   *                                                                                             g_   llet std = impletet std algor it=

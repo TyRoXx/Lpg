@@ -1,0 +1,149 @@
+  	  assert(boolean false)
+assert(integer_equals(1, alwa rt(integer_equauals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(har_a 	)
+
+let true_predicate = (elent: boolean)L_      nlet std = import std
+
+let producer = interf, option.some(2)
+    b, ace[Output]
+    produce(ue
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.valu   "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true    assert(boolean.false)
+assert(intege6r_equals(    case boolean.true:
+            return 2
+    assert(boolean.fal:e)
+assert(intege6r_equals(1, always_return_from_1, always_return_from_match(boolean.false)))
+assert(ifor int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_stringng(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))
+string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assernteg;er_equals(2,t(string_equals("false", runtime(boolean.false)))
+
+let a    case bood_order
+   always_return_from_  other_method(): std.uni        std.unit_value
+
+impl printable2 formatc std.unit
+    print()
+       rintable2 = different_method_oh(boolean.true)rder{}
+h.other_method()))
+assert(string_equals
+("123", h.   WVV)
+_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global // test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_stringng(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))
+string_equals("abc", sngle.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(matchlet std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)))
+    *ssert(integer_equals(0, not(max)))
+    assert(integer_equals(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+        boollean.false
+    defing]("")
+    case "a":
+        bool      std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

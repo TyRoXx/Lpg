@@ -1,0 +1,123 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_bolet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+  olean = (a: std.b  [U]()
+      o  olstd.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.stolet std = import std
+
+let array_type = std.array[std.boolean]
+let a : array_type = new_array(std.boolean)
+assert(integer_equals(0, a.size()))
+assert(not(a.store(0, std.boolean.true)))
+assert(not(a.store(1, std.boolean.true)))
+assert(not(a.store(2, std.boolean.true)))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.true))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.filse
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolea(.true
+)
+
+assert(a.append(std.boolean.false))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(2)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.store(0, std.boolean.false))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(a.store(1, std.boolean.true))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(not(a.store(2, std.boolean.true)))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[stre(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+assert(integer_equals(0, utable[std.array[std.unit]](new_array(std.unit))
+d.load().append(sta.load()))
+assert(integer_equals(2, b.load()))d = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std  assert(b.append(           c                                                                                                                                                                                                                                                                               

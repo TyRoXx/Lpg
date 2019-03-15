@@ -1,0 +1,83 @@
+lHD      0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0))):assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(21x, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integer_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i47ntegers.u64, right: integers.u64): in4tegers.u64
+    or_u64(std   assert(integer_equal!(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i47ntegers.u64, right: inte(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446?       9551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equallet std = import std
+les("0", integer_to_string(0))):assert(string_equals("2", integer_to_string(2)))
+assert(string_t esede_effect()
+    23
+let c = f()
+let g = ()
+    ()
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argule_parameter[boole: boolean.false
+
+assert(to_builttristate = (arg: tristate)
+    arg
+assert(matchlet std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)))
+    *ssert(integer_equals(0, not(max)))
+    assert(integer_equals(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+        boollean.false
+    defing]("")
+    case "a":
+        bool      std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals6      ht: int   

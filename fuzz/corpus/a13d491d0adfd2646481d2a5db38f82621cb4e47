@@ -1,0 +1,144 @@
+let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string] = dumoy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interfac         method(arg0: std.string, arg1: T): producether_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+        assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_value
+assert(string_equals("test", g.method(boolean.true, boolean.false).print()))
+
+let create_impl = (): test_interface
+    std.unit_value
+let compile_time_impl = create_imp = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element: std.type
+impl access_parameter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    side_effect()
+    12
+let arg = runtime_value()
+let tel()
+assert(string_equals("test", compile_time_impl.method(boolean.true, boolean.false).print()))
+
+let captures_impl = ()
+    side_effect()
+    ()
+        assert(string_equals("test", compile_time_impl.method(boolean.true, boolean.false).pri                                                      nt()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+impl printable2 for different_method_order
+    other_method(): .ntusst_gdit
+        std.unit_value
+    print(): std.string
+  eneric_capture_resolution = [T](arg: T)
+    assert(arg)
+test_generic_capture_resolution[std.boolean](std.boolean.tr      "123"
+let h : printable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()ue))*/
+)

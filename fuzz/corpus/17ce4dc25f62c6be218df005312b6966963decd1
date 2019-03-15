@@ -1,0 +1,145 @@
+let std = import std
+
+let printable = issert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string] = dumoy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interfac         method(arg0: std.string, arg1: T): producether_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: )
+        "test"
+
+let g : test_interface = std.unit_value
+assert(string_equals("test", g))
+assert(string_.method(boolean.true, boolean.false).print()))
+
+let create_impl = (): test_interface
+    std.unit_value
+let compile_time_implequals('tst', "tst"))
+ = create_impl()
+asassert(string_equals('Hsert(string_equals("test", compile_time_impl.method(boolean.truello\nWorld'T "Hele, boolealon.false).pr\\nWorint()))
+
+let captures_li
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.meneric functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type																																										                                                                                                                                                                                                                                                                                                                                                                        boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(matchlet std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)))
+    *ssert(integer_equals(0, not(max)))
+    assert(integer_equals(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+        boollean.false
+    defing]("")
+    case "a":
+        bool      std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals6      ht: int   

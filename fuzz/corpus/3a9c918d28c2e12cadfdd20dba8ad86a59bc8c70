@@ -1,0 +1,78 @@
+t std = imlet std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]
+
+let final_node = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    nexlet std = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unit
+
+let mutable_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutable[T] for mutable_content[T]
+    load(): T
+        match self.content.load(0)
+            case std.option[T].some(let value):
+                value
+            case std.option[T].none:
+                fail()
+    store(value: T): st0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutt(): std.option[linked_list_node]
+        std.option[linked_list_node].none
+
+let m]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]iddle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_port std
+let option = st11111111111111111111111111111111111111111111111111111111111111111111111111111111111111t std
+
+let linked_list_node = interface
+    value(): boable[std.string]("test")
+assert(string_equals("test",olean
+    next(): std.option[linked_list_node]
+
+let f p2.load()))
+p2.storinal_node = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_port std
+let option = st111111111111111111111111111111111generic_self_referencee("123")
+assert(string_equals(" = interface[T]
+    a(): generic_self_reference[T]
+    b(): generic_self_reference[std.boolean]
+
+impl generic_self_reference[std.boole123"an] for std.unit
+    a(): generic_self_reference[std.boolean]
+     assert(integer, p2.load())_equals(0,     )  self
+ of = (a: boo
+lea 

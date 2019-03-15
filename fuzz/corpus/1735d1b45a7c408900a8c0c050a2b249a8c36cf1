@@ -1,0 +1,110 @@
+                                                 std = import' std
+
+le                                                                                                          t s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+assert(u_instance.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg                                                                               .a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], se monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+   d(b))
+assert(integer_equals(1, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+         arassert(string_equals("123456", concat("123", "456")))
+
+let runtime_string = ()
+    side_effect(456", concat("123", runtime_string())a)
+    "456"
+assert(string_equals("123456", concat("123", runtime_string())at(t_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u64
+    not_u64(std.runtime_value[integers.u64](input))
+
+test_not[not_u64_runtime]()
+ match ""
+    case "":
+ let std = import std
+assert(type_equals(type_of(0), type_of(0)))
+assert(type_equals(type_of(0), int(0, 0)))
+assert(type_equals(type_of(""), std.string))
+assert(type_equals(type_of(std.string), std.type))
+ily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolb(let state):
+     si   de_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type check// test integer_to_string
+// compile_time evaluation:
+assert(strinZZZ[ZZZZZZZZ: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", testequals("2", test_integer_to_string(2)))
+assert(string_eq", test_integer_to_string(2147483647)))
+tring_literal = "abc"
+        let cover_sts.add(std.boolean.false))
+assert(s.contains(std.nt(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let tuple = f[std.boolean]()[123]()["test"]()
+assert(type														   *                                                                                             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  "                                                                                                                                                     assert(b.append(           c                                                                                                                                                                                                                                                                               

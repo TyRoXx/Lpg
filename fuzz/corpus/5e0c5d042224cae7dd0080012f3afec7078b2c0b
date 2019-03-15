@@ -1,0 +1,151 @@
+mpl l = ()
+    sid)_effect()
+    ()
+        assert(string_equals("test", compile_time_impl.method(boolean.true, boolean.false).pri                                                      nt()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+impl printable2 for different_method_order
+    other_method(): .ntusst_gdit
+        std.unit_value
+    print(): std.string
+  eneric_capture_resolution = [T](arg: T)
+    assert(arg)
+test_generic_capture_resolution[std.boolean](std.boolean.tr      "123"
+let h : printable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()ue))*/
+)
+e subtract_result.ok(let result):
+        boolean.false
+      case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.false))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.store(0, std.boolean.false))
+assert(match a.load(0)
+    case std.option[std.boolean].solet std = import std
+
+let f = [T](a: T)
+    a
+let g = f[std.boolean]
+assert(g(std.boolean.true))
+
+let f2 = [T](a: T): T
+    a
+let g2 = f2[std.boolean]
+assert(g2(std.boolean.true))
+
+let instlet std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char        (): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): std.unit
+    _Thread_local(): std.unit
+    _(): std.unit
+    ___(): std.unit
+let parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+    await(): std.unit
+    boolean(): std.unit
+//etc..
+d = import std
+let string = std.string
+let option = std.opotin
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(st.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].soXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXme(let element2):
+                assert(c.append("abcd.boolean].some(let element): element
+    case std.option[std.boolean].none:  /std.boolean.false"))
+                match element2.load(0)
+                    case option[string].som
+)
+
+aessert(nend_4()
+    append_4()
+let append_64 = ()
+    append_16()(let
+    ap s):pend                                                           let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

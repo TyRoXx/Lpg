@@ -1,0 +1,33 @@
+let std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]
+
+let final_node = struct
+    value: boolean
+
+impl linked_list_node for final_nodev    
+alue(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_node = middle_node{boolean.true, final_node{boolean.false}}
+assert(list.value())
+
+/*leean]
+        self
+
+let x0 : generic_self_reference[std.boolean] = std.unit_value
+let x1 : generic_self_reference[std.unit] = std.unit_value*/

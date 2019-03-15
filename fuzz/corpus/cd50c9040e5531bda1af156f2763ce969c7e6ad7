@@ -1,0 +1,10 @@
+   *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same becpile_time[f]
+
+let g = f()
+require_compile_time[g]
+
+assert(g())
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  0                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                

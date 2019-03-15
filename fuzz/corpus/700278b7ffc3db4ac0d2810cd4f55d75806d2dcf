@@ -1,0 +1,97 @@
+ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max,on[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_integer(5), length)
+        case optio)
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let conversion_test_interface = interface
+    method(): std.boolean
+impl conversion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+         case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the typt_value}
+assert(conversion.i.e checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+  method()      std.boolean.true)
+
+)
+te.b: boolean.false
+rt(not(s.re  move(std  cis not the same.
+assert(not(type_equals(make_enum[1]()                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          let self = import importsitself
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              il()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtime_value[integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                                                                                                                                                                                                                             

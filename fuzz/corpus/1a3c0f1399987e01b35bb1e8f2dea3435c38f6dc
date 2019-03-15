@@ -1,0 +1,59 @@
+s       >        std.option[linked_list_node].none
+
+let middle_node = struct
+    val;e: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+  _array(string)
+assert(integer_equals(0, a.size()))
+assert(n", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")))4 = (printed: printable)
+    let method = printed.pr   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:tnteger = integers.integer
+
+let handler_a = (element: integer): std.unit
+    asselet std = import std
+let option = std.onit
+    method(a: boolean, b: boolean)
+        assert(a)
+        assert(not(b))
+        "test"
+
+letd.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boolean):  g : test_interface = std.unit_value
+assert(string_equals("test", g.method(boolean.true, boolean.false).print()))
+
+let create_impl = (): test_interface
+    std.unit_value
+let compile_time_impl = create_imp = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element:std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equal std.type
+impl s("true", 

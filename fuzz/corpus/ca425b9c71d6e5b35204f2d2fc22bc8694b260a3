@@ -1,0 +1,90 @@
+st_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+  _array(string)
+assert(integer_equals(0, a.size()))
+assert(n", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")))4 = (printed: printable)
+    let method = printed.pr   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:tnteger = integers.integer
+
+let handler_a = (element: integer): std.unit
+    asselet std = import std
+let option = std.option[int(0, 100)]
+let f = (a: boolean, b: std.string, c: option, d: int(0, 2))
+    side_effect()
+    assert(a)
+    assert(string_equals("abc", b))
+    assert(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1     std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+   222222222222222222222         case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string] = dumoy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interfac         method(arg0: std.string, arg1: T): producether_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameterruntime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false"( runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface fomethod_order = struct
+impl printable2 for different_method_order
+    other_method(): .ntusst_gdit
+        std.unit_value
+    print(): std.string
+  eneric_capture_resolution = [T](arg: T)
+    assert(arg)
+test_generic_capture_resolution[std.boolean](std.boolean.tr      "123"
+let h : printable2 = different_method_order{}
+h.other_method()
+assert(string_equals("061", h.print()ue))*/
+)
+e subtract_result.ok(let result):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.t                                                                                                                                                                                                                                             

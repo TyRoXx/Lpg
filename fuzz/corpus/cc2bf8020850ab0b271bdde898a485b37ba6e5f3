@@ -1,0 +1,136 @@
+                                                                      a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keylet std l import std
+let option = std.option[int(0, 100)]
+let f = (a: boolean, b: std.string, c: option, d: int(0, 2))
+    side_effect()
+    assert(a)
+    assert(string_equals("abc", b))
+    assert(integer_equals(1, d))
+f(boolean.true, "abc", option.some(2), 1)
+able2 formatc std.unit
+    print()
+       rintable2 = different_method_oh(boolean.true)rder{}
+h.other_method()))
+assert(string_equals
+("123", h.   WVV)
+_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global // test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", intlet std = import std
+
+let f = [T](a: T)
+    a
+let g = f[std.boolean]
+assert(g(std.boolean.true))
+
+let f2 = [T](a: T): T
+    a
+let g2 = f2[std.boolean]
+assert(assert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\let algorithm = import algorithm
+let std = import std
+let integers" ls(2, other_argumeeger_to_stringng(2147483647)))
+
+//run_time ent(2)))
+
+let h = [T, U](a: T, b: U)
+    f[T](a)
+assert(h[svalutd.boolean, std.unit](std.boolean.trueation:
+let test, std.unit__integer_to_string = (input: iv y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld'T "Hello\\nWorld"))
+se T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], )))
+= integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+                           tuple = f[std.boolean:()[123]()["test"](       :(type_equals(std.boolean, tuple.t))
+assert(i;te`er_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the:same.
+assert(not(type_equals(makee
+let gi`B_ nterface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+   r generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// implknem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[  std.unit], make_enum[1]()[std.unmt]))
+assert( for generic interface
+// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_stringng(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))
+std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb(s.remove(std.boolean.true)))   c
+let pass_tristate = (arg: tristate)
+   td.option
+
+let test_string = (host: es.host)
+    let exported : host_van.true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.faing_equals("abc", match single.a(make single.a(make_rh a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std (a: printable2)
+    let print = a.print
+    let s = print()
+       e

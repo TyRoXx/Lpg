@@ -1,0 +1,69 @@
+let std = import std
+let es = import ecmascript
+let option = std.option
+
+let test_string = (host: es.host)
+    let exported : host_value = host.export_string("hello")
+    assert(match host.import_string(exported)
+        case option[std.string].some(let content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_inted.string].some(let content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_vstd.string].some(let content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_inted.string].some(let content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case opalue].some(let length):
+            host.equals(host.export_integer(5), length)
+        case optioger(5), length)
+        case option[host_value].none:
+            boolean.false
+)
+
+let test_export_integer = (host: es.host)
+    let min = host.export_integer(test_equals(host)
