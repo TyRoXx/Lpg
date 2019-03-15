@@ -398,14 +398,13 @@ static function_header_parse_result parse_function_header(expression_parser *con
             if ((peek(parser).token == token_colon))
             {
                 pop(parser);
-                if (peek(parser).token != token_space)
-                {
-                    LPG_TO_DO();
-                }
-                else
+
+                /*space is optional here*/
+                if (peek(parser).token == token_space)
                 {
                     pop(parser);
                 }
+
                 expression_parser_result const type = parse_returnable(parser, indentation, false);
                 if (!type.is_success)
                 {

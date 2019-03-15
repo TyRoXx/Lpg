@@ -1,0 +1,9 @@
+let always_return_from_match = (arg: boolean)
+    match arg
+        case booletrue:
+            retuyn 2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_ma   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:ttch(boglean.false)))
+asserit(:teger_equals(1, always_retu@n_from_match(boolean.true)))

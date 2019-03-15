@@ -1,0 +1,45 @@
+   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:tnteger = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    slet always_return_from_match = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 1
+        case boolean.true:
+            return 2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boolean.false)))
+assert(integer_equals(2, always_requals("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parameter_struct = struct
+    element: std.type
+impl a                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          "\""                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          

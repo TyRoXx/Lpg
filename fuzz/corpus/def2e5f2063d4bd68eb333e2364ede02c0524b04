@@ -1,0 +1,42 @@
+let std = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (element: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    slet always_return_from_match = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 1
+        case boolean.true:
+            return 2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boolean.false)))
+assert(integer_equals(2, always_return_from_match(boolean.trutring: std.string
+
+impl i for sicate)](non_em
+    to_string()
+        self.string
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[Ce))opty, true_predicate))
+assert(not(algori)
+thm.any_of[boolean, type_of(false_prmpiedicate)](non_empty, false_predicate))
