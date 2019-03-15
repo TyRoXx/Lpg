@@ -155,7 +155,9 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
         {
             if (!unicode_view_equals_c_str(expected_case.content, "default"))
             {
-                LPG_TO_DO();
+                parser->on_error(parse_error_create(parse_error_expected_case_or_default, expected_case.where),
+                                 parser->on_error_user);
+                return false;
             }
             is_default = true;
             pop(parser);
@@ -170,7 +172,8 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
         }
         else
         {
-            parser->on_error(parse_error_create(parse_error_expected_case, expected_case.where), parser->on_error_user);
+            parser->on_error(
+                parse_error_create(parse_error_expected_case_or_default, expected_case.where), parser->on_error_user);
             return false;
         }
         expression_parser_result key

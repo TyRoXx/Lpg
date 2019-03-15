@@ -1,3 +1,4 @@
+#include "lpg_ascii.h"
 #include "lpg_cli.h"
 #include <assert.h>
 #include <stddef.h>
@@ -6,6 +7,10 @@
 
 int LLVMFuzzerTestOneInput(uint8_t const *const data, size_t const size)
 {
+    if (!is_ascii((char const *)data, size))
+    {
+        return 0;
+    }
     cli_parser_user user = {stream_writer_create_null_writer(), false};
     optional_sequence const result =
         parse(user, unicode_view_from_c_str("fuzzing"), unicode_view_create((char const *)data, size));
