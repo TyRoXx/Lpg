@@ -2375,10 +2375,14 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_string:
         return evaluate_match_expression_with_string(state, function, element, input);
 
+    case type_kind_unit:
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*element)));
+        return evaluate_expression_result_empty;
+
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
-    case type_kind_unit:
     case type_kind_lambda:
     case type_kind_tuple:
     case type_kind_type:

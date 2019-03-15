@@ -1,0 +1,72 @@
+let algorithm = import algorith																																														_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeust)
+    second(LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLSecond)
+
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.i       string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case usingray[string])
+let c = new_array(string)
+assert(b.append(c))
+assert(intege       c(0, a.size()))
+assert(a.append(b))
+assert(integer_equals(1, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let element2):
+    c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.i       string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case usingray[string])
+let c = new_array(string)
+assert(b.append(c))
+assert(intege       c(0, a.size()))
+assert(a.append(b))
+assert(integer_equals(1, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let element2):
+              
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters astd.unirg)
+
+let b = single_parameter[std.string].a(runtime_strlet ha dler_a = (element: inting("abc"))
+assert(match b
+    case single_param     let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a:                                                                                                                                                         t])                                                                             case tristate.b: boolean.false
+    c)ase trist

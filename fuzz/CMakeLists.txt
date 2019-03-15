@@ -1,7 +1,12 @@
 include_directories(../cli_impl)
+include_directories(../semantics)
+include_directories(../type_check)
+include_directories(../tokenization)
 include_directories(../syntax)
 include_directories(../generic)
 file(GLOB sources "*.c" "*.h")
+
+add_definitions(-DLPG_FUZZ_MODULE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/../standard_library")
 
 if(LPG_WITH_CLANG_FUZZER)
     add_definitions(-DLPG_WITH_CLANG_FUZZER=1)
