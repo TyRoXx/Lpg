@@ -59,6 +59,21 @@ void test_parse_expression_syntax_error(void)
 
     {
         parse_error const expected_errors[] = {
+            parse_error_create(parse_error_unexpected_indentation, source_location_create(1, 0))};
+        expression expected = expression_from_lambda(
+            lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
+                          expression_allocate(expression_from_sequence(sequence_create(
+                              expression_allocate(expression_from_identifier(identifier_expression_create(
+                                  unicode_string_from_c_str("a"), source_location_create(1, 8)))),
+                              1))),
+                          source_location_create(0, 0)));
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("()\n"
+                                                                                                   "        a"));
+    }
+
+    {
+        parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_identifier, source_location_create(1, 4))};
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("interface\n"

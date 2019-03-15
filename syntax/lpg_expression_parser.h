@@ -21,7 +21,8 @@ typedef enum parse_error_type {
     parse_error_expected_for,
     parse_error_expected_left_parenthesis,
     parse_error_expected_right_parenthesis,
-    parse_error_expected_right_bracket
+    parse_error_expected_right_bracket,
+    parse_error_unexpected_indentation
 } parse_error_type;
 
 typedef struct parse_error

@@ -136,6 +136,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected left parenthesis";
     case parse_error_expected_right_bracket:
         return "Expected right bracket";
+    case parse_error_unexpected_indentation:
+        return "Unexpected indentation";
     }
     LPG_UNREACHABLE();
 }

@@ -9,6 +9,38 @@ bool is_end_of_file(rich_token const *token)
     return (token->status == tokenize_success) && (token->content.length == 0);
 }
 
+typedef enum comparison_result { equal, greater, less } comparison_result;
+
+static comparison_result check_indentation_level(rich_token const found, size_t const expected)
+{
+    if (expected == 0 && found.token != token_indentation)
+    {
+        return equal;
+    }
+
+    if (found.token != token_indentation)
+    {
+        return less;
+    }
+
+    size_t found_indentation_spaces = 0;
+    for (size_t i = 0; i < found.content.length; i++)
+    {
+        char const currentCharacter = found.content.begin[i];
+        found_indentation_spaces += ((currentCharacter == ' ') ? 1 : spaces_for_indentation);
+    }
+    size_t const actual_indentation = (found_indentation_spaces / spaces_for_indentation);
+    if (actual_indentation > expected)
+    {
+        return greater;
+    }
+    if (actual_indentation < expected)
+    {
+        return less;
+    }
+    return equal;
+}
+
 static bool is_same_indentation_level(rich_token const found, size_t const expected)
 {
     if (expected == 0 && found.token != token_indentation)
@@ -93,7 +125,15 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         {
             continue;
         }
-        if (is_same_indentation_level(indentation_token, indentation))
+
+        switch (check_indentation_level(indentation_token, indentation))
+        {
+        case greater:
+            parser->on_error(
+                parse_error_create(parse_error_unexpected_indentation, indentation_token.where), parser->on_error_user);
+        /*fall through*/
+
+        case equal:
         {
             if (indentation > 0)
             {
@@ -107,11 +147,11 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
                 elements[element_count] = element.success;
                 ++element_count;
             }
-            line_is_empty(parser);
-        }
-        else
-        {
             break;
+        }
+
+        case less:
+            return sequence_create(elements, element_count);
         }
     }
     return sequence_create(elements, element_count);
