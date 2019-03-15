@@ -1,4 +1,5 @@
 #include "lpg_expression_parser.h"
+#include "lpg_allocate.h"
 #include "lpg_array_size.h"
 #include "lpg_assert.h"
 
@@ -7,13 +8,16 @@ expression_parser expression_parser_create(rich_token_producer rich_token_produc
                                            callback_user on_error_user)
 {
     expression_parser const result = {
-        rich_token_producer_argument,
-        find_next_token_user,
-        on_error,
-        on_error_user,
-        {{tokenize_success, 0, {NULL, 0}, {0, 0}}, {tokenize_success, 0, {NULL, 0}, {0, 0}}},
-        0};
+        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0};
     return result;
+}
+
+void expression_parser_free(expression_parser const freed)
+{
+    if (freed.cached_tokens)
+    {
+        deallocate(freed.cached_tokens);
+    }
 }
 
 parse_error parse_error_create(parse_error_type type, source_location where)
@@ -34,9 +38,14 @@ bool expression_parser_has_remaining_non_empty_tokens(expression_parser const *c
 
 rich_token peek_at(expression_parser *parser, size_t const offset)
 {
-    ASSUME(offset < LPG_ARRAY_SIZE(parser->cached_tokens));
     while (parser->cached_token_count <= offset)
     {
+        if (parser->cached_tokens_allocated <= offset)
+        {
+            parser->cached_tokens =
+                reallocate_array(parser->cached_tokens, (offset + 1), sizeof(*parser->cached_tokens));
+            parser->cached_tokens_allocated = (offset + 1);
+        }
         parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->find_next_token_user);
         switch (parser->cached_tokens[parser->cached_token_count].status)
         {

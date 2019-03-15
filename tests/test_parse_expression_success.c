@@ -30,6 +30,7 @@ static void test_successful_parse_impl(expression const expected, unicode_string
     REQUIRE(user.base.remaining_size == 0);
     REQUIRE(expression_equals(&expected, &result.success));
     REQUIRE(!expression_parser_has_remaining_non_empty_tokens(&parser));
+    expression_parser_free(parser);
     expression_free(&result.success);
     unicode_string_free(&input);
 }
@@ -213,6 +214,7 @@ static void test_new_lines(void)
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 0);
 
+        expression_parser_free(parser);
         sequence_free(&actual);
         unicode_string_free(&input);
     }
@@ -225,6 +227,7 @@ static void test_new_lines(void)
         sequence actual = parse_program(&parser);
         REQUIRE(actual.length == 0);
 
+        expression_parser_free(parser);
         sequence_free(&actual);
         unicode_string_free(&input);
     }
@@ -250,6 +253,7 @@ static void test_new_lines(void)
         REQUIRE(actual.length == 1);
         REQUIRE(expression_equals(&actual.elements[0], &unequals_expression));
 
+        expression_parser_free(parser);
         expression_free(&unequals_expression);
         sequence_free(&actual);
         unicode_string_free(&input);
@@ -271,6 +275,7 @@ static void test_new_lines(void)
         REQUIRE(actual.length == 1);
         REQUIRE(expression_equals(&actual.elements[0], &loop_expression));
 
+        expression_parser_free(parser);
         expression_free(&loop_expression);
         sequence_free(&actual);
         unicode_string_free(&input);

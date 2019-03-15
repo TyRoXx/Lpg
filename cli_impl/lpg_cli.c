@@ -179,6 +179,7 @@ optional_sequence parse(cli_parser_user user, unicode_view const file_name, unic
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const result = parse_program(&parser);
+    expression_parser_free(parser);
     if (user.has_error)
     {
         sequence_free(&result);

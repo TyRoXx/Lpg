@@ -42,13 +42,15 @@ typedef struct expression_parser
     callback_user find_next_token_user;
     parse_error_handler on_error;
     callback_user on_error_user;
-    rich_token cached_tokens[3];
+    rich_token *cached_tokens;
     size_t cached_token_count;
+    size_t cached_tokens_allocated;
 } expression_parser;
 
 expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),
                                            callback_user find_next_token_user,
                                            LPG_NON_NULL(parse_error_handler on_error), callback_user on_error_user);
+void expression_parser_free(expression_parser const freed);
 bool expression_parser_has_remaining_non_empty_tokens(LPG_NON_NULL(expression_parser const *const parser));
 
 rich_token peek_at(expression_parser *parser, size_t const offset);

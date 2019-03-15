@@ -141,6 +141,7 @@ load_module_result load_module(function_checking_state *state, unicode_view name
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const parsed = parse_program(&parser);
+    expression_parser_free(parser);
     if (translator.has_error)
     {
         sequence_free(&parsed);

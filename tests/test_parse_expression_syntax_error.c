@@ -33,6 +33,7 @@ static void test_syntax_error(parse_error const *expected_errors, size_t const e
     {
         REQUIRE(!result.is_success);
     }
+    expression_parser_free(parser);
     unicode_string_free(&input);
     REQUIRE(user.expected_count == 0);
 }

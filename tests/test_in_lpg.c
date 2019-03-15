@@ -32,6 +32,7 @@ static sequence parse(unicode_view const input)
     test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
     expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
     sequence const result = parse_program(&parser);
+    expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
     return result;
 }
