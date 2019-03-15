@@ -1,0 +1,35 @@
+l] et std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(21x, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integer_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i47ntegers.u64, right: integers.u64): in4tegers.u64
+    or_u64(std.runtime_value[836integers.u64](left)47), right)
+
+test_or[or_u64_runtime]())
+)

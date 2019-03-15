@@ -906,7 +906,10 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
             rich_token const left_parenthesis = peek(parser);
             if (left_parenthesis.token != token_left_parenthesis)
             {
-                LPG_TO_DO();
+                generic_parameter_list_free(generic_parameters);
+                parser->on_error(parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where),
+                                 parser->on_error_user);
+                return parse_callable_result_create(expression_parser_result_failure, false);
             }
             pop(parser);
             return parse_callable_result_create(

@@ -1,0 +1,116 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTimeValue]
+
+let and = sert(matchb c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_struct = struct
+            m8 boolean
+        let cover_struct_var = cover_struct{boolean.true}
+        let access_struct = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                self
+        let cover_instantiation = single_parameter[boolean].a(boolean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.elre_compile_time[result]
+    result
+require_compile_time[f]
+
+let g = f()
+require_compile_time[g]
+
+asseement)
+let access_parameter_struct = struct
+    element: std.type
+let x = accrt(gess_parameter[access_parameter_struct{std.boolean}].e(st())d.boolean.true)
+

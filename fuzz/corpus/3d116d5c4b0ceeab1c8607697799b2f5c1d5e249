@@ -1,0 +1,78 @@
+   *                                                                                                  let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+                                                                                                                                                        assert(b.append(           cov two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_string("abc"))
+asspile_time = enum[CompileTimeValue]
+
+let and = sert(matstd.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+assert(not(s.remove(std.boolean.true)))
+assert(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(ne
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+assert(not(a.store(1, "")))
+assert(not(a.store(2, "")))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("abc"))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(let ele  case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boo                                                                                                                                                                                                                                                                                               ion[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(2)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+
+assert(a.store(1, "xyz"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+assert(not(a.store(3, "???")))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      d = imp                           

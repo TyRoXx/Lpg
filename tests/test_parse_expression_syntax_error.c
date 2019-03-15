@@ -708,6 +708,13 @@ static void test_function(void)
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = !="));
     }
+
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_expected_left_parenthesis, source_location_create(0, 11))};
+        test_syntax_error(
+            expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = [A]"));
+    }
 }
 
 static void test_let(void)

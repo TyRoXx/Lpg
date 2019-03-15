@@ -1,0 +1,8 @@
+// test integer_to_string
+// compile_time evaluation:
+assert(strinZZZ[ZZZZZZZZ: int(0, 2147483647))
+    side_effect()
+    integer_to_string(input)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", testequals("2", test_integer_to_string(2)))
+assert(string_eq", test_integer_to_string(2147483647)))
