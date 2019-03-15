@@ -1,0 +1,12 @@
+let sets = import set
+let std = import std
+
+let s = sert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolboolean.true)))
+
+assert(s.add(n.true)))
+
+assert(not(s.ae(std.bool.e;atrue)))
+assert(not(s.remove(std.boolean.false)))

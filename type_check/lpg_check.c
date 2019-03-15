@@ -529,6 +529,37 @@ static void check_function_clean_up(function_checking_state *const state)
     }
 }
 
+static check_function_result finish_function_check(function_checking_state state, type const return_type,
+                                                   instruction_sequence const body_out)
+{
+    type *const capture_types =
+        state.capture_count ? allocate_array(state.capture_count, sizeof(*capture_types)) : NULL;
+    for (size_t i = 0; i < state.capture_count; ++i)
+    {
+        capture_types[i] = state.captures[i].what;
+    }
+
+    function_pointer *const signature = allocate(sizeof(*signature));
+    *signature =
+        function_pointer_create(optional_type_create_set(return_type), tuple_type_create(NULL, 0),
+                                tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
+
+    if (state.register_debug_name_count < state.used_registers)
+    {
+        state.register_debug_names =
+            reallocate_array(state.register_debug_names, state.used_registers, sizeof(*state.register_debug_names));
+        for (register_id i = state.register_debug_name_count; i < state.used_registers; ++i)
+        {
+            state.register_debug_names[i] = unicode_string_from_c_str("");
+        }
+    }
+    checked_function const result =
+        checked_function_create(signature, body_out, state.register_debug_names, state.used_registers);
+
+    check_function_clean_up(&state);
+    return check_function_result_create(result, state.captures, state.capture_count);
+}
+
 check_function_result
 check_function(program_check *const root, function_checking_state *const parent, expression const body_in,
                structure const global, check_error_handler *const on_error, void *const user,
@@ -571,113 +602,86 @@ check_function(program_check *const root, function_checking_state *const parent,
     }
 
     evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
-
-    type return_type = type_from_unit();
-    if (body_evaluated.has_value)
+    if (!body_evaluated.has_value)
     {
-        return_type = body_evaluated.type_;
-        if (explicit_return_type.is_set)
-        {
-            if (body_evaluated.always_returns)
-            {
-                if (!state.return_type.is_set)
-                {
-                    LPG_TO_DO();
-                }
-                return_type = state.return_type.value;
-            }
-            else
-            {
-                conversion_result const converted = convert(
-                    &state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
-                    expression_source_begin(body_in), explicit_return_type.value, false);
-                switch (converted.ok)
-                {
-                case success_no:
-                    for (size_t i = 0; i < state.register_debug_name_count; ++i)
-                    {
-                        unicode_string_free(state.register_debug_names + i);
-                    }
-                    if (state.register_debug_names)
-                    {
-                        deallocate(state.register_debug_names);
-                    }
-                    instruction_sequence_free(&body_out);
-                    check_function_clean_up(&state);
-                    return check_function_result_empty;
+        return finish_function_check(state, type_from_unit(), body_out);
+    }
 
-                case success_yes:
-                    return_type = converted.result_type;
-                    ASSUME(type_equals(explicit_return_type.value, converted.result_type));
-                    break;
-                }
-                register_id const unit_goes_into = allocate_register(&state.used_registers);
-                add_instruction(
-                    &body_out, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
+    if (explicit_return_type.is_set)
+    {
+        if (body_evaluated.always_returns)
+        {
+            if (!state.return_type.is_set)
+            {
+                LPG_TO_DO();
             }
+            return finish_function_check(state, state.return_type.value, body_out);
         }
         else
         {
-            if (body_evaluated.always_returns)
+            conversion_result const converted = convert(
+                &state, &body_out, body_evaluated.where, body_evaluated.type_, body_evaluated.compile_time_value,
+                expression_source_begin(body_in), explicit_return_type.value, false);
+            switch (converted.ok)
             {
-                if (!state.return_type.is_set)
+            case success_no:
+                for (size_t i = 0; i < state.register_debug_name_count; ++i)
                 {
-                    LPG_TO_DO();
+                    unicode_string_free(state.register_debug_names + i);
                 }
-                return_type = state.return_type.value;
+                if (state.register_debug_names)
+                {
+                    deallocate(state.register_debug_names);
+                }
+                instruction_sequence_free(&body_out);
+                check_function_clean_up(&state);
+                return check_function_result_empty;
+
+            case success_yes:
+                ASSUME(type_equals(explicit_return_type.value, converted.result_type));
+                break;
+            }
+            register_id const unit_goes_into = allocate_register(&state.used_registers);
+            add_instruction(
+                &body_out, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
+            return finish_function_check(state, converted.result_type, body_out);
+        }
+    }
+    else
+    {
+        if (body_evaluated.always_returns)
+        {
+            if (!state.return_type.is_set)
+            {
+                LPG_TO_DO();
+            }
+            return finish_function_check(state, state.return_type.value, body_out);
+        }
+        else
+        {
+            if (body_evaluated.has_value)
+            {
+                register_id const unit_goes_into = allocate_register(&state.used_registers);
+                add_instruction(&body_out, instruction_create_return(
+                                               return_instruction_create(body_evaluated.where, unit_goes_into)));
+                return finish_function_check(state, body_evaluated.type_, body_out);
             }
             else
             {
-                if (body_evaluated.has_value)
+                for (size_t i = 0; i < state.register_debug_name_count; ++i)
                 {
-                    register_id const unit_goes_into = allocate_register(&state.used_registers);
-                    add_instruction(&body_out, instruction_create_return(
-                                                   return_instruction_create(body_evaluated.where, unit_goes_into)));
+                    unicode_string_free(state.register_debug_names + i);
                 }
-                else
+                if (state.register_debug_names)
                 {
-                    for (size_t i = 0; i < state.register_debug_name_count; ++i)
-                    {
-                        unicode_string_free(state.register_debug_names + i);
-                    }
-                    if (state.register_debug_names)
-                    {
-                        deallocate(state.register_debug_names);
-                    }
-                    instruction_sequence_free(&body_out);
-                    check_function_clean_up(&state);
-                    return check_function_result_empty;
+                    deallocate(state.register_debug_names);
                 }
+                instruction_sequence_free(&body_out);
+                check_function_clean_up(&state);
+                return check_function_result_empty;
             }
         }
     }
-
-    type *const capture_types =
-        state.capture_count ? allocate_array(state.capture_count, sizeof(*capture_types)) : NULL;
-    for (size_t i = 0; i < state.capture_count; ++i)
-    {
-        capture_types[i] = state.captures[i].what;
-    }
-
-    function_pointer *const signature = allocate(sizeof(*signature));
-    *signature =
-        function_pointer_create(optional_type_create_set(return_type), tuple_type_create(NULL, 0),
-                                tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
-
-    if (state.register_debug_name_count < state.used_registers)
-    {
-        state.register_debug_names =
-            reallocate_array(state.register_debug_names, state.used_registers, sizeof(*state.register_debug_names));
-        for (register_id i = state.register_debug_name_count; i < state.used_registers; ++i)
-        {
-            state.register_debug_names[i] = unicode_string_from_c_str("");
-        }
-    }
-    checked_function const result =
-        checked_function_create(signature, body_out, state.register_debug_names, state.used_registers);
-
-    check_function_clean_up(&state);
-    return check_function_result_create(result, state.captures, state.capture_count);
 }
 
 static evaluate_expression_result make_compile_time_unit(void)
