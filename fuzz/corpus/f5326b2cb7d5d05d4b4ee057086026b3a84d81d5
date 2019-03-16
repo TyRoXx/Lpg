@@ -1,0 +1,79 @@
+t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))ls("abc", match single.a(make single.a(maabc", optionk.some      n_stateful_enum()
+    case single.a(let state): state
+))
+
+ enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+  tate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.faing_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    cascture)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean           h return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(matc9h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let rt(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(string_equals("abc", content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            t pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.a)
+   boolean.true
+)
+
+let test_read_property = (h caseost tristate.a:: e

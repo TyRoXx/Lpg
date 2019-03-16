@@ -1,0 +1,184 @@
+let std = import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+let trivial_return_implicit_type = ()
+    return boXlean.true
+assert(trivial_return_implicit_type())
+
+let match_return_explicit_type = (arg: boolean): std.string
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.let std = import std
+let integers = import integer
+let integer = integers.integer
+
+match add(123, 0)
+    case add_result.ok(let result):
+        assert(integer_equaake_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make(single.a(make_ru    assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+)
+
+let structurate != (e                                                            = (arg: boolean)
+    match arg
+        case boolean.true:
+ t m))
+as3       .not(test_single(single.a("def"))))
+
+assert(strins("abc", match return_stateful_enum()
+    case single.a(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_et pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match return_staulti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristattate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.tru return_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+lette = (arg: tristate)
+    arg
+assert(match pass_tristattate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.tru return_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match return_staulti = ena(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristattate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.tru return_statHful_enum()
+ state(monesatto.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match return_staulti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristattate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.tru return_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match retur!!!!!!!!!!!!!!!oy

@@ -1,0 +1,51 @@
+()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+      t(0, 12=)
+    v! std.string
+//on uc yanest generic functions as expected
+let f = [t helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f        
+    [U]std
+
+let helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+                               case std.boolean.td.bo[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+      -     helper{T, U, V}
+                               case std.boolean.false: "false"
+
+let b : transfor Zmer[std.boo  assert(s stase d
+        b: boolean pa, s)
+)
+
+let two_parameters = enum[First, Secos_paraassert(st    string_equals("abc", s)
+)
+
+let t"o_params("hello

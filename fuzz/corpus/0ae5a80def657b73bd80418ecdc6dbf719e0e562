@@ -1,0 +1,8 @@
+l: std.type,    u: int(0, 123)
+    v: std.string
+//you can nest generic functi                                                 ons as expected
+l(et f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.booleantime_va

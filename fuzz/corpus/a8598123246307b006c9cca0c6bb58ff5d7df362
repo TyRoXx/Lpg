@@ -1,0 +1,14 @@
+t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(makac"c,e single.a(maabc", optionk.some            assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+lurn_stateful_enum()
+    case single.ao(let sat("1c

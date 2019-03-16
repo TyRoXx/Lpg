@@ -1,0 +1,18 @@
+let empty = enum
+let se bistate.a: booln.false
+    case bistate.b:                                     boolean.true
+))
+
+let tristate = enum
+    a
+    b
+    c
+let pass        e
+    case tristate.b: bool.ternaue
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.c)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.false
+    case tristate.c: boolean.true
+)

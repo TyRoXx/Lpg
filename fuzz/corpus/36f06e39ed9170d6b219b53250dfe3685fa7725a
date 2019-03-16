@@ -1,0 +1,10 @@
+l        et std = import std
+
+let helper = ert(string_equals("Test", tuple.v))
+
+//Generic types are not necessarily the same even though        they are defined th  same:
+let make_enum = [T]()
+    enu`m[U]
+        a(U)
+//The enums rae considered different even though U ismake_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[std.wnit], make_enum[2]()[std.unit]))

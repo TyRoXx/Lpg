@@ -1,0 +1,25 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.st  ng] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass==============(=====================================================P===ert(match usingmpl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================================================================<========ert(match using_global[boole   0produce()
+        std.boolean.true
+	let a : produproducee std.boolean.true: "t        ttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt)
+        std.boolean.true
+	let a : produproduce())
+
+impl transfomrer[std.b;olean, std.string] for dummy
+=========================================================ert(match usingmpl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================================================================<========ert(match using_global[boole    prod uce()
+        std.boo=============<= a : prod [T]()
+    [U]()
+          case  [V](s)t

@@ -1,0 +1,18 @@
+d 	  lean.true
+true
+        ca.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_  i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_a====================ert(match using_globalop
+  [boole      pr

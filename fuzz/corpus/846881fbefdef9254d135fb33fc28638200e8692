@@ -1,0 +1,42 @@
+let std = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.unit
+    side_effect,)
+    let inner = ()
+           case std.option[std.boolean].some(let element):
+                    assert(to.append(element))
+                    copy_array_boolean(from, to)
+                case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array           d.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array(std.boolean)
+copy_array_boolean(wd      original, into)
+assert(integer_equals(1, into                case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(        y(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.booleopy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array           std.unit_value
+        cas!e std.boolean.false:
+            match from.load(to.size())
+                case stdlet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.eoumeratenew_array(boolean)
+assert(non_empty.append(boolean.tru.option[T].e))
+assert

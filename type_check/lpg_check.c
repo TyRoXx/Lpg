@@ -894,7 +894,6 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
     deallocate(header.parameter_names);
     if (!checked.success)
     {
-        deallocate(header.parameter_types);
         return evaluate_expression_result_empty;
     }
 

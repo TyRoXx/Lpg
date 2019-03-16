@@ -1,0 +1,77 @@
+[	   boolean, type_of(fan), faport std
+
+let single_p         = enum[T]
+    a std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.str  enumt std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c:]option, d: int(5, 2))
+    side_effect()ean.true
+    case tristate.b: booan.false
+    case bista[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[te.b:!bood(boolean)
+    e
+    f
+assert(matc context*/
+load(1)
+    case std.option[slet b = 23
+let h = ()
+    side_effect()
+    ()
+       e assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!et emjty = enum
+let pass_empty = (arg: ", tuplestate.b:e .v))
+
+//Generic types are not necessarily the same even though(boolean)
+    e
+    f
+assert(matc9h mult8i.b(scase bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let th%y ar) definoolean
+
+let requet no_leak = tristate = enum
+     new_a
+ et a    case boolea(40, somen.false:[[[[[[[[[[[[[[[[[[[[te.b: bood(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean           h return_statefuriable in a runt   _context*/
+let f = ()
+    side_effec ()
+    23
+let c = f()
+let g = ()
+    ()
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+load(1)
+    case std.option[slet b = 23
+let h = ()
+    side_effect()
+    ()
+  ean
+              ture = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(sin    helper{T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+asserassert(integer_equals(123, tuple.u))
+assert(string_equals("test", tupgle)
+ rt(not(type_equah (make_enum[0]()[std.unilean)
+    e
+    f
+assert(match multi.b(stle.v))
+
+//Generic typesnoo!!!

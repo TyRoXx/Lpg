@@ -1,0 +1,22 @@
+l      	     td = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.un 
+ ti  side_effect()
+    e:
+            m        atch from.load(to.size((): std.unit
+    f()
+
+let g = (): std.unit
+    side_effe      case std.boo copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match cnteger_equals(from.size(), to.size())
+        case std.boolean.true:
+                   (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match cn)
+        g()
+
+let h = ()ring_equals("6", k(std.booleanM   se)))
+
+let copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.quals(from.sizray(std.boolean), new_array(std.boolean))

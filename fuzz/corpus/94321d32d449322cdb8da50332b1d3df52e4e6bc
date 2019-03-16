@@ -1,0 +1,18 @@
+           nostate = enum
+    a
+let passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld'T "Hello\\nWorld"))
+seals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+ match return_stateful_enum()
+    case single.a(let st###############################################.append(std.unit_value))
+assert(integer_equals(0, cou ter.size()))
+call_twice[type_tes
+

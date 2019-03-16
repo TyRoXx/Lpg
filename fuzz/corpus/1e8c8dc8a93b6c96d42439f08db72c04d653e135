@@ -1,0 +1,26 @@
+l   
+    0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer(_equals(1, or(0, 1)))
+    assert({integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0))):assert(string_equals("2", i                                                                                        nteger_to_string(8)))
+assert(string_equals("2147483647", integer_to_string(2147483647)))
+
+//run_time evaluation:
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(niput)
+assert4(std   assert(integer_equal!(3, or(1, 2)))
+test_or[or_u64]()elotr 
+
+_u64_runtime = (left: i23ntegers.u64, right: inte(0, 0)))
+    assert(integax = 18446?       9551615
+    Nassert(intls(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let "",d(2)
+    case std.o      "?ring].some(let element): boolean.fals6      ht: int   

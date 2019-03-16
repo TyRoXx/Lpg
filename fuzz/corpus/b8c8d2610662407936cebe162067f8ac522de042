@@ -1,0 +1,14 @@
+l   std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let                        e(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure(boolean.false))quals("a"
+    method(): std.strquals("0",   runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_einquagl
+
+impl[S

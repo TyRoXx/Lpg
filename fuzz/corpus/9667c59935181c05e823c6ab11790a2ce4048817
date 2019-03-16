@@ -1,0 +1,35 @@
+l      	  import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.unit
+    side_effect()
+    let inner = ()
+           case std.option[std.boolean].some(let element):
+                            assert(to.append(element))
+                    co y_array_boolean(from, to)
+                case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(std.              case std<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<    (std.boolean)
+assert(orrue))
+let into = new_array(std.boolean)
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array(std.boolean)
+copy_               case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let origOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOinal = new_array        (std.boolean)
+assert(original.append(s, to.size())
+        case std.boolean.true:
+            std.unean.true
+assert(trit_olean].some(let

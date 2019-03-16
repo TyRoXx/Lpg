@@ -1,0 +1,42 @@
+let std = import std
+
+let require_comlet std = import stdt
+e
+l single_parameter = enum[T]
+    a(T)5555555555555555555555555555555555555555555555555555555555555GJJJ5555555555555555555555555555555555555555555555555555555555
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+leb runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter.[tsstdring].a(runtima(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"&
+        let cover_struct = struct
+            m: boolean
+        let cover_struct_var = coverrs_tuct{boolean.true}
+        let access_struct = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        lettd.and
+require_compile_time[and]
+
+let f = ()
+    let result cover_not = !boolean.true
+        let cover_interface = interface
+            m(): ter[access_parameter_struct{std.boolean}].e(st())d.boolean.true)
+

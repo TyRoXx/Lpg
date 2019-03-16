@@ -1,0 +1,15 @@
+l        et t_instance            )                                                      ("abc", u_instance= ))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bsert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+ face for std.unit
+    meth: std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.unit_value}
+assert(conversion.i.method())

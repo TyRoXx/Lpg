@@ -1,0 +1,60 @@
+ new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+ass%  te = enlow !  *                               ring_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(Fimport             g_   let std = import std
+let string =t()
+    concat("", value)
+assert(test_single(single.a(make_)
+    case multilet std = import std
+
+let helper = struct
+    t: std.typ.c(let state): boolean.false
+    case multi.d(let state): boe
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions olean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+a
+//thes  typeon[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case stdlet std = implet algorithm = import ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    let std = import std
+let runtime_string = (a: std.string)
+    side_effect()
+    a
+
+assert(string_equals("",(element: integer): std.unit
+    assert(integer_equals(0s("", runtime_string, element))
+algorithm.enumerate[unit
+ ("")))
+assert(   short(): std.unit
+    signed(): std.unit
+    sizeof()string_equals("\n", : std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.unrunti/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.ume_string("\n")))nit
+    _Atomic(): st
+d.uni

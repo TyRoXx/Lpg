@@ -1,0 +1,3 @@
+a Zssert(string_equals("123456", concat("126", concat("123", runtime_string())a)
+    "456"
+assert(s4ring_equals("061728", conca(1"t23", runtime_string())at(

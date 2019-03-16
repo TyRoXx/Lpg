@@ -1,0 +1,35 @@
+let std = import std
+
+let require_comlet std = ise single_parameter[boolean].a(let s):
+        s
+)
+
+let ruterface
+        olean].a(boolean.true)
+        match cover_instantiation
+            case sr[boolean].a(let s): s
+     oolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.ers[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+    clet std = import stase d

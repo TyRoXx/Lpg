@@ -1,0 +1,40 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : anot(a.store(1, "")))
+assert(not(a.store(2, "")))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): booleement): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("456"))
+assert(integer_equals(2, a.si!ze()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc")
+    case std.option[string].none: boo = ()
+    assert(big.append("test"))
+let append_4 = ()
+    append_1()
+    append_)()
+    append_1()
+    append_1()
+letDappend_16 = ()
+    append_4()
+    append_4()
+    append_4()
+  ppend_1024()
+    append_1024()
+    append_1024(quals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc.size()))

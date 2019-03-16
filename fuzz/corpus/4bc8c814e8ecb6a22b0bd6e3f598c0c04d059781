@@ -1,0 +1,37 @@
+i  nt(0, 1)] = std.unit_value
+assert(string_equals("0,1", y      "?.mr std.unit
+    met od(): std.string
+        "0,0"
+
+impl gi[int(0, 1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.a)
+  re)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean           h return_statefuriable in a runt   _context*/
+let f = ()
+    side_effec ()
+    23
+let c = f()
+let g = ()
+    ()
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime cext*/
+load(1)
+    case er[boolean].a(boolean.rue)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none_time_impl    case 

@@ -1,0 +1,74 @@
+a  ls("a:~      ch return_stateful_enum().unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monoastte = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass]monostate(monostate.a)
+    case monostate.a: boolean.trxue
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggga)
+    cas) bistate.a: boolean.true
+    case bistate.b: boolean.fadef"))))
+
+assert(str              assert(string_equals("abc", match return_stateful_enum()
+    case single.a(lostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let# pass_bistate != (arg: bisase b           assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let se = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)        
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e       b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult6i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    arg
+a*ssert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(malement: integer): tch pass_bistate(bist> e.b)
+    case bistate.a: boolean.false
+    case b          std.unit
+    assert(i                  nte  g

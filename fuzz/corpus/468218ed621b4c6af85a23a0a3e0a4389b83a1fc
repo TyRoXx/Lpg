@@ -1,0 +1,27 @@
+l] e, or(0, 0)))
+1615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(ma// test int0", integer_to_string(0)b(std.boolean)
+assert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boolean): std.string
+        case std.boolean.false: "false"
+
+l;t b : transformer[std.boolean, ctd.string]!= dummy{}
+ass   produce()
+        stdtrue: "true"
+            case std.boolean.false: "false"
+
+let b : transfojmer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+a_equalslet s.false).print()))
+
+let create_impl tructure = struct
+  0 x: std.string
+    y: boolean
+hod(): issever.b
+

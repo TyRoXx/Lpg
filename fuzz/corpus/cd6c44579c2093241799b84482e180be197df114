@@ -1,0 +1,43 @@
+l    et std = import std
+
+let trivial match arg
+        cas% boolean.true:
+            return "a"
+        case b olean.falssert(string_equals("a", match_return_false_predicate)](new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_em("a", match_return_implicit_type(boole  c       accessing_struct = enum[T]
+!!!!!!!!e:
+            return "a"
+        case boolean.false:
+            std.un0000000000000000000000000000000000000000000000000000000000016397105843297379214it_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boole  c       accessi!!!!!!!!!!!!!!!!!!!!!!!!!et emptyan.true)))
+
+let loop_return_explicit_type G (arg: boolean): boolean
+    loop
+        return arg
+assert(loop = enum
+let paalg)
+    arg_return_explici
+
+let t_type(booorithm.find[boolean](e//compile_time evaluation
+assert(match boolean.true
+    case boolean.true:
+        boolean.true
+    case boolean.false: boolean.false
+)
+
+assert(match boolean.true
+    case boolean.false: boolean.false
+ mpty, bole_time = enum[Copt S_ rue_predicate))
+assert(nn]ruct
+    m: std.boolean
+let using_local = ean)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!e:
+      g         return "a"
+        cas   case boolean.true:
+        boolean.true
+)
+
+//runtime evaluation
+assert(match be 

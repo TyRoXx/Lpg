@@ -1,0 +1,76 @@
+e_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(bool.tneuare)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 3
+        let cover_string_literal = "abc"
+        let cover_struct = struct
+            m: boolean
+        let cover_struct_var = cover_struct{boolean.true}
+        let access_struct = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+                selt.ok(leterface
+ ;  irint(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    othemeter = enum[T]
+    a(T)0000771397342245129784any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(no   OOOOOOOOOOO= (printed: printable)
+    let method = printed;.print)    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                                          int(0,                                                                               

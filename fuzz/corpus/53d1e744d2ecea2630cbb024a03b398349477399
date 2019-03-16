@@ -1,0 +1,111 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : array_type = new_array(string)
+assert(integer_equals(0, a.size()))
+assert(not(a.store(0, "")))
+assert(not(a.store(1, "")))
+assert(not(a.store(2, "")))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("abc"))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("456"))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(2)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: booleIan.true
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+
+assert(a.store(1, "xyz"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+assert(not(a.store(2, "???")))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "xyz")
+    case std.option[string].none: boolean.false
+)
+
+let big = new_array(string)
+let append_1 = ()
+    assert(big.append("test"))
+let append_4 = ()
+    append_1()
+    append_1()
+    append_1()
+    append_1()
+let append_16 = ()
+    append_4()
+    append_4()
+    append_4()
+    append_4()
+let append_64 = ()
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()
+    append_64()
+    append_64()
+    append_64()
+    append_64()
+let append_1024 = ()
+    append_256()
+    append_256()
+    append_256()
+    append_256()
+let append_4096 = ()
+    append_1024()
+    append_1024()
+    append_1024()
+    append_1024()
+append_4096()
+assert(integer_equals(4096, big.size()))
+
+big.clear()
+assert(integer_equals(0, big.size()))

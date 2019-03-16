@@ -1,0 +1,24 @@
+l eger(1))))
+    assert(not(host.equals(host.export_integer(0), host.opex_rtstring("0"))))
+
+//
+(global: host_value, host: es.host)
+    test_string(host)
+    test_read_property(host)
+    test_export_integer(host)
+    test_undefg = std.string
+let option = std.option
+let a = new_array(st                                                  d.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+host.export!integer(1))))
+    assert(not(host.equals(host.export_integer(0), host.export_string("0"))))
+
+//
+(global: host_value, host: es.host)
+T    test_string(host)
+    test_read_property(host)
+    tring] = std.make_mutable[std.striest_exportng]("test")
+assert(string_wquals("test", p.load()))
+p.store("124")
+assert(string_equal_is(

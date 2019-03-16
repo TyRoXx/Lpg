@@ -1,0 +1,132 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yo ucan nest g%nlet f = [T]()
+    [U]()
+        [V]()
+            helper{T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(inte r_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the same even though        they are defined the same:
+let make_enum = [T]()
+    enu`m[U]
+        a(U)
+//The enums rae considered different even though U is the same because Teric functions as expected       
+let f = [T]()
+    [U]()
+        [V]()
+         uy   ct   "c0"
+e[ n)
+h   break
+
+loop
+    loop
+        let no_leak =a)
+
+let u = struct
+    instance.b))
+assert(i   helper{T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+asser*(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the same even though        they are defined the same:
+let make_enu (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boolean.true}py_array = [T](from(type_equals(make_enum[1]()[std.unit], make_enum[5]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], mak: std                             e_enum[1]()[std .unitn].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(s, to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                 new_array(std.boolean))
+
+let original = new_array       array_boolean(original, into)
+asse: std.boolean): std.string
+    side_effect()
+    match a
+        case std.boolean.true:
+            k(std.boolean.false)
+        case std.boolean.false:
+       true))
+let into = new_array(std.boolean)
+copy_array_boolean(original, into)
+assetion[std.boolean].none:
+  rily the same even though        they are defined the same:
+let make_enum = [T]()
+    enu`m[U]
+        a(U)
+//The enums rae considered different even though U is the same because Teric functions as expected       
+let f = [T]()
+    [U]()
+        [V]()
+         uy   ct   "c0"
+e[ n)
+h   break
+
+loop
+    loop
+        let no_leak =a)
+
+let u = struct
+    instance.b))
+assert(i   helper{T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+asser*(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the same even though        they are defined the same:
+let make_enum = [T]()
+    enu`m[U]
+        a(U)
+//The enums rae considered different even though U is the same because T is not the same.
+assert(notnteger_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{boolean.true}py_array = [T](from(type_equals(make_enum[1]()[std.unit], make_enum[5]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], mak: std                             e_enum[1]()[std .unitn].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(s, to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                 new_array(std.boolean))
+
+let original = new_array       array_boolean(original, into)
+asse: std.boolean): std.string
+    side_effect()
+    match a
+        case std.boolean.true:
+            k(std.boolean.false)
+        case std.boolean.false:
+       true))
+let into = new_array(std.boolean)
+copy_array_boolean(original, into)
+assetion[std.boolean].none:
+                    fail()
+
+copy_armake_mutable[type_of(structtype_of([]) (TT)]([rt(integer : std_again.boolean = e
+
+let t_array(bodimatch intc"))
+to_match
+    case_.  sdt acc

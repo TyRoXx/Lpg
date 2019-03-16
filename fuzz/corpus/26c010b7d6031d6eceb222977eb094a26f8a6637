@@ -1,0 +1,16 @@
+let std = import stdlet std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.run
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.booleantime_va

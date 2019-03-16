@@ -1,0 +1,19 @@
+let stit_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boolean.true)))
+
+let loop_return_explicit_type = (arg: boolean): bmolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+        return arg
+assert(loop_r'turn_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        cast(integer_equals(1, returAAAAAAAAAAAAAAAAA"b"
+assert(string_equals("a", match_return_exAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAn_integer_explicit(boolean.false)))
+asser))

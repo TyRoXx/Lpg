@@ -1,0 +1,54 @@
+           method(arg: Struce.meltensingle_parameter =let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean enum[T]
+    a(T)
+
+let a = single_parametent(0, 1)] = std.unit_vassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+  abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+   et passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWo, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered differerld'T "Hello\\nWorld"))
+se T isDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD not the same.
+assert(not(type_eqnt even though U is the same becaus "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)te_ monostate = enum
+    a
+let passasseret(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"num[2]()[std.unit], make_

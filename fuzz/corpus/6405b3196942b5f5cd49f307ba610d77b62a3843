@@ -1,0 +1,47 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl tran  ormer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boole    produce()
+        std.boolean.tr2B      ue
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boolean): std.stri2B      ng
+        match input
+            case         std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   produce()
+   or dummy
+    transfo  W   
+: std.bool!an): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for d     std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] fo) dummy
+    transfo  W   
+: std.boolean): std.string
+        match input
+   nestd.boolea~, std.string] for d     std.boolean.true
+	let a : produproduce())
+
+iy
+    transfo  W   
+: std.boolean): std.striroduprodc", 0}
+asslet std = impor64, right: int   

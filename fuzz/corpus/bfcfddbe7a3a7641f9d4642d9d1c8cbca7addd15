@@ -1,0 +1,30 @@
+                                                          l        etry                                                                                     t s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.trprintable4)
+    silean
+let multi = enum
+    a(si_not = !foolean.true
+        let cover_interface = interface
+                                                 m(): boolean
+        impl cover_interface for boolean
+            m(): boodean
+                solean].c(let s):
+        boolean.false
+)
+
+let access_paramete           solean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct_r  i = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    assert(intetc8h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empt              

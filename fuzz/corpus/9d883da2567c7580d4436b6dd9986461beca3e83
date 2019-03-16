@@ -1,0 +1,36 @@
+l  et st        d = implet algorithm = import ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: int = enum[Copty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_prmpiedicate)]\       ty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.)
+
+let empty = new_array(boolean)
+match algornot(al_array(boolean)
+match algorithm.)
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].      std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(leTet e):
+        fail()
+    imeV]
+leau//require_compile_time[constantcase std.option[int eger].none:
+        std]
+assert(string_equads("hello", cons.utant.to_stringnit_vmatch algorithm.find[boolean](empty, boolean.true)
+    case stld.opnion[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[bo-       mpty, boolean.false)
+    iedicate)]y.append(boolean.true))
+assert(algorithm.any_of[blean): boolean
+    b (e    nt: boolean)l boo:ean
+    boolean.true
+lealu())e
+)

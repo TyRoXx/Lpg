@@ -1,0 +1,20 @@
+let std = import std
+let single = enum
+    a(std.string)
+atch arg
+        case single.a(let statentime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("let a = .
+abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]uals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let strucg_equals("let a = .
+abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]uals("abc", mat'ch return_stateful_enum()
+    case single.a(let serated garbage code out of thi
