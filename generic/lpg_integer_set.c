@@ -8,7 +8,7 @@ integer_set integer_set_from_range(integer_range const range)
     {
         LPG_TO_DO();
     }
-    integer_set const result = {allocate_array(size.low, sizeof(*result.elements)), size.low};
+    integer_set const result = {allocate_array((size_t)size.low, sizeof(*result.elements)), (size_t)size.low};
     for (uint64_t i = 0; i < size.low; ++i)
     {
         result.elements[i] = range.minimum;
