@@ -1,0 +1,38 @@
+(-       capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.                                                              xt*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+  (0, s       >        std.oprt(stling_equals("0,1", y.method()))
+
+let z = impord.unit
+    method(): g_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert= ()
+  (0, s       >        std.oprt(stling_equals("0,1", y.method()))
+
+let z = impord.unit
+    method(): g_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_    equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

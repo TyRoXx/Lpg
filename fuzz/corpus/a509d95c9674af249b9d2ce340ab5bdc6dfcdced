@@ -1,0 +1,14 @@
+let std = import std
+let std_again = import let . d = import stse
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equal                                               g_   let std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[ std.arrayd.option
+
+let test_string = (host: es.host)
+    let ex_||||||||||||||||||||||||||                                                                                                                                                

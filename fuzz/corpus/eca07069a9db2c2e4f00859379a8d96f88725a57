@@ -1,0 +1,82 @@
+l      5)         import std
+
+n[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_welf_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boolean] for std.unit
+    alet linked_list_node = interface
+    value(): boolean
+    next(): std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boolean] for std.unit
+    a(): generic_self_reference[std.boolean]
+        self
+    b(): genede = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.optio~[linked_list_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for EEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        se.lf
+    b(): generic_self_ran] = std.unit_value
+let x1 : generict: linked_list_node
+
+impl linked_list_node for middleDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD_node
+    value(): boolean
+        self.value
+    next(): std.option[linkeEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        se.lf
+    b(): generic_self_raq] = std.unit_valse.lf
+    b(): generic_self_ran] = std.unit_value
+let x1 : generict: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_nodeEE    EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        se.lf
+    b(): generic_self_raq] = std.unit_value
+let x1 : generic_self_reference[std.unit] = std.unit_value*/

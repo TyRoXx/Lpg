@@ -1608,6 +1608,19 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(4, 22))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface[T]\n"
+                                               "let s = struct[T]\n"
+                                               "impl[T] i[T] for s[T]\n"
+                                               "let a : i[std.unit] = std.unit_value\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

@@ -1,0 +1,44 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = |td.boolean.true
+let imports_are_equivalent : std_again.b0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+assert(integer_equals(0, a.load()))
+assert(truct[M])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[t                                ype_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = est", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.s  WMVqassert(integer_equals(0, a.load()))
+assertX
+ $*])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutabutable[std.string]("test")
+std.make_mutable[t                                ype_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

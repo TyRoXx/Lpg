@@ -1,0 +1,55 @@
+ake_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(strins("abc", match return_stateful_enum()
+    case single.a(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristattate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.tru return_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match return_stateful_                

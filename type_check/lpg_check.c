@@ -1038,8 +1038,11 @@ typedef struct infer_generic_arguments_result
 
 static void infer_generic_arguments_result_free(infer_generic_arguments_result const freed)
 {
-    deallocate(freed.argument_types);
-    deallocate(freed.arguments);
+    if (freed.argument_types)
+    {
+        deallocate(freed.argument_types);
+        deallocate(freed.arguments);
+    }
 }
 
 static infer_generic_arguments_result infer_generic_arguments(function_checking_state *const state,
@@ -1129,6 +1132,12 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
         break;
     }
 
+    case type_kind_unit:
+    {
+        infer_generic_arguments_result const result = {false, NULL, NULL};
+        return result;
+    }
+
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
@@ -1143,7 +1152,6 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     case type_kind_string:
     case type_kind_tuple:
     case type_kind_type:
-    case type_kind_unit:
         LPG_TO_DO();
     }
     infer_generic_arguments_result const result = {false, NULL, NULL};

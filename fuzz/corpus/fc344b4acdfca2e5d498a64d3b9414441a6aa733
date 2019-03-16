@@ -1,0 +1,127 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct =let std = import std
+let integers = impor t integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:ak enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass========C==============================================================  let no_lmutable[integers.u31](0)
+loop
+    match integer_one
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_po   dequals(i.load(), 10000)
+        case boolean.true:
+       break
+        case boolean.false:
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_terlsu.ok(let next):
+            i.store  case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass========C==============================================================  let no_
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_std
+let inte gers = import integer
+
+loop
+    side_efdect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u32](0)
+     case boolean.false:
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass========C=============)=========OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO========================================  let no_lmuta ble[integers.u31](0)
+loop
+    match integer_one
+
+let middle_node = struct
+ _u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_array(boolean)
+    break enum[T]
+    a(T)
+    b(std.bool
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+  ean)
+ass========let std = import std
+
+let print

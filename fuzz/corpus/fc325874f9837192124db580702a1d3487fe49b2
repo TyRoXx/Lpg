@@ -1,0 +1,56 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = methd = import std
+
+let printable = interface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    oth  s
+
+impl printable2 for std.string
+    print(): std.string
+      let a = boolean.true
+let restring_equals("0", runtime(0)))
+assert(string_equals("0", runtime(1)))
+assert(string_equals("true", runtime(booleanR
+ VV]
+assert(string_equals("false", runtime(boolean.false)))
+
+let a  ble2 for d.unit_value)))
+assertod()
+
+let printable2 = interface
+    print(): std.string
+    oth  s
+
+impl printable2 for std.string
+    print(): std.string
+      let a = boolean.true
+let restring_equals("0", runtime(0)))
+assert(string_equals("0", runtime(1)))
+assert(string_equals("true", runtime(booleanR
+ VV]
+assert(string_equals("false", runtime(boolean.false)))
+
+let a  ble2 for d.unit_value)))
+assert(string_equals("0", pure(0)))
+assert(string_equals("1", pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assertntime(booleanR
+ VV]
+assert(string_equals("false", runtime(boolean.false
+
+impl linked_list_node for final_node
+    valuert(string_equa(): boolean
+        selufalls("

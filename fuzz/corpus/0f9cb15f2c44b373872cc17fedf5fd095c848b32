@@ -1,0 +1,32 @@
+t std = imleQ std = import std
+
+let linked_li t_node = interface              ion[linked_list_node]
+
+let final_node = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match bo     Q ue
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    brenode]
+        std.option[linked_list_node].none
+
+let m]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]111111111111111111ak
+  1  

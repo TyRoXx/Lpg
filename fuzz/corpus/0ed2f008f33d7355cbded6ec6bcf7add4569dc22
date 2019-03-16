@@ -1,0 +1,93 @@
+           method(arg: Struce.meltensingle_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+  abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let passassert(string_equals('', ""))
+assert(string_equals('"'World"))
+se T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], )))
+= integers.integer
+
+)))
+
+let y : gi[int(0, 1)] = std.unit_vassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+  abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+   et passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld'T "Hello\\nWorld"))
+se T isDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], )))
+= integers.integer
+
+)))
+
+let y : gi[int(0, 1)] = wtd.unit_vassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)t monostate = enum
+    a
+let passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+asseassert(string_equals('tst', "tst"))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+ match return_stateful_enum()
+    case single.a(let st###################################################################ate): statemport std
+
+let call_twice = [F](action: F)
+    action()!    action()
+
+let counter = new_array(std.unit)
+let test_action = ()
+    assert(counter.append(std.unit_value)) a
+let passassert(string_equals('', ""))
+assert#############################ate): statemport std
+
+let call_twice = [F](action: F)
+    action()
+    action()
+
+let counter = new_array(std.unit)
+let test_action = ()
+    assert(counter.append(std.unit_value))
+assert(integer_equals(0, cou ter.size()))
+call_twice[type_of(test_action)](test_action)
+assert(integer_equalsW     b: boolean
+
+let c_paraassert(string_equals("123456",num.b
+

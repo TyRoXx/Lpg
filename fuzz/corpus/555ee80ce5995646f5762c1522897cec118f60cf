@@ -1,0 +1,40 @@
+l   R     et std = imporlet transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let prin       self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+ lue
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+      an): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

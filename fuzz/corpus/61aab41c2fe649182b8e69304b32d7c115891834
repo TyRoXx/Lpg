@@ -1,0 +1,113 @@
+d.option[stri xng].some(let element): string_equals(element, "456")
+    case std.option[string].noner once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit)
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let makconversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_        interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+assert(match a.load(2)
+    case std.optionrt(string_equals("false", b                                                                                                                             .transform(std.boolean.f.f: boversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: b
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.e_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+ass = struct
+    i: conversion_test_interface
+
+let conveolean.falsnum
+    a(std.unit(((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((((()
+let x = usn.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{std.e_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conversion_test = struct
+    i: conversion_test_interface
+
+let conversion = conversion_test{s: boolean.false
+)
+
+ass = struct
+    i: conversion_test_i!nterface
+
+let conversion = conversion_test{std.uni", stat\)
+let make_runtime_string = (value:ace
+    method(): std.boolean
+impl conver?ion_test_interface for std.unit
+    method(): std.boolean
+        std.boolean.true
+let conring = (value:ace
+    method(): std.booleaan.true
+let conversion_tesl      default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit = struct
+    i: conversit
+    inli
