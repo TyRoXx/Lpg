@@ -958,14 +958,14 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         case token_comment:
         {
             pop(parser);
-            char const multi_line_comment_start[2] = "/*";
+            char const multi_line_comment_start[2] = {'/', '*'};
             ASSUME(multi_line_comment_start[0] == head.content.begin[0]);
             ASSUME(head.content.length >= LPG_ARRAY_SIZE(multi_line_comment_start));
             unicode_view content = unicode_view_create(head.content.begin + LPG_ARRAY_SIZE(multi_line_comment_start),
                                                        head.content.length - LPG_ARRAY_SIZE(multi_line_comment_start));
             if (head.content.begin[1] == multi_line_comment_start[1])
             {
-                char const multi_line_comment_end[2] = "*/";
+                char const multi_line_comment_end[2] = {'*', '/'};
                 if ((content.length >= LPG_ARRAY_SIZE(multi_line_comment_end)) &&
                     !memcmp((content.begin + content.length - LPG_ARRAY_SIZE(multi_line_comment_end)),
                             multi_line_comment_end, LPG_ARRAY_SIZE(multi_line_comment_end)))
