@@ -1,0 +1,41 @@
+d   lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+i                                                                         nit]et std = impor:
+      lo  boean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std. case using   boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match uskng_global[booleboolean
+let uan, stnot(a.store(0, std.boolean.true)))
+assert(not(a.store(1, std.boolean.true)))
+assert(not(a.store(2, al[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match uskng_global[booleboolean
+let uan, stnot(a.store(0, std.boolean.true)))
+assert(not(a.store(1, std.boolean.true)))
+assert(not(a.store(2, std.boolean.true))y = [T](from: std.array[T], to: std.array[T]): std.unit
+    match integer_equals(from.size(), to.size())t_instance.a)
+
+let u = struct
+    a: t
+    b: std.
+isnt rg  ance = u{t{boolean.true}, "abc", 0}
+asslet std = impor64, right: int   

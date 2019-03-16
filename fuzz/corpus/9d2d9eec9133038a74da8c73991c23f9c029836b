@@ -1,0 +1,20 @@
+l        "? import std
+
+/*use a captured variable in a compilelet m = boolean
+let f5 = ()
+    let f6 = ()
+        let a t b = 23
+let h = ()
+    side_effect()
+ b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!let(std = import std,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,poring
+    y: boolean
+let ")))
+assert(not(a.store(1, "")))

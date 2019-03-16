@@ -1,0 +1,56 @@
+()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+      t(0, 12=)
+    v! std.string
+//on uc yanest generic functit(st    string_equa side_                          case std.boolean.false: "false"
+
+effect()
+    ()
+      t(0, 12=)
+    v! std.string
+//on uc yanest generic functions as expected
+let f = [t helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f        
+    [U]std
+
+let helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest gels("abc", s)let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+/
+)
+/ case taken
+///////////////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        bool
+let t"o_params("helloean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        bool

@@ -1,0 +1,14 @@
+l
+    b
+    c
+let pass&_t_tristate(tristate.a)
+    case tristate.a: bb)
+    case tristate.a: b:olean.false
+    case tristate.b: boolean.true
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.c)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.false
+    case tristate.c: boolean.true
+)

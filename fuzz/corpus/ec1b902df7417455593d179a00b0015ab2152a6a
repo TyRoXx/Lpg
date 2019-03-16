@@ -1,0 +1,15 @@
+l 
+   ptd = import std
+
+let producer = interface[Output]
+    pr= [or]()
+    assert(integer_eq@uals(0,{{{{{{{{{{{_equals(1, or(0,   assert(integer_e1ua                                                r(1, ))1)
+ 6   ssert(integer_equals(1, or(0, 1)))
+    asserW  (M=_     uals(1, or(1, 0)))
+    let max = 18446744073709551616
+   assert(integer_equals(1, or(0, 1)))
+    asserW  (M=_     uals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(integer_equals(max,std
+let antegers =oim prt integer
+let integer ls(1, or(1, 1))_equa covee!)!sr!!!!!!!!!!

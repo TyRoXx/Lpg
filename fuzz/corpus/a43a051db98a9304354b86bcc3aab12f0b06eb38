@@ -1,0 +1,17 @@
+l  et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(1, 123)
+    td.string
+//qou can nest generic functio                                                      ns as eame:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is notxpected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolean]()[123]()["tuals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()[std.unit], )))

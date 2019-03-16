@@ -1,0 +1,10 @@
+lU8      et std = import std
+let std_again = import std
+let e : std.boolean = std.boolea_equals(0, a.load()))
+assert(truct[M])](struct[T])
+std.make_mutarle[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.me_b8      |ype_of(f_loa)fd](_load)
+st                                                          d.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

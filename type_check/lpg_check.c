@@ -3031,19 +3031,25 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
     evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, interface_, NULL);
     if (!interface_evaluated.has_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
     if (!interface_evaluated.compile_time_value.is_set)
     {
-        LPG_TO_DO();
+        emit_semantic_error(state, semantic_error_create(
+                                       semantic_error_expected_compile_time_type, expression_source_begin(interface_)));
+        return evaluate_expression_result_empty;
     }
     if (interface_evaluated.compile_time_value.value_.kind != value_kind_type)
     {
-        LPG_TO_DO();
+        emit_semantic_error(state, semantic_error_create(
+                                       semantic_error_expected_compile_time_type, expression_source_begin(interface_)));
+        return evaluate_expression_result_empty;
     }
     if (interface_evaluated.compile_time_value.value_.type_.kind != type_kind_interface)
     {
-        LPG_TO_DO();
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_expected_interface, expression_source_begin(interface_)));
+        return evaluate_expression_result_empty;
     }
 
     generic_closures const closures = find_generic_closures_in_impl(state, tree);

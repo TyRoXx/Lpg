@@ -1,0 +1,7 @@
+let always_return_from_atch = (arg: boolean)
+    match arg
+        case booletrue:
+            return 2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+assert(integer_equals(2, always_retu@n_from_match(boolean.true)))

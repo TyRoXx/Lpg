@@ -1,0 +1,33 @@
+l Z let std =[boolean].a(let s):
+        boolealn.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessiun Etime_string = (arg: std.str  	  as
+let match_return_implici"+      t_type = (arg: boolean)
+    match arg
+        case test_interface = interface
+    m(): boolean
+impl test_interface for std.stboolean.true:
+            return "alet return_runtime_string = (arg: std.string)
+    side_weffect()
+   (return concat("abc", arg)
+assert(string_e  quals("abcdef"T return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[2]()[std.ufi .t])))
+assert(t      !     t]))
+assert(type_equarface[Struct]
+    method(a// test inteistate(trista         se boolean.true: "true"
+ ace[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].d.boolean.true})
+assert(f.l element): string_equals(element, "456")
+    case std.option[string].noner oncussert(string_equals("unit", pure(std.unit_value)))
+assert(string_equals("0"O_pure(0)))
+assert(string_equals("1", pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure                            
