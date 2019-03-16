@@ -3962,8 +3962,6 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         &lambda_checking, &ignored_instructions,
         lambda_create(generic_parameter_list_create(NULL, 0), original.header, original.result, original.source), NULL,
         optional_function_id_create(this_lambda_id));
-    ASSUME(evaluated.compile_time_value.value_.function_pointer.code == this_lambda_id);
-    ASSUME(!evaluated.compile_time_value.value_.function_pointer.external);
     instruction_sequence_free(&ignored_instructions);
     local_variable_container_free(lambda_checking.local_variables);
     if (lambda_checking.register_compile_time_values)
@@ -3972,10 +3970,6 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     }
     if (!evaluated.has_value)
     {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
         if (argument_types)
         {
             deallocate(argument_types);
@@ -3994,6 +3988,8 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     {
         LPG_UNREACHABLE();
     }
+    ASSUME(evaluated.compile_time_value.value_.function_pointer.code == this_lambda_id);
+    ASSUME(!evaluated.compile_time_value.value_.function_pointer.external);
 
     if (argument_types)
     {

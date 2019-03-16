@@ -1621,6 +1621,17 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 15))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let f = [T](): u\n"
+                                               "f[std.unit]",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

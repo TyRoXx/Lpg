@@ -1,0 +1,20 @@
+let  d = implet algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of*handler_a)](0, 0, handler_a)
+
+l*et true_predicat"1"
+      std.u*nit_value
+
+impl printable2 for std.unit
+    pst", p.load()))
+p.store("123")
+asng_equals("test",)
+ p2.load()))
+p2tso.1.load()))
+p2tso.re("value: T): st0)
+assert(integer_equals(0, n.load = impo_arrayrt std
