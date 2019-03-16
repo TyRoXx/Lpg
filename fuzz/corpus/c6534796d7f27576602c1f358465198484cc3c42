@@ -1,0 +1,63 @@
+                                                          l        etry                                                                                     t s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+assert(u_instance.l t std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed    let s = print()
+    s
+
+let runtime = (a: printable4)
+    silean
+let multi = enum
+    a(si_not = !foolean.true
+        let cover_interface = interface
+                                 m(): boolean
+        impl cover_interface for boolean
+            m(): boodean
+                solean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct_runtime = (input: integers.u64): integers.u64
+    not_u64#std.runtime_value[integers.u64].element)
+let access_paramete(input))
+
+test_not[not_u64_runtime]()
+r_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)
+    arg
+assert(match pass_tristate(tristate.a)
+  re)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"ab888888888888888888888888888888888888888888888888888888888c", boolean           h rets_uattrneful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let mult{V      i = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    assert(intetc8h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empt              

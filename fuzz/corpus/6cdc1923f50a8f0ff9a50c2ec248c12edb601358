@@ -1,0 +1,88 @@
+_        __aslet std = import ssert(booletd
+
+let requain.t e : std.boolean = std.boolean.true
+lestring_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()WVu .store(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+assert(integer_equals(0, a.load()))
+assert(truct[M])](struct[T])
+std.make_mutable[type_of([T]() Tsert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[stdhad a bug that generated garbage code o.uniut of this:
+let nestlL        = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effecs(make_enum[1]()[std.unit], make_enum[2]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unructure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+it]
+//the type checker once ))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[stdhad a bug that generated garbage code o.uniut of this:
+let nestlL        = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timlean.true)(ile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boo  an)
+    side_ef.unit_value))
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captures something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true) 
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(capture_twice())
+                                                                  assert(t   t pass_tristate = (arg: tristate)
+    arg
+assert(matchlet std = import std
+let integers = import integer
+  t integer = integers.integer
+let u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(18446744073709551614, not(1)))
+    *ssert(integer_equals(0, not(max)))
+    assert(integer_equals(1, not(184467440737095(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+)   for(): std.unit
+    goto(): std.unit
+    if(): st

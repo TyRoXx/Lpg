@@ -1281,28 +1281,26 @@ static conversion_result convert(function_checking_state *const state, instructi
     switch (to.kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
+    case type_kind_generic_enum:
+    case type_kind_generic_interface:
+    case type_kind_generic_lambda:
     case type_kind_enum_constructor:
     case type_kind_enumeration:
     case type_kind_function_pointer:
+    case type_kind_method_pointer:
     case type_kind_lambda:
     case type_kind_string:
     case type_kind_unit:
     case type_kind_structure:
     case type_kind_type:
+    case type_kind_host_value:
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch, original_source));
         conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
 
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-    case type_kind_method_pointer:
     case type_kind_tuple:
-    case type_kind_generic_enum:
-    case type_kind_generic_interface:
         LPG_TO_DO();
 
     case type_kind_integer_range:

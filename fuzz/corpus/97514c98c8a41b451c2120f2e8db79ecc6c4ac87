@@ -1,0 +1,17 @@
+l     ^td = import std
+let std_again = import std
+let e : std.boolng_etd.array[std.unit]](nev                                       )            alue) std.mak dmutable[host_value   mutable[type_of(interface[ d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().mt].some)
+std.make_[T])
+std.maoe_mutable[std.string]("test")
+std.make_oad
+std.make_mutable[type    _of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.   Zunit_value
+std.make_ake_runtime_.load)
+let lambda = () std.   Zunit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

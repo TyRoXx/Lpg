@@ -1,0 +1,9 @@
+// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_stringng(4294967294)))
+
+//run_time evaluation*
+let test_integer_to_?triinput)
+assert(string_equals("0", test_integer_to_string(0)))
+assert(string_equals("2", test_integer_to_string(2)))
+ass t(r_to_string(2147483647)))
