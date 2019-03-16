@@ -1,0 +1,33 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================roducer[std.boolean] = dummy{}
+a  T (   b(std.boolean)
+ass=================================(========================================================ert(match usingmpl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================================================================<========ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproducee std.boolean.true: "tcod^uce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transfomrer[std.b;olean, std.string] for dummy
+=========================================================ert(match usingmpl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================================================================<========ert(match using_global[boole    produce()
+        std.boo=============<= a : produproduce())
+
+impl transformer[std.b;olean, std.string] for dummy
+    transfo  W   
+: std.boolean): std.string
+        match                an nest generic functions as expected
+let f = [T]()
+    [U]()
+          case  [V](s)t

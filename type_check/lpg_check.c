@@ -2736,19 +2736,15 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
                          optional_value_create(value_from_type(type_from_interface(id))), into);
     }
 
-    method_description *const methods = allocate_array(element.method_count, sizeof(*methods));
+    method_description *const checked_methods = allocate_array(element.method_count, sizeof(*checked_methods));
+    function_id checked_method_count = 0;
     for (size_t i = 0; i < element.method_count; ++i)
     {
         interface_expression_method const method = element.methods[i];
         evaluated_function_header const header = evaluate_function_header(state, function, method.header);
         if (!header.is_success)
         {
-            for (size_t k = 0; k < i; ++k)
-            {
-                method_description_free(methods[k]);
-            }
-            deallocate(methods);
-            return evaluate_expression_result_empty;
+            continue;
         }
         ASSUME(header.return_type.is_set);
         for (size_t j = 0; j < method.header.parameter_count; ++j)
@@ -2759,24 +2755,24 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         {
             deallocate(header.parameter_names);
         }
-        for (size_t k = 0; k < i; ++k)
+        for (size_t k = 0; k < checked_method_count; ++k)
         {
             if (unicode_view_equals(
-                    unicode_view_from_string(methods[k].name), unicode_view_from_string(method.name.value)))
+                    unicode_view_from_string(checked_methods[k].name), unicode_view_from_string(method.name.value)))
             {
                 emit_semantic_error(
                     state, semantic_error_create(semantic_error_duplicate_method_name, method.name.source));
             }
         }
-        methods[i] = method_description_create(unicode_view_copy(unicode_view_from_string(method.name.value)),
-                                               tuple_type_create(header.parameter_types, method.header.parameter_count),
-                                               header.return_type.value);
+        checked_methods[checked_method_count] = method_description_create(
+            unicode_view_copy(unicode_view_from_string(method.name.value)),
+            tuple_type_create(header.parameter_types, method.header.parameter_count), header.return_type.value);
+        checked_method_count += 1;
     }
 
     state->root->interfaces_defined[id] = true;
-    state->program->interfaces[id].methods = methods;
-    state->program->interfaces[id].method_count =
-        /*TODO avoid truncation safely*/ (function_id)element.method_count;
+    state->program->interfaces[id].methods = checked_methods;
+    state->program->interfaces[id].method_count = checked_method_count;
 
     value const result = value_from_type(type_from_interface(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));

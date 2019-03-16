@@ -1,0 +1,46 @@
+let std = import std
+let es = import ecmascriort  assert(match host.import_string(exported)
+        ct(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+       ssert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_integer(5), length)
+        case option[host_value].none:
+         ng(exported)
+        case option[std.string].some(let content):
+            string_equals("hello", conte.export_string("hello")
+    let arguments = new_array(host_value)
+    assert(arguments.append(host.export_integer(0)))
+  xport_integer(104)))
+
+let test_import_integer = (host: es.host)
+    let zero = host.export_integer(0)
+    assert(match host.import_integer(zero)
+        case option[es.integer].some(let value):
+   (        integer_equals(value, 0)
+        case option[es  nteger].none:
+            boolean.false
+)
+    let one = host.export_integer(2)
+    as sert(match host.import_integer(one)
+        case option[es.integer].some(let value)D
+            integtring(host)
+    test_read_property(host)
+    test_export_integer(host)
+    test_undefined(host)
+    test_call_method(host)
+    test_import_integer(host)
+    test_eger(host)
+    test_undefined(host)
+    test_call_method(host)
+    test_import_integer(host)
+    test_equals(host)

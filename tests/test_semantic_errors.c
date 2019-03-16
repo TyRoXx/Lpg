@@ -1580,6 +1580,19 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_unknown_element, source_location_create(2, 22))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let std = import std\n"
+                                               "let i = interface\n"
+                                               "    invalid_method(): u\n"
+                                               "impl i for std.unit\n"
+                                               "let a : i = std.unit_value",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }
