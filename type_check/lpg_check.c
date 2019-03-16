@@ -604,6 +604,15 @@ check_function(program_check *const root, function_checking_state *const parent,
     evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
     if (!body_evaluated.has_value)
     {
+        if (!body_evaluated.always_returns && !explicit_return_type.is_set)
+        {
+            register_id const return_value_goes_into = allocate_register(&state.used_registers);
+            add_instruction(&body_out, instruction_create_literal(literal_instruction_create(
+                                           return_value_goes_into, value_from_unit(), type_from_unit())));
+            register_id const unit_goes_into = allocate_register(&state.used_registers);
+            add_instruction(&body_out, instruction_create_return(
+                                           return_instruction_create(return_value_goes_into, unit_goes_into)));
+        }
         return finish_function_check(state, type_from_unit(), body_out);
     }
 

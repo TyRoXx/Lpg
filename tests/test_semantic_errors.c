@@ -148,7 +148,7 @@ void test_semantic_errors(void)
             simple_check("let v = match a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -197,7 +197,7 @@ void test_semantic_errors(void)
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -209,7 +209,7 @@ void test_semantic_errors(void)
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -344,7 +344,7 @@ void test_semantic_errors(void)
             simple_check("let x = u[boolean]\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -394,7 +394,9 @@ void test_semantic_errors(void)
         REQUIRE(checked.function_count == 1);
         instruction const expected_body_elements[] = {
             instruction_create_global(0), instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
-            instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
+            instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
+            instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
+            instruction_create_return(return_instruction_create(3, 4))};
         instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
@@ -427,7 +429,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = w\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -466,7 +468,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = w.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -487,7 +489,7 @@ void test_semantic_errors(void)
             simple_check("let v = assert.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -509,7 +511,7 @@ void test_semantic_errors(void)
             simple_check("let v = \"\".a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -519,7 +521,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = 1.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -570,7 +572,7 @@ void test_semantic_errors(void)
             simple_check("let v = int(0, 1).a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -902,7 +904,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = s{}\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1298,7 +1300,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean.something)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1309,7 +1311,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean.true.true)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1320,7 +1322,7 @@ void test_semantic_errors(void)
             simple_check("assert(\"true\")", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1330,7 +1332,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert(2)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1340,7 +1342,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert(assert)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1351,7 +1353,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1362,7 +1364,7 @@ void test_semantic_errors(void)
             simple_check("assert(side_effect())", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1372,7 +1374,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert()", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length == 0);
+        REQUIRE(checked.functions[0].body.length > 0);
         checked_program_free(&checked);
     }
     {
@@ -1564,7 +1566,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#if 0
     {
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(1, 4))};
@@ -1579,7 +1580,6 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
-#endif
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }
