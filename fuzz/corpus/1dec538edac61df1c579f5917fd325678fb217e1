@@ -1,0 +1,106 @@
+l           et std = import std
+
+      let printable = inter other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equt printable = interface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.truit_value)))
+aface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("                    &                                                 a     a2.ssert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equt printable = interface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equa W]", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0",ring_equals("1", runtime(1)))
+assert(string_equals(("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", rug
+let f4 = (printed: pristring
+        self
+    other_)
+
+assuals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_v(alue)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a4 : printable2 = "abc"
+assert(string_equals("                    &                                                 a     a2.print()))
+
+let test_interface = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+ string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", rualue)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("0", runtime(1)))
+assert(string_equals(ntime("a")))
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equt printable = in erface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unitYS_
+  me( runtime("")))
+std.unit_value)))
+assert(stringther_method()
+assert(string_equals("123", h.print()))

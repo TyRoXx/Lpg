@@ -1,0 +1,30 @@
+d        .true
+
+let a : producer[(): std.uniterface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abs parameter = (const b:oolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let consducer = interface[Output]
+    et producer = interface[Output]                     
+    produce(): Output
+
+let   transformer = interface[From, To]
+    tr    astd.unit_valut])e)
+asse m: std.boolean
+let using_locEl = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_lite  _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstra  assert({integer_equa coverse)!!!!!!!!!!!!

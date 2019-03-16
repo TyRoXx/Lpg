@@ -1,0 +1,36 @@
+l        import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_retusn_explit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+me_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdef", return_runtime_uals(5, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdef", return_rest_interface for std.string
+    m(): boolean
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return booleplit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdef", return_runtime)
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdef", return_runtime_string("def")))
+
+let test_intee
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ce = (arg: std.string): test_interface
+   c  e_effect()
+    return arg
+assert(return_interface("abc").m())

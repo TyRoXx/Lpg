@@ -1,0 +1,54 @@
+l        et std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)]  = interface[T]
+    method(): std.string
+
+impl[S] gi[S]ufovvvvvvvvvvvvvvring_equals("0,1", y.method()))
+
+let z : gi["z"string_equals("*,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["ze] = std.unit_value
+assestd.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["ze] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i =e     ce
+    method(s) :td.boolean
+
+let gs = struct[T]
+    dummy:, 1)]{1}
+assert(u2.met    ))
+std.unit
+    megi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl fc%
+let gi = interface[T]
+    mestring_equals("0,0"N x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi[2z"string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl fotd.option[std.boolean].some(lat element): not(element)
+    case std.option[std.boolean].none: sud.boolean.false
+)
+
+assert(a.store(1     

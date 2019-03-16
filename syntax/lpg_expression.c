@@ -552,9 +552,9 @@ new_array_expression new_array_expression_clone(new_array_expression const origi
     return new_array_expression_create(expression_allocate(expression_clone(*original.element)));
 }
 
-sequence sequence_create(expression *elements, size_t length)
+sequence sequence_create(expression *elements, size_t length, source_location begin)
 {
-    sequence const result = {elements, length};
+    sequence const result = {elements, length, begin};
     return result;
 }
 
@@ -742,14 +742,7 @@ source_location expression_source_begin(expression const value)
         return value.source;
 
     case expression_type_sequence:
-        if (value.sequence.length > 0)
-        {
-            return expression_source_begin(value.sequence.elements[0]);
-        }
-        else
-        {
-            LPG_TO_DO();
-        }
+        return value.sequence.begin;
 
     case expression_type_declare:
         return value.declare.name.source;
@@ -1592,7 +1585,7 @@ sequence sequence_clone(sequence const original)
     {
         elements[i] = expression_clone(original.elements[i]);
     }
-    return sequence_create(elements, original.length);
+    return sequence_create(elements, original.length, original.begin);
 }
 
 expression expression_from_binary_operator(binary_operator_expression value)

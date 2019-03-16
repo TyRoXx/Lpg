@@ -111,6 +111,7 @@ static void parse_optional_space(expression_parser *const parser)
 
 static sequence parse_sequence(expression_parser *parser, size_t indentation)
 {
+    source_location const begin = peek(parser).where;
     expression *elements = NULL;
     size_t element_count = 0;
     for (;;)
@@ -151,10 +152,10 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
         }
 
         case less:
-            return sequence_create(elements, element_count);
+            return sequence_create(elements, element_count, begin);
         }
     }
-    return sequence_create(elements, element_count);
+    return sequence_create(elements, element_count, begin);
 }
 
 static expression_parser_result const expression_parser_result_failure = {

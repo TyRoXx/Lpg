@@ -1,0 +1,72 @@
+lement: integer): std.unit
+    assert(integer_equals(0, element)assert(a.store(1, std.boolean.true))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.booleanatype = new_array(std.boolean)
+assert(integer_equals(0, a.size()))
+assert(not(a.store(0, std.boolean.true)))
+assert(not(a.store(1,  d.boolean.true)))
+assert(not(a.store(2, std.boolean.true)))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let ele   VE_td.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.true))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(not(a.store(2, std.boolean.true)))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): eleemnt
+    case std.option[std.boolean].none: std.boolean.f m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+assert(integer_equals(3, n.load()))
+n.store(0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p =  W"test")
+assert(string_equals("test", p.loa.svalue)
+assert(test_single(single.a(make_runtime_string("abc"))))
+as3       .not(test_single(let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)  
+  match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abcay_type = std.array[string]
+let a : array_type = new_array(string)
+assert(integer_equals(0, a.size()))
+assert(n", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_|||||||||||||||||||||||||||||||||||||single(single.a(mak        e_string("abc")))singleX	      ))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caseot(a.store(0, " single.a(let state): state
+))
+
+let structure = struct
+    ?: std.string                                                                                                                                                     

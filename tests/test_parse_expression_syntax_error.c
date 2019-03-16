@@ -65,7 +65,7 @@ void test_parse_expression_syntax_error(void)
                           expression_allocate(expression_from_sequence(sequence_create(
                               expression_allocate(expression_from_identifier(identifier_expression_create(
                                   unicode_string_from_c_str("a"), source_location_create(1, 8)))),
-                              1))),
+                              1, source_location_create(1, 0)))),
                           source_location_create(0, 0)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("()\n"
@@ -630,13 +630,13 @@ static void test_function(void)
             parse_error_create(parse_error_invalid_token, source_location_create(1, 4))};
         expression expected = expression_from_declare(declare_create(
             identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(0, 4)), NULL,
-            expression_allocate(expression_from_lambda(
-                lambda_create(generic_parameter_list_create(NULL, 0),
-                              function_header_tree_create(
-                                  NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
-                                               unicode_string_from_c_str("unit"), source_location_create(0, 12))))),
-                              expression_allocate(expression_from_sequence(sequence_create(NULL, 0))),
-                              source_location_create(0, 8))))));
+            expression_allocate(expression_from_lambda(lambda_create(
+                generic_parameter_list_create(NULL, 0),
+                function_header_tree_create(
+                    NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
+                                 unicode_string_from_c_str("unit"), source_location_create(0, 12))))),
+                expression_allocate(expression_from_sequence(sequence_create(NULL, 0, source_location_create(1, 0)))),
+                source_location_create(0, 8))))));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = (): unit\n"
                                                                                                    "    ?"));

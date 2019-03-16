@@ -145,7 +145,7 @@ void test_semantics(void)
     }
     {
         structure const empty_global = structure_create(NULL, 0);
-        sequence root = sequence_create(NULL, 0);
+        sequence root = sequence_create(NULL, 0, source_location_create(0, 0));
         unicode_string const module_directory = find_builtin_module_directory();
         module_loader loader =
             module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);

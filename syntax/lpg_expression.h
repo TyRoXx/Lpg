@@ -186,6 +186,7 @@ typedef struct sequence
 {
     expression *elements;
     size_t length;
+    source_location begin;
 } sequence;
 
 sequence sequence_clone(sequence const original);
@@ -297,7 +298,7 @@ void new_array_expression_free(new_array_expression const freed);
 bool new_array_expression_equals(new_array_expression const left, new_array_expression const right);
 new_array_expression new_array_expression_clone(new_array_expression const original);
 
-sequence sequence_create(expression *elements, size_t length);
+sequence sequence_create(expression *elements, size_t length, source_location begin);
 void sequence_free(LPG_NON_NULL(sequence const *value));
 declare declare_create(identifier_expression name, expression *optional_type, LPG_NON_NULL(expression *initializer));
 void declare_free(declare const *value);

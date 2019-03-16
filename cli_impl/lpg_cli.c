@@ -172,7 +172,7 @@ static optional_sequence make_optional_sequence(sequence const content)
     return result;
 }
 
-static optional_sequence const optional_sequence_none = {false, {NULL, 0}};
+static optional_sequence const optional_sequence_none = {false, {NULL, 0, {0, 0}}};
 
 optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source)
 {

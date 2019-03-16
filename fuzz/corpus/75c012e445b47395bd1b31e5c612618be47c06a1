@@ -1,0 +1,16 @@
+l   et std = ie.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]uals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let struatu    struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(stLructure)
+    c(std.unit)
+    d(se
+)
+
+//the type checker once had a bug that generated garbage code out of thi

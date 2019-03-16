@@ -873,7 +873,7 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_type_mismatch, source_location_create(5, 8))};
+            semantic_error_create(semantic_error_type_mismatch, source_location_create(5, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let i = interface\n"

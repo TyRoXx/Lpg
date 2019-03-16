@@ -1,0 +1,5 @@
+assert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+asse""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""rt(string_equals('Hello\nWorld', "Hello\\nWorld"))

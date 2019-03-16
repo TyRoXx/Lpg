@@ -1,0 +1,19 @@
+let a = boolean.true
+let result : int(1, 2) = match a
+    case boolean.false:
+        0
+    case boolean.true:
+        2
+assert(integer_equals(2, result))
+
+let runtime_var = ()
+    side_effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime_var()
+    case boolean.true:
+        40
+    case boolean.false:
+        1
+
+assert(integer_equals(40, something))

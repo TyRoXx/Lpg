@@ -2104,7 +2104,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 define_register_debug_name(state, placeholder_where, unicode_view_copy(maybe_pattern.placeholder_name));
 
                 action_evaluated = check_sequence_finish(
-                    state, &action, sequence_create(case_tree.action, 1), previous_number_of_variables);
+                    state, &action, sequence_create(case_tree.action, 1, expression_source_begin(*case_tree.action)),
+                    previous_number_of_variables);
                 break;
             }
 

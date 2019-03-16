@@ -70,8 +70,8 @@ void test_expression(void)
     {
         expression *elements_left = allocate_array(1, sizeof(*elements_left));
         elements_left[0] = expression_from_break(source_location_create(0, 0));
-        test_not_equal(expression_from_sequence(sequence_create(elements_left, 1)),
-                       expression_from_sequence(sequence_create(NULL, 0)));
+        test_not_equal(expression_from_sequence(sequence_create(elements_left, 1, source_location_create(0, 0))),
+                       expression_from_sequence(sequence_create(NULL, 0, source_location_create(0, 0))));
     }
     {
         expression *elements_left = allocate_array(1, sizeof(*elements_left));
@@ -79,8 +79,8 @@ void test_expression(void)
         expression *elements_right = allocate_array(1, sizeof(*elements_right));
         elements_right[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 0)));
-        test_not_equal(expression_from_sequence(sequence_create(elements_left, 1)),
-                       expression_from_sequence(sequence_create(elements_right, 1)));
+        test_not_equal(expression_from_sequence(sequence_create(elements_left, 1, source_location_create(0, 0))),
+                       expression_from_sequence(sequence_create(elements_right, 1, source_location_create(0, 0))));
     }
     {
         match_case *left = allocate_array(1, sizeof(*left));

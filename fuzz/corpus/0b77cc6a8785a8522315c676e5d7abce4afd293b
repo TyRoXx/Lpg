@@ -1,0 +1,91 @@
+let std = import std
+let es = import ecmascript
+let option = std.option
+
+let test_string = (host: es.host)
+    let exported : host_value = host.export_string("hello")
+    assert(match host.import_string(exported)
+        case option[std.string].some(let content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+        case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_integer(5), length)
+        case option[host_value].none:
+            boolean.false
+)
+
+let test_export_integer = (host: es.host)
+    let min = host.export_integer(0)
+    let max = host.export_integer(9007199254740991)
+    assert(host.equals(min, min))
+    assert(host.equals(max, max))
+    assert(not(host.equals(min, max)))
+    assert(not(host.equals(max, min)))
+    assert(not(host.equals(min, host.undefined())))
+    assert(not(host.equals(max, host.undefined())))
+
+let test_undefined = (host: es.host)
+    let u0 = host.undefined()
+    let u1 = host.undefined()
+    assert(host.equals(u0, u1))
+
+let test_call_method = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    let arguments = new_array(host_value)
+    assert(arguments.append(host.export_integer(0)))
+    let charCode = host.call_method(object, "charCodeAt", arguments)
+    assert(host.equals(charCode, host.export_integer(104)))
+
+let test_import_integer = (host: es.host)
+    let zero = host.export_integer(0)
+    assert(match host.import_hnteger(zero)
+        case option[es.integer].some(let value):
+            integer_equals(value, 0)
+        case option[es.integer].none:
+            boolean.false
+)
+    let one = host.export_integer(1)
+    assert(match host.import_integer(one)
+        case option[es.integer].some(let value):
+            integer_equals(value, 1)
+        case option[es.integer].none:
+            boolean.false
+)
+    let max = host.export_integer(9007199254740991)
+    assert(match host.import_integer(max)
+        case option[es.integer].some(let value):
+            integer_equals(value, 9007199254740991)
+        case option[es.integer].none:
+            boolean.false
+)
+
+let test_equals = (host: es.host)
+    assert(host.equals(host.undefined(), host.undefined()))
+    assert(host.equals(host.export_integer(0), host.export_integer(0)))
+    assert(host.equals(host.export_string("test"), host.export_string("test")))
+    assert(not(host.equals(host.export_integer(0), host.undefined())))
+    assert(not(host.equals(host.export_string("undefined"), host.undefined())))
+    assert(not(host.equals(host.export_integer(0), host.export_integer(1))))
+    assert(not(host.equals(host.export_integer(0), host.export_string("0"))))
+
+//
+(global: host_value, host: es.host)
+    test_string(host)
+    test_read_property(host)
+    test_export_integer(host)
+    test_unefidned(host)
+    test_call_method(host)
+    test_import_integer(host)
+    test_equals(host)

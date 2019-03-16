@@ -266,7 +266,7 @@ static void test_new_lines(void)
                                                                "    break");
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_break(source_location_create(2, 4));
-        expression loop_expression = expression_from_loop(sequence_create(elements, 1));
+        expression loop_expression = expression_from_loop(sequence_create(elements, 1, source_location_create(1, 0)));
 
         test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, NULL, 0};
         expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
@@ -304,7 +304,8 @@ static void test_lambdas()
         test_successful_parse(
             expression_from_lambda(lambda_create(
                 generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, result_expression),
-                expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                expression_allocate(
+                    expression_from_sequence(sequence_create(elements, 1, source_location_create(1, 0)))),
                 source_location_create(0, 0))),
             unicode_string_from_c_str("(): 1\n"
                                       "    1"),
@@ -329,7 +330,8 @@ static void test_lambdas()
             integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 4)));
         test_successful_parse(expression_from_lambda(lambda_create(
                                   generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
-                                  expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                                  expression_allocate(expression_from_sequence(
+                                      sequence_create(elements, 1, source_location_create(1, 0)))),
                                   source_location_create(0, 0))),
                               unicode_string_from_c_str("()\n"
                                                         "    1"),
@@ -348,7 +350,8 @@ static void test_lambdas()
         test_successful_parse(
             expression_from_lambda(
                 lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 1, NULL),
-                              expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                              expression_allocate(
+                                  expression_from_sequence(sequence_create(elements, 1, source_location_create(1, 0)))),
                               source_location_create(0, 0))),
             unicode_string_from_c_str("(a: type)\n"
                                       "    1"),
@@ -372,7 +375,8 @@ static void test_lambdas()
         test_successful_parse(
             expression_from_lambda(
                 lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(parameters, 2, NULL),
-                              expression_allocate(expression_from_sequence(sequence_create(elements, 1))),
+                              expression_allocate(
+                                  expression_from_sequence(sequence_create(elements, 1, source_location_create(1, 0)))),
                               source_location_create(0, 0))),
             unicode_string_from_c_str("(a: b, c: d)\n"
                                       "    1"),
@@ -530,10 +534,10 @@ static void test_match_cases(void)
         expression *case_0 = allocate_array(1, sizeof(*case_0));
         case_0[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 2), source_location_create(2, 8)));
-        cases[0] =
-            match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
-                                  integer_create(0, 1), source_location_create(1, 9)))),
-                              expression_allocate(expression_from_sequence(sequence_create(case_0, 1))));
+        cases[0] = match_case_create(
+            expression_allocate(expression_from_integer_literal(
+                integer_literal_expression_create(integer_create(0, 1), source_location_create(1, 9)))),
+            expression_allocate(expression_from_sequence(sequence_create(case_0, 1, source_location_create(2, 0)))));
         cases[1] =
             match_case_create(expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
                                   integer_create(0, 3), source_location_create(3, 9)))),
@@ -610,7 +614,7 @@ static void test_comment(void)
         elements[0] = expression_from_comment(
             comment_expression_create(unicode_string_from_c_str("Testing the comments"), source_location_create(1, 4)));
         elements[1] = expression_from_break(source_location_create(2, 4));
-        test_successful_parse(expression_from_loop(sequence_create(elements, 2)),
+        test_successful_parse(expression_from_loop(sequence_create(elements, 2, source_location_create(1, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    //Testing the comments\n"
                                                         "    break"),
@@ -623,7 +627,7 @@ static void test_loops(void)
     {
         expression *elements = allocate_array(1, sizeof(*elements));
         elements[0] = expression_from_break(source_location_create(1, 4));
-        test_successful_parse(expression_from_loop(sequence_create(elements, 1)),
+        test_successful_parse(expression_from_loop(sequence_create(elements, 1, source_location_create(1, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    break"),
                               false);
@@ -633,7 +637,7 @@ static void test_loops(void)
         elements[0] = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(1, 4)));
         elements[1] = expression_from_break(source_location_create(2, 4));
-        test_successful_parse(expression_from_loop(sequence_create(elements, 2)),
+        test_successful_parse(expression_from_loop(sequence_create(elements, 2, source_location_create(1, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    f\n"
                                                         "    break"),
@@ -644,7 +648,7 @@ static void test_loops(void)
         elements[0] = expression_from_identifier(
             identifier_expression_create(unicode_string_from_c_str("f"), source_location_create(1, 4)));
         elements[1] = expression_from_break(source_location_create(2, 4));
-        test_successful_parse(expression_from_loop(sequence_create(elements, 2)),
+        test_successful_parse(expression_from_loop(sequence_create(elements, 2, source_location_create(1, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    f\n"
                                                         "    break\n"),
@@ -654,8 +658,8 @@ static void test_loops(void)
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
         inner_loop[0] = expression_from_break(source_location_create(2, 8));
         expression *outer_loop = allocate_array(1, sizeof(*outer_loop));
-        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
-        test_successful_parse(expression_from_loop(sequence_create(outer_loop, 1)),
+        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1, source_location_create(1, 0)));
+        test_successful_parse(expression_from_loop(sequence_create(outer_loop, 1, source_location_create(2, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    loop\n"
                                                         "        break\n"),
@@ -665,9 +669,9 @@ static void test_loops(void)
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
         inner_loop[0] = expression_from_break(source_location_create(2, 8));
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
-        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1));
+        outer_loop[0] = expression_from_loop(sequence_create(inner_loop, 1, source_location_create(1, 0)));
         outer_loop[1] = expression_from_break(source_location_create(3, 4));
-        test_successful_parse(expression_from_loop(sequence_create(outer_loop, 2)),
+        test_successful_parse(expression_from_loop(sequence_create(outer_loop, 2, source_location_create(2, 0))),
                               unicode_string_from_c_str("loop\n"
                                                         "    loop\n"
                                                         "        break\n"

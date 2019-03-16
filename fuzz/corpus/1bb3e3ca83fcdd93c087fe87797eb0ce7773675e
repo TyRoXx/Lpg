@@ -1,0 +1,23 @@
+l c      ~et std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+   inng
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equals("", runtime("")))zassert(string_equals("a", runtime("aq")))
+assert(string_equals("unitYS_
+  Qe(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(se)))
+assert(string_etr))
+assert(string_equals("false", runtime(boolean.false))) 
+let a2 : printable2 =able2 for   Qunit
+    print()
+       rintls("123", h.prent_method_order{}
+h.other_metho(()
+assert(string_equals("123", h.print()))

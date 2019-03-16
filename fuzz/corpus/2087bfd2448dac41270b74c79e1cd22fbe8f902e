@@ -1,0 +1,55 @@
+/       _time e*valuation
+let d : tch
+    case 0: boolean.false
+    case 1: boolean.true
+    case 2: boolean.f integer_to_match
+    case 0: boolean.false
+    case 1: boolean.true
+ :   case 2: boolean.false
+    case 3: boolean.false
+
+asser   
+t(b))
+
+//runtime e|booleantime_ase 0: boolean.falseean.false
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+asser   
+t(b))
+        me e|booleantime_key()
+    case 0: boolean.false
+    case 2: boolean.fs 
+ela   case 2: boolean.t
+    case 1: boolean.true
+    case 2: boolean.f integer_to_match
+    case 0: boolean.false
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+asser   
+t(b))
+        me e|booleantime_key()
+    case 0: boolean.false
+    case 2: boolean.fs 
+ela   case 2: boolean.true
+ n.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runtime eval  o@
+lete_runtime_key = ()
+    sidt(match make_runtime_key()
+    cas 	0: boolean.false
+    case 2: boolean.fs 
+ela   case 2: boolean.true
+    case 3: bo|booleantime_key()
+    c case 2: boolean.fs 
+ela   case 2: boolean.true
+    case 3: boolean fale 3: boolean false
+)
+
