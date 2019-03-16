@@ -1,0 +1,52 @@
+l       ^td = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+ltd.let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([]) (TT)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(l)
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.makeber)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member)) 
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([]) (TT)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(l)
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([]) (TT)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

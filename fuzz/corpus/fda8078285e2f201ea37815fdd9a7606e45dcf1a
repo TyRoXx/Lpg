@@ -1,0 +1,29 @@
+l oet std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char$): std.unit
+    c ost(): std.unit
+    continue(): std.unit
+    default(): std.unilet std = import std
+
+// impl for generic t std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for()maginary()                                                                                    : std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): std.unit
+    _Thread_local(): s  .unit
+    _(): std.unit
+    ___(): std.unit
+let parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_mem): std.string
+
+impl[S] gi[S] for stber =d.unit
+    method(): g_equals( str

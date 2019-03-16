@@ -1,0 +1,111 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = _a.print
+    l                   et s = print()
+    s
+
+let runtime = (a: printable4)
+    side_eff,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z"print()
+        "0"
+    u  _u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+ \  method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i    
+terface
+    method(): std.boolea{{{{{{{{{{n
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+    i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = gs    match input
+            case std.bo[i

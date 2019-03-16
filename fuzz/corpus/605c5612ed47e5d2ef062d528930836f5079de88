@@ -1,0 +1,150 @@
+l  et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    c ost(): std.unit
+    continue(): std.unit
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): stface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): stce
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] 
+    signed(): std.unit
+    sizeof(): s|td.unit
+    static(9: std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomilet std = import std
+let in;egers = ubtract(std.runtime_value[int ;  xeger](0), 0)
+    case subtract_result.ok(let resultc(): std.unit
+    _Bool(): std.unit
+    _ggggggggggggggggggggggggggggggggggggggggggggg):
+        assert(integer_equals(0, result))
+    t(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(t
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): stce
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impool(): std.unit
+    _ggggggggggggggggggggggggggggggggggggggggggggg):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow   *                ggggggggggggggggggggggggggggggggggggggggggComplex(         )      e

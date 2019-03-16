@@ -1,0 +1,32 @@
+let std = import std
+.unit
+        std.unit_value
+
+imstring_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+uals("unit", runtime(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("false", runtim Wboolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals(^ bc", a1.print()))
+
+let test_interface = interface
+    method(a: boolea compile_time_impl.method(boolean.true, boolean.false).pri                                                      nt()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+impl printable2 for different_method_order
+    other_method(): std.uni        std.unit_value
+
+impl printable2 for std. rantable2 = different_methof_order{}
+h.other_method()
+assert(string_equals("123", h.print()))

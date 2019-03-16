@@ -1,0 +1,38 @@
+l  et std = import std
+let c_resault(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+le: std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))rray(boolean)
+man)
+assert(match using_global[boole    produce()
+    
+
+let y : gi[int(0, 1)] = std.unit_value
+asse    std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.srt(string_equals("0,1", y.method()))
+
+let    default(): std.unilet stdtring] for dummy
+    tr ansf=o

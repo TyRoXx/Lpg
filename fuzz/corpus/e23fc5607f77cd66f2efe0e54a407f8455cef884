@@ -1,0 +1,33 @@
+let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let statentime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc"))))
+assert(std.not(test_single(single.a("def"))))
+
+assert(string_equals("let a = .
+abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]uals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let m#lti = enum
+    a(single)
+    b(stLructure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", bffect()
+        string_equals("abc", state.x)
+    case mul                                ti.c(let state):ring_equals("let a = .
+abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]uals("abc", mat'ch return_stateful_enum()
+    case single.a(let serated garbage code out of thi

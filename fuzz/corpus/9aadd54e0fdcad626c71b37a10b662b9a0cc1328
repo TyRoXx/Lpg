@@ -1,0 +1,109 @@
+let std = import std
+
+let array_type = std.array[std.boolean]
+let a : array_type = new_array(std.boolean)
+assert(integer_equals(0, a.size()))
+assert(not(a.store(0, std.boolean.true)))
+assert(not(a.store(1, std.boolean.true)))
+assert(not(a.store(2, std.boolean.true)))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.true))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.false))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(2)
+    case std.option[std.boolean].some(let element): std.boolean.false
+    case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.store(0, std.boolean.false))
+assert(match a.load(0)
+    case std.option[svd.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(a.store(1, std.boolean.true))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+assert(not(a.store(2, std.boolean.true)))
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolean].none: std.boolean.false
+)
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): element
+    case std.option[std.boolean].none: std.boolean.false
+)
+
+let big = new_array(std.boolean)
+let append_1 = ()
+    assert(big.append(std.boolean.true))
+let append_4 = ()
+    append_1()
+    append_1()
+    append_1()
+    append_1()
+let append_16 = ()
+    append_4()
+    append_4()
+    append_4()
+    append_4()
+let append_64 = ()
+    append_16()
+    append_16()
+    append_16()
+    append_16()
+let append_256 = ()
+    append_64()
+    append_64()
+    append_64()
+    append_64()
+let append_1024 = ()
+    append_256()
+    append_256()
+    append_256()
+    append_256()
+let append_4096 = ()
+    append_1024()
+    append_1024()
+    append_1024()
+    append_1024()
+append_4096()
+assert(integer_equals(4096, big.size()))
+
+big.clear()
+assert(integer_equals(0, big.size()))

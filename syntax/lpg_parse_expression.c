@@ -958,18 +958,28 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         case token_comment:
         {
             pop(parser);
-            size_t end = head.content.length;
-            if (head.content.begin[1] == '*')
+            char const multi_line_comment_start[2] = "/*";
+            ASSUME(multi_line_comment_start[0] == head.content.begin[0]);
+            ASSUME(head.content.length >= LPG_ARRAY_SIZE(multi_line_comment_start));
+            unicode_view content = unicode_view_create(head.content.begin + LPG_ARRAY_SIZE(multi_line_comment_start),
+                                                       head.content.length - LPG_ARRAY_SIZE(multi_line_comment_start));
+            if (head.content.begin[1] == multi_line_comment_start[1])
             {
-                end -= 2;
+                char const multi_line_comment_end[2] = "*/";
+                if ((content.length >= LPG_ARRAY_SIZE(multi_line_comment_end)) &&
+                    !memcmp((content.begin + content.length - LPG_ARRAY_SIZE(multi_line_comment_end)),
+                            multi_line_comment_end, LPG_ARRAY_SIZE(multi_line_comment_end)))
+                {
+                    content.length -= LPG_ARRAY_SIZE(multi_line_comment_end);
+                }
             }
-            unicode_view const view = unicode_view_cut(head.content, 2, end);
 
-            comment_expression const comment = comment_expression_create(unicode_view_copy(view), head.where);
+            comment_expression const comment = comment_expression_create(unicode_view_copy(content), head.where);
 
             expression_parser_result const result = {1, expression_from_comment(comment)};
             return parse_callable_result_create(result, false);
         }
+
         case token_string:
         {
             pop(parser);

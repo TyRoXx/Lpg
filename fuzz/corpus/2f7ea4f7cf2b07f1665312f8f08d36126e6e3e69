@@ -1,0 +1,28 @@
+let std = imro spttd
+
+let f = (): std.unit
+    f()
+
+let g = (): std.un 
+ ti  side_effe   g()
+
+let h = ()ring_equals("4", k(std.booleanM   se)))
+
+let copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match integer_equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load      case std.boo copy_array_boolean = (from: std.array[s*d.boolean], to: std.array[std.boolean]): std.unit
+    match cnteger_equals(from.size(), to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.f                                                                                                                                                                  0                                                                       alpy_array_boolean = (from: std.rrrrrrrrrrrrarray[s*d.boolean], to: std.array[std.boolean]): std.uni      Mft
+    match m.looa(td.size())
+                case std.option[T].some(let element):
+                    assert(to.append(element))
+                    copy_array[T](from, tolet g = (): std.un 
+ ti  side_effe   g()
+
+let h = ()ring_eq    fail()
+copy_array[std.boolean](new_array(std.boolean), new_array(std.boolean))

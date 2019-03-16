@@ -113,4 +113,5 @@ void test_tokenize(void)
     test_invalid("/*Hello World*");
     test_invalid("/**");
     test_invalid("/");
+    test_invalid("/*a\n\b");
 }

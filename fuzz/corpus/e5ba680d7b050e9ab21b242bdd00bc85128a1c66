@@ -1,0 +1,53 @@
+  	  assert(boolean.false)ger_equals(0, element))
+algoritOOOOOOOOOOOOOOOOOh = (element: booledicate = (element: boolean): boolean, option.some(2)
+            t))
+algoritOOOOOOOOOOOOOOOOOhm.enumerate[type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+                               #                                                let std = import std
+let boolean = std.boolean
+
+let require   ake_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass u64 = integers.u64
+
+let test_not = [not]()
+    let max = 18446744073709551615
+    assert(integer_equals(max, not(0)))
+    assert(integer_equals(184467440    assert(integer_equals(1, not(18446744073709551614)))
+test_not[not_u64]()
+
+let not_u64_runtime = (input: integers.u64): integers.u6

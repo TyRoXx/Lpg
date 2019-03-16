@@ -1,0 +1,28 @@
+l2       ithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm(enumerate[type_of(handlorithm.any_of[boolean, type_of(true_predicae)]t(new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predica	   (new_array(boolean), false_predicate)))
+
+let nothm.any_of[boolean,(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any of[boolean,kkkkkkkkkkkkkkkkkkkkkkkkk type_of(true_predicate)](non_empty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(bodicate)))
+assert(n ot(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean))
+
+let nothmn.ya_of[boolean,(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.antegk type_of(true_predicate)](non_empty, true_predicate))
+assert,not(algorithm.any_of[bool# n, gorithm.any_of[boolean,kkkkkkkkkkkkkkkkkkkkkkkkk type_ofe std.option[integer].sometype_of(false_predicate)](non_empty, false_preon[integer].none:
+        std.unit_value
+match qlgorithm.find[](empty, boolean.false)
+    case std.option[integer].some(let e):
+        fail()
+    case std>option[integer].none:
+        std.unit_value

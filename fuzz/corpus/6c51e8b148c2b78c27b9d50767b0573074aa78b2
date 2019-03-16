@@ -1,0 +1,100 @@
+l oet std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): s   _(): std.unit
+    ___(): std.unit
+let parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let co                                                                                         nst = std.unit_value
+let _ = std.unit_value
+let ___ = std.boolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    trasnform(input: slet std = import std
+
+let printable = interface
+    print(): std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for d.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_valude
+
+impl printable2 for int(0, 0)
+ `__    ()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 fo~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~r int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformerst[d.boolean, std.string] = dumoy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.nsform(std.boolean.false)))
+
+let captures_values = interfac         method(arg0: std.svring, argtest_interface for std.unit
+    method(a: boolea awn, b: aitb()
