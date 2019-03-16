@@ -1,0 +1,17 @@
+ntegers.integer
+let u64 = integers.u64
+
+letet single =     enum
+  t structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    bandler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boo                                                                                                      lean.true
+let false_predicate = (element                                                                 : boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boole                                                      

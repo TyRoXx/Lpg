@@ -4,6 +4,7 @@
 #include "lpg_function_checking_state.h"
 #include "lpg_instruction.h"
 #include "lpg_instruction_checkpoint.h"
+#include "lpg_integer_set.h"
 #include "lpg_interpret.h"
 #include "lpg_local_variable.h"
 #include "lpg_standard_library.h"
@@ -1653,8 +1654,7 @@ static void deallocate_boolean_cases(match_instruction_case *cases, bool *cases_
     deallocate(cases_handled);
 }
 
-static void deallocate_integer_range_list_cases(match_instruction_case *cases, size_t const case_count,
-                                                integer_range_list integer_ranges)
+static void deallocate_integer_range_list_cases(match_instruction_case *cases, size_t const case_count)
 {
     for (size_t j = 0; j < case_count; ++j)
     {
@@ -1664,7 +1664,6 @@ static void deallocate_integer_range_list_cases(match_instruction_case *cases, s
     {
         deallocate(cases);
     }
-    integer_range_list_deallocate(integer_ranges);
 }
 
 static void deallocate_cases(match_instruction_case *cases, size_t const case_count)
@@ -2278,14 +2277,14 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
         match_instruction_case *const cases = allocate_array((*element).match.number_of_cases, sizeof(*cases));
 
-        integer_range_list integer_ranges_unhandled =
-            integer_range_list_create_from_integer_range(input.type_.integer_range_);
+        integer_set integer_ranges_unhandled = integer_set_from_range(input.type_.integer_range_);
 
         type result_type = type_from_unit();
         optional_value compile_time_result = optional_value_empty;
 
         bool all_cases_return = true;
-        for (size_t i = 0; i < (*element).match.number_of_cases; ++i)
+        size_t const number_of_cases = (*element).match.number_of_cases;
+        for (size_t i = 0; i < number_of_cases; ++i)
         {
             match_case const case_tree = (*element).match.cases[i];
             if (!case_tree.key_or_default)
@@ -2296,7 +2295,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
             if (!key_evaluated.has_value)
             {
-                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i);
+                integer_set_free(integer_ranges_unhandled);
                 return key_evaluated;
             }
 
@@ -2304,21 +2304,23 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             {
                 emit_semantic_error(
                     state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*key)));
-                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i);
+                integer_set_free(integer_ranges_unhandled);
                 return evaluate_expression_result_empty;
             }
 
             {
-                if (integer_range_list_contains(integer_ranges_unhandled, key_evaluated.type_.integer_range_))
+                if (integer_set_contains_range(integer_ranges_unhandled, key_evaluated.type_.integer_range_))
                 {
-                    integer_range_list_remove(&integer_ranges_unhandled, key_evaluated.type_.integer_range_);
+                    integer_set_remove_range(&integer_ranges_unhandled, key_evaluated.type_.integer_range_);
                 }
                 else
                 {
                     // TODO: Better error description
                     emit_semantic_error(state, semantic_error_create(
                                                    semantic_error_duplicate_match_case, expression_source_begin(*key)));
-                    deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
+                    deallocate_integer_range_list_cases(cases, i);
+                    integer_set_free(integer_ranges_unhandled);
                     return evaluate_expression_result_empty;
                 }
             }
@@ -2331,7 +2333,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 evaluate_expression(state, &action, *case_tree.action, NULL);
             if (!action_evaluated.has_value)
             {
-                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i);
+                integer_set_free(integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return action_evaluated;
             }
@@ -2347,7 +2350,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 /*TODO: support types that are not the same, but still comparable*/
                 emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
                                                                  expression_source_begin(*case_tree.action)));
-                deallocate_integer_range_list_cases(cases, i, integer_ranges_unhandled);
+                deallocate_integer_range_list_cases(cases, i);
+                integer_set_free(integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return evaluate_expression_result_empty;
             }
@@ -2363,10 +2367,11 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 key_evaluated.where, action, optional_register_id_create_set(action_evaluated.where));
         }
 
-        ASSUME(integer_equal(integer_range_list_size(integer_ranges_unhandled), integer_create(0, 0)));
+        ASSUME(integer_set_is_empty(integer_ranges_unhandled));
         if (compile_time_result.is_set)
         {
-            deallocate_integer_range_list_cases(cases, (*element).match.number_of_cases, integer_ranges_unhandled);
+            deallocate_integer_range_list_cases(cases, (*element).match.number_of_cases);
+            integer_set_free(integer_ranges_unhandled);
             restore(before);
             register_id const result_register = allocate_register(&state->used_registers);
             add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -2374,7 +2379,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             return evaluate_expression_result_create(
                 true, result_register, result_type, compile_time_result, true, all_cases_return);
         }
-        integer_range_list_deallocate(integer_ranges_unhandled);
+        integer_set_free(integer_ranges_unhandled);
         register_id const result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_match(match_instruction_create(

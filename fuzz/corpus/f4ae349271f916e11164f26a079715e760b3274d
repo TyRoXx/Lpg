@@ -1,0 +1,23 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_eq*als("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(strin    
+   ("0,1", y.method()))
+
+let z = impord.unit
+    method(): g_equals("0,1gs[T]
+    method(): .dtbosolean
+        std.boolean.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

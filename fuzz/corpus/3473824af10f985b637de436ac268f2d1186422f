@@ -1,0 +1,36 @@
+r_method(): .ntusst_gdit
+     = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let prstd.boolean]oms.e(let )))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+as   *                                                                                             g_   let std = import             g_   let std = import stdint std.option
+let a = new_array(std.array[std.arrayd.option
+
+let test_str|||||||||||||single(single.a(mak        e_string("abc")))singleX	   3)](3)
+as   *                                                                                             g_   let std = import             g_   let std = import std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.arrayd.option
+
+let test_str|||||||||||||single(single.a(mak        e_string("abc")))singleX	      ))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc"))
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parime = (left: integers.u65, right: int   

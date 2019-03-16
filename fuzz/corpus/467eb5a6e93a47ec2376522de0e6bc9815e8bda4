@@ -1,0 +1,44 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================roducer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+as================================================<========ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    d.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass==============================<==========================================================ert(match uer[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boolean): std.string
+        match input
+            case std.boolean.true: "tcoduce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transfomrer[std.b;olean, st Qstring] for dummy
+=========================================================ert(match usingmpl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass================================================================================<========ert(match using_global[boole    produce()
+        std.boolean.trze
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    d.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass==============================<=================================]()
+          case  [V](s)t

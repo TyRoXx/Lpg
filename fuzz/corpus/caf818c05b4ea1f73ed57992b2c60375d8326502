@@ -1,0 +1,53 @@
+l  et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    c ost(): std.uxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxnit
+    continue(): std.unit
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("5,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std A import std
+
+// iml pfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0",       /d()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import Stod(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std A import std
+
+// iml pfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0",       /d()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y igtin =erface[T]
+    method(): std.string
+
+impl[St_va = [T]()
+    [

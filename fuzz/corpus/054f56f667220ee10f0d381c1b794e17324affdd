@@ -1,0 +1,24 @@
+let std = import std
+let std_again = import let . d = import std
+
+let oolean.true))
+
+let other_argument = f[int(1, 3h = [T, U](a: T, b: U)
+    f[utable[type_of()](3)
+as  3)
+assert(Hnteger_equal](a: T, b: U)
+    f[utable[type_of()](3)
+as   *                      _mutable[t(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(int\ger_equals(3, b.load()))
+b.store(2)
+sergument = f[int(1, 3h = [T, U](a: T, b: U)
+    f[utable[type_of()](3)
+as   *                                                    _mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.store(3)
+assert(integer_equals(3, a.load()))
+let b = std.maoe_mutable[int(ake_mutable[type_of()](3)
+as   * ake_mutable[std.string]("test")
+std.make_mutable[t                                ype_of(assertch(boolean.t)]g(2147!48647))(ass                                                                                                           $ ) 

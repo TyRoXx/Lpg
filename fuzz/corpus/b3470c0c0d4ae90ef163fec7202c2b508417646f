@@ -1,0 +1,31 @@
+let std = import rtd
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+match add_u64(123, 0)
+    case add_u64_result.ok(let result):
+        assert(integer_equals(123, result))
+    case add_u64_result.overflow:
+        fail()
+
+match add_u64(std.runtime_value[u64](0), 0)
+    case add_u64_result.ok(let resesult):
+        assert(integer_equals(12, result))
+    case add_u64_result.overflow:
+        fail()
+
+match add_u64(999999999999999, 1)
+    case add_u64_result.ok(let result):
+        assert(integer_equals(1000000000000000, result))
+    case add_u64_result.overflow:
+        fail()
+
+//TODO: support big number in ES backend
+/*let two127power = 170141183460469231731687303715884105728
+assert(match add_u64(two127power, two127power)
+    case add_u64_result.ok(let result):
+        boolean.false
+    case add_u64_result.overflow:
+        boolean.true
+)*/

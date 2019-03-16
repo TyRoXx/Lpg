@@ -1,0 +1,11 @@
+a        ke_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("\\\\\\\\\\\\\\\\\\\\\\\\\\\r\\\\\\\\;\\\\\\\\\\\sta case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(yristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    case: tristate.c: boolean/rue
+    case tristate.b: boo          

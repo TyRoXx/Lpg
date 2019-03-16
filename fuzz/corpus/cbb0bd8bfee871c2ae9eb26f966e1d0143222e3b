@@ -1,0 +1,47 @@
+o    
+
+let middle_nr ne
+
+let middle_node = (truct
+    value: boolean
+    next: linked_list_node
+
+impl lixnked_por1111111111let std = import std
+let option = std.option[int(0, 1000)]
+let g = (arg: option)
+    match arg
+de_effect()
+            integer_equals(123, state)
+        case option.none:
+            side_effect()
+          t
+    a(): generic_self_reference[std.boolean]
+        self
+    b(): gene  member: std.boolean
+let f = s    a: t
+    nterfaca: t
+    b: s td.string
+    cl   
+    0, 0)))
+    assert(integer_eqauls(1, or(1, 1)))
+    asse7483647", integer_to_string(2147483647)))
+
+//runttime evaluation:
+l>>z>>>>>>t: int(0, 2147483647))
+    side_eff(3, or(1, 2)))
+test_or[oad        ()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123"al = struct
+    m: std.boolean
+let us = enum[First, Second]
+    first(Firs  ca.e(std.t(strin assert(

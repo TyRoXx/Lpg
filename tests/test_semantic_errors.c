@@ -1593,6 +1593,21 @@ void test_semantic_errors(void)
         REQUIRE(expected.count == 0);
         checked_program_free(&checked);
     }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_duplicate_match_case, source_location_create(5, 9))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let integer_to_match : int(0, 3) = 2     \n"
+                                               "assert(match integer_to_match\n"
+                                               "    case 0: boolean.false\n"
+                                               "    case 1: boolean.false\n"
+                                               "    case 3: boolean.true\n"
+                                               "    case 3: boolean.false\n"
+                                               ")",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        checked_program_free(&checked);
+    }
     unicode_string_free(&module_directory);
     standard_library_description_free(&std_library);
 }

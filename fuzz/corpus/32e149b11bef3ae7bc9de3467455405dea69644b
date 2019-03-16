@@ -1,0 +1,29 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+rint
+    l                   et s = side_eff,0"
+
+impl gi[int(0, 1)] for s option.some(2)
+    b, 1     std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        match input
+   ,        case std.boolean.true: "true"
+   22222222oolea{{{{{{{{{{n
+
+let gs                         = struct[T]
+    dummy: T
+
+impl[T] other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+                           "1"
+    otd.boolean): std.st       ring
+    i 

@@ -1,0 +1,18 @@
+let std = import std
+
+let = struct
+    value: boolean
+
+impl linked_list_node flinked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linked_list_node].some(self.next)
+
+let lisQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQue*/

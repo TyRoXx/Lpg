@@ -1,0 +1,22 @@
+a       pke_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("\\\\\\\\\\\\\\\\\\\\\\\\\\\r\\\\\\\\;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\", boole    arg: empty)
+f   arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+e.b)
+    cae.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case trista case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    case: tristate.c: boolean/rue
+    case tristate.b: boo          

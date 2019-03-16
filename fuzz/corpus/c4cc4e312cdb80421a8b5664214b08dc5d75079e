@@ -1,0 +1,15 @@
+st_node]
+        std.option[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linhed_list_node for middle_node
+    value(): boolean
+     string)
+    side_effec0t()
+ee[type_of(handler_a)](0, 0, handlerd.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].noner once ha_a)
+
+led a bug that gene    i:t true_p

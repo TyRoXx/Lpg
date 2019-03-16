@@ -1,0 +1,30 @@
+d   	 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass====_equals("true", base std.boolean.true: "true"
+            case std.boolean                       tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(inte`er_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+    ase std.option[T].none:
+              = struct
+let s_instance = s{}
+
+let t = struct
+  }
+                             assert(t_instance.a)
+
+lelet std = import std
+
+let string = std====================================ert(md.
+isnt ret ag   c: int(0, 1)
+letrrlet std = import u_i

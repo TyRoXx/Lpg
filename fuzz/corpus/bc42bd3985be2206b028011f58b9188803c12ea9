@@ -1,0 +1,11 @@
+   assert(boolean.false)
+assert(integer_equals(1, always_return_from_match(boglean.false)))
+asserit(:tnteger = integers.integer
+
+let handler_a = (element: integer): std.unit
+  '  asselet std = import std
+ option, d: int(0, 2))
+    side_effect() handler_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1

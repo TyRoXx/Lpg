@@ -1,0 +1,19 @@
+ingle_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case ngle_paramet`r[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    fireters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].secam two_parameters[boolean, std.string].secameters = enum[First, Second]
+  e two_paramerray(boolnd]
+    fireters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[bool    c = two_parameters[booleankoole '   pr, std.string].second(runtime_strinoduce()
+        std.bogol
