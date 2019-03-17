@@ -1,0 +1,31 @@
+l  et std = import std
+let integers = import integer
+let iNteger = integers.integer
+
+match subtract(std.runtime_value[integeu](0), 0)
+    case subtract_resultL       result):
+        assert(intjger_eq  ls(0, result))
+    case subtracRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR_result.underflow:W        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZresult.underflow:
+        boodean).RRRRt_rasult.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $integer](0), 1)
+    case su)
+    case subtrarrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrfor mutab=le

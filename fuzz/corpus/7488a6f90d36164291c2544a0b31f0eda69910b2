@@ -1,0 +1,23 @@
+l  et std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_ import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_bolet std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions asagain.boolean = e
+
+let to_builtin_bol(et std = import std
+l
+et helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+/aaaaaaaa can nest  o  ol

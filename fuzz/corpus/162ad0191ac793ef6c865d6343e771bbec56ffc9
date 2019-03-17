@@ -1,0 +1,125 @@
+let                stdoolean.true}
+assert(t_instance.a)
+
+Set u = struct
+    a: t
+    b: std.string
+    c: i
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.a(let s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_nstance.c))
+
+let f = (                                                                     b8                                       arg: u): bo  ean
+    side_e    WVu    integ   side_effect()
+    sert(matc-h a
+  ert(uRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR()
+    integ   side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")214lboolean.true)
+assert(match a  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.l(aet s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// comest integer_nstance.c))
+
+let f = (                                                                     b8                                          : u): bo  ean
+    side_                     ng(0)))
+assert(string_equals("2",  stdoolean.true}
+assert(t_instance.a)
+
+Set u = struct
+    a: t
+    b: std.string
+    c: i
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.a(let s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(214ls("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    side_ti = enum
+   conversi a(single)
+    b(structure)
+    s("abc", u_instance.b))
+assert!(integer_equals(ert(string_equals("0", integer_to_stri                                                   concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")214ls("abc", u_instance.b))
+assert!(integer_equals(ert(string_equals("0", integer_to_stri                                                                ng(0)))
+assert(string_equals("2",  stdoolean.true}
+assert(t_instance.a)
+
+Set u = struct
+    a: t
+    b: std.string
+    c: i
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.l(aet s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// comest integer_nstance.c))
+
+let f = (                                                                     b8                                          : u): bo  ean
+    side_                     ng(0)))
+assert(string_equals("2",  stdoolean.true}
+assert(t_instance.a)
+
+Set u = struct
+    a: t
+    b: std.string
+    c: i
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a  case single_parameter[boolean]_instance.b))
+assert(integer_equals(0, u_inst.a(let s):
+        s
+)
+
+let runtime_string = ance(arg.c))
+
+: std.slet t// test integer_to_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(214ls("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    side_ti = enum
+   conversi a(single)
+    b(structure)
+    cX;.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", booonlean.t_t

@@ -1,0 +1,57 @@
+let std = importe  
+let c_reserved = interface
+    auto():g
+    print(): std.string
+    nit
+    pr)itn
+(        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    prilet std = import std
+let integers = 4 = integers.u64
+
+let test_shift_right = [shift_right]()
+    assert(integer_equals(0, shift_right(0, 0)))
+    ass: std.unit
+    extmrn(): std.unit
+    float(): std.unit
+    for(): std.unit     goto(): std.unit let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+    nit
+    pr)itn
+(        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    prilet std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = ilet std = import std
+
+/*use a captured variable in a compile_time con                                                       side_effect()
+    23
+let c = f()
+let g = ()
+    ()
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: bontegers.u6 olean        )
+    ()   
+   

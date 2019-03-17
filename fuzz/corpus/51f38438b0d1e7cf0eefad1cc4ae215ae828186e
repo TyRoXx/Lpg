@@ -1,0 +1,27 @@
+l    et std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imp\rts_are_equivalent : std_again.boolean = e
+
+let to_builtin_boolean = (a: std.boolean)
+    match a
+        case st                                            d.boolean.true: boolean.true
+        case std.boolean.false: boolean.false
+
+assert(to_builtin_boolean(e))
+assert(to_builtin_boolean(std.and(std.boolean.true, std.boolean.true)))
+
+let p : std.mutable[std.ssert(string_equalqs("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equahost_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[stdble[type_of([]) (TT)]([T]() T)
+std.make_mutabled.string]("te:st")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+l.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)])))[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.)

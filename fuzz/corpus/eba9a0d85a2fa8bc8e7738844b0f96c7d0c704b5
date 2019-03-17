@@ -1,0 +1,110 @@
+t(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+`__Velse(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    (fi): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(let std = import std
+let single = enum
+    a(std.string)
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    (fi): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(let std = import std
+let single = enum
+    a(std.string)
+let t   long(let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(let state):
+            side_effect()
+            string_equals("abc", state)
+let make_runtime_s                               first(First)
+    second(Second)
+
+let c)= two_parameters[boolean, std.string].second(runtime_stringqua("abc"))
+asspile_time = enum[CompileTimeValue]
+
+let anl{{{alse
+assert(d  eric_self_refeqn= interface
+    print(): std.string
+let f4 = (printed: pris.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () s
+
+let oolean.true))
+
+lettable[type_of(enum[T])](enum[T])t: boolean): bo lean
+    boolean.true
+let false_predicate = (el  te)))
+
+let n.any_of[boolean, tl   u let sets = import set
+let std = import std
+
+let s = sert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolboolean.true)))
+
+assert(s.add(n.true)))
+
+assert(not(s.ae(std.bool.e;atrue)))
+assert(not(s.remove(std.boolean.false)))
+ofhhandler_a)](0,et trueimpyr >st= (element: 	 ((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhahhan impyr >st= ((((((((((((((((((((((:(((((((((((((((ype_ofhhandler_a)](0,et trueimpyr >st= (element: 	 (((l   u       h   it(m
+let std = ihpyr >st= (element: 	 (((((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhandler_a)](0,et trueimpyr >st= (element:(not = [not(0)))
+    ttttttttttf")))
+
+let test_interface = inte 	 ((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhahhandl^r_a)](t std = impyr >st std = impyr >st= (element: 	 XWWWWWWB impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhandler_a)](0,et trueimpyrst >= (element: 	 (((l   u       h   it(m
+let std = impyr >st= (element: 	 (((((((= impyr >st= (((((rface
+  b r udert.strindef")))
+
+letot(0)((((((((((((((((((((((((())
+   = interfenu!!!!
+(((((((ype_ofhhandler_a)](0,et tru .load()))
+m.store(2)
+assert(integer_e)):e___   access7ng_struct>= enum[T]
+ a_(0, 3)] = make_mutable[int(0, 3)](3)
+assert(integer_equals(3, n.load()){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{s(i.load(), 10000)
+     (  case boo((((((((((((ype_ofhhandler_a)](0,et trueimpyr >st= (element: 	 (((l   u       h   it(m
+let std = ihpyr >st= (element: 	 (((((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhandler_a)](0,et trueimpyr >st= (element:(not = [not(0)))
+    ttttttttttf")))
+
+let test_interface = inte 	 ((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhahhandl^r_a)](t std = impyr >st std = impyr >st= (element: 	 XWWWWWWB impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhandler_a)](0,et trueimpyrst >= (element: 	 (((l   u       h   it(m
+let std = impyr >st= (element: 	 (((((((= impyr >st= (((((rface
+  b r udert.strindef")))
+
+letot(0)((((((((((((((((((((((((())
+   = interfenu!!!!
+(((((((ype_ofhhandler_a)](0,et tru .load()))
+m.store(2)
+assert(integer_e)):e___   access7ng_struct>= enum[T]
+ a_(0, 3)] = make_mutable[int(0, 3)](3)
+assert(integer_equals(3, n.load()){{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{s(i.load(), 10000)
+     (  case boole++++++r A_enum[T]
+   ++++++++++++++++++++++++++++++++++++++++++1111111111111111     ts(t(n11111111111111111111111111111111111111111_property( assert(boolean.false)  boolean.true
+let false_predicaettd
+larg)
+
+let b =

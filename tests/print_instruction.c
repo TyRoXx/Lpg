@@ -152,7 +152,7 @@ void print_instruction(instruction const printed, size_t const indentation)
         return;
 
     case instruction_global:
-        printf("global\n");
+        printf("global %u\n", printed.global_into);
         return;
 
     case instruction_read_struct:

@@ -1,0 +1,94 @@
+l        = import set
+  let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+!ssert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolatneu.re)))
+
+assert(not(s.add(std.boolean.false)))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.true))
+assert(s.contains(std.boolean.false))
+assert(s.containoolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+!ssert(s.contains(st                                                                                                  ooleane.true)))s.clear()
+assert(not(s.contains(std.boolean.false)))
+alet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print()                                                 : std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s"= print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 fossert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+assert(nr int(0, 0)
+    print()
+        "0"
+    other_method()
+  tring_equals("0", pure(0)))
+assert(string_equals("1", pure(        ert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtz#      ime(1)))
+assert(string_equals("true", runtime(boolean.true)))
+assert(string_equals("fals                                                           e", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: booleot(s.remove(std.boolean.true)))
+assert(s.remove(std.boolean.false))
+assert(notan, b: boolean): printable2
+
+impl test_e
+    m(): interface
+   (s.contai     f(): boolean
+
+let different_method_order = struct
+impl printans(std.b

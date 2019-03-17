@@ -1,0 +1,27 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_t  e = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":seane k
+t///////////
+
+let c = match ""
+    deoolean.false
+require_compile_time[c]
+        boolean.false
+require_compile_time[c]Wass ert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        boolean.true
+    case "a":
+   default:
+        boolean.tr)

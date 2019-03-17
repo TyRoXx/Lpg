@@ -1,0 +1,32 @@
+t std = imlet std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]
+
+let final_node = struct
+    value: b
+
+let mutable_content = stru0555t std
+
+let linked_list_node = interface
+    value(): boable[std.string]("test")
+assert(string_equals("test",olean
+    next(): std.option[linked_list_node]
+
+let f p2.load()))
+p2.storinal_node = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.option[linked" = interface[T]
+    a(): generic_self_reference[T]
+    b(): generic_self_reference[std.boolean]
+
+impl generic_self_reference[std.boole123"an] for std.unit
+    a(): generic_self_reference[std.boolean]
+     assert(integer, p2.load())_equals(0,     )  self
+ of = (a: boo
+lea 

@@ -257,6 +257,7 @@ static void run_erase_type(erase_type_instruction const erase_type, garbage_coll
 static run_sequence_result run_call(call_instruction const call, value *const registers, interpreter *const context)
 {
     value const callee = registers[call.callee];
+    ASSUME(value_is_valid(callee));
     if (callee.kind == value_kind_unit)
     {
         return run_sequence_result_unavailable_at_this_time;
@@ -265,6 +266,7 @@ static run_sequence_result run_call(call_instruction const call, value *const re
     LPG_FOR(size_t, j, call.argument_count)
     {
         arguments[j] = registers[call.arguments[j]];
+        ASSUME(value_is_valid(arguments[j]));
     }
     switch (callee.kind)
     {

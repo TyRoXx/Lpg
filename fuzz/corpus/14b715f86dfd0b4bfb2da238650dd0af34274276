@@ -1,0 +1,26 @@
+r             	 mer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+                std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, olean]
+        dummy{}
+
+let cacess_parameter = interface[Struct]
+    method(arg: Struct.element :)tsd.unit
+let access_paraemsrte_tru          ct = struct
+    element: std.type
+impl access_parameter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    side_effec///////// impord.unit
+   ct]
+    e(Struct.eleme

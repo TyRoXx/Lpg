@@ -21,27 +21,33 @@ check_function_result check_function_result_create(checked_function function, ca
 
 check_function_result const check_function_result_empty = {false, {NULL, {NULL, 0}, NULL, 0}, NULL, 0};
 
+typedef enum evaluation_status {
+    evaluation_status_value,
+    evaluation_status_return,
+    evaluation_status_exit,
+    evaluation_status_error
+} evaluation_status;
+
 typedef struct evaluate_expression_result
 {
+    evaluation_status status;
     type type_;
     optional_value compile_time_value;
     register_id where;
     bool is_pure;
-    bool always_returns;
-    bool has_value;
 } evaluate_expression_result;
 
-static evaluate_expression_result evaluate_expression_result_create(bool const has_value, register_id const where,
-                                                                    type const type_,
+static evaluate_expression_result evaluate_expression_result_create(evaluation_status const status,
+                                                                    register_id const where, type const type_,
                                                                     optional_value const compile_time_value,
-                                                                    bool const is_pure, bool const always_returns)
+                                                                    bool const is_pure)
 {
-    evaluate_expression_result const result = {type_, compile_time_value, where, is_pure, always_returns, has_value};
+    evaluate_expression_result const result = {status, type_, compile_time_value, where, is_pure};
     return result;
 }
 
 static evaluate_expression_result const evaluate_expression_result_empty = {
-    {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, 0, false, false, false};
+    evaluation_status_error, {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, 0, false};
 
 static function_checking_state
 function_checking_state_create(program_check *const root, function_checking_state *parent,
@@ -256,9 +262,15 @@ static read_structure_element_result read_element(function_checking_state *state
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
     evaluate_expression_result const object = evaluate_expression(state, function, object_tree, NULL);
-    if (!object.has_value)
+    switch (object.status)
     {
+    case evaluation_status_error:
+    case evaluation_status_return:
+    case evaluation_status_exit:
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
+
+    case evaluation_status_value:
+        break;
     }
 
     type const *const actual_type = &object.type_;
@@ -431,10 +443,10 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
             add_instruction(to, instruction_create_read_struct(read_struct_instruction_create(
                                     captures, local.where.captured_in_current_lambda.value, capture_result)));
             return evaluate_expression_result_create(
-                true, capture_result, local.what, local.compile_time_value, local.is_pure, false);
+                evaluation_status_value, capture_result, local.what, local.compile_time_value, local.is_pure);
         }
         return evaluate_expression_result_create(
-            true, local.where.local_address, local.what, local.compile_time_value, local.is_pure, false);
+            evaluation_status_value, local.where.local_address, local.what, local.compile_time_value, local.is_pure);
 
     case read_local_variable_status_compile_time_value:
     {
@@ -444,7 +456,7 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
                                 literal_instruction_create(into, local.compile_time_value.value_, local.what)));
         write_register_compile_time_value(state, into, local.compile_time_value.value_);
         return evaluate_expression_result_create(
-            true, into, local.what, local.compile_time_value, local.is_pure, false);
+            evaluation_status_value, into, local.what, local.compile_time_value, local.is_pure);
     }
 
     case read_local_variable_status_unknown:
@@ -465,14 +477,15 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         return evaluate_expression_result_empty;
     }
     return evaluate_expression_result_create(
-        true, result, element_read.type_, element_read.compile_time_value, true, false);
+        evaluation_status_value, result, element_read.type_, element_read.compile_time_value, true);
 }
 
 static evaluate_expression_result make_unit(register_id *const used_registers, instruction_sequence *output)
 {
     type const unit_type = {type_kind_unit, {0}};
-    evaluate_expression_result const final_result = evaluate_expression_result_create(
-        true, allocate_register(used_registers), unit_type, optional_value_create(value_from_unit()), true, false);
+    evaluate_expression_result const final_result =
+        evaluate_expression_result_create(evaluation_status_value, allocate_register(used_registers), unit_type,
+                                          optional_value_create(value_from_unit()), true);
     add_instruction(output, instruction_create_literal(
                                 literal_instruction_create(final_result.where, value_from_unit(), type_from_unit())));
     return final_result;
@@ -603,9 +616,11 @@ check_function(program_check *const root, function_checking_state *const parent,
     }
 
     evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
-    if (!body_evaluated.has_value)
+    bool const body_has_value = (body_evaluated.status == evaluation_status_value);
+    bool const body_always_returns = (body_evaluated.status == evaluation_status_return);
+    if (!body_has_value && !body_always_returns)
     {
-        if (!body_evaluated.always_returns && !explicit_return_type.is_set)
+        if (!explicit_return_type.is_set)
         {
             register_id const return_value_goes_into = allocate_register(&state.used_registers);
             add_instruction(&body_out, instruction_create_literal(literal_instruction_create(
@@ -619,7 +634,7 @@ check_function(program_check *const root, function_checking_state *const parent,
 
     if (explicit_return_type.is_set)
     {
-        if (body_evaluated.always_returns)
+        if (body_always_returns)
         {
             if (!state.return_type.is_set)
             {
@@ -659,7 +674,7 @@ check_function(program_check *const root, function_checking_state *const parent,
     }
     else
     {
-        if (body_evaluated.always_returns)
+        if (body_always_returns)
         {
             if (!state.return_type.is_set)
             {
@@ -669,7 +684,7 @@ check_function(program_check *const root, function_checking_state *const parent,
         }
         else
         {
-            if (body_evaluated.has_value)
+            if (body_has_value)
             {
                 register_id const unit_goes_into = allocate_register(&state.used_registers);
                 add_instruction(&body_out, instruction_create_return(
@@ -697,7 +712,7 @@ check_function(program_check *const root, function_checking_state *const parent,
 static evaluate_expression_result make_compile_time_unit(void)
 {
     evaluate_expression_result const result = {
-        type_from_unit(), optional_value_create(value_from_unit()), 0, true, false, false};
+        evaluation_status_value, type_from_unit(), optional_value_create(value_from_unit()), ~(register_id)0, true};
     return result;
 }
 
@@ -719,21 +734,23 @@ static compile_time_type_expression_result
 expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
 {
     evaluate_expression_result const result = evaluate_expression(state, function, element, NULL);
-    if (result.has_value)
+    switch (result.status)
     {
+    case evaluation_status_value:
         if (!result.compile_time_value.is_set || (result.compile_time_value.value_.kind != value_kind_type))
         {
             emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
                                                              expression_source_begin(element)));
             return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
         }
-    }
-    else
-    {
+        return compile_time_type_expression_result_create(true, result.where, result.compile_time_value.value_.type_);
+
+    case evaluation_status_error:
+    case evaluation_status_exit:
+    case evaluation_status_return:
         return compile_time_type_expression_result_create(false, ~(register_id)0, type_from_unit());
     }
-    return compile_time_type_expression_result_create(
-        result.has_value, result.where, result.compile_time_value.value_.type_);
+    LPG_UNREACHABLE();
 }
 
 typedef struct evaluated_function_header
@@ -854,8 +871,8 @@ evaluate_generic_lambda_expression(function_checking_state *state, instruction_s
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_lambda(id), type_from_generic_lambda())));
     write_register_compile_time_value(state, into, value_from_generic_lambda(id));
-    return evaluate_expression_result_create(
-        true, into, type_from_generic_lambda(), optional_value_create(value_from_generic_lambda(id)), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, into, type_from_generic_lambda(),
+                                             optional_value_create(value_from_generic_lambda(id)), true);
 }
 
 static evaluate_expression_result evaluate_lambda(function_checking_state *const state,
@@ -951,17 +968,18 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
             add_instruction(function, instruction_create_literal(
                                           literal_instruction_create(destination, compile_time_lambda, result_type)));
             return evaluate_expression_result_create(
-                true, destination, result_type, optional_value_create(compile_time_lambda), true, false);
+                evaluation_status_value, destination, result_type, optional_value_create(compile_time_lambda), true);
         }
         add_instruction(function, instruction_create_lambda_with_captures(lambda_with_captures_instruction_create(
                                       destination, this_lambda_id, captures, checked.capture_count)));
-        return evaluate_expression_result_create(true, destination, result_type, optional_value_empty, false, false);
+        return evaluate_expression_result_create(
+            evaluation_status_value, destination, result_type, optional_value_empty, false);
     }
     value const result = value_from_function_pointer(function_pointer_value_from_internal(this_lambda_id, NULL, 0));
     add_instruction(function, instruction_create_literal(literal_instruction_create(destination, result, result_type)));
     write_register_compile_time_value(state, destination, result);
     return evaluate_expression_result_create(
-        true, destination, result_type, optional_value_create(result), false, false);
+        evaluation_status_value, destination, result_type, optional_value_create(result), false);
 }
 
 static optional_size find_implementation(lpg_interface const *const in, type const self)
@@ -1059,8 +1077,14 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
         evaluate_expression(&inference_state, function, *self_tree.generic, NULL);
     instruction_sequence_free(&ignored);
     function_checking_state_free(inference_state);
-    if (!generic_evaluated.has_value)
+    switch (generic_evaluated.status)
     {
+    case evaluation_status_value:
+        break;
+
+    case evaluation_status_error:
+    case evaluation_status_exit:
+    case evaluation_status_return:
         LPG_TO_DO();
     }
     if (!generic_evaluated.compile_time_value.is_set)
@@ -1356,10 +1380,18 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
                                                     size_t const parameter_id)
 {
     evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree, NULL);
-    if (!argument.has_value)
+    switch (argument.status)
+    {
+    case evaluation_status_error:
+    case evaluation_status_exit:
+    case evaluation_status_return:
     {
         argument_evaluation_result const result = {optional_value_empty, 0, success_no};
         return result;
+    }
+
+    case evaluation_status_value:
+        break;
     }
     conversion_result const converted =
         convert(state, function, argument.where, argument.type_, argument.compile_time_value,
@@ -1374,9 +1406,15 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
     evaluate_expression_result const callee = evaluate_expression(state, function, *called.callee, NULL);
-    if (!callee.has_value)
+    switch (callee.status)
     {
-        return make_compile_time_unit();
+    case evaluation_status_error:
+    case evaluation_status_exit:
+    case evaluation_status_return:
+        return evaluate_expression_result_empty;
+
+    case evaluation_status_value:
+        break;
     }
 
     switch (callee.type_.kind)
@@ -1614,9 +1652,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     deallocate(compile_time_arguments);
     if (!return_type.is_set)
     {
-        return evaluate_expression_result_create(false, result, type_from_unit(), compile_time_result, false, false);
+        return evaluate_expression_result_create(
+            evaluation_status_error, result, type_from_unit(), compile_time_result, false);
     }
-    return evaluate_expression_result_create(true, result, return_type.value, compile_time_result, false, false);
+    return evaluate_expression_result_create(
+        evaluation_status_value, result, return_type.value, compile_time_result, false);
 }
 
 evaluate_expression_result evaluate_not_expression(function_checking_state *state, instruction_sequence *function,
@@ -1641,7 +1681,7 @@ evaluate_expression_result evaluate_not_expression(function_checking_state *stat
         add_instruction(
             function, instruction_create_call(call_instruction_create(not_register, arguments, 1, result_register)));
         return evaluate_expression_result_create(
-            true, result_register, result.type_, optional_value_empty, false, false);
+            evaluation_status_value, result_register, result.type_, optional_value_empty, false);
     }
     emit_semantic_error(
         state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin((*element))));
@@ -1734,9 +1774,15 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
         evaluate_expression_result const enum_element_evaluated =
             evaluate_expression(state, function, *root.call.callee, NULL);
         restore(before_pattern);
-        if (!enum_element_evaluated.has_value)
+        switch (enum_element_evaluated.status)
         {
+        case evaluation_status_error:
+        case evaluation_status_exit:
+        case evaluation_status_return:
             return pattern_evaluate_result_failure;
+
+        case evaluation_status_value:
+            break;
         }
         if (enum_element_evaluated.type_.kind != type_kind_enum_constructor)
         {
@@ -1792,7 +1838,7 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
         {
             is_pure = false;
         }
-        if (final_result.always_returns)
+        if (final_result.status == evaluation_status_return)
         {
             always_returns = true;
         }
@@ -1802,8 +1848,9 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
         local_variable_free(state->local_variables.elements + i);
     }
     state->local_variables.count = previous_number_of_variables;
-    return evaluate_expression_result_create(final_result.has_value, final_result.where, final_result.type_,
-                                             final_result.compile_time_value, is_pure, always_returns);
+    return evaluate_expression_result_create(always_returns ? evaluation_status_return : final_result.status,
+                                             final_result.where, final_result.type_, final_result.compile_time_value,
+                                             is_pure);
 }
 
 static bool merge_types(type *result_type, const type evaluated_type)
@@ -1880,7 +1927,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         if (key)
         {
             key_evaluated = evaluate_expression(state, function, *key, NULL);
-            if (!key_evaluated.has_value)
+            if (key_evaluated.status != evaluation_status_value)
             {
                 return key_evaluated;
             }
@@ -1920,14 +1967,14 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         instruction_sequence action = instruction_sequence_create(NULL, 0);
         evaluate_expression_result const action_evaluated =
             evaluate_expression(state, &action, *case_tree.action, NULL);
-        if (!action_evaluated.has_value)
+        if (action_evaluated.status != evaluation_status_value)
         {
             instruction_sequence_free(&action);
             deallocate_cases(cases, i);
             return action_evaluated;
         }
 
-        all_cases_return = (all_cases_return && action_evaluated.always_returns);
+        all_cases_return = (all_cases_return && (action_evaluated.status == evaluation_status_return));
 
         if (i == 0)
         {
@@ -1988,8 +2035,8 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         register_id const result_register = allocate_register(&state->used_registers);
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       result_register, compile_time_result.value_, result_type)));
-        return evaluate_expression_result_create(
-            true, result_register, result_type, compile_time_result, true, all_cases_return);
+        return evaluate_expression_result_create(all_cases_return ? evaluation_status_return : evaluation_status_value,
+                                                 result_register, result_type, compile_time_result, true);
     }
 
     /* The default case is always the last case in order to save work in the backends. */
@@ -1999,8 +2046,8 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
     register_id const result_register = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_match(match_instruction_create(
                                   input.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-    return evaluate_expression_result_create(
-        true, result_register, result_type, optional_value_empty, false, all_cases_return);
+    return evaluate_expression_result_create(all_cases_return ? evaluation_status_return : evaluation_status_value,
+                                             result_register, result_type, optional_value_empty, false);
 }
 
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
@@ -2008,7 +2055,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
     evaluate_expression_result const input = evaluate_expression(state, function, *(*element).match.input, NULL);
-    if (!input.has_value)
+    if (input.status != evaluation_status_value)
     {
         return input;
     }
@@ -2111,7 +2158,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             case pattern_evaluate_result_kind_no_pattern:
             {
                 evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
-                if (!key_evaluated.has_value)
+                if (key_evaluated.status != evaluation_status_value)
                 {
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
                     return key_evaluated;
@@ -2168,7 +2215,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 #endif
             }
 
-            if (action_evaluated.has_value)
+            if (action_evaluated.status == evaluation_status_value)
             {
                 if (i == 0)
                 {
@@ -2191,7 +2238,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
             }
 
-            all_cases_return = (all_cases_return && action_evaluated.always_returns);
+            all_cases_return = (all_cases_return && (action_evaluated.status == evaluation_status_return));
 
             switch (maybe_pattern.kind)
             {
@@ -2200,14 +2247,15 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 cases[i] = match_instruction_case_create_stateful_enum(
                     match_instruction_case_stateful_enum_create(
                         maybe_pattern.stateful_enum_element.which, placeholder_where),
-                    action, action_evaluated.has_value ? optional_register_id_create_set(action_evaluated.where)
-                                                       : optional_register_id_create_empty());
+                    action, (action_evaluated.status == evaluation_status_value)
+                                ? optional_register_id_create_set(action_evaluated.where)
+                                : optional_register_id_create_empty());
                 break;
 
             case pattern_evaluate_result_kind_no_pattern:
                 ASSUME(key_value != ~(register_id)0);
                 cases[i] = match_instruction_case_create_value(
-                    key_value, action, action_evaluated.has_value
+                    key_value, action, (action_evaluated.status == evaluation_status_value)
                                            ? optional_register_id_create_set(action_evaluated.where)
                                            : optional_register_id_create_empty());
                 break;
@@ -2265,11 +2313,12 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             add_instruction(function, instruction_create_literal(literal_instruction_create(
                                           result_register, compile_time_result.value_, result_type)));
             return evaluate_expression_result_create(
-                true, result_register, result_type, compile_time_result, true, all_cases_return);
+                all_cases_return ? evaluation_status_return : evaluation_status_value, result_register, result_type,
+                compile_time_result, true);
         }
 
-        return evaluate_expression_result_create(
-            true, result_register, result_type, optional_value_empty, false, all_cases_return);
+        return evaluate_expression_result_create(all_cases_return ? evaluation_status_return : evaluation_status_value,
+                                                 result_register, result_type, optional_value_empty, false);
     }
 
     case type_kind_integer_range:
@@ -2301,7 +2350,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             }
             expression *const key = case_tree.key_or_default;
             evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
-            if (!key_evaluated.has_value)
+            if (key_evaluated.status != evaluation_status_value)
             {
                 deallocate_integer_range_list_cases(cases, i);
                 integer_set_free(integer_ranges_unhandled);
@@ -2339,7 +2388,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             instruction_sequence action = instruction_sequence_create(NULL, 0);
             evaluate_expression_result const action_evaluated =
                 evaluate_expression(state, &action, *case_tree.action, NULL);
-            if (!action_evaluated.has_value)
+            if (action_evaluated.status != evaluation_status_value)
             {
                 deallocate_integer_range_list_cases(cases, i);
                 integer_set_free(integer_ranges_unhandled);
@@ -2347,7 +2396,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 return action_evaluated;
             }
 
-            all_cases_return = (all_cases_return && action_evaluated.always_returns);
+            all_cases_return = (all_cases_return && (action_evaluated.status == evaluation_status_return));
 
             if (i == 0)
             {
@@ -2385,15 +2434,16 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             add_instruction(function, instruction_create_literal(literal_instruction_create(
                                           result_register, compile_time_result.value_, result_type)));
             return evaluate_expression_result_create(
-                true, result_register, result_type, compile_time_result, true, all_cases_return);
+                all_cases_return ? evaluation_status_return : evaluation_status_value, result_register, result_type,
+                compile_time_result, true);
         }
         integer_set_free(integer_ranges_unhandled);
         register_id const result_register = allocate_register(&state->used_registers);
         add_instruction(
             function, instruction_create_match(match_instruction_create(
                           input.where, cases, (*element).match.number_of_cases, result_register, result_type)));
-        return evaluate_expression_result_create(
-            true, result_register, result_type, optional_value_empty, false, all_cases_return);
+        return evaluate_expression_result_create(all_cases_return ? evaluation_status_return : evaluation_status_value,
+                                                 result_register, result_type, optional_value_empty, false);
     }
 
     case type_kind_string:
@@ -2434,7 +2484,7 @@ static evaluate_struct_arguments_result evaluate_struct_arguments(function_check
     for (size_t i = 0; i < argument_count; ++i)
     {
         evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i], NULL);
-        if (!argument_evaluated.has_value)
+        if (argument_evaluated.status != evaluation_status_value)
         {
             deallocate(registers);
             evaluate_struct_arguments_result const result = {NULL};
@@ -2717,8 +2767,8 @@ evaluate_generic_interface_expression(function_checking_state *state, instructio
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_interface(id), type_from_generic_interface())));
     write_register_compile_time_value(state, into, value_from_generic_interface(id));
-    return evaluate_expression_result_create(true, into, type_from_generic_interface(),
-                                             optional_value_create(value_from_generic_interface(id)), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, into, type_from_generic_interface(),
+                                             optional_value_create(value_from_generic_interface(id)), true);
 }
 
 static evaluate_expression_result evaluate_interface(function_checking_state *state, instruction_sequence *function,
@@ -2787,7 +2837,8 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
 
     value const result = value_from_type(type_from_interface(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
-    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false, false);
+    return evaluate_expression_result_create(
+        evaluation_status_value, into, type_from_type(), optional_value_create(result), false);
 }
 
 static evaluate_expression_result
@@ -2814,8 +2865,8 @@ evaluate_generic_struct_expression(function_checking_state *state, instruction_s
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_struct(id), type_from_generic_struct())));
     write_register_compile_time_value(state, into, value_from_generic_struct(id));
-    return evaluate_expression_result_create(
-        true, into, type_from_generic_struct(), optional_value_create(value_from_generic_struct(id)), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, into, type_from_generic_struct(),
+                                             optional_value_create(value_from_generic_struct(id)), true);
 }
 
 static evaluate_expression_result evaluate_struct(function_checking_state *state, instruction_sequence *function,
@@ -2833,7 +2884,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
         struct_expression_element const element = evaluated.elements[i];
         evaluate_expression_result const element_type_evaluated =
             evaluate_expression(state, function, element.type, NULL);
-        if (!element_type_evaluated.has_value)
+        if (element_type_evaluated.status != evaluation_status_value)
         {
             for (size_t j = 0; j < i; ++j)
             {
@@ -2866,7 +2917,8 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     register_id const into = allocate_register(&state->used_registers);
     value const result = value_from_type(type_from_struct(id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, result, type_from_type())));
-    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(result), false, false);
+    return evaluate_expression_result_create(
+        evaluation_status_value, into, type_from_type(), optional_value_create(result), false);
 }
 
 typedef struct method_evaluation_result
@@ -2981,7 +3033,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
 
     evaluate_expression_result const generic =
         evaluate_expression(state, function, *interface_instantiation.generic, NULL);
-    if (!generic.has_value)
+    if (generic.status != evaluation_status_value)
     {
         LPG_TO_DO();
     }
@@ -2995,7 +3047,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     }
 
     evaluate_expression_result const self = evaluate_expression(state, function, *element.self, NULL);
-    if (!self.has_value)
+    if (self.status != evaluation_status_value)
     {
         LPG_TO_DO();
     }
@@ -3029,7 +3081,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
                                                                           impl_expression const tree)
 {
     evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, interface_, NULL);
-    if (!interface_evaluated.has_value)
+    if (interface_evaluated.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
     }
@@ -3091,7 +3143,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
 
     evaluate_expression_result const generic =
         evaluate_expression(state, function, *interface_expression_.generic, NULL);
-    if (!generic.has_value)
+    if (generic.status != evaluation_status_value)
     {
         LPG_TO_DO();
     }
@@ -3270,7 +3322,7 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
                                                               instantiate_struct_expression const element)
 {
     evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type, NULL);
-    if (!type_evaluated.has_value)
+    if (type_evaluated.status != evaluation_status_value)
     {
         return type_evaluated;
     }
@@ -3278,7 +3330,7 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
                                                          expression_source_begin(*element.type)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     if (type_evaluated.compile_time_value.value_.kind != value_kind_type)
     {
@@ -3336,13 +3388,13 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
         add_instruction(function, instruction_create_literal(literal_instruction_create(
                                       into, compile_time_value, type_from_struct(structure_id))));
         write_register_compile_time_value(state, into, compile_time_value);
-        return evaluate_expression_result_create(
-            true, into, type_from_struct(structure_id), optional_value_create(compile_time_value), true, false);
+        return evaluate_expression_result_create(evaluation_status_value, into, type_from_struct(structure_id),
+                                                 optional_value_create(compile_time_value), true);
     }
     add_instruction(function, instruction_create_instantiate_struct(instantiate_struct_instruction_create(
                                   into, structure_id, arguments_evaluated.registers, element.arguments.length)));
     return evaluate_expression_result_create(
-        true, into, type_from_struct(structure_id), optional_value_empty, false, false);
+        evaluation_status_value, into, type_from_struct(structure_id), optional_value_empty, false);
 }
 
 static evaluate_expression_result evaluate_type_of(function_checking_state *const state,
@@ -3356,8 +3408,8 @@ static evaluate_expression_result evaluate_type_of(function_checking_state *cons
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   where, value_from_type(target_evaluated.type_), type_from_type())));
     write_register_compile_time_value(state, where, value_from_type(target_evaluated.type_));
-    return evaluate_expression_result_create(
-        true, where, type_from_type(), optional_value_create(value_from_type(target_evaluated.type_)), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, where, type_from_type(),
+                                             optional_value_create(value_from_type(target_evaluated.type_)), true);
 }
 
 static generic_closures find_generic_closures(function_checking_state *state, enum_expression const definition)
@@ -3388,8 +3440,8 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   into, value_from_generic_enum(id), type_from_generic_enum())));
     write_register_compile_time_value(state, into, value_from_generic_enum(id));
-    return evaluate_expression_result_create(
-        true, into, type_from_generic_enum(), optional_value_create(value_from_generic_enum(id)), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, into, type_from_generic_enum(),
+                                             optional_value_create(value_from_generic_enum(id)), true);
 }
 
 static evaluate_expression_result
@@ -3410,7 +3462,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         {
             expression const state_expr = *element.elements[i].state;
             evaluate_expression_result const state_evaluated = evaluate_expression(state, function, state_expr, NULL);
-            if (state_evaluated.has_value)
+            if (state_evaluated.status == evaluation_status_value)
             {
                 if (!state_evaluated.compile_time_value.is_set ||
                     (state_evaluated.compile_time_value.value_.kind != value_kind_type))
@@ -3461,7 +3513,8 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
     value const literal = value_from_type(type_from_enumeration(new_enum_id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
     write_register_compile_time_value(state, into, literal);
-    return evaluate_expression_result_create(true, into, type_from_type(), optional_value_create(literal), true, false);
+    return evaluate_expression_result_create(
+        evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
 }
 
 static bool values_equal(value const *const first, value const *const second, size_t const count)
@@ -3512,7 +3565,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
             function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
         write_register_compile_time_value(state, into, literal);
         return evaluate_expression_result_create(
-            true, into, type_from_type(), optional_value_create(literal), true, false);
+            evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     enum_expression const original = root->generic_enums[generic].tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
@@ -3567,7 +3620,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     {
         deallocate(enum_checking.register_compile_time_values);
     }
-    if (!evaluated.has_value)
+    if (evaluated.status != evaluation_status_value)
     {
         if (arguments)
         {
@@ -3604,8 +3657,8 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
-    return evaluate_expression_result_create(
-        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, result_where, evaluated.type_,
+                                             optional_value_create(evaluated.compile_time_value.value_), true);
 }
 
 static evaluate_expression_result instantiate_generic_struct(function_checking_state *const state,
@@ -3644,7 +3697,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
             function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
         write_register_compile_time_value(state, into, literal);
         return evaluate_expression_result_create(
-            true, into, type_from_type(), optional_value_create(literal), true, false);
+            evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     struct_expression const original = root->generic_structs[generic].tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
@@ -3701,7 +3754,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
     {
         deallocate(struct_checking.register_compile_time_values);
     }
-    if (!evaluated.has_value)
+    if (evaluated.status != evaluation_status_value)
     {
         if (arguments)
         {
@@ -3734,8 +3787,8 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
-    return evaluate_expression_result_create(
-        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, result_where, evaluated.type_,
+                                             optional_value_create(evaluated.compile_time_value.value_), true);
 }
 
 static evaluate_expression_result instantiate_generic_interface(function_checking_state *const state,
@@ -3774,7 +3827,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));
         write_register_compile_time_value(state, into, literal);
         return evaluate_expression_result_create(
-            true, into, type_from_type(), optional_value_create(literal), true, false);
+            evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     interface_expression const original = root->generic_interfaces[generic].tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
@@ -3831,7 +3884,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     {
         deallocate(interface_checking.register_compile_time_values);
     }
-    if (!evaluated.has_value)
+    if (evaluated.status != evaluation_status_value)
     {
         if (arguments)
         {
@@ -3865,8 +3918,8 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
-    return evaluate_expression_result_create(
-        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, result_where, evaluated.type_,
+                                             optional_value_create(evaluated.compile_time_value.value_), true);
 }
 
 static evaluate_expression_result instantiate_generic_lambda(function_checking_state *const state,
@@ -3906,7 +3959,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         add_instruction(function, instruction_create_literal(literal_instruction_create(into, literal, function_type)));
         write_register_compile_time_value(state, into, literal);
         return evaluate_expression_result_create(
-            true, into, function_type, optional_value_create(literal), true, false);
+            evaluation_status_value, into, function_type, optional_value_create(literal), true);
     }
     lambda const original = root->generic_lambdas[generic].tree;
     generic_lambda const instantiated_lambda = state->root->generic_lambdas[generic];
@@ -3973,7 +4026,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     {
         deallocate(lambda_checking.register_compile_time_values);
     }
-    if (!evaluated.has_value)
+    if (evaluated.status != evaluation_status_value)
     {
         if (argument_types)
         {
@@ -4003,8 +4056,8 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
-    return evaluate_expression_result_create(
-        true, result_where, evaluated.type_, optional_value_create(evaluated.compile_time_value.value_), true, false);
+    return evaluate_expression_result_create(evaluation_status_value, result_where, evaluated.type_,
+                                             optional_value_create(evaluated.compile_time_value.value_), true);
 }
 
 static evaluate_expression_result evaluate_generic_instantiation(function_checking_state *const state,
@@ -4012,7 +4065,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                                                  generic_instantiation_expression const element)
 {
     evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *element.generic, NULL);
-    if (!generic_evaluated.has_value)
+    if (generic_evaluated.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
     }
@@ -4022,7 +4075,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     {
         evaluate_expression_result const argument_evaluated =
             evaluate_expression(state, function, element.arguments[i], NULL);
-        if (!argument_evaluated.has_value)
+        if (argument_evaluated.status != evaluation_status_value)
         {
             if (arguments)
             {
@@ -4121,8 +4174,8 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
             write_register_compile_time_value(state, where, current_module.content.value_);
             add_instruction(function, instruction_create_literal(literal_instruction_create(
                                           where, current_module.content.value_, current_module.schema.value)));
-            return evaluate_expression_result_create(true, where, current_module.schema.value,
-                                                     optional_value_create(current_module.content.value_), true, false);
+            return evaluate_expression_result_create(evaluation_status_value, where, current_module.schema.value,
+                                                     optional_value_create(current_module.content.value_), true);
         }
     }
     begin_load_module(state->root, unicode_view_copy(unicode_view_from_string(element.name.value)));
@@ -4140,7 +4193,7 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
     add_instruction(function, instruction_create_literal(
                                   literal_instruction_create(where, imported.loaded.value_, imported.schema)));
     return evaluate_expression_result_create(
-        true, where, imported.schema, optional_value_create(imported.loaded.value_), true, false);
+        evaluation_status_value, where, imported.schema, optional_value_create(imported.loaded.value_), true);
 }
 
 static evaluate_expression_result evaluate_new_array(function_checking_state *const state,
@@ -4148,7 +4201,7 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                      new_array_expression const element)
 {
     evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element, NULL);
-    if (!element_evaluated.has_value)
+    if (element_evaluated.status != evaluation_status_value)
     {
         return element_evaluated;
     }
@@ -4164,7 +4217,7 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
         state, function, import_expression_create(expression_source_begin(*element.element),
                                                   identifier_expression_create(
                                                       array_module_name, expression_source_begin(*element.element))));
-    if (!array_imported.has_value)
+    if (array_imported.status != evaluation_status_value)
     {
         LPG_TO_DO();
     }
@@ -4192,7 +4245,7 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
     argument_types[0] = element_evaluated.type_;
     evaluate_expression_result const array_instantiated = instantiate_generic_interface(
         state, function, array_generic, arguments, 1, argument_types, expression_source_begin(*element.element));
-    if (!array_instantiated.has_value)
+    if (array_instantiated.status != evaluation_status_value)
     {
         LPG_TO_DO();
     }
@@ -4214,7 +4267,7 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                   array_instantiated.compile_time_value.value_.type_.interface_, into,
                                   element_evaluated.compile_time_value.value_.type_)));
     return evaluate_expression_result_create(
-        true, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false, false);
+        evaluation_status_value, into, array_instantiated.compile_time_value.value_.type_, optional_value_empty, false);
 }
 
 static evaluate_expression_result evaluate_declare(function_checking_state *const state,
@@ -4239,7 +4292,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     unicode_view const name = unicode_view_from_string(element.name.value);
     evaluate_expression_result const initializer =
         evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL);
-    if (!initializer.has_value)
+    if (initializer.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
     }
@@ -4263,7 +4316,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
         evaluate_expression_result const declared_type =
             evaluate_expression(state, function, *element.optional_type, NULL);
         restore(previous_code);
-        if (declared_type.has_value)
+        if (declared_type.status == evaluation_status_value)
         {
             if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
             {
@@ -4299,7 +4352,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
                                   literal_instruction_create(unit_goes_into, value_from_unit(), type_from_unit())));
     write_register_compile_time_value(state, unit_goes_into, value_from_unit());
     evaluate_expression_result const result = {
-        type_from_unit(), optional_value_create(value_from_unit()), unit_goes_into, false, false, true};
+        evaluation_status_value, type_from_unit(), optional_value_create(value_from_unit()), unit_goes_into, false};
     return result;
 }
 
@@ -4350,7 +4403,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
                                       where, value_from_integer(element.integer_literal.value), what)));
         write_register_compile_time_value(state, where, value_from_integer(element.integer_literal.value));
         return evaluate_expression_result_create(
-            true, where, what, optional_value_create(value_from_integer(element.integer_literal.value)), true, false);
+            evaluation_status_value, where, what,
+            optional_value_create(value_from_integer(element.integer_literal.value)), true);
     }
 
     case expression_type_access_structure:
@@ -4365,7 +4419,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
             return evaluate_expression_result_empty;
         }
         return evaluate_expression_result_create(
-            true, result, element_read.type_, element_read.compile_time_value, element_read.is_pure, false);
+            evaluation_status_value, result, element_read.type_, element_read.compile_time_value, element_read.is_pure);
     }
 
     case expression_type_comment:
@@ -4408,7 +4462,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         write_register_compile_time_value(state, result, value_from_string(literal));
         type const string_type = {type_kind_string, {0}};
         return evaluate_expression_result_create(
-            true, result, string_type, optional_value_create(value_from_string(literal)), true, false);
+            evaluation_status_value, result, string_type, optional_value_create(value_from_string(literal)), true);
     }
 
     case expression_type_identifier:
@@ -4431,12 +4485,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         state->is_in_loop = previous_is_in_loop;
         register_id const unit_goes_into = allocate_register(&state->used_registers);
         add_instruction(function, instruction_create_loop(loop_instruction_create(unit_goes_into, body)));
-        evaluate_expression_result const loop_result = {type_from_unit(),
-                                                        optional_value_create(value_from_unit()),
-                                                        unit_goes_into,
-                                                        true,
-                                                        loop_body_result.always_returns,
-                                                        true};
+        evaluate_expression_result const loop_result = {
+            loop_body_result.status, type_from_unit(), optional_value_create(value_from_unit()), unit_goes_into, true};
         return loop_result;
     }
 
@@ -4452,7 +4502,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
             emit_semantic_error(
                 state, semantic_error_create(semantic_error_break_outside_of_loop, expression_source_begin(element)));
         }
-        return evaluate_expression_result_create(true, into, type_from_unit(), optional_value_empty, false, false);
+        return evaluate_expression_result_create(
+            evaluation_status_value, into, type_from_unit(), optional_value_empty, false);
     }
 
     case expression_type_sequence:
@@ -4493,7 +4544,7 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
                                                              const expression *returned)
 {
     evaluate_expression_result const result = evaluate_expression(state, body, *returned, NULL);
-    if (!result.has_value)
+    if (result.status != evaluation_status_value)
     {
         return result;
     }
@@ -4513,7 +4564,7 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
             add_instruction(
                 body, instruction_create_return(return_instruction_create(converted.where, unit_goes_into)));
             return evaluate_expression_result_create(
-                true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
+                evaluation_status_return, unit_goes_into, type_from_unit(), optional_value_empty, false);
         }
         }
         LPG_UNREACHABLE();
@@ -4524,7 +4575,8 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
     }
     register_id const unit_goes_into = allocate_register(&state->used_registers);
     add_instruction(body, instruction_create_return(return_instruction_create(result.where, unit_goes_into)));
-    return evaluate_expression_result_create(true, unit_goes_into, type_from_unit(), optional_value_empty, false, true);
+    return evaluate_expression_result_create(
+        evaluation_status_return, unit_goes_into, type_from_unit(), optional_value_empty, false);
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,

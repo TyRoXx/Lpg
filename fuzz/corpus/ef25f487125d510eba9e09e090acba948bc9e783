@@ -1,0 +1,36 @@
+ake_ruboolean
+let multi = enum
+    a(single)
+    ("def"))))                assert(string_equals("abc", match return_stateful_enum()
+    case single.a(lostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let# pass_bistate != (arg: bisase b           assert(string_equals("abc", match rete single.a(make_runtmei_string("ab                   )                                              assert(string_equals("abc", match return_stateful_enum()
+    case single.a(lostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let# pass_bistate != (arg: bisase b           assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let s   arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(malement: integer): tch pass_bistate(bist> e.b)
+    case bistate.a: boolean.false
+    case b          std.unit
+    assert(i                  nte  g

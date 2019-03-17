@@ -1,0 +1,12 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : sin.boolean = e
+
+let to(0, a.load()e_of(assert)](assert)
+let fQload : type_of(f.load) = (.load
+std.make_mutable[|ypesert)
+let fQload .make_mutable[|ypeWof(f_loa)fd](_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambda)]))))

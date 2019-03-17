@@ -1,0 +1,29 @@
+// test integer_to_string
+// compile_time / test integer_to_string
+// compile_time evaluation:
+assert(strinZZZ[ZZZZZZZZ: int(0, 2147483647))
+    side_:ffect()
+    integFls("0", test_integer_to_let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let( method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+lint = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    prin,t()
