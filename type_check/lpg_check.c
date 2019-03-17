@@ -709,13 +709,6 @@ check_function(program_check *const root, function_checking_state *const parent,
     }
 }
 
-static evaluate_expression_result make_compile_time_unit(void)
-{
-    evaluate_expression_result const result = {
-        evaluation_status_value, type_from_unit(), optional_value_create(value_from_unit()), ~(register_id)0, true};
-    return result;
-}
-
 typedef struct compile_time_type_expression_result
 {
     type compile_time_value;
@@ -1442,7 +1435,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_generic_interface:
         emit_semantic_error(
             state, semantic_error_create(semantic_error_not_callable, expression_source_begin(*called.callee)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     size_t const expected_arguments =
         expected_call_argument_count(callee.type_, state->program->functions, state->program->enums);
@@ -1653,7 +1646,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     if (!return_type.is_set)
     {
         return evaluate_expression_result_create(
-            evaluation_status_error, result, type_from_unit(), compile_time_result, false);
+            evaluation_status_exit, result, type_from_unit(), compile_time_result, false);
     }
     return evaluate_expression_result_create(
         evaluation_status_value, result, return_type.value, compile_time_result, false);
@@ -2213,6 +2206,13 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 // silence MSVC warning about uninitialized variables
                 LPG_UNREACHABLE();
 #endif
+            }
+
+            if (action_evaluated.status == evaluation_status_error)
+            {
+                instruction_sequence_free(&action);
+                deallocate_boolean_cases(cases, enum_elements_handled, i);
+                return evaluate_expression_result_empty;
             }
 
             if (action_evaluated.status == evaluation_status_value)
@@ -2891,7 +2891,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
                 struct_member_free(elements + j);
             }
             deallocate(elements);
-            return make_compile_time_unit();
+            return evaluate_expression_result_empty;
         }
         if (!element_type_evaluated.compile_time_value.is_set ||
             (element_type_evaluated.compile_time_value.value_.kind != value_kind_type))
@@ -2903,7 +2903,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
                 struct_member_free(elements + j);
             }
             deallocate(elements);
-            return make_compile_time_unit();
+            return evaluate_expression_result_empty;
         }
         elements[i] = structure_member_create(element_type_evaluated.compile_time_value.value_.type_,
                                               unicode_view_copy(unicode_view_from_string(element.name.value)),
@@ -3336,13 +3336,13 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     {
         emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
                                                          expression_source_begin(*element.type)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     if (type_evaluated.compile_time_value.value_.type_.kind != type_kind_structure)
     {
         emit_semantic_error(
             state, semantic_error_create(semantic_error_expected_structure, expression_source_begin(*element.type)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     struct_id const structure_id = type_evaluated.compile_time_value.value_.type_.structure_;
     ASSUME(structure_id < state->program->struct_count);
@@ -3351,19 +3351,19 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
     {
         emit_semantic_error(
             state, semantic_error_create(semantic_error_missing_argument, expression_source_begin(*element.type)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     if (element.arguments.length > instantiated_structure->count)
     {
         emit_semantic_error(
             state, semantic_error_create(semantic_error_extraneous_argument, expression_source_begin(*element.type)));
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     evaluate_struct_arguments_result const arguments_evaluated = evaluate_struct_arguments(
         state, function, element.arguments.elements, element.arguments.length, instantiated_structure->members);
     if (!arguments_evaluated.registers)
     {
-        return make_compile_time_unit();
+        return evaluate_expression_result_empty;
     }
     value *const compile_time_values = garbage_collector_allocate_array(
         &state->program->memory, element.arguments.length, sizeof(*compile_time_values));
@@ -4331,7 +4331,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
                             declared_type.compile_time_value.value_.type_, false);
                 if (converted.ok == success_no)
                 {
-                    return make_compile_time_unit();
+                    return evaluate_expression_result_empty;
                 }
                 final_where = converted.where;
                 final_type = declared_type.compile_time_value.value_.type_;
