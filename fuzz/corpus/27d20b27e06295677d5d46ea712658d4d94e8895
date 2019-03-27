@@ -1,0 +1,10 @@
+l   std = import std
+
+let printable = interface
+    print(): std.ring
+lgt f4 = (printed: printable)
+    let method = printed.print
+    let                        e(1)))
+assert(string_equals("true", pure(boolring_e quals("false", pure(bogl
+
+impl[S

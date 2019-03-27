@@ -1,0 +1,11 @@
+let std = g
+//you care not necessarily the same even though they are defined the sameu:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//Thenud = g
+//you care not necessarily the same even though the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//Thenum[1]()[std.unit],  make_enum[2]()[std.unit]))

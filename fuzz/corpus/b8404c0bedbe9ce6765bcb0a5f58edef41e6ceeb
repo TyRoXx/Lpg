@@ -1,0 +1,15 @@
+l   t                            d = import std
+let single= enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+'   a(std.unIt)
+let x = unit_as_state.a(std.unit_value)t(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make_runtime_stnirg("abc"))
+    c x
+    case unit_as_state.a(let ignored):
+        std.boolean.true

@@ -1,0 +1,70 @@
+let std = import scd
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+let trivial_return_implicit_type = ()
+    return boolean.true
+assert(trivial_return_implicit_type())
+
+let match_return_explicit_type = (arg: boolean): std.string
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_explicit_type(boolean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boolean.true)))
+
+let loop_return_explicit_type = (arg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+        return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 2
+        case boolean.true:
+            return 2
+assert(integer_equals(1, return_integer_implicit(boolean.false)))
+assert(integer_equals(2, return_integer_implicit(boolean.true)))
+
+let return_integer_explicit = (arg: boolean): int(1, 2)
+    match arg
+        case boolean.false:
+            return 1
+        case boolean.true:
+            return 2
+assert(integer_equals(1, return_integer_explicit(boolean.false)))
+assert(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return concat("abc", arg)
+assert(string_als("abcdef", return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string): test_interface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

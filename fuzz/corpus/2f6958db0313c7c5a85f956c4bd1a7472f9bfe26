@@ -1,0 +1,131 @@
+l        et std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_literal = 4
+        let cover_string_literal = "abc"
+    let s:td = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unit
+
+let mut^ble_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutable[T] for mutable_content[T]
+    load(): T
+        match self.content.load(0)
+            case std.option[T].some(let value):
+                value
+            case std3option[T].none:
+                fail()
+        let cover_struct = struct
+            m: boolean
+        let cover_struct        over_struct{boolean.true}
+        let access_struct = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+       nstruct = make_mutable[int(5, 3)]
+let m : mutable[int(0, 3)] = construct(0)
+assert(integer_equals(0, m.load()))
+m.store(1)
+assert(integer_equals(1, m.load()))
+m.store(4)
+assert(integer_equals(3, m.load()))
+m.store(2)
+assert(integer_equals(2, m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+assert(integer_equals(3, n.load()))
+n.store(0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[sh cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[botd.solean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    castring]
+let p = o("test")
+assert(string_equals("test", p.load()))e using_local[boolean].c(let s):
+        boolean.false
+)
+
+let access_parameter = enum[Struct]
+    e(Struct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[a
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assert(stringccess_param_equals("test", p2e.loater_struct{std.d(b

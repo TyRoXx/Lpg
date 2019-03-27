@@ -1,0 +1,32 @@
+//compile_time evaluation
+let d : tch
+    case 0: boolean.false
+    case 1: boolean.true
+    case 2: boolean.f integer_to_match
+    case 0: boolean.false
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+asser   
+t(b))
+
+//runtime ebooleantime_key()
+    case 0: boolean.false
+    case 2: boolean.fs 
+ela   case 2: boolean.true
+ n.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runti o@
+lete_runtime_key = ()
+    sidt(match make_runtime_key()
+    case 0: boolean.false
+    case 2: boolean.fs 
+ela   case 2: boolean.true
+    case 3: boolean false
+)
+

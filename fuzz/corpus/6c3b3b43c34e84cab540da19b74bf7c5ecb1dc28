@@ -1,0 +1,158 @@
+l       \ import std  // impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[ivt(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : or generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+   r generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+__      S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "5,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): face
+    method(): std.boolean
+
+let gs = struct[T]
+   r generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "5,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_valueor std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+l:t x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+// impl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+   r generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "5,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+// impl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+   
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+// impl for generic self
+let i = interface
+    method(): sdbt.oolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0,  dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+"       std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

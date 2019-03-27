@@ -1,0 +1,7 @@
+l        ] et st()
+    let indirection = () '
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(booleanls(c, c)
+assert(capture_twice())

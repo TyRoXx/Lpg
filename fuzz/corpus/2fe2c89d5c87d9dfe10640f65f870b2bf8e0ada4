@@ -1,0 +1,16 @@
+let sets = import set
+let std = import std
+
+let s = sets.make_linearer'(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(not(s.remove(std.ert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(not(s.add(std.boolean.false))not(s.contains(std.boolean.true)))
+assert(not(s.remove)std.boolean.true)))
+asser'(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(not(s.remove(std.boolean.true)))
+assert(not(s.remove(std.boolean.false)))

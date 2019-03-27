@@ -1,0 +1,40 @@
+l       et std = import std
+let boolean =]
+assert(aan.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYoolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+     efault:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY:YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_colBG                       )
+
+let fmp(arilg:

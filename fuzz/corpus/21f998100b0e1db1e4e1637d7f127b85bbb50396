@@ -1,0 +1,11 @@
+a    e_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_eq*uals("\\\\\\\\\\\\\\\\\\\\\\\\\\\r\\\\\\\\;\\\\\\\\\\\sa case tristate.b: boolean.false
+    case tri^tate.c: boolean.false
+)
+assert(match pass_tristate(yristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    case: tristate.c: obolean/rue
+    case tristate.b: boo          

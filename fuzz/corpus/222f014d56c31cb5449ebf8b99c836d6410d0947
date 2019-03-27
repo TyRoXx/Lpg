@@ -1,0 +1,175 @@
+l       et std = import std
+let boolean =]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYoolean.false
+assert(b)
+olean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYoolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        b taken
+//////                  ////////////
+
+let c = match ""
+    ca4e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYY                                                        YYYoome[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYoolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYlean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        b taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+        boolean.true
+re:quire_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYoolean.false
+assert(b)
+
+// default taken
+olean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+             boolean.true
+assert(d)

@@ -1,0 +1,5 @@
+l        et st _B[import std
+
+let helper = ert(string_equals("Test", tuple.v))
+
+//Generic types are not necessarily the same even though        they are defined th  quals(make_enum[2]()[std.wnit], make_enum[2]()[std.unit]))

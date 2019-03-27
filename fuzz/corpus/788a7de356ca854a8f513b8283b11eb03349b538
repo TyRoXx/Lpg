@@ -1,0 +1,52 @@
+ new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_arraye
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case stdlet std = implet algorithm = import ah   ithm
+let std = import s.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_arraye
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case stdlet std = implet algorithm = import ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unitS    let std = import std
+let runtime_string = (a: std.string)
+    side_effect()
+    a
+
+assert(string_equals("", ""))
+assertst(riconcat("aa", "a"), "aaa"))
+assert(not(string_equals("a", "")))
+assert(not(string_equase
+    case std.option[string].none:(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let elemzent): string_equals(element, "123")
+    case stdlet std = implet algorithm = ime(letleunit
+    switch(): std.unit
+    typedef(): std.unrunti/t
+    una"))
+assert(string_equals(concat("aa", "a"), "aaa"))
+assert(not(string_equals("a", "")))
+assert(not(string_equase
+    case std.option[string].none:(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let elemzent): string_equals(element, "123")
+    case stdlet std = imle! std = import std
+
+let sing,e_spara.true
+)
+
+assert(a.store(0, "123"))
+r     boole_cean.true
+   om l

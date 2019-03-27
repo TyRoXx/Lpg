@@ -1,0 +1,24 @@
+let                                                                    st std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{b oolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0};assert(u_instance.a.a)
+assert(string_equals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+l    std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, even though th%y ar 

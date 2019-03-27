@@ -1,0 +1,70 @@
+a2B      ke_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc",Q match single.a(make single.a(make_runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(struct        ur{b"eac", boolean.trlet empty = enum
+let pass_empty = (a.true
+)
+
+let b*state = enum
+    a
+    b
+let m
+    a
+let pass_monostate = (arg: m     ::::::::::::::::::::::::::::::::::::::::::::   onostate)
+    arg
+assert(match pass_monostate(monosate
+))
+
+let strur e      `      !"))a)
+    case monostate.a: boolean.true
+)
+
+let b*state = enum
+    a
+    b
+let pass_bistate
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+    let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(mauch mult6i.b(structure{"abc", bool)
+assert(strate.a)
+cture = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i
+
+let a = single_pcoean)
+    e
+        f
+assert(mring_e  qualsvger_equa c(overse)!!!!!c", boolean !! 

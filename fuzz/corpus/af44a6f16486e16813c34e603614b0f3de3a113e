@@ -1,0 +1,137 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+    untime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import al    boolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    case two_parameterl[oebosan, std.sTring]olean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    ca  boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    case two_parameterl[oebosan, std.sTriean.false
+    default:
+        boolean.true
+require_compile_timee[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYY        YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match "[c]
+assert(c)
+
+let d = match std.runtime_value[std.string](boolean.false
+    case 4: boolean.fs 
+ela   case 2: boolean.tru .u
+ertne
+    case 2: boolean.false
+    case 3: boo                                                                                  lean.false
+
+assert(not(b))
+qual    e
+.trl boolean.false
+    default:
+   et em     pualsW     b: bameterl[oebosan, std.sTring].second(let s):
+       )
+)
+
+let using_globtdmascriptlet  boooolean.true
+assert(4
+  d)
+  assert(boole a]

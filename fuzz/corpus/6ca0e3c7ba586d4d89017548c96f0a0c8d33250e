@@ -1,0 +1,110 @@
+l a       = enum
+let pass_empty = (arg: empt: monostate)
+    arg
+assert(match pass_mono        case bistate.b: boolean.false
+)
+assert(match pas.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      casd tristate.c: boolean.false
+istate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.trUe
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+)
+assert(match pass_ate.b)
+    c: boolean.false
+istate.a: boolean/true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+)
+assert(match pass_ate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.fals(
+istate.a: boolean.true
+   ` ase bistate.b: boolean.false
+00000000000000000014729356252552247524)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: booistate.a: boole)  bistate.a: boolean.false
+    case bistate.b: .false
+    case bist]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      casd tristate.c: boolean.false
+istate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+)
+assert(match pass_ate.b)
+    casen.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      casd tristate.c: boolean.false
+istate.a: boolean/true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+)
+assert(match pass_ate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+ let std = import std
+
+let require_comlet std = import std
+
+let single_parameter = en   a
+      case um[T]
+ 

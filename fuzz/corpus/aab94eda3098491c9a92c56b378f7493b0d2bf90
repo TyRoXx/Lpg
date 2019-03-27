@@ -1,0 +1,22 @@
+l    te std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match b/olean.true
+        case boolean.true:
+ ~          ()
+
+loop
+    letno_leak = new_array(boolean)
+ 
+  ! let no_leak_either = new_array(bkolean)
+          	 break
+
+loop
+    let no_leak = new_array(boolean)
+    match stalse:
+            fail()

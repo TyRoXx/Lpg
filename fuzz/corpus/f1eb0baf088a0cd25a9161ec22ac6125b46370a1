@@ -1,0 +1,47 @@
+l    et std = import std
+
+let printable = interfasert(match
+    case tristate.c: boolean.false
+)
+assert(match pasert(match
+    case tristate. : boolean.false
+)
+assert(match pass_tristate(                                                                        t(match(1, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equaist  _B_W rg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista                                                                                                                                                 pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match(1, alwa rt(integer_equals(1, [type_of(har_a)
+
+let true_predicate = (element: boolean): boolean, option.some(2)
+    b, 1  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(mctha pass_tristate(trista           te(tristata        n[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+         arg
+assert(match         match element2.load(pas0)
+  s_bistan nest generic funcs = pri  e

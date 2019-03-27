@@ -1,0 +1,31 @@
+l   xet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO=   rinted: prinEtable)
+    let method = printed.print
+    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                                          int(0, 0)
+    print()
+        "0"
+  metod()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                ted.print
+    let string = method()
+
+let printable2ther_method()
+        std.unit_value
+
+impl printable2 for                                                     `______^             int(0, std.boolean.false
+)
+
+assert(not(a.store(2, std.boo
+    appeinterface
+    0

@@ -1,0 +1,17 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    meThod(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+            
+assert(string_equals("u", u.method()))
+
+// impl for generic sel u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

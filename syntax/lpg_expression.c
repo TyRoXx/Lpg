@@ -693,7 +693,7 @@ source_location expression_source_begin(expression const value)
         return expression_source_begin(*value.new_array.element);
 
     case expression_type_import:
-        LPG_TO_DO();
+        return value.import.begin;
 
     case expression_type_generic_instantiation:
         return expression_source_begin(*value.generic_instantiation.generic);

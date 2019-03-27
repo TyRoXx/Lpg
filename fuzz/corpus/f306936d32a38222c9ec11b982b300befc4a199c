@@ -1,0 +1,25 @@
+l      I
+ import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continstd.unit
+    extern(): std.unit
+    float():ine():s*er(): std.unit
+    restrict()read_local(): std.unit
+    _(): std.unit
+    ___(): std.unit
+let parameter = (clet std = import std
+
+let printable = interface
+    print(): std.stit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Staticit
+let parameter = (clet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (pr = inter__face
+ :

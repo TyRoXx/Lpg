@@ -1,0 +1,152 @@
+l        import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+        let a : m  = ()
+    side_effect()
+    23
+   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+le runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+/*capture am = bet helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "
+ 2"
+let t = ()
+    elt=u   ()
+        helper{inleX	      ))))
+
+as f6 = ()
+        let a : m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = (
+    side_effect()
+    23
+leg = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_effect()integer_equals(b, 23))
+h()()
+
+/*capture am.string
+    b: std.string
+let x = 2
+let y = "2"
+le     ))))
+
+as f6 = ()
+        let a : m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+    '   assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = (
+    side_effect()
+    23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+/*capture am = bet helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "2"
+let t = ()
+    elt=u    )
+        helper{inleX	      ))))
+
+assert(string_equals("abc", match single.ateger_to_string(x), y}
+    string_equals(     let a : m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = (
+    side_effect()
+                                               23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+;h()()
+
+/*capture am = bet helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "2"
+letle.a(make_r
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+/*capture am   bet helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "2"
+le     ))))
+
+as f6 = ()
+        " singeael(l.t state): state
+))
+
+let structure = struct
+    ?: std.string
+    y: boolean
+let ")))
+assert(not(a.store(1, "")))

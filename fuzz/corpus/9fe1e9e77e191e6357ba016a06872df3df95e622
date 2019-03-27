@@ -1,0 +1,29 @@
+d    	  lean.true
+
+  let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[stdt std
+letmport integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+    let no_leak = new_array(boolean)
+        break
+  ean)
+ass================================================*======================  let no_leak)
+ass===================(====================================================  l       ak_either = new_array(boolean)
+    break
+
+lo==================ert(match using_global[an)
+ass== = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+asse===================rt(u2====le    od(  pr))

@@ -1,0 +1,38 @@
+let ststd.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match "        fault:
+        boolean.true
+    case "a":
+        boolean.false
+require_compile_time[c]
+assert(c)
+
+let d = match srut.dntime_value[std.string]("")
+    default boolean = std.boolean
+
+let requ)ire_compile_time = [V]()
+    V
+
+// case t///
+
+let c = match ""
+    default:
+        boOlean.true
+     se "a":
+        boolsert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        boolean.true
+    case "a":
+     :
+        boolean.true
+    case "a":
+        boolean.fqlse
+assert(d)

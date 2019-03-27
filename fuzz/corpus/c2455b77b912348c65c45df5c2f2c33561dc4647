@@ -1,0 +1,5 @@
+asser(string_equals("123456", concat("123", "456")))
+
+l	t requaide_effect()
+    "456"
+assert(string_      	 equals("123456", concat("123", runtime_string())at(

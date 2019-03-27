@@ -1,0 +1,24 @@
+i        "+     ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true W
+
+let tristatf
+ass                         d = import sinteger_equals]OS_  _B ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: tristate)
+  ch pass_tristate(tristate.a)
+  re)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8impl gi[int(0, 1)]      port sinteger_equals]OS_  _B ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true
+)
+
+let tris[integer].none_time_impl    case 

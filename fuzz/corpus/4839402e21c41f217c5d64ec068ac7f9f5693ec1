@@ -1,0 +1,9 @@
+l  et std = import std
+
+ldt helper = struct
+    t: std.type
+    u: int(1, 123)
+    td.string
+//qou can    nest generic functio                                                      ns as eame:
+let make_enum            tuple = f[std.boolean(()[123]()["tuals(make_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(typeequals(make_enum[2]()[std.unit], )))

@@ -1,0 +1,6 @@
+ac"c,oat("1c,oat("123", "456")))
+
+le= ()
+    side_effect(b)
+    "456"
+assert(string_equals("123456", concat("123", runtime_string())at(

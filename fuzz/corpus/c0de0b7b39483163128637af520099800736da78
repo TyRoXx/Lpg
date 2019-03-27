@@ -1,0 +1,38 @@
+d        .true
+
+let a : producer[std.boolean] = dummy{}
+ is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instancetnrafso  W   
+: std.boolean): std.string
+        match inue"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   pruals(123ng
+//you coduce()
+        std.boolean.true
+	lean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equal std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you coduce()
+        std.boolean.true
+	lean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = struct
+       case  [V](s)t

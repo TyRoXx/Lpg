@@ -1,0 +1,7 @@
+let std = imp= std.array[string]
+let a : (.onaatstore(1, "")))
+assert(not(a.store(2   , "")))
+
+assert(match a.load(0)
+    case$std.option[string].some(let elemment): string_equals(element, "abc")
+    case stdt): string_equalelemment): string()))

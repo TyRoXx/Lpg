@@ -1,0 +1,18 @@
+l        e std
+let b$   an = std.boolean
+
+let rkquire_compile_ttring]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//efault:
+        boolean.false
+assert(b)
+
+// default taken
+/////////n.true
+assert(d)

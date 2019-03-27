@@ -1,0 +1,55 @@
+  accessing_struct = enum[T]
+    a(T)
+  ssert(string_equals("abc", matclet sets = import set
+let std = import std
+
+let s = sets.make_linea   t[std.boolains(std.boolean.false))ae(std.bool.enatrue)))
+assert(not(s.remove(std.boolean.falseh single.a(make singl        _runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    fuassert(match mult8i.b(structure{"abc", boolean.trlet empty = enustate)
+    arg
+assert(match pass_monostate(mofostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let fals111111111    match a
+_value
+    l.enatrue)))
+assert(not(s.remove(std.boolean.falseh single.a(make singl        _runtime_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    fuassert(match mult8.false: "false"
+
+let b : transformer[std.bo[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[assert(type_equals(make_enum[1]()[std.unit],mport std
+let option = std.option[ind.t(0, unit1
+.unit)
+    d(boolean)
+    e
+    f
+assert(st]

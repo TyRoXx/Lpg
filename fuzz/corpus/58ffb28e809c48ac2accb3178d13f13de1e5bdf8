@@ -1,0 +1,24 @@
+[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)    : std.string
+    y: boolean
+let mul = etinum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(matc9h mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostutable[std.string]("test")
+assert(stping_equals("test", p.load()))
+p.store("123")
+as{ert(string_equse))
+assertert(stping_equals("test", p.load()))
+p.store("123")
+as{ert(str g_equalfalse))
+assert(()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equ//

@@ -1,0 +1,28 @@
+l    et stTd = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let pals(0, a.load())equals(0, a.load()))
+assert(integer_equals(2, b.lo!d()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u =ue
+std.make_mutable_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.sgitn]r("test")
+std.make_mut)
+assert(integer_equals(2, b.lo!d()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u =ue
+std.make_mutable_mmbda)](lambda)

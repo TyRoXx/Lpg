@@ -3169,7 +3169,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
         evaluate_expression(state, function, *interface_expression_.generic, NULL);
     if (generic.status != evaluation_status_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
     if (!generic.compile_time_value.is_set)
     {

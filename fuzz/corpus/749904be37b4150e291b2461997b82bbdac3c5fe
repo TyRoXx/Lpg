@@ -1,0 +1,17 @@
+l        p  i mort std
+let single = enum
+    d(boolean)
+    e
+    f
+assert(match ug that generated gar       e out oi sfth:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit_value)
+asse<q(match x
+    case unit_       std.boolean.true
+)

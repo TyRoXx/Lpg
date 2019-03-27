@@ -1,0 +1,29 @@
+let std = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.u].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array           d.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array(std.boolean)
+copy_array_boolean(wd      original, into)
+assert(integer_equals(1, into                case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(        y(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.booleopy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array           std.unit_value    er
+let integer = integers.integer
+d   ion[string].some(let element): string_equa      
+let handler_a = (element: integer): *std.unit
+    assert(integer_equals(0,  element))
+al go

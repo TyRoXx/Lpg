@@ -1,0 +1,91 @@
+let std = import std
+
+leta.print
+    let s = print()
+    le4)
+    side_effect()
+    let print = a.print
+    
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method;( std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl~ printable2 e: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("", pure("")))
+assert(string_(string_equals("0", pure(0)))
+assert(string_equals("1", pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pur= (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    yrint(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printabl1 for std.unit
+    print()
+        "unit"
+    other_method()tring_equals("1", pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pur= (a: printable4)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    yrint(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable1 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+   i        std.unit_value
+
+impl printable2 for std.unit
+ r{}
+h.other_method()
+assert(string_equals("123", h.print()))

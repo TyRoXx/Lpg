@@ -1,0 +1,121 @@
+l  (ltd = import std
+
+let require_comlet std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+assert(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+lot b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abcs.remove(std.boolean.tvue)))
+assert(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(ne
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+assert(not(a.store(1, "")))
+assert(not(a.store(2, "")))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("abc"))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    cae()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): scat("", arg)
+
+lot b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        string_equals("abcs.remove(std.boolean.true)))
+assert(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(ne
+    case using_global[boolean].b(let s):
+        s
+)
+
+let accessing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+assert(match using_global[boolean].b(boolean.true)
+assert(not(a.store(1, "")))
+assert(not(a.store(2, "")))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("abc"))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.opolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.append("456"))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case .false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(2)
+    case std.opt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                case std.option[string].none: boolean.true
+)
+
+assert(a.store(0, "123"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+
+assert(a.store(1, "xyz"))
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "123")
+    case std.option[string].none: boolean.false
+)
+assert(match a.load(1)
+    case std.option[string].some(let element): string_equals(elem                                                                                                                                                                                                                                

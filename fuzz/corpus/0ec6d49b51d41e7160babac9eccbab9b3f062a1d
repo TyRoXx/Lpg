@@ -1,0 +1,84 @@
+l          = import set
+  let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+!sassert(not(s.contains(std.boolatneu.re)))
+
+assert(not(s.add(std.boolean.false)))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.true))
+assert(s.contains(std.boolean.false))
+assert(s.containoolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+!ssert(s.contains(st                                                                                                  ooleane.true)))s.clear()
+assert(not(s.contains(std.boolean.false)))
+alet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = oethod()
+
+let printable2 = interface
+    print()                                                 : std.string
+    other_method(): std.unit
+
+ltd.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print()                                                 : std.string
+    other    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 fossert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolesert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolatneu.re)))
+
+assert(not(s.add(std.boolean.false)))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.true))
+assert(s.contains(std.boolean.false))
+assert(s.containoolean]()print():                                                   string_equals("true", pure(boolean.true)))
+assert(string_equals("false", puer(boolean.false)))
+
+assert(string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interface = interface
+    method(a: booleot(s.remove(std.boolean.true)))
+assert(s.remove(std.boolean.false))
+assert(notan, b: boolean): p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.contai     f(): boolean
+
+let different_method_order = struct
+impl printans(std.b

@@ -1,0 +1,16 @@
+t     = imlet std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[.linked_list_node]
+
+laet final_nodnode]
+        std11111111t std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]
+
+let finaloolean
+      [linked_lic_self_reference[T]
+    b()ference[ = (a: boolea 

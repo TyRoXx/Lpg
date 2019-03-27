@@ -1,0 +1,49 @@
+    case using_global[bo  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_integer_eq  ls(2, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+atch pass_tristate(trista           te(tristatase option[string_equals("0,1", y.method()))
+
+let z = import Stod(): std.string
+
+impl[S= import Stod(): std.string
+
+impl[St_value
+ass_value
+a).tper < struct
+  
+let he                        (test= _single(single.a("def")))e
+ s = struct
+    member: std oolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)))
+d.load().append(std.unist_value) std.make_mutable[host_value](a)
+st`.make_mutable[type_of(interface[T])](ifcetnare[T])
+std.make_mutable[type_of(std.option[std|.unit].d.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[ at "abc", 

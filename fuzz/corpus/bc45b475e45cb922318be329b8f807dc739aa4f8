@@ -1,0 +1,17 @@
+l     std = import std
+let c_resault(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))rface[T]
+    method(): std.string
+
+impl[St_value
+assstd.string
+
+impl[St_value
+asse     )
+    

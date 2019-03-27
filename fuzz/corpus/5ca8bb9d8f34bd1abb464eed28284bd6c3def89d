@@ -1,0 +1,101 @@
+l    L       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): stt.unit
+  oc  nst(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do():han, b: boolean): printable2
+
+impl _keywords = inte
+ercfa    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+         Zjean
+    ___: boolean
+let const = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.bransformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] funit
+    do():han, b: boolean): printable2
+
+impl _keywords = inte
+ercfa    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+         Zjean
+    ___: boolean
+let const = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    Jtransform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.strior dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolea produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f3 = (printed: printable)
+    let method = printe.unit
+   : std.unit
+   test_intea awn, b: aitb()

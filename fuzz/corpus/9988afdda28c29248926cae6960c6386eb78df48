@@ -1,0 +1,57 @@
+l   ststd.boo//////
+
+let c = match ""
+    default:
+        boolean.tru 
+ae   cse "a":
+        boolean.false
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+//////////#
+
+let c = match ""
+    default:
+        boolean.true
+     se "a":
+        boolean_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken/////
+//////
+
+let c = match ""
+    default:
+        boolean.true
+     se "a":
+        boolean.false
+require_compile_time[c]
+assert(c)
+
+let d = match st[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default boolean = std.boolean
+
+let require^compile
+let d = match std.runtime_value[std.string]("")
+    default boolean =   std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// casassert(d)

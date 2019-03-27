@@ -1,0 +1,94 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_time context*/
+let m = boole!n
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assrte(f5())
+
+/*use a runtable in a com ile_ti ecmontext*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f6]
+assrte(f5())
+
+/*use als(c, 23))
+g()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    assert(integer_equals(b, 23))
+require_compile_time[h]
+h()
+
+/*capturd: std.unit)
+        side_effect()
+        std.ed variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f6]
+assrte(f5())
+
+/*use a runtable in a compile_ti ecmontext*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assrte(f5())
+
+/*use als(t f5 = ()
+    let a : m = boolea
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    assert(integer_equals(b, 23))
+require_compile_time[h]
+h()
+
+/*capturd: std.unit)
+        side_effect()
+        std.ed variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assrte(f5())
+
+/*use a runtable in a compile_ti ecmontext*/
+let m = boolean
+let f5 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assrte(f5())
+
+/*use als(c, 23))
+g()
+
+/*use a constant in a runtime cd(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true))
+
+/*capture thec, 23))
+g()
+
+/)us 23)))
+assert(z(boolean.true, boolean.true))
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assertac(pture_twice())

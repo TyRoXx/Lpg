@@ -1,0 +1,69 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = pr\inted.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.           other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = e.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable3 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        stt()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boole", pure(boolean.false)))
+
+ pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure(booleanboolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+        assert(not(b))
+        "test"
+
+let g : test_interface l()
+assert(string_equals("test", compile_time_impl.method(boolean.true, boole("123", h.print()))

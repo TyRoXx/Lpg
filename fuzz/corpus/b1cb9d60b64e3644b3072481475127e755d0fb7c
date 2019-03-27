@@ -1,0 +1,38 @@
+l        = import set
+  let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true))std.boolean.false))
+assert(s.containoolean])
+
+asse                                                                            ooleane.true)))s.cleai()
+assert(not(s.contains(s  Q     an.false)))
+alet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print()                                                 : std.string
+    other_method(): std.unit
+
+letlse)))
+
+let a0 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: booleot(s.remove(std.boolean.true)))
+assert(s.remove(std.boolean.false))
+asser        t(notan, b: boolean): printable2
+
+impl test_e
+    m(): interface
+   (s.contai     f(): boolean
+
+let different_method_order = struct
+impl printans(std.b

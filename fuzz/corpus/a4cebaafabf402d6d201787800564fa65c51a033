@@ -1,0 +1,35 @@
+l a       = enum
+let pass_empty = (arg: empt: monostate)
+    arg
+
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+istate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+)
+assert(match pass_ate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.fals(
+istate.a: boolean.true
+    case bistate.b: boolean.false
+55555555555555555555555555555555555555)
+assert(match pass_bistate(bieeeeeeeeeeeeeeeeeeeeestate.b)
+    case bistate.a: booistate.a: beeeeeeeeeeee

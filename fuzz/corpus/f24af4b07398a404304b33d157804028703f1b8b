@@ -1,0 +1,215 @@
+ = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): nue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.uni       t
+    register(): std.unit
+W___ rict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.
+let parameter = (const: boolean, _: boolean, ___: boolean)ean.true
+    a
+require_co!!!!!!howt.ea{{{{{{{{{{{{{alse
+assert(not(aldler_a)](5, 0, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hand!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!host.ea{{{{{{{{{{{{{alse
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new(array(boole!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!r = (const: boolean, _: boolean, ___: boolean)ean.true
+    a
+require_co!!!!!!howt.ea{{{{{{{{{{{{{alse
+assert(not(aldler_a)](5, 0, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hand!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!host.ea{{{{{{{{{{{{{alse
+asse  let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = prinrue, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+_mutable[iing():
+
+impl i for s _std.unit
+    long(): std.uni       t
+    register(): std.unit
+W___ rict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.
+let parameter = (const: boolean, _: boolean, ___: boolean)ean.true
+    a
+require_co!!!!!!howt.ea{{{{{{{{{{{{{alse
+assert(not(aldler_a)](5, 0, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hand!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!host.ea{{{{{{{{{{{{{alse
+assert(not(algorithm.any_of[boolean, type_of(true_predicate)](new(array(boole!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!r = (const: boolean, _: boolean, ___: boolean)ean.true
+    a
+require_co!!!!!!howt.ea{{{{{{{{{{{{{alse
+assert(not(aldler_a)](5, 0, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hand!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!host.ea{{{{{{{{{{{{{alse
+asse  let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = prinrue, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+_mutable[iing():
+
+impl i for s _mutable[inem
+    to_striad

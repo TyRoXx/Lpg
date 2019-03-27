@@ -1,0 +1,12 @@
+l    et std=W new_array'boolean)
+       ay(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    mop
+    loopv_boolean](boolean.true)
+        case )oolean.true:
+            break
+        case boolean.false:
+            fail()

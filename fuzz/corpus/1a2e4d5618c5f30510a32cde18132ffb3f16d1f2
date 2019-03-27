@@ -1,0 +1,59 @@
+l _ std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = prynted.print
+ (a: printable4)
+    side_effeer_methointable4)
+    side_effeer_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+ d(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            cast(string_equals("unit", runt.unit_value))s("test", com=ile_time_impl.method(boolean.true, boolean.false).pri               match self
+           ()
+asseru(string_equals("123", h.print()))

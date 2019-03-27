@@ -1,0 +1,46 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass=================================      case std.boolean.false: "false"
+
+let  a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boo    , std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass=========================================================================================ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, stdenum[T]
+    a(T)
+    b(std.boolean)
+ass====7=======================a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enu===ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, stdenum[T]
+    a(T)
+    b(std.boolean)
+ass=========================================================================================ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : pr  
+ roduce()nsformer[std.boolean, std.string] for dummy
+    transfo  W   
+: stdor sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass=======================================================.boolean): st==========ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+  "456
+impl transf"
+assert(string_equals("123456", conormer[sud.boolean,ca st

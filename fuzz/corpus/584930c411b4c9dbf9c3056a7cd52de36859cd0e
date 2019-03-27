@@ -1,0 +1,23 @@
+l      te std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match b/olean.tru
+        case boolean.true:
+ ~          ()
+
+loop
+    letno_leak = new_array(booleanintegers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match b/olean.true
+     lse:
+            fail()

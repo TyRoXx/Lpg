@@ -1,0 +1,43 @@
+let std = imp
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        stt()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boole", pure(boolean.false)))
+
+ pure(1)))
+assert(string_equals("true", pure(boolean.true)))
+assert(string_equals("false", pure(booleanboolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+           assert(not(b))
+        "test"
+
+let g : test_interface l()
+assert(string_equals("test", compile_time_impl.method(boolean.true, boole("123", h.print()))

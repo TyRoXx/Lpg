@@ -1,0 +1,52 @@
+l        h  std = import std
+let in;egers = ubtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract_result.underflow   *              ail()
+
+matc                                                                        sserh subtract(10, 2)
+    t(b.append(           ccaue
+)
+hm.any_of[boolean, type_of(true_predicate)](non_empty, true_predi                                                   case sstd.boolean.true
+let conversion_test = struct
+    i: conversion_test_>>>>d.uni", state)
+let make_runtime_string = (value: std.string)
+    sid_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>interface
+
+let conversion = covnersion_test{std.uni", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_    assert(4"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""8""""""""""""""""""""""""""""""""""""""""""(integer_equalstring("abc"))))
+assert(std.nos(1, d))
+f(boolean.true, "t(test_si b
+  `$pass_tristate => (arg: trid.boolea!].some(ldt elemngle(singct
+    i: conversion_test_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>interface
+
+let converiatio< = single_parameter[boole): boolean
+                self
+        let c`veon = conversion_test{std.uni", state)
+let make_runtime_string = (value: std.string)
+    sid_>>>>M>   concat("", qua    lstring("abc"))))
+assert(std.nos(1, d))
+f(boolean.true (,t"etst_single(singct
+    i: conversion_test    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_    assert(t"""""""""""""""""""""""""""""""""""""""""b]]]]]]]""""""""""" case tristate.a: booct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(s", value)
+assert(test_single(single.a(make_runtime_    assert(t"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""(integer_equalstring("abc"))))
+assert(std.nos(0, d))
+f(boolean.true, "t(test_single(singct
+    i: conversion_test_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>interface
+
+let conversil      M_ elfv_       let cover_instantiatio< = single_paramboolean
+  :             self
+        let c`veon = conversion_test{std.uni", state)
+let make_runtime_string = (value: std.string)
+    sid_>>>>M>>>>>>>>>>>3Q      >>>)
+let make_runtime_string = (value: std.string)
+    sid_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>inr_instantiatio< = single_parterameter[boofac

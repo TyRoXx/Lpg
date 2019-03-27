@@ -1,0 +1,28 @@
+l         = import std
+
+le:t single_p         = enum[!]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: booleant pass_tri[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: trista|e)
+    ar[[[[[[[[[[e => (arg: trista|e)
+    ar[[[[[[[[[[[[te.b: booleant pass_tristate => (arg: tri        state)
+    
+    b
+    c
+let pass_tristate => (arg: tristate))
+    ar[[[[[[[[[[[[te.b: booleant pass_tristate => (arg: tristate)
+    ar[[[[[[[[te.b: booleant pass_tristate => (arg: tristate)
+    ar[[[[et tristate = enum
+          b
+    c
+let pass_tristate => (arg: tristate)
+    a   s = print()
+ #      e

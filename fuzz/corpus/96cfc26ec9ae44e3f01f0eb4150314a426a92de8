@@ -1,0 +1,45 @@
+let s                                      td = import std
+
+let printable = inter other_)
+
+assert(string_equals("", r______________________________________________________________________________________________untime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equale", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("                    &                                                 a     a2.print()))
+
+let tti_senterface = interface
+    method(a: boolean,  a     a2.print()))
+
+let test_interface = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni        std.unit_value
+
+iace = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni    assert(string_equals("a", runtim     7J
+assert(string_equals("unitYS_
+  me(std.unit_value)             &                                                 a     a2.print()))
+
+let tti_senterface = interface
+    method(a: boolean,  a     a2.print()))
+
+let test_interface = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni        std.unit_value
+
+iace = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni    assert(string_equals("a", runtim     7J
+assert(string_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assed(): std.uni        std*unit_value
+
+impl printable2 for std.unit
+    print()
+ st
+h.other_method()
+assert(string_equals("123", h.print()))

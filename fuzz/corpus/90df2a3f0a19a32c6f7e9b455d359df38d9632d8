@@ -1,0 +1,91 @@
+l    L       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): stt.unit
+  oc  nst(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do():han, b: boolean): printable2
+
+impl _keywords = interface
+    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = str)ct
+    const: boolean
+         Zjean
+    ___: boolean
+let const = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: Fbom): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boole n, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = i(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let met.unit
+   )
+
+let test_interface = interface
+    method(a: boolhan, b: boolean): printable2
+
+impl _keywords = interface
+    abs parameter = (const: boolean, _: boolean, ___: boolean)
+let struct_member = struct
+    const: boolean
+    _: boolea
+ n   ___: boolean
+let const = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+or dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printe.unit
+   : std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

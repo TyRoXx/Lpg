@@ -1,0 +1,9 @@
+let algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integerment: boolean): boolean
+    boolean.fsert(not(algorithm.any_of[boolean, type_of(true_predicate)](new_arra (boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](rithm = import algorithm
+le       std.unit_valt(not(algorithm.any_of[boolean, type_of(true_predicate)](new_array(boolaen), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(faleers_dpicate)]option[integer].none:
+        std.unit_value

@@ -1,0 +1,96 @@
+l         import std
+
+let linked_list_node = interface
+    value ): boolean
+    next(): std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_notion[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boole: std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEUEEEEEEEEEEEEEEEEEEEEEEEst_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        alue(): boolean
+    next(): std                                                    .uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boolean
+        self.value
+    next(): std.optino[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEnalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE+EEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        alue(): boolean
+    next(): std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boolean
+        self.value
+    next(): std.optino[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit     a(): generic_self_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.aoolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.optinode](makdeEEEEUEEEEEEEEEEEEEEEEEEElue(): boole: std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEUEEEEEEEEEEEEEEEEEEEEEEEst_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        alue(): boolean
+    next(): std                                                    .uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boolean
+        self.value
+    next(): std.optino[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEnalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEola ]enfor std.unit
+    a(): generic_self_reference[.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUE EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        alue(): boolean
+    next(): std                                                    .uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boolean
+        self.value
+    next(): std.optino[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEnalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEola ]enfor std.unitfor std.unit     a(): generic_self_reference[std.boolean]
+        ]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.aoolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.optinode](make single.a(make_runtime_string(.none
+
+le"

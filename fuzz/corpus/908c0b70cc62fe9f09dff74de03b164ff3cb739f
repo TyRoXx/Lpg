@@ -1,0 +1,11 @@
+64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assertst_or[or_u64]()
+
+let or_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    or_u64(std.runtime_value[integers.u64](left), right)
+
+test_or[or_u64_runtime]()

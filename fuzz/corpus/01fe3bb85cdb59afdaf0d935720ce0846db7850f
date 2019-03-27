@@ -1,0 +1,10 @@
+l   p   ^td = import std
+let integers = import intd.runtime_value[able[std.string]("test")
+assue
+ert(string_equals("test",)
+ p1.laod()))
+p2.store("123")
+assertals("test",)
+ p4.load()))
+p2.store(3"21")
+asse{t(string_equals("123", p2.load()))

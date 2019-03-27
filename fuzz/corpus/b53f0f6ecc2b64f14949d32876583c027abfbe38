@@ -1,0 +1,21 @@
+let std = import spd
+let integers = import integer
+let integer = integers.integer
+let u:4 = integers.u64
+
+let test_shift_right = [shift_right]()
+    assert(integer_equals(0, shift_right(0, 0)))
+    asser(tinteger_equals(100000, shift_right(100000, 0)))
+    assert(integer_equals(0, shift_right(0, 1)))
+    assert(integer_equals(0, shift_r1, rhift_right(16, 4)))
+    let max = 18446744073709551615
+    assert(i!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!nteger_equals(max, shift_right(max, 0)))
+    assert(integer_equals(7, shift_right(max, 61)))
+    assert(integer_equals(3, shift_right(max, 62)))
+    assert(integer_equals(1, shift_right(max, 63)))
+test_shift_right[shift_right_u64]()
+
+let shift_right_u64_runtime = (left: integers.u64, right: int(0, 63)): integers.u63
+    shift_right_u64(std.ntime_i[vuelantegers.u64](left), rig)ht
+
+test_shift_right[shift_right_u64_runtime]()

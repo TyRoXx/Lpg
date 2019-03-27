@@ -1,0 +1,64 @@
+l        import std
+
+/*use a captured variable in a compile_time context*/
+let m = b_to_string(x),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = (`
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runti`me context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture let c = f()
+let g = ()
+   =u   ()
+        helper{i       
+
+/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side        _effect()
+    ()   ^     assert(integer_equal        s(b, 23))
+h()(et h = (
+    side_effect()
+    23
+letSSSSSSSSSSSSSS cg()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = (
+    side_effect()
+    23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23        
+
+/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+/*cap))
+
+let structure = struct
+    ?: st:.string
+    y: boolean
+let ")))
+assert(not(a.store(1, "")))

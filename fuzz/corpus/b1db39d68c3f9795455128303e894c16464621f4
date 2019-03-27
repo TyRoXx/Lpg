@@ -1,0 +1,129 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    case two_parameterl[oebosan, std.sTring].second(let s):
+       )
+)
+
+let using_globtdmascriptlet p can nest generic funcs = pri  e
+a
+        boolean.fassert(match multi.b(structure{"abc"lno,ob oean.t_tption[std, arg)
+a      an.true)))
+assert(std.no loop
+        break
+        asrets(boolean.falsetE(xor()
+
+let L       gs = struct[T]
+    dummy: T
+
+implhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    case two_parameterl[oebosan, std.sTring].second(let s):
+       )
+)
+
+let using_gllse
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+                                              le t(>       le t(ts(t(ns(                                                   atch std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:  ion[string].some(let s):
+  e
+assert(matc:
+let algorinhm = import algorithm
+let std = e)
+    case usingray[string])
+let c = new_array(stringrt(a.applean.false
+    case two_parameterl[oebosan, std.sTring].second(let s):
+       )
+)
+
+let using_globtdmascriptlet  boolean.false
+    default:
+        boolean!true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+   obtdmascriptlet p                                                                             can nest generic funcs = pri  e
+assert(match multi.b(structure{"abc"lno,ob oean.t_tption[std, arg)
+asseolean.true
+    case 2: boolean.false
+    case 3: boo    Q   se
+
+asser   
+t(b))
+        me e|booleantime_key()
+    case 0: boolean.tle t(ty(tfalse
+    case 2:                                                                                    

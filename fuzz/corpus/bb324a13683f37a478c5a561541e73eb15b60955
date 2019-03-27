@@ -1,0 +1,70 @@
+d        .true
+
+let a : producer[std.b[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]store(2, std.boolean.true))y = [T](from: std.array[T], to: std.array[T]): std.unit
+    match integer_equals(from.size(), to.size())
+        case std.ple.t))
+assert(inte`er_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+= [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "fals_equalslet std = import std
+
+let helper = struct
+("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yod
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tu
+("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                       tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.tple.v))
+
+//Generic types are not necessarily the same even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit], maeu_knem[2]()[std.ufi .t])))
+assert(type_equals(make_enum[1]store(2, std.boolean.true))y = [T](from: std.array[T], to: std.array[T]): std.unit
+    match integer_equals(from.size(), to.size())
+        case std.ple.t))
+assert(inte`er_equals   case std.boolean.false:
+            match from.load(to.size())
+                case std.option    some(let element):
+                    assert(to.append(element))
+                    copy_array[T](from,t                    case std.option[T].none:
+              = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true}, "abc", 0}
+asslet std = impor64, right: int   

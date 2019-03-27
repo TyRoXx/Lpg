@@ -1,0 +1,48 @@
+let                                  qqqqqqqqqqqqqq                                  stdoolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: i
+    a(T)
+
+let a = single_paramete, u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  tring("(boolean.true)
+assert(match a
+  ert(u_instance.a.a)
+assert(string_equals("abc", u  case single_parametering_equals("2147483647", integer_to_string(214ls("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    side_effect()
+    integ   side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_string("abc")214ls("abc", u_instance.b))
+assert!(integer_equals(ert(string_equals("0", integer_to_stri                                                                ng(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("2147483647", integer_to_string(214
+s("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): bo  ean
+    side_effect()
+    integ   "", 1}))
+
+let nested = struct
+    a: struct
+        b: boolean
+
+let ture = struct
+    x: std.string
+    y: boolean
+let multi = enum
+   conversi a(single)
+    b(structure)
+    cX$.                                                                                                                                unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"aBc", booonlean.t_t

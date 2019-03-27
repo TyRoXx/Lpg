@@ -1,0 +1,23 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*uselean.true, boolean.tru
+
+/*capture m4ltiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captures soeething*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true))
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assertac(pture_twice())
