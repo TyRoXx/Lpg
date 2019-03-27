@@ -365,12 +365,13 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
         expression_parser_result const body = parse_expression(parser, indentation, false);
         if (!body.is_success)
         {
+            generic_parameter_list_free(generic_parameters);
+            function_header_tree_free(header);
             return expression_parser_result_failure;
         }
         expression_parser_result const result = {
             1, expression_from_lambda(
                    lambda_create(generic_parameters, header, expression_allocate(body.success), lambda_begin))};
-
         return result;
     }
     if (next_token.token == token_newline)
@@ -384,13 +385,8 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
     }
     pop(parser);
     parser->on_error(parse_error_create(parse_error_expected_lambda_body, next_token.where), parser->on_error_user);
-
-    clean_up_parameters(header.parameters, header.parameter_count);
-    if (header.return_type != NULL)
-    {
-        expression_deallocate(header.return_type);
-    }
-
+    generic_parameter_list_free(generic_parameters);
+    function_header_tree_free(header);
     return expression_parser_result_failure;
 }
 
@@ -426,6 +422,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
                 expression_parser_result const type = parse_returnable(parser, indentation, false);
                 if (!type.is_success)
                 {
+                    clean_up_parameters(parameters, parameter_count);
                     return function_header_parse_result_failure;
                 }
                 result_type = expression_allocate(type.success);

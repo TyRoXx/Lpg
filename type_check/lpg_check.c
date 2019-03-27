@@ -494,6 +494,7 @@ static evaluate_expression_result make_unit(register_id *const used_registers, i
 static void define_register_debug_name(function_checking_state *const state, register_id const which,
                                        unicode_string const name)
 {
+    ASSUME(which < state->used_registers);
     register_id const previous_size = state->register_debug_name_count;
     if (which >= previous_size)
     {
@@ -505,6 +506,7 @@ static void define_register_debug_name(function_checking_state *const state, reg
             state->register_debug_names[i] = unicode_string_from_c_str("");
         }
         state->register_debug_name_count = new_size;
+        ASSUME(state->register_debug_name_count <= state->used_registers);
     }
     unicode_string_free(state->register_debug_names + which);
     state->register_debug_names[which] = name;
@@ -558,6 +560,7 @@ static check_function_result finish_function_check(function_checking_state state
         function_pointer_create(optional_type_create_set(return_type), tuple_type_create(NULL, 0),
                                 tuple_type_create(capture_types, state.capture_count), optional_type_create_empty());
 
+    ASSUME(state.register_debug_name_count <= state.used_registers);
     if (state.register_debug_name_count < state.used_registers)
     {
         state.register_debug_names =
@@ -615,7 +618,12 @@ check_function(program_check *const root, function_checking_state *const parent,
         define_register_debug_name(&state, address, unicode_view_copy(unicode_view_from_string(parameter_names[i])));
     }
 
+    ASSUME(state.register_debug_name_count <= state.used_registers);
+
     evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
+
+    ASSUME(state.register_debug_name_count <= state.used_registers);
+
     bool const body_has_value = (body_evaluated.status == evaluation_status_value);
     bool const body_always_returns = (body_evaluated.status == evaluation_status_return);
     if (!body_has_value && !body_always_returns)
@@ -629,6 +637,7 @@ check_function(program_check *const root, function_checking_state *const parent,
             add_instruction(&body_out, instruction_create_return(
                                            return_instruction_create(return_value_goes_into, unit_goes_into)));
         }
+        ASSUME(state.register_debug_name_count <= state.used_registers);
         return finish_function_check(state, type_from_unit(), body_out);
     }
 
@@ -1404,6 +1413,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case evaluation_status_error:
     case evaluation_status_exit:
     case evaluation_status_return:
+        ASSUME(state->register_debug_name_count <= state->used_registers);
         return evaluate_expression_result_empty;
 
     case evaluation_status_value:
@@ -1433,6 +1443,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     case type_kind_interface:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
+        ASSUME(state->register_debug_name_count <= state->used_registers);
         emit_semantic_error(
             state, semantic_error_create(semantic_error_not_callable, expression_source_begin(*called.callee)));
         return evaluate_expression_result_empty;
@@ -1454,9 +1465,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         argument_evaluation_result const result = evaluate_argument(state, function, argument_tree, callee.type_, i);
         if (result.ok != success_yes)
         {
+            ASSUME(state->register_debug_name_count <= state->used_registers);
             restore(previous_code);
             deallocate(compile_time_arguments);
             deallocate(arguments);
+            ASSUME(state->register_debug_name_count <= state->used_registers);
             return evaluate_expression_result_empty;
         }
         if (result.compile_time_value.is_set)
@@ -1471,10 +1484,12 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
     }
     if (called.arguments.length < expected_arguments)
     {
+        ASSUME(state->register_debug_name_count <= state->used_registers);
         deallocate(compile_time_arguments);
         restore(previous_code);
         deallocate(arguments);
         emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, called.closing_parenthesis));
+        ASSUME(state->register_debug_name_count <= state->used_registers);
         return evaluate_expression_result_empty;
     }
     optional_type const return_type =
@@ -1642,12 +1657,16 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         }
     }
 
+    ASSUME(state->register_debug_name_count <= state->used_registers);
+
     deallocate(compile_time_arguments);
     if (!return_type.is_set)
     {
+        ASSUME(state->register_debug_name_count <= state->used_registers);
         return evaluate_expression_result_create(
             evaluation_status_exit, result, type_from_unit(), compile_time_result, false);
     }
+    ASSUME(state->register_debug_name_count <= state->used_registers);
     return evaluate_expression_result_create(
         evaluation_status_value, result, return_type.value, compile_time_result, false);
 }
@@ -4534,8 +4553,10 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
         return evaluate_expression_result_empty;
     }
     state->root->expression_recursion_depth += 1;
+    ASSUME(state->register_debug_name_count <= state->used_registers);
     evaluate_expression_result const result =
         evaluate_expression_core(state, function, element, early_initialized_variable);
+    ASSUME(state->register_debug_name_count <= state->used_registers);
     state->root->expression_recursion_depth -= 1;
     return result;
 }
