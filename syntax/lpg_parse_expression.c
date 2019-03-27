@@ -271,6 +271,10 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
             expression_parser_result const value = parse_expression(parser, indentation, 0);
             if (!value.is_success)
             {
+                if (!is_default)
+                {
+                    expression_free(&key.success);
+                }
                 return false;
             }
             {
@@ -747,6 +751,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
                 parser->on_error(
                     parse_error_create(parse_error_expected_right_parenthesis, name.where), parser->on_error_user);
                 is_success = false;
+                expression_free(&maybe_state.success);
                 break;
             }
             state = expression_allocate(maybe_state.success);
@@ -1126,6 +1131,10 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                 pop(parser);
                 parser->on_error(
                     parse_error_create(parse_error_expected_arguments, maybe_close.where), parser->on_error_user);
+                for (size_t i = 0; i < argument_count; ++i)
+                {
+                    expression_free(arguments + i);
+                }
                 if (arguments)
                 {
                     deallocate(arguments);
@@ -1438,6 +1447,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
     expression_parser_result const implemented_interface = parse_expression(parser, indentation, false);
     if (!implemented_interface.is_success)
     {
+        generic_parameter_list_free(generic_parameters);
         return expression_parser_result_failure;
     }
 
@@ -1448,6 +1458,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
+            generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
     }
@@ -1459,6 +1470,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         {
             parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
+            generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
     }
@@ -1470,6 +1482,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
+            generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
     }
@@ -1478,6 +1491,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
     if (!self.is_success)
     {
         expression_free(&implemented_interface.success);
+        generic_parameter_list_free(generic_parameters);
         return expression_parser_result_failure;
     }
 
@@ -1489,6 +1503,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
             parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
             expression_free(&implemented_interface.success);
             expression_free(&self.success);
+            generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
     }
@@ -1543,6 +1558,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
                 parser->on_error(
                     parse_error_create(parse_error_expected_newline, new_line.where), parser->on_error_user);
                 is_success = false;
+                function_header_tree_free(header_parsed.header);
                 break;
             }
             pop(parser);
