@@ -1216,6 +1216,10 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
         }
         else
         {
+            if (parser_result.is_success)
+            {
+                expression_free(&parser_result.success);
+            }
             for (size_t i = 0; i < argument_count; ++i)
             {
                 expression_free(arguments + i);
