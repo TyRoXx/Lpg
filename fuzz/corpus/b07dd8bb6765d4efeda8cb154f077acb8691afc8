@@ -1,0 +1,28 @@
+l    et std = import std
+let c_reserved = interface
+    aqto(): std.unit
+    char(): std.untd.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): it
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): std.unit
+    _Thread_local(): std.un std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: pri'ntable)
+    let metpho= r dinted.print
+    let onst: boolean, _: boolean, _string = method()
+
+let printable2 = intEr__face
+ :

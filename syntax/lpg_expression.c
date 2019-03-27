@@ -1011,6 +1011,11 @@ string_expression string_expression_clone(string_expression const original)
     return string_expression_create(unicode_view_copy(unicode_view_from_string(original.value)), original.source);
 }
 
+bool string_expression_equals(string_expression const left, string_expression const right)
+{
+    return source_location_equals(left.source, right.source) && unicode_string_equals(left.value, right.value);
+}
+
 void comment_expression_free(comment_expression const *value)
 {
     unicode_string_free(&value->value);
@@ -1514,8 +1519,10 @@ bool expression_equals(expression const *left, expression const *right)
         return integer_literal_expression_equals(left->integer_literal, right->integer_literal);
 
     case expression_type_impl:
-    case expression_type_string:
         LPG_TO_DO();
+
+    case expression_type_string:
+        return string_expression_equals(left->string, right->string);
 
     case expression_type_access_structure:
         return access_structure_equals(left->access_structure, right->access_structure);

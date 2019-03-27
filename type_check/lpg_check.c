@@ -1162,6 +1162,7 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     }
 
     case type_kind_unit:
+    case type_kind_type:
     {
         infer_generic_arguments_result const result = {false, NULL, NULL};
         return result;
@@ -1180,7 +1181,6 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     case type_kind_method_pointer:
     case type_kind_string:
     case type_kind_tuple:
-    case type_kind_type:
         LPG_TO_DO();
     }
     infer_generic_arguments_result const result = {false, NULL, NULL};

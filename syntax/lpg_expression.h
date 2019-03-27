@@ -329,6 +329,7 @@ typedef struct string_expression
 string_expression string_expression_create(unicode_string value, source_location source);
 void string_expression_free(LPG_NON_NULL(string_expression const *value));
 string_expression string_expression_clone(string_expression const original);
+bool string_expression_equals(string_expression const left, string_expression const right);
 
 typedef struct integer_literal_expression
 {

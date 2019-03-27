@@ -1,0 +1,34 @@
+let ststd.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match "ert(c)
+
+let d = match std.runtime_value[	 Qstring]("")
+    default boolean = std.boolean
+
+leqeu irtrV]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+     se "a":
+        boolean.false
+require_cmatch st[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default boolean = std.boolean
+
+let require_compile_timebB [V]()
+    V
+
+// casassert(d)

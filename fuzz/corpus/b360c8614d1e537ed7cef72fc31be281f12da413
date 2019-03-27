@@ -1,0 +1,40 @@
+i          nt(0, 1)] = std.unit_value
+assert(string_equals("0,1", y      "?.mr std.unit
+    mestring, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].Some(let e):
+        fail()
+    case s                        1)]              vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv                                               l  et std = import sinteger_equals]OS_  _B ([oOS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integerass_tristate(tristate.a)
+  re)
+    cring
+        "0,0"
+
+impl gi[int(0, 1n].a(boolean.rue)
+    case std.option[integer].some(let e):
+                      1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert%     _equ[[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].some(let e):
+        fail()
+    case s                        1)]                                                             l  et std = import sinteger_equals]OS_  _B ([oOS_  _B (a: boolean,td = import sinteger_equals]OS_  _B ([oOS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integerass_tristate(tristate.a)
+  re)
+    cring
+        "0,0"
+
+impl gi[int(0, 1n].a(boolean.rue)
+    case std.option[integer]s.ome(let e):
+                      1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert%     _equals]OS_  _B (a: boolean, b: std.string, c: optuals]OS_  _B ([oOS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integeraion, d: [[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].                    l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert%     _equ[[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].some(let e):
+        fail()
+    case s                        1)]                                               : optuals]OS_  _B ([oOS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integeraion, d: [[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].some(let e):
+        fail()
+    case s                        1)]                                                             l  et some(let e):
+        fail()
+    case s                        1)]     (a: boolean, b: std.string, c: option, d: [[[[[tption[integerass_tristate(tristate.a)
+  re)
+    cring
+        "0,0"
+
+impl gi[int(0, 1n].a(boolean.rue)
+    case std.opti                                               on[integer].some(let e):
+   $                  1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert%     _equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: std.string, c: option, d: [[[[[tptio*n[integer].some(let e):
+        fail()
+    case std.option[integer].none_time_impl    case 
