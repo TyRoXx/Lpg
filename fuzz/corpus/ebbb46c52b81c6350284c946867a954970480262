@@ -1,0 +1,48 @@
+l  std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a      	    boolean.false
+require_compile_time[c]
+        b     require_compile_time[c]Wassert(c)vylet d = match std.runtime_value[std.string]("")
+    deftea tslud = import std
+assert(type_equals(type_of(0), >yplt:
+        e_of(0)))
+assert(typboolean.true
+    case "a":
+   defaul  t
+:  e_compile_time = [V]()
+    V
+
+// case taken
+/////////o/
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+////'//////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a         	 boolean.false
+require_compile_time[c]
+        b     require_comp)vylet d = match std.runtime_value[std.string]("")
+    deftea tslud = import std
+assert(type_equals(trt(type_equals(type_of(std.stringr)
+), std.type))

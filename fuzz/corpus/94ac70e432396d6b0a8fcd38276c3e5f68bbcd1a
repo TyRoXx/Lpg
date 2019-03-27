@@ -1,0 +1,19 @@
+let std = import std
+
+// impl for i[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gstd = import std
+
+// impl for i[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unert(u2.methodi[int(0, 0)] = std.unit_value
+asequals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.un1)] = std.unert(u2.method())

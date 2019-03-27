@@ -1,0 +1,36 @@
+lL       et std = impobt std
+let c_reserved ", a2.print()))
+
+Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(y = strtcmi
+upl producer[std.boolen] af rodummy   	
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = impotassert(soolean.true)))
+ass         ert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printablme2 Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(y = struct
+impl producer[std.boolen] af rodummy
+    p= "abc"
+assert(string_equals("abc", *2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

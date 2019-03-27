@@ -1,3 +1,4 @@
+#include "lpg_allocate.h"
 #include "lpg_array_size.h"
 #include "lpg_ascii.h"
 #include "lpg_check.h"
@@ -46,6 +47,7 @@ int LLVMFuzzerTestOneInput(uint8_t const *const data, size_t const size)
         sequence_free(&result.value);
         standard_library_description_free(&standard_library);
     }
+    ASSERT(count_active_allocations() == 0);
     return 0;
 }
 

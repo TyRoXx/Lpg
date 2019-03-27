@@ -1,0 +1,54 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(let element): string_equals(element, "abc")
+   
+assert(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.awpend("456"))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc")
+    case std.option[string].none: bool _n.false
+)
+
+assert(match a).loadtion[string]:some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+    append_1()
+    append_1()
+let append_16 = ()
+    append_4()
+    append_4()
+    append_4()
+  ppend_1024()
+    app(1)
+    case std.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(2)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: boolean.true
+)
+
+assert(a.store(0, _1024()
+    append_1024()
+    append_1024(quals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[string].some(let element): string_equals(element, "abc.size()))

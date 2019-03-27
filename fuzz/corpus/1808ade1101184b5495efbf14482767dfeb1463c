@@ -1,0 +1,19 @@
+l    et std = import std
+
+letequals(1, return_inurn_runtime, arg)
+assert(strikg_equals("abcdef", return_puntian): std.string
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", mat*h_return_explicit_type(boolean.true)d.string)
+    side_effect()
+  face for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string): test_jnterface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

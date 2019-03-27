@@ -1,0 +1,14 @@
+let std = import std
+let es = import ecmascript
+let option = std.option
+
+(window: host_value, host: eossh.t)
+    let arguments = new_array(host_value)
+    assert(arguments.append(host.export_string("Hello, world!")))
+    match host.read_property(window, "document")
+        case option[host_value].some(let console):
+            host.call_method(console, "write", arguments)
+            std.unit_value
+        case option[host_value].none:
+            assert(boolean.false)
+            std.unit_value

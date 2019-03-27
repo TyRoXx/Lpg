@@ -1077,6 +1077,10 @@ static tuple parse_tuple(expression_parser *parser, size_t indentation, source_l
         }
         else
         {
+            if (parser_result.is_success)
+            {
+                expression_free(&parser_result.success);
+            }
             for (size_t i = 0; i < element_count; ++i)
             {
                 expression_free(tuple_elements + i);
@@ -1174,13 +1178,12 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
     }
 }
 
-static bool parse_instantiate_struct(expression_parser *parser, size_t indentation, expression *result,
-                                     source_location const opening_brace)
+static expression parse_instantiate_struct(expression_parser *parser, size_t indentation, expression structure,
+                                           source_location const opening_brace)
 {
     tuple const arguments = parse_tuple(parser, indentation, opening_brace);
-    *result = expression_from_instantiate_struct(
-        instantiate_struct_expression_create(expression_allocate(*result), arguments));
-    return true;
+    return expression_from_instantiate_struct(
+        instantiate_struct_expression_create(expression_allocate(structure), arguments));
 }
 
 static bool parse_generic_instantiation(expression_parser *const parser, size_t const indentation,
@@ -1292,10 +1295,8 @@ static expression_parser_result parse_returnable(expression_parser *const parser
         if (maybe_operator.token == token_left_curly_brace)
         {
             pop(parser);
-            if (parse_instantiate_struct(parser, indentation, &result.success, maybe_operator.where))
-            {
-                continue;
-            }
+            result.success = parse_instantiate_struct(parser, indentation, result.success, maybe_operator.where);
+            continue;
         }
         if (maybe_operator.token == token_left_bracket)
         {

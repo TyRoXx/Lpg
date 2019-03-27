@@ -1,0 +1,88 @@
+l-        = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_resultL       result):
+        assert(intjger_eq  ls(0, result))
+    case subtracRRRRRRRRRRRR"123", p.load())RRRRRRRRRRRRRRRt_result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtim  	  
+ $inteoS     middle_node = 
+ u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_por1111 u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_por11111111111111111zzzz   middle_node = 
+ u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_porger](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    ca    se subtractZr1111 u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_por1111111111e111std.uni.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean):  = struct
+    const: boolean
+    _:                                                                          : std.uni.print()))
+
+let tmatch_ ret  urn_explicit_type(boolean.true))):e___   access7ng_struct>= enum[T]
+ a__       {{{{{{{{{{{{{{{{{{{{{{{{{{{ing_struct>= enum[T]
+ a__          +Vu    b(std.boolea!!!!! enuatch_ret  urn_explicit_type(boolean.true))):e___   accessing_struct>= enum[T]
+ a__          +Vu    b(std.boolea!!!!! enun.trum
+    a("a", match_return_explicit_type(boolean.tr                         (                         ue))):e___   access{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{{ing_struct>= enum[T]
+ a__          +Vu    b(std.boolea!!!!! enun.trum
+   `a
+tch_ret abs param= interface
+    abs parameter = (const b:oolean, _: boolean, _let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yo ucan nest g%nlet f = [T]()
+    [U]()
+        [V]()
+            helper{T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the same even though        they let std = import stteger = integers.integer
+let u64 = integers.u64
+
+let test_or = _equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()
+
+let or_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    or_u64(std.runtime_value[integers.u64](left), right)
+
+test_or[or_u64_runtime]()
+nit], make_enum[5]()[std.unit])))
+assert(type_equals(                     d                               nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+          U](a: T, b: U)
+    f[utable[type_of()](3)
+as  te)](non_empty, true_predicate))_predicate)](new_a]
