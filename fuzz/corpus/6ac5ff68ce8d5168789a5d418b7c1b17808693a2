@@ -1,0 +1,44 @@
+l    or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    asserthinteger_equals(1, or(0, 1)))
+    assert({integer_equals(1, o5
+    assert(integer_equals(max, (0)b(std.boolean)
+assert(match using_global[boole    0ro(duce()
+        std.boolean.true
+	let a : produprod transformer[std.boolean, std.string]!= dummy{}
+ass   produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transf!o  W   
+: std.boolean): Wstd.string
+   p    match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(stoduproduce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transf ` W   
+: std.atch input
+            case std.boolean.true: "true"
+            case std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   produce()
+     std.boolean.true
+	let a : produproduce())
+
+impl traner[std.boolean, std.string] for dummy
+    transfo  W   
+: std.boooolean
+        impl cover_inted.string
+    y: boolean
+hod(): it
+
+let puren.false))
+assever.b
+

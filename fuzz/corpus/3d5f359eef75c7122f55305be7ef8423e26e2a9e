@@ -1,0 +1,167 @@
+l      5)L       et std = e
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): s       double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.un        it
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): s                                                                                                td.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+: std.unit
+    _(): std.unit
+    ___(): std.unit
+letan.false)!)
+
+let a2 : printablme2 = "abc"
+assert(string_equals("abc", a2.Yprint()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+     t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+   auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascriptlet std =.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): st.  .unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): s       double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+   !int(): std.unit
+    long(): std.un        it
+    register(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+  import std
+
+let"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_metho)d(
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    otd.boolean): std.string
+        ma
+    print()
+        "unit"
+    other_method()std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): s       double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.un        it
+ster(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    union():    b
+let n = nestGd_enum.b
+

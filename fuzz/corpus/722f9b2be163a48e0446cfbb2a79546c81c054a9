@@ -1,0 +1,16 @@
+l   p   ^td = import std
+let integers = import intd.runtime_value[able[std.string]("test")
+assue
+ert(string_equals("test",)
+ p1.laod()))
+p2.store("123")
+assert(string_equd
+
+// impl for, n.load()))
+
+let )o = make_mutable[std.string]
+let p e
+ert(string_{equals("test",)
+ p4.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

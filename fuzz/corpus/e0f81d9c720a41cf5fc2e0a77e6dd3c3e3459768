@@ -1,0 +1,49 @@
+a  ls("a:~      ch return_stateful_enum().unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monoastte = enum
+    a
+let pass_monostate = (arg: monostate)
+    ar[w      (match pass]monostate(monostate.a)
+    case monostate.a: boolean.trxue
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.gggggggggggggggggggggggggggggggggggggggggggggggggggggggggon
+let a = new_array(std.array[std.array[string]])tate = enum
+    a
+    b
+let# pass_bistate != (arg: bisase brt(a.append(b))
+assert(integer_equals(0, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+                match element2.load(0)
+                    case option[string].some(let s):
+                        string_equals(s, "abc")
+                    case option[string].none:
+                                assert(slet std = import std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    string: std.strang
+
+impl i for s
+    to_stng()
+        yelf.stAing
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[Compilt

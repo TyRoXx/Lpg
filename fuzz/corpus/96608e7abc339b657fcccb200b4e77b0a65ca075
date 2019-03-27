@@ -1,0 +1,128 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_shift_right = [shift_right]()
+    assert(integer_equals(0, shift_right(0, 0)))
+    assert(integer_eqlals(100000, shift_right(100000, 0)))
+    assert(integer_equals(0, shift_right(0, 1)))
+    assert(integer_equals(0, shift_ri  ght(0, 10)))
+    assert(integer_equals(0, shift_right(0, 63)))
+    oS     middle_node = 
+ u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_por1111 u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_pozzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzpty de]
+
+let final_node == (a struct
+   ode = struct
+    5alue: boolean
+    next: linked_lisMt_node
+
+impl linked_por1111111111111111111111_l1111111111111111111111nked_list_noempty de]
+
+let zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzpty de]
+
+let final_node == (a struct
+   ode = struct
+ assert(integer_equals(1, shift_right(1, 0)))
+    assert(integer_equals(1, shift_right(2, 1)))
+    assert(integer_equals(1, shift_right(4, 2)))
+    assert(integer_equals(1, shift_right(8, 3)))
+    assert(integer_equals(1, shift_right(16, 4)))
+    let max = 18446744073709551615
+       ert(integer_equals(max, shift_right(max, 0)))
+    assert(integer_equals(7, shif   5alue: boolean
+    next: linked_lisMt_node
+
+impl linked_por1111111111111111t_right(max, 61)))
+    assert(integer_equals(3, shift_right(max, 62)))
+    111111_l1111111111111111111111nked_list_noempty de]
+
+let final_node assert(integer== (a strUct
+                                                                                                                                      valrgzzzzzzzzzzzzzzz{zzzzptyg  "
+
+let final_node == (a struct
+   ode = struct
+    v
+ u\   value: boolean
+    next: linked_list_:od e
+
+impl linked_  r1111 u\   value: boolean
+    _equanext: linked_list_:od e
+
+impl       por11111111111111111zzzzzzzzzzzzzzzfinalls(1, shift_right(max, 63)))
+test_shift_node == (a strUct
+        _right[shift_right_u64]()
+
+ l      est = struct
+    i: conversion_test_>>>>d.uni", state)
+let make_runtime_string = (value: std.string)
+    sid_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>interface
+
+let conversion = conversion_test{std.uni", state)
+let make_runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runtime_    assert(t"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""(integer_equalstring("abc"))))
+assert(std.nos(1, d))
+f(boolean.true, um
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated garbage code out of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unIt)
+let x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(s", value)
+assert(test_single(single.a(make_runtime_      bassert(t"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""(integer_equalstring("abc"))))
+assert(std.nos(0, d))
+f(boolean.true, "t(test_single(singcor sing_struct =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+   integer_one
+
+let middle_node = struct
+    value: boolean
+  ;  next: linked_list_node
+
+impl linked_por110equals(i.loa boolean.true
+        case boolean.truevalue: std.string)
+    sid_>>>>M>>>>>>>>>>>3Q      >>>)
+let make_runtime_string = (value: std.string)
+    sid_>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>i          (std.option[std.unit].some)](stimports_are_equiv : std.mutable[std.string]at "abc", 

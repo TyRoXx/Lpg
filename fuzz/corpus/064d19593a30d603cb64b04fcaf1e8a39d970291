@@ -1,0 +1,28 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.ma(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store(0)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(3, b.load()))
+b.store(2)
+assert(integer_equals(0, a.load()))
+assert(integer_equals(2, b.lo!d()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u =ue
+std.make_mutable_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.mare_mutable[type_of(f_load)](f_load)
+std.make_tamuble[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_mutable[type_of(lambda)](lambda)

@@ -1,0 +1,78 @@
+let std = import std
+lvalue
+let ___ = std.boolean
+let e = enumt ___ = std.boolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.br(): std.unie: boolean
+    nex producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.br(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): tstd.unit
+   st_node]
+
+let final_node = struct
+    value: boolean
+
+impl linked_list_node for final_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[link_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable4)
+    side_effect()
+    let print = a.print
+  "true"
+           ed_list_node].none
+
+l%t middle_node = struct
+  t: linked_list_node
+
+impl linked_port std
+let opti case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: on = ststd.unit): 0000000000000000000000pro

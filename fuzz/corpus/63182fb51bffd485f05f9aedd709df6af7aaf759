@@ -1,0 +1,12 @@
+l    std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, even though th%y are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the same.
+as U, V}
+        let                                              !   `______a                                tuple = f[std.boolean:()[123]()["test"a                                tuple = f[std.boolean:()[123]()["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = import stdt], )))

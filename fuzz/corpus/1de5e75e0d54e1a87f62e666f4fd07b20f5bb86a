@@ -1,0 +1,38 @@
+l    et std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            ()
+
+loop
+    let n                                                                                                      o_leak = new_array(boolean)
+    break
+
+          loop
+    loop
+        let no_leak =W new_array'boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    mop
+    loopv__Z     let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+          	 break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case )oolean.true:
+            break
+        case boolean.false:
+            fail()

@@ -1,0 +1,30 @@
+t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))ls("abc", match single.a(make single.a(maabc", optionk.some  e monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let rt(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(string_equals("abc", content):
+            string_equals("hello", content)
+        case option[std.string].none:
+            boolean.false
+)
+    assert(match host.import_string(host.undefined())
+   $    case option[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            t pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.a)
+   boolean.true
+)
+
+let test_read_property = (h caseost tristate.a:: e

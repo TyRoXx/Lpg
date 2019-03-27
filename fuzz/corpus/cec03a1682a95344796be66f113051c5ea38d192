@@ -1,0 +1,28 @@
+l         et std = imporlet ssert(a.produce())
+
+impl transformer[std.boolean, stdXstring] for dummy
+    transform(input: sld.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+ lue
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    otassert(string_equals("unit", runtime(std.unit_value)))
+assert(string_equals("0", r[std.boolean]
+
+impl captuhes_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+      an): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_i^nterface for std.unit
+    method(a: boolea awn, b: aitb()

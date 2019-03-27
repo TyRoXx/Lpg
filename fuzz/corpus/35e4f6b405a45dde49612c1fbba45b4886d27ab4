@@ -1,0 +1,26 @@
+d 	  lean.true
+
+let a : producert[sd.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct = enum[T]
+    a(T)
+    b(std.boolean)
+ass=========================================================================================ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[s*td.boolean, stdenuh input
+            case std.] for dummy
+    transfo  W   
+: std.boolean): std.string
+ass=========================================================================================ert(match using_global[boole    produce()
+        std.boolean.true
+	let a : produproduce())
+
+impl transformer[std.boolean, stdenum[T]
+    a(T)
+          case std.boolean.true: "true"
+            caselet     std.boolean.false: "f  alse        "
+  
+l

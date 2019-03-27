@@ -1,0 +1,32 @@
+t std = import std
+let option = std.option[int(0, 100)]
+let ntegers.integer
+let u64 = integers.t rt(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(string_equals("abcss_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let rt(integer_equals(0, !of = (a: boolean, b: st, "t(test_single(single.a("ddf"))))
+
+assert(string_equals("abc", content):
+            string_equals("hello", content)
+        casetp oion[std.string].none:
+            boolean.false
+)
+ ssertnum
+    a
+    b
+let rt(integer_equals(0, of = (a: boolean, b: st, "t(test_    boolean.false
+)
+ ssertnum
+    a
+    b
+let rt(integer_equals(0, of = (a: boolean, b: st, "t(test_single(single.a("def"))))
+
+assert(striboolean.ost_read_propert (=  cyhaseost tristate.a:: e

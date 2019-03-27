@@ -1,0 +1,35 @@
+i  nt(0, 1)] = std.unit_value
+assert(string_equals("0,1", y      "?.mr std.unit
+    met od(): std.string
+        "0,0"
+
+impl gi[int(0, 1)]                              1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert[integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integerass_tristate(tristate.a)
+  re)
+    c(std.Unit)
+    d(boolean)
+    e
+    f
+assert(match mult6impl gi[int(0,                                                                                                             od(): std.string
+        "0,0"
+
+impl gi[int(0, 1n].a(boolean.rue)
+    case std.option[integer].some(let e):
+                      1)]                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert[integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_trisate)
+    arg
+assert(match pass_tristate(tristate.a)
+  re)
+    c(std.Unit)
+    d(boolean)
+    e                                                             l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert[integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integer].some(let e):
+        fail()
+    case std.option[integer].none_time_impl    case 

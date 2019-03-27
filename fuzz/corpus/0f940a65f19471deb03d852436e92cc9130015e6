@@ -1,0 +1,39 @@
+r        ean)
+man)
+assert(match using_global[b               boolean.tru    result):
+   )))
+    assert(integer_equals(1844:
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+              tch using_glol        et std = import std
+let single = enum
+    a(std.bal[booleanan
+sert(integer_equals(1844:
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_glo[lab[boolean].b(boolean.true)
+    case using_global[bcover_enuUm 0)
+    case subtract_resultL       result):
+   )))
+    assert(integer_equals(1844:
+        string_equals("abc", s)
+)
+
+let using_global = enum[T]
+    a(T)
+    b(boolean)
+assert(match using_glol        et std = import std
+let single = enum
+    a(std.bal[boolean].b(boolean.true)
+    case using_global[bcover_enum 0string)
+let test_single = (arg: single)
+    matc)
+    ch arg
+    

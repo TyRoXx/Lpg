@@ -1,0 +1,46 @@
+let std = import std
+
+let tr ivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+let trivial_return_implicit_type = ()
+    return boolean.true
+assert(trivial_return_implicit_type())
+rg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+        return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        case b  ret}rn conca
+let match_return_explicit_type = (arg: booleit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+        return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        case b  ret}rn conca
+let matype(boolean.true)))
+
+let loop_return_explicit_type = (arg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolealet std = import type = (arg: boolean)
+    loop
+        return arg
+assert(loop_return_implicit_type(boolean.teturn boolean.true
+let return_interface = (arg: std.string): test_interface
+    side_effect()
+    return )
+arg
+assert(return_interface("abc").m())

@@ -1,0 +1,144 @@
+l-        = import std
+let integers = import i case sueger_equals(0, n.loa"test",)ake_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("1equals("123", p.load()))
+
+let p2 = make_mutable[strt(string_equals("teststd.string]("test")
+assue
+ert(string_equals("test",)
+ p 
+2.load()))
+)
+assert(string8_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")
+assue ert(string_ke_mutable[std.string]1"test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p",)
+ p2.load()))
+p2tso.1.load()))
+p2tso.re("value: T): st0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p  = makoe_mutable[std.string]
+let p = o("test")ssert(string_equals("123", p.load()))
+
+let p3 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+erface case sueger_equals(0, n.loa"test",)ake_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("1equals("123", p.load()))
+
+let p2 = make_mutable[strt(string_equals("test",)
+ p2.load()))
+p2tso.1.load()))
+p2tso.re("value: T): st0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p  = makoe_mutable[std.string]
+let p = o("test")ssert(string_equals("123", p.load()))
+
+let p3 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+erface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")                                                                 assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()4))
+
+let p2 = make_mutable[std.string]("test")
+assuest")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+erface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equaoad()))
+
+let p4 =m ake_mutable[std.string]1"test")
+assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p 
+2.load()))
+)
+assert(string8_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")
+assue ert(string_ke_mutable[std.string]1"test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load([T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")                                                                 assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()4))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+erface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+asser= o("tels("test", p.load()))
+p.store("1equals("123", p.load()))
+
+let p2 = make_mutable[strt(string_equals("tp2 "test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+erface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert(string_equaoad()))
+
+let p2 =m ake_mutable[std.string]1"test")
+assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p 
+2.load()))
+)
+assert(string8_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")
+assue ert(str)ing_ke_mutable[std.string]1"test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

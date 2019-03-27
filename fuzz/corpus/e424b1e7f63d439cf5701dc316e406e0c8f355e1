@@ -1,0 +1,27 @@
+d.boolean.true
+
+let a :  s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boleoan.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.
+isnt rg   c: in_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_euuals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                       et u = struct
+    a: t
+    b: std.
+isnt rg   c: in_enum[1]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_euuals(make_enum[2]()[std.unit], make_enum[2]()[std.u                                                                             nit]et std = impor:
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std. case using   boolean.false
+    case using_global[boolean].b(let s):
+      64, right: int   

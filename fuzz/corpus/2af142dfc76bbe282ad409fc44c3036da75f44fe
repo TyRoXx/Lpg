@@ -1,0 +1,34 @@
+le std
+let b    an = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////////
+
+let a = match ""
+    case "":
+        boolean.true
+    defau
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////////:
+        boolean.false
+    defauh "":
+        boolean.true
+    defaul   case "a":
+        boolean.false
+    default:
+        boolean.true
+assert(d)

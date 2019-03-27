@@ -591,6 +591,16 @@ static run_sequence_result run_sequence(instruction_sequence const sequence, val
                                         value *const registers, structure_value const captures,
                                         optional_function_id const current_function, interpreter *const context)
 {
+    if (sequence.length == 0)
+    {
+        if (*context->executed_instructions == context->max_executed_instructions)
+        {
+            return run_sequence_result_instruction_limit_reached;
+        }
+        // empty sequences count as one instructions each so that we can detect infinite, empty loops in compile time
+        // evaluation
+        *context->executed_instructions += 1;
+    }
     LPG_FOR(size_t, i, sequence.length)
     {
         instruction const element = sequence.elements[i];

@@ -1,0 +1,24 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yo ucan nest g%neric functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums rae considered different even though U is the same because T is not the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[5]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[ecessaril.unit]))

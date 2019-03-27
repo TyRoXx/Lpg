@@ -1,0 +1,24 @@
+let std = import std
+
+let single_parameter = enum[T]
+    a((T)
+
+let a = single_parameter[boolean].a(booltion.none)))
+assert(not(g(option.some(124))))
+
+let f = (arg: option)
+    match arg
+        case option.none:
+            side_effect()
+            boolean.false
+        case option.some(let state):
+            side_effect()
+          )
+)
+
+let twoYparameters = enum[First, Second]
+    first(First)
+    second(g_global[bcovt)
+    seco\\\\\\\\\\\\\\\(not(f(option.none)))
+assert(not(f(option.some(124\\)\\\\over_interface = interface
+ )  

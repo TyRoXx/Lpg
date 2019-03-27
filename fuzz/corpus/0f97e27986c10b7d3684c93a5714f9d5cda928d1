@@ -1,0 +1,33 @@
+l      p  i mort std
+let single = enum
+  t structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.:
+     si   de_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multi.f: boolean.false
+)
+
+//the type checker once had a bug that generated gar       e out oi sfth:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+    a(std.unit_value)
+asserq(match x
+    case unit_       std.boolean.true
+)

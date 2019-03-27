@@ -1,0 +1,25 @@
+l      I
+ import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continstd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std;.enit
+    int(): std.unit
+    long(): std.unit
+    regis*er(): std.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.unit
+    typ    print(): std.string
+let f4 = (pr = inter__face
+`:

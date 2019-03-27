@@ -1,0 +1,20 @@
+let std = import std
+
+//import std
+
+// impl for generic interface
+let gi`B_ uterface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+&   method(): std.string
+        S
+
+impl                   ] for std.unit
+    method)): std+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++ std.boolean.true
+
+let z4 : i =   gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u(2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

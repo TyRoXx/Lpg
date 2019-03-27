@@ -1,0 +1,9 @@
+let std = im, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessaril	 thesame even though        they are defined the same:
+Nlet        
+m1= [T]
+    enu`m[U]
+        a(U)
+//The enums\ae considered different even though U isnum[2]()[std.unit]))

@@ -1,0 +1,18 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_result.als(0, result))
+    case subtract^result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(matcsubtract(std.runtime_value[integer](0), 1)
+    case subtractow:
+        boolean.true
+)

@@ -1,0 +1,117 @@
+teger = integers.in(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interfaceB," ger_equals(1, d.load().size()))
+d.store(new)
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std oolean
+let f = std.make_mutable[s](s{std.boolean.true}assert(string_equals("123456", concat("123", "456")))
+
+let runtime_string = ()
+    side_effect(456", concat("123", runtime_string())a)
+    "456"
+assert(string_equals("123456", conca(1"t23", runtime_string())at(])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)))
+d.load().append(std.unist_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+stdxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxnit
+    continue(): std.unit
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("5,0", x.method()))
+
+le                        t y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    std
+
+// iml pfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0",       /d()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import Stod(): std.string
+
+impl[S= import Stod(): stdlet std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_result.ok(let result):
+        assert(integer_equals(0, result))
+    case subtract^result.underflow:
+        fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runtime_value[integer](0), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case sithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer(not(algorithm.any_of[boolean, type_of(false_predicate)U(new_array(boolean), false_predicate)))
+
+let non_empty = new_array(boolean)
+assert(non_empty.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predicate)](non_empty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+an.true)))
+
+assert(s.add(std.boolean.true))
+assert(s.contains(std.boolean.false))
+assert(s.contains(std.boolean.true))
+
+assert(not(s.add(std.boolean.true)))
+assert(s.contains(std.boolean.false))
+assert(s.contains(std.boolean.true))
+
+s.clear()
+assert(not(s1contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+assert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+assert(not(s.r0move(std.boolean.true)))
+aspert(s.remove(std.boolean.false))
+assert(not(s.contains(std.boolean.false)))
+assert(not(s.contains(std.boolean.true)))
+assert(not(s.remove(std.boolean.true)))
+asser{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)))
+d.load().append(std.unist_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].d.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad()ase lern.true)*                      ==
+)
+
+let bis     = enum
+    match element2.load(0)
+                       "\""                                                             (std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[mat "abc", 

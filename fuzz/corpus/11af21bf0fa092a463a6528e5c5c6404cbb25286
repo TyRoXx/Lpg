@@ -1,0 +1,44 @@
+ake_runtime_string("abc"))))
+as3       .not(test_single(single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("ab(            )
+    se bistate.b: boolean.false
+)
+assert(match pass_ibstate(bistate.b)
+ timt(arg: bistate)
+    arg
+single.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("ab(            )
+    caszi      e monostate.a: boolean.trxue
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a:t pass_bistate != (arg: bistate)
+    arg
+assert(match pas
+assert(match pass_bi                                                                      vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtate.a:t pass_bistate != (arg: bistate)
+    arg
+assert(match pas
+assert(match pass_bi                                                                      vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv    state(bistate.b)
+    case bistan.false
+    case b                  assert(string_equals("abc", match return_stateful_enum()
+    case single.a(let state): stat_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+
+let pass_bistate != (arg: bistate)
+    arg
+assert(match!pass_bisle.a(leean
+let multi =       

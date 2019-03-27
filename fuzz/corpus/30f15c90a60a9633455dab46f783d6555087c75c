@@ -1,0 +1,106 @@
+    case using_global[bo  arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match
+    case tristate.c: boolean.false
+)
+assert(match pass_integer_eq  ls(2, alwa rt(integer_equals(1, d))
+f(boolean.true, "abc"rt(integer_equals(0, element))
+atch pass_tristate(trista           te(tristatase option[std.array[string]].some( et element2):
+                assert(c.append("abc"))
+         arg
+assert(matchml pfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0",       /d()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import Stod(): std.string
+
+impl[S= import Stod(): std.string
+
+impl[St_value
+ass_value
+a).tper < struct
+  
+let heet self = import ilper 
+let heent,td.option[string].some(let elm
+!   a(    le)
+tch  std
+roduce
+erface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+ass
+        std.unit_value
+
+impl printable4 for int(1, 1)
+    print()
+      nterfac  e
+  method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(no", compileder = struct
+impl printable0 for different_method_orderethod_order{}
+h.otherd_met(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        b    an.false
+assa    unti sdd.string
+    y: boolean
+let multi = enum
+    a(single)
+    ("def"))))
+
+assert(stss_b                                              istate != (ar b                                                         (test= _single(single.a("def"))))
+
+assert(sa)](0,et trueimpyr >st= (element: 	 (((l   u       h   it(m
+let std = impyr >st= (element: 	 (((((((= impyr >st= (((((((((((((((((((((((((((((((((((((ype_ofhhandler_a)](0,et trueimpyr >st= (element: 	 ((((= impyr >st= ((((((((((((((((((((((((((,((((((((((ype_ofhhahhandler_a)]ew)
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std oolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)))
+d.load().append(std.unist_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](ifcetnare[T])
+std.make_mutable[type_of(std.option[std.unit].d.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[mat "abc", 

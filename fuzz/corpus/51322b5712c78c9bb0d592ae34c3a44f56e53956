@@ -1,0 +1,12 @@
+l    et std =se boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", mat*h_return_explicit_type(boolean.true)d.string)
+    side_effect()
+  face for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string):jnt_se tterface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

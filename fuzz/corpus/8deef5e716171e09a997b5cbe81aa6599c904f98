@@ -1,0 +1,33 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): it
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): std.unit
+    _Atomic(): std.unit
+    _Bool(): std.unit
+    _Complex(): std.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): std.unit
+    _Thread_local(): std.unit
+    _(): std.unit
+    ___(): std.unit
+let parameter = (clet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let onst: boolean, _: boolean, _string = method()
+
+let printable2 = intEr__face
+ :

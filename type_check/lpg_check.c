@@ -277,12 +277,11 @@ static read_structure_element_result read_element(function_checking_state *state
     switch (actual_type->kind)
     {
     case type_kind_generic_struct:
-        LPG_TO_DO();
-
     case type_kind_host_value:
     case type_kind_generic_lambda:
     case type_kind_method_pointer:
-        LPG_TO_DO();
+        emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
+        return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_structure:
         return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
@@ -1085,6 +1084,11 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
         break;
 
     case evaluation_status_error:
+    {
+        infer_generic_arguments_result const result = {false, NULL, NULL};
+        return result;
+    }
+
     case evaluation_status_exit:
     case evaluation_status_return:
         LPG_TO_DO();
@@ -1941,6 +1945,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             key_evaluated = evaluate_expression(state, function, *key, NULL);
             if (key_evaluated.status != evaluation_status_value)
             {
+                deallocate_cases(cases, i);
                 return key_evaluated;
             }
             if (key_evaluated.type_.kind != type_kind_string)
@@ -3068,7 +3073,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     evaluate_expression_result const self = evaluate_expression(state, function, *element.self, NULL);
     if (self.status != evaluation_status_value)
     {
-        LPG_TO_DO();
+        return evaluate_expression_result_empty;
     }
     if (!self.compile_time_value.is_set)
     {

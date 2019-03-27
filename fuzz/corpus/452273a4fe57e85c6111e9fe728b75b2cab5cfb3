@@ -1,0 +1,21 @@
+l         import std
+
+// impl for generic interface
+let gi = interuface[T]
+    method(): std.string
+
+impl[S] gi[S] for std4unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1);] for std.unit
+    method(): std.string
+        "0,1"
+
+le  i[int(0, 0)] = std.unit_value
+assert(string_equals("ic imy:, 2)]{1}
+assert(u2.method())

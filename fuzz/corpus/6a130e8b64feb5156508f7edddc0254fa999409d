@@ -1,0 +1,11 @@
+s       >        s))4 = (printed: printable)
+    let ruct = struct
+    element:std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolean.false: "        false"
+
+let b : transfo      rmer[std.boolean, std.string]!=  
+  y{}
+assert(string_equal std.type
+impl s("true", 

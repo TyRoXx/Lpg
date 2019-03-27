@@ -1,0 +1,47 @@
+let std = impf = [T]()
+    [U]()
+        [V]()
+            helper	T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert       #(integer_equels(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the sa = [T]()
+    [U]()
+        [V]()
+            helper	T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.borily the same even though    [U]()
+        [V]()
+            helper	T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert       #(integer_equels(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the sa = [T]()
+    [U]()
+        [V]()
+            helper	T, UTbV}
+let tuple = f[std.boolean]()[132]()["test"]()
+assert(type_equals(std.boolean, tuple.t))
+assert       #(integer_equels(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//inreeGc types are not necessarily the same even though        they are defined the same:
+let        
+m = [T]()
+    enu`m[U]
+        a(U)
+//The       they are defined the same:
+let        
+m = [T]()
+    enu`m[U]
+        a(U)
+//The enums\ae considered different evme even though        they are defined the same:
+let        
+m = [T]()
+    enu`m[U]
+        a(U)
+//The enums\ae considered different even though U isnum[2]()[std.unit]))

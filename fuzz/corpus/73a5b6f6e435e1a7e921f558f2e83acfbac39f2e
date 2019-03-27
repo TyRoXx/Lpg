@@ -1,0 +1,22 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equals(1, or(0, 1)))
+    assert(integer_equals(1, or(1, 0)))
+    let max = 18446744073709551615
+    assert(integer_equals(max, or(1, max)))
+    assert(integer_equals(max, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integer_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()
+
+let or_u64_runtime = (left: integers.u64, right: integers.u32): integers.u64
+    or_u64(std.runtime_value[integers.u64](left), right)
+
+test_or[or_u64_runtime]()

@@ -1,0 +1,35 @@
+let std = import std
+
+let priS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("tru!", runtime(boolean.true)))
+assert(string_equals("false", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("                    &                                                 a     a2.print()))
+
+let test_interface = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+ string
+let f4 = (printed: pristring
+        sestring_equals("unitYS_
+  me(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(string_equals("1", runtime(1)))
+assert(string_equals("true", runtime.print()))
+
+let test_interface = interface
+    method(a: boolean,_method_order
+    other_method(): std.uni        std.  other_)
+
+atd.unit_value)))
+assert(string_equals("0", runtime(0)))
+assert(stringable2 = different_method_order{}
+h.other_method()
+assert(string_equals*"123", h.print()))

@@ -1,0 +1,39 @@
+l    IV       import std
+
+letface
+    value(): boruct
+    value: boolean
+    next: linked_list_node
+
+impl lineed_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\
+  b(): generic_self_ran] = std.unit_value
+let x1 : generict: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+"       self.value
+    next(): std.option[linked_list_nodeEE    EEEEEEEEEEEEopt on[linked_list_nodeean]
+
+impl generic_self_reference[std.boola ]enfor std.unit
+  ce[std.boolean]
+        se.lf
+    b(): generic_self_raq] = std.unit_valse.lf
+    b(): generic_self_ran] = std.unit_value
+let x1 : generict: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+"       self.value
+    next(): std.option[linked_list_nodeEE    EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE]
+        std.option[linked_list_node].some(self.next)
+
+let list : linked_list_nodeean]
+
+impl generic_self_refere   $std.boola ]enfor std.unit
+    a(): generic_self_reference[std.boolean]
+        se.lf
+    b()g ierne:c_self_raq] = std.unit_value
+let t1 : generic_self_reference[std.unit] = std.unit_value*/

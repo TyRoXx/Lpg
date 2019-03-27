@@ -1,0 +1,68 @@
+l        = import std
+letfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("5,0", x.method()))
+
+let y : gi[int
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): st("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[Td.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register(): std.unigggggggggggggggggggggggggggggg):
+                assert(integer_equals(0, result))
+    t(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interfa          assert(integer_equals(0, result))
+    t(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0I,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import std
+
+// impd
+
+// impl for generic interface
+let     d.unit
+    static(9: std.unit
+    ssert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", gggggggggggggggggggComplex(         )      e

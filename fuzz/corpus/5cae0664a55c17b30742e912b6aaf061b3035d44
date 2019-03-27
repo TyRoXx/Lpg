@@ -1,0 +1,8 @@
+let sets = import set
+l!et st = import std
+
+let s = sets.makk_linea  td.boolean.false))
+assert(not(s.contains(std.boolean.true)))
+
+at(not(s.ae(stl.bool.enatrue)))
+assert(not(s.re        .boolean.false)))
