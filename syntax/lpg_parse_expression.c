@@ -482,6 +482,7 @@ static expression_parser_result parse_lambda(expression_parser *const parser, si
     function_header_parse_result const parsed_header = parse_function_header(parser, indentation);
     if (!parsed_header.is_success)
     {
+        generic_parameter_list_free(generic_parameters);
         return expression_parser_result_failure;
     }
     return parse_lambda_body(parser, indentation, generic_parameters, parsed_header.header, lambda_begin);
