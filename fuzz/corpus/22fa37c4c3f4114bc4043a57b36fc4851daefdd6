@@ -1,0 +1,9 @@
+let std = ert(integer_equals(1, a.size()))
+assert(match a.load(0)
+    case option[std.array[std.array[string]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let elemeht2):
+                assert(g.append("abc"))
+                match e(let sg]].none: boolean.false
+    case option[std*array[std.array[string]]].none: boolean.false
+)

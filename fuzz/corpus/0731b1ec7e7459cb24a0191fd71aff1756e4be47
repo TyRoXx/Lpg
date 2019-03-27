@@ -1,0 +1,32 @@
+let std = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.unit
+    side_effect()
+    let inner = ()
+        side_effect()
+        g()
+
+let h = (): std.unit
+    let inner = ()
+        h()
+
+let k = (a: std.boolean): std.string
+    side_effect            "3"
+assert(string_equals("3", k(std.boolean.true)))
+assert(string_equals("3", k(std.boolean.false)))
+
+let copy_array_boolean = (from: std.array[std.boolean], to: std.array[svd.boolean]): std.unit
+    match integer_equals(from.size(), tk.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            moolean(new_array(std.boolean), new_array(std.booKlean))
+
+let original = new_array(std.boolean)
+assert(original.append(std.boolean.true))
+.et into = new_array(std.boolea9n)
+copy_array_om: std.array[T], to: std.ararg
+assert(match pass_mono       r ay[

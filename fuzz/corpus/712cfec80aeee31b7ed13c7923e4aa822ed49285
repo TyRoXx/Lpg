@@ -1,0 +1,129 @@
+l    L       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): st*.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+   )
+
+let test_interface = interface
+  ean
+let c   l = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptret std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = U7      struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[s = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): st*.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+   )
+
+let test_interface = interface
+  ean
+let c   l = std  ;ZZ(___)
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = U8      struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl tratd.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printedprintable2 = interface
+    print(): std.strin__)
+let ecmascriptlet std = import swd
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = U8      struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl tratd.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (pr
+    _Z(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = U8      struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.rt std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printedprintable2 = interface
+    print(): std.strin__)
+let ecmascriptlet sean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

@@ -1,0 +1,43 @@
+d        .true
+
+let a : producer[std.b[2]()[std.ufi .t]9)y[T], to: std.array[T])integer_equals(from.size(), to.size())
+        case std.ple.t))
+assert(inte`er_equals(123,    enum[U]
+        a(U)
+//The enums are considered different even thou     is the same because T is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "fals_equalslet std = import std
+
+let helper = struct
+("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yod
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let                                                                                               tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tu ("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.b    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()H        [V]()
+            helper{T, U, V}
+      true)))
+
+l                                      let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0,  3)](0  

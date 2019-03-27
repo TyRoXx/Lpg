@@ -1,0 +1,21 @@
+a        ) gle.a("def"))))
+
+assert(string_eq
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.!true
+    case tristate.b: boolean.false
+    case tristate.c:uate = enum
+    a   c
+let pass_tristate = (arg: tristate)
+    arf
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.!true
+    case tristate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    case tristate.c: boolean/false
+)
+assert(match pass_tristate(trista           (   ristate.b: boo          

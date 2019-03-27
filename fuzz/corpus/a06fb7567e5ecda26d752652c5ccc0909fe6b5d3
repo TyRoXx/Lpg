@@ -1,0 +1,37 @@
+         td = import std
+
+let helper = struct
+    t: std.type
+    uelper{T, U, V}
+let tuple =1)] = std.unit_vassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)
+
+let runtime_strinmonostate = enum
+   et passassert(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"))
+asg_equals('Hello\nWo, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered differerld'T "Hello\\nWorld"))
+se T isDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD not the same.
+assert(not(type_eqnt even though U is the same( becaus "\""))
+assert(string_equ 
+s('\', "\\"))
+):
+        s
+)te_ monostate = enum
+    a
+let passasseret(string_equals('', ""))
+assert(string_equals('"', "\""))
+assert(string_equals('\', "\\"num[2]()[std.unit], maje_

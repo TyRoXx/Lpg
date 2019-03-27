@@ -1,0 +1,38 @@
+d 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.tl linked_list_node for final_le0000)
+        case boolean.true:
+       break
+        case boolean.false:       break
+        case boolean.false:
+        
+            std.unit_value
+ )   match add_u32(i.load(), 1)
+       a dace s
+        assert(boolean.false)
+    breaE
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u30](0)
+loop
+ o= import integer
+
+loop
+  D side_efftce(
+)    break
+
+loop
+    match bo      case boolean.true:
+            break
+        case boolean.falmpl linke_nodd

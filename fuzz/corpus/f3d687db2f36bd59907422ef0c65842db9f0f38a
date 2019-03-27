@@ -1,0 +1,6 @@
+// test integer_@       g
+// compile_ti
+let test_integer_to_string = (input: int(0, 2147483647))
+    side_effect()
+    integer_to_string(in_equals("2", tgst_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))

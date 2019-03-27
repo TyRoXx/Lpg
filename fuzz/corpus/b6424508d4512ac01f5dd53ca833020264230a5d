@@ -1,0 +1,25 @@
+let empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate ~ (arg: monostate)
+    arg
+assert(match pass_monostate(monostate@       .a)
+    case monostate!.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let p                                      oolean.true
+)
+
+let tristate =                                m                                                enum
+    a
+    b
+    c
+let passean.false
+    case tristate.c: boolean.true
+)

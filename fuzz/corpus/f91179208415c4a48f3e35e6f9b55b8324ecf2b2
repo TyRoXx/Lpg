@@ -1,0 +1,11 @@
+let std = import std
+
+//import std
+
+// iml for generic if
+let i = interface
+    method(): 2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u(2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

@@ -1,0 +1,27 @@
+let std = import std
+let singl  = a(std.string)
+let test_sijgle =bc"))))
+ash return_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+   "a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals(                                               "abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: ucture{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case mult

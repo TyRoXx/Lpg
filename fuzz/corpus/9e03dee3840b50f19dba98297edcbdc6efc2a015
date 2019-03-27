@@ -1,0 +1,122 @@
+l       ^td = import std
+let std_again = import std
+let e : std.boolean = std.bood)
+std.make_mutable[type_of(f.td.unit].some)
+std.make_mutable[type_of(struct[T])](sy   t[T])
+std.make_mutable[type_of([]) (TT)]([T]() T)
+std.make_mutable[type_of(enum[T])le[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_ake_runtime_string(lean.true
+let imports_are_equivalent : std_again.boolean = e
+
+ltd.letlet std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_boolean = (a: std.boolean)
+    match a
+        case std.boolean.true: bool f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(nofl.t(oad().member))
+ean.truable[type_of(struct[T])](struct[T
+s        ])
+smuttd.make_mutable[atypbleatch self
+            case boolean.true: "true"
+            case boolelet empty = enum
+let se bistat_.a: booln.false
+    case bistate.b:                                     boolean.true
+))
+
+let tristate = enum
+    a
+    b
+    c
+let pass        untime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+       `   lean.false
+assa    unti sdd.string
+    y: boolean
+let multi = enum
+    a(single)
+    ("def"))))
+
+assert(stss_b   l   p                                qqqqqqqqqqqtring
+//you can nesstring
+
+let arrlet std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: sin    gle)
+    m          string_equa   va:u slelet std = import std
+let integers = import integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](5), 0)
+     int(0, 123)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+       ger
+
+match subtract(std.runtime_value[integer](0), 0)
+     in: array_type = new_array(23456", concat("123", "456")))
+
+let runtime_string = (t(string_equals("123456"    qqe
+)
+assert(match pass_bistaquals("abc", matchd `  ______{boolean.c", 0!m
+\       |d = im___ <= u{t{boo |d = im___ <= u{t{boolint  lint   boolean
+let multi = enum
+    a(single)
+    b(structure)
+   qqqqqqqqqqqq                                  std = imporl  et import integer
+let integer = invegers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+     int(0, 123)
+    v: std.string
+//you cant integer
+let integer = integers.integer
+
+match subtract(std.runtime_value[integer](5), 0)
+     int(0t    (eh.prquirien_clet heet self = import ilper 
+let heent,td.option[string].some(l                        et elm
+!   a(    le)
+tch  std] for dummy
+  /////ctext*/
+le                         )
+    24
+let c = fake_mutable[type_of(f_load)](f_load)
+sttd.make_mutable_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+tring_equals("abc", match single.a(make single.a(make_runtime_strinent at compile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side_effect()
+    let ate.a: boolean.true
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", matchd `  ______{boolean.c", 0!m
+\       |d = im___ <= u{t{boo |d = im___ <= u{t{boolint  lint   boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: b                                                                                                                     le                                                                                 

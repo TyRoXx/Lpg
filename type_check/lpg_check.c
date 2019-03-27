@@ -3057,8 +3057,16 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
 
     evaluate_expression_result const generic =
         evaluate_expression(state, function, *interface_instantiation.generic, NULL);
-    if (generic.status != evaluation_status_value)
+    switch (generic.status)
     {
+    case evaluation_status_value:
+        break;
+
+    case evaluation_status_error:
+        return evaluate_expression_result_empty;
+
+    case evaluation_status_exit:
+    case evaluation_status_return:
         LPG_TO_DO();
     }
     if (!generic.compile_time_value.is_set)
@@ -3105,9 +3113,17 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
                                                                           impl_expression const tree)
 {
     evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, interface_, NULL);
-    if (interface_evaluated.status != evaluation_status_value)
+    switch (interface_evaluated.status)
     {
+    case evaluation_status_value:
+        break;
+
+    case evaluation_status_error:
         return evaluate_expression_result_empty;
+
+    case evaluation_status_exit:
+    case evaluation_status_return:
+        LPG_TO_DO();
     }
     if (!interface_evaluated.compile_time_value.is_set)
     {
@@ -3167,9 +3183,17 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
 
     evaluate_expression_result const generic =
         evaluate_expression(state, function, *interface_expression_.generic, NULL);
-    if (generic.status != evaluation_status_value)
+    switch (generic.status)
     {
+    case evaluation_status_value:
+        break;
+
+    case evaluation_status_error:
         return evaluate_expression_result_empty;
+
+    case evaluation_status_exit:
+    case evaluation_status_return:
+        LPG_TO_DO();
     }
     if (!generic.compile_time_value.is_set)
     {

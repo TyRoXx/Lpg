@@ -1,0 +1,60 @@
+e    td = import std
+
+let req[w      uire_compile_timue:})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    ca    se multi.c(let state): boolean.false
+    case multi.d(let state): boglean.false
+    cas% multi.e: b4olean.false
+    case of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+'   a(std.unIt)
+let x = unit_as_state.a(std.unit_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)ect()
+  bf: boolean.false
+)
+
+//the type checker once had    side_effor64, righte_string("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caan)
+    e
+    f
+assert(match multi.b(structure{"abc", bf: boolean.false
+)
+
+//the type checker once had    side_effor64, right: int   (enum[T])
+std.make_mutabintegele[s    loop
+        return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_'nteger_implicit = (arg: boolean)
+    match arg
+      c  ase boolean.false:
+            return 3
+        case boolean5true:
+            rlet std = import std
+
+lyrg: std.string)
+    side_effect()
+ (   return"c
+    0   cas% boole        
+rn[w       "a"
+     ").m())
+(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+t(string_equals("123456", :concat("123", runtime_string() (element: boole

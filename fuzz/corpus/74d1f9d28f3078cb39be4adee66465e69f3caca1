@@ -1,0 +1,20 @@
+l`     et std = imp;rt std
+let c_res std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z = import st0, 1)] = std.  it_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equal   do() std.us( str

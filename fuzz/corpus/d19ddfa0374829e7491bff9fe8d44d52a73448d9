@@ -1,0 +1,83 @@
+l      }? import std
+let std_again = import case std.option[std.boolean].none: std.boolean.true
+)
+
+assert(a.append(std.boolean.false))
+assert(integer_equals(2, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case std.o      match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+aLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLssert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+letoolean)
+assert(matean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_al[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+           = ()
+        and(boolean.true, boolean.true)
+    requLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLssert(match using_local[boolean].b(local{boolean.true})
+LLLLssert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+letoolean)
+assert(matean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_al[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+           = ()
+        and(boolean.true, boolean.true)
+    requLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLssert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+let access_parameter = enum[Struccase two_parametlt]
+    result
+require_compile_time[f]
+
+let g = f()
+r= (arg: std.string)
+    side_euments(): ___ = std.boolean
+a.storassert(ma((((((vanue

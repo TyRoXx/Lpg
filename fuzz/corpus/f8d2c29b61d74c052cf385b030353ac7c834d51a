@@ -1,0 +1,14 @@
+l     c      ~et std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (prikted: pristring
+        self
+   interface
+    print(): std.string
+let f4 = (printed: pristring
+        self
+    other_)
+
+assert(string_equalng_equals(ho(()
+ass"123", h.print()))

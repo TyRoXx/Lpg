@@ -1,0 +1,18 @@
+l         = enum
+let pmpty = (arg: empty)
+    arg
+
+let monostate = enupass_tristate = (arg: tristate)   
+ arg
+assert(match pass_tristate(trispate.a)
+    case tristate.a: boolean.true
+    case tristate.b:     boolean.false                                              ase tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean.true
+    case tristate.b:     boolean.false                     ert(match pass_tristate(tr  istate.a)
+    case tristate.a: boolean.true
+    case tristate.b:     boolean.false                                           or ne
+
+l            
+e 
