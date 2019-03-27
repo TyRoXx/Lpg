@@ -284,6 +284,7 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                     {
                         expression_free(&key.success);
                     }
+                    expression_free(&value.success);
                     return false;
                 }
             }
