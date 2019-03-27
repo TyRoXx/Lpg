@@ -238,6 +238,10 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
             if (colon.token != token_colon)
             {
                 parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
+                if (!is_default)
+                {
+                    expression_free(&key.success);
+                }
                 return false;
             }
         }
@@ -250,6 +254,10 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
             {
                 parser->on_error(
                     parse_error_create(parse_error_expected_expression, peek(parser).where), parser->on_error_user);
+                if (!is_default)
+                {
+                    expression_free(&key.success);
+                }
                 return false;
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
@@ -272,6 +280,10 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 {
                     parser->on_error(
                         parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
+                    if (!is_default)
+                    {
+                        expression_free(&key.success);
+                    }
                     return false;
                 }
             }
