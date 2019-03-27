@@ -3502,6 +3502,7 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
     enum_id const new_enum_id = state->program->enum_count;
     state->program->enum_count += 1;
     state->program->enums = reallocate_array(state->program->enums, (new_enum_id + 1), sizeof(*state->program->enums));
+    state->program->enums[new_enum_id] = enumeration_create(NULL, 0);
     enumeration_element *const elements = allocate_array(element.element_count, sizeof(*elements));
     for (size_t i = 0; i < element.element_count; ++i)
     {
@@ -3668,8 +3669,12 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     {
         deallocate(enum_checking.register_compile_time_values);
     }
-    if (evaluated.status != evaluation_status_value)
+    switch (evaluated.status)
     {
+    case evaluation_status_value:
+        break;
+
+    case evaluation_status_error:
         if (arguments)
         {
             deallocate(arguments);
@@ -3679,6 +3684,10 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
             deallocate(argument_types);
         }
         return evaluate_expression_result_empty;
+
+    case evaluation_status_exit:
+    case evaluation_status_return:
+        LPG_TO_DO();
     }
     if (!evaluated.compile_time_value.is_set)
     {

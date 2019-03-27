@@ -1,0 +1,19 @@
+let std = import std
+
+let require_comlet std = import std
+
+let single_paramentiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requ           ing_                                                             n].b(locaequ 
+s('\', "\\"))
+assert(string_equals

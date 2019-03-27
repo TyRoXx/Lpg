@@ -1,0 +1,64 @@
+l    L       et std = import std
+lt_r ceeserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): st*.nit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+   )
+
+let test_interface = interface
+  ean
+let c   l = stmascriptlet std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.bool]an.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[dst.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printedprintable2 = interface
+  ect()
+td.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_mtrue)))
+assert(string_equals("false", runti e(boolea  n.false)))
+
+let a2 : printablme2 = "abc"
+assert(string_equal{("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

@@ -1,0 +1,11 @@
+let std = impo"unit", runtime(std.unit_value)))
+assert(string_eq", runtime(0)))
+uals("unit", runt1))JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJ() 
+let nested = interface
+  ) i  (m:nterface
+        f(): booler = struct
+impl         std.unit_value
+
+impl printable2 for std. rantable2 = different_methof_order{}
+h.other_method()
+assert(s;tring_equals("123", h.print()))

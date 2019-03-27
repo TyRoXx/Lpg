@@ -1,0 +1,57 @@
+l    et std = import std
+
+let printable = interface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = methd = import std
+
+let printable = interface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = method()
+
+le!t printable2 = interface
+    print(): erface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = !ethd = import std
+
+let printable = interface
+    print(): std.string
+let f4 et method = printed.(print
+    let string = method()
+
+le!t printable2 = interface
+    print(): std.string
+    oth  s
+
+impl printable1 for std.string
+    print(): std.string
+      let a = boolean.tru("true", runtime(booleanR
+ VV]
+assert(string_equals("false", runtime(boolean.false)))
+
+let a  ble2 for d.unit_value)))
+assertod(std.string
+    oth  s
+
+impl printable2 for std.string
+    print(): std.string
+      let a = boolean.tru("true", runtime(booleanR
+ VV]
+assert(strin        g_equals("false", runtime(boolean.false)))
+
+let a  ble2 for d.unit_value)))
+assertod()
+
+let printable2 = interface
+    print(): std.string
+    oth  s
+
+impl printable2 for std.st
+ VV]
+assert(string_equals("false", runtime(boolean.false
+
+impl linked_list_node for final_node
+    valuert): boolean
+        selufalls("

@@ -1,0 +1,24 @@
+l] et st  side_effecoolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtimeindirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (aue, std.unit_value))
+
+/*capture multiple variables*/
+let x = 2 let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captures something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 58)))
+assert(z(boolean.true, boolean.true))
+
+/*cap _ture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(captur1_twice())

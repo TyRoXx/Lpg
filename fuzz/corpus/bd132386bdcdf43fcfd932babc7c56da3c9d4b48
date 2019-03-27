@@ -1,0 +1,24 @@
+let std = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unit
+
+let mutable_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutablm[T] for mutable_content[T]
+    load(): T
+        match self.content.load(0)
+            case std.option[T].some(let value):
+                value
+            case std.option[T].none:
+                fail()
+    store(value: T): std.unit
+        assert(self.content.store(0, value))
+
+let make_mutable =le[int(0, 3)](3)
+assert(integer_equals(3, n.l, n.load"test", p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

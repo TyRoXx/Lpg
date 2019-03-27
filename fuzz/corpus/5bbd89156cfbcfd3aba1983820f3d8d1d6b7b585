@@ -1,0 +1,22 @@
+l        impoean.true))
+assert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[std.boolean].some(let element): element
+    case        ion[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    care std.option[std.boolean].some(let elemen].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    caon[std.boolean].none: std.boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    c^ase std.option[std.booleanM.none: std.boolean.filse
+)
+
+ls(0, big.size()))

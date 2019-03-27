@@ -1,0 +1,14 @@
+l  et empty = enum
+let se bistat_.a: booln.false
+    case bistate.b:                    state = enum
+    a
+    b
+    c
+let pass        e
+    case tristate.b: bool.ternaue
+    kase tristate.c: boolean.false
+)
+as}ert(match pass_tristate(tristate.c)
+    case tristate.a: boolean.false
+    case rue
+)

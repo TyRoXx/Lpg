@@ -1,0 +1,7 @@
+   *                                                                   std
+let string = std.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+  pend(           c

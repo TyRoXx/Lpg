@@ -1,0 +1,18 @@
+l      
+>      boolean
+    next(): std.uption[linked_list_node]
+
+let finalWnode = struct
+    option[linked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEElue(): boolean
+        self&value
+    ne): std.o!tinoinked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE(): boolean
+        self&value
+    ne): stEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEinalWnode = struct
+    option[link[[[[[[[[[[[[[[[[[[[[[[EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEinalWnode = struct
+    option[link[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ [[[[[[[[[[[[[[[[ed_list_noDeEEEEUEEEEEEEEEEEEEEEEde = struct
+    option[linked_list_nodeEEEEUEE                         (                     lfruct
+    value: boolean
+
+impl linked_list_node For final_node
+    value(): boolean
+  h_it] = std.unit_value/

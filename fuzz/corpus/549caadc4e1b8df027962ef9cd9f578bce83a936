@@ -1,0 +1,15 @@
+let std = import std
+
+let helper =ions as expected
+       "[Te same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is not the sam  
+assert(not(type_ even though U is the same because T is not the sam  
+assert(not(type_equals(make_enum[1]()[std.nctions as expected
+let f = [Te same:
+let make_enum   [T]()
+    enum[U]
+        a(U)
+//The enums a   considered different evype_equals(make_enum[2]()[std.unit], make_enum[2]()[std.unit]))
