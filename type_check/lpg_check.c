@@ -3904,6 +3904,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source);
+
     generic_interface const instantiated_interface = state->root->generic_interfaces[generic];
     if (argument_count < instantiated_interface.tree.parameters.count)
     {
@@ -3931,6 +3932,15 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
         emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
         return evaluate_expression_result_empty;
     }
+
+    size_t const instantiation_id = root->interface_instantiation_count;
+    root->interface_instantiations =
+        reallocate_array(root->interface_instantiations, root->interface_instantiation_count + 1,
+                         sizeof(*root->interface_instantiations));
+    root->interface_instantiations[instantiation_id] = generic_interface_instantiation_create(
+        generic, argument_types, arguments, argument_count, state->program->interface_count);
+    root->interface_instantiation_count += 1;
+
     for (size_t i = 0; i < instantiated_interface.tree.parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&interface_checking.used_registers);
@@ -3956,14 +3966,6 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     }
     if (evaluated.status != evaluation_status_value)
     {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
         return evaluate_expression_result_empty;
     }
     if (!evaluated.compile_time_value.is_set)
@@ -3978,13 +3980,10 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     {
         LPG_UNREACHABLE();
     }
-    size_t const id = root->interface_instantiation_count;
-    root->interface_instantiations =
-        reallocate_array(root->interface_instantiations, root->interface_instantiation_count + 1,
-                         sizeof(*root->interface_instantiations));
-    root->interface_instantiations[id] = generic_interface_instantiation_create(
-        generic, argument_types, arguments, argument_count, evaluated.compile_time_value.value_.type_.interface_);
-    root->interface_instantiation_count += 1;
+    ASSUME(instantiation_id < root->interface_instantiation_count);
+    ASSUME(evaluated.compile_time_value.value_.type_.interface_ ==
+           root->interface_instantiations[instantiation_id].instantiated);
+
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
