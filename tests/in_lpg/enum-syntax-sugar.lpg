@@ -1,0 +1,14 @@
+let e = enum
+    a
+    b
+
+/*let variable : e = a
+
+let function = (arg: e): boolean
+    true
+assert(function(a))
+
+let match_ : e = match boolean.true
+    case true: a
+    case false: b
+*/

@@ -504,6 +504,7 @@ void test_in_lpg(void)
                                                  "enum-generic.lpg",
                                                  "enum-stateful.lpg",
                                                  "enum-stateless.lpg",
+                                                 "enum-syntax-sugar.lpg",
                                                  "equality.lpg",
                                                  "fail.lpg",
                                                  "function-pointer.lpg",

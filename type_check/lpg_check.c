@@ -4357,6 +4357,35 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
             state, semantic_error_create(semantic_error_declaration_with_existing_name, element.name.source));
     }
 
+    optional_type declared_type = optional_type_create_empty();
+    if (element.optional_type)
+    {
+        instruction_checkpoint const previous_code = make_checkpoint(state, function);
+        evaluate_expression_result const declared_type_evaluated =
+            evaluate_expression(state, function, *element.optional_type, NULL);
+        restore(previous_code);
+        switch (declared_type_evaluated.status)
+        {
+        case evaluation_status_value:
+            if (!declared_type_evaluated.compile_time_value.is_set ||
+                declared_type_evaluated.type_.kind != type_kind_type)
+            {
+                emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                                 expression_source_begin(*element.optional_type)));
+            }
+            else
+            {
+                declared_type = optional_type_create_set(declared_type_evaluated.compile_time_value.value_.type_);
+            }
+            break;
+
+        case evaluation_status_exit:
+        case evaluation_status_error:
+        case evaluation_status_return:
+            LPG_TO_DO();
+        }
+    }
+
     instruction_checkpoint const before_initialization = make_checkpoint(state, function);
     unicode_view const name = unicode_view_from_string(element.name.value);
     evaluate_expression_result const initializer =
@@ -4378,35 +4407,18 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
 
     type final_type = initializer.type_;
     optional_value final_compile_time_value = initializer.compile_time_value;
-
-    if (element.optional_type)
+    if (declared_type.is_set)
     {
-        instruction_checkpoint const previous_code = make_checkpoint(state, function);
-        evaluate_expression_result const declared_type =
-            evaluate_expression(state, function, *element.optional_type, NULL);
-        restore(previous_code);
-        if (declared_type.status == evaluation_status_value)
+        conversion_result const converted =
+            convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
+                    expression_source_begin(*element.initializer), declared_type.value, false);
+        if (converted.ok == success_no)
         {
-            if (!declared_type.compile_time_value.is_set || declared_type.type_.kind != type_kind_type)
-            {
-                emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
-                                                                 expression_source_begin(*element.optional_type)));
-            }
-            else
-            {
-                conversion_result const converted =
-                    convert(state, function, final_where, initializer.type_, initializer.compile_time_value,
-                            expression_source_begin(*element.initializer),
-                            declared_type.compile_time_value.value_.type_, false);
-                if (converted.ok == success_no)
-                {
-                    return evaluate_expression_result_empty;
-                }
-                final_where = converted.where;
-                final_type = declared_type.compile_time_value.value_.type_;
-                final_compile_time_value = converted.compile_time_value;
-            }
+            return evaluate_expression_result_empty;
         }
+        final_where = converted.where;
+        final_type = declared_type.value;
+        final_compile_time_value = converted.compile_time_value;
     }
 
     if (declaration_possible)
