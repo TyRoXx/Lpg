@@ -80,7 +80,8 @@ function_checking_state_create(program_check *const root, function_checking_stat
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,
-                                                 instruction_sequence *const output, sequence const input);
+                                                 instruction_sequence *const output, sequence const input,
+                                                 optional_type const expected_return_type);
 
 static type get_parameter_type(type const callee, size_t const which_parameter,
                                checked_function const *const all_functions, enumeration const *const all_enums)
@@ -208,11 +209,12 @@ static read_structure_element_result read_tuple_element(function_checking_state 
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element,
-                                                      unicode_view const *const early_initialized_variable);
+                                                      unicode_view const *const early_initialized_variable,
+                                                      optional_type const expected_result_type);
 
-static evaluate_expression_result evaluate_return_expression(function_checking_state *pState,
-                                                             instruction_sequence *pSequence,
-                                                             const expression *pExpression);
+static evaluate_expression_result evaluate_return_expression(function_checking_state *state,
+                                                             instruction_sequence *sequence,
+                                                             const expression *expression);
 
 static read_structure_element_result read_interface_element_at(function_checking_state *state,
                                                                instruction_sequence *function, register_id const from,
@@ -261,7 +263,8 @@ static read_structure_element_result read_element(function_checking_state *state
                                                   const identifier_expression *const element, register_id const result)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const object = evaluate_expression(state, function, object_tree, NULL);
+    evaluate_expression_result const object =
+        evaluate_expression(state, function, object_tree, NULL, optional_type_create_empty());
     switch (object.status)
     {
     case evaluation_status_error:
@@ -426,7 +429,7 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 
 static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_state *const state),
                                                 LPG_NON_NULL(instruction_sequence *const to), unicode_view const name,
-                                                source_location const where)
+                                                source_location const where, optional_type const expected_result_type)
 {
     ASSUME(to);
     instruction_checkpoint const previous_code = make_checkpoint(state, to);
@@ -463,6 +466,29 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
 
     case read_local_variable_status_forbidden:
         return evaluate_expression_result_empty;
+    }
+
+    if (expected_result_type.is_set && (expected_result_type.value.kind == type_kind_enumeration))
+    {
+        enumeration const *const enum_ = state->program->enums + expected_result_type.value.enum_;
+        for (enum_element_id i = 0; i < enum_->size; ++i)
+        {
+            enumeration_element const *const element = enum_->elements + i;
+            if (unicode_view_equals(name, unicode_view_from_string(element->name)))
+            {
+                if (element->state.is_set)
+                {
+                    LPG_TO_DO();
+                }
+                value const literal = value_from_enum_element(i, enum_->elements[i].state.value, NULL);
+                register_id const result = allocate_register(&state->used_registers);
+                add_instruction(to, instruction_create_literal(
+                                        literal_instruction_create(result, literal, expected_result_type.value)));
+                write_register_compile_time_value(state, result, literal);
+                return evaluate_expression_result_create(
+                    evaluation_status_value, result, expected_result_type.value, optional_value_create(literal), true);
+            }
+        }
     }
 
     register_id const global = allocate_register(&state->used_registers);
@@ -619,7 +645,8 @@ check_function(program_check *const root, function_checking_state *const parent,
 
     ASSUME(state.register_debug_name_count <= state.used_registers);
 
-    evaluate_expression_result const body_evaluated = evaluate_expression(&state, &body_out, body_in, NULL);
+    evaluate_expression_result const body_evaluated =
+        evaluate_expression(&state, &body_out, body_in, NULL, explicit_return_type);
 
     ASSUME(state.register_debug_name_count <= state.used_registers);
 
@@ -734,7 +761,8 @@ static compile_time_type_expression_result compile_time_type_expression_result_c
 static compile_time_type_expression_result
 expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
 {
-    evaluate_expression_result const result = evaluate_expression(state, function, element, NULL);
+    evaluate_expression_result const result =
+        evaluate_expression(state, function, element, NULL, optional_type_create_empty());
     switch (result.status)
     {
     case evaluation_status_value:
@@ -1075,7 +1103,7 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
                                        state->program, &ignored, optional_type_create_empty(), false, source);
     use_generic_closures(&inference_state, closures);
     evaluate_expression_result const generic_evaluated =
-        evaluate_expression(&inference_state, function, *self_tree.generic, NULL);
+        evaluate_expression(&inference_state, function, *self_tree.generic, NULL, optional_type_create_empty());
     instruction_sequence_free(&ignored);
     function_checking_state_free(inference_state);
     switch (generic_evaluated.status)
@@ -1385,7 +1413,10 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
                                                     expression const argument_tree, type const callee_type,
                                                     size_t const parameter_id)
 {
-    evaluate_expression_result const argument = evaluate_expression(state, function, argument_tree, NULL);
+    type const parameter_type =
+        get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums);
+    evaluate_expression_result const argument =
+        evaluate_expression(state, function, argument_tree, NULL, optional_type_create_set(parameter_type));
     switch (argument.status)
     {
     case evaluation_status_error:
@@ -1401,8 +1432,7 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
     }
     conversion_result const converted =
         convert(state, function, argument.where, argument.type_, argument.compile_time_value,
-                expression_source_begin(argument_tree),
-                get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums), false);
+                expression_source_begin(argument_tree), parameter_type, false);
     argument_evaluation_result const result = {converted.compile_time_value, converted.where, converted.ok};
     return result;
 }
@@ -1411,7 +1441,8 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
                                                            instruction_sequence *function, call const called)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const callee = evaluate_expression(state, function, *called.callee, NULL);
+    evaluate_expression_result const callee =
+        evaluate_expression(state, function, *called.callee, NULL, optional_type_create_empty());
     switch (callee.status)
     {
     case evaluation_status_error:
@@ -1678,12 +1709,13 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 evaluate_expression_result evaluate_not_expression(function_checking_state *state, instruction_sequence *function,
                                                    const expression *element)
 {
-    evaluate_expression_result const result = evaluate_expression(state, function, *(*element).not.expr, NULL);
+    value const boolean_value = state->global->members[3].compile_time_value.value_;
+    ASSUME(boolean_value.kind == value_kind_type);
+
+    evaluate_expression_result const result =
+        evaluate_expression(state, function, *(*element).not.expr, NULL, optional_type_create_set(boolean_value.type_));
     ASSUME(state->global->members[3].compile_time_value.is_set);
 
-    value boolean_value = state->global->members[3].compile_time_value.value_;
-
-    ASSUME(boolean_value.kind == value_kind_type);
     if (type_equals(boolean_value.type_, result.type_))
     {
         const register_id global_register = allocate_register(&state->used_registers);
@@ -1771,7 +1803,7 @@ static pattern_evaluate_result pattern_evaluate_result_create_pattern(enum_const
 }
 
 static pattern_evaluate_result check_for_pattern(function_checking_state *state, instruction_sequence *function,
-                                                 expression const root)
+                                                 expression const root, enum_id const expected_enumeration)
 {
     switch (root.type)
     {
@@ -1788,7 +1820,8 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
         }
         instruction_checkpoint const before_pattern = make_checkpoint(state, function);
         evaluate_expression_result const enum_element_evaluated =
-            evaluate_expression(state, function, *root.call.callee, NULL);
+            evaluate_expression(state, function, *root.call.callee, NULL,
+                                optional_type_create_set(type_from_enumeration(expected_enumeration)));
         restore(before_pattern);
         switch (enum_element_evaluated.status)
         {
@@ -1838,7 +1871,8 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
 
 static evaluate_expression_result check_sequence_finish(function_checking_state *const state,
                                                         instruction_sequence *const output, sequence const input,
-                                                        size_t const previous_number_of_variables)
+                                                        size_t const previous_number_of_variables,
+                                                        optional_type const expected_result_type)
 {
     if (input.length == 0)
     {
@@ -1849,7 +1883,9 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     LPG_FOR(size_t, i, input.length)
     {
-        final_result = evaluate_expression(state, output, input.elements[i], NULL);
+        final_result =
+            evaluate_expression(state, output, input.elements[i], NULL,
+                                (i == (input.length - 1)) ? expected_result_type : optional_type_create_empty());
         if (!final_result.is_pure)
         {
             is_pure = false;
@@ -1919,7 +1955,8 @@ static bool check_for_duplicate_string_case(function_checking_state *const state
 static evaluate_expression_result evaluate_match_expression_with_string(function_checking_state *const state,
                                                                         instruction_sequence *const function,
                                                                         expression const *const element,
-                                                                        evaluate_expression_result const input)
+                                                                        evaluate_expression_result const input,
+                                                                        optional_type const expected_result_type)
 {
     ASSUME(input.type_.kind == type_kind_string);
     instruction_checkpoint const before = make_checkpoint(state, function);
@@ -1942,7 +1979,8 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             ;
         if (key)
         {
-            key_evaluated = evaluate_expression(state, function, *key, NULL);
+            key_evaluated =
+                evaluate_expression(state, function, *key, NULL, optional_type_create_set(type_from_string()));
             if (key_evaluated.status != evaluation_status_value)
             {
                 deallocate_cases(cases, i);
@@ -1983,7 +2021,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
 
         instruction_sequence action = instruction_sequence_create(NULL, 0);
         evaluate_expression_result const action_evaluated =
-            evaluate_expression(state, &action, *case_tree.action, NULL);
+            evaluate_expression(state, &action, *case_tree.action, NULL, expected_result_type);
         if (action_evaluated.status != evaluation_status_value)
         {
             instruction_sequence_free(&action);
@@ -2068,10 +2106,12 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
 }
 
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
-                                                     const expression *element)
+                                                     const expression *element,
+                                                     optional_type const expected_result_type)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const input = evaluate_expression(state, function, *(*element).match.input, NULL);
+    evaluate_expression_result const input =
+        evaluate_expression(state, function, *(*element).match.input, NULL, optional_type_create_empty());
     if (input.status != evaluation_status_value)
     {
         return input;
@@ -2120,7 +2160,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 LPG_TO_DO();
             }
             expression *const key = case_tree.key_or_default;
-            pattern_evaluate_result const maybe_pattern = check_for_pattern(state, function, *key);
+            pattern_evaluate_result const maybe_pattern = check_for_pattern(state, function, *key, input.type_.enum_);
             switch (maybe_pattern.kind)
             {
             case pattern_evaluate_result_kind_is_pattern:
@@ -2168,13 +2208,14 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
                 action_evaluated = check_sequence_finish(
                     state, &action, sequence_create(case_tree.action, 1, expression_source_begin(*case_tree.action)),
-                    previous_number_of_variables);
+                    previous_number_of_variables, expected_result_type);
                 break;
             }
 
             case pattern_evaluate_result_kind_no_pattern:
             {
-                evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
+                evaluate_expression_result const key_evaluated =
+                    evaluate_expression(state, function, *key, NULL, optional_type_create_set(input.type_));
                 if (key_evaluated.status != evaluation_status_value)
                 {
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
@@ -2217,7 +2258,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     value_equals(input.compile_time_value.value_, key_evaluated.compile_time_value.value_);
                 key_value = key_evaluated.where;
 
-                action_evaluated = evaluate_expression(state, &action, *case_tree.action, NULL);
+                action_evaluated = evaluate_expression(state, &action, *case_tree.action, NULL, expected_result_type);
                 break;
             }
 
@@ -2374,7 +2415,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 LPG_TO_DO();
             }
             expression *const key = case_tree.key_or_default;
-            evaluate_expression_result const key_evaluated = evaluate_expression(state, function, *key, NULL);
+            evaluate_expression_result const key_evaluated =
+                evaluate_expression(state, function, *key, NULL, optional_type_create_set(input.type_));
             if (key_evaluated.status != evaluation_status_value)
             {
                 deallocate_integer_range_list_cases(cases, i);
@@ -2412,7 +2454,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             instruction_sequence action = instruction_sequence_create(NULL, 0);
             evaluate_expression_result const action_evaluated =
-                evaluate_expression(state, &action, *case_tree.action, NULL);
+                evaluate_expression(state, &action, *case_tree.action, NULL, expected_result_type);
             switch (action_evaluated.status)
             {
             case evaluation_status_value:
@@ -2484,7 +2526,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     }
 
     case type_kind_string:
-        return evaluate_match_expression_with_string(state, function, element, input);
+        return evaluate_match_expression_with_string(state, function, element, input, expected_result_type);
 
     case type_kind_unit:
         emit_semantic_error(
@@ -2520,14 +2562,15 @@ static evaluate_struct_arguments_result evaluate_struct_arguments(function_check
     register_id *registers = allocate_array(argument_count, sizeof(*registers));
     for (size_t i = 0; i < argument_count; ++i)
     {
-        evaluate_expression_result const argument_evaluated = evaluate_expression(state, function, arguments[i], NULL);
+        type const member_type = members[i].what;
+        evaluate_expression_result const argument_evaluated =
+            evaluate_expression(state, function, arguments[i], NULL, optional_type_create_set(member_type));
         if (argument_evaluated.status != evaluation_status_value)
         {
             deallocate(registers);
             evaluate_struct_arguments_result const result = {NULL};
             return result;
         }
-        type const member_type = members[i].what;
         if (type_equals(argument_evaluated.type_, member_type))
         {
             registers[i] = argument_evaluated.where;
@@ -2920,7 +2963,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     {
         struct_expression_element const element = evaluated.elements[i];
         evaluate_expression_result const element_type_evaluated =
-            evaluate_expression(state, function, element.type, NULL);
+            evaluate_expression(state, function, element.type, NULL, optional_type_create_set(type_from_type()));
         if (element_type_evaluated.status != evaluation_status_value)
         {
             for (size_t j = 0; j < i; ++j)
@@ -3069,7 +3112,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     }
 
     evaluate_expression_result const generic =
-        evaluate_expression(state, function, *interface_instantiation.generic, NULL);
+        evaluate_expression(state, function, *interface_instantiation.generic, NULL, optional_type_create_empty());
     switch (generic.status)
     {
     case evaluation_status_value:
@@ -3091,7 +3134,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         LPG_TO_DO();
     }
 
-    evaluate_expression_result const self = evaluate_expression(state, function, *element.self, NULL);
+    evaluate_expression_result const self =
+        evaluate_expression(state, function, *element.self, NULL, optional_type_create_set(type_from_type()));
     if (self.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -3125,7 +3169,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
                                                                           generic_instantiation_expression const self,
                                                                           impl_expression const tree)
 {
-    evaluate_expression_result const interface_evaluated = evaluate_expression(state, function, interface_, NULL);
+    evaluate_expression_result const interface_evaluated =
+        evaluate_expression(state, function, interface_, NULL, optional_type_create_set(type_from_type()));
     switch (interface_evaluated.status)
     {
     case evaluation_status_value:
@@ -3195,7 +3240,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
     }
 
     evaluate_expression_result const generic =
-        evaluate_expression(state, function, *interface_expression_.generic, NULL);
+        evaluate_expression(state, function, *interface_expression_.generic, NULL, optional_type_create_empty());
     switch (generic.status)
     {
     case evaluation_status_value:
@@ -3382,7 +3427,8 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
                                                               instruction_sequence *const function,
                                                               instantiate_struct_expression const element)
 {
-    evaluate_expression_result const type_evaluated = evaluate_expression(state, function, *element.type, NULL);
+    evaluate_expression_result const type_evaluated =
+        evaluate_expression(state, function, *element.type, NULL, optional_type_create_set(type_from_type()));
     if (type_evaluated.status != evaluation_status_value)
     {
         return type_evaluated;
@@ -3463,7 +3509,8 @@ static evaluate_expression_result evaluate_type_of(function_checking_state *cons
                                                    type_of_expression const element)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const target_evaluated = evaluate_expression(state, function, *element.target, NULL);
+    evaluate_expression_result const target_evaluated =
+        evaluate_expression(state, function, *element.target, NULL, optional_type_create_empty());
     restore(before);
     register_id const where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3523,7 +3570,8 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         if (element.elements[i].state)
         {
             expression const state_expr = *element.elements[i].state;
-            evaluate_expression_result const state_evaluated = evaluate_expression(state, function, state_expr, NULL);
+            evaluate_expression_result const state_evaluated =
+                evaluate_expression(state, function, state_expr, NULL, optional_type_create_set(type_from_type()));
             if (state_evaluated.status == evaluation_status_value)
             {
                 if (!state_evaluated.compile_time_value.is_set ||
@@ -4133,7 +4181,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                                                  instruction_sequence *const function,
                                                                  generic_instantiation_expression const element)
 {
-    evaluate_expression_result const generic_evaluated = evaluate_expression(state, function, *element.generic, NULL);
+    evaluate_expression_result const generic_evaluated =
+        evaluate_expression(state, function, *element.generic, NULL, optional_type_create_empty());
     if (generic_evaluated.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -4143,7 +4192,7 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     for (size_t i = 0; i < element.count; ++i)
     {
         evaluate_expression_result const argument_evaluated =
-            evaluate_expression(state, function, element.arguments[i], NULL);
+            evaluate_expression(state, function, element.arguments[i], NULL, optional_type_create_empty());
         if (argument_evaluated.status != evaluation_status_value)
         {
             if (arguments)
@@ -4269,7 +4318,8 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                      instruction_sequence *const function,
                                                      new_array_expression const element)
 {
-    evaluate_expression_result const element_evaluated = evaluate_expression(state, function, *element.element, NULL);
+    evaluate_expression_result const element_evaluated =
+        evaluate_expression(state, function, *element.element, NULL, optional_type_create_empty());
     if (element_evaluated.status != evaluation_status_value)
     {
         return element_evaluated;
@@ -4361,8 +4411,8 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     if (element.optional_type)
     {
         instruction_checkpoint const previous_code = make_checkpoint(state, function);
-        evaluate_expression_result const declared_type_evaluated =
-            evaluate_expression(state, function, *element.optional_type, NULL);
+        evaluate_expression_result const declared_type_evaluated = evaluate_expression(
+            state, function, *element.optional_type, NULL, optional_type_create_set(type_from_type()));
         restore(previous_code);
         switch (declared_type_evaluated.status)
         {
@@ -4389,7 +4439,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     instruction_checkpoint const before_initialization = make_checkpoint(state, function);
     unicode_view const name = unicode_view_from_string(element.name.value);
     evaluate_expression_result const initializer =
-        evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL);
+        evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL, declared_type);
     if (initializer.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -4440,7 +4490,8 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
 static evaluate_expression_result evaluate_expression_core(function_checking_state *const state,
                                                            instruction_sequence *const function,
                                                            expression const element,
-                                                           unicode_view const *const early_initialized_variable)
+                                                           unicode_view const *const early_initialized_variable,
+                                                           optional_type const expected_result_type)
 {
     switch (element.type)
     {
@@ -4510,7 +4561,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         return evaluate_not_expression(state, function, &element);
 
     case expression_type_match:
-        return evaluate_match_expression(state, function, &element);
+        return evaluate_match_expression(state, function, &element, expected_result_type);
 
     case expression_type_string:
     {
@@ -4549,7 +4600,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
     case expression_type_identifier:
     {
         unicode_view const name = unicode_view_from_string(element.identifier.value);
-        evaluate_expression_result const address = read_variable(state, function, name, element.identifier.source);
+        evaluate_expression_result const address =
+            read_variable(state, function, name, element.identifier.source, expected_result_type);
         return address;
     }
 
@@ -4561,7 +4613,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         instruction_sequence body = {NULL, 0};
         bool const previous_is_in_loop = state->is_in_loop;
         state->is_in_loop = true;
-        evaluate_expression_result const loop_body_result = check_sequence(state, &body, element.loop_body);
+        evaluate_expression_result const loop_body_result =
+            check_sequence(state, &body, element.loop_body, optional_type_create_empty());
         ASSUME(state->is_in_loop);
         state->is_in_loop = previous_is_in_loop;
         register_id const unit_goes_into = allocate_register(&state->used_registers);
@@ -4588,7 +4641,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
     }
 
     case expression_type_sequence:
-        return check_sequence(state, function, element.sequence);
+        return check_sequence(state, function, element.sequence, expected_result_type);
 
     case expression_type_declare:
         return evaluate_declare(state, function, element.declare);
@@ -4605,7 +4658,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element,
-                                                      unicode_view const *const early_initialized_variable)
+                                                      unicode_view const *const early_initialized_variable,
+                                                      optional_type const expected_result_type)
 {
     size_t const expression_recursion_limit = 100;
     if (state->root->expression_recursion_depth >= expression_recursion_limit)
@@ -4617,7 +4671,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
     state->root->expression_recursion_depth += 1;
     ASSUME(state->register_debug_name_count <= state->used_registers);
     evaluate_expression_result const result =
-        evaluate_expression_core(state, function, element, early_initialized_variable);
+        evaluate_expression_core(state, function, element, early_initialized_variable, expected_result_type);
     ASSUME(state->register_debug_name_count <= state->used_registers);
     state->root->expression_recursion_depth -= 1;
     return result;
@@ -4626,7 +4680,7 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
 static evaluate_expression_result evaluate_return_expression(function_checking_state *state, instruction_sequence *body,
                                                              const expression *returned)
 {
-    evaluate_expression_result const result = evaluate_expression(state, body, *returned, NULL);
+    evaluate_expression_result const result = evaluate_expression(state, body, *returned, NULL, state->return_type);
     if (result.status != evaluation_status_value)
     {
         return result;
@@ -4663,11 +4717,12 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
 }
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,
-                                                 instruction_sequence *const output, sequence const input)
+                                                 instruction_sequence *const output, sequence const input,
+                                                 optional_type const expected_return_type)
 {
     ASSUME(output);
     size_t const previous_number_of_variables = state->local_variables.count;
-    return check_sequence_finish(state, output, input, previous_number_of_variables);
+    return check_sequence_finish(state, output, input, previous_number_of_variables, expected_return_type);
 }
 
 static structure clone_structure(structure const original)

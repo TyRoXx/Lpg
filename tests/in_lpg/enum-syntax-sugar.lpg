@@ -2,7 +2,7 @@ let e = enum
     a
     b
 
-/*let variable : e = a
+let variable : e = a
 
 let function = (arg: e): boolean
     true
@@ -10,5 +10,17 @@ assert(function(a))
 
 let match_ : e = match boolean.true
     case true: a
-    case false: b
-*/
+    case false: fail()
+
+let structure = struct
+    element: e
+
+let s = structure{a}
+let t = structure{b}
+
+let a : e = b
+//locals have priority, so "a" means e.b here:
+assert(match a
+    case a: true
+    case e.a: false
+)
