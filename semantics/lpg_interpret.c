@@ -669,7 +669,7 @@ static external_function_result call_interpreted_function(checked_function const
         registers[next_register] = arguments[i];
         ++next_register;
     }
-    value return_value = value_from_unit();
+    value return_value = value_create_invalid();
     *context->current_recursion += 1;
     run_sequence_result const result =
         run_sequence(callee.body, &return_value, registers,

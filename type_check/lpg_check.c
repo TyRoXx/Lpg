@@ -2262,7 +2262,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 compile_time_result = optional_value_create(action_evaluated.compile_time_value.value_);
             }
 
-            all_cases_return = (all_cases_return && (action_evaluated.status == evaluation_status_return));
+            all_cases_return = (all_cases_return && ((action_evaluated.status == evaluation_status_return) ||
+                                                     (action_evaluated.status == evaluation_status_exit)));
 
             switch (maybe_pattern.kind)
             {
@@ -2412,29 +2413,39 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             instruction_sequence action = instruction_sequence_create(NULL, 0);
             evaluate_expression_result const action_evaluated =
                 evaluate_expression(state, &action, *case_tree.action, NULL);
-            if (action_evaluated.status != evaluation_status_value)
+            switch (action_evaluated.status)
             {
+            case evaluation_status_value:
+            case evaluation_status_return:
+            case evaluation_status_exit:
+                break;
+
+            case evaluation_status_error:
                 deallocate_integer_range_list_cases(cases, i);
                 integer_set_free(integer_ranges_unhandled);
                 instruction_sequence_free(&action);
                 return action_evaluated;
             }
 
-            all_cases_return = (all_cases_return && (action_evaluated.status == evaluation_status_return));
+            all_cases_return = (all_cases_return && ((action_evaluated.status == evaluation_status_return) ||
+                                                     (action_evaluated.status == evaluation_status_exit)));
 
-            if (i == 0)
+            if (action_evaluated.status == evaluation_status_value)
             {
-                result_type = action_evaluated.type_;
-            }
-            else if (!type_equals(result_type, action_evaluated.type_))
-            {
-                /*TODO: support types that are not the same, but still comparable*/
-                emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
-                                                                 expression_source_begin(*case_tree.action)));
-                deallocate_integer_range_list_cases(cases, i);
-                integer_set_free(integer_ranges_unhandled);
-                instruction_sequence_free(&action);
-                return evaluate_expression_result_empty;
+                if (i == 0)
+                {
+                    result_type = action_evaluated.type_;
+                }
+                else if (!type_equals(result_type, action_evaluated.type_))
+                {
+                    /*TODO: support types that are not the same, but still comparable*/
+                    emit_semantic_error(state, semantic_error_create(semantic_error_type_mismatch,
+                                                                     expression_source_begin(*case_tree.action)));
+                    deallocate_integer_range_list_cases(cases, i);
+                    integer_set_free(integer_ranges_unhandled);
+                    instruction_sequence_free(&action);
+                    return evaluate_expression_result_empty;
+                }
             }
 
             if (!compile_time_result.is_set && input.compile_time_value.is_set && input.is_pure &&
@@ -2445,7 +2456,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             }
 
             cases[i] = match_instruction_case_create_value(
-                key_evaluated.where, action, optional_register_id_create_set(action_evaluated.where));
+                key_evaluated.where, action, (action_evaluated.status == evaluation_status_value)
+                                                 ? optional_register_id_create_set(action_evaluated.where)
+                                                 : optional_register_id_create_empty());
         }
 
         ASSUME(integer_set_is_empty(integer_ranges_unhandled));

@@ -7,3 +7,27 @@ let always_return_from_match = (arg: boolean)
     assert(boolean.false)
 assert(integer_equals(1, always_return_from_match(boolean.false)))
 assert(integer_equals(2, always_return_from_match(boolean.true)))
+
+let std = import std
+let array_back = [T](elements: std.array[T]): T
+    match subtract(elements.size(), 1)
+        case subtract_result.ok(let index):
+            match elements.load(index)
+                case std.option[T].some(let back):
+                    return back
+                case std.option[T].none:
+                    fail()
+        case subtract_result.underflow:
+            fail()
+let a = new_array(boolean)
+assert(a.append(boolean.true))
+assert(array_back[boolean](a))
+
+let return_from_integer_match = (input: int(0, 1)): boolean
+    match input
+        case 0:
+            return boolean.true
+        case 1:
+            fail()
+assert(return_from_integer_match(0))
+assert(return_from_integer_match(std.runtime_value[int(0, 1)](0)))

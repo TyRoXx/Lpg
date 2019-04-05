@@ -1592,13 +1592,10 @@ Host.prototype."));
 {\n\
    return ((typeof from === 'boolean') ? "));
     LPG_TRY(enum_construct_stateful_begin(
-        enum_encoding_element_stateful_from_direct(
-            ecmascript_value_set_create_any_bool()),
-        0, ecmascript_output));
+        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_any_bool()), 0, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
     LPG_TRY(enum_construct_stateful_end(
-        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_any_bool()),
-        ecmascript_output));
+        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_any_bool()), ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
