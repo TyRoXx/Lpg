@@ -25,3 +25,11 @@ assert(match boolean.true
         side_effect()
         boolean.true
 )
+
+// without case keyword
+assert(match boolean.true
+    boolean.false: boolean.false
+    true:
+        side_effect()
+        boolean.true
+)

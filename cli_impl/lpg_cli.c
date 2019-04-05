@@ -114,8 +114,6 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected space";
     case parse_error_expected_colon:
         return "Expected colon";
-    case parse_error_expected_case_or_default:
-        return "Expected match case or default";
     case parse_error_expected_element_name:
         return "Expected element name";
     case parse_error_expected_identifier:

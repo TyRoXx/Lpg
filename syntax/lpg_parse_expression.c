@@ -192,14 +192,8 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
         pop(parser);
         rich_token const expected_case = peek(parser);
         bool is_default = false;
-        if (expected_case.token == token_identifier)
+        if ((expected_case.token == token_identifier) && (unicode_view_equals_c_str(expected_case.content, "default")))
         {
-            if (!unicode_view_equals_c_str(expected_case.content, "default"))
-            {
-                parser->on_error(parse_error_create(parse_error_expected_case_or_default, expected_case.where),
-                                 parser->on_error_user);
-                return false;
-            }
             is_default = true;
             pop(parser);
         }
@@ -210,12 +204,6 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
             {
                 return false;
             }
-        }
-        else
-        {
-            parser->on_error(
-                parse_error_create(parse_error_expected_case_or_default, expected_case.where), parser->on_error_user);
-            return false;
         }
         expression_parser_result key
 #ifdef _MSC_VER

@@ -814,7 +814,8 @@ static void test_match_case(void)
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_case_or_default, source_location_create(1, 4))};
+            parse_error_create(parse_error_expected_expression, source_location_create(1, 4)),
+            parse_error_create(parse_error_expected_expression, source_location_create(2, 0))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
                                                                                                             "    \n"));
     }
@@ -885,7 +886,7 @@ static void test_match_case(void)
 
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_expected_case_or_default, source_location_create(1, 4))};
+            parse_error_create(parse_error_expected_colon, source_location_create(1, 9))};
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("match a\n"
                                                                                               "    casee\n"));
