@@ -40,6 +40,7 @@ ecmascript_value_set ecmascript_value_set_create_array(void);
 ecmascript_value_set ecmascript_value_set_create_undefined(void);
 ecmascript_value_set ecmascript_value_set_create_from_value(ecmascript_value const from);
 ecmascript_value_set ecmascript_value_set_create_bool(bool value);
+ecmascript_value_set ecmascript_value_set_create_any_bool(void);
 ecmascript_value_set ecmascript_value_set_create_object(void);
 ecmascript_value_set ecmascript_value_set_create_anything(void);
 bool ecmascript_value_set_merge_without_intersection(ecmascript_value_set *into, ecmascript_value_set const other);

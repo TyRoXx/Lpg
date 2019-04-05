@@ -1558,7 +1558,51 @@ isFinite(from) && \
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ";\n\
 };\n\
-"));
+Host.prototype."));
+    LPG_TRY(generate_method_name(8, host, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (callee, arguments_)\n\
+{\n\
+   var convertedArguments = [];\n\
+   for (var i = 0, c = arguments_."));
+    LPG_TRY(generate_method_name(0, &array_interface, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "(); i < c; ++i)\n\
+   {\n\
+       convertedArguments.push(arguments_."));
+    LPG_TRY(generate_method_name(1, &array_interface, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "(i)"));
+    {
+        method_description const call_method = host->methods[1];
+        ASSUME(call_method.parameters.length == 3);
+        type const arguments = call_method.parameters.elements[2];
+        ASSUME(arguments.kind == type_kind_interface);
+        lpg_interface const *const array_of_host_value = all_interfaces + arguments.interface_;
+        method_description const load = array_of_host_value->methods[1];
+        ASSUME(load.parameters.length == 1);
+        type const load_result = load.result;
+        ASSUME(load_result.kind == type_kind_enumeration);
+        LPG_TRY(stateful_enum_get_state(strategy_cache, load_result.enum_, 0, ecmascript_output));
+    }
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
+   }\n\
+   return callee.apply(null, convertedArguments);\n\
+};\n"));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "Host.prototype."));
+    LPG_TRY(generate_method_name(9, host, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (from)\n\
+{\n\
+   return ((typeof from === 'boolean') ? "));
+    LPG_TRY(enum_construct_stateful_begin(
+        enum_encoding_element_stateful_from_direct(
+            ecmascript_value_set_create_any_bool()),
+        0, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, "from"));
+    LPG_TRY(enum_construct_stateful_end(
+        enum_encoding_element_stateful_from_direct(ecmascript_value_set_create_any_bool()),
+        ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
+    LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
+};\n"));
     return success_yes;
 }
 

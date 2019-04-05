@@ -126,6 +126,12 @@ ecmascript_value_set ecmascript_value_set_create_bool(bool value)
         ecmascript_integer_range_create_empty(), false, false, false, false, false, false, value, !value);
 }
 
+ecmascript_value_set ecmascript_value_set_create_any_bool(void)
+{
+    return ecmascript_value_set_create(
+        ecmascript_integer_range_create_empty(), false, false, false, false, false, false, true, true);
+}
+
 ecmascript_value_set ecmascript_value_set_create_object(void)
 {
     return ecmascript_value_set_create(

@@ -80,6 +80,52 @@ let test_equals = (host: es.host)
     assert(not(host.equals(host.export_integer(0), host.export_integer(1))))
     assert(not(host.equals(host.export_integer(0), host.export_string("0"))))
 
+let test_call_function_0_arguments = (global: host_value, host: es.host)
+    let isNaN = match host.read_property(global, "isNaN")
+        case option[host_value].some(let content):
+            content
+        case option[host_value].none:
+            fail()
+    let arguments = new_array(host_value)
+    let result = host.call_function(isNaN, arguments)
+    match host.import_boolean(result)
+        case option[boolean].some(let content):
+            //undefined is treated as NaN
+            assert(content)
+        case option[boolean].none:
+            fail()
+
+let test_call_function_1_argument = (global: host_value, host: es.host)
+    let isNaN = match host.read_property(global, "isNaN")
+        case option[host_value].some(let content):
+            content
+        case option[host_value].none:
+            fail()
+    let arguments = new_array(host_value)
+    assert(arguments.append(host.export_integer(0)))
+    let result = host.call_function(isNaN, arguments)
+    match host.import_boolean(result)
+        case option[boolean].some(let content):
+            assert(not(content))
+        case option[boolean].none:
+            fail()
+
+let test_call_function_2_arguments = (global: host_value, host: es.host)
+    let parseInt = match host.read_property(global, "parseInt")
+        case option[host_value].some(let content):
+            content
+        case option[host_value].none:
+            fail()
+    let arguments = new_array(host_value)
+    assert(arguments.append(host.export_string("123")))
+    assert(arguments.append(host.export_integer(10)))
+    let result = host.call_function(parseInt, arguments)
+    match host.import_integer(result)
+        case option[es.integer].some(let content):
+            assert(integer_equals(123, content))
+        case option[es.integer].none:
+            fail()
+
 //
 (global: host_value, host: es.host)
     test_string(host)
@@ -89,3 +135,6 @@ let test_equals = (host: es.host)
     test_call_method(host)
     test_import_integer(host)
     test_equals(host)
+    test_call_function_0_arguments(global, host)
+    test_call_function_1_argument(global, host)
+    test_call_function_2_arguments(global, host)
