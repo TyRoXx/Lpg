@@ -1602,7 +1602,14 @@ Host.prototype."));
     LPG_TRY(stream_writer_write_string(ecmascript_output, " : "));
     LPG_TRY(generate_stateless_enum_element(1, ecmascript_output));
     LPG_TRY(stream_writer_write_string(ecmascript_output, ");\n\
-};\n"));
+};\
+Host.prototype."));
+    LPG_TRY(generate_method_name(10, host, ecmascript_output));
+    LPG_TRY(stream_writer_write_string(ecmascript_output, " = function (value)\n\
+{\n\
+   return value;\n\
+};\n\
+\n"));
     return success_yes;
 }
 

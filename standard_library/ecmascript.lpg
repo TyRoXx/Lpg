@@ -16,6 +16,7 @@ let host = interface
     import_integer(from: host_value): option[integer]
     call_function(callee: host_value, arguments: array[host_value]): host_value
     import_boolean(from: host_value): option[boolean]
+    export_boolean(value: boolean): host_value
 
 let export = struct
     integer: type_of(integer)

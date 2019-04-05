@@ -126,6 +126,18 @@ let test_call_function_2_arguments = (global: host_value, host: es.host)
         case option[es.integer].none:
             fail()
 
+let test_export_boolean = (host: es.host)
+    match host.import_boolean(host.export_boolean(boolean.true))
+        case option[boolean].some(let content):
+            assert(content)
+        case option[boolean].none:
+            fail()
+    match host.import_boolean(host.export_boolean(boolean.false))
+        case option[boolean].some(let content):
+            assert(not(content))
+        case option[boolean].none:
+            fail()
+
 //
 (global: host_value, host: es.host)
     test_string(host)
@@ -138,3 +150,4 @@ let test_call_function_2_arguments = (global: host_value, host: es.host)
     test_call_function_0_arguments(global, host)
     test_call_function_1_argument(global, host)
     test_call_function_2_arguments(global, host)
+    test_export_boolean(host)
