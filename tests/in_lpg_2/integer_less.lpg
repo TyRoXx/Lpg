@@ -1,0 +1,15 @@
+()
+    assert(integer_less(20, 100))
+    assert(not(integer_less(100, 20)))
+    assert(integer_less(0, 1))
+    assert(not(integer_less(1, 0)))
+    assert(not(integer_less(1, 1)))
+    assert(not(integer_less(0, 0)))
+    assert(not(integer_less(10000, 10000)))
+
+    let runtime_zero = ()
+        side_effect()
+        0
+    assert(integer_less(runtime_zero(), 1))
+    assert(not(integer_less(runtime_zero(), runtime_zero())))
+    assert(not(integer_less(1, runtime_zero())))

@@ -1,8 +1,0 @@
-assert(integer_equals(20, 20))
-assert(not(integer_equals(100, 20)))
-
-let runtime_zero = ()
-    side_effect()
-    0
-assert(integer_equals(runtime_zero(), 0))
-assert(not(integer_equals(1, runtime_zero())))

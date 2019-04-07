@@ -494,28 +494,10 @@ void test_in_lpg(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&tests_build_dir);
 
-        static char const *const test_files[] = {"comment_multi.lpg",
-                                                 "comment_single.lpg",
-                                                 "ecmascript.lpg",
-                                                 "empty.lpg",
-                                                 "equality.lpg",
-                                                 "function-pointer.lpg",
-                                                 "generic-impl-generic-self.lpg",
-                                                 "generic-nesting.lpg",
-                                                 "integer-equals.lpg",
-                                                 "integer-less.lpg",
-                                                 "integer-to-string.lpg",
-                                                 "loop.lpg",
-                                                 "option.lpg",
-                                                 "raw-string-literal.lpg",
-                                                 "recursion.lpg",
-                                                 "return.lpg",
-                                                 "set.lpg",
-                                                 "shift_left_u64.lpg",
-                                                 "shift_right_u64.lpg",
-                                                 "std.lpg",
-                                                 "string-equals.lpg",
-                                                 "web.lpg"};
+        static char const *const test_files[] = {
+            "comment_multi.lpg",  "comment_single.lpg",     "ecmascript.lpg", "empty.lpg",         "loop.lpg",
+            "option.lpg",         "raw-string-literal.lpg", "recursion.lpg",  "return.lpg",        "set.lpg",
+            "shift_left_u64.lpg", "shift_right_u64.lpg",    "std.lpg",        "string-equals.lpg", "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
         for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
