@@ -43,10 +43,10 @@ script:
  - export LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/
  - if [ "$UB_SANITIZER" == "ON" ] || [ "$MEMORY_SANITIZER" == "ON" ] || [ "$ADDRESS_SANITIZER" == "ON" ] || [ "$THREAD_SANITIZER" == "ON" ]; then
      tests/tests || exit 1;
-     cli/lpg run ../tests/in_lpg/interface.lpg || exit 1;
+     cli/lpg run ../tests/in_lpg/empty.lpg || exit 1;
    else
      valgrind --error-exitcode=42 --leak-check=full ./tests/tests || exit 1;
-     valgrind --error-exitcode=42 --leak-check=full ./cli/lpg run ../tests/in_lpg/interface.lpg || exit 1;
+     valgrind --error-exitcode=42 --leak-check=full ./cli/lpg run ../tests/in_lpg/empty.lpg || exit 1;
    fi
  - LD_LIBRARY_PATH=.:/usr/lib/clang/3.8.0/lib/linux/ CTEST_OUTPUT_ON_FAILURE=1 ctest || exit 1
  - cd ..
