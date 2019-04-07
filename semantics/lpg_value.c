@@ -370,11 +370,6 @@ bool enum_less_than(enum_element_value const left, enum_element_value const righ
     return left.which < right.which;
 }
 
-bool value_is_valid(value const checked)
-{
-    return (checked.kind >= value_kind_integer) && (checked.kind <= value_kind_generic_struct);
-}
-
 bool value_is_mutable(value const original)
 {
     switch (original.kind)

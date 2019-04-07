@@ -9,14 +9,22 @@ typedef struct unicode_view
     size_t length;
 } unicode_view;
 
-unicode_view unicode_view_create(char const *begin, size_t length) LPG_USE_RESULT;
+static inline unicode_view unicode_view_create(char const *begin, size_t length)
+{
+    unicode_view const result = {begin, length};
+    return result;
+}
 
 static inline unicode_view unicode_view_from_c_str(char const *c_str)
 {
     return unicode_view_create(c_str, strlen(c_str));
 }
 
-unicode_view unicode_view_from_string(unicode_string string) LPG_USE_RESULT;
+static inline unicode_view unicode_view_from_string(unicode_string string)
+{
+    unicode_view const result = {string.data, string.length};
+    return result;
+}
 
 static inline bool unicode_view_equals_c_str(unicode_view left, char const *right)
 {

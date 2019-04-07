@@ -3,18 +3,6 @@
 #include "lpg_assert.h"
 #include <string.h>
 
-unicode_view unicode_view_create(char const *begin, size_t length)
-{
-    unicode_view const result = {begin, length};
-    return result;
-}
-
-unicode_view unicode_view_from_string(unicode_string string)
-{
-    unicode_view const result = {string.data, string.length};
-    return result;
-}
-
 bool unicode_view_equals(unicode_view left, unicode_view right)
 {
     if (left.length != right.length)
