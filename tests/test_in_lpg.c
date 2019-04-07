@@ -495,10 +495,6 @@ void test_in_lpg(void)
         unicode_string_free(&tests_build_dir);
 
         static char const *const test_files[] = {"algorithm.lpg",
-                                                 "array-boolean.lpg",
-                                                 "array-capture.lpg",
-                                                 "array-nesting.lpg",
-                                                 "array-string.lpg",
                                                  "backend_reserved_names.lpg",
                                                  "boolean.lpg",
                                                  "concat.lpg",
