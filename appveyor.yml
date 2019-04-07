@@ -35,6 +35,9 @@ test_script:
   - cd build
   - cd cli
   - .\%BUILD_TYPE%\lpg.exe run ../../tests/in_lpg/empty.lpg
+  - cd ..
+  - set CTEST_OUTPUT_ON_FAILURE=1
+  - ctest -C %BUILD_TYPE%
 
 after_test:
 
