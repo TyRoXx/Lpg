@@ -1,5 +1,0 @@
-assert(string_equals('', ""))
-assert(string_equals('"', "\""))
-assert(string_equals('\', "\\"))
-assert(string_equals('tst', "tst"))
-assert(string_equals('Hello\nWorld', "Hello\\nWorld"))

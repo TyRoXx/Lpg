@@ -71,7 +71,7 @@ void *garbage_collector_try_allocate_array(LPG_NON_NULL(garbage_collector *const
 {
     optional_size const bytes = size_multiply(length, element);
     ASSERT(bytes.state == optional_set);
-    return garbage_collector_allocate(gc, bytes.value_if_set);
+    return garbage_collector_try_allocate(gc, bytes.value_if_set);
 }
 
 void *garbage_collector_allocate_array(LPG_NON_NULL(garbage_collector *const gc), size_t const length,

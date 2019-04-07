@@ -44,7 +44,7 @@ static void check_generated_c_code(char const *const source, standard_library_de
     checked_program checked =
         check(root, standard_library.globals, expect_no_errors, &loader,
               source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
-              unicode_view_from_string(module_directory), NULL);
+              unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count >= 1);
     optimize(&checked);

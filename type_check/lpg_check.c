@@ -4752,9 +4752,9 @@ static structure clone_structure(structure const original)
 }
 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, module_loader *loader,
-                      source_file source, unicode_view const current_import_directory, void *user)
+                      source_file source, unicode_view const current_import_directory,
+                      size_t const max_compile_time_heap, void *user)
 {
-    size_t const max_compile_time_heap = 100000;
     size_t const max_recursion = 100;
     structure *const structures = allocate_array(1, sizeof(*structures));
     structures[0] = clone_structure(global);

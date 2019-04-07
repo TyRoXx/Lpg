@@ -156,7 +156,11 @@ static external_function_result invoke_method(value const *const captures, void 
                     new_capacity = 1;
                 }
                 value *const new_elements =
-                    garbage_collector_allocate_array(context->gc, new_capacity, sizeof(*new_elements));
+                    garbage_collector_try_allocate_array(context->gc, new_capacity, sizeof(*new_elements));
+                if (!new_elements)
+                {
+                    return external_function_result_create_out_of_memory();
+                }
                 if (from.array->count > 0)
                 {
                     memcpy(new_elements, from.array->elements, sizeof(*new_elements) * from.array->count);

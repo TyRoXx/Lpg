@@ -476,7 +476,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     unicode_view const source_file_path = unicode_view_from_c_str(arguments.file_name);
     checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader,
                                     source_file_create(source_file_path, unicode_view_from_string(source)),
-                                    path_remove_leaf(source_file_path), &context);
+                                    path_remove_leaf(source_file_path), 100000, &context);
     sequence_free(&root.value);
     switch (arguments.command)
     {

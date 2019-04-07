@@ -46,7 +46,7 @@ static void check_single_wellformed_function(char const *const source, structure
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, &loader,
               source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
-              unicode_view_from_string(module_directory), NULL);
+              unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
     instruction_sequence const expected_body = instruction_sequence_create(expected_body_elements, expected_body_size);
@@ -91,7 +91,7 @@ static void check_wellformed_program(char const *const source, structure const n
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, &loader,
               source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
-              unicode_view_from_string(module_directory), NULL);
+              unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == expected.function_count);
     for (size_t i = 0; i < expected.function_count; ++i)
@@ -154,7 +154,7 @@ void test_semantics(void)
         checked_program checked =
             check(root, empty_global, expect_no_errors, &loader,
                   source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str("")),
-                  unicode_view_from_string(module_directory), NULL);
+                  unicode_view_from_string(module_directory), 100000, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));

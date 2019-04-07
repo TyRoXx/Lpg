@@ -1,0 +1,13 @@
+()
+    let std = import std
+    let runtime_string = (a: std.string)
+        side_effect()
+        a
+
+    assert(string_equals("", ""))
+    assert(string_equals("aaa", "aaa"))
+    assert(string_equals(concat("aa", "a"), "aaa"))
+    assert(not(string_equals("a", "")))
+    assert(not(string_equals("a", "b")))
+    assert(string_equals("", runtime_string("")))
+    assert(string_equals("\n", runtime_string("\n")))

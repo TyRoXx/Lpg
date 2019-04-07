@@ -45,7 +45,7 @@ static void check_single_wellformed_function(char const *const source, structure
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, &loader,
               source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
-              unicode_view_from_string(module_directory), NULL);
+              unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
     remove_dead_code(&checked);

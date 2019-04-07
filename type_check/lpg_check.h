@@ -30,4 +30,4 @@ check_function(program_check *const root, function_checking_state *const parent,
 
 checked_program check(sequence const root, structure const global, LPG_NON_NULL(check_error_handler *on_error),
                       LPG_NON_NULL(module_loader *loader), source_file source,
-                      unicode_view const current_import_directory, void *user);
+                      unicode_view const current_import_directory, size_t const max_compile_time_heap, void *user);

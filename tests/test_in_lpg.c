@@ -388,7 +388,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
     checked_program checked = check(root, global_object, expect_no_errors, &loader,
-                                    source_file_create(test_name, source), current_import_directory, NULL);
+                                    source_file_create(test_name, source), current_import_directory, 200000, NULL);
     sequence_free(&root);
 
     // not optimized
@@ -495,9 +495,7 @@ void test_in_lpg(void)
         unicode_string_free(&tests_build_dir);
 
         static char const *const test_files[] = {
-            "comment_multi.lpg",  "comment_single.lpg",     "ecmascript.lpg", "empty.lpg",         "loop.lpg",
-            "option.lpg",         "raw-string-literal.lpg", "recursion.lpg",  "return.lpg",        "set.lpg",
-            "shift_left_u64.lpg", "shift_right_u64.lpg",    "std.lpg",        "string-equals.lpg", "web.lpg"};
+            "comment_multi.lpg", "comment_single.lpg", "ecmascript.lpg", "empty.lpg", "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
         for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
