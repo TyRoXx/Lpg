@@ -494,10 +494,7 @@ void test_in_lpg(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&tests_build_dir);
 
-        static char const *const test_files[] = {"add.lpg",
-                                                 "add_u64.lpg",
-                                                 "algorithm.lpg",
-                                                 "and_u64.lpg",
+        static char const *const test_files[] = {"algorithm.lpg",
                                                  "array-boolean.lpg",
                                                  "array-capture.lpg",
                                                  "array-nesting.lpg",
@@ -541,9 +538,7 @@ void test_in_lpg(void)
                                                  "match-return.lpg",
                                                  "match-string-case-first.lpg",
                                                  "match-string-default-first.lpg",
-                                                 "not_u64.lpg",
                                                  "option.lpg",
-                                                 "or_u64.lpg",
                                                  "raw-string-literal.lpg",
                                                  "recursion.lpg",
                                                  "return.lpg",
@@ -557,8 +552,7 @@ void test_in_lpg(void)
                                                  "subtract.lpg",
                                                  "type-of.lpg",
                                                  "unit_value.lpg",
-                                                 "web.lpg",
-                                                 "xor_u64.lpg"};
+                                                 "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
         for (size_t i = 0; i < LPG_ARRAY_SIZE(threads); ++i)
