@@ -52,9 +52,9 @@ void generic_impl_self_free(generic_impl_self const freed)
 }
 
 generic_impl generic_impl_create(impl_expression tree, generic_closures closures, generic_impl_self self,
-                                 source_file_owning source)
+                                 source_file_owning source, unicode_string current_import_directory)
 {
-    generic_impl const result = {tree, closures, self, source};
+    generic_impl const result = {tree, closures, self, source, current_import_directory};
     return result;
 }
 
@@ -64,4 +64,5 @@ void generic_impl_free(generic_impl const freed)
     impl_expression_free(freed.tree);
     generic_impl_self_free(freed.self);
     source_file_owning_free(freed.source);
+    unicode_string_free(&freed.current_import_directory);
 }

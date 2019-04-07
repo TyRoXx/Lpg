@@ -1,0 +1,4 @@
+let run = [imported]()
+    imported()
+
+run[import fail]()

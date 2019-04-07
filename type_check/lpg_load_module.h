@@ -33,4 +33,4 @@ typedef struct load_module_result
 
 struct function_checking_state;
 
-load_module_result load_module(LPG_NON_NULL(struct function_checking_state *state), unicode_view name);
+load_module_result load_module(LPG_NON_NULL(struct function_checking_state *const state), unicode_view const name);

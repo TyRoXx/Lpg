@@ -54,7 +54,7 @@ static checked_program simple_check(sequence const root, structure const global,
                                     expected_parse_errors expected_errors, source_file const source)
 {
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, &expected_errors);
-    return check(root, global, on_error, &loader, source, user);
+    return check(root, global, on_error, &loader, source, module_directory, user);
 }
 
 void test_import_errors(void)

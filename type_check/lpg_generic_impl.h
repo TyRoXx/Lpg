@@ -41,8 +41,9 @@ typedef struct generic_impl
     generic_closures closures;
     generic_impl_self self;
     source_file_owning source;
+    unicode_string current_import_directory;
 } generic_impl;
 
 generic_impl generic_impl_create(impl_expression tree, generic_closures closures, generic_impl_self self,
-                                 source_file_owning source);
+                                 source_file_owning source, unicode_string current_import_directory);
 void generic_impl_free(generic_impl const freed);

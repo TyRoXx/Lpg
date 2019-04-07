@@ -1,9 +1,10 @@
 #include "lpg_generic_interface.h"
 #include "lpg_allocate.h"
 
-generic_interface generic_interface_create(interface_expression tree, generic_closures closures)
+generic_interface generic_interface_create(interface_expression tree, generic_closures closures,
+                                           unicode_string current_import_directory)
 {
-    generic_interface const result = {tree, closures, NULL, 0};
+    generic_interface const result = {tree, closures, NULL, 0, current_import_directory};
     return result;
 }
 
@@ -19,4 +20,5 @@ void generic_interface_free(generic_interface const freed)
     {
         deallocate(freed.generic_impls);
     }
+    unicode_string_free(&freed.current_import_directory);
 }

@@ -42,7 +42,8 @@ int LLVMFuzzerTestOneInput(uint8_t const *const data, size_t const size)
         module_loader loader =
             module_loader_create(unicode_view_from_c_str(LPG_FUZZ_MODULE_DIRECTORY), ignore_parse_errors, &user);
         checked_program checked = check(result.value, standard_library.globals, ignore_semantic_errors, &loader,
-                                        source_file_create(unicode_view_from_c_str("fuzzing"), source), NULL);
+                                        source_file_create(unicode_view_from_c_str("fuzzing"), source),
+                                        unicode_view_from_c_str(LPG_FUZZ_MODULE_DIRECTORY), NULL);
         checked_program_free(&checked);
         sequence_free(&result.value);
         standard_library_description_free(&standard_library);

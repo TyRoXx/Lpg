@@ -473,9 +473,10 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
     semantic_error_context context = {diagnostics, false};
     module_loader loader = module_loader_create(module_directory, handle_parse_error, &user);
-    checked_program checked = check(
-        root.value, standard_library.globals, handle_semantic_error, &loader,
-        source_file_create(unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source)), &context);
+    unicode_view const source_file_path = unicode_view_from_c_str(arguments.file_name);
+    checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader,
+                                    source_file_create(source_file_path, unicode_view_from_string(source)),
+                                    path_remove_leaf(source_file_path), &context);
     sequence_free(&root.value);
     switch (arguments.command)
     {
@@ -536,11 +537,11 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
             LPG_TO_DO();
         }
         {
-            unicode_view const source_pieces[] = {current_directory, unicode_view_from_c_str("generated.js")};
-            unicode_string const source_file_path = path_combine(source_pieces, LPG_ARRAY_SIZE(source_pieces));
+            unicode_view const pieces[] = {current_directory, unicode_view_from_c_str("generated.js")};
+            unicode_string const generated_js = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
             write_file_if_necessary(
-                unicode_view_from_string(source_file_path), unicode_view_create(generated.data, generated.used));
-            unicode_string_free(&source_file_path);
+                unicode_view_from_string(generated_js), unicode_view_create(generated.data, generated.used));
+            unicode_string_free(&generated_js);
         }
 
         {

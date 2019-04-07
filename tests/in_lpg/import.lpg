@@ -1,0 +1,6 @@
+//you can import from the standard module directory
+let std = import std
+let option = import option
+
+//you can import from the current directory
+let empty = import empty

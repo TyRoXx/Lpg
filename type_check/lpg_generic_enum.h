@@ -8,7 +8,9 @@ typedef struct generic_enum
 {
     enum_expression tree;
     generic_closures closures;
+    unicode_string current_import_directory;
 } generic_enum;
 
-generic_enum generic_enum_create(enum_expression tree, generic_closures closures);
+generic_enum generic_enum_create(enum_expression tree, generic_closures closures,
+                                 unicode_string current_import_directory);
 void generic_enum_free(generic_enum const freed);

@@ -10,7 +10,9 @@ typedef struct generic_lambda
     lambda tree;
     generic_closures closures;
     source_file_owning file;
+    unicode_string current_import_directory;
 } generic_lambda;
 
-generic_lambda generic_lambda_create(lambda tree, generic_closures closures, source_file_owning file);
+generic_lambda generic_lambda_create(lambda tree, generic_closures closures, source_file_owning file,
+                                     unicode_string current_import_directory);
 void generic_lambda_free(generic_lambda const freed);

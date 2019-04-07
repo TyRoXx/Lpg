@@ -49,12 +49,11 @@ static evaluate_expression_result evaluate_expression_result_create(evaluation_s
 static evaluate_expression_result const evaluate_expression_result_empty = {
     evaluation_status_error, {type_kind_type, {0}}, {false, {value_kind_integer, {{NULL, 0}}}}, 0, false};
 
-static function_checking_state
-function_checking_state_create(program_check *const root, function_checking_state *parent,
-                               bool const may_capture_runtime_variables, structure const *global,
-                               check_error_handler *on_error, void *user, checked_program *const program,
-                               instruction_sequence *const body, optional_type const return_type,
-                               bool const has_declared_return_type, source_file source)
+static function_checking_state function_checking_state_create(
+    program_check *const root, function_checking_state *const parent, bool const may_capture_runtime_variables,
+    structure const *global, check_error_handler *const on_error, void *const user, checked_program *const program,
+    instruction_sequence *const body, optional_type const return_type, bool const has_declared_return_type,
+    source_file const source, unicode_view const current_import_directory)
 {
     function_checking_state const result = {root,
                                             parent,
@@ -75,7 +74,8 @@ function_checking_state_create(program_check *const root, function_checking_stat
                                             has_declared_return_type,
                                             NULL,
                                             0,
-                                            source};
+                                            source,
+                                            current_import_directory};
     return result;
 }
 
@@ -608,13 +608,14 @@ check_function(program_check *const root, function_checking_state *const parent,
                checked_program *const program, type const *const parameter_types, unicode_string *const parameter_names,
                size_t const parameter_count, optional_type const self, bool const may_capture_runtime_variables,
                optional_type const explicit_return_type, source_file const source,
-               unicode_view const *const early_initialized_variable, optional_function_id const current_function_id)
+               unicode_view const current_import_directory, unicode_view const *const early_initialized_variable,
+               optional_function_id const current_function_id)
 {
     ASSUME(root);
     instruction_sequence body_out = instruction_sequence_create(NULL, 0);
-    function_checking_state state =
-        function_checking_state_create(root, parent, may_capture_runtime_variables, &global, on_error, user, program,
-                                       &body_out, explicit_return_type, explicit_return_type.is_set, source);
+    function_checking_state state = function_checking_state_create(
+        root, parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out, explicit_return_type,
+        explicit_return_type.is_set, source, current_import_directory);
 
     if (early_initialized_variable && current_function_id.is_set && explicit_return_type.is_set)
     {
@@ -884,8 +885,9 @@ evaluate_generic_lambda_expression(function_checking_state *state, instruction_s
     root->generic_lambdas =
         reallocate_array(root->generic_lambdas, root->generic_lambda_count + 1, sizeof(*root->generic_lambdas));
     generic_lambda_id const id = root->generic_lambda_count;
-    root->generic_lambdas[id] = generic_lambda_create(
-        lambda_clone(element), generic_closures_create(NULL, 0), source_file_to_owning(state->source));
+    root->generic_lambdas[id] =
+        generic_lambda_create(lambda_clone(element), generic_closures_create(NULL, 0),
+                              source_file_to_owning(state->source), unicode_view_copy(state->current_import_directory));
     root->generic_lambda_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     if (early_initialized_variable)
@@ -928,11 +930,11 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         state->program->functions[this_lambda_id].signature->result = header.return_type;
     }
 
-    check_function_result const checked =
-        check_function(state->root, state, *evaluated.result, *state->global, state->on_error, state->user,
-                       state->program, header.parameter_types, header.parameter_names, evaluated.header.parameter_count,
-                       optional_type_create_empty(), true, header.return_type, state->source,
-                       early_initialized_variable, optional_function_id_create(this_lambda_id));
+    check_function_result const checked = check_function(
+        state->root, state, *evaluated.result, *state->global, state->on_error, state->user, state->program,
+        header.parameter_types, header.parameter_names, evaluated.header.parameter_count, optional_type_create_empty(),
+        true, header.return_type, state->source, state->current_import_directory, early_initialized_variable,
+        optional_function_id_create(this_lambda_id));
     for (size_t i = 0; i < evaluated.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -1046,12 +1048,13 @@ static void use_generic_closures(function_checking_state *const state, generic_c
 static optional_size instantiate_generic_impl(function_checking_state *const state, interface_id const target_interface,
                                               impl_expression const tree, generic_closures const closures,
                                               type const *const argument_types, value *const arguments, type const self,
-                                              source_file const original_source)
+                                              source_file const original_source,
+                                              unicode_view const original_current_import_directory)
 {
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
-        optional_type_create_empty(), false, original_source);
+        optional_type_create_empty(), false, original_source, original_current_import_directory);
     for (size_t i = 0; i < tree.generic_parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&interface_checking.used_registers);
@@ -1091,16 +1094,15 @@ static void infer_generic_arguments_result_free(infer_generic_arguments_result c
     }
 }
 
-static infer_generic_arguments_result infer_generic_arguments(function_checking_state *const state,
-                                                              instruction_sequence *const function,
-                                                              generic_instantiation_expression const self_tree,
-                                                              type const self, source_file const source,
-                                                              generic_closures const closures)
+static infer_generic_arguments_result
+infer_generic_arguments(function_checking_state *const state, instruction_sequence *const function,
+                        generic_instantiation_expression const self_tree, type const self, source_file const source,
+                        unicode_view const original_current_import_directory, generic_closures const closures)
 {
     instruction_sequence ignored = {NULL, 0};
-    function_checking_state inference_state =
-        function_checking_state_create(state->root, NULL, false, state->global, state->on_error, state->user,
-                                       state->program, &ignored, optional_type_create_empty(), false, source);
+    function_checking_state inference_state = function_checking_state_create(
+        state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored,
+        optional_type_create_empty(), false, source, original_current_import_directory);
     use_generic_closures(&inference_state, closures);
     evaluate_expression_result const generic_evaluated =
         evaluate_expression(&inference_state, function, *self_tree.generic, NULL, optional_type_create_empty());
@@ -1229,23 +1231,25 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
             if (type_equals(impl->self.regular, self))
             {
                 return instantiate_generic_impl(state, target_interface, impl->tree, impl->closures, argument_types,
-                                                arguments, self, source_file_from_owning(impl->source));
+                                                arguments, self, source_file_from_owning(impl->source),
+                                                unicode_view_from_string(impl->current_import_directory));
             }
         }
         else
         {
             instruction_sequence ignored = instruction_sequence_create(NULL, 0);
             infer_generic_arguments_result const inferred = infer_generic_arguments(
-                state, &ignored, impl->self.generic, self, source_file_from_owning(impl->source), impl->closures);
+                state, &ignored, impl->self.generic, self, source_file_from_owning(impl->source),
+                unicode_view_from_string(impl->current_import_directory), impl->closures);
             instruction_sequence_free(&ignored);
             if (!inferred.can_be_inferred)
             {
                 infer_generic_arguments_result_free(inferred);
                 continue;
             }
-            optional_size const result =
-                instantiate_generic_impl(state, target_interface, impl->tree, impl->closures, inferred.argument_types,
-                                         inferred.arguments, self, source_file_from_owning(impl->source));
+            optional_size const result = instantiate_generic_impl(
+                state, target_interface, impl->tree, impl->closures, inferred.argument_types, inferred.arguments, self,
+                source_file_from_owning(impl->source), unicode_view_from_string(impl->current_import_directory));
             infer_generic_arguments_result_free(inferred);
             return result;
         }
@@ -1267,8 +1271,8 @@ static optional_size instantiate_generic_impl_for_regular_interface(function_che
             LPG_TO_DO();
         }
     }
-    return instantiate_generic_impl(
-        state, to, impl->tree, impl->closures, argument_types, arguments, self, impl->source);
+    return instantiate_generic_impl(state, to, impl->tree, impl->closures, argument_types, arguments, self,
+                                    impl->source, unicode_view_from_string(impl->current_import_directory));
 }
 
 static optional_size require_implementation(function_checking_state *const state, instruction_sequence *const function,
@@ -1297,7 +1301,8 @@ static optional_size require_implementation(function_checking_state *const state
             continue;
         }
         infer_generic_arguments_result const inferred =
-            infer_generic_arguments(state, function, impl->self, self, impl->source, impl->closures);
+            infer_generic_arguments(state, function, impl->self, self, impl->source,
+                                    unicode_view_from_string(impl->current_import_directory), impl->closures);
         if (!inferred.can_be_inferred)
         {
             continue;
@@ -2841,7 +2846,8 @@ evaluate_generic_interface_expression(function_checking_state *state, instructio
     }
 
     generic_closures const closures = find_generic_interface_closures(state, element);
-    root->generic_interfaces[id] = generic_interface_create(interface_expression_clone(element), closures);
+    root->generic_interfaces[id] = generic_interface_create(
+        interface_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
     root->generic_interface_count += 1;
 
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -2939,7 +2945,8 @@ evaluate_generic_struct_expression(function_checking_state *state, instruction_s
     }
 
     generic_closures const closures = find_generic_struct_closures(state, element);
-    root->generic_structs[id] = generic_struct_create(struct_expression_clone(element), closures);
+    root->generic_structs[id] = generic_struct_create(
+        struct_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
     root->generic_struct_count += 1;
 
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3048,8 +3055,8 @@ static method_evaluation_result evaluate_method_definition(function_checking_sta
     check_function_result const checked = check_function(
         state->root, state, expression_from_sequence(method.body), *state->global, state->on_error, state->user,
         state->program, header.parameter_types, header.parameter_names, method.header.parameter_count,
-        optional_type_create_set(self), false, optional_type_create_set(declared_result_type), state->source, NULL,
-        optional_function_id_empty());
+        optional_type_create_set(self), false, optional_type_create_set(declared_result_type), state->source,
+        state->current_import_directory, NULL, optional_function_id_empty());
     for (size_t i = 0; i < method.header.parameter_count; ++i)
     {
         unicode_string_free(header.parameter_names + i);
@@ -3156,9 +3163,10 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         &root->generic_interfaces[generic.compile_time_value.value_.generic_interface];
     interface_->generic_impls = reallocate_array(
         interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
-    interface_->generic_impls[interface_->generic_impl_count] = generic_impl_create(
-        impl_expression_clone(element), closures,
-        generic_impl_self_create_regular(self.compile_time_value.value_.type_), source_file_to_owning(state->source));
+    interface_->generic_impls[interface_->generic_impl_count] =
+        generic_impl_create(impl_expression_clone(element), closures,
+                            generic_impl_self_create_regular(self.compile_time_value.value_.type_),
+                            source_file_to_owning(state->source), unicode_view_copy(state->current_import_directory));
     interface_->generic_impl_count += 1;
     return make_unit(&state->used_registers, function);
 }
@@ -3211,7 +3219,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
     root->generic_impls_for_regular_interfaces[root->generic_impls_for_regular_interfaces_count] =
         generic_impl_regular_interface_create(interface_evaluated.compile_time_value.value_.type_.interface_,
                                               impl_expression_clone(tree), closures,
-                                              generic_instantiation_expression_clone(self), state->source);
+                                              generic_instantiation_expression_clone(self), state->source,
+                                              unicode_view_copy(state->current_import_directory));
     root->generic_impls_for_regular_interfaces_count += 1;
     return make_unit(&state->used_registers, function);
 }
@@ -3272,7 +3281,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
     interface_->generic_impls[interface_->generic_impl_count] =
         generic_impl_create(impl_expression_clone(tree), closures,
                             generic_impl_self_create_generic(generic_instantiation_expression_clone(self)),
-                            source_file_to_owning(state->source));
+                            source_file_to_owning(state->source), unicode_view_copy(state->current_import_directory));
     interface_->generic_impl_count += 1;
     return make_unit(&state->used_registers, function);
 }
@@ -3542,7 +3551,8 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
         reallocate_array(root->generic_enums, root->generic_enum_count + 1, sizeof(*root->generic_enums));
     generic_enum_id const id = root->generic_enum_count;
     generic_closures const closures = find_generic_closures(state, element);
-    root->generic_enums[id] = generic_enum_create(enum_expression_clone(element), closures);
+    root->generic_enums[id] = generic_enum_create(
+        enum_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
     root->generic_enum_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3677,12 +3687,13 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    enum_expression const original = root->generic_enums[generic].tree;
+    generic_enum const instantiated_enum = state->root->generic_enums[generic];
+    enum_expression const original = instantiated_enum.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state enum_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
-        optional_type_create_empty(), false, state->source);
-    generic_enum const instantiated_enum = state->root->generic_enums[generic];
+        optional_type_create_empty(), false, state->source,
+        unicode_view_from_string(instantiated_enum.current_import_directory));
     if (argument_count < instantiated_enum.tree.parameters.count)
     {
         if (arguments)
@@ -3817,12 +3828,13 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    struct_expression const original = root->generic_structs[generic].tree;
+    generic_struct const instantiated_struct = state->root->generic_structs[generic];
+    struct_expression const original = instantiated_struct.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state struct_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
-        optional_type_create_empty(), false, state->source);
-    generic_struct const instantiated_struct = state->root->generic_structs[generic];
+        optional_type_create_empty(), false, state->source,
+        unicode_view_from_string(instantiated_struct.current_import_directory));
     if (argument_count < instantiated_struct.tree.generic_parameters.count)
     {
         if (arguments)
@@ -3947,13 +3959,14 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    interface_expression const original = root->generic_interfaces[generic].tree;
+    generic_interface const instantiated_interface = state->root->generic_interfaces[generic];
+    interface_expression const original = instantiated_interface.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
-        optional_type_create_empty(), false, state->source);
+        optional_type_create_empty(), false, state->source,
+        unicode_view_from_string(instantiated_interface.current_import_directory));
 
-    generic_interface const instantiated_interface = state->root->generic_interfaces[generic];
     if (argument_count < instantiated_interface.tree.parameters.count)
     {
         if (arguments)
@@ -4078,12 +4091,13 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         return evaluate_expression_result_create(
             evaluation_status_value, into, function_type, optional_value_create(literal), true);
     }
-    lambda const original = root->generic_lambdas[generic].tree;
     generic_lambda const instantiated_lambda = state->root->generic_lambdas[generic];
+    lambda const original = instantiated_lambda.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state lambda_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
-        optional_type_create_empty(), false, source_file_from_owning(instantiated_lambda.file));
+        optional_type_create_empty(), false, source_file_from_owning(instantiated_lambda.file),
+        unicode_view_from_string(instantiated_lambda.current_import_directory));
     if (argument_count < instantiated_lambda.tree.generic_parameters.count)
     {
         if (arguments)
@@ -4738,7 +4752,7 @@ static structure clone_structure(structure const original)
 }
 
 checked_program check(sequence const root, structure const global, check_error_handler *on_error, module_loader *loader,
-                      source_file source, void *user)
+                      source_file source, unicode_view const current_import_directory, void *user)
 {
     size_t const max_compile_time_heap = 100000;
     size_t const max_recursion = 100;
@@ -4811,9 +4825,10 @@ checked_program check(sequence const root, structure const global, check_error_h
         NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL,
         NULL, 0, 0, interpreter_create(globals, &program.memory, &program.functions, &program.interfaces, max_recursion,
                                        &current_recursion, max_executed_instructions, &executed_instructions)};
-    check_function_result const checked = check_function(
-        &check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL, 0,
-        optional_type_create_empty(), true, optional_type_create_empty(), source, NULL, optional_function_id_create(0));
+    check_function_result const checked =
+        check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
+                       0, optional_type_create_empty(), true, optional_type_create_empty(), source,
+                       current_import_directory, NULL, optional_function_id_create(0));
     deallocate(globals);
     if (checked.success)
     {

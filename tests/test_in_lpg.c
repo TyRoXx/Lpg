@@ -371,7 +371,7 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 }
 
 static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object,
-                               unicode_view const in_lpg_directory)
+                               unicode_view const in_lpg_directory, unicode_view const current_import_directory)
 {
     sequence const root = parse(source);
 
@@ -387,8 +387,8 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
-    checked_program checked =
-        check(root, global_object, expect_no_errors, &loader, source_file_create(test_name, source), NULL);
+    checked_program checked = check(root, global_object, expect_no_errors, &loader,
+                                    source_file_create(test_name, source), current_import_directory, NULL);
     sequence_free(&root);
 
     // not optimized
@@ -421,20 +421,20 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
     checked_program_free(&checked);
 }
 
-static void run_file(char const *const source_file_name, structure const global_object,
-                     unicode_view const in_lpg_directory)
+static void run_file(char const *const source_file_name, unicode_view const in_lpg_subdirectory,
+                     structure const global_object, unicode_view const in_lpg_directory)
 {
-    unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)),
-                                   unicode_view_from_c_str("in_lpg"), unicode_view_from_c_str(source_file_name)};
+    unicode_view const pieces[] = {path_remove_leaf(unicode_view_from_c_str(__FILE__)), in_lpg_subdirectory,
+                                   unicode_view_from_c_str(source_file_name)};
     unicode_string const full_expected_file_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     blob_or_error const expected_or_error = read_file(full_expected_file_path.data);
-    unicode_string_free(&full_expected_file_path);
     REQUIRE(!expected_or_error.error);
     unicode_string const expected = unicode_string_validate(expected_or_error.success);
 
-    expect_output_impl(
-        unicode_view_from_c_str(source_file_name), unicode_view_from_string(expected), global_object, in_lpg_directory);
+    expect_output_impl(unicode_view_from_c_str(source_file_name), unicode_view_from_string(expected), global_object,
+                       in_lpg_directory, path_remove_leaf(unicode_view_from_string(full_expected_file_path)));
     unicode_string_free(&expected);
+    unicode_string_free(&full_expected_file_path);
 }
 
 typedef struct run_file_in_thread_state
@@ -450,7 +450,7 @@ static void run_file_in_thread(void *argument)
 {
     run_file_in_thread_state *const cast = argument;
     duration const time_before = read_monotonic_clock();
-    run_file(cast->file, cast->globals, cast->in_lpg_directory);
+    run_file(cast->file, unicode_view_from_c_str("in_lpg"), cast->globals, cast->in_lpg_directory);
     duration const time_after = read_monotonic_clock();
     duration const difference = absolute_duration_difference(time_before, time_after);
     cast->how_long_did_it_take = difference;
@@ -471,20 +471,28 @@ static int compare_threads_by_how_long_they_took(void const *const left, void co
     return 0;
 }
 
+static unicode_string find_tests_build_directory(void)
+{
+    unicode_string executable_path = get_current_executable_path();
+    unicode_view executable_dir = path_remove_leaf(unicode_view_from_string(executable_path));
+    unicode_view tests_dir = executable_dir;
+#ifdef _MSC_VER
+    tests_dir = path_remove_leaf(tests_dir);
+#endif
+    executable_path.length = tests_dir.length;
+    return executable_path;
+}
+
 void test_in_lpg(void)
 {
     standard_library_description const std_library = describe_standard_library();
 
     {
-        unicode_string const executable_path = get_current_executable_path();
-        unicode_view const executable_dir = path_remove_leaf(unicode_view_from_string(executable_path));
-        unicode_view tests_dir = executable_dir;
-#ifdef _MSC_VER
-        tests_dir = path_remove_leaf(tests_dir);
-#endif
-        unicode_view const in_lpg_dir_pieces[] = {tests_dir, unicode_view_from_c_str("in_lpg")};
+        unicode_string const tests_build_dir = find_tests_build_directory();
+        unicode_view const in_lpg_dir_pieces[] = {
+            unicode_view_from_string(tests_build_dir), unicode_view_from_c_str("in_lpg")};
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
-        unicode_string_free(&executable_path);
+        unicode_string_free(&tests_build_dir);
 
         static char const *const test_files[] = {"add.lpg",
                                                  "add_u64.lpg",
@@ -506,7 +514,6 @@ void test_in_lpg(void)
                                                  "enum-stateless.lpg",
                                                  "enum-syntax-sugar.lpg",
                                                  "equality.lpg",
-                                                 "fail.lpg",
                                                  "function-pointer.lpg",
                                                  "generic-impl-generic-self.lpg",
                                                  "generic-nesting.lpg",
@@ -585,5 +592,19 @@ void test_in_lpg(void)
         unicode_string_free(&in_lpg_dir);
     }
 
+    standard_library_description_free(&std_library);
+}
+
+void test_in_lpg_2(void)
+{
+    standard_library_description const std_library = describe_standard_library();
+    unicode_string const tests_build_dir = find_tests_build_directory();
+    unicode_view const in_lpg_2_dir_pieces[] = {
+        unicode_view_from_string(tests_build_dir), unicode_view_from_c_str("in_lpg_2")};
+    unicode_string const in_lpg_2_dir = path_combine(in_lpg_2_dir_pieces, LPG_ARRAY_SIZE(in_lpg_2_dir_pieces));
+    unicode_string_free(&tests_build_dir);
+    run_file("all_tests.lpg", unicode_view_from_c_str("in_lpg_2"), std_library.globals,
+             unicode_view_from_string(in_lpg_2_dir));
+    unicode_string_free(&in_lpg_2_dir);
     standard_library_description_free(&std_library);
 }

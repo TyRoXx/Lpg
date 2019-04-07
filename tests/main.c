@@ -67,6 +67,7 @@ int main(void)
                                     test_blob,
                                     test_c_backend,
                                     test_create_process,
+                                    test_in_lpg_2,
                                     test_in_lpg,
                                     test_value,
                                     test_remove_dead_code,

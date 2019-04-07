@@ -29,6 +29,7 @@ typedef struct function_checking_state
     optional_value *register_compile_time_values;
     register_id register_compile_time_value_count;
     source_file source;
+    unicode_view current_import_directory;
 } function_checking_state;
 
 void function_checking_state_free(function_checking_state const freed);

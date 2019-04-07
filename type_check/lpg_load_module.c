@@ -67,13 +67,13 @@ static void translate_semantic_error(complete_semantic_error const error, void *
 }
 
 static load_module_result type_check_module(function_checking_state *const state, sequence const parsed,
-                                            source_file const source)
+                                            source_file const source, unicode_view const current_import_directory)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
     check_function_result const checked = check_function(
         state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
-        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), source, NULL,
-        optional_function_id_empty());
+        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), source,
+        current_import_directory, NULL, optional_function_id_empty());
     if (!checked.success)
     {
         load_module_result const failure = {optional_value_empty, type_from_unit()};
@@ -118,26 +118,55 @@ static load_module_result type_check_module(function_checking_state *const state
     LPG_UNREACHABLE();
 }
 
-load_module_result load_module(function_checking_state *state, unicode_view name)
+typedef struct import_attempt_result
+{
+    blob_or_error module_source;
+    unicode_string full_module_path;
+} import_attempt_result;
+
+static void import_attempt_result_free(import_attempt_result const freed)
+{
+    unicode_string_free(&freed.full_module_path);
+    if (!freed.module_source.error)
+    {
+        blob_free(&freed.module_source.success);
+    }
+}
+
+static import_attempt_result try_load(unicode_view const module_directory, unicode_view name)
 {
     unicode_string const file_name = unicode_view_concat(name, unicode_view_from_c_str(".lpg"));
-    module_loader *const loader = state->root->loader;
-    unicode_view const pieces[] = {loader->module_directory, unicode_view_from_string(file_name)};
+    unicode_view const pieces[] = {module_directory, unicode_view_from_string(file_name)};
     unicode_string const full_module_path = path_combine(pieces, LPG_ARRAY_SIZE(pieces));
     unicode_string_free(&file_name);
     blob_or_error module_source = read_file_unicode_view_name(unicode_view_from_string(full_module_path));
-    if (module_source.error)
+    import_attempt_result const result = {module_source, full_module_path};
+    return result;
+}
+
+load_module_result load_module(function_checking_state *const state, unicode_view const name)
+{
+    module_loader *const loader = state->root->loader;
+    import_attempt_result attempt = try_load(loader->module_directory, name);
+    if (attempt.module_source.error)
     {
-        unicode_string_free(&full_module_path);
-        load_module_result const failure = {optional_value_empty, type_from_unit()};
-        return failure;
+        import_attempt_result_free(attempt);
+        attempt = try_load(state->current_import_directory, name);
+        if (attempt.module_source.error)
+        {
+            import_attempt_result_free(attempt);
+            load_module_result const failure = {optional_value_empty, type_from_unit()};
+            return failure;
+        }
     }
-    module_source.success.length = remove_carriage_returns(module_source.success.data, module_source.success.length);
+    attempt.module_source.success.length =
+        remove_carriage_returns(attempt.module_source.success.data, attempt.module_source.success.length);
     /*TODO: check whether source is UTF-8*/
-    parser_user parser_state = {module_source.success.data, module_source.success.length, source_location_create(0, 0)};
+    parser_user parser_state = {
+        attempt.module_source.success.data, attempt.module_source.success.length, source_location_create(0, 0)};
     parse_error_translator translator = parse_error_translator_create(
-        loader->on_parse_error, loader->on_parse_error_user, unicode_view_from_string(full_module_path),
-        unicode_view_create(module_source.success.data, module_source.success.length), false);
+        loader->on_parse_error, loader->on_parse_error_user, unicode_view_from_string(attempt.full_module_path),
+        unicode_view_create(attempt.module_source.success.data, attempt.module_source.success.length), false);
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const parsed = parse_program(&parser);
@@ -145,17 +174,16 @@ load_module_result load_module(function_checking_state *state, unicode_view name
     if (translator.has_error)
     {
         sequence_free(&parsed);
-        unicode_string_free(&full_module_path);
-        blob_free(&module_source.success);
+        import_attempt_result_free(attempt);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const result = type_check_module(
-        state, parsed,
-        source_file_create(unicode_view_from_string(full_module_path),
-                           unicode_view_create(module_source.success.data, module_source.success.length)));
+    load_module_result const result =
+        type_check_module(state, parsed, source_file_create(unicode_view_from_string(attempt.full_module_path),
+                                                            unicode_view_create(attempt.module_source.success.data,
+                                                                                attempt.module_source.success.length)),
+                          path_remove_leaf(unicode_view_from_string(attempt.full_module_path)));
     sequence_free(&parsed);
-    unicode_string_free(&full_module_path);
-    blob_free(&module_source.success);
+    import_attempt_result_free(attempt);
     return result;
 }

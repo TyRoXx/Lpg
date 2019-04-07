@@ -56,7 +56,7 @@ static checked_program simple_check(char const *const source, structure const gl
     user->source = source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source));
     sequence const root = parse(source);
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, NULL);
-    checked_program const result = check(root, global, expect_errors, &loader, user->source, user);
+    checked_program const result = check(root, global, expect_errors, &loader, user->source, module_directory, user);
     sequence_free(&root);
     return result;
 }
