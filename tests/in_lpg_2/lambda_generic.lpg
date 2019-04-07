@@ -1,0 +1,22 @@
+let std = import std
+
+()
+    let f = [T](a: T)
+        a
+    let g = f[std.boolean]
+    assert(g(std.boolean.true))
+
+    let f2 = [T](a: T): T
+        a
+    let g2 = f2[std.boolean]
+    assert(g2(std.boolean.true))
+
+    let instantiate_again = f[std.boolean]
+    assert(instantiate_again(std.boolean.true))
+
+    let other_argument = f[int(0, 3)]
+    assert(integer_equals(2, other_argument(2)))
+
+    let h = [T, U](a: T, b: U)
+        f[T](a)
+    assert(h[std.boolean, std.unit](std.boolean.true, std.unit_value))
