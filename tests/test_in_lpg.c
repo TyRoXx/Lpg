@@ -520,7 +520,6 @@ void test_in_lpg(void)
                                                  "interface.lpg",
                                                  "interface-constant.lpg",
                                                  "interface-generic.lpg",
-                                                 "struct-generic.lpg",
                                                  "interface-generic-impl.lpg",
                                                  "interface-recursive.lpg",
                                                  "lambda-as-parameter.lpg",
@@ -547,11 +546,6 @@ void test_in_lpg(void)
                                                  "shift_right_u64.lpg",
                                                  "std.lpg",
                                                  "string-equals.lpg",
-                                                 "struct-compile-time.lpg",
-                                                 "struct.lpg",
-                                                 "subtract.lpg",
-                                                 "type-of.lpg",
-                                                 "unit_value.lpg",
                                                  "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;

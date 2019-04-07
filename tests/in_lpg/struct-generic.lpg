@@ -1,7 +1,0 @@
-let std = import std
-
-let s = struct[T]
-    e: T
-let instantiated = s[std.boolean]
-let v : instantiated = instantiated{std.boolean.true}
-assert(v.e)
