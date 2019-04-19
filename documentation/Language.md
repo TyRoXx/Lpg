@@ -5,6 +5,9 @@
     1. [Variables and constants](#Variables-and-constants)
     1. [Functions](#Function-Syntax)
     1. [Interfaces](#Interfaces)
+    1. [Enums](#Enums)
+    1. [Stateful enums](#Stateful-enums)
+    1. [Generic enums](#Generic-enums)
 1. Concepts
     1. [Match](#Match)
     1. [Loops](#Loops)
@@ -161,6 +164,62 @@ let u = struct
 let u_instance = u{t{std.boolean.true}, "abc"}
 ```
 
+### Enums
+
+The built-in `boolean` type is equivalent to this definition.
+```lpg
+let boolean = enum
+    false
+    true
+```
+
+If you declare the type of a variable explicitly, you can initialize it with just the name of the `enum` element:
+```lpg
+let a = boolean.true
+let b : boolean = true
+```
+
+The same applies to `match` `case`s, function calls, `struct` instantiations, etc.
+```lpg
+let a : boolean = true
+match a
+    case true: assert(true)
+    case false: assert(false)
+
+let s = struct
+    e: boolean
+let s_instance = s{false}
+```
+
+### Stateful enums
+
+An `enum` element can optionally define additional state. For example, you could define your own `enum` that can be used to either return success or an error message:
+```lpg
+let std = import std
+let result = enum
+    success
+    error(std.string)
+
+// this is how you use stateful enum elements:
+let my_function = (): result
+    error("not implemented")
+
+match my_function()
+    case success:
+        fail()
+    case error(let message):
+        assert(string_equals(message, "not implemented"))
+```
+
+### Generic enums
+
+This is an example for a generic enum with one generic parameter:
+```lpg
+let option = enum[T]
+    some(T)
+    none
+```
+
 ## Concepts
 
 ### Match
@@ -172,9 +231,9 @@ let bool = import std.boolean
 
 let a = bool.true
 let result : int(1, 2) = match a
-    case bool.false:
+    case false:
         1
-    case bool.true:
+    case true:
         2
 
 assert(integer_equals(2, result))
@@ -186,10 +245,10 @@ Matching stateful enums works like this:
 ```
 let option = import std.option
 let result : int(1, 2) = match option[boolean].some(boolean.true)
-    case option[boolean].some(let e):
+    case some(let e):
         assert(e)
         1
-    case option[boolean].none:
+    case none:
         2
 assert(integer_equals(1, result))
 ```
@@ -227,10 +286,10 @@ let bool = std.boolean
 let a = bool.true
 loop
     let still_running = match a
-        case bool.false:
+        case false:
             break
             std.unit
-        case bool.true:
+        case true:
             std.unit
 assert(bool.true)
 ```
