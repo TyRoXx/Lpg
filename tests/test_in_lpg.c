@@ -494,6 +494,8 @@ void test_in_lpg(void)
         unicode_string const in_lpg_dir = path_combine(in_lpg_dir_pieces, LPG_ARRAY_SIZE(in_lpg_dir_pieces));
         unicode_string_free(&tests_build_dir);
 
+        REQUIRE(create_directory(unicode_view_from_string(in_lpg_dir)) == success_yes);
+
         static char const *const test_files[] = {
             "comment_multi.lpg", "comment_single.lpg", "ecmascript.lpg", "empty.lpg", "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
