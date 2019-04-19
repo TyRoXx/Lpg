@@ -148,7 +148,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         memory_writer cmakelists_content = {NULL, 0, 0};
         stream_writer writer = memory_writer_erase(&cmakelists_content);
         REQUIRE(success_yes == stream_writer_write_string(writer, "cmake_minimum_required(VERSION 3.2)\n"
-                                                                  "project(generated_test_solution)\n"
+                                                                  "project(generated_test_solution C)\n"
                                                                   "if(MSVC)\n"
                                                                   "    add_definitions(/WX)\n"
                                                                   "    add_definitions(/wd4101)\n"
