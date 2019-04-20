@@ -2967,14 +2967,14 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
     for (size_t i = 0; i < element.method_count; ++i)
     {
         interface_expression_method const method = element.methods[i];
-        evaluated_function_header const header = evaluate_function_header(state, function, method.header);
+        evaluated_function_header header = evaluate_function_header(state, function, method.header);
         if (!header.is_success)
         {
             continue;
         }
         if (!header.return_type.is_set)
         {
-            LPG_TO_DO();
+            header.return_type = optional_type_create_set(type_from_unit());
         }
         for (size_t j = 0; j < method.header.parameter_count; ++j)
         {

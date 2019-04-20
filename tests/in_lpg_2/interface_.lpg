@@ -109,3 +109,12 @@ let std = import std
     let h : printable2 = different_method_order{}
     h.other_method()
     assert(string_equals("123", h.print()))
+
+    let implicit_unit = interface
+        m()
+    impl implicit_unit for boolean
+        m(): std.unit
+            assert(self)
+    let implicit_unit_instance : implicit_unit = boolean.true
+    let implicit_unit_result = implicit_unit_instance.m()
+    assert(type_equals(type_of(implicit_unit_result), std.unit))
