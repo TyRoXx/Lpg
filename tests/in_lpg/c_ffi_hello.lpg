@@ -3,6 +3,6 @@ let std = import std
 
 let puts_parameters = new_array(ffi.value_type)
 assert(puts_parameters.append(pointer))
-let puts = ffi.function_reference{"<stdio.h>", "puts", puts_parameters, std.option[ffi.value_type].some(ffi.value_type.int)}
+let puts = ffi.function_reference{"<stdio.h>", "puts", puts_parameters, std.option[ffi.value_type].some(int)}
 ()
     side_effect()
