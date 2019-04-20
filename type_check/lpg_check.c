@@ -91,9 +91,9 @@ static optional_enum_id optional_enum_id_create_empty(void)
     return result;
 }
 
-static optional_enum_id optional_enum_id_create_set(enum_id const value)
+static optional_enum_id optional_enum_id_create_set(enum_id const value_)
 {
-    optional_enum_id const result = {true, value};
+    optional_enum_id const result = {true, value_};
     return result;
 }
 
