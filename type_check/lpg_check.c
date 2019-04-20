@@ -79,9 +79,49 @@ static function_checking_state function_checking_state_create(
     return result;
 }
 
+typedef struct optional_enum_id
+{
+    bool is_set;
+    enum_id value;
+} optional_enum_id;
+
+static optional_enum_id optional_enum_id_create_empty(void)
+{
+    optional_enum_id const result = {false, ~(enum_id)0};
+    return result;
+}
+
+static optional_enum_id optional_enum_id_create_set(enum_id const value)
+{
+    optional_enum_id const result = {true, value};
+    return result;
+}
+
+typedef struct type_expectation
+{
+    optional_type exact_type;
+    optional_enum_id enum_constructors;
+} type_expectation;
+
+static type_expectation type_expectation_create_exact(optional_type exact_type)
+{
+    type_expectation result;
+    result.exact_type = exact_type;
+    result.enum_constructors = optional_enum_id_create_empty();
+    return result;
+}
+
+static type_expectation type_expectation_create_enum_constructors(enum_id const id)
+{
+    type_expectation result;
+    result.exact_type = optional_type_create_empty();
+    result.enum_constructors = optional_enum_id_create_set(id);
+    return result;
+}
+
 static evaluate_expression_result check_sequence(function_checking_state *const state,
                                                  instruction_sequence *const output, sequence const input,
-                                                 optional_type const expected_return_type);
+                                                 type_expectation const expected_return_type);
 
 static type get_parameter_type(type const callee, size_t const which_parameter,
                                checked_function const *const all_functions, enumeration const *const all_enums)
@@ -210,7 +250,7 @@ static read_structure_element_result read_tuple_element(function_checking_state 
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element,
                                                       unicode_view const *const early_initialized_variable,
-                                                      optional_type const expected_result_type);
+                                                      type_expectation const expected_result_type);
 
 static evaluate_expression_result evaluate_return_expression(function_checking_state *state,
                                                              instruction_sequence *sequence,
@@ -263,8 +303,8 @@ static read_structure_element_result read_element(function_checking_state *state
                                                   const identifier_expression *const element, register_id const result)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
-    evaluate_expression_result const object =
-        evaluate_expression(state, function, object_tree, NULL, optional_type_create_empty());
+    evaluate_expression_result const object = evaluate_expression(
+        state, function, object_tree, NULL, type_expectation_create_exact(optional_type_create_empty()));
     switch (object.status)
     {
     case evaluation_status_error:
@@ -429,7 +469,8 @@ static size_t expected_call_argument_count(const type callee, checked_function c
 
 static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_state *const state),
                                                 LPG_NON_NULL(instruction_sequence *const to), unicode_view const name,
-                                                source_location const where, optional_type const expected_result_type)
+                                                source_location const where,
+                                                type_expectation const expected_result_type)
 {
     ASSUME(to);
     instruction_checkpoint const previous_code = make_checkpoint(state, to);
@@ -468,9 +509,9 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
         return evaluate_expression_result_empty;
     }
 
-    if (expected_result_type.is_set && (expected_result_type.value.kind == type_kind_enumeration))
+    if (expected_result_type.exact_type.is_set && (expected_result_type.exact_type.value.kind == type_kind_enumeration))
     {
-        enumeration const *const enum_ = state->program->enums + expected_result_type.value.enum_;
+        enumeration const *const enum_ = state->program->enums + expected_result_type.exact_type.value.enum_;
         for (enum_element_id i = 0; i < enum_->size; ++i)
         {
             enumeration_element const *const element = enum_->elements + i;
@@ -482,12 +523,41 @@ static evaluate_expression_result read_variable(LPG_NON_NULL(function_checking_s
                 }
                 value const literal = value_from_enum_element(i, enum_->elements[i].state.value, NULL);
                 register_id const result = allocate_register(&state->used_registers);
-                add_instruction(to, instruction_create_literal(
-                                        literal_instruction_create(result, literal, expected_result_type.value)));
+                add_instruction(to, instruction_create_literal(literal_instruction_create(
+                                        result, literal, expected_result_type.exact_type.value)));
                 write_register_compile_time_value(state, result, literal);
-                return evaluate_expression_result_create(
-                    evaluation_status_value, result, expected_result_type.value, optional_value_create(literal), true);
+                return evaluate_expression_result_create(evaluation_status_value, result,
+                                                         expected_result_type.exact_type.value,
+                                                         optional_value_create(literal), true);
             }
+        }
+    }
+
+    if (expected_result_type.enum_constructors.is_set)
+    {
+        enumeration const *const enum_ = state->program->enums + expected_result_type.enum_constructors.value;
+        for (enum_element_id i = 0; i < enum_->size; ++i)
+        {
+            enumeration_element const *const element = enum_->elements + i;
+            if (!unicode_view_equals(name, unicode_view_from_string(element->name)))
+            {
+                continue;
+            }
+            if (!element->state.is_set)
+            {
+                LPG_TO_DO();
+            }
+            enum_constructor_type *const enum_constructor =
+                garbage_collector_allocate(&state->program->memory, sizeof(*enum_constructor));
+            *enum_constructor = enum_constructor_type_create(expected_result_type.enum_constructors.value, i);
+            type const constructor_type = type_from_enum_constructor(enum_constructor);
+            value const literal = value_from_enum_constructor();
+            register_id const result = allocate_register(&state->used_registers);
+            add_instruction(
+                to, instruction_create_literal(literal_instruction_create(result, literal, constructor_type)));
+            write_register_compile_time_value(state, result, literal);
+            return evaluate_expression_result_create(
+                evaluation_status_value, result, constructor_type, optional_value_create(literal), true);
         }
     }
 
@@ -647,7 +717,7 @@ check_function(program_check *const root, function_checking_state *const parent,
     ASSUME(state.register_debug_name_count <= state.used_registers);
 
     evaluate_expression_result const body_evaluated =
-        evaluate_expression(&state, &body_out, body_in, NULL, explicit_return_type);
+        evaluate_expression(&state, &body_out, body_in, NULL, type_expectation_create_exact(explicit_return_type));
 
     ASSUME(state.register_debug_name_count <= state.used_registers);
 
@@ -762,8 +832,8 @@ static compile_time_type_expression_result compile_time_type_expression_result_c
 static compile_time_type_expression_result
 expect_compile_time_type(function_checking_state *state, instruction_sequence *function, expression const element)
 {
-    evaluate_expression_result const result =
-        evaluate_expression(state, function, element, NULL, optional_type_create_empty());
+    evaluate_expression_result const result = evaluate_expression(
+        state, function, element, NULL, type_expectation_create_exact(optional_type_create_empty()));
     switch (result.status)
     {
     case evaluation_status_value:
@@ -1105,7 +1175,8 @@ infer_generic_arguments(function_checking_state *const state, instruction_sequen
         optional_type_create_empty(), false, source, original_current_import_directory);
     use_generic_closures(&inference_state, closures);
     evaluate_expression_result const generic_evaluated =
-        evaluate_expression(&inference_state, function, *self_tree.generic, NULL, optional_type_create_empty());
+        evaluate_expression(&inference_state, function, *self_tree.generic, NULL,
+                            type_expectation_create_exact(optional_type_create_empty()));
     instruction_sequence_free(&ignored);
     function_checking_state_free(inference_state);
     switch (generic_evaluated.status)
@@ -1420,8 +1491,8 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
 {
     type const parameter_type =
         get_parameter_type(callee_type, parameter_id, state->program->functions, state->program->enums);
-    evaluate_expression_result const argument =
-        evaluate_expression(state, function, argument_tree, NULL, optional_type_create_set(parameter_type));
+    evaluate_expression_result const argument = evaluate_expression(
+        state, function, argument_tree, NULL, type_expectation_create_exact(optional_type_create_set(parameter_type)));
     switch (argument.status)
     {
     case evaluation_status_error:
@@ -1443,11 +1514,17 @@ static argument_evaluation_result evaluate_argument(function_checking_state *con
 }
 
 static evaluate_expression_result evaluate_call_expression(function_checking_state *state,
-                                                           instruction_sequence *function, call const called)
+                                                           instruction_sequence *function, call const called,
+                                                           type_expectation const expected_result_type)
 {
     instruction_checkpoint const previous_code = make_checkpoint(state, function);
+    type_expectation expected_call_type = type_expectation_create_exact(optional_type_create_empty());
+    if (expected_result_type.exact_type.is_set && (expected_result_type.exact_type.value.kind == type_kind_enumeration))
+    {
+        expected_call_type = type_expectation_create_enum_constructors(expected_result_type.exact_type.value.enum_);
+    }
     evaluate_expression_result const callee =
-        evaluate_expression(state, function, *called.callee, NULL, optional_type_create_empty());
+        evaluate_expression(state, function, *called.callee, NULL, expected_call_type);
     switch (callee.status)
     {
     case evaluation_status_error:
@@ -1718,7 +1795,8 @@ evaluate_expression_result evaluate_not_expression(function_checking_state *stat
     ASSUME(boolean_value.kind == value_kind_type);
 
     evaluate_expression_result const result =
-        evaluate_expression(state, function, *(*element).not.expr, NULL, optional_type_create_set(boolean_value.type_));
+        evaluate_expression(state, function, *(*element).not.expr, NULL,
+                            type_expectation_create_exact(optional_type_create_set(boolean_value.type_)));
     ASSUME(state->global->members[3].compile_time_value.is_set);
 
     if (type_equals(boolean_value.type_, result.type_))
@@ -1824,9 +1902,9 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
             return pattern_evaluate_result_no;
         }
         instruction_checkpoint const before_pattern = make_checkpoint(state, function);
-        evaluate_expression_result const enum_element_evaluated =
-            evaluate_expression(state, function, *root.call.callee, NULL,
-                                optional_type_create_set(type_from_enumeration(expected_enumeration)));
+        evaluate_expression_result const enum_element_evaluated = evaluate_expression(
+            state, function, *root.call.callee, NULL,
+            type_expectation_create_enum_constructors(expected_enumeration));
         restore(before_pattern);
         switch (enum_element_evaluated.status)
         {
@@ -1877,7 +1955,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
 static evaluate_expression_result check_sequence_finish(function_checking_state *const state,
                                                         instruction_sequence *const output, sequence const input,
                                                         size_t const previous_number_of_variables,
-                                                        optional_type const expected_result_type)
+                                                        type_expectation const expected_result_type)
 {
     if (input.length == 0)
     {
@@ -1888,9 +1966,10 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     LPG_FOR(size_t, i, input.length)
     {
-        final_result =
-            evaluate_expression(state, output, input.elements[i], NULL,
-                                (i == (input.length - 1)) ? expected_result_type : optional_type_create_empty());
+        final_result = evaluate_expression(
+            state, output, input.elements[i], NULL, (i == (input.length - 1))
+                                                        ? expected_result_type
+                                                        : type_expectation_create_exact(optional_type_create_empty()));
         if (!final_result.is_pure)
         {
             is_pure = false;
@@ -1961,7 +2040,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
                                                                         instruction_sequence *const function,
                                                                         expression const *const element,
                                                                         evaluate_expression_result const input,
-                                                                        optional_type const expected_result_type)
+                                                                        type_expectation const expected_result_type)
 {
     ASSUME(input.type_.kind == type_kind_string);
     instruction_checkpoint const before = make_checkpoint(state, function);
@@ -1985,7 +2064,8 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
         if (key)
         {
             key_evaluated =
-                evaluate_expression(state, function, *key, NULL, optional_type_create_set(type_from_string()));
+                evaluate_expression(state, function, *key, NULL,
+                                    type_expectation_create_exact(optional_type_create_set(type_from_string())));
             if (key_evaluated.status != evaluation_status_value)
             {
                 deallocate_cases(cases, i);
@@ -2112,11 +2192,11 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
 
 evaluate_expression_result evaluate_match_expression(function_checking_state *state, instruction_sequence *function,
                                                      const expression *element,
-                                                     optional_type const expected_result_type)
+                                                     type_expectation const expected_result_type)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const input =
-        evaluate_expression(state, function, *(*element).match.input, NULL, optional_type_create_empty());
+    evaluate_expression_result const input = evaluate_expression(
+        state, function, *(*element).match.input, NULL, type_expectation_create_exact(optional_type_create_empty()));
     if (input.status != evaluation_status_value)
     {
         return input;
@@ -2219,8 +2299,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
 
             case pattern_evaluate_result_kind_no_pattern:
             {
-                evaluate_expression_result const key_evaluated =
-                    evaluate_expression(state, function, *key, NULL, optional_type_create_set(input.type_));
+                evaluate_expression_result const key_evaluated = evaluate_expression(
+                    state, function, *key, NULL, type_expectation_create_exact(optional_type_create_set(input.type_)));
                 if (key_evaluated.status != evaluation_status_value)
                 {
                     deallocate_boolean_cases(cases, enum_elements_handled, i);
@@ -2420,8 +2500,8 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                 LPG_TO_DO();
             }
             expression *const key = case_tree.key_or_default;
-            evaluate_expression_result const key_evaluated =
-                evaluate_expression(state, function, *key, NULL, optional_type_create_set(input.type_));
+            evaluate_expression_result const key_evaluated = evaluate_expression(
+                state, function, *key, NULL, type_expectation_create_exact(optional_type_create_set(input.type_)));
             if (key_evaluated.status != evaluation_status_value)
             {
                 deallocate_integer_range_list_cases(cases, i);
@@ -2568,8 +2648,8 @@ static evaluate_struct_arguments_result evaluate_struct_arguments(function_check
     for (size_t i = 0; i < argument_count; ++i)
     {
         type const member_type = members[i].what;
-        evaluate_expression_result const argument_evaluated =
-            evaluate_expression(state, function, arguments[i], NULL, optional_type_create_set(member_type));
+        evaluate_expression_result const argument_evaluated = evaluate_expression(
+            state, function, arguments[i], NULL, type_expectation_create_exact(optional_type_create_set(member_type)));
         if (argument_evaluated.status != evaluation_status_value)
         {
             deallocate(registers);
@@ -2970,7 +3050,8 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
     {
         struct_expression_element const element = evaluated.elements[i];
         evaluate_expression_result const element_type_evaluated =
-            evaluate_expression(state, function, element.type, NULL, optional_type_create_set(type_from_type()));
+            evaluate_expression(state, function, element.type, NULL,
+                                type_expectation_create_exact(optional_type_create_set(type_from_type())));
         if (element_type_evaluated.status != evaluation_status_value)
         {
             for (size_t j = 0; j < i; ++j)
@@ -3119,7 +3200,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     }
 
     evaluate_expression_result const generic =
-        evaluate_expression(state, function, *interface_instantiation.generic, NULL, optional_type_create_empty());
+        evaluate_expression(state, function, *interface_instantiation.generic, NULL,
+                            type_expectation_create_exact(optional_type_create_empty()));
     switch (generic.status)
     {
     case evaluation_status_value:
@@ -3142,7 +3224,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     }
 
     evaluate_expression_result const self =
-        evaluate_expression(state, function, *element.self, NULL, optional_type_create_set(type_from_type()));
+        evaluate_expression(state, function, *element.self, NULL,
+                            type_expectation_create_exact(optional_type_create_set(type_from_type())));
     if (self.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -3177,8 +3260,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
                                                                           generic_instantiation_expression const self,
                                                                           impl_expression const tree)
 {
-    evaluate_expression_result const interface_evaluated =
-        evaluate_expression(state, function, interface_, NULL, optional_type_create_set(type_from_type()));
+    evaluate_expression_result const interface_evaluated = evaluate_expression(
+        state, function, interface_, NULL, type_expectation_create_exact(optional_type_create_set(type_from_type())));
     switch (interface_evaluated.status)
     {
     case evaluation_status_value:
@@ -3249,7 +3332,8 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
     }
 
     evaluate_expression_result const generic =
-        evaluate_expression(state, function, *interface_expression_.generic, NULL, optional_type_create_empty());
+        evaluate_expression(state, function, *interface_expression_.generic, NULL,
+                            type_expectation_create_exact(optional_type_create_empty()));
     switch (generic.status)
     {
     case evaluation_status_value:
@@ -3437,7 +3521,8 @@ static evaluate_expression_result evaluate_instantiate_struct(function_checking_
                                                               instantiate_struct_expression const element)
 {
     evaluate_expression_result const type_evaluated =
-        evaluate_expression(state, function, *element.type, NULL, optional_type_create_set(type_from_type()));
+        evaluate_expression(state, function, *element.type, NULL,
+                            type_expectation_create_exact(optional_type_create_set(type_from_type())));
     if (type_evaluated.status != evaluation_status_value)
     {
         return type_evaluated;
@@ -3518,8 +3603,8 @@ static evaluate_expression_result evaluate_type_of(function_checking_state *cons
                                                    type_of_expression const element)
 {
     instruction_checkpoint const before = make_checkpoint(state, function);
-    evaluate_expression_result const target_evaluated =
-        evaluate_expression(state, function, *element.target, NULL, optional_type_create_empty());
+    evaluate_expression_result const target_evaluated = evaluate_expression(
+        state, function, *element.target, NULL, type_expectation_create_exact(optional_type_create_empty()));
     restore(before);
     register_id const where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3581,7 +3666,8 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
         {
             expression const state_expr = *element.elements[i].state;
             evaluate_expression_result const state_evaluated =
-                evaluate_expression(state, function, state_expr, NULL, optional_type_create_set(type_from_type()));
+                evaluate_expression(state, function, state_expr, NULL,
+                                    type_expectation_create_exact(optional_type_create_set(type_from_type())));
             if (state_evaluated.status == evaluation_status_value)
             {
                 if (!state_evaluated.compile_time_value.is_set ||
@@ -4195,8 +4281,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
                                                                  instruction_sequence *const function,
                                                                  generic_instantiation_expression const element)
 {
-    evaluate_expression_result const generic_evaluated =
-        evaluate_expression(state, function, *element.generic, NULL, optional_type_create_empty());
+    evaluate_expression_result const generic_evaluated = evaluate_expression(
+        state, function, *element.generic, NULL, type_expectation_create_exact(optional_type_create_empty()));
     if (generic_evaluated.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -4205,8 +4291,8 @@ static evaluate_expression_result evaluate_generic_instantiation(function_checki
     type *const argument_types = allocate_array(element.count, sizeof(*argument_types));
     for (size_t i = 0; i < element.count; ++i)
     {
-        evaluate_expression_result const argument_evaluated =
-            evaluate_expression(state, function, element.arguments[i], NULL, optional_type_create_empty());
+        evaluate_expression_result const argument_evaluated = evaluate_expression(
+            state, function, element.arguments[i], NULL, type_expectation_create_exact(optional_type_create_empty()));
         if (argument_evaluated.status != evaluation_status_value)
         {
             if (arguments)
@@ -4332,8 +4418,8 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                      instruction_sequence *const function,
                                                      new_array_expression const element)
 {
-    evaluate_expression_result const element_evaluated =
-        evaluate_expression(state, function, *element.element, NULL, optional_type_create_empty());
+    evaluate_expression_result const element_evaluated = evaluate_expression(
+        state, function, *element.element, NULL, type_expectation_create_exact(optional_type_create_empty()));
     if (element_evaluated.status != evaluation_status_value)
     {
         return element_evaluated;
@@ -4425,8 +4511,9 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     if (element.optional_type)
     {
         instruction_checkpoint const previous_code = make_checkpoint(state, function);
-        evaluate_expression_result const declared_type_evaluated = evaluate_expression(
-            state, function, *element.optional_type, NULL, optional_type_create_set(type_from_type()));
+        evaluate_expression_result const declared_type_evaluated =
+            evaluate_expression(state, function, *element.optional_type, NULL,
+                                type_expectation_create_exact(optional_type_create_set(type_from_type())));
         restore(previous_code);
         switch (declared_type_evaluated.status)
         {
@@ -4453,7 +4540,8 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     instruction_checkpoint const before_initialization = make_checkpoint(state, function);
     unicode_view const name = unicode_view_from_string(element.name.value);
     evaluate_expression_result const initializer =
-        evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL, declared_type);
+        evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL,
+                            type_expectation_create_exact(declared_type));
     if (initializer.status != evaluation_status_value)
     {
         return evaluate_expression_result_empty;
@@ -4505,7 +4593,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
                                                            instruction_sequence *const function,
                                                            expression const element,
                                                            unicode_view const *const early_initialized_variable,
-                                                           optional_type const expected_result_type)
+                                                           type_expectation const expected_result_type)
 {
     switch (element.type)
     {
@@ -4535,7 +4623,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
             state, function, element.lambda, early_initialized_variable, optional_function_id_empty());
 
     case expression_type_call:
-        return evaluate_call_expression(state, function, element.call);
+        return evaluate_call_expression(state, function, element.call, expected_result_type);
 
     case expression_type_enum:
         return evaluate_enum_expression(state, function, element.enum_);
@@ -4627,8 +4715,8 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         instruction_sequence body = {NULL, 0};
         bool const previous_is_in_loop = state->is_in_loop;
         state->is_in_loop = true;
-        evaluate_expression_result const loop_body_result =
-            check_sequence(state, &body, element.loop_body, optional_type_create_empty());
+        evaluate_expression_result const loop_body_result = check_sequence(
+            state, &body, element.loop_body, type_expectation_create_exact(optional_type_create_empty()));
         ASSUME(state->is_in_loop);
         state->is_in_loop = previous_is_in_loop;
         register_id const unit_goes_into = allocate_register(&state->used_registers);
@@ -4673,7 +4761,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
 static evaluate_expression_result evaluate_expression(function_checking_state *const state,
                                                       instruction_sequence *const function, expression const element,
                                                       unicode_view const *const early_initialized_variable,
-                                                      optional_type const expected_result_type)
+                                                      type_expectation const expected_result_type)
 {
     size_t const expression_recursion_limit = 100;
     if (state->root->expression_recursion_depth >= expression_recursion_limit)
@@ -4694,7 +4782,8 @@ static evaluate_expression_result evaluate_expression(function_checking_state *c
 static evaluate_expression_result evaluate_return_expression(function_checking_state *state, instruction_sequence *body,
                                                              const expression *returned)
 {
-    evaluate_expression_result const result = evaluate_expression(state, body, *returned, NULL, state->return_type);
+    evaluate_expression_result const result =
+        evaluate_expression(state, body, *returned, NULL, type_expectation_create_exact(state->return_type));
     if (result.status != evaluation_status_value)
     {
         return result;
@@ -4732,7 +4821,7 @@ static evaluate_expression_result evaluate_return_expression(function_checking_s
 
 static evaluate_expression_result check_sequence(function_checking_state *const state,
                                                  instruction_sequence *const output, sequence const input,
-                                                 optional_type const expected_return_type)
+                                                 type_expectation const expected_return_type)
 {
     ASSUME(output);
     size_t const previous_number_of_variables = state->local_variables.count;

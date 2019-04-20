@@ -855,8 +855,8 @@ static success_indicator generate_stateful_enum_name(enum_id const id, standard_
         if (member.state.is_set)
         {
             LPG_TRY(indent(2, definition_writer));
-            LPG_TRY(
-                generate_type(member.state.value, standard_library, definitions, program, additional_memory, definition_writer));
+            LPG_TRY(generate_type(
+                member.state.value, standard_library, definitions, program, additional_memory, definition_writer));
             LPG_TRY(stream_writer_write_string(definition_writer, " "));
             LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), definition_writer));
             LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
@@ -866,8 +866,7 @@ static success_indicator generate_stateful_enum_name(enum_id const id, standard_
     LPG_TRY(stream_writer_write_string(definition_writer, "};\n"));
     LPG_TRY(stream_writer_write_string(definition_writer, "}\n"));
     LPG_TRY(generate_type(
-         type_from_enumeration(id), standard_library, definitions, program,
-                          additional_memory, definition_writer));
+        type_from_enumeration(id), standard_library, definitions, program, additional_memory, definition_writer));
     LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
     type_definition *const new_definition = definitions->elements + definition_index;
     new_definition->definition.data = definition_buffer.data;
@@ -929,7 +928,8 @@ static success_indicator generate_type(type const generated, standard_library_us
     case type_kind_enumeration:
         if (has_stateful_element(program->enums[generated.enum_]))
         {
-            return generate_stateful_enum_name(generated.enum_, standard_library, definitions, program, additional_memory, c_output);
+            return generate_stateful_enum_name(
+                generated.enum_, standard_library, definitions, program, additional_memory, c_output);
         }
         return stream_writer_write_string(c_output, "stateless_enum");
 
@@ -3333,7 +3333,7 @@ success_indicator generate_c(checked_program const program, garbage_collector *c
     {
         LPG_TRY_GOTO(generate_interface_reference_definition(i, c_output), fail);
     }
-	
+
     ASSUME(definitions.count == definitions.next_order);
     {
         size_t *const ordered_definitions = type_definitions_sort_by_order(definitions);

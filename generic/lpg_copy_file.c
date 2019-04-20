@@ -1,6 +1,6 @@
 #include "lpg_copy_file.h"
-#include "lpg_win32.h"
 #include "lpg_assert.h"
+#include "lpg_win32.h"
 #ifdef _WIN32
 #include <Windows.h>
 #else

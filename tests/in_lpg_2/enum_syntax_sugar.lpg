@@ -2,6 +2,7 @@
     let e = enum
         a
         b
+        c(boolean)
 
     let variable : e = a
 
@@ -24,4 +25,12 @@
     assert(match a
         case a: true
         case e.a: false
+        case c(let state): false
+)
+
+    let stateful : e = c(true)
+    assert(match stateful
+        case e.a: false
+        case b: false
+        case c(let state): state
 )
