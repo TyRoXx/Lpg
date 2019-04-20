@@ -45,9 +45,18 @@ static uint64_t maximum(uint64_t const first, uint64_t const second)
 bool ecmascript_integer_range_merge_without_intersection(ecmascript_integer_range *const into,
                                                          ecmascript_integer_range const from)
 {
+    if (ecmascript_integer_range_is_empty(*into))
+    {
+        *into = from;
+        return true;
+    }
+    if (ecmascript_integer_range_is_empty(from))
+    {
+        return true;
+    }
     uint64_t const new_min = minimum(into->first, from.first);
     uint64_t const new_max = maximum(into->after_last - 1, from.after_last - 1);
-    uint64_t const new_size = (new_max - new_min);
+    uint64_t const new_size = (new_max - new_min) + 1;
     uint64_t const into_size = (into->after_last - into->first);
     uint64_t const from_size = (from.after_last - from.first);
     if (new_size < (into_size + from_size))

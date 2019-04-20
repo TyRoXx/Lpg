@@ -497,6 +497,8 @@ void test_in_lpg(void)
         REQUIRE(create_directory(unicode_view_from_string(in_lpg_dir)) == success_yes);
 
         static char const *const test_files[] = {
+            // TODO
+            //"c_ffi_hello.lpg",
             "comment_multi.lpg", "comment_single.lpg", "ecmascript.lpg", "empty.lpg", "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;

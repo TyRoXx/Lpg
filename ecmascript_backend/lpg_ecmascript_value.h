@@ -23,3 +23,4 @@ ecmascript_value ecmascript_value_create_integer(uint64_t value);
 ecmascript_value ecmascript_value_create_boolean(bool value);
 ecmascript_value ecmascript_value_create_undefined(void);
 success_indicator generate_ecmascript_value(ecmascript_value const value, stream_writer const ecmascript_output);
+bool ecmascript_value_equals(ecmascript_value const left, ecmascript_value const right);

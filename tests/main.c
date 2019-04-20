@@ -8,6 +8,7 @@
 #include "test_cli.h"
 #include "test_create_process.h"
 #include "test_decode_string_literal.h"
+#include "test_ecmascript_enum_encoding_strategy.h"
 #include "test_enum_encoding.h"
 #include "test_expression.h"
 #include "test_identifier.h"
@@ -63,6 +64,7 @@ int main(void)
                                     test_semantics,
                                     test_import_errors,
                                     test_implicitly_convertible,
+                                    test_ecmascript_enum_encoding_strategy,
                                     test_cli,
                                     test_blob,
                                     test_c_backend,

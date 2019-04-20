@@ -53,3 +53,24 @@ success_indicator generate_ecmascript_value(ecmascript_value const value, stream
     }
     return success_yes;
 }
+
+bool ecmascript_value_equals(ecmascript_value const left, ecmascript_value const right)
+{
+    if (left.type != right.type)
+    {
+        return false;
+    }
+    switch (left.type)
+    {
+    case ecmascript_value_integer:
+        return (left.integer == right.integer);
+
+    case ecmascript_value_boolean:
+        return (left.boolean == right.boolean);
+
+    case ecmascript_value_null:
+    case ecmascript_value_undefined:
+        return true;
+    }
+    LPG_UNREACHABLE();
+}

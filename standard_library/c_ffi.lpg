@@ -1,0 +1,19 @@
+let std = import std
+
+let value_type = enum
+    pointer
+    uint32_t
+    uint64_t
+    size_t
+    int
+
+let function_reference = struct
+    header: std.string
+    name: std.string
+    parameters: std.array[value_type]
+    return_type: std.option[value_type]
+
+let export = struct
+    value_type: type_of(value_type)
+    function_reference: type_of(function_reference)
+export{value_type, function_reference}

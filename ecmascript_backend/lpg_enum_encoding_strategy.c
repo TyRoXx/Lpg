@@ -18,10 +18,46 @@ enum_encoding_element_stateful enum_encoding_element_stateful_from_indirect(void
     return result;
 }
 
+bool enum_encoding_element_stateful_equals(enum_encoding_element_stateful const left,
+                                           enum_encoding_element_stateful const right)
+{
+    switch (left.encoding)
+    {
+    case enum_encoding_element_stateful_encoding_direct:
+        switch (right.encoding)
+        {
+        case enum_encoding_element_stateful_encoding_direct:
+            return ecmascript_value_set_equals(left.direct, right.direct);
+
+        case enum_encoding_element_stateful_encoding_indirect:
+            return false;
+        }
+        LPG_UNREACHABLE();
+
+    case enum_encoding_element_stateful_encoding_indirect:
+        switch (right.encoding)
+        {
+        case enum_encoding_element_stateful_encoding_direct:
+            return false;
+
+        case enum_encoding_element_stateful_encoding_indirect:
+            return true;
+        }
+        LPG_UNREACHABLE();
+    }
+    LPG_UNREACHABLE();
+}
+
 enum_encoding_element_stateless enum_encoding_element_stateless_create(ecmascript_value key)
 {
     enum_encoding_element_stateless const result = {key};
     return result;
+}
+
+bool enum_encoding_element_stateless_equals(enum_encoding_element_stateless const left,
+                                            enum_encoding_element_stateless const right)
+{
+    return ecmascript_value_equals(left.key, right.key);
 }
 
 enum_encoding_element enum_encoding_element_from_stateful(enum_encoding_element_stateful stateful)
@@ -57,6 +93,32 @@ ecmascript_value_set enum_encoding_element_value_set(enum_encoding_element const
     return ecmascript_value_set_create_from_value(from.stateless.key);
 }
 
+bool enum_encoding_element_equals(enum_encoding_element const left, enum_encoding_element const right)
+{
+    if (left.has_state)
+    {
+        if (right.has_state)
+        {
+            return enum_encoding_element_stateful_equals(left.stateful, right.stateful);
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        if (right.has_state)
+        {
+            return false;
+        }
+        else
+        {
+            return enum_encoding_element_stateless_equals(left.stateless, right.stateless);
+        }
+    }
+}
+
 enum_encoding_strategy enum_encoding_strategy_create(enum_encoding_element *elements, enum_element_id count)
 {
     enum_encoding_strategy const result = {elements, count};
@@ -76,8 +138,8 @@ ecmascript_value_set enum_encoding_strategy_value_set(enum_encoding_strategy con
     ecmascript_value_set result = ecmascript_value_set_create_empty();
     for (size_t i = 0; i < from.count; ++i)
     {
-        ASSERT(ecmascript_value_set_merge_without_intersection(
-            &result, enum_encoding_element_value_set(from.elements[i])));
+        ecmascript_value_set const element = enum_encoding_element_value_set(from.elements[i]);
+        ASSERT(ecmascript_value_set_merge_without_intersection(&result, element));
     }
     return result;
 }

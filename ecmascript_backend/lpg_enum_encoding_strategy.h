@@ -18,6 +18,8 @@ typedef struct enum_encoding_element_stateful
 
 enum_encoding_element_stateful enum_encoding_element_stateful_from_direct(ecmascript_value_set direct);
 enum_encoding_element_stateful enum_encoding_element_stateful_from_indirect(void);
+bool enum_encoding_element_stateful_equals(enum_encoding_element_stateful const left,
+                                           enum_encoding_element_stateful const right);
 
 typedef struct enum_encoding_element_stateless
 {
@@ -25,6 +27,8 @@ typedef struct enum_encoding_element_stateless
 } enum_encoding_element_stateless;
 
 enum_encoding_element_stateless enum_encoding_element_stateless_create(ecmascript_value key);
+bool enum_encoding_element_stateless_equals(enum_encoding_element_stateless const left,
+                                            enum_encoding_element_stateless const right);
 
 typedef struct enum_encoding_element
 {
@@ -39,6 +43,7 @@ typedef struct enum_encoding_element
 enum_encoding_element enum_encoding_element_from_stateful(enum_encoding_element_stateful stateful);
 enum_encoding_element enum_encoding_element_from_stateless(enum_encoding_element_stateless stateless);
 ecmascript_value_set enum_encoding_element_value_set(enum_encoding_element const from);
+bool enum_encoding_element_equals(enum_encoding_element const left, enum_encoding_element const right);
 
 typedef struct enum_encoding_strategy
 {
