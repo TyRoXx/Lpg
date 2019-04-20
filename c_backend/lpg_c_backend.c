@@ -813,46 +813,67 @@ static success_indicator generate_struct_member_name(unicode_view const name, st
     return escape_identifier(name, c_output);
 }
 
-static success_indicator generate_stateful_enum_name(enum_id const generated, stream_writer const c_output)
+static success_indicator generate_stateful_enum_name(enum_id const id, standard_library_usage *const standard_library,
+                                                     type_definitions *const definitions,
+                                                     checked_program const *const program,
+                                                     garbage_collector *const additional_memory,
+                                                     stream_writer const c_output)
 {
-    LPG_TRY(stream_writer_write_string(c_output, "enum_"));
-    LPG_TRY(stream_writer_write_integer(c_output, integer_create(0, generated)));
-    return success_yes;
-}
+    unicode_string const *const existing_definition = find_type_definition(*definitions, type_from_enumeration(id));
+    if (existing_definition)
+    {
+        return stream_writer_write_unicode_view(c_output, unicode_view_from_string(*existing_definition));
+    }
 
-static success_indicator
-generate_stateful_enum_definition(enum_id const id, standard_library_usage *const standard_library,
-                                  type_definitions *const definitions, checked_program const *const program,
-                                  garbage_collector *const additional_memory, stream_writer const c_output)
-{
+    memory_writer definition_buffer = {NULL, 0, 0};
+    stream_writer definition_writer = memory_writer_erase(&definition_buffer);
+    size_t const definition_index = definitions->count;
+    ++(definitions->count);
+    unicode_string name = make_type_definition_name(definition_index);
+    definitions->elements =
+        reallocate_array(definitions->elements, (definitions->count + 1), sizeof(*definitions->elements));
+    {
+        type_definition *const new_definition = definitions->elements + definition_index;
+        new_definition->what = type_from_enumeration(id);
+        new_definition->name = name;
+    }
+    LPG_TRY(stream_writer_write_string(definition_writer, "typedef struct "));
     enumeration const generated = program->enums[id];
-    LPG_TRY(stream_writer_write_string(c_output, "struct "));
-    LPG_TRY(generate_stateful_enum_name(id, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
-    LPG_TRY(indent(1, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "size_t which;\n"));
-    LPG_TRY(indent(1, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "union\n"));
-    LPG_TRY(indent(1, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "{\n"));
+    LPG_TRY(generate_type(
+        type_from_enumeration(id), standard_library, definitions, program, additional_memory, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, "\n"));
+    LPG_TRY(stream_writer_write_string(definition_writer, "{\n"));
+    LPG_TRY(indent(1, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, "size_t which;\n"));
+    LPG_TRY(indent(1, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, "union\n"));
+    LPG_TRY(indent(1, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, "{\n"));
     for (struct_member_id i = 0; i < generated.size; ++i)
     {
         enumeration_element const member = generated.elements[i];
         if (member.state.is_set)
         {
-            LPG_TRY(indent(2, c_output));
+            LPG_TRY(indent(2, definition_writer));
             LPG_TRY(
-                generate_type(member.state.value, standard_library, definitions, program, additional_memory, c_output));
-            LPG_TRY(stream_writer_write_string(c_output, " "));
-            LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), c_output));
-            LPG_TRY(stream_writer_write_string(c_output, ";\n"));
+                generate_type(member.state.value, standard_library, definitions, program, additional_memory, definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, " "));
+            LPG_TRY(generate_struct_member_name(unicode_view_from_string(member.name), definition_writer));
+            LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
         }
     }
-    LPG_TRY(indent(1, c_output));
-    LPG_TRY(stream_writer_write_string(c_output, "};\n"));
-    LPG_TRY(stream_writer_write_string(c_output, "};\n"));
-    return success_yes;
+    LPG_TRY(indent(1, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, "};\n"));
+    LPG_TRY(stream_writer_write_string(definition_writer, "}\n"));
+    LPG_TRY(generate_type(
+         type_from_enumeration(id), standard_library, definitions, program,
+                          additional_memory, definition_writer));
+    LPG_TRY(stream_writer_write_string(definition_writer, ";\n"));
+    type_definition *const new_definition = definitions->elements + definition_index;
+    new_definition->definition.data = definition_buffer.data;
+    new_definition->definition.length = definition_buffer.used;
+    new_definition->order = definitions->next_order++;
+    return stream_writer_write_unicode_view(c_output, unicode_view_from_string(name));
 }
 
 static success_indicator generate_type(type const generated, standard_library_usage *const standard_library,
@@ -908,7 +929,7 @@ static success_indicator generate_type(type const generated, standard_library_us
     case type_kind_enumeration:
         if (has_stateful_element(program->enums[generated.enum_]))
         {
-            return generate_stateful_enum_name(generated.enum_, c_output);
+            return generate_stateful_enum_name(generated.enum_, standard_library, definitions, program, additional_memory, c_output);
         }
         return stream_writer_write_string(c_output, "stateless_enum");
 
@@ -3200,17 +3221,6 @@ success_indicator generate_c(checked_program const program, garbage_collector *c
                      fail);
     }
 
-    for (enum_id i = 0; i < program.enum_count; ++i)
-    {
-        if (!has_stateful_element(program.enums[i]))
-        {
-            continue;
-        }
-        LPG_TRY_GOTO(generate_stateful_enum_definition(
-                         i, &standard_library, &definitions, &program, additional_memory, program_defined_writer_a),
-                     fail);
-    }
-
     for (function_id i = 1; i < program.function_count; ++i)
     {
         checked_function const current_function = program.functions[i];
@@ -3323,20 +3333,7 @@ success_indicator generate_c(checked_program const program, garbage_collector *c
     {
         LPG_TRY_GOTO(generate_interface_reference_definition(i, c_output), fail);
     }
-
-    for (enum_id i = 0; i < program.enum_count; ++i)
-    {
-        if (!has_stateful_element(program.enums[i]))
-        {
-            continue;
-        }
-        LPG_TRY(stream_writer_write_string(c_output, "typedef struct "));
-        LPG_TRY_GOTO(generate_stateful_enum_name(i, c_output), fail);
-        LPG_TRY(stream_writer_write_string(c_output, " "));
-        LPG_TRY_GOTO(generate_stateful_enum_name(i, c_output), fail);
-        LPG_TRY(stream_writer_write_string(c_output, ";\n"));
-    }
-
+	
     ASSUME(definitions.count == definitions.next_order);
     {
         size_t *const ordered_definitions = type_definitions_sort_by_order(definitions);

@@ -18,6 +18,7 @@
 #include "lpg_standard_library.h"
 #include "lpg_stream_writer.h"
 #include "lpg_thread.h"
+#include "lpg_copy_file.h"
 #include "lpg_write_file.h"
 #include "lpg_write_file_if_necessary.h"
 #include "test.h"
@@ -228,7 +229,7 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
         unicode_string_free(&test_executable);
         REQUIRE(process.success == success_yes);
         REQUIRE(0 == wait_for_process_exit(process.created));
-        REQUIRE(rename_file(unicode_view_from_string(source_file_path), unicode_view_from_string(last_success)));
+        REQUIRE(copy_file(unicode_view_from_string(source_file_path), unicode_view_from_string(last_success)));
     }
     unicode_string_free(&source_file_path);
 out:
@@ -497,8 +498,7 @@ void test_in_lpg(void)
         REQUIRE(create_directory(unicode_view_from_string(in_lpg_dir)) == success_yes);
 
         static char const *const test_files[] = {
-            // TODO
-            //"c_ffi_hello.lpg",
+            "c_ffi_hello.lpg",
             "comment_multi.lpg", "comment_single.lpg", "ecmascript.lpg", "empty.lpg", "web.lpg"};
         run_file_in_thread_state threads[LPG_ARRAY_SIZE(test_files)];
         size_t joined_until = (size_t)0 - 1;
