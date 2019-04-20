@@ -1903,8 +1903,7 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
         }
         instruction_checkpoint const before_pattern = make_checkpoint(state, function);
         evaluate_expression_result const enum_element_evaluated = evaluate_expression(
-            state, function, *root.call.callee, NULL,
-            type_expectation_create_enum_constructors(expected_enumeration));
+            state, function, *root.call.callee, NULL, type_expectation_create_enum_constructors(expected_enumeration));
         restore(before_pattern);
         switch (enum_element_evaluated.status)
         {
@@ -2973,7 +2972,10 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         {
             continue;
         }
-        ASSUME(header.return_type.is_set);
+        if (!header.return_type.is_set)
+        {
+            LPG_TO_DO();
+        }
         for (size_t j = 0; j < method.header.parameter_count; ++j)
         {
             unicode_string_free(header.parameter_names + j);

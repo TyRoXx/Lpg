@@ -1,4 +1,13 @@
 let std = import std
+let integer = import integer
+let size_type = integer.u64
+
+let host = interface
+    get_string_data(value: std.string): host_value
+    string_from_bytes(data: host_value, length: size_type): std.option[std.string]
+    copy_memory(from: host_value, to: host_value, length: size_type): std.unit
+    malloc(size: size_type): host_value
+    free(memory: host_value): std.unit
 
 let value_type = enum
     pointer
@@ -16,4 +25,6 @@ let function_reference = struct
 let export = struct
     value_type: type_of(value_type)
     function_reference: type_of(function_reference)
-export{value_type, function_reference}
+    host: type_of(host)
+    size_type: type_of(size_type)
+export{value_type, function_reference, host, size_type}
