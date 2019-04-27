@@ -8,6 +8,16 @@ let host = interface
     copy_memory(from: host_value, to: host_value, length: size_type): std.unit
     malloc(size: size_type): host_value
     free(memory: host_value): std.unit
+    allocate_c_string(value: std.string): host_value
+    assert(condition: boolean): std.unit
+    read_errno(): integer.u32
+    fopen(filename: host_value, mode: host_value): host_value
+    fflush(stream: host_value): integer.u32
+    fclose(stream: host_value): integer.u32
+    fread(buffer: host_value, size: size_type, count: size_type, stream: host_value): size_type
+    fwrite(buffer: host_value, size: size_type, count: size_type, stream: host_value): size_type
+    strlen(string: host_value): size_type
+    strcmp(left: host_value, right: host_value): integer.u32
 
 let value_type = enum
     pointer
@@ -22,9 +32,13 @@ let function_reference = struct
     parameters: std.array[value_type]
     return_type: std.option[value_type]
 
+let prerequisites = struct
+    includes: std.array[std.string]
+
 let export = struct
     value_type: type_of(value_type)
     function_reference: type_of(function_reference)
     host: type_of(host)
     size_type: type_of(size_type)
-export{value_type, function_reference, host, size_type}
+    prerequisites: type_of(prerequisites)
+export{value_type, function_reference, host, size_type, prerequisites}

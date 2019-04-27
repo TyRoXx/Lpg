@@ -4,5 +4,19 @@ let std = import std
 let puts_parameters = new_array(ffi.value_type)
 assert(puts_parameters.append(pointer))
 let puts = ffi.function_reference{"<stdio.h>", "puts", puts_parameters, some(int)}
-(host: ffi.host)
-    side_effect()
+
+let c_imports = interface
+    puts(printed: host_value): std.unit
+
+let includes = new_array(std.string)
+assert(includes.append("<stdio.h>"))
+
+let main = (host: ffi.host, c: c_imports)
+    let message = host.allocate_c_string("Hello, world!")
+    c.puts(message)
+    host.free(message)
+
+let export = struct
+    prerequisites: ffi.prerequisites
+    main: type_of(main)
+export{ffi.prerequisites{includes}, main}
