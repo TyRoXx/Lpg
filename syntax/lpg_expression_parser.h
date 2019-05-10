@@ -21,7 +21,8 @@ typedef enum parse_error_type {
     parse_error_expected_left_parenthesis,
     parse_error_expected_right_parenthesis,
     parse_error_expected_right_bracket,
-    parse_error_unexpected_indentation
+    parse_error_unexpected_indentation,
+    parse_error_nesting_too_deep
 } parse_error_type;
 
 typedef struct parse_error
@@ -45,6 +46,7 @@ typedef struct expression_parser
     rich_token *cached_tokens;
     size_t cached_token_count;
     size_t cached_tokens_allocated;
+    size_t current_nesting_depth;
 } expression_parser;
 
 expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),

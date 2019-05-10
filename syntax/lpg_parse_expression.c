@@ -1663,6 +1663,15 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
 expression_parser_result parse_expression(expression_parser *const parser, size_t const indentation,
                                           bool const may_be_statement)
 {
+    size_t const maximum_nesting_depth = 20;
+    if (parser->current_nesting_depth >= maximum_nesting_depth)
+    {
+        rich_token const head = peek(parser);
+        pop(parser);
+        parser->on_error(parse_error_create(parse_error_nesting_too_deep, head.where), parser->on_error_user);
+        return expression_parser_result_failure;
+    }
+    parser->current_nesting_depth += 1;
     if (may_be_statement)
     {
         rich_token const head = peek(parser);
@@ -1678,23 +1687,31 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 {
                     result.success = expression_from_return(expression_allocate(result.success));
                 }
+                parser->current_nesting_depth -= 1;
                 return result;
             }
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
+            parser->current_nesting_depth -= 1;
             return expression_parser_result_failure;
         }
         if (head.token == token_let)
         {
             pop(parser);
-            return parse_let_expression(parser, indentation);
+            expression_parser_result const result = parse_let_expression(parser, indentation);
+            parser->current_nesting_depth -= 1;
+            return result;
         }
         if (head.token == token_impl)
         {
             pop(parser);
-            return parse_impl(parser, indentation, head.where);
+            expression_parser_result const result = parse_impl(parser, indentation, head.where);
+            parser->current_nesting_depth -= 1;
+            return result;
         }
     }
-    return parse_returnable(parser, indentation, true);
+    expression_parser_result const result = parse_returnable(parser, indentation, true);
+    parser->current_nesting_depth -= 1;
+    return result;
 }
 
 sequence parse_program(expression_parser *parser)

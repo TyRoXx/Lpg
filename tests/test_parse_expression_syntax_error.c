@@ -273,6 +273,13 @@ void test_parse_expression_syntax_error(void)
                                                                                                    "int22222"));
     }
 
+    {
+        parse_error const expected_errors[] = {
+            parse_error_create(parse_error_nesting_too_deep, source_location_create(0, 20))};
+        test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
+                          unicode_string_from_c_str("!!!!!!!!!!!!!!!!!!!!!!"));
+    }
+
     test_tokenizer_error();
     test_unnamed_function();
     test_function();

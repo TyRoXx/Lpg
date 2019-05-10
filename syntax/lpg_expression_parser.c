@@ -8,7 +8,7 @@ expression_parser expression_parser_create(rich_token_producer rich_token_produc
                                            callback_user on_error_user)
 {
     expression_parser const result = {
-        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0};
+        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0};
     return result;
 }
 

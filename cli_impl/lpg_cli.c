@@ -136,6 +136,8 @@ static char const *describe_parse_error(parse_error_type const error)
         return "Expected right bracket";
     case parse_error_unexpected_indentation:
         return "Unexpected indentation";
+    case parse_error_nesting_too_deep:
+        return "Expressions are nested too deep";
     }
     LPG_UNREACHABLE();
 }
