@@ -22,7 +22,7 @@ check_function_result check_function_result_create(checked_function function, ca
 check_function_result const check_function_result_empty = {false, {NULL, {NULL, 0}, NULL, 0}, NULL, 0};
 
 typedef enum evaluation_status {
-    evaluation_status_value,
+    evaluation_status_value = 1,
     evaluation_status_return,
     evaluation_status_exit,
     evaluation_status_error
@@ -4532,8 +4532,10 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
             }
             break;
 
-        case evaluation_status_exit:
         case evaluation_status_error:
+            break;
+
+        case evaluation_status_exit:
         case evaluation_status_return:
             LPG_TO_DO();
         }
