@@ -693,7 +693,8 @@ static external_function_result call_interpreted_function(checked_function const
         }
         if (!value_is_valid(return_value))
         {
-            ASSERT(!"missing return instruction");
+            // missing return instruction
+            abort();
         }
         ASSUME(value_conforms_to_type(return_value, callee.signature->result.value));
         return external_function_result_from_success(return_value);
