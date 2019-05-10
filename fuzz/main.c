@@ -33,12 +33,6 @@ int LLVMFuzzerTestOneInput(uint8_t const *const data, size_t const size)
     if (result.has_value)
     {
         standard_library_description const standard_library = describe_standard_library();
-        value globals_values[standard_library_element_count];
-        for (size_t i = 0; i < LPG_ARRAY_SIZE(globals_values); ++i)
-        {
-            globals_values[i] = value_from_unit();
-        }
-        ASSUME(LPG_ARRAY_SIZE(globals_values) == standard_library.globals.count);
         module_loader loader =
             module_loader_create(unicode_view_from_c_str(LPG_FUZZ_MODULE_DIRECTORY), ignore_parse_errors, &user);
         checked_program checked = check(result.value, standard_library.globals, ignore_semantic_errors, &loader,
