@@ -4,7 +4,9 @@ include_directories(../type_check)
 include_directories(../tokenization)
 include_directories(../syntax)
 include_directories(../generic)
-file(GLOB sources "*.c" "*.h")
+
+add_library(fuzz_target fuzz_target.h fuzz_target.c)
+target_link_libraries(fuzz_target cli_impl)
 
 add_definitions(-DLPG_FUZZ_MODULE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/../standard_library")
 
@@ -14,9 +16,9 @@ if(LPG_WITH_CLANG_FUZZER)
     set_target_properties(fuzz PROPERTIES LINK_FLAGS -fsanitize=fuzzer)
 else()
     add_definitions(-DLPG_WITH_CLANG_FUZZER=0)
-    add_executable(fuzz ${sources})
+    add_executable(fuzz main.c)
 endif()
-target_link_libraries(fuzz cli_impl)
+target_link_libraries(fuzz fuzz_target)
 
 target_compile_options(fuzz PUBLIC ${LPG_COMPILE_FLAGS})
 if(LPG_WITH_CLANG_FORMAT_AUTO)
