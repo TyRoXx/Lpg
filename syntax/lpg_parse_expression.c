@@ -862,6 +862,101 @@ static parse_callable_result parse_callable_result_create(expression_parser_resu
     return result;
 }
 
+static parse_callable_result parse_identifier(expression_parser *parser, rich_token const head)
+{
+    pop(parser);
+    expression_parser_result const result = {
+        1, expression_from_identifier(identifier_expression_create(unicode_view_copy(head.content), head.where))};
+    return parse_callable_result_create(result, true);
+}
+
+static parse_callable_result parse_break(expression_parser *parser, rich_token const head)
+{
+    pop(parser);
+    expression_parser_result const result = {1, expression_from_break(head.where)};
+    return parse_callable_result_create(result, true);
+}
+
+static parse_callable_result parse_generic_lambda(expression_parser *parser, size_t indentation)
+{
+    generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
+    parse_optional_space(parser);
+    rich_token const left_parenthesis = peek(parser);
+    if (left_parenthesis.token != token_left_parenthesis)
+    {
+        generic_parameter_list_free(generic_parameters);
+        parser->on_error(
+            parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where), parser->on_error_user);
+        return parse_callable_result_create(expression_parser_result_failure, false);
+    }
+    pop(parser);
+    return parse_callable_result_create(
+        parse_lambda(parser, indentation, generic_parameters, left_parenthesis.where), false);
+}
+
+static parse_callable_result parse_integer(expression_parser *parser, rich_token const head)
+{
+    pop(parser);
+    integer value;
+    if (integer_parse(&value, head.content))
+    {
+        expression_parser_result const result = {
+            1, expression_from_integer_literal(integer_literal_expression_create(value, head.where))};
+        return parse_callable_result_create(result, true);
+    }
+    parser->on_error(parse_error_create(parse_error_integer_literal_out_of_range, head.where), parser->on_error_user);
+    return parse_callable_result_create(expression_parser_result_failure, false);
+}
+
+static parse_callable_result parse_comment(expression_parser *parser, rich_token const head)
+{
+    pop(parser);
+    char const multi_line_comment_start[2] = {'/', '*'};
+    ASSUME(multi_line_comment_start[0] == head.content.begin[0]);
+    ASSUME(head.content.length >= LPG_ARRAY_SIZE(multi_line_comment_start));
+    unicode_view content = unicode_view_create(head.content.begin + LPG_ARRAY_SIZE(multi_line_comment_start),
+                                               head.content.length - LPG_ARRAY_SIZE(multi_line_comment_start));
+    if (head.content.begin[1] == multi_line_comment_start[1])
+    {
+        char const multi_line_comment_end[2] = {'*', '/'};
+        if ((content.length >= LPG_ARRAY_SIZE(multi_line_comment_end)) &&
+            !memcmp((content.begin + content.length - LPG_ARRAY_SIZE(multi_line_comment_end)), multi_line_comment_end,
+                    LPG_ARRAY_SIZE(multi_line_comment_end)))
+        {
+            content.length -= LPG_ARRAY_SIZE(multi_line_comment_end);
+        }
+    }
+
+    comment_expression const comment = comment_expression_create(unicode_view_copy(content), head.where);
+
+    expression_parser_result const result = {1, expression_from_comment(comment)};
+    return parse_callable_result_create(result, false);
+}
+
+static parse_callable_result parse_not(expression_parser *parser, size_t indentation)
+{
+    pop(parser);
+    expression_parser_result const result = parse_expression(parser, indentation, false);
+    if (!result.is_success)
+    {
+        return parse_callable_result_create(expression_parser_result_failure, false);
+    }
+
+    expression *const success = allocate(sizeof(*success));
+    *success = result.success;
+
+    expression const expr = expression_from_not(not_expression_create(success));
+    expression_parser_result const result1 = {1, expr};
+    return parse_callable_result_create(result1, true);
+}
+
+static parse_callable_result handle_end_of_file(expression_parser *const parser, rich_token const head)
+{
+    pop(parser);
+    parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
+    return parse_callable_result_create(expression_parser_result_failure, false);
+}
+
 static parse_callable_result parse_callable(expression_parser *parser, size_t indentation)
 {
     for (;;)
@@ -869,26 +964,15 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         rich_token const head = peek(parser);
         if (is_end_of_file(&head))
         {
-            pop(parser);
-            parser->on_error(parse_error_create(parse_error_expected_expression, head.where), parser->on_error_user);
-            return parse_callable_result_create(expression_parser_result_failure, false);
+            return handle_end_of_file(parser, head);
         }
         switch (head.token)
         {
         case token_identifier:
-        {
-            pop(parser);
-            expression_parser_result const result = {1, expression_from_identifier(identifier_expression_create(
-                                                            unicode_view_copy(head.content), head.where))};
-            return parse_callable_result_create(result, true);
-        }
+            return parse_identifier(parser, head);
 
         case token_break:
-        {
-            pop(parser);
-            expression_parser_result const result = {1, expression_from_break(head.where)};
-            return parse_callable_result_create(result, true);
-        }
+            return parse_break(parser, head);
 
         case token_loop:
             pop(parser);
@@ -904,21 +988,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
                 parse_lambda(parser, indentation, generic_parameter_list_create(NULL, 0), head.where), true);
 
         case token_left_bracket:
-        {
-            generic_parameter_list const generic_parameters = parse_generic_parameters(parser);
-            parse_optional_space(parser);
-            rich_token const left_parenthesis = peek(parser);
-            if (left_parenthesis.token != token_left_parenthesis)
-            {
-                generic_parameter_list_free(generic_parameters);
-                parser->on_error(parse_error_create(parse_error_expected_left_parenthesis, left_parenthesis.where),
-                                 parser->on_error_user);
-                return parse_callable_result_create(expression_parser_result_failure, false);
-            }
-            pop(parser);
-            return parse_callable_result_create(
-                parse_lambda(parser, indentation, generic_parameters, left_parenthesis.where), false);
-        }
+            return parse_generic_lambda(parser, indentation);
 
         case token_right_bracket:
         case token_right_curly_brace:
@@ -946,44 +1016,10 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
             break;
 
         case token_integer:
-        {
-            pop(parser);
-            integer value;
-            if (integer_parse(&value, head.content))
-            {
-                expression_parser_result const result = {
-                    1, expression_from_integer_literal(integer_literal_expression_create(value, head.where))};
-                return parse_callable_result_create(result, true);
-            }
-            parser->on_error(
-                parse_error_create(parse_error_integer_literal_out_of_range, head.where), parser->on_error_user);
-            break;
-        }
+            return parse_integer(parser, head);
 
         case token_comment:
-        {
-            pop(parser);
-            char const multi_line_comment_start[2] = {'/', '*'};
-            ASSUME(multi_line_comment_start[0] == head.content.begin[0]);
-            ASSUME(head.content.length >= LPG_ARRAY_SIZE(multi_line_comment_start));
-            unicode_view content = unicode_view_create(head.content.begin + LPG_ARRAY_SIZE(multi_line_comment_start),
-                                                       head.content.length - LPG_ARRAY_SIZE(multi_line_comment_start));
-            if (head.content.begin[1] == multi_line_comment_start[1])
-            {
-                char const multi_line_comment_end[2] = {'*', '/'};
-                if ((content.length >= LPG_ARRAY_SIZE(multi_line_comment_end)) &&
-                    !memcmp((content.begin + content.length - LPG_ARRAY_SIZE(multi_line_comment_end)),
-                            multi_line_comment_end, LPG_ARRAY_SIZE(multi_line_comment_end)))
-                {
-                    content.length -= LPG_ARRAY_SIZE(multi_line_comment_end);
-                }
-            }
-
-            comment_expression const comment = comment_expression_create(unicode_view_copy(content), head.where);
-
-            expression_parser_result const result = {1, expression_from_comment(comment)};
-            return parse_callable_result_create(result, false);
-        }
+            return parse_comment(parser, head);
 
         case token_string:
         {
@@ -1002,21 +1038,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         }
 
         case token_not:
-        {
-            pop(parser);
-            expression_parser_result const result = parse_expression(parser, indentation, false);
-            if (!result.is_success)
-            {
-                return parse_callable_result_create(expression_parser_result_failure, false);
-            }
-
-            expression *const success = allocate(sizeof(*success));
-            *success = result.success;
-
-            expression const expr = expression_from_not(not_expression_create(success));
-            expression_parser_result const result1 = {1, expr};
-            return parse_callable_result_create(result1, true);
-        }
+            return parse_not(parser, indentation);
 
         case token_interface:
             pop(parser);
@@ -1280,19 +1302,10 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     return result;
 }
 
-static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
-                                                 bool const may_be_binary)
+static expression_parser_result parse_returnable_suffixes(expression_parser *const parser, size_t const indentation,
+                                                          bool const may_be_binary, expression const left_most)
 {
-    parse_callable_result const callee = parse_callable(parser, indentation);
-    if (!callee.content.is_success)
-    {
-        return callee.content;
-    }
-    if (!callee.can_be_continued)
-    {
-        return callee.content;
-    }
-    expression_parser_result result = callee.content;
+    expression_parser_result result = {true, left_most};
     for (;;)
     {
         rich_token const maybe_operator = peek(parser);
@@ -1413,6 +1426,21 @@ static expression_parser_result parse_returnable(expression_parser *const parser
         }
         return result;
     }
+}
+
+static expression_parser_result parse_returnable(expression_parser *const parser, size_t const indentation,
+                                                 bool const may_be_binary)
+{
+    parse_callable_result const callee = parse_callable(parser, indentation);
+    if (!callee.content.is_success)
+    {
+        return callee.content;
+    }
+    if (!callee.can_be_continued)
+    {
+        return callee.content;
+    }
+    return parse_returnable_suffixes(parser, indentation, may_be_binary, callee.content.success);
 }
 
 static expression_parser_result parse_impl(expression_parser *const parser, size_t const indentation,

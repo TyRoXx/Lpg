@@ -42,15 +42,13 @@ void test_parse_expression_syntax_error(void)
 {
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0)),
-            parse_error_create(parse_error_expected_expression, source_location_create(0, 39))};
+            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
                           unicode_string_from_c_str("340282366920938463463374607431768211456"));
     }
     {
         parse_error const expected_errors[] = {
-            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0)),
-            parse_error_create(parse_error_expected_expression, source_location_create(0, 95))};
+            parse_error_create(parse_error_integer_literal_out_of_range, source_location_create(0, 0))};
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL,
                           unicode_string_from_c_str("3402823669209384634633746074317682114569"
                                                     "9999999999999999999999999999999999999999"
