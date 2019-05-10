@@ -61,3 +61,14 @@
                     case std.option[T].none:
                         fail()
     copy_array[std.boolean](new_array(std.boolean), new_array(std.boolean))
+
+    let return_from_loop = ()
+        loop
+            return boolean.true
+    assert(return_from_loop())
+
+    let return_from_loop_runtime = ()
+        loop
+            side_effect()
+            return boolean.true
+    assert(return_from_loop_runtime())

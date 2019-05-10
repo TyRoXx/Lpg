@@ -42,5 +42,9 @@ void ParserTypeCheckerFuzzTarget(uint8_t const *const data, size_t const size)
         sequence_free(&result.value);
         standard_library_description_free(&standard_library);
     }
-    ASSERT(count_active_allocations() == allocations_before);
+    size_t const allocations_after = count_active_allocations();
+    if (allocations_after != allocations_before)
+    {
+        fprintf(stderr, "leak detected\n");
+    }
 }

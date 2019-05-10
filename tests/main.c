@@ -44,44 +44,18 @@ int main(void)
 {
     duration const started_at = read_monotonic_clock();
     static void (*tests[])(void) = {
+        test_thread, test_blob, test_path, test_integer, test_integer_range, test_allocator, test_semantic_errors,
+        test_unicode_string, test_unicode_view, test_decode_string_literal, test_arithmetic, test_instruction,
+        test_stream_writer, test_identifier, test_expression, test_save_expression, test_tokenize,
+        test_parse_expression_success, test_parse_expression_syntax_error, test_semantics, test_import_errors,
+        test_implicitly_convertible, test_ecmascript_enum_encoding_strategy, test_cli, test_blob, test_c_backend,
+        test_create_process, test_in_lpg_2, test_in_lpg, test_value, test_remove_dead_code, test_type, test_web,
+        test_enum_encoding,
 #ifndef _MSC_VER
         // some test cases cause a stack overflow in the compiler because MSVC uses a lot of stack for some reason
-        test_fuzz,
+        test_fuzz
 #endif
-        test_thread,
-        test_blob,
-        test_path,
-        test_integer,
-        test_integer_range,
-        test_allocator,
-        test_semantic_errors,
-        test_unicode_string,
-        test_unicode_view,
-        test_decode_string_literal,
-        test_arithmetic,
-        test_instruction,
-        test_stream_writer,
-        test_identifier,
-        test_expression,
-        test_save_expression,
-        test_tokenize,
-        test_parse_expression_success,
-        test_parse_expression_syntax_error,
-        test_semantics,
-        test_import_errors,
-        test_implicitly_convertible,
-        test_ecmascript_enum_encoding_strategy,
-        test_cli,
-        test_blob,
-        test_c_backend,
-        test_create_process,
-        test_in_lpg_2,
-        test_in_lpg,
-        test_value,
-        test_remove_dead_code,
-        test_type,
-        test_web,
-        test_enum_encoding};
+    };
     for (size_t i = 0; i < (sizeof(tests) / sizeof(*tests)); ++i)
     {
         tests[i]();

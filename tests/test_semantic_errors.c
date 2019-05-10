@@ -150,7 +150,7 @@ void test_semantic_errors(void)
             simple_check("let v = match a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -199,7 +199,7 @@ void test_semantic_errors(void)
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -211,7 +211,7 @@ void test_semantic_errors(void)
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -346,7 +346,7 @@ void test_semantic_errors(void)
             simple_check("let x = u[boolean]\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -390,7 +390,8 @@ void test_semantic_errors(void)
             semantic_error_create(semantic_error_unknown_element, source_location_create(1, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("side_effect()\n"
-                                               "h()",
+                                               "h()\n"
+                                               "//\n",
                                                std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
@@ -431,7 +432,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = w\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -470,7 +471,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = w.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -491,7 +492,7 @@ void test_semantic_errors(void)
             simple_check("let v = assert.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -513,7 +514,7 @@ void test_semantic_errors(void)
             simple_check("let v = \"\".a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -523,7 +524,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = 1.a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -574,7 +575,7 @@ void test_semantic_errors(void)
             simple_check("let v = int(0, 1).a\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -906,7 +907,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("let v = s{}\n", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1302,7 +1303,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean.something)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1313,7 +1314,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean.true.true)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1324,7 +1325,7 @@ void test_semantic_errors(void)
             simple_check("assert(\"true\")", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1334,7 +1335,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert(2)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1344,7 +1345,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert(assert)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1355,7 +1356,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1366,7 +1367,7 @@ void test_semantic_errors(void)
             simple_check("assert(side_effect())", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1376,7 +1377,7 @@ void test_semantic_errors(void)
         checked_program checked = simple_check("assert()", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        REQUIRE(checked.functions[0].body.length > 0);
+        REQUIRE(checked.functions[0].body.length == 0);
         checked_program_free(&checked);
     }
     {
@@ -1517,22 +1518,7 @@ void test_semantic_errors(void)
     {
         semantic_error const errors[] = {
             semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 12)),
-            semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(2, 6)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(2, 19)),
-            semantic_error_create(semantic_error_compile_time_memory_limit_reached, source_location_create(3, 6))};
+            semantic_error_create(semantic_error_expected_compile_time_value, source_location_create(2, 6))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"
                                                "let f = [S]()\n"
@@ -1570,7 +1556,9 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 4))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(1, 4)),
+            semantic_error_create(semantic_error_unknown_element, source_location_create(3, 4)),
+            semantic_error_create(semantic_error_unknown_element, source_location_create(5, 4))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let append_256 = ()\n"
                                                "    append_64()\n"
@@ -1692,7 +1680,8 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
-            semantic_error_create(semantic_error_unknown_element, source_location_create(5, 12))};
+            semantic_error_create(semantic_error_unknown_element, source_location_create(5, 12)),
+            semantic_error_create(semantic_error_unknown_element, source_location_create(6, 0))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let test_single = (arg: boolean)\n"
                                                "    match arg\n"

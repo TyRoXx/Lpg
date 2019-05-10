@@ -721,6 +721,25 @@ check_function(program_check *const root, function_checking_state *const parent,
 
     ASSUME(state.register_debug_name_count <= state.used_registers);
 
+    if (body_evaluated.status == evaluation_status_error)
+    {
+        for (size_t i = 0; i < state.register_debug_name_count; ++i)
+        {
+            unicode_string_free(state.register_debug_names + i);
+        }
+        if (state.register_debug_names)
+        {
+            deallocate(state.register_debug_names);
+        }
+        if (state.captures)
+        {
+            deallocate(state.captures);
+        }
+        instruction_sequence_free(&body_out);
+        check_function_clean_up(&state);
+        return check_function_result_empty;
+    }
+
     bool const body_has_value = (body_evaluated.status == evaluation_status_value);
     bool const body_always_returns = (body_evaluated.status == evaluation_status_return);
     if (!body_has_value && !body_always_returns)
@@ -1015,6 +1034,11 @@ static evaluate_expression_result evaluate_lambda(function_checking_state *const
         return evaluate_expression_result_empty;
     }
 
+    if (checked.function.body.length == 1)
+    {
+        instruction const body = checked.function.body.elements[0];
+        ASSUME((body.type == instruction_call) || (body.type == instruction_return) || (body.type == instruction_loop));
+    }
     ASSUME(checked.function.signature->parameters.length == 0);
     checked.function.signature->parameters.elements = header.parameter_types;
     checked.function.signature->parameters.length = evaluated.header.parameter_count;
@@ -1965,10 +1989,10 @@ static evaluate_expression_result check_sequence_finish(function_checking_state 
     evaluate_expression_result final_result = evaluate_expression_result_empty;
     LPG_FOR(size_t, i, input.length)
     {
+        bool const is_last_in_sequence = (i == (input.length - 1));
         final_result = evaluate_expression(
-            state, output, input.elements[i], NULL, (i == (input.length - 1))
-                                                        ? expected_result_type
-                                                        : type_expectation_create_exact(optional_type_create_empty()));
+            state, output, input.elements[i], NULL,
+            is_last_in_sequence ? expected_result_type : type_expectation_create_exact(optional_type_create_empty()));
         if (!final_result.is_pure)
         {
             is_pure = false;
