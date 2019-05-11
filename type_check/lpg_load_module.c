@@ -1,4 +1,5 @@
 #include "lpg_load_module.h"
+#include "lpg_allocate.h"
 #include "lpg_array_size.h"
 #include "lpg_check.h"
 #include "lpg_find_next_token.h"
@@ -66,14 +67,15 @@ static void translate_semantic_error(complete_semantic_error const error, void *
     translator->on_error(error, translator->user);
 }
 
-static load_module_result type_check_module(function_checking_state *const state, sequence const parsed,
-                                            source_file const source, unicode_view const current_import_directory)
+static load_module_result type_check_module(function_checking_state *const state, sequence const module_parsed,
+                                            source_file_owning *const module_source,
+                                            unicode_view const current_import_directory)
 {
     semantic_error_translator translator = {state->on_error, state->user, false};
     check_function_result const checked = check_function(
-        state->root, NULL, expression_from_sequence(parsed), state->root->global, translate_semantic_error, &translator,
-        state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(), source,
-        current_import_directory, NULL, optional_function_id_empty());
+        state->root, NULL, expression_from_sequence(module_parsed), state->root->global, translate_semantic_error,
+        &translator, state->program, NULL, NULL, 0, optional_type_create_empty(), false, optional_type_create_empty(),
+        module_source, current_import_directory, NULL, optional_function_id_empty());
     if (!checked.success)
     {
         load_module_result const failure = {optional_value_empty, type_from_unit()};
@@ -178,11 +180,16 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
-    load_module_result const result =
-        type_check_module(state, parsed, source_file_create(unicode_view_from_string(attempt.full_module_path),
-                                                            unicode_view_create(attempt.module_source.success.data,
-                                                                                attempt.module_source.success.length)),
-                          path_remove_leaf(unicode_view_from_string(attempt.full_module_path)));
+    source_file_owning *module_source = allocate(sizeof(*module_source));
+    *module_source =
+        source_file_owning_create(attempt.full_module_path, unicode_string_validate(attempt.module_source.success));
+    attempt.full_module_path.data = NULL;
+    attempt.full_module_path.length = 0;
+    attempt.module_source.success.data = NULL;
+    attempt.module_source.success.length = 0;
+    program_check_add_module_source(state->root, module_source);
+    load_module_result const result = type_check_module(
+        state, parsed, module_source, path_remove_leaf(unicode_view_from_string(module_source->name)));
     sequence_free(&parsed);
     import_attempt_result_free(attempt);
     return result;

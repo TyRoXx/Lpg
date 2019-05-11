@@ -1,6 +1,7 @@
 #pragma once
 
 #include "lpg_parse_expression.h"
+#include "lpg_source_file.h"
 #include "lpg_value.h"
 
 typedef struct complete_parse_error

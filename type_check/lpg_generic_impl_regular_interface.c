@@ -4,7 +4,7 @@
 generic_impl_regular_interface generic_impl_regular_interface_create(interface_id interface_, impl_expression tree,
                                                                      generic_closures closures,
                                                                      generic_instantiation_expression self,
-                                                                     source_file source,
+                                                                     source_file_owning const *source,
                                                                      unicode_string current_import_directory)
 {
     generic_impl_regular_interface const result = {

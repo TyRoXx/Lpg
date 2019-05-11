@@ -87,6 +87,15 @@ void program_check_free(program_check const freed)
     {
         deallocate(freed.generic_impls_for_regular_interfaces);
     }
+    for (size_t i = 0; i < freed.module_source_count; ++i)
+    {
+        source_file_owning_free(*freed.module_sources[i]);
+        deallocate(freed.module_sources[i]);
+    }
+    if (freed.module_sources)
+    {
+        deallocate(freed.module_sources);
+    }
 }
 
 void begin_load_module(program_check *to, unicode_string name)
@@ -123,4 +132,11 @@ void succeed_load_module(program_check *to, unicode_view const name, value const
     ASSUME(found);
     found->content = optional_value_create(content);
     found->schema = optional_type_create_set(schema);
+}
+
+void program_check_add_module_source(program_check *to, source_file_owning *module_source)
+{
+    to->module_sources = reallocate_array(to->module_sources, to->module_source_count + 1, sizeof(*to->module_sources));
+    to->module_sources[to->module_source_count] = module_source;
+    to->module_source_count += 1;
 }

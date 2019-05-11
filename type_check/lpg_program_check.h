@@ -46,9 +46,12 @@ typedef struct program_check
     size_t generic_impls_for_regular_interfaces_count;
     size_t expression_recursion_depth;
     interpreter compile_time_interpreter;
+    source_file_owning **module_sources;
+    size_t module_source_count;
 } program_check;
 
 void program_check_free(program_check const freed);
 void begin_load_module(program_check *to, unicode_string name);
 void fail_load_module(program_check *to, unicode_view const name);
 void succeed_load_module(program_check *to, unicode_view const name, value const content, type const schema);
+void program_check_add_module_source(program_check *to, source_file_owning *module_source);
