@@ -28,8 +28,10 @@ typedef struct expected_errors
 
 static expected_errors make_expected_errors(semantic_error const *const errors, size_t const count)
 {
+    static size_t const line_offsets[] = {0};
     expected_errors const result = {
-        errors, count, source_file_create(unicode_view_from_c_str(""), unicode_view_from_c_str(""))};
+        errors, count, source_file_create(unicode_view_from_c_str(""), unicode_view_from_c_str(""),
+                                          source_file_lines_create(line_offsets, LPG_ARRAY_SIZE(line_offsets)))};
     return result;
 }
 
@@ -53,12 +55,15 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 static checked_program simple_check(char const *const source, structure const global, expected_errors *const user,
                                     unicode_view const module_directory)
 {
-    user->source = source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source));
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(source));
+    user->source = source_file_create(
+        unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source), source_file_lines_from_owning(lines));
     sequence const root = parse(source);
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, NULL);
     checked_program const result =
         check(root, global, expect_errors, &loader, user->source, module_directory, 100000, user);
     sequence_free(&root);
+    source_file_lines_owning_free(lines);
     return result;
 }
 

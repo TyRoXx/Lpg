@@ -9,9 +9,11 @@ typedef struct complete_parse_error
     parse_error relative;
     unicode_view file_name;
     unicode_view source;
+    source_file_lines lines;
 } complete_parse_error;
 
-complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source);
+complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source,
+                                                 source_file_lines lines);
 bool complete_parse_error_equals(complete_parse_error const left, complete_parse_error const right);
 
 typedef void complete_parse_error_handler(complete_parse_error, callback_user);

@@ -1,6 +1,7 @@
 include_directories(../cli_impl)
 include_directories(../generic)
 include_directories(../syntax)
+include_directories(../semantics)
 add_definitions(-DLPG_CLI_MODULE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/../standard_library")
 file(GLOB sources "*.c" "*.h")
 add_executable(lpg ${sources})

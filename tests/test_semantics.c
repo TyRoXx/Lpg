@@ -43,9 +43,11 @@ static void check_single_wellformed_function(char const *const source, structure
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(source));
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, &loader,
-              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
+              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source),
+                                 source_file_lines_from_owning(lines)),
               unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
@@ -60,6 +62,7 @@ static void check_single_wellformed_function(char const *const source, structure
     }
     checked_program_free(&checked);
     unicode_string_free(&module_directory);
+    source_file_lines_owning_free(lines);
     instruction_sequence_free(&expected_body);
 }
 
@@ -88,9 +91,11 @@ static void check_wellformed_program(char const *const source, structure const n
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(source));
     checked_program checked =
         check(root, non_empty_global, expect_no_errors, &loader,
-              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
+              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source),
+                                 source_file_lines_from_owning(lines)),
               unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == expected.function_count);
@@ -101,6 +106,7 @@ static void check_wellformed_program(char const *const source, structure const n
     checked_program_free(&checked);
     checked_program_free(&expected);
     unicode_string_free(&module_directory);
+    source_file_lines_owning_free(lines);
 }
 
 static void test_loops(const standard_library_description *std_library);
@@ -151,9 +157,11 @@ void test_semantics(void)
         unicode_string const module_directory = find_builtin_module_directory();
         module_loader loader =
             module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
+        source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(""));
         checked_program checked =
             check(root, empty_global, expect_no_errors, &loader,
-                  source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str("")),
+                  source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(""),
+                                     source_file_lines_from_owning(lines)),
                   unicode_view_from_string(module_directory), 100000, NULL);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
@@ -166,6 +174,7 @@ void test_semantics(void)
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
         unicode_string_free(&module_directory);
+        source_file_lines_owning_free(lines);
     }
 
     standard_library_description const std_library = describe_standard_library();
