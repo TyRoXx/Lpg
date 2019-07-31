@@ -8,6 +8,8 @@ void *allocate(size_t size) LPG_USE_RESULT;
 void *allocate_array(size_t size, size_t element) LPG_USE_RESULT;
 void *reallocate(void *memory, size_t new_size) LPG_USE_RESULT;
 void *reallocate_array(void *memory, size_t new_size, size_t element) LPG_USE_RESULT;
+void *reallocate_array_exponentially(void *array, size_t new_size, size_t element, size_t current_size,
+                                     size_t *capacity) LPG_USE_RESULT;
 void deallocate(LPG_NON_NULL(void *memory));
 size_t count_total_allocations(void) LPG_USE_RESULT;
 size_t count_active_allocations(void) LPG_USE_RESULT;

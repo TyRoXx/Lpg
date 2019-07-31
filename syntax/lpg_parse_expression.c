@@ -114,6 +114,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
     source_location const begin = peek(parser).where;
     expression *elements = NULL;
     size_t element_count = 0;
+    size_t element_allocated = 0;
     for (;;)
     {
         rich_token const indentation_token = peek(parser);
@@ -143,8 +144,8 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
             expression_parser_result const element = parse_expression(parser, indentation, 1);
             if (element.is_success)
             {
-                /*TODO: avoid O(N^2)*/
-                elements = reallocate_array(elements, (element_count + 1), sizeof(*elements));
+                elements = reallocate_array_exponentially(
+                    elements, (element_count + 1), sizeof(*elements), element_count, &element_allocated);
                 elements[element_count] = element.success;
                 ++element_count;
             }
