@@ -67,34 +67,42 @@ void test_import_errors(void)
         sequence root = parse("import syntaxerror\n");
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
+        source_file_lines_owning const importing_lines = source_file_lines_owning_scan(importing_file_content);
         complete_semantic_error const semantic_errors[] = {complete_semantic_error_create(
             semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
-            source_file_create(importing_file, importing_file_content))};
+            source_file_create(
+                importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         unicode_view const expected_file_name_pieces[] = {
             module_directory_view, unicode_view_from_c_str("syntaxerror.lpg")};
         unicode_string const expected_file_name =
             path_combine(expected_file_name_pieces, LPG_ARRAY_SIZE(expected_file_name_pieces));
         unicode_view const expected_source = unicode_view_from_c_str("let a = .\n");
+        source_file_lines_owning const expected_lines = source_file_lines_owning_scan(expected_source);
         complete_parse_error const parse_errors[] = {
             complete_parse_error_create(
                 parse_error_create(parse_error_expected_expression, source_location_create(0, 8)),
-                unicode_view_from_string(expected_file_name), expected_source),
+                unicode_view_from_string(expected_file_name), expected_source,
+                source_file_lines_from_owning(expected_lines)),
             complete_parse_error_create(
                 parse_error_create(parse_error_expected_expression, source_location_create(0, 9)),
-                unicode_view_from_string(expected_file_name), expected_source),
+                unicode_view_from_string(expected_file_name), expected_source,
+                source_file_lines_from_owning(expected_lines)),
             complete_parse_error_create(
                 parse_error_create(parse_error_expected_expression, source_location_create(1, 0)),
-                unicode_view_from_string(expected_file_name), expected_source)};
+                unicode_view_from_string(expected_file_name), expected_source,
+                source_file_lines_from_owning(expected_lines))};
         expected_parse_errors const expected_parse_errors_ = {parse_errors, LPG_ARRAY_SIZE(parse_errors)};
-        checked_program checked =
-            simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_,
+            source_file_create(importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
         unicode_string_free(&expected_file_name);
+        source_file_lines_owning_free(importing_lines);
+        source_file_lines_owning_free(expected_lines);
     }
 
     {
@@ -106,41 +114,49 @@ void test_import_errors(void)
         unicode_view const imported_file_content = unicode_view_from_c_str("let a = unknown\n");
         unicode_view const importing_file = unicode_view_from_c_str("test.lpg");
         unicode_view const importing_file_content = unicode_view_from_c_str(source);
+        source_file_lines_owning const imported_lines = source_file_lines_owning_scan(imported_file_content);
+        source_file_lines_owning const importing_lines = source_file_lines_owning_scan(importing_file_content);
         complete_semantic_error const semantic_errors[] = {
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_unknown_element, source_location_create(0, 8)),
-                source_file_create(unicode_view_from_string(imported_file), imported_file_content)),
+                source_file_create(unicode_view_from_string(imported_file), imported_file_content,
+                                   source_file_lines_from_owning(imported_lines))),
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
-                source_file_create(importing_file, importing_file_content))};
+                source_file_create(
+                    importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
-        checked_program checked =
-            simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_,
+            source_file_create(importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
         unicode_string_free(&imported_file);
+        source_file_lines_owning_free(imported_lines);
+        source_file_lines_owning_free(importing_lines);
     }
 
     {
         sequence root = parse("import doesnotexist\n");
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
+        source_file_lines_owning const lines = source_file_lines_owning_scan(importing_file_content);
         complete_semantic_error const semantic_errors[] = {complete_semantic_error_create(
             semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
-            source_file_create(importing_file, importing_file_content))};
+            source_file_create(importing_file, importing_file_content, source_file_lines_from_owning(lines)))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
-        checked_program checked =
-            simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_,
+            source_file_create(importing_file, importing_file_content, source_file_lines_from_owning(lines)));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
+        source_file_lines_owning_free(lines);
     }
 
     {
@@ -152,23 +168,29 @@ void test_import_errors(void)
         unicode_view const imported_file_content = unicode_view_from_c_str("let self = import importsitself\n");
         unicode_view const importing_file = unicode_view_from_c_str("test.lpg");
         unicode_view const importing_file_content = unicode_view_from_c_str(source);
+        source_file_lines_owning const importing_lines = source_file_lines_owning_scan(importing_file_content);
+        source_file_lines_owning const imported_lines = source_file_lines_owning_scan(imported_file_content);
         complete_semantic_error const semantic_errors[] = {
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_import_failed, source_location_create(0, 11)),
-                source_file_create(unicode_view_from_string(imported_file), imported_file_content)),
+                source_file_create(unicode_view_from_string(imported_file), imported_file_content,
+                                   source_file_lines_from_owning(imported_lines))),
             complete_semantic_error_create(
                 semantic_error_create(semantic_error_import_failed, source_location_create(0, 0)),
-                source_file_create(importing_file, importing_file_content))};
+                source_file_create(
+                    importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)))};
         expected_semantic_errors expected = {semantic_errors, LPG_ARRAY_SIZE(semantic_errors)};
         expected_parse_errors const expected_parse_errors_ = {NULL, 0};
-        checked_program checked =
-            simple_check(root, std_library.globals, expect_errors, &expected, module_directory_view,
-                         expected_parse_errors_, source_file_create(importing_file, importing_file_content));
+        checked_program checked = simple_check(
+            root, std_library.globals, expect_errors, &expected, module_directory_view, expected_parse_errors_,
+            source_file_create(importing_file, importing_file_content, source_file_lines_from_owning(importing_lines)));
         REQUIRE(expected.count == 0);
         sequence_free(&root);
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
         unicode_string_free(&imported_file);
+        source_file_lines_owning_free(importing_lines);
+        source_file_lines_owning_free(imported_lines);
     }
 
     unicode_string_free(&module_directory);

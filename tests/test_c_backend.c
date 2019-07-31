@@ -41,11 +41,14 @@ static void check_generated_c_code(char const *const source, standard_library_de
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(source));
     checked_program checked =
         check(root, standard_library.globals, expect_no_errors, &loader,
-              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source)),
+              source_file_create(unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source),
+                                 source_file_lines_from_owning(lines)),
               unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
+    source_file_lines_owning_free(lines);
     REQUIRE(checked.function_count >= 1);
     optimize(&checked);
 

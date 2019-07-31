@@ -8,16 +8,17 @@
 #include "lpg_path.h"
 #include "lpg_read_file.h"
 
-complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source)
+complete_parse_error complete_parse_error_create(parse_error relative, unicode_view file_name, unicode_view source,
+                                                 source_file_lines lines)
 {
-    complete_parse_error const result = {relative, file_name, source};
+    complete_parse_error const result = {relative, file_name, source, lines};
     return result;
 }
 
 bool complete_parse_error_equals(complete_parse_error const left, complete_parse_error const right)
 {
     return parse_error_equals(left.relative, right.relative) && unicode_view_equals(left.file_name, right.file_name) &&
-           unicode_view_equals(left.source, right.source);
+           unicode_view_equals(left.source, right.source) && source_file_lines_equals(left.lines, right.lines);
 }
 
 module_loader module_loader_create(unicode_view module_directory, complete_parse_error_handler on_parse_error,
@@ -33,14 +34,16 @@ typedef struct parse_error_translator
     callback_user on_error_user;
     unicode_view file_name;
     unicode_view source;
+    source_file_lines lines;
     bool has_error;
 } parse_error_translator;
 
 static parse_error_translator parse_error_translator_create(complete_parse_error_handler *on_error,
                                                             callback_user on_error_user, unicode_view file_name,
-                                                            unicode_view source, bool has_error)
+                                                            unicode_view source, source_file_lines lines,
+                                                            bool has_error)
 {
-    parse_error_translator const result = {on_error, on_error_user, file_name, source, has_error};
+    parse_error_translator const result = {on_error, on_error_user, file_name, source, lines, has_error};
     return result;
 }
 
@@ -48,7 +51,7 @@ static void translate_parse_error(parse_error const error, void *user)
 {
     parse_error_translator *const translator = user;
     complete_parse_error const complete_error =
-        complete_parse_error_create(error, translator->file_name, translator->source);
+        complete_parse_error_create(error, translator->file_name, translator->source, translator->lines);
     translator->has_error = true;
     translator->on_error(complete_error, translator->on_error_user);
 }
@@ -166,9 +169,12 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
     /*TODO: check whether source is UTF-8*/
     parser_user parser_state = {
         attempt.module_source.success.data, attempt.module_source.success.length, source_location_create(0, 0)};
+    unicode_string const source_loaded = unicode_string_validate(attempt.module_source.success);
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_string(source_loaded));
     parse_error_translator translator = parse_error_translator_create(
         loader->on_parse_error, loader->on_parse_error_user, unicode_view_from_string(attempt.full_module_path),
-        unicode_view_create(attempt.module_source.success.data, attempt.module_source.success.length), false);
+        unicode_view_create(attempt.module_source.success.data, attempt.module_source.success.length),
+        source_file_lines_from_owning(lines), false);
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const parsed = parse_program(&parser);
@@ -177,12 +183,12 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
     {
         sequence_free(&parsed);
         import_attempt_result_free(attempt);
+        source_file_lines_owning_free(lines);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
         return failure;
     }
     source_file_owning *module_source = allocate(sizeof(*module_source));
-    *module_source =
-        source_file_owning_create(attempt.full_module_path, unicode_string_validate(attempt.module_source.success));
+    *module_source = source_file_owning_create(attempt.full_module_path, source_loaded, lines);
     attempt.full_module_path.data = NULL;
     attempt.full_module_path.length = 0;
     attempt.module_source.success.data = NULL;

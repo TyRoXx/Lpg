@@ -34,57 +34,23 @@ typedef struct parse_error_translator
     cli_parser_user *base;
     unicode_view file_name;
     unicode_view source;
+    source_file_lines lines;
 } parse_error_translator;
 
-static unicode_view find_whole_line(unicode_view const source, line_number const found_line)
+static unicode_view find_whole_line(unicode_view const source, source_file_lines const lines,
+                                    line_number const found_line)
 {
-    char const *begin_of_line = source.begin;
-    char const *const end_of_file = source.begin + source.length;
-    if (found_line > 0)
-    {
-        line_number current_line = 0;
-        char const *i = begin_of_line;
-        for (;;)
-        {
-            /*the location cannot be beyond the end of the file*/
-            ASSUME(i != end_of_file);
-
-            if (*i == '\r' || *i == '\n')
-            {
-                if (*i == '\r')
-                {
-                    char const *const newline = i + 1;
-                    if ((newline != end_of_file) && (*newline == '\n'))
-                    {
-                        ++i;
-                    }
-                }
-                ++i;
-                ++current_line;
-                if (current_line == found_line)
-                {
-                    begin_of_line = i;
-                    break;
-                }
-            }
-            else
-            {
-                ++i;
-            }
-        }
-    }
-    size_t line_length = 0;
-    for (char const *i = begin_of_line; (i != end_of_file) && (*i != '\n') && (*i != '\r'); ++i)
-    {
-        ++line_length;
-    }
-    return unicode_view_create(begin_of_line, line_length);
+    ASSUME(found_line < lines.line_count);
+    size_t const begin = lines.line_offsets[found_line];
+    size_t const end =
+        ((found_line + 1) == lines.line_count) ? source.length : (lines.line_offsets[found_line + 1] - 1u);
+    return unicode_view_cut(source, begin, end);
 }
 
-static void print_source_location_hint(unicode_view const source, stream_writer const diagnostics,
-                                       source_location const where)
+static void print_source_location_hint(unicode_view const source, source_file_lines const lines,
+                                       stream_writer const diagnostics, source_location const where)
 {
-    unicode_view const affected_line = find_whole_line(source, where.line);
+    unicode_view const affected_line = find_whole_line(source, lines, where.line);
     ASSERT(success_yes == stream_writer_write_bytes(diagnostics, affected_line.begin, affected_line.length));
     ASSERT(success_yes == stream_writer_write_string(diagnostics, "\n"));
     for (column_number i = 0; i < where.approximate_column; ++i)
@@ -155,14 +121,14 @@ static void handle_parse_error(complete_parse_error const error, callback_user c
     ASSERT(line.begin);
     ASSERT(success_yes == stream_writer_write_unicode_view(actual_user->diagnostics, line));
     ASSERT(success_yes == stream_writer_write_string(actual_user->diagnostics, ":\n"));
-    print_source_location_hint(error.source, actual_user->diagnostics, error.relative.where);
+    print_source_location_hint(error.source, error.lines, actual_user->diagnostics, error.relative.where);
 }
 
 static void translate_parse_error(parse_error const error, callback_user const user)
 {
     parse_error_translator *const actual_user = user;
     complete_parse_error const complete =
-        complete_parse_error_create(error, actual_user->file_name, actual_user->source);
+        complete_parse_error_create(error, actual_user->file_name, actual_user->source, actual_user->lines);
     handle_parse_error(complete, actual_user->base);
 }
 
@@ -174,10 +140,11 @@ static optional_sequence make_optional_sequence(sequence const content)
 
 static optional_sequence const optional_sequence_none = {false, {NULL, 0, {0, 0}}};
 
-optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source)
+optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source,
+                        source_file_lines const lines)
 {
     parser_user parser_state = {source.begin, source.length, source_location_create(0, 0)};
-    parse_error_translator translator = {&user, file_name, source};
+    parse_error_translator translator = {&user, file_name, source, lines};
     expression_parser parser =
         expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
     sequence const result = parse_program(&parser);
@@ -303,7 +270,7 @@ static void handle_semantic_error(complete_semantic_error const error, void *use
     ASSERT(line.begin);
     ASSERT(success_yes == stream_writer_write_unicode_view(context->diagnostics, line));
     ASSERT(success_yes == stream_writer_write_string(context->diagnostics, ":\n"));
-    print_source_location_hint(error.source.content, context->diagnostics, error.relative.where);
+    print_source_location_hint(error.source.content, error.source.lines, context->diagnostics, error.relative.where);
 }
 
 static compiler_command parse_compiler_command(char const *const command, bool *const valid)
@@ -414,13 +381,15 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         return true;
     }
 
+    source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_string(source));
     cli_parser_user user = {diagnostics, false};
-    optional_sequence const root =
-        parse(user, unicode_view_from_c_str(arguments.file_name), unicode_view_from_string(source));
+    optional_sequence const root = parse(user, unicode_view_from_c_str(arguments.file_name),
+                                         unicode_view_from_string(source), source_file_lines_from_owning(lines));
     if (!root.has_value)
     {
         sequence_free(&root.value);
         unicode_string_free(&source);
+        source_file_lines_owning_free(lines);
         return true;
     }
 
@@ -436,6 +405,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
             memory_writer_free(&format_buffer);
             sequence_free(&root.value);
             unicode_string_free(&source);
+            source_file_lines_owning_free(lines);
             return true;
         }
 
@@ -448,12 +418,14 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
             memory_writer_free(&format_buffer);
             unicode_string_free(&temporary);
             unicode_string_free(&source);
+            source_file_lines_owning_free(lines);
             return true;
         }
 
         memory_writer_free(&format_buffer);
         unicode_string_free(&temporary);
         unicode_string_free(&source);
+        source_file_lines_owning_free(lines);
         return false;
     }
 
@@ -476,9 +448,10 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     semantic_error_context context = {diagnostics, false};
     module_loader loader = module_loader_create(module_directory, handle_parse_error, &user);
     unicode_view const source_file_path = unicode_view_from_c_str(arguments.file_name);
-    checked_program checked = check(root.value, standard_library.globals, handle_semantic_error, &loader,
-                                    source_file_create(source_file_path, unicode_view_from_string(source)),
-                                    path_remove_leaf(source_file_path), 100000, &context);
+    checked_program checked = check(
+        root.value, standard_library.globals, handle_semantic_error, &loader,
+        source_file_create(source_file_path, unicode_view_from_string(source), source_file_lines_from_owning(lines)),
+        path_remove_leaf(source_file_path), 100000, &context);
     sequence_free(&root.value);
     switch (arguments.command)
     {
@@ -576,6 +549,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
     }
 #endif
     }
+    source_file_lines_owning_free(lines);
     checked_program_free(&checked);
     standard_library_description_free(&standard_library);
     unicode_string_free(&source);
