@@ -284,59 +284,79 @@ static tokenize_result tokenize_identifier(const char *input, size_t length)
     {
     }
 
+#define LPG_EQUALS_LITERAL(view, literal) (!memcmp((view).begin, (literal), sizeof(literal) - 1))
+
     unicode_view const content = unicode_view_create(input, i);
-    if (unicode_view_equals_c_str(content, "case"))
+    if (content.length <= 5)
     {
-        return make_success(token_case, content.length);
+        if (content.length == 4)
+        {
+            if (LPG_EQUALS_LITERAL(content, "case"))
+            {
+                return make_success(token_case, content.length);
+            }
+            if (LPG_EQUALS_LITERAL(content, "loop"))
+            {
+                return make_success(token_loop, content.length);
+            }
+            if (LPG_EQUALS_LITERAL(content, "impl"))
+            {
+                return make_success(token_impl, content.length);
+            }
+            if (LPG_EQUALS_LITERAL(content, "enum"))
+            {
+                return make_success(token_enum, content.length);
+            }
+        }
+        if (unicode_view_equals_c_str(content, "let"))
+        {
+            return make_success(token_let, content.length);
+        }
+        if (content.length == 5)
+        {
+            if (LPG_EQUALS_LITERAL(content, "break"))
+            {
+                return make_success(token_break, content.length);
+            }
+            if (LPG_EQUALS_LITERAL(content, "match"))
+            {
+                return make_success(token_match, content.length);
+            }
+        }
     }
-    if (unicode_view_equals_c_str(content, "break"))
+    if (content.length == 6)
     {
-        return make_success(token_break, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "loop"))
-    {
-        return make_success(token_loop, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "match"))
-    {
-        return make_success(token_match, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "return"))
-    {
-        return make_success(token_return, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "let"))
-    {
-        return make_success(token_let, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "interface"))
-    {
-        return make_success(token_interface, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "struct"))
-    {
-        return make_success(token_struct, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "impl"))
-    {
-        return make_success(token_impl, content.length);
-    }
-    if (unicode_view_equals_c_str(content, "enum"))
-    {
-        return make_success(token_enum, content.length);
+        if (LPG_EQUALS_LITERAL(content, "struct"))
+        {
+            return make_success(token_struct, content.length);
+        }
+        if (LPG_EQUALS_LITERAL(content, "return"))
+        {
+            return make_success(token_return, content.length);
+        }
+        if (LPG_EQUALS_LITERAL(content, "import"))
+        {
+            return make_success(token_import, content.length);
+        }
     }
     if (unicode_view_equals_c_str(content, "type_of"))
     {
         return make_success(token_type_of, content.length);
     }
-    if (unicode_view_equals_c_str(content, "import"))
+    if (content.length == 9)
     {
-        return make_success(token_import, content.length);
+        if (LPG_EQUALS_LITERAL(content, "new_array"))
+        {
+            return make_success(token_new_array, content.length);
+        }
+        if (LPG_EQUALS_LITERAL(content, "interface"))
+        {
+            return make_success(token_interface, content.length);
+        }
     }
-    if (unicode_view_equals_c_str(content, "new_array"))
-    {
-        return make_success(token_new_array, content.length);
-    }
+
+#undef LPG_EQUALS_LITERAL
+
     return make_success(token_identifier, i);
 }
 
