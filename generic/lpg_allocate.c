@@ -53,6 +53,25 @@ void *reallocate_array(void *memory, size_t new_size, size_t element)
     return new_memory;
 }
 
+void *reallocate_array_exponentially(void *array, size_t new_size, size_t element, size_t current_size,
+                                     size_t *capacity)
+{
+    size_t const old_capacity = *capacity;
+    ASSUME(current_size <= old_capacity);
+    if (old_capacity < new_size)
+    {
+        optional_size new_capacity = size_multiply(old_capacity, 2);
+        ASSERT(new_capacity.state == optional_set);
+        if (new_capacity.value_if_set < new_size)
+        {
+            new_capacity.value_if_set = new_size;
+        }
+        *capacity = new_capacity.value_if_set;
+        array = reallocate_array(array, new_capacity.value_if_set, element);
+    }
+    return array;
+}
+
 void deallocate(void *memory)
 {
     ASSERT(memory != NULL);

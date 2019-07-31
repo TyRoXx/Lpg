@@ -40,12 +40,9 @@ rich_token peek_at(expression_parser *parser, size_t const offset)
 {
     while (parser->cached_token_count <= offset)
     {
-        if (parser->cached_tokens_allocated <= offset)
-        {
-            parser->cached_tokens =
-                reallocate_array(parser->cached_tokens, (offset + 1), sizeof(*parser->cached_tokens));
-            parser->cached_tokens_allocated = (offset + 1);
-        }
+        parser->cached_tokens =
+            reallocate_array_exponentially(parser->cached_tokens, (offset + 1), sizeof(*parser->cached_tokens),
+                                           parser->cached_token_count, &parser->cached_tokens_allocated);
         parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->find_next_token_user);
         switch (parser->cached_tokens[parser->cached_token_count].status)
         {
