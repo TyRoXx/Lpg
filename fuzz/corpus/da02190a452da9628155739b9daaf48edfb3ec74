@@ -1,0 +1,16 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a capturde variable in a compile_time context*/
+let m = boolean
+e[f4]
+assrte(f5())
+re_compile_time[f5]
+assrte(f5())
+
+!/*use a cd(d, integer_equals(c, 23)))
+assert(z(boolean.tru    e, boolean.true)                                         variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assertac(pture_twice())

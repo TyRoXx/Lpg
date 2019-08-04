@@ -1,0 +1,23 @@
+let empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate ~ (arg: g
+
+let monostate = enum
+    a
+let pass_monostate ~ (arg: monostate)
+    arg
+(ssert(match paate!.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let p  istate = enum
+    a
+    b
+let p                        oolean.true
+)

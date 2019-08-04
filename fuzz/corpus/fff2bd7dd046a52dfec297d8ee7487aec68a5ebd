@@ -1,0 +1,56 @@
+l         import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assertn_impllet std = import std
+
+let i = interface
+    ticit_re4urn_explicit_type = (arg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.t  match arg
+        case boolean.true:
+            return "a"
+        case boolean.faolean)
+    match arg
+        case boolean.false:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return lean.fao    )
+    match arg
+*        casolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            se boolean.faolean)
+    match arg
+        case boolean.false:
+          return "a"
+        case boolean.faolean)
+    match arg
+        case boolean.false:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+       (boolean.true))
+o_string(): std.string
+
+let s = struct
+    string: std.string
+
+im
+let lo:p_return_implicit_type = (aDDDDDDDDDDDDDDDpl i for s
+    to_string()
+        sDDDDDDDDDDDDDDDDDDDDDDDDDDDDDs[int(0, 1)]{1}
+assert(u: i         lo"ean}
+)

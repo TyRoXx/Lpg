@@ -1,0 +1,14 @@
+let s:td = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load()(value: T): mutable[T]
+    let content = new_array(T)
+    assert(content.append(velau))
+    assert(integer_equals(5, content.siload()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(5, 3)](3)
+assert(integer_eqYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYuals(3, n.load()))
+n.store(0)
+ass.store("123")
+assert(string_equals("123", p2.load()))

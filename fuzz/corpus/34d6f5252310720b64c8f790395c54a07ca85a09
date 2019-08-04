@@ -1,0 +1,16 @@
+l      	 et std = import  std
+
+let producean]hod(arg4: std.ansformer = interface[From, To]
+    transform(inpu)pl pror dr = interface[From, To]
+    transform(inpu): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+                                                pru)o
+(edc     f = interface[T]
+    method(1ga :rstd.ansformer = interface[From, To]
+    transform(inpu): From): Toct
+    !leiestring, arg1: T): producer[std.boolean]
+
+imt: boolean        an, option.some(2)
+    ntime_van](std.boolean.true)*/

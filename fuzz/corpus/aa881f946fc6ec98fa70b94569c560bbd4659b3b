@@ -1,0 +1,61 @@
+l boolean
+    ___: bo!lean
+let))
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = interfa)ce
+    print(): std.string
+let f4 = (printed: /printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+  d_ int(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+  ; let s = print()
+    sabc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printab)
+tit_value
+
+impl printable2 for std.unit
+    print()(
+        "unit"
+    other_method()
+        st    _: boolean
+    __    oolean
+let))
+
+impl transformer[std.boolean, std.string] for dummy                                                           interface
+    print():ng
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method() interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interfaceface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (ace = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords < interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

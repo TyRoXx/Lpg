@@ -1,0 +1,15 @@
+d       .true
+
+let a : producer[std.boolean] = dummy{ert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "false"
+
+let b : )ranfsormer[stg]!=
+leter[std.boolean, std.string]!= dummy{}
+ass   pruals(121ng
+//you coduce()
+        std&boolean.true
+	lean.false: alse"
+
+let b : transformer[std.boolean, std.string]!= dummy{}|      ual std.stri"
+
+let b : transformer[sto.bloedan, std.string]!= d%mmy{}
+assert(string_equals("tr  [V](s)t

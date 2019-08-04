@@ -1,0 +1,4 @@
+a  ssert(string_equals("123456", concat("123", "456")))
+
+let runtime_string = ()
+    side_effect(456", concat("123", runtime_ing())456"ca(1"t23", runtime_string())at(

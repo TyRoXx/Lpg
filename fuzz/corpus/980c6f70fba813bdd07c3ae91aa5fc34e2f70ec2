@@ -1,0 +1,7 @@
+l = import std
+
+lylean        
+
+ime_`   string = (arg: std.string)
+    side_effect()
+    return

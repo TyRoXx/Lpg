@@ -1,0 +1,66 @@
+l  et  let std = import std
+
+leostate = enum
+    ade_effect()
+ ean, std.string].first(let s):
+ an.fals(1844:             
+    c: int(0, 1)
+let u_insta   _= uti = enum
+    a(sin}
+assert(t_inst(0, 1)
+det u_insta   _= uti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(b{t{ebooaln.e}, "abc", 1}
+assert(u_insta    l t std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+iet pti = enum
+    a(sin}
+assert(t_inst(0, 1)
+det u_ins  ___ B_uti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(b{t{boolean.true}, "abc 1)
+det u_insta   _= uti = enum
+    a(single)
+    b(structure)
+    c(std interface
+  ue
+assert(string_equals("0,1", y.methoul_enum()
+ $  case single.a(let state): state
+)ssert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.s   g
+    c: int(0, 1)
+let u_insta   _= uti = enum
+    a(sin}
+assert(t_instance.a)
+
+let u =tur sct
+    a: t
+    b: std.string
+    c: n( ,0ti1)
+det u_insta   _= urintable2 = interface
+  ue
+assert(string_equals("0,1", y.methoul_enum()
+    case ~single.a(let state): state
+)ssert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.s   g
+    c: int(5, 1)
+   _= uti = enum
+    a(sin}
+assert(t_instan
+let pass_empt              

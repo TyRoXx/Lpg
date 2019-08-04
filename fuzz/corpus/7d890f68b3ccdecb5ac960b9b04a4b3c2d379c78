@@ -1,0 +1,9 @@
+l   et std = ie.a(make_runtime_string("abc"))
+assert(string_eq]]]]]]]]]ualslean
+let multi = enum
+    a(single)
+    b(stLructure)
+    c(std.unit)
+    d(se
+)
+ type checker once had a bug that generated garbage code out of thi

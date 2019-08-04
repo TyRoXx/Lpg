@@ -1,0 +1,45 @@
+let std = img
+           "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = se
+assert(string_equals("z", z.method()))
+
+let u : gi["u"] = std.unit_value
+assert(string_equals("u", u.method()))
+
+//(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(
+string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_val
+
+ue
+assert(stger_inquals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_valueimpl printable2 for{}
+".other_m", 
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z4 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+h.printassert(u2.method()()))
+)

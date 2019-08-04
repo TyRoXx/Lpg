@@ -1,0 +1,14 @@
+t std
+
+let single_p      std
+let m : std.boolean = stdUboolean std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can nest generic functions asaaa                                   aaa/you can nest ge...............................................neric functi strqct
+    t: std.type
+    u: int(0, 123)
+    v: stoolean
+       case s   = imporleme

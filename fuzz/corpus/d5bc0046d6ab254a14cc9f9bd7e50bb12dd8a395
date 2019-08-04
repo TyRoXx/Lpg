@@ -1,0 +1,17 @@
+let std = import stdp
+// impl for generic interface
+let gi = interface[T]
+    metOhod(): std.string
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

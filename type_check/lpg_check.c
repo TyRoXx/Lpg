@@ -3247,7 +3247,9 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
                                  unicode_view_from_string(element.generic_parameters.names[i])))
         {
-            LPG_TO_DO();
+            emit_semantic_error(state, semantic_error_create(
+                                           semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
+            return evaluate_expression_result_empty;
         }
     }
 

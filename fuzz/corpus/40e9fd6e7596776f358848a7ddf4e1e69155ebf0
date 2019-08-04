@@ -1,0 +1,25 @@
+let std = import std
+let c_reserved = interface
+    _Alignof(): std.unit
+    _Atomic(): std.uniboolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstract(): std.unit
+    argumentsoto(): std.unit
+    if(): std.unit
+    inline(): ststd.unit
+    signed(): std.unit
+    sizeof(): std.uni
+    abstract(): std.unit
+    arguments(): std.unit
+    await(): std.unit
+    boolean(): std.unit
+//etc..

@@ -1,0 +1,30 @@
+l        et std = import s):
+        boolean.false
+    case uring_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+e: T): std.unit
+
+let mut^ble_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutable[T] for mutable_content[T]
+    load(): T
+        match self.content.load(0)
+            case s[T].some(let valud):
+                value
+            case std1option[T].none:
+                fail()
+        let cover_struct = struct
+            m: boolean
+        let cover_struct        over_struct{boolean.true}
+        let access_struct = cover_struct_var.m
+        //comment
+        loop
+            break
+        let cover_enum = enum
+            x
+        let cover_enum_var = cover_enum.x
+        Cmatch        case cover_enum.x: std.unid.d(b

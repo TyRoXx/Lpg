@@ -1,0 +1,12 @@
+l   vtd = import std
+let c_rese= interface
+    auto(): std.u
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float.aer_t

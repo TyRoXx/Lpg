@@ -1,0 +1,8 @@
+l`   ring
+
+impl[St_value
+assert(s ring_equals(",00," x.method()))
+
+let y : gi[int(0, 1)] = std.uni 
+impl[St_value
+assert(string_equal   do() std.us( str

@@ -1,0 +1,37 @@
+let std = import std
+let boolean = std. [V]()
+    V
+
+// case taken
+///////////////
+
+let a = mathh ""        td.false
+    default:
+        bsert(c)
+    V
+
+// case taken
+///////////////
+let a = string]("")
+    case "":
+                boolean.true
+    default:
+    boolean.false
+assert(b)
+
+// default taken
+//////    case "a":
+        boolean.false
+    default:
+        bsert(c)
+    V
+
+// case taken
+///////////////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+   _time[d.string]("")
+    case ""b:
+        bosero

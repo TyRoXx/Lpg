@@ -1,0 +1,41 @@
+l           et std = iman.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   bboolean.false
+require_compile_time[a]
+as sert(a)
+
+let b = matcd.Runtime_value[std.string]("")
+    case ""sert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+as~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~     /////-//////
+
+lett:
+        boolean.false
+require_compile_time[a]:c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYstd.string](&")
+    case "":
+        boolean.true
+    default:
+
+        boolea    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert(d)

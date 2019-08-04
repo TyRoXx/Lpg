@@ -1,0 +1,4 @@
+assert(str_equals('', ""))
+assert(string_equals('"', "\""))
+asse Wtring_equals('\', "\\"))
+as)

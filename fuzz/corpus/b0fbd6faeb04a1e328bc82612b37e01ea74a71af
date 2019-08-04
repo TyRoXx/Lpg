@@ -1,0 +1,23 @@
+a  ls("a:~      ch return_stateful_enum().unit)
+    d(boolean)
+    e
+    fonostate)
+    ar[w      (match pass]monostate(moass_bistate(ase brt(a.append(b))
+asasert(intequals(0,rt(match a.load(0)
+    case option[std.array[std.array[snritg]]].some(let element):
+        match element.load(0)
+            case option[std.array[string]].some(let element2):
+                assert(c.append("abc"))
+                match element2.load(0)
+                    case option[string].some(let s):
+                        string_equals(s,ing(): std.string
+
+let s = struct
+    string: std.strang
+
+impl i for s
+    to_stng()
+        yelf.stAing
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[Compilt

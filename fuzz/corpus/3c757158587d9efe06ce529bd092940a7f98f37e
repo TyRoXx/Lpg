@@ -1,0 +1,76 @@
+l-        = import std
+let_equals("test",)
+  2.load()))
+p2tso.re("value: T): st0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p3old.a()))
+p2tso.re(:123*)
+.string]("t)
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p1.|oad()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic interface   eoolean).trlet std = import s_mutable[slet p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("value: T): st0)
+assert(integ\er_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(strinp.load()))
+p.store(
+let p2 = makem_utable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+assert(strinw_equd
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o("test")
+assert p1 =) make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic st")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.stotd.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.stoassert p1 =) make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic st")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+assert(string_e(quals("123", p2.load()))

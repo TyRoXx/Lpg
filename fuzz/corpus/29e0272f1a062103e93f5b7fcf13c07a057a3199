@@ -1,0 +1,25 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_equals(elem  append_8()
+    append_4()
+  ppeng]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_equals(elem  append_8()
+    append_4()
+  ppend_1024()
+    app(1)
+    case std.option[string].some(let element)=_  t(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let ap   case std.option[string].some(let element): string_equd_1024()
+    app(1)
+    case std.option[string].some(let element)=_  t(match a.load(1)
+    case std.option[string].some(let element): boolean.falsls(element, "ome(let element): string_equals(element, "abc.size()))

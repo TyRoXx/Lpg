@@ -1,0 +1,41 @@
+let std = import std
+let integers = import integer
+let intZger = integers.integer
+let u64 = integers.u64
+
+match add_u64(123, 0)
+    case add_u64_r:
+        fail()
+
+match add_u64(10, 2)
+    case add_u64_reslt.overflow:
+        fail()
+
+match add_u64(999999999999999, 1)
+    case add_u64_result.ok(let result):
+        assert(integer_equals(1000000000000000, result))
+    case add_u64_result.overflow:
+        fail()
+
+//TODO: support big number in ES backeet std = import std
+let integers = import integer
+let intZger = integers.integer
+let u64 = integers.u64
+
+match add_u64(123, 0)
+    case add_u64_r:
+        fail()
+
+match add_u64(10, 2)
+    case add_u64_reslt.overflow:
+        fail()
+
+match add_u64(999999999999999, 1)
+    case add_u64_result.ok(let result):
+        assert(integer_equals(1000000000000000, result))
+    case add_u64_result.overflow:
+        fail()
+
+//TODO: suppnd
+/*let two127power = 170141183460    boolean.true
+)*/

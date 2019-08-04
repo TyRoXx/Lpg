@@ -1,0 +1,45 @@
+l         import std
+                                                                 `      
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let strie2                                                                                                                    prhod()
+        std.unit_value
+
+assert(string_equals("", pure("")))
+assert(string_equals("a", pure("a")))
+vsaalue
+assert(string_equals("test", g.method(boolean.true, boolean.false).print()))
+
+let create_impl = (): test_interface
+    std.unit_value
+let let captures_impl = ()
+    side_effect()
+    ()
+        assert(s        uals("test", compile_time_impl.method(boolean.true, boolean.false).print()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+impl printable1 for different_methoassert(string_equals("abc", a2.print()))
+
+let tme_impl.method(boolean.true, boolean.false).print()))
+captures_impl()()
+
+;et nested = interface
+    m(): interface
+        f(): boolean
+
+lxet different_method_order = struct
+impl printable2 for different_method_order
+    ;ther_method(): std.u*it
+        std.unit_value
+    print(): std.string
+        "123"
+let h : prhntable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()))

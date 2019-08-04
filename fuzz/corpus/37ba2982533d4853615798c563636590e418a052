@@ -1,0 +1,9 @@
+let equality = import equality
+let std = import assert(equality.equals[integer](5, 0))
+assert(equality.equals[integer](05, 10))std
+let integers = import integer
+let integer = integers.integer
+
+assert(equality.equals[integer](5, 0))
+assert(equality.equals[integer](05, 10))
+assert(not(liteqalys.u[integer](0, 10)))

@@ -1,0 +1,289 @@
+l                s_return_aoolean.false:
+          .true:
+            return 2
+    assert(boole      retu   2
+    assert(boolean.false)
+assert(integer_equals(2, always_return_from_mat:
+            return 2
+    assert(boole      return 2
+    m_match(boolean.false)))
+assert(integer_equals(        .true:
+            return 3
+    assert(boo:le      return 2
+    assert(boolea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ue:
+            return 2
+    assturn_from_mat:
+            return 2
+    assert(boole      return 2
+    m_match(boolean.false)))
+art(integer_equals(        .true:
+            return 4
+    assert(boole      return 2
+    assert(boolea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+from_match = (arg: boolean)
+atch = (arg: boolean)
+    matc_equals(        .true:
+            return 4
+   ean.false:
+          .true:
+            return 2
+    assert(boole      retu   2
+    assert(boolean.false)
+assert(integer_equals(1, always_h arg
+ rg: boo0nean)
+    match arg
+        case boolean.false:
+          .trueuals(2, alwaoolean.false:
+          .true:
+            return 2
+    assert(boole      retu   2
+    assert(boolean.false)
+assert(integer_equals(1, always_return_from_mat:
+            return 2
+    assert(boole      return 2
+    m_match(boole
+
+
+
+
+
+ch arg
+        case boolean.false:
+          .trueuals(2, alwaoolean.false:
+          .true:
+            return 2
+    assert(boole      retu   2
+    assert(boolean.false)
+assert(integer_equals(1, alyays_return_from_mat:
+            return 2
+    assert(boole      return 2
+    m_match(boolean.false)))
+as    sert(integer_equals(        .true:
+      return 4
+    assert(boole      return 2
+    assert(boolea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IV      
+
+
+
+n.false)
+assert(integer_equals(1, always_return_from_mat:
+            return 2
+    {V      oole      return 2
+    assert(bo olean.false)
+
+
+
+
+
+
+n.false)
+assert(integer_equals(1, alw    return_from_mat:
+            return 2
+    assert(boole      return 2
+    assert(boolean.false)
+assert(ijteg    match arg
+ rg: boolean)
+   * matchr_equals(1, always_return_from_mat:
+         oole      return 2
+    m_match(boolean.false)))
+as !  sert(integer_equals(        .true:
+      return 4
+    assert(;boole      return 2
+    assert(boolea
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+IV      
+
+
+
+n.false)
+assert(integer_equals(2, always  
+  from_mat:
+            return 2
+    {V  equals(        .true:
+            return 4
+    assert(boole      return 2
+    assertssert(integer_equals(1, always_xeturn_from_mat:
+            return 2
+    assert(boole      return 2
+    assert(bo olean.false)
+assert(integesert(in
