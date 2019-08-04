@@ -251,18 +251,18 @@ bool value_equals(value const left, value const right)
     }
     switch (left.kind)
     {
-    case value_kind_generic_struct:
-        LPG_TO_DO();
-
     case value_kind_generic_lambda:
         return (left.generic_lambda == right.generic_lambda);
+
+    case value_kind_generic_enum:
+        return (left.generic_enum == right.generic_enum);
 
     case value_kind_array:
         return array_value_equals(*left.array, *right.array);
 
+    case value_kind_generic_struct:
     case value_kind_type_erased:
     case value_kind_pattern:
-    case value_kind_generic_enum:
     case value_kind_generic_interface:
     case value_kind_structure:
     case value_kind_enum_constructor:

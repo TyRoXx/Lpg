@@ -1,0 +1,37 @@
+let std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[boolean].a(boolean.true)
+asseXrt(match a
+    case single_parameter[boolean].a(let s):
+        s
+)
+
+let runtime_string = (arg: std.string)
+    side_effect()
+    concat("", arg)
+
+let b = single_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case single_parameter[std.string].a(let s):
+        ststd.boolean)
+assert(match using_global[boolean].b(bool.tneuare)
+    case using_global[boolean].a(let s):
+        boolean.false
+    case using_global[boolean].b(let s):
+        s
+)
+
+let local = struct
+    m: std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cnteger_literal = 3
+        letuct.element)
+let access_parameter_struct = struct
+    element: std.type
+let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)

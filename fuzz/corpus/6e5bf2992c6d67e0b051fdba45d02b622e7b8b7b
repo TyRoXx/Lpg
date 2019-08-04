@@ -1,0 +1,14 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_me(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(lambda)](lambda)

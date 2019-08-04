@@ -4495,6 +4495,12 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                          expression_source_begin(*element.element)));
         return evaluate_expression_result_empty;
     }
+    if (element_evaluated.compile_time_value.value_.kind != value_kind_type)
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                         expression_source_begin(*element.element)));
+        return evaluate_expression_result_empty;
+    }
     unicode_string array_module_name = {"array", 0};
     array_module_name.length = strlen(array_module_name.data);
     evaluate_expression_result const array_imported = evaluate_import(
@@ -4546,7 +4552,6 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
         LPG_TO_DO();
     }
     register_id const into = allocate_register(&state->used_registers);
-    ASSUME(element_evaluated.compile_time_value.value_.kind == value_kind_type);
     add_instruction(function, instruction_create_new_array(new_array_instruction_create(
                                   array_instantiated.compile_time_value.value_.type_.interface_, into,
                                   element_evaluated.compile_time_value.value_.type_)));
