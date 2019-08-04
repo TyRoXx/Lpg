@@ -3300,7 +3300,9 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     }
     if (self.compile_time_value.value_.kind != value_kind_type)
     {
-        LPG_TO_DO();
+        emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_type,
+                                                         expression_source_begin(*element.self)));
+        return evaluate_expression_result_empty;
     }
 
     generic_closures const closures = find_generic_closures_in_impl(state, element);

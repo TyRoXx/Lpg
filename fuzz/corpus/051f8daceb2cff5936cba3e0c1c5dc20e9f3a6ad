@@ -1,0 +1,127 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.falsetime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        bKoolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.run_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////         /////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:e
+    default:
+        boolean.trYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+ 
+require_compile//                  ////////////
+
+le_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile_time[a]
+assert(a)
+
+let b = match std.run_time[a]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//////         /////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:e
+    defaudefault:
+        boolean.false
+assert(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+        boolean!true
+require_compile_time[c]
+assert(c)
+
+let d = matc///
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+        boolean!true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert(d)

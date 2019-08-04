@@ -378,6 +378,17 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
+            semantic_error_create(semantic_error_expected_compile_time_type, source_location_create(1, 17))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let i = interface[T]\n"
+                                               "impl[T] i[T] for 1\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(2, 11))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"

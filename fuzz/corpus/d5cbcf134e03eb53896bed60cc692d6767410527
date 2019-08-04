@@ -1,0 +1,21 @@
+lstd
+let integers = import integer
+le.integer
+
+match add(123, 0)
+    case add_result.ok(let result):
+        assert(integer_equals(123, result))
+    case add_result.overflow:
+        fail()
+
+match add(std.runtime_value[integer](0), 0)
+    case add_result.ok(let result):
+        assert(integer_equals(0, result))
+    case add_rerflow:
+        fail()
+
+//TODO: support big number in ES backend
+/*let two127power = 17014118346046923173168m7303715884105728
+as)sertmatch  tw  case add_result.overflow:
+        boolean.true
+)*/
