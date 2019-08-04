@@ -1,0 +1,101 @@
+d         	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl tr        ansformer[stdb.ool*ean, std.string] for sing_struct =let std = import std
+let integers = import integer
+
+loop
+    si 	  lean.true
+
+let a : producer[st        d.boolean] = dummy{}
+assert(a.produce())
+
+impl tr        ansformer[std.boolean, stlet std = import std
+let integers = import integer
+
+loop
+    side_effect()
+  ` break
+
+loop
+  an.false: std.unit_v oop
+    match in$teger    case boolean.false:
+                  it_value
+ )   match add_u32(i.load(), 1)
+        cased(), 1)
+        case add_u32_result.ok(let neflow:
+            fail((
+
+loop
+    let no_leak = new_a =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+  an.false: std.unit_v  alue
+
+loop
+        lg_struct =let std = import std
+lloop
+        lg_struct =let std = import sdt
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    matc        ash add_u32(i.load(), 1)
+        case add_u32_result.ok(let neflow:
+            fail((
+
+loop
+    let no_leak = new_a =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+  ` break
+
+loop
+  an.false: std.unit_v oop
+    match in$teger    case boolean.false:
+                  it_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let neflow:
+            fail((
+
+loop
+    let no_leak = new_a =let std = import std
+
+  ` break
+
+loop
+  an.false: std.unit_v oop
+    match in$teger    case boolean.false:
+                  it_value
+ )   match add_u32(i.load(), 1)
+        case add_u32_result.ok(let neflow:
+            fail((
+
+loop
+    let no_leak = new_a =let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+let gs = struct[T]
+    dummy: T
+
+se boolean.trimpl[T] i forue:
+            break
+   gs[T]
+       

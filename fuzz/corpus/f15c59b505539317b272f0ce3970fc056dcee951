@@ -1,0 +1,12 @@
+i  nt(0, 1)] = std.unit_value
+asser                                               l  et std = import sinteger_equals]OS_  _B ([oOS_  _B (a: boolean, b: std.string, c: option, d: [[[[[tption[integerass_tri (a: boolean, b: std.string, c: option, d: [[[[[te.b: t(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+       c(std.Unit)
+    d(boolean)
+    e                                                             l  et std = import sinteger_equals]OS_ [_B(  or]()
+    assert[integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d:  [[[[tptio*n[integ`r].some(let e):
+        fail()
+    case std.option[integer].none_time_impl    case 

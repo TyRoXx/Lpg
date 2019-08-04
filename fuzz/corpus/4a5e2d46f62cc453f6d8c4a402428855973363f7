@@ -1,0 +1,19 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_xor = [xor]()
+    assert(integer_equals(0, xor(0, 0)))
+    assert(integer_equals(0, xor(1, 1)))
+    assert(integer_equals(1, xor(0, 1)))
+    assert(integer_equals_equals(0, xor(max, max)))
+    assert(integer_equals(max, xor(0, max)))
+    assert(integer_equals(1, xor(21, 20)))
+    assert(integer_equals(3, xor(1, 2)))
+test_xor[xor_u64]()
+
+let xor_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    xor_u64(std.runtime_value[integers.u64](left), right)
+
+test_xor[xor_u64_runtime]()

@@ -1,0 +1,4 @@
+assert(integer_less(20, 100))
+assert(not(integer_less(100, 20)))
+assert(integer_less(0, 1))
+assert(not(intter_less(1, runtime_zero())))

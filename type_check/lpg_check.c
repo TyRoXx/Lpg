@@ -3738,7 +3738,6 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                         enumeration_element_free(elements + m);
                     }
                     deallocate(elements);
-                    state->program->enum_count -= 1;
                     return evaluate_expression_result_empty;
                 }
                 element_state = optional_type_create_set(state_evaluated.compile_time_value.value_.type_);
@@ -3750,7 +3749,6 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                     enumeration_element_free(elements + m);
                 }
                 deallocate(elements);
-                state->program->enum_count -= 1;
                 return evaluate_expression_result_empty;
             }
         }
@@ -3767,12 +3765,14 @@ evaluate_enum_expression(function_checking_state *state, instruction_sequence *f
                     enumeration_element_free(elements + m);
                 }
                 deallocate(elements);
-                state->program->enum_count -= 1;
                 return evaluate_expression_result_empty;
             }
         }
     }
-    state->program->enums[new_enum_id] = enumeration_create(elements, element.element_count);
+    enumeration *const destination = &state->program->enums[new_enum_id];
+    ASSUME(destination->size == 0);
+    ASSUME(destination->elements == NULL);
+    *destination = enumeration_create(elements, element.element_count);
     register_id const into = allocate_register(&state->used_registers);
     value const literal = value_from_type(type_from_enumeration(new_enum_id));
     add_instruction(function, instruction_create_literal(literal_instruction_create(into, literal, type_from_type())));

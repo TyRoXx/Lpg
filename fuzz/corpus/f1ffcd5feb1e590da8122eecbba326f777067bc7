@@ -1,0 +1,25 @@
+l! et sstring_e  quals("ab:def"T return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[2]()[std.ufi .t])))
+assert(t            t]))
+assert(type_equarfake_mutable[type_of(std.option[std.unit].df[boolean, type_of(false_prmpiedicate)]\       ty, false_predicate)))
+
+let empty = new_array(a(let s):
+        boolealn.falring)
+     sile_weffect()
+   (return concat("abc"} arg)
+assert(string_e  quals("abcdef"T return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[2;]()[std.ufi .t])lement): string_equals(element, "912")
+    case std.option[string: boolean)l boo:ean
+    boole(an.truel
+ealu())e
+) 
