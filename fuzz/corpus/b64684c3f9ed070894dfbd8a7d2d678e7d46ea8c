@@ -1,0 +1,7 @@
+let std = g
+//yre nh they are defined thsame:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums#are], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2](dt).s[unit], make_enum[2]()[std.unit]))

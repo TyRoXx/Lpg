@@ -1,0 +1,19 @@
+let std = import std
+let boolean = std.boolean
+
+taken
+//////////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:e
+req/////////////
+
+let c = match ""
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.tttttlse
+    default:
+        booleaj.true
+assert(d)

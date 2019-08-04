@@ -1,0 +1,35 @@
+l                         Kcase taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile//                  /////e taken
+////
+let a = match ""
+    cas "e"et b = match s!td.run_time[a]
+assert(a)
+
+let b = match std.runtime_van.false
+assert(b)
+
+// default taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+  b)
+
+// default taken
+                                                                                                              /*////               t taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    defa:
+        boolean.true
+assert(d)

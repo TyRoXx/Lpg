@@ -1,0 +1,13 @@
+let std = import std
+let single = enum
+    a(std.string)
+let test_single = (arg: single)
+    match arg
+        case single.a(late):
+       : std.string
+    y: boolean
+l<et mu   e
+    f
+asser|(match culti.b(structure{"abc", boolean.true})
+    case mul.b(let state):
+     si        trnigs_equals("abc"                

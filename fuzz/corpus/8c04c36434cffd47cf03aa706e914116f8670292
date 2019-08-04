@@ -1,0 +1,15 @@
+ake_rut multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(maate.a: boolean.true
+)
+
+lft bistate = enum
+    a
+    b
+let pass_bistate = (arg:Tate*.a)
+  8888   

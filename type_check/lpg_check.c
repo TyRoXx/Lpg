@@ -3804,6 +3804,33 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
                                                            source_location const where)
 {
     program_check *const root = state->root;
+    generic_enum const instantiated_enum = root->generic_enums[generic];
+    if (argument_count < instantiated_enum.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_enum.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
     for (size_t i = 0; i < root->enum_instantiation_count; ++i)
     {
         generic_enum_instantiation *const instantiation = root->enum_instantiations + i;
@@ -3835,39 +3862,12 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    generic_enum const instantiated_enum = state->root->generic_enums[generic];
     enum_expression const original = instantiated_enum.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state enum_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
         unicode_view_from_string(instantiated_enum.current_import_directory));
-    if (argument_count < instantiated_enum.tree.parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
-        return evaluate_expression_result_empty;
-    }
-    if (argument_count > instantiated_enum.tree.parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
-        return evaluate_expression_result_empty;
-    }
     for (size_t i = 0; i < instantiated_enum.tree.parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&enum_checking.used_registers);
@@ -3941,6 +3941,33 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
                                                              source_location const where)
 {
     program_check *const root = state->root;
+    generic_struct const instantiated_struct = root->generic_structs[generic];
+    if (argument_count < instantiated_struct.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_struct.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
     for (size_t i = 0; i < root->struct_instantiation_count; ++i)
     {
         generic_struct_instantiation *const instantiation = root->struct_instantiations + i;
@@ -3972,39 +3999,12 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    generic_struct const instantiated_struct = state->root->generic_structs[generic];
     struct_expression const original = instantiated_struct.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state struct_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
         unicode_view_from_string(instantiated_struct.current_import_directory));
-    if (argument_count < instantiated_struct.tree.generic_parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
-        return evaluate_expression_result_empty;
-    }
-    if (argument_count > instantiated_struct.tree.generic_parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
-        return evaluate_expression_result_empty;
-    }
     for (size_t i = 0; i < instantiated_struct.tree.generic_parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&struct_checking.used_registers);
@@ -4072,6 +4072,33 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
                                                                 type *const argument_types, source_location const where)
 {
     program_check *const root = state->root;
+    generic_interface const instantiated_interface = root->generic_interfaces[generic];
+    if (argument_count < instantiated_interface.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_interface.tree.parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
     for (size_t i = 0; i < root->interface_instantiation_count; ++i)
     {
         generic_interface_instantiation *const instantiation = root->interface_instantiations + i;
@@ -4103,41 +4130,12 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
         return evaluate_expression_result_create(
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
-    generic_interface const instantiated_interface = state->root->generic_interfaces[generic];
     interface_expression const original = instantiated_interface.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
         unicode_view_from_string(instantiated_interface.current_import_directory));
-
-    if (argument_count < instantiated_interface.tree.parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
-        return evaluate_expression_result_empty;
-    }
-    if (argument_count > instantiated_interface.tree.parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
-        return evaluate_expression_result_empty;
-    }
-
     size_t const instantiation_id = root->interface_instantiation_count;
     root->interface_instantiations =
         reallocate_array(root->interface_instantiations, root->interface_instantiation_count + 1,
@@ -4203,6 +4201,33 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
                                                              source_location const where)
 {
     program_check *const root = state->root;
+    generic_lambda const instantiated_lambda = root->generic_lambdas[generic];
+    if (argument_count < instantiated_lambda.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
+        return evaluate_expression_result_empty;
+    }
+    if (argument_count > instantiated_lambda.tree.generic_parameters.count)
+    {
+        if (arguments)
+        {
+            deallocate(arguments);
+        }
+        if (argument_types)
+        {
+            deallocate(argument_types);
+        }
+        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
+        return evaluate_expression_result_empty;
+    }
     for (size_t i = 0; i < root->lambda_instantiation_count; ++i)
     {
         generic_lambda_instantiation *const instantiation = root->lambda_instantiations + i;
@@ -4235,39 +4260,12 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         return evaluate_expression_result_create(
             evaluation_status_value, into, function_type, optional_value_create(literal), true);
     }
-    generic_lambda const instantiated_lambda = state->root->generic_lambdas[generic];
     lambda const original = instantiated_lambda.tree;
     instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
     function_checking_state lambda_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, instantiated_lambda.file,
         unicode_view_from_string(instantiated_lambda.current_import_directory));
-    if (argument_count < instantiated_lambda.tree.generic_parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_missing_argument, where));
-        return evaluate_expression_result_empty;
-    }
-    if (argument_count > instantiated_lambda.tree.generic_parameters.count)
-    {
-        if (arguments)
-        {
-            deallocate(arguments);
-        }
-        if (argument_types)
-        {
-            deallocate(argument_types);
-        }
-        emit_semantic_error(state, semantic_error_create(semantic_error_extraneous_argument, where));
-        return evaluate_expression_result_empty;
-    }
     for (size_t i = 0; i < instantiated_lambda.tree.generic_parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&lambda_checking.used_registers);

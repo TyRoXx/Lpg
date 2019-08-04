@@ -1,0 +1,48 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured le in a coultiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captu2esffect()
+    assert(integer_equals(b, 23))
+require_compile_time[h]
+h(ue)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 =/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*func    side_effect()
+        std.and(indirection(), b)
+assert(f7ue, std.unit_value))
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captu2esffect()
+    assert(integer_equals(b, 23))
+require_clet re, boolean.true)(std.unit_value, std.unltiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captu2es something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, stde_twice())

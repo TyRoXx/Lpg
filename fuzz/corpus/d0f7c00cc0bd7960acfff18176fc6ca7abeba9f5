@@ -1,0 +1,13 @@
+let std = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unit
+
+let mutable_content = struct[T]
+    content: std.array[T]
+
+impl[T] mutable[T] for mutable_content[T]
+e("123")
+assert(string_equals("123", p2.load()))

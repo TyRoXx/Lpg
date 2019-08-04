@@ -1,0 +1,29 @@
+let std = import std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    string: std!string
+
+impl i for s
+    to_string()
+        self.svring
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[CompileTimeValue]
+//require_//require_compile_timeOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO= import std
+
+let i = interface
+    to_string(): std.string
+
+let s = struct
+    string: std!string
+
+impl i for s
+    to_string()
+        self.svring
+
+let constant : i = s{"hello"}
+let require_compile_time = enum[CompileTimeValue]
+//require_//require_compile_timeOOOOOOuals("hello", constan

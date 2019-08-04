@@ -1,0 +1,9 @@
+64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    asssert(integer_equals(mar(max, max)))
+    
+    or_u65(std.runtime_value[integers.u64](left), right)
+
+test_or[or_u64_runtime]()

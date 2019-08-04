@@ -1,0 +1,7 @@
+s     string
+        match inpu                                                        t
+   ,        case std.boolean.true: "true"
+   222222222222222222222         case std.boolean.false: "false"
+
+let b : transformer[sct_result.ok(let result){V      :
+                     )                           

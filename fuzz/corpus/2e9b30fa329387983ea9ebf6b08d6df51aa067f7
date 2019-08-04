@@ -1,0 +1,164 @@
+lettstd = import std
+
+let printable  method()
+
+letntable4 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+     lue
+
+impl printable4 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolea std.string
+leter_method()
+        stunit_value
+
+impl printable2 for int(1, 1)
+    print()
+n, b: boolean)
+        ass! interface
+    print(): std.string
+leter_method()
+        stunit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    metho    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boole
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+ass
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface =  Q
+  _valu*e
+assert(string_equals("test", g.method(boolean.true, boolean.false).pnt()))ir
+
+let create_impl = (): t printable2ther_method()
+    t_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+      HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHOOOOOO= (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2ther_method()
+        stface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_valu*e
+ass
+        std.unit_value
+
+impl printable4 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+     lue
+
+impl printable4 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolea std.string
+leter_method()
+        stunit_value
+
+impl printable2 for int(1, 1)
+    print()
+n, b: boolean)
+        ass! interface
+    print(): std.string
+leter_method()
+        stunit_value
+
+impl printaethod(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    metho    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))t g : test_interface = std.unit_valu*e
+ass
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface =  Q
+  _valu*e
+assert(string_equals("test", g.method(boolean.true, boolean.false).pnt()))ir
+
+let create_impl = (): test_interface
+    std.unit_value
+let compile_time_impl = create_impl()
+assert(string_equals("test", compileder = struct
+impl printable0 for different_method_orderethod_order{}
+h.other_method()
+assert(string_equals("123", h.print()))

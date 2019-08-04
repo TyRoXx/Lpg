@@ -1,0 +1,43 @@
+let std = import std
+
+//MMMMMMMMMMMMMMMMMMMMMMMMrin", x.method()))
+
+let y : gi[int(0, 1)] = stdaMMMMMMMMMMMMMMMMMMMMring
+
+impl[q] gi[S] for std.unip
+    method(): std.string
+        S
+
+impl gi[int(2, 0)] for std.unit
+    method(): sMMMMMMMMMMMMMMMMMMMMMMMMMMMring
+
+impl[q] gi[S] for std.unip
+    method(): std.string
+        S
+
+impl gi[int(2, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = stdaMMMMMMMMMMMMMMMMMMMMring
+
+impl[q] gi[S] for std.unip
+    method(): std.string
+        S
+
+impl gi[int(2, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unitssert(u2.method())

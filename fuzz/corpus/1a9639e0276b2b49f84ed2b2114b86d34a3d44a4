@@ -1,0 +1,13 @@
+l! et sstring_e  quals("ab:def"T return_run0ime_string("f")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.       retur interface
+    m():0boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[1;]()[std.ufi .t])lemeoufi .t])lement): strilet equality = import equality
+let std = import std
+let intng_equa

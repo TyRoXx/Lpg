@@ -1,0 +1,75 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f4 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assert(f5())
+
+/*use a runtime variable in a runtime context*/
+let f = ()
+    side_effectme[h]
+h()
+
+/*capture an argument at compile time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effe(ct)
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side_effect()
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture multiple variables*/
+let x = 2
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parametele time*/
+let f6 = (a: boolean, b: boolean)
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.cnd(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime*/
+let f7 = (a: boolean, b: boolean)
+    side_effect()
+    let indirection = () a
+    (c: std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f7(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture multiple variables*/
+let x = 4
+let y = "2"
+let t = ()
+    string_equals(y, integer_to_string(x))
+assert(t())
+
+/*function with multiple parameters captu2es something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true))
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(capture_twice())

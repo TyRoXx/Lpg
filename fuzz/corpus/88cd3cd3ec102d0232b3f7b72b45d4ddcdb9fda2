@@ -1,0 +1,126 @@
+let std = import stdp
+// impl for generic interfactdp
+// impl for generic interface
+let gi = interface[T]
+    metOhod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = e
+let gi = interface[T]
+    metOhod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: erfactdp
+// impl for generic interface
+let gi = integ
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+erface
+let gi = interface[T]
+    metOhod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = e
+let gi = interface[T]
+    metOhod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: erfactdp
+// impl for generic interface
+let gi = interface[T]
+    metOhod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+iT
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std
+impl gi[int(5, 1)] for std.une
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+iT
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]gs[int(0, 1)]{1}(a2.method())

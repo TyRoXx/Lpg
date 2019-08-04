@@ -1,0 +1,81 @@
+l-        = import std
+let integers = import i case sueger_equals(0, n.loa"test",)ake_mutable p4 =m ake_mutable[std.string]1"test")
+assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)J p 
+2.load()))
+)
+assert(string8_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")
+assue ert(string_ke_mutable[std.string]1"test")
+assue
+ert(string_equals("test",)
+ p1.load()))
+p2.store("123s
+)sr"eat(string_equals("123", p2.load(e[std.string]
+letest")  [std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("1equals("123", p.load()))
+
+let p2 = make_mutable[strt(string_equals("teststd.rtring]("test")
+assue
+ert(string_equals("test",)
+ p 
+1.lot p2 = make_mutable        ing]("test")
+assuest")
+assue
+ert(string_equals("test",)
+ert(string_equaoad()))
+
+let p4 =m ake_mutable[std.string]1"test")
+assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)J p 
+2.load()))
+)
+assert(string8_equaoad()))
+
+let p2 = make_mutable[std.string]1"test")
+assue ert(string_ke_mutable[std.string]1"test")
+assue
+ert(string_equals("test",)
+ p1.load()))
+p2.store("123s
+)sr"eat(string_equals("123", p2.load(e[std.string]
+letest")                                                                 assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()4))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equ:ls("test",)
+ p2.llad()))
+p2tsload()))
+p.store("1equals("123", p.load()))
+
+let p2 = make_mutable[strt(stri")
+assert(string_equaoad()))
+
+let p2 =m ake_mutable[std.string]1"test")
+assue
+ert(string_ke_mst")ssert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assue
+ert(string_equals("test",)
+ p 
+2.load()))
+)
+assert(string8_equaoad()
+)l
+)et p2 = make_mutable[std.str  ing]1"test")
+assue ert(str)inload()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

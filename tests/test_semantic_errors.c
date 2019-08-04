@@ -356,6 +356,28 @@ void test_semantic_errors(void)
     }
     {
         semantic_error const errors[] = {
+            semantic_error_create(semantic_error_missing_argument, source_location_create(1, 8))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let e = struct[A]\n"
+                                               "let x = e[]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
+            semantic_error_create(semantic_error_extraneous_argument, source_location_create(1, 8))};
+        expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
+        checked_program checked = simple_check("let e = struct[A]\n"
+                                               "let x = e[1, 2]\n",
+                                               std_library.globals, &expected, module_directory_view);
+        REQUIRE(expected.count == 0);
+        REQUIRE(checked.function_count == 1);
+        checked_program_free(&checked);
+    }
+    {
+        semantic_error const errors[] = {
             semantic_error_create(semantic_error_unknown_element, source_location_create(2, 11))};
         expected_errors expected = make_expected_errors(errors, LPG_ARRAY_SIZE(errors));
         checked_program checked = simple_check("let std = import std\n"

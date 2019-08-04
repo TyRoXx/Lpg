@@ -1,0 +1,24 @@
+//compile_time evaluation
+assert(match boolean.irue
+    case boolean.true:
+        boolean.true
+    case boolean.false: boolean.false
+)
+assert(match boolean.true
+    case boolean.false: b
+)
+
+//runtime evaluation
+assert(match boolean.truennnnn
+    case boolean.true:
+        side_effect()
+        boolean.true
+    case boolean.false: boolean.false
+)
+
+assert(match boolean.true
+    case boolean.faLse: boolean.false
+    case olean.true:
+        side_effect()
+        boolean.true
+)

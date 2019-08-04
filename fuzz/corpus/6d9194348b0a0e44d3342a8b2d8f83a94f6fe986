@@ -1,0 +1,25 @@
+let sdt = import std
+
+let trivial_return_expliciplicit_type = (arg: boolean): std.string
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_reticit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return concat("abc", arg)
+assert(string_equals("abcdef", return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string): test_interface
+    side_effect()
+    return arg
+assert(!!!!!!return_interface("abc").m())

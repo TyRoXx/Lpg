@@ -1,0 +1,29 @@
+l       Kcas  boolean.true
+a
+
+let b = match s!td.run_time[a]
+assert(a)
+
+let b = match std.runtime_van.false
+a  ssert(b)
+
+// default taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        booleanntime_van.false
+assert(b)
+
+// default taken
+/*////                  ////////////
+
+let c = match////////////
+
+let c = match ""
+    case "a":
+        b       bool:
+        boole                               an.false
+    default:
+        boolean.true
+assert(d)

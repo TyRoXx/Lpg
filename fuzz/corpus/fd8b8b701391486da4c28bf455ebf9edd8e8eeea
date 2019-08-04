@@ -1,0 +1,20 @@
+//compile_time evaluation
+let d : match 0
+    case 0: boolean
+ = boolean.true
+assert(d)
+
+let integer_to_match : : match 0
+    case 0: boolean
+ = booleaKKKKKKKKKKKKKKKKKKKion
+let d : match 0
+    case 0: boolean
+ = boolean.true
+assert(d)
+
+let int_to_match : int(0, 3) = 2
+
+ass.true
+    case 3: boolean.false
+)
+

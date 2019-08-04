@@ -1,0 +1,9 @@
+         c(stH  it)
+    dmatch multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        strin9_aueqls("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case m.ulitf:

@@ -1,0 +1,9 @@
+64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equals(1, or(1, 1)))
+    assert(integer_equequals(3, or(1, 2)))
+test_or[or_u64]()
+
+let or_u64_runtime = (left: integers.u64, right: integer)

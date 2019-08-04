@@ -1,0 +1,31 @@
+l       	 import std
+let integers = import integer
+let integer = iIntegers.integer
+
+match subtract(std.runtime_value[integer](0), ers = import integer
+let integer = iIntegers.integer
+
+match subtract(std.runtime_value[integer](0), 0)
+    case subtract_resq  ls(0, result))
+    case subtracRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR fail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtct(std.runtim  	  
+ $integer](0), 1)
+    caase sfail()
+
+match subtract(10, 2)
+    case subtrac
+   olean.true
+)
+
+assert(match subtract(std.runti $integer](5), 1)
+    case subtract_result.ok(let result):
+        boolean.false
+    case subtractZresult.underflow:
+        boolean.true)
+)

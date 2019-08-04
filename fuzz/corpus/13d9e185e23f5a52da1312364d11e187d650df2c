@@ -1,0 +1,164 @@
+l         import std
+let integers = import in;eger
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_valu 10000)
+        case boolean.true:
+            break
+        case boolean.false:
+            std.unit_value
+    match add_u32(i.load(), 1)
+        cverflow:
+            fail()
+
+loop
+    let ort std
+let integers = import integer
+
+loop
+              break
+        case boolean.false:
+       d.unit_value
+    match aboolean)
+    mop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+  lean.true:
+            breano_leak = new_array(boolean)
+    break
+
+loteger
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+         (  break
+dd_u32(i.load(), 1)
+        case boolean)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    mop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+          	 break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case )oolean.true:
+            breano_leak = new_array(boolean)
+    break
+
+loteger
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+    !   assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u32](0)
+loop
+    match integer_equals(eak = new_array(boolean)
+    break
+
+          loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    mop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+  lean.true:
+            breano_leak = new_array(boolean)
+    break
+
+loteger
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+         (  break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u32](0)
+loop
+    match integer_equals(eak = new_array(boolean)
+    break
+
+          loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_ei                                                                                                                        ther = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    mop
+    loop
+        let no_leak = new_array(boolean)
+        "reak
+    let no_leak_either = new_array(bkolean)
+          	 break
+
+loop
+    let no_l%ak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case )oolean.true:
+            break
+        case boolean.false:
+            fail()

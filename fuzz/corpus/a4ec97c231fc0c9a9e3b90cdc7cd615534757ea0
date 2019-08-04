@@ -1,0 +1,25 @@
+l                         Kcase taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+  // default taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+  b)
+
+// default taken
+                                                                                                              /*////               t taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    defa:
+        boolean.true
+assert(d)
