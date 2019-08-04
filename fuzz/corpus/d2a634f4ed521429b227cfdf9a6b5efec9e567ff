@@ -1,0 +1,36 @@
+a       lti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult)
+
+let= enum
+    a
+    b
+let pass_bisucture = struct
+    x:  !y: boolean
+    let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+ass[rt(mauch mult6i.b(structure{"abc", bool)
+assert(strate.a)
+cassert(s    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+asseet a = single_pcoean)
+    e
+        f
+assert(mring_e  qualsvger_equa c(overseoolean !! 

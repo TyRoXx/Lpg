@@ -1,0 +1,9 @@
+l     ct`   _membwords = interface
+    abs parame ter= (co  n
+    _: boolean
+    ___: boolean= interface[Output]
+    et producer = interface[Output]
+    produce(): Output
+
+let transformer  4<L       mer = interface[From, To]
+    tr    as

@@ -1,0 +1,24 @@
+l       et std = import std
+
+lUt printable = interface
+
+    otehr_method()
+        std.unit_value
+
+impl printable2 for lnt(1, 1)
+    print()
+      nterface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o  assert(not(b))
+        "test"
+
+let g : test_interface = std.unit_vallue
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method()
+assert"246", h.print()))

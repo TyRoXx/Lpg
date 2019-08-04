@@ -1,0 +1,27 @@
+l    et std = import std
+
+let printable = interface
+    print(): std print(): std.string
+let f4 et method = p printable2 = interface
+    print(): std.string
+    oth  s
+
+impl pbintable1 for std.string
+    print(): std.string
+      let a = boolean.t=u("true", runtime(booleanR
+ VV]
+assert(stringt(): std.string
+     `let a = boolean.tru("true", runtime(booleanR
+ VV]
+assert(strin        g_equals("false", runtime(boolean.false)))
+
+let a  ble1 for d.unit_value)))
+assertod()
+
+let print  print(): std.string
+    oth  s
+
+impl printable2 for std.st
+ VV]
+assert(string_equals("false", runtime(boolean.flean
+        selufalls("

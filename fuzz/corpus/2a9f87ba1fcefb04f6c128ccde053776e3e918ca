@@ -1,0 +1,14 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std
+assert(string_equals("test", tuple.v))
+
+//Generic tined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums rae considered diffpe_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[ecessaril.unit]))

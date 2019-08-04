@@ -1,0 +1,15 @@
+s cnode]
+        std.option[linked_list_node].none
+
+let mi    ddle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boole match input
+            case std.boolean.true: "true"
+   222222222222222222222    : transformer[std.boolean, std.stt
+            case std.boolean.true: "true"
+   222222222222222222222         case std.boolean.false: "false"
+
+let b : transformer[s                                               

@@ -1,0 +1,224 @@
+ ~       e monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistssert(                                                                                                      t
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+  ` a
+let p        ass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatep.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: cturepass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(mattruct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+ tate = enum
+    a
+    b
+let pas;si.b(structure{"abc", boolean.trlet empty = enum
+let     e monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+     b
+let pass_bistssert(matc9h mult8i.b(struct
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatep.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: cturepass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(mattruct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+ tate = enum
+    a
+    b
+let pas;si.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+ pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate].a)
+    case monostas;si.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+ pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg:y)
+    arg
+
+let monosta        te = enum
+    a
+let pass_monostateate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg:y)
+   num
+    a
+    b
+let pass_bistate = (arg: cturepass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(mattruct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+ tate = enum
+    a
+    b
+let pas;si.b(structure{"abc", boolean.trlet empty = enum
+Slet     e monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+     b
+let pass_bistssert(matc9h mult8i.b(struct
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostatep.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: cturepass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(mattruct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+ tate = enum
+    a
+    b
+let pas;si.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+ pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_m = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg:y)
+    arg
+
+let monosta        te = enum
+    a
+let pass_monostate =   d(boolean)
+    e
+    f
+asser

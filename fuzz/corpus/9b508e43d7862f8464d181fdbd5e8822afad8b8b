@@ -1,0 +1,56 @@
+l -        = import std
+mutable[slet p2 = make_mutable% Qing]("test")
+assue
+erQing]("test")
+assue
+ert(string_equals("test"string_equals("test",)
+ let mutable = interface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o(e[std.string]("test")
+assue
+ert(string_equals("tast",)
+ p2.load()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic st")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.stotd.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.stoassert p1 =) make_mutable[std.string]("test")
+assue
+ert(string_equ)
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+asseing_equals("test"string_equals("test",)
+ let mutable = interface[T]
+    load(): T
+    store(valumutable[std.string]
+let p = o(e[std.string]("test")
+assue
+ert(string_equals("tast",)
+ p2.load()))
+p2tso.re("123")
+assert(string_equd
+
+// impl for generic st")
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.stotd.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.stoassert p1 =) make_mutable[std.string]("test")
+assue
+ert(string_equ)
+assue
+ert(string_equals("test",)
+ p2.load()))
+p2.store("123")
+assert(string_e(quals("123", p2.load()))

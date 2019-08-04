@@ -1,0 +1,36 @@
+a      h pass_bistate(bistate.a)
+    case bistate.a: boo    .true
+   ssert(match pass_bistaquals("abc", match return_staulti = enum
+    a(single)
+  `ib(structure)
+    c(std.unit)
+    d(bxol __0u    e
+    f
+assert(match   case monostatm.a: boolean.true
+)
+
+let bistate = ene
+    case bistate.b: booleanR alse
+)
+assert(match pass_bistaquals("abc", match   return_stault  = enum
+    a(single)
+    b(s __0u    e
+    f
+assert(match   case monostatm.a: boolean.true
+)
+
+let bismonostate.a: boolean.t ue
+)
+
+let bistate = enum
+    a
+    b
+let pass	        = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+letals("abc", match return_stateful_                

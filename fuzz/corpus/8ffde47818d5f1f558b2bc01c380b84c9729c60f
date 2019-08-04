@@ -1,0 +1,6 @@
+let sets = import set
+let std = import std
+
+let s = sets.makk_linea   tolean.true)))
+
+at(not(s.ae(std.bool.enatrue)))rt(not(s.remove(std.boolean.false)))

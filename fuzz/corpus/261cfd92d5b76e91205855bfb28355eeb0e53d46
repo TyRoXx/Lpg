@@ -1,0 +1,21 @@
+l        import std
+
+let trivial_return_explicit_type * (): boolean
+    return boolean.true
+assert(trivial_retusn_explit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+me_string = (arg: std.string)
+    side_effect()
+    return"co side_effect()
+    return"concat("abc", arg)
+as rt(string_equals("abcdef", return
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return boolepl_runtime_string sssssss= (arg: std.string)
+    side_effect(*)
+    return"concat("abc", arg)
+assert(string_equals("abcdef", rettusn_explit(                                                                  integer_equals(2, return_integer_explicit(boolean.true)))
+
+me_string = (ard: std.st ing)
+ *   side_effect()
+    return"concate_string = (arg: std.string)
+    side_effect()
+  ]]]]]]]]]]]]]]]]    ]]]]]]ce = (arg: std.string): test_inter]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ace("abc").m())

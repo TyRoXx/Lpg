@@ -1,0 +1,17 @@
+                               ru        ring = (value: s                                    _runt)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+      case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.ufalse
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multq.f: bnit
+    char(): std.unit
+    const(): std.unit
+    continue(): stdnit
+    inline(): std.unitI
+    int(): nue(): s 

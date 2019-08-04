@@ -1,0 +1,71 @@
+let std = import std
+let std_again = import std
+let e : std.bood_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+ale[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.molean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+ale[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])e[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_olean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+ale[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.molean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+ale[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])e[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+sttd.make_!!!!!!!!!!!!!!!!mutable_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)table[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutableake_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])e[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+st
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutableake_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])e[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+sttd.make_!!!!!!!!!!!!!!!!mutable_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_mutable[type_of(lambda)](lambda)

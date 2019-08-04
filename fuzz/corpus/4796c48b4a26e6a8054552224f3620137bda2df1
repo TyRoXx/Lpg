@@ -1,0 +1,17 @@
+let std = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    load(): T
+    store(value: T): std.unmutable[int(5, 3)]
+let m : mutable[int(0, 3)] = construct(equals(0, m.load()))
+m.store(1)
+assert(integer_equals(1, m.load()))
+m.store(4)
+assert(intger_equals(3, n.load()))
+n.store(0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("tes123", p2.load()))

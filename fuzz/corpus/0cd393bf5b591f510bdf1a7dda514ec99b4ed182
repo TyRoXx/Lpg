@@ -1,0 +1,96 @@
+l         = import std
+
+le:t single_p         = enum[!]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate   = import std
+
+le:t single_p         = enum[!]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: boolean)t pass_tri[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: trista|e)
+   e => (arg: tristate)
+    
+    b
+    c
+let pass_tristate => (arg: tristat   t()
+ # mport std
+
+le:t single_p         = 
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: b     a
+    b
+    c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: booleant pass*_tristate => (arg: tristate)
+    ar[[[[et tristate = enum
+          b
+    c
+let pass_tristate => (arg: tristate)
+    a   s = pr => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: booleant pass_tri[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let ptate => (arg: trista|e)
+    ar[[[[[[[[[[[[te.b: booleant pass_tristate => (arg: tristate)
+    
+    b
+    c
+let paNss_tristate => (arg: tristate)
+    a   s = print()
+ # mport std
+
+le:t single_p         = enum[T]
+    a std.string)
+    [[[[[[[[[[[[[[[[[~   [[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: b     a
+    b
+    c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[r   c
+let pass_tristate   = import std
+
+le:t single_p         = enum[!]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[r   c
+let pass_tristate => (arg: trista e)
+    ar[[[[[[[[[[[[te.b: booleant pass_tri[te.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: trista|e)
+ate => (arg: tristate)
+    
+    b
+    c
+let pass_tristate => (arg: tristate)
+    a   s = print()
+ # mport std
+
+le:t single_p         = enum[T]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[te.b: booleant pass_tristate => (arg: tristate)
+    ar[[[[et tristate = enum
+          b
+    c
+let pass_tristate => (arg: tristate)
+    a   s = print()
+ #      e

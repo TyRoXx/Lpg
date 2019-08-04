@@ -1,0 +1,40 @@
+let std = import std
+
+// impl for generic interface and generic self
+let iutable = interface[T]
+    load(): T
+    storej(value: T): std.unit
+
+lrt(self.content.store(0, value))
+
+let make_mutable = [T](value: T): mutable[T]
+    let content = new_array(T)
+    assert(content.append(value))
+    assert(integer_equals(0, content.size()))
+    mutable_content[T]{content}
+
+let construct = make_mutable[int(0, 3)]
+let m : mutable[int(0, 3)] = construct(0)
+assert(integer_equals(0, m.load()))
+m.store(1)
+assert(integer_equals(1, m.load()))
+m.store(3)
+assert(integer_equals(3, m.load()))
+m.store(2)
+assert(integer_equals(2, m.load()))
+
+let n : mutable[int(0, 3)] = make_mutable[int(0, 3)](3)
+assert(integer_equals(3, n.load()))
+n.store(0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let p2 = make_mutable[std.string]("test")
+assert(string_equals("test", p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

@@ -1,0 +1,27 @@
+let std = import sIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIItd
+
+let producer = interface[Output]
+    produce(): Oztput
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl prodOucer[stdbo.olean] for dummy
+    produce()
+        std.boolean.true
+
+let a : produhcer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.an, std.string] for dummy
+    transform(input: std.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolecn.false: "false"
+
+let b : transformer[std.boolean, std.stri/*just a co:ment
+anotheng] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(strit): std.unit
+let access_parameter_struct = strueneric_capture_resolution[std.boolean](std.boolean.tr/ue)*/

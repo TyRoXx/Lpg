@@ -1,0 +1,17 @@
+l mport std
+
+l t  c
+let tp_asrsistate => (arg: trista e)
+   .b: boolean.true
+)
+
+let tristate = enum
+    |a
+    b
+    *
+let pass_tristate => (arg: trisleant pass_tristate => (arg: tristate)
+    ar[[[et tristate = enum
+    a
+     u_Y  c
+let pass_tristate => (arg: tristat()
+    r       e

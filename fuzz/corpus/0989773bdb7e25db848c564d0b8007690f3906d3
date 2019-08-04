@@ -1,0 +1,41 @@
+l       Kcase taken
+////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+        boolean.false
+require_compile//                  ////////////
+
+let c = match ""
+    ca        se "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    camatch std.run_time[a]
+assert(a)
+
+let b = match std.runtime_van.false
+assert(b)
+
+// default taken
+/*////                  ////////////
+
+let c = match ""
+    case "a":
+        boolean.false
+    default:
+        boolean!true
+require_compile_time[c]
+as:sert(c)
+
+let d < match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert(d)

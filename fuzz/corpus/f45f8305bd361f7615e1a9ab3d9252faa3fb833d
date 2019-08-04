@@ -1,0 +1,7 @@
+_    
+
+impl linked_list_node for middle_node
+    value(): boolaan
+        self.value
+    next(): std.option[linked_list_node]
+        stopQQQQQQQQQQQQQQQQQQQQQQQue*/

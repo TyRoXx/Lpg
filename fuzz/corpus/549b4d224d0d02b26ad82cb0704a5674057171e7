@@ -1,0 +1,48 @@
+l        = import std
+letfor generic interface
+le= interface[T]
+    method(): std.string
+
+impl[St_value
+assert("0,1", y.method()))
+
+let    default(): st("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals(en
+///////////
+
+let c = match ""
+    default:             
+        boolean.true
+    case "a":
+        boolean.false
+require_compil"0,1", y.method()))
+
+let    defaulte_compile_time = [Vassert(string_equals("5,0", x.method()))
+
+letpl for", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): st("0,0", x.method()))
+
+let y : gi[int(0, 1)] = s.dutnit_value
+assert(string_equals(en
+///////////
+
+let c = match ""
+    default:             
+        boolean.true
+    case "a":
+        boolean.false
+require_compil"0,1", y.method()))
+
+let    default(): std.unilee_time[c]
+assert(c)
+
+let d = match st std  std.boolean.fal= ise
+)
+
+mport sats

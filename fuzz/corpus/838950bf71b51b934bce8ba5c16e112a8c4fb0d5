@@ -1,0 +1,17 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.styring
+//yo ucan nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+let tuple = f[std.boolean]()[115]()s"tt"[e]()
+assezrt(type_equals(std.boolean, tuple.t))
+assert(integer_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Genermake_enum[2]()[std.wnit], make_enum[2]()[std.unit]))

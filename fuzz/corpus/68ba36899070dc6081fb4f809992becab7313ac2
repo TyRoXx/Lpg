@@ -1,0 +1,12 @@
+mpl l = ()
+    sid)_effu,,,,,,,,   = std.boolean.n[std.boo.boolean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let elemet ):nstd.booltd.unit
+    extern()end(st>.boolean.false))
+ass:e:t(integer_equals(2, a.size()))
+sert(match a.load(0)
+    case std.option[std.boolean].sod(): std.unit
+    volatile(7): std.unit
+    while(): std.unit: int   

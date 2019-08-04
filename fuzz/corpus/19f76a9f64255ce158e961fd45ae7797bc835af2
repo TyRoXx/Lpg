@@ -1,0 +1,32 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolea(integer_equals(0, a.load()))
+assert(integer_equals(2, b.load()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.trud())
+
+let d = std.make_mutable[std.array[std.ukit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(2, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(not(f.load().member))ssert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let_mutable[se_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutablRRRRRRRRRR(assert)
+let f_load : type_of(f.load) = f.load
+stdm.ake_mutable[type_of(f_load)](f_load)
+std.make_tamuble[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_mutable[type_of(lambda)](lambda)

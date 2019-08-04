@@ -1,0 +1,15 @@
+l! et sstring_e  quals("ab:def"T return_run0ime_string("f")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.       retur interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[1;]()[std.ufi .t])lemeoufi .t])lement): string_equals(element, "912")
+    case std.option[string: boolean)l bon:oa a e
+   boole(an.truel
+ealu())e
+) 

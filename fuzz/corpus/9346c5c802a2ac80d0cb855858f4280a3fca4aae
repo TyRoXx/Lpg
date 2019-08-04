@@ -1,0 +1,87 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_eq= import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+         std.option[string].some(let element): string_equals(element, "abc")
+    case std.opfalse
+)
+
+assert(match a).loadtion[string]:some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].sore(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+          _1()
+    append_1()
+let append_16 = ()
+    append_4()
+    append_4()
+    append_4()
+  ppend_1024()
+    app(1)
+    case std.option[string].some(let element): string_eqoolean.false
+)
+
+rasset(match a.load(0)
+    case std.option[string].some(let element): boolean.r_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(0)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+         std.option[string]l       ^ : s.some(let element): string_equals(element, "abc")
+    case std.opfalse
+)
+
+assert(match a).loadtion[string]:some(let element): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].sore(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+          _1()
+    append_1()
+let appent ap   case std.option[string].some(let element): string_equals(element, "456")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(2)
+    case std.        ope std.option[string].some(let element): string_uals(element, "abc")
+    catd.boolean = std.boolean.f(f_load)](f_load)
+std.make_mutable[type_of(se std.option[string].nonf.load)](f.le: boolean.false
+)
+
+assert(oad)
+let lambda = () std.unit_value
+std.mmatake_ak
+ch let

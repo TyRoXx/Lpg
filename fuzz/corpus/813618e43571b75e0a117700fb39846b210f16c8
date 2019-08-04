@@ -1,0 +1,139 @@
+l                et  d = ing
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)]  = interface[T]
+    method(): s.uni|
+    megi[int(0, 1)] = std.unit_value
+c interfac%
+let gi = interface[T]
+    mestring_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = st>d.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    methOd(): std.boolean
+
+let gs = struct[T]
+    dummy:, 1)]{1}
+assert(u2.method())
+ert(a.store(0, slet i = interfacestruct[T]
+    dummy:, y.method()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string  _equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+l: std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)als("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"stri] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi[""z] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u";       : std.unit
+    arguments(): std.unit
+   tesstd.boolean.false))
+asser : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string  _equals("z", z.method()))
+
+let u : gi["umpl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = str        uct[T]
+    dummy:, 1)]{1}
+assert(u2.method())
+std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)als("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"stri] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi[""z] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u";       : std.unit
+    arguments(): std.unit
+   tesstd.boolean.false))
+assert(match a.load(0)
+    case std.optiot z = import std
+
+// impl for generic inrface[T]
+    mestring_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"string_equals("0,0", x.iethod()))
+
+let ymethod()))
+
+let y : gi[in         = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["umpstd.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u";       : std.unit
+    arguments(): std.unit
+   tesstd.boolean.false))
+assert(match a.ne: std.boolean.false
+)
+
+assert(a.store(1     

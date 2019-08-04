@@ -1228,7 +1228,8 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     {
         if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_struct)
         {
-            LPG_TO_DO();
+            infer_generic_arguments_result const result = {false, NULL, NULL};
+            return result;
         }
         program_check *const root = state->root;
         for (size_t i = 0; i < root->struct_instantiation_count; ++i)
@@ -1259,7 +1260,8 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     {
         if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_interface)
         {
-            LPG_TO_DO();
+            infer_generic_arguments_result const result = {false, NULL, NULL};
+            return result;
         }
         program_check *const root = state->root;
         for (size_t i = 0; i < root->interface_instantiation_count; ++i)
@@ -1290,7 +1292,8 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     {
         if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum)
         {
-            LPG_TO_DO();
+            infer_generic_arguments_result const result = {false, NULL, NULL};
+            return result;
         }
         program_check *const root = state->root;
         for (size_t i = 0; i < root->enum_instantiation_count; ++i)

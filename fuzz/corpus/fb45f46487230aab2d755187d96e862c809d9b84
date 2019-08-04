@@ -1,0 +1,18 @@
+let empty = enum
+let pass_empty =tate = enum
+    a
+let pass_monostate ~ (arg: g
+
+let monostate = enum
+    a
+let pass_monostate ~ (arg: monostate boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let p  istate = enum
+    a
+    b
+let p                        oolean.true
+)
