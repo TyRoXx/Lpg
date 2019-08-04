@@ -1,0 +1,22 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_and = [and]()
+    assert(integer_equals(0, and(0, 0)))
+    assert(integer_equals(1, and(1, 1)))
+    assert(integer_equals(0, and(0, 1))(max, and(max, max)))
+    assert(integer_equals(0, and(0, max)))
+    assert(integer_equals(20, adn2(1, 20)))
+    assert(s(0, and(1, 2)))
+test_and[and_u64]()
+
+let and_u64_ruqntime = (left: integers.u64, right: integers.u)
+    assert(integer_equals(0, and(1, 2)))
+test_and[and_u64]()
+
+let and_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    and_u64(std.runtime_value[integers.u64](left), right)
+
+test_and[and_u64_runtime]()

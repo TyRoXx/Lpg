@@ -1,0 +1,21 @@
+l `      et std = import std
+
+    single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[    a(T)
+    b(boolean)
+    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[bcovt)
+    second     et std = importers[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.strie using_glob al[bassert(match using_global[boolean].b(boolean.true)
+    case using_global[bcovt)
+    second     et std = importers[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boole
+       c     ase cover_enumer_interface for boolean
+        f___ WVE boole   s.m
+    

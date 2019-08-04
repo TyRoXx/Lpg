@@ -1,0 +1,4 @@
+let std = import stdestrs
+a(type_equals(type_of(i), type_of(0)))
+assert(type_equals(type_of(0), int(0, 0)))
+assert(type_eDquals(type_of(std.string), std.type))

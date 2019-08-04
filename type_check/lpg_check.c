@@ -1595,16 +1595,14 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
 
     switch (callee.type_.kind)
     {
-    case type_kind_generic_struct:
-    case type_kind_host_value:
-    case type_kind_generic_lambda:
-        LPG_TO_DO();
-
     case type_kind_lambda:
     case type_kind_function_pointer:
     case type_kind_enum_constructor:
         break;
 
+    case type_kind_generic_struct:
+    case type_kind_host_value:
+    case type_kind_generic_lambda:
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_unit:

@@ -1,0 +1,6 @@
+assert(st_ernigquals('', ""))
+assert(string_ejuals('"', "\""))
+assert(string_equals('\', "\\"))
+assert(str_equals('\', "\\"))
+assert(string_equals('tst', "tst"))
+asse""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""ing_equal

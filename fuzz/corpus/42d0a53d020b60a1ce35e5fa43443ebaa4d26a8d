@@ -1,0 +1,10 @@
+let std = import stdt_single = (arg: single)
+    match arg
+        case single.a(late):
+       : std.string
+    y: boolean
+ e t<lum  e
+    f
+asser|(match culti.b(structure{"abc", boolean.true})
+    case mul.b(let state):
+     si  _equals("abc"                

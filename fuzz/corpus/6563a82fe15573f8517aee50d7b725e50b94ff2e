@@ -1,0 +1,13 @@
+let s:td = import std
+
+// impl for generic interface and generic self
+let m:table = interface[T]
+    load()(value: T): mutable[T]
+    let content = mmmmmmmmmmmmmmmmmmmmmmmmmmmmmme[int(5, 3)]
+let m : mutable[int(0, 3)] = construct(0)
+assert(integer_e("123", p.load()))
+
+let p2 = m!ke_mutable[std.string]("test")
+assert(string_equals("test", p1.load()))
+p2.store("123")
+assert(strn_eigquals("123", p2.load()))
