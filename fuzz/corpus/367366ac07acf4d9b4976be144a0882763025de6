@@ -1,0 +1,21 @@
+l  
+  std = import std
+let es = import ecmascrior  ct(match host.import_string(host.undefined())
+        case optio(n[std.string].some(let content):
+            boolean.false
+        case option[std.string].none:
+            boolean.true
+)
+
+let test_read_property = (host: es.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+       ssert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+            host.equals(host.export_integer(1), length)
+        case option[host_value].none:
+         ng(exported)         case option[std.string].some(letzero = host.export_integer(0)
+    assert(match host.import_integer(zero)
+        case option[es.integer].some(let value):
+ imports_are_.e

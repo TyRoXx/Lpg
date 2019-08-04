@@ -1,0 +1,53 @@
+l      std = import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let      ()  v                                            
+    /*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        as                                                                       = ()
+    elt=u   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+  ring(x),= boolean.true
+        a
+ = ()
+    elt=u   ()
+        helpert{nieger_to_string(x),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in agrunt   _context*/
+t g = ()
+        e_string("abc")))sing!!!!!!!!!!!!!!!!  helper{integer_to_string(x),= boolean.true
+        a
+                                            string
+let- x = 2
+let y = "2"
+let*t = ()
+    elt=u   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+    f6()
+as*sert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+let c =  f8()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+let c = f()
+       ()
+    *)
+        asserenum()
+    caseot(a.store(0, "tur"")))

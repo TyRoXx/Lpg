@@ -257,6 +257,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_generic_impl_parameter_mismatch:
         return "The generic parameters of the impl and the interface have to be exactly the same currently";
+
+    case semantic_error_placeholder_not_supported_here:
+        return "A placeholder cannot be used here";
     }
     LPG_UNREACHABLE();
 }

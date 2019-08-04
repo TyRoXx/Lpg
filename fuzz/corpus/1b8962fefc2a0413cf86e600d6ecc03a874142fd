@@ -1,0 +1,96 @@
+tL  ue(): boolean
+        self.value
+    next(): std.option[linked_list_node]
+        std.option[linkel_dist_node].none
+
+l%t middle_nristate.a)
+    case tristate.a: boolean.true
+    case tristatetate.a: boolean.false
+    case tristate.b: boolean.false
+           cassingle.a("def"))))
+
+assert(string_equals("abc", match single.a(make single.a(make_runtime_string("abc)
+assert(string_equals("ab,"c match return_state)ul_enum()
+    case single.a(let state): state
+))
+*let structure = struct
+    x: snt d.string
+    y: boolean
+let multi = enum
+    a)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult6i.b(structure{"abc", boole       !an.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+e.b)
+    case bistate.a: boolean. ! e
+    caseate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean..a("def"))))
+
+assert(string_uquals("abc", match sistate(tristate.a)
+    case tristate.a: boolean.!true
+    case trihing. Itan.tate.b: boolean.false
+!  :  case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    casU]()
+        [V]()
+            helper{T, U, V}
+        let tup le = f[std.boolean]()[121]()["test"]()
+assert(type																					Q					uue
+																																										)													l         import std
+
+
+let require_comle			t std = importaan.true)))
+assert(ne
+    case using_global[tate        .b: boolean.'true
+    casU]()
+        [V]()
+            helper{T, U, V}
+      1: booleanulti = enum
+    a(single)
+    b(structure)
+    c(std.unit just hal)
+    d(boolean)
+    e
+    f
+assert(match mult6i.b(structure{"abc", boole       !an.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+e.b)
+    case bistate.a: boolean.   e
+    caseate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean..a("def"))))
+
+essert(string_equals("abc", match sistate(tristate.a)
+    case tristate.a: boolean.!true
+    case triste tristate.c: boolean.tate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    casU](      e 1: boolean.false
+    case 4: boolean.true
+  quals(element, "abc")
+    case std.optio

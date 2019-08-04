@@ -4806,6 +4806,10 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         return evaluate_struct(state, function, element.struct_, early_initialized_variable);
 
     case expression_type_placeholder:
+        emit_semantic_error(state, semantic_error_create(semantic_error_placeholder_not_supported_here,
+                                                         expression_source_begin(element)));
+        return evaluate_expression_result_empty;
+
     case expression_type_binary:
         LPG_TO_DO();
     }

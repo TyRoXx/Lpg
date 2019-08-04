@@ -1,0 +1,11 @@
+l    td = i std.boolean
+let using_local = enum[T]
+    a(T)
+    b(local)
+    c(()
+        let cover_integer_lite= 3
+        let cover_string_literal = "abc"
+        let cover_struct = struct
+            m: boolean
+        l t cover_struct_var = cover_struct t{std.boolean}].d          (wt())d.bo.true)
+

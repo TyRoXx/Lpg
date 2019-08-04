@@ -1,0 +1,89 @@
+l   std = import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat(" arg)
+assert]]]]]]]](string_equals("abcdef", return_runtime_uals(2, rne_urtinteger_explicit(boolean.true)))
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_ing = (arg: std.string)
+    side_effect()
+    return"concat(" arg)
+assert]]]]]]]](string_equals("abcdef", return_runtime_uals(2, rne_urtinteger_explicit(boolean.true)))
+g = (arg: std.string)
+    side_effect()
+    return"_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return booleplit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_eqUals("abcdef", retYurn_runtime)
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"conurn_runtime_strie
+let imp\rts_are_eq", arg)
+assert(suivalent
+let return_runtime_strin  = (arg: std.string)
+    side_effect()
+    return"_interface = interface
+    m(): ]]]]]]]]](arg: std.stng = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdEf", return_runtime_uals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"_interface]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return booleplit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(str*ing_equals("abcdef", retYurnn_rmitue)
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abclet std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imp\rts_are_eq", arg)
+assert(suivalent
+let return_runtime_strin  = (arg: std.string)
+    side_effect()
+    return"_interface = interface
+    m(): ]]]]]]]]](arg: std.string)
+    side_effect()
+    return                                           "conurn_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdEf", return_runtime_uals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return booleplit(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(str*ing_equals("abcdef", retYurnn_rmitue)
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return"concat("abclet std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imp\rts_are_eq", arg)
+assert(suivalent : std_again.botring_eolean quals("a=
