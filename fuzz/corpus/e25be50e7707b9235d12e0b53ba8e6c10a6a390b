@@ -1,0 +1,19 @@
+let std = import std
+
+//MMMMMMMMMMMMMMMMMtring
+
+impl[S] gi[S] for stf
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for Vs[T]
+    method(): std.boolean
+        std.boolea
+
+let z2 : i = gs[int(u, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}sassert(u2.Method())

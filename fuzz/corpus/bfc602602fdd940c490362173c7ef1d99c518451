@@ -1,0 +1,56 @@
+l                import sta runtime variable intext*/
+let b = 23       g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*ush a constant in a runtime context*/
+let b = 23       
+let h =ert(in
+h()()
+
+/*capture am = bet helper = struct
+    a  side_(effect()
+                                               23
+letSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in(a runtim  e context*/
+let b = 23       
+  t h = () 
+ _ ie sdeffein)eger_equals(b, 23))
+;h()()
+
+/*capturxt*/
+let b = 23
+let h = (
+    side_effe a runtime context  = ()
+    *)
+        assert(integ_equals(c, 11     `__u
+/*use a 'onstant in(a runtime context*/
+let b = 23      side_effect()
+    ()  _equals(c, 11     `__u
+/*use a scntoant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()   ^     assert(in)eger_equals(
+/*capturxt*/
+let b = 23
+let h = (
+    side_effe a runtimct()
+    ()  _equals(c, 11     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   sidt b = 23
+let h = (
+    side_effect()
+    23
+leg = ()
+rt(        equals(c, vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv24     `__u
+/b = 23       
+let h =s ()
+    side_ef/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_ore(1, "")))

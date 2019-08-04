@@ -1,0 +1,28 @@
+let std = import std
+let std_again = import sd.make_mutable[typm_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutablsert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.booleqn.false})
+assert(not(f.load().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[typm_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])]ble[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () s.tdunit_oolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mute[type_of(lambda)](lambda)

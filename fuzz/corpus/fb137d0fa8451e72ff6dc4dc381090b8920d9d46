@@ -1,0 +1,9 @@
+lS              failarray(boolean)
+match algorithm.find[boolean](emptyan.true)
+    case: e):
+        failarray(boolean)
+match algorithm.find[boolean](empty, boolean.truee)
+    case:                     ean)
+match algorithm.find[boolean](empty, boolean.tru e)
+    case:  tet singl,match using_local[boolean].b(local{*     eboolean.true})
+    case    

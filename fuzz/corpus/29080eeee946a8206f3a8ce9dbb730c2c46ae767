@@ -1,0 +1,13 @@
+let std =!import std
+
+/*        r{integer_to_strngals(u().a, u().b)/*capture meltiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y =" 2"
+let t = ()
+    let u = ()
+        helper{inng(x), y}
+    string_equals(u().a, u().b)
+assert(t())

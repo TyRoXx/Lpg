@@ -1,0 +1,18 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("246")
+assert(string_equals("123", p.load()))
+
+let d = std.make_mutable[std.array[std.unit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+ad.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_munit_value
+std.make_mutable[type_of(lambda)](lambda)

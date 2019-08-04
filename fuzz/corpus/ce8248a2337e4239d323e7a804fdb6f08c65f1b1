@@ -1,0 +1,14 @@
+l  
+  std = impor].none:
+            boolean.true
+)
+
+let test_read_property = (host: eq.host)
+    let object : host_value = host.export_string("hello")
+    assert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+       ssert(match host.read_property(object, "length")
+        case option[host_value].some(let length):
+      ssert(match host.import_integer(zero)
+        case option[es.integer].some(let value):
+ imports_are_.e

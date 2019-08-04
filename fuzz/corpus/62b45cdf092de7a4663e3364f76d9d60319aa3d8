@@ -1,0 +1,14 @@
+let std = import std
+
+// impl for generic interface and generic self
+let mutable = interface[T]
+    l33333333333333333333333333333oad(): T
+    store(value: T): std.unit
+
+let m= [T](value: egerger_equals(d, m.load()))
+m.store(1)
+assert(integer_equals(1, m.load()))
+m.store(4)
+assert(intger_equals(3, n.load()))
+n.store(0)
+asert(string_equals("122", p2.load()))

@@ -1,0 +1,11 @@
+l        import std
+
+let trivial_retur = (arg: std.string)
+    side_effect()
+    return"co side_effect()
+    return"concat("abc", arg)
+as rt(string_equals("abcdef", return
+   ]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]     return boolepl_runtime_string sssssss= (qrg: std.string)
+    side_effect(*)
+    return"concat("abc", arg)
+assert(string_equal: test_inter]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]]ace("abc").m())

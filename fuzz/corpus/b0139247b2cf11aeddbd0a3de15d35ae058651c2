@@ -1,0 +1,16 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+    charion(): std.unit
+    unsigned(): std.unit.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    dnsigned(): std.unit.unit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    dc_assert(): s
+    await(): std.unit
+    boolean(): std.unit
+//etc..

@@ -1,0 +1,20 @@
+let algorithm = import algorithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let hanler_a = (element: inteappend(boolean.true))
+assert(algorithm.any_of[boolan, etype_of(true_predicate)](non_empty, trucate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value

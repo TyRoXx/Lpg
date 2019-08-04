@@ -1,0 +1,59 @@
+tL  ue(): boolean
+        self.value
+    next(): stdruntime_string("abc)
+assert(string_e structure = struct
+    x: snt d.string
+    y: boolean
+let multi = enum
+   case bistate.a: boolean.   e
+    caseate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean..a("def"))))
+
+essert(string_equals("abc", match sistate(tristate.a)
+    case tristate.a: boolean.!true
+    case triste tristate.c: boolean.tate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(t.a)
+    case tristate.a: boolean..a("def"))))
+
+assert(string_uquals("abc", match sistate(tristate.a)
+    case tristate.a: boolean.!*rue
+    case trihing. Itan.tate.b: boolean.false
+!  :  case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    casle)
+    b(structur                        f
+assert(match mult6i.b(structure{"abc", boole       !an.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+e.b)
+    case bistate.a: boolean.   e
+    caseate)
+    arg
+assert(match pass_tristate(tristate.a)
+    case tristate.a: boolean..a("def"))))
+
+essert(string_equals("abc", match sistate(tristate.a)
+    case tristate.a: boolean.!true
+    case triste tristate.c: boolean.tate.b: boolean.false
+    case tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.'true
+    casU](      e 1: booleal           import std
+let std_again = import let . d = import std
+
+let oolean.true))
+
+let other_argument = f[int (1, 3h = [T, U]t(i in(1,: boolean.true
+  qe[tyu

@@ -1,0 +1,38 @@
+l    )))
+p.store("123")
+assert(st;rinf_equalq)
+
+ sert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register():estd.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switc:(): std.unit
+    t*pedef(): std.urameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let l):
+        boolean.false
+    case using_locab(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()S        and(boolean.true, boolean.true)
+    requiboolean.false
+)rameter =        ul      result
+require_compile_ti s.m
+  an].c(let s):
+         = e[ng)
+    side_eumT]
+    metOentsh();:

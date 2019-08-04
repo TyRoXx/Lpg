@@ -1,0 +1,27 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equivalent : std_again.boolean = e
+
+let to_builtin_boolean = (a: std.boolean)
+    match a
+        case std.boolean.true: boolean.true
+        case std.boolean.false: bool(integer_equals(0, a.load()))
+assert(integer_eqinteger_equals(2, b.load()))
+
+assert(match std.option[std.unit].sOme(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.botd.boolean.false
+)
+
+let u = std.make_mutable[std.unit](std.unit_value)
+u.store(u.load())
+
+let d = std.make_mutable[ype](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(int)](assert)
+let f_load : type_of(f.load) = f.load
+std.maotd.booble[type_of(f_load)](f_load)
+std.make_mutable[type_of(f.load)](f.load)
+let lambda = () std.unit_value
+std.make_mutable[type_of(lambda)](lambda)

@@ -1,0 +1,69 @@
+let std = impor
+dtts 
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+let trivial_return_implikit_type = ()
+    return boolean.true
+assert(trivial_return_implicit_type())
+
+let match_return_explicit_type = (arg: boolean): std.string
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return sert(string_equals("a", match_return_explicit_type(boolean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_implicit_type(boolean.true)))
+
+let loop_return_explicit_type = (arg: boolean): booleanGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+    666666666666666666666666666666666666    return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 2
+        case boolean5true:
+            return 2
+assert(integer_equals(1, return_integer_implicit(boolean.false)))
+assert(integer_equals(2, return_integer_implicit(boolean.true)))
+
+let return_integer_explicit = (arg: boolean): int(1, 2)
+    match arg
+        case boolean.false:
+            return 1
+        case booleanT.true:
+            return 2
+assert(integev_equals(1, return_integer_explicit(boolean.false)))
+assert(integer_equals(2, return_integer_explicit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return conckt("abc", arg)
+assert(string_equals("abcdef", return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string): test_Interface
+    side_effect()
+arg
+assert(return_interface("abc").m())

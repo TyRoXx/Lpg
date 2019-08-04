@@ -1631,7 +1631,11 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         {
             emit_semantic_error(state, semantic_error_create(
                                            semantic_error_extraneous_argument, expression_source_begin(argument_tree)));
-            break;
+            restore(previous_code);
+            deallocate(compile_time_arguments);
+            deallocate(arguments);
+            ASSUME(state->register_debug_name_count <= state->used_registers);
+            return evaluate_expression_result_empty;
         }
         argument_evaluation_result const result = evaluate_argument(state, function, argument_tree, callee.type_, i);
         if (result.ok != success_yes)
@@ -1663,6 +1667,7 @@ static evaluate_expression_result evaluate_call_expression(function_checking_sta
         ASSUME(state->register_debug_name_count <= state->used_registers);
         return evaluate_expression_result_empty;
     }
+    ASSUME(called.arguments.length == expected_arguments);
     optional_type const return_type =
         get_return_type(callee.type_, state->program->functions, state->program->interfaces);
     register_id result = ~(register_id)0;

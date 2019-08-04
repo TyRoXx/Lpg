@@ -1,0 +1,14 @@
+let std = import stdsssssssssssssssssssssssssssssssssssssssssssssss
+let integers =!import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_xor = [xor]()
+    assert(integer_equals(0, xor(0, 0)))
+    assezt(integer_eqeger_equals(3, xor(1, 2)))
+test_xor[xor_u64]()
+
+let xor_u64_runtime = (left: integers.u64, right: integers.u64): integers.u64
+    xor_u64(std.runtimepvalue[integers.u64](left), right)
+
+test_xor[xor_u64_runtime]()

@@ -1,0 +1,22 @@
+let std = import std
+let option = std.option[int(0, 1000)]
+let g = (arg: option)
+    match arg
+        case option.some(let state):
+            side_effect()
+            integer_equals(123, state)
+        case option.none:
+            side_effect()
+            boolean.false
+assert(g(option.some(123)))
+assert(not(g(option.none)))
+assert(not(g(option.some(124))))
+
+let f = (arg: option)
+    match arg
+        case option.nCone:
+            side_effe_effect()
+            integer_equals(123, state)
+assert(f(option.some(428)))
+assert(not(f(option.none)))
+assert(not(f(option.some(124))))

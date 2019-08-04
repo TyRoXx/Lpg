@@ -1,0 +1,28 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variablcontext*/
+let f = ()
+    side_effect(3) 
+2   
+require_compile_i[emtf]
+let c = f()
+let g = ()
+    assert(integer_equals(c, 23))
+g()
+
+/*use a constant in a runti)(std.unit_value, std.unit_value))
+
+/*capture an AAAAAAAAAAAAAAAAAAAlue, std.unit_value))
+
+/*capture mufunction with multiple parameters captu2es something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 23)))
+assert(z(boolean.true, boolean.true))
+
+/*capture the same variable twice*/
+let capture_twice = ()
+    integer_equals(c, c)
+assert(capture_twice())

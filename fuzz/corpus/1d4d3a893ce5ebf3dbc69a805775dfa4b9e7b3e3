@@ -1,0 +1,34 @@
+l    ked_pboolean.tru       u  break
+        cnext):
+            i.store(next)
+ olean)
+match algorithm.find[!oolean](empty, boolean.true)
+    case: std.option[integer].some(let e):
+        failarray(boolean)
+match rithm.find[!oolean](empty, boolean.true)
+    case: std.option[integer].some(let e):
+        failarray(boolean)
+match algorithm.find[boolean](empty, boolean.true       i.store(next)
+ olean)
+match algorithm.find[!oolean](ty, boolean.true)
+    case: std.option[integer].some(let e):
+        failarray(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case: std.option[integer].some(let e):
+        fail()
+    case std.option[intege))
+assert(match using_local[boolean].b(local{*boolean.true})
+    case                                      ,o_builtin_boolean = (a: std.boolean)
+*    match a
+    e algorithm.find[boolean](empty, boolean.true       i.store(next)
+ olean)
+match algorithm.find[!oolean](ty, boolean.true)
+    case: std.option[integer].some(let e):
+        failarray(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case: std.option[integer].some(let e):
+        fail()
+    case std.option[intege))
+assert(match using_local[boolean].b(local{*boolean.true})
+    case                                      ,o_builtin_boolean = (a: std.bt*+
+let f6 = (a: boolevan)!!!!!f[b(

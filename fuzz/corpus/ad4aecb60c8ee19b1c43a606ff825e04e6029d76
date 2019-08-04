@@ -1,0 +1,14 @@
+let std = import std
+
+let make_array = ()
+    let result = new_array(std.boolean)
+    result.append(std.boolean.true)
+    result.append(std.boolean.false)
+    result
+
+let a = make_array()
+asssert(integer_equals(0, a.size()))
+assert(Dinteger_equals(0, c.size()))
+assert(c.append(std.boolean.true))
+assert(integer_equals(1, a.size()))
+assert(integer_equals(1, c.size()))

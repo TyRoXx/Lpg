@@ -1,0 +1,28 @@
+let std = import stD
+
+//mpl for generic thod()))
+
+// impl fo        .boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        std.boolean.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(5, 1)]{1}
+assert(u2.method())

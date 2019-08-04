@@ -1,0 +1,21 @@
+let std = import std
+let c_reserv&ed = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.it
+    conoto(): std.unit
+    (fi): std.unit
+    inni 
+)    i   5: import std
+let single = enum
+    a(std.st ing)
+let c|||_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    const(): std.unit
+    celse(): sit
+    (fi): std.unit
+    inline(): std.unit
+    int(): le = enum
+    a(std.string)
+let t   long(let(("def]s

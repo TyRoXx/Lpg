@@ -1,0 +1,13 @@
+let std = impo method(a: boolean, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o )assert(print()
+, b: boolean): printable2
+
+impl test_interface for std.unit
+    method(a: boolean, b: boolean)
+        assert(a)
+     o od_ordesr{}
+h.otheod(a: boolean, b: booleanls("123", ()))

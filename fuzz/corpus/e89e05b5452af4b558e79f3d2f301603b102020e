@@ -1,0 +1,28 @@
+l       
+      std.option[linked_list x2 : generict: linked_list_node
+
+impl linked_list_node for middle_node
+    value():    alue
+    next(): std.option[liDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDnked_list_nfdeEE    EEEEEEEEEEEEtd.uption[linked_d.unit
+    a(): generic_self_reference[std.boolean]
+                ]
+ x0 : generict: linked_list_node
+
+ linkedneric_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self.value
+    next(): std.option[linked_list_nodeEE    EEEEEEEEEEErence[std.boolean]
+        se.lf
+    enerict: linked_list_nod    e
+
+impl linked_lism_node for middle_node
+    value(): boolean
+"       self.value
+    next(N: std.option[linked_list_nodeEE    EEEEEEEEEEEEEEce[std.boola ]enfor std.lf_reference  inked_list_node
+
+impl linked_ for middle_node
+    value(): boolean
+"       self.value
+    next(N: stdnit] = std.unit_value**/

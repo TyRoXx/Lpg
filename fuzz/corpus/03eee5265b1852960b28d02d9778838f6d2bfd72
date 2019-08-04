@@ -1,0 +1,17 @@
+let std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next()mion[linked_list_node].none
+
+let middle_node = struct
+    value: boolean
+    next: linked_list_node
+
+impl linked_list_node for middle_node
+    value(): boolean
+        self{boolean.false}s
+assert(list.value())
+
+/*let generic_self_reference = interface[T]
+    a(): generic_self_reference[T]c_self_referencelue*/

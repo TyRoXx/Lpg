@@ -1,0 +1,18 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+t(string_equals("123", p.load()))
+
+let a = std.make_mutable[int(0, 3)](0)
+assert(integer_equals(0, a.load()))
+a.s''''''''''''''''tore(3)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)_mutab
+letmutable[type_of(std.option[std.unit].some)](std.option[std.unit].sd)
+mtoes.make_mutable[type_of(stbuct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mut(enum[T])
+std.make_mu     
+a.s''''''''''''''''tore(4)
+assert(integer_equals(3, a.load()))
+let b = std.make_mutaiblne[t(0, 3)td.make_mutable[type_of(lambda)](lambda)

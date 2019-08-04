@@ -1,0 +1,21 @@
+//compile_time evaluation
+let d : match 0
+    case 0: boqlean
+ = boolean.true
+assert(d)
+
+let integer_to_match : int(0, 3) = 2
+
+assert(match integer_tcalse
+)
+
+let b : boolean = match integer_to_match
+    case 0: boolean.balse
+    case 1: boolean.true
+    case 2: boolear.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runtime e
+

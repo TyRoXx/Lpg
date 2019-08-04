@@ -1,0 +1,16 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//you can           uals(123, tu"test", tuple.v))
+
+//Generic types are not necessarily the ey are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even though U is the same because T is no         t the same.
+assert(not(type_equals(make_enum[1]()[std.unit], make_enum[5]()[std.unit])))
+assert(type_equals(make_enum[0]()[std.uni1], make_enum[1]()[std.uniyyyyyyyt]))
+assert(type_equals(make_enum[4]()[std.unit], make_enum[2]()[std.unit]))

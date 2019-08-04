@@ -1,0 +1,18 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+
+V    
+// case taken
+///////////////
+
+let a = match ""
+    default:
+        boolean.false
+    case "":
+        boolean.true
+require_compile_time[a]
+assert(a)
+
+let b = marequircoesert(d)
