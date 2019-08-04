@@ -34,7 +34,8 @@ typedef enum semantic_error_type {
     semantic_error_missing_default,
     semantic_error_duplicate_default_case,
     semantic_error_generic_impl_parameter_mismatch,
-    semantic_error_placeholder_not_supported_here
+    semantic_error_placeholder_not_supported_here,
+    semantic_error_unused_generic_parameter
 } semantic_error_type;
 
 typedef struct semantic_error

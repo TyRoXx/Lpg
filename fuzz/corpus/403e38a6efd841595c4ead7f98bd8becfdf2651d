@@ -1,0 +1,48 @@
+i  de_parameter[std.string].a(runtime_string("abc"))
+assert(match b
+    case ngle_paramet`r[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    fireters = enum[First, Second]
+    first(First)
+    secon!(Second)
+
+let c = two_parameters[boolean, std.string].secam two_parameters[boolean, std.string].secameters = enum[First, Second]
+  e two_paramerray(boolnd]
+    fireters = enum[First, Second]
+    funtime_r[std.string].a(let s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Secireters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].secam two_parameters[boolean, std.string].secameters = enum[First, Se        e two_paramerray*boolnd]
+    firgters = enum[First, Second]
+    first(First)
+    second(Second)
+
+let c = two_parameters[bool    c = two_parameteruntime_string("abclet s):
+        string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    fire)ters = enum[First, Second]
+    fir t, std.string].secam two_parameters[boolean, std.string].secameters = enum[First, Second]
+  e two_paramerray(boolnd]
+    fireters = enum[First, Second]
+    first(First)
+  ire   string_equals("abc", s)
+)
+
+let two_parameters = enum[First, Second]
+    fireters = enum[First, Second]
+    fir t(First)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].secam two_parameters[boolean, std.string].secameters = enum[First, Second]
+  e two_paramerray(boolnd]
+W    fireters = enum[First,   std.bogol

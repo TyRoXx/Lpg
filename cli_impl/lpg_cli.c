@@ -260,6 +260,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_placeholder_not_supported_here:
         return "A placeholder cannot be used here";
+
+    case semantic_error_unused_generic_parameter:
+        return "Self and/or the interface have to use generic parameters";
     }
     LPG_UNREACHABLE();
 }

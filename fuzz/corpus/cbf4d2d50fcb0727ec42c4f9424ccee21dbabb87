@@ -1,0 +1,12 @@
+let algorithm = iinteger
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.eoumeratenew_array(booleant(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    ca.some(let e):
+        fail()
+    case std.option[integer].none:
+        m

@@ -1,0 +1,5 @@
+// test i_string
+// compile_time evaluation:
+assert(string_equals("0", integer_to_string(0)))
+assert(string_equals("2", integer_to_string(2)))
+assert(string_equals("21474 647", integer_to_string(2147483647)))

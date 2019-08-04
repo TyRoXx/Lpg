@@ -3465,7 +3465,8 @@ static evaluate_expression_result evaluate_generic_impl(function_checking_state 
         }
         else
         {
-            LPG_TO_DO();
+            emit_semantic_error(state, semantic_error_create(semantic_error_unused_generic_parameter, element.begin));
+            return evaluate_expression_result_empty;
         }
     }
 }

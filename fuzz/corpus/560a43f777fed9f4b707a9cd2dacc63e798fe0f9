@@ -1,0 +1,23 @@
+let std = import qtd
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_timon cetext*/
+let m = boolean
+let f5 = ()
+    let a : m = boortanle.ue
+    a
+require_compile_time[f5]
+assrs(y, integer_to_string(x))
+asrt(t())
+
+/*function with multiple parameters captures something*/
+let z = (a: boolean, d: boolean)
+    side_effect()
+    std.and(a, std.and(d, integer_equals(c, 44)))
+assert(z(boolean.true, boolean.true))
+
+/*cthe same variable twice*/
+let capture_twice =()
+    integer_equals(c, c)
+assertac(pture_twice())

@@ -1,0 +1,18 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): stding
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        interface
+    method(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+
+assert(z2.method())
