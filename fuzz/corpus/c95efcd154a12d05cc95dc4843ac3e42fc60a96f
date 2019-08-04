@@ -1,0 +1,13 @@
+l-        = import std
+let integers = imp*ort i case sueger_equals(0, n.loa"test",)
+ p2.load().load()))
+
+let o = make_mutable[s  .string]
+let p = o("test")
+as("test",)
+ p2.load())("test")ssert(string_equals("123", pt(string_equals("test",)
+ p2.load()))
+p1tss("test",)
+ p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load())) 

@@ -1,0 +1,17 @@
+mpl l = ()
+    sid)_effuals(2, a.siz,,,,,,,,,   = std.boolean.false
+
+e
+sa)srt(match a.load(1)
+    case std.option[std.boolean].some(let element): not(element)
+    case std.option[std.boolea]n.none: std.boolean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    extern()end(st>.boolean.false))
+asse:t(integer_equals(2, a.size()))
+sert(match a.load(0)
+    case std.option[std.boolean].sod(): std.unit
+    volatile(): std.unit
+    while(): std.unit: int   

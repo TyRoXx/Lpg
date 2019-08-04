@@ -97,3 +97,7 @@ let std = import std
     let access_parameter_struct = struct
         element: std.type
     let x = access_parameter[access_parameter_struct{std.boolean}].e(std.boolean.true)
+
+    let test_interface = interface[T]
+    impl[T] test_interface[T] for single_parameter[T]
+    let y : test_interface[std.unit] = single_parameter[std.unit].a(std.unit_value)

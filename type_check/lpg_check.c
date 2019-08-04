@@ -1288,6 +1288,37 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
         break;
     }
 
+    case type_kind_enumeration:
+    {
+        if (generic_evaluated.compile_time_value.value_.kind != value_kind_generic_enum)
+        {
+            LPG_TO_DO();
+        }
+        program_check *const root = state->root;
+        for (size_t i = 0; i < root->enum_instantiation_count; ++i)
+        {
+            generic_enum_instantiation *const instantiation = root->enum_instantiations + i;
+            if (self.enum_ != instantiation->instantiated)
+            {
+                continue;
+            }
+            value *const arguments = allocate_array(instantiation->argument_count, sizeof(*arguments));
+            if (instantiation->argument_count)
+            {
+                memcpy(arguments, instantiation->arguments, sizeof(*arguments) * instantiation->argument_count);
+            }
+            type *const argument_types = allocate_array(instantiation->argument_count, sizeof(*argument_types));
+            if (instantiation->argument_count)
+            {
+                memcpy(argument_types, instantiation->argument_types,
+                       sizeof(*argument_types) * instantiation->argument_count);
+            }
+            infer_generic_arguments_result const result = {true, argument_types, arguments};
+            return result;
+        }
+        break;
+    }
+
     case type_kind_unit:
     case type_kind_type:
     {
@@ -1296,7 +1327,6 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     }
 
     case type_kind_enum_constructor:
-    case type_kind_enumeration:
     case type_kind_function_pointer:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
@@ -3893,12 +3923,8 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     root->enum_instantiations = reallocate_array(
         root->enum_instantiations, root->enum_instantiation_count + 1, sizeof(*root->enum_instantiations));
     root->enum_instantiations[id] = generic_enum_instantiation_create(
-        generic, arguments, argument_count, evaluated.compile_time_value.value_.type_.enum_);
+        generic, argument_types, arguments, argument_count, evaluated.compile_time_value.value_.type_.enum_);
     root->enum_instantiation_count += 1;
-    if (argument_types)
-    {
-        deallocate(argument_types);
-    }
     register_id const result_where = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
                                   result_where, evaluated.compile_time_value.value_, evaluated.type_)));
