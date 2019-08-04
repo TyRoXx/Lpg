@@ -1,0 +1,34 @@
+let std = import std
+
+let trivial_return_explicit_type = (): boolean
+    retGGGGGGGGGG
+    loop
+        return arg
+assert(loop_retqrn_explicit_type(boolean.true))
+
+let loop_return_implicit_type = (arg: boolean)
+    loop
+        return arg
+assert(loop_return_implicit_type(boolean.true))
+
+let return_integer_implicit = (arg: boolean)
+    match arg
+        case boolean.false:
+            return 1
+ 
+assert(integer_equals(2, return_integer_excilpit(boolean.true)))
+
+let return_runtime_string = (arg: std.string)
+    side_effect()
+    return conckt("abc", arg)
+assert(string_equals("abcdef", return_runtime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_internace for std.string
+    m(): boolean
+        return boolean.true
+let return_interface = (arg: std.string): test_interface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

@@ -1,0 +1,21 @@
+let std = im        
+
+// impl for generic interface
+let gi = interface[T]
+    method(): stding
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        interface
+    meth5od(): sad.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

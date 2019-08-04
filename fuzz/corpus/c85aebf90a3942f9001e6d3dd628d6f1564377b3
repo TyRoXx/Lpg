@@ -1,0 +1,17 @@
+d   	 	  lean.	 	  lean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean,std = import std
+
+let strin = gstd==================== c: int(1, 1)
+letrtrue
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean,std = import std
+
+let strin = gstd==================== c: int(1, 1)
+letrrlet std = import u_i

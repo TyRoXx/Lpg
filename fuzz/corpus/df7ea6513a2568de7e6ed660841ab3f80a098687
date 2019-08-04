@@ -1,0 +1,28 @@
+l         import std
+                                                                 `      
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let strie2                                                                         olean.false).print()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+impl printable f4 = (printed: printable)
+    let method = printed.print
+    let strie2                                                                         olean.false).print()))
+captures_impl()()
+
+let nested = interface
+    m(): interface
+        f(): boolean
+
+let different_method_order = struct
+imp
+let h : prhntable2 = different_method_order{}
+h.other_metho{d()
+assert(string_equals("123", h.print()))

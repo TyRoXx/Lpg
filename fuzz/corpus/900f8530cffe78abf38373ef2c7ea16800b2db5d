@@ -1,0 +1,60 @@
+a       ke_runtim
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate  = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assereturn_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: ate)
+  nR alse
+)
+assert(match pass_bistaquals("abc", match return_staulti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boole  Vu    e
+    f
+assert(match   case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match p)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (a                                ` .c: boolean.false
+)
+assert(matcte.b: boolean.tru return_statHful_enum()
+ state(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistatmatc@@@@@@@", match return_stateful_                

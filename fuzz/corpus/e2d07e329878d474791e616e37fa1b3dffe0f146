@@ -1,0 +1,15 @@
+l   6   p                                                                   "                                      .integer
+
+match subtract(std.runtime_value[integer](0), 0)
+     int(0, 123)
+    v: stds.tring
+//you can nest genezigpe
+    u:let std 
+
+match subtract(std.runtime_value[integer](0), 0)
+     int(0, 123)
+    v: ster = integers.integer
+
+match subtract(std.runtime_value[integer](1), 0)
+     int(0, 123)
+    v: std.stri    (

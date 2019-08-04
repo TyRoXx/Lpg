@@ -1,0 +1,7 @@
+let std = g
+//you care not necessarily the same even though they     defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//Tunit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.unit]))

@@ -3369,7 +3369,9 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
 {
     if (interface_expression_.count != tree.generic_parameters.count)
     {
-        LPG_TO_DO();
+        emit_semantic_error(state, semantic_error_create(semantic_error_generic_impl_parameter_mismatch,
+                                                         expression_source_begin(*interface_expression_.generic)));
+        return evaluate_expression_result_empty;
     }
     for (size_t i = 0; i < interface_expression_.count; ++i)
     {

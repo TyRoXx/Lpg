@@ -1,0 +1,36 @@
+let sdt = import std
+
+let trivitch_return_explicit_type = (arg: boolean): std.string
+    matcatch_return_explicit_type(booarg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+asse:a"
+        case boolean.false:_type(boolean.true)))
+
+let lean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+assea"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_explicit_type(boolean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+asse): test_interface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

@@ -1,0 +1,62 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f4 = ()
+    let a : m = boolean.true
+    a
+require_compile_time[f5]
+assert(f5())
+
+/*use a"1"
+    other_method()
+        std.unit_value
+
+impl printabl runtime variable in a runtime context*/
+let f = ()
+    side

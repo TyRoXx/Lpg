@@ -1,0 +1,2 @@
+assert(string_equalsring_equals('tst', "tst"))
+assert(string_equals('Hellrld', "Hello\\nWorld"))

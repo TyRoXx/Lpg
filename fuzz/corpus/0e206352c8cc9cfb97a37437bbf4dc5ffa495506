@@ -1,0 +1,148 @@
+l                import std
+
+/*use a captured variabel in a compile_tse a runtime variable intext*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+/*capture am = bet helper = struct
+   per{integer_to_string(x bo,=)olean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+le ;runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^  = 23       
+let h )
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in a runtime context*/
+let b = 23       
+let h =ert(integer_equals(b, 23))
+h()()
+
+/*capture am = bet helper   per{integer_to_string(x),= boole!an.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+le ;runtime context*/
+let b = 23       
+let h = ()
+    side_effect()
+    ()   ^  = 23       
+let h = ()
+    side_effect()integer_equals(b, 23))
+h()()
+
+/*ca23
+l    et h = (
+    side_effect()
+    23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in a runtime context*/
+let b = 23       
+let h =ert(integer_equals(b, 23))
+h()()
+
+/*capture am = bet helper = struct
+    a  side_effect()
+                                               23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        asseral}(b, 23))
+;h()()
+
+/*capturxt*/
+let b = 50
+let h = (
+    side_effe a runtime context g = ()
+    *)
+        assert(integer_equals(c, 11     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()  _equals(c, 11     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()   #_____ sert(in)eger_equals(b, 23))
+;h()()
+
+/*capturxt*/
+let b = 23
+let h = (
+    side_effect()
+    23
+leg = ()
+    *) 
+        assert(        equals(c, vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv23     `__u
+/b = 23       
+let h =s ()
+    side_ef/*use a constant in a runtime context*/
+let b = 23       
+ = struct
+    a  side_effect()
+                                               23
+letSSSSSSSSSSSSSS c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()   ^     assert(in)eger_equal}(b, 23))
+;h()()
+
+/*capturxt*/
+let b = 50
+let h = (
+    side_effe a runtime context g = ()
+    *)
+        assert(integer_equals(c, 11     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()  _equals(c, 11     `__u
+/*use a constant in(a runtime context*/
+let b = 23       
+  t h = () 
+   side_effect()
+    ()   #_____ sert(in)eger_equals(b, 23))
+;h()()
+
+/*capturxt*/
+let b = 23
+let h = (
+    side_effect()
+    23
+leg = ()
+    *) 
+        assert(        equals(c, vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv23     `__u
+/b = 23       
+let h =s ()
+    side_ef/*use a constant in a runtime context*/
+let b = 23       
+let h = ()
+    side_ore(1, "")))

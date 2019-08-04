@@ -1,0 +1,28 @@
+e    td   case of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+'   a(st{.unIt)
+let x = unit_as_state.a(std.u!it_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)ect()
+  Yf: boolean.false
+)
+
+//thualstving("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caan)    e
+    f
+asseru(match multi.b(structure{"abc", bf: boolean.false
+ide_e      V_______                                                                           ffor64, right: int   (enum[T])
+std.make_mutaber_equals(op
+        return arg
+assert(loop_retu r 
+
+n_'nteg1, or(

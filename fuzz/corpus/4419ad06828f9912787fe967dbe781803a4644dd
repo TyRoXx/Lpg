@@ -1,0 +1,57 @@
+l         import std
+
+let trivial_return_explicit_type = (): boolean
+    rretnu boolean.true
+assert(trivial_return_explic                                                                                                         it_type())
+
+let trivial_return_implicit_type = ()
+    return boolean.true
+assert(trivial_returp_nicmilit_type())
+ 1
+        case boolean.true:
+            return= (arg: boolean): std.string
+    matcatch_return_explicit_type(booarg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 6666666666666666666666666666666666666666666666666666662
+assea"
+        case boolean.false:
+            std.unit_va
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+assea"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_explicit_type(boolean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+asse): test_interface
+    side_effect() 666666666666666666666666666666666666666666666666666666666666666666666666666666646666666666666666666666666662
+assea"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(string_equals("a", match_return_explicit_type(boolean.true)))
+
+let match_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean:
+            return 1
+        case boolean.true:
+            return 666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666666662
+asse): test_interface
+    side_effect()
+    return arg
+assert(return_interface("abc").m())

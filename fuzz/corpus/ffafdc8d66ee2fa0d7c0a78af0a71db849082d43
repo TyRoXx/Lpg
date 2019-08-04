@@ -1,0 +1,76 @@
+()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+      t(0, 12=)
+    v! std.string
+//you can nest genfunctions as expected
+yet f = [T]()
+                                                                                           g                  [U]()
+        [V]()
+            hedper{T, U, V}
+ ions as expected
+let f = [T]()
+    [U]()
+        :[V]()
+         i__     r{T, U)
+        [V]()
+            helper{T, U, V}
+ ions as expected
+let f = [T]()
+    [U](        )
+        [V]()
+         i_)
+  pected
+let f = [T]()
+    [U]()
+        [V]()
+         i_)
+    v! std.string
+//you can nest generic) functions as expected
+yet f = [T]()
+                                                                                                                                   [U]()
+        [V]()
+            helper{T, U, V}
+ ions as expected
+let f = [T]()
+    [U]()
+        [V]()
+         i__     r{T, U, V}
+        let                                         (std.un                                                    tuple = f[std
+        [V]()
+            helper{T, U, V}
+ ions cs expected
+let f = [et f = [T]()
+    [U]()
+        [V]()
+         )i_)
+    v! std.string
+//you can nest generic functions as expected
+yet f = [T]()
+                                                                                                                                                [U]()
+        [V]()
+            helper{T, U, V}
+ ions as expected
+let f = [T]()
+    [U]()
+        [V]()
+         i__     r{T, U, V}
+        let                                         (std.un                                                    tuple = f[std
+        [V]()
+            helper{T, U, V}
+ ions as expected
+let f = [T]()
+    [U]()
+        [V]()
+         i_T]()
+    [U]()
+        [V]()
+         i__ )   r{T, U, V}
+        let                  '                                       

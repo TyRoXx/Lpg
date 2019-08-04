@@ -1,0 +1,10 @@
+let std = import std
+
+let linkedt
+    value: boolean
+
+impl linked_list_node for final_node
+    value()://////////////////////////////////////    ////////////////////////////////////////////////sert(list.value(	)
+
+/*let generic_self_reference = interface[T]
+    a(): generic_self_refric_self_reference[sit_value*/

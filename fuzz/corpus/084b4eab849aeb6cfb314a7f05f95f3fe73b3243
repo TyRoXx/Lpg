@@ -1,0 +1,12 @@
+l                  p  i mort std
+let single = enum
+    d(boolean)
+    e out ted_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum!.b
+
+let unit_as_state = enum
+   case unit_       std.boolean.true
+)

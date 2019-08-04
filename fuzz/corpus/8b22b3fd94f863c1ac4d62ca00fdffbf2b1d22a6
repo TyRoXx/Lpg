@@ -1,0 +1,100 @@
+l             = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    c ost(): std.unit
+    continue(): std.unit
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : giTint
+    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gethod(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.method()))
+
+let    default(): std.unilet std = import std
+
+        for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+lunit
+    for(): std.unit
+    goto(): stce
+let gi = interface[T]
+    method(): std.strin g
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] 
+    signed(!: std.niut
+    sizeof(): s|td.unit
+    static(9: std.unit
+    switch(): std.unit
+    typedef(): std.un/t
+    uninn(): sod()))
+
+let    default(): std.unilet st% = import std
+
+V/ impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = stl L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method():       std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{d.unit_value
+assertouble(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    fo0}
+asser(): st`.unit
+    i = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+                                                                                

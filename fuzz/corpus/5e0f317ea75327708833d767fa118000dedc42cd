@@ -1,0 +1,19 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+match add_u64(123, 0)
+    case add_u64_result.orflow:
+        fail()
+
+match add_u64(999999999999999, 1)
+    case add_u64_result.ok(let result):
+        assert(integer_equals(1000000000000000, result))
+    case add_u64_rrflow:
+        fail()
+
+//TODO: support big number in ES backend
+/*let tw  o127power = 1701411add_u64(two127power, two127power)
+    case add_u64_result.oase add_u64_result.overflow:olean.true
+)*/

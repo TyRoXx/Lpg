@@ -1,0 +1,20 @@
+let std = import std
+
+// impl for genssert(string_equals("u", u.method()))
+
+// impl for generic self
+let i = interface
+    method(): std.boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        s        an.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

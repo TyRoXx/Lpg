@@ -1,0 +1,9 @@
+l    a let max = 18446744073709551616
+    assert(integer_equals(max,std
+leassert(in  g:r_e....asert({integer_equa              aarray[string]].= 18446744073709551616
+    assert(integer_equ!ls(mager_equa        asserW   M=_     uals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(integer_equals(max,std0, 1)))
+   uals(1, ossert)(integer_equals(0, oax = 18446744073709551616
+    assert(integer_equ!ls(mager_equa        asserW   M=_     uals(1, or(1, aarray[string]].none:fbool an.fals*e
+    case optiointe!!!!!
