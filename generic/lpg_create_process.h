@@ -25,13 +25,26 @@ typedef struct child_process
 #endif
 } child_process;
 
+typedef
+#ifdef _WIN32
+    DWORD
+#else
+    int
+#endif
+        error_code;
+
 typedef struct create_process_result
 {
     success_indicator success;
-    child_process created;
+    union
+    {
+        child_process created;
+        error_code error;
+    };
 } create_process_result;
 
-create_process_result create_process_result_create(success_indicator is_success, child_process created);
+create_process_result create_process_result_create_success(child_process created);
+create_process_result create_process_result_create_error(error_code error);
 create_process_result create_process(unicode_view const executable, unicode_view const *const arguments,
                                      size_t const argument_count, unicode_view const current_path,
                                      file_handle const input, file_handle const output, file_handle const error);
