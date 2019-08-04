@@ -1558,6 +1558,7 @@ static success_indicator generate_value(value const generated, type const type_o
             unicode_view const formatted =
                 integer_format(generated.integer_, lower_case_digits, 10, buffer, sizeof(buffer));
             LPG_TRY(stream_writer_write_unicode_view(c_output, formatted));
+            LPG_TRY(stream_writer_write_string(c_output, "u"));
             return success_yes;
         }
         LPG_TO_DO();
