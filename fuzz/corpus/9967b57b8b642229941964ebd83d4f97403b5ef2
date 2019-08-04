@@ -1,0 +1,56 @@
+let std = import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+        let a : m = boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runtime context*/
+let f = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    ()
+      text*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+        let a : m = boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime v a : m = boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runtime context*/
+let f = ()
+    side_effeble in a et f5 = ()
+  f6()
+assert(f5())
+
+/*use a runtime variable in a runtime context*/
+let f = ()
+    side_ebfect()
+    21
+let c = f()
+let g = ()
+    ()
+      text*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+    et a : m =ct()
+    23
+let c = f()
+let g = ()
+    ()
+        assert(integer_equalsert(integer_equals(u().b)
+assret(t())

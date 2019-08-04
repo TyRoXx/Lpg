@@ -1,0 +1,27 @@
+l       #et std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+ }}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}}terface = interface
+    method(a: boolean, b: boolean): printable1
+
+impl _keywords = interface
+    abs parametero_Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert():}}}}}}}}}}}}}}}}}}}}}terface = interface
+    method(a: boolean, b: boolean): printable1
+
+impl _keywords = interface
+    abs parface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl _keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+   test_interface for std.unit
+    method(a: boolea awn, b: aitb()

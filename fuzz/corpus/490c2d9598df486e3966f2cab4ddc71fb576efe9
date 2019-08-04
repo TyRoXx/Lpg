@@ -1,0 +1,6 @@
+let std = imp        YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY////    /IYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+        boolean.true
+    default: ! ion[stringea)

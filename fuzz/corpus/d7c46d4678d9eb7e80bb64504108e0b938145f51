@@ -1,0 +1,18 @@
+l         import std    t tcit_typeboolean.false:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boole5an)
+    match arg
+        case boolean.true:
+            return " 
+a"       case boolean: boe:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_vaan):= (aDDDDDDDeoolean)
+  tho  loop
+        returnd())
+ arg

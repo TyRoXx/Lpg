@@ -1,0 +1,6 @@
+letlet std = import std
+
+/*use a captured variable in a compile_time context*/      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+ass           ert                     0      slet t

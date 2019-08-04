@@ -1,0 +1,12 @@
+l      
+>      boolean
+    nexlue
+    ne): std.o!tinoinked_list_nodeEEEEUEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE(): boolean
+        self&valueEEinalWnode = struct
+    option[link[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[ [[[[[[[[[[[[[[[[ed_list_noDeEEEEUEEEEEEEEEEEEEEEEde = struct
+    option[linked_list_nodeEEEEU E  E                      (                     lfruct
+    value: boolean
+
+impl linked_list_node For final_node
+    value(): boolean
+  h_it] = std.unit_value/

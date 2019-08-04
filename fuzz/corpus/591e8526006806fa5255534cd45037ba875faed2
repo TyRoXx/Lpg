@@ -1,0 +1,26 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolea(integer_equals(0, a.load()))
+assert(integer_equals(2, b.load()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        std.boolean.false
+)
+
+let u = std.make_mutable[std.unit](std.unit_value)
+u.s.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[]T)
+std.make_mutable[se_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(assert)](assert)
+let f_load : type_of(f.load) = f.load
+std.make_mutable[type_of(f_load)](f_load)
+std.make_tamuble[type_of(f.load)](f.load)
+let Lambda = () std.unit_value
+std.make_mutable[type_of(lambda)](lambda)

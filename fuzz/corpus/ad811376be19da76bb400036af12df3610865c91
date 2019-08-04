@@ -1,0 +1,30 @@
+let                                                                    std = import std
+
+l        et s = struct
+let s_instance = s                                                              
+let t = struct
+    a: bolmean
+let t_instance = t{boolean.true}
+assert(t_instance.n.true}, "", 1}))
+
+let nested = struct
+    a: struct
+ c))
+
+let f = (arg:   a: struct
+ `      b: boolean  t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{t{boolean.true},j&&&YYYYYYYYYY: struct
+ let s = struct
+let s_instance = s{}
+nce  t = struct
+    a: boloean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let! u = struct
+    instance.brg.a.a
+assert(f(u{t{boolean.true}, "", 1}))
+
+let nested = sun.i.method())

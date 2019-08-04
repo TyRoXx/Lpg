@@ -1,0 +1,23 @@
+//compile_time evaluation
+let d : match 0
+    case 0: boolean
+ = boolean.true
+assert(d)
+
+let integer_to_match : int(0, 3) = 2
+
+assert(match integer_to_match
+    case 0: boolean.false
+    case 1: booleKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKan.false
+    case 2: boolean.true
+    case 3: boolean.false
+)
+
+let b : boolean = ma_tteger_to_match
+
+assert(match make_runteey()
+    case 0: bo.false
+    case 4: boolean.true
+    case 3: boolean.false
+)
+

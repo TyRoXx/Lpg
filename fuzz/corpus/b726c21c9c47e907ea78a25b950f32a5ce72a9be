@@ -1,0 +1,20 @@
+l    L       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): stt.unit
+ let transformer = interface[From, T        o]
+ = interface[From, Trt std
+
+let printable = interf
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.b
+
+let printable = interfacg
+let f2 = (printed: printable)
+    let method = printe.unitaitb()

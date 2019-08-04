@@ -1,0 +1,14 @@
+dy    	  lean.true
+
+let a : producer[std.boolean] = mudym{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for sing_struct 9 enuan.truerue"
+            cakkkkkkkkkkkse std.boolean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+ass   produce()
+        std.boolean"false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+assert(string_equals("true", b.transfor  std.boo u{t{booleanight: int   

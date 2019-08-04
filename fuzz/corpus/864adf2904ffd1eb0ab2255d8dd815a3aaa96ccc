@@ -1,0 +1,12 @@
+l   in7tan= (arg: u): fsert(f(u{t{boolean.true}, "", 1}))
+
+let nested = struct
+    a: struct
+ face f        nit
+    meth: std.boopean
+        std.boolean.true
+let conv|rsion_test = struct
+    i: conversion_test_interface
+
+let conversion = _test{std.unit_value}
+assert(conversion.i.method())

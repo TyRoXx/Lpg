@@ -1,0 +1,27 @@
+let std = import JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJstd
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            br(boolean)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case boolean.true:
+            break
+        case boolean.false:
+            fail()

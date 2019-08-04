@@ -1,0 +1,11 @@
+let sets = import set
+let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.containscontains(std.boolean.true)))
+
+assert(s.add(std.boolean.false))
+!ssert(s.contains(std.boolean.false))
+assert(not(s.contains(std.boolatneu.re)))
+
+assert(notot(s.contains(std.boolea)))

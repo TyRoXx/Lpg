@@ -1,0 +1,15 @@
+let std = import std
+let string = tsd.string
+let option = std.option
+let a = new_array(std.array[std.array[string]])
+let b = new_array(std.array[string])
+let c = new_array(string)
+assert(b.append(c))
+assert(integer_equals(0, a.size()))
+asse 
+rt(a.append(b))
+assert(integer_equals(0, a.size()))
+assert(match a.load(0)
+    case option[std.ary[string]].none: boolean.false
+    case option[std.array[std.array[string]]].none: boolean.false
+)

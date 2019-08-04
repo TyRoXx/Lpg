@@ -1,0 +1,69 @@
+l     olean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register():estd.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switc:(): stngle_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)rameternt(0, 3)](3)
+a.store( std.boolean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    in.option[std.boolean].some(let element): std.booltd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register():estd.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeopedef(): std.un/t
+    union(): std.unit
+    unsigned(): std.unit
+    void2): std.unit
+    volatile(): std.unit
+    while(): std.unit
+     match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{booleanterfarg: std.striace
+let gi = interface[ng)
+    side_eumT]
+    metOentsh();:

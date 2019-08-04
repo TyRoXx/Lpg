@@ -1,0 +1,130 @@
+let std = import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f2 = ()
+    let f6 = ()
+        let a : m  = ()
+    side_effect()
+    23
+   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+    f5()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f       () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let hel E_std.string
+    b: std.                                                                                               string
+let- x = 2
+let y*use a captured variable in a compile_time context*/
+let m = boolean
+let f2 = ()
+    let f6 = ()
+        let a : m  = ()
+    side_effect()
+    23
+   ()
+        helper{integer_to_string(x),= boolean.true
+        a
+    f5()
+assert(f5())
+
+/*use a runtime variable in a runt  oolean.true)()())
+
+/*capture multiple variables*/
+let helper = structv____ E_std.string
+    b: std.                                                                                               string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+      () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.                                                                                                           string
+let- x = 2
+l(et y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= boolean.                                                           string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime varitext*/
+let f = ()
+    side_effect()
+    23
+      () a
+assert(f6(boo(ean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.                       23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let WWWWWWWWWWWWWWWWWW = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= boolean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+    23
+      () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.                                                                                                   let std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a        string
+let- x = 2
+l(et y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= boolean.                                                  = single_parameter[boolean].a(boolean.true)
+asseXrt(match a
+    case single_parameter[boolean].a(          string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_strxni(g),= bolet s):
+      o

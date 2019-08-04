@@ -1,0 +1,25 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    metmod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = st(string_equals("0,1", y.method()))
+
+let z : gi["z"] = std.unit_value
+assert(string_equals("z", z.method()))
+
+let u : gi["u"] = std.unit_value
+assert(str2.method())

@@ -1,0 +1,40 @@
+f
+assertb.true
+
+let a : ps                             et = printed.print
+    let string = method()
+
+let printal        import std
+ble2 = interface
+    print(): std.string
+    other_method()
+/*use: s a bl'e2)
+    let print = a.print
+    let s = print()
+    s
+
+me = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        e) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[typm_of(std.option[std.unit].some)](std.option[std.unit].some)
+std.make_mutable[type_of(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.stringle in a runtime context*/
+let f = ()
+    side_effec|()
+    23
+require_compile_time[f]
+let c = f()
+let g = ()
+    assert(integer_equals(c, 23))
+g()
+
+/*use a cons(t(ns( tle  t(ns( tle t(ty(t(ty(tg, c: option, d: inoption.sconver     std = import m)

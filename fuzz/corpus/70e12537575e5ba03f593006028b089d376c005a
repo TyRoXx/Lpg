@@ -1,0 +1,72 @@
+l         import std
+
+let trstruct
+    rn arg
+assert(loop_return_explicit_type(boolean.true))
+o_string(): std.string
+
+let s = struct
+    string: std.stri"a"
+        cas  import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+let trivial_return_implicit_type = ()
+    return boolean.true
+assert(trivial_return_implicit_type())
+
+let match_return_explicit_type = (arg: boolean): std.string
+    match arg
+        case boolean.true:
+            return "a 
+ "      case boolean.faolean)
+    match arg
+        case boolean.f-lse:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+         !  return   match arg
+        case boolean.false:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.falseD
+            se boolean.faolean)
+    match arg
+        case boolean.false:
+        h_return_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_imrlicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_va
+let i = interface
+    ticit_return_explicit_type = (arg: boolean): boolean
+    loop
+        returct
+    string: std.string
+
+im
+let loop_return_impl_return_impllet std = import std
+
+let i = interface
+    'ticit_reexplicit_type(boolean.true))
+o_string(): std.string
+
+let s = struct
+    string: std.string
+
+im
+let loop_return__equals("trueproducer[sai

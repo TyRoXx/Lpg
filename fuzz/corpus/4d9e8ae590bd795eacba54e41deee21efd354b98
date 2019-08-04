@@ -1,0 +1,20 @@
+l    assert(integer_equals(0, oax = 18446744073709551616
+    assert(integer_equ!ls(mager_equa        asserW   M=_     uals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(integer_equals(max,std
+leassert(in  g:r_equals(1, or(0, 1)))
+    ..........asert({integer_equa              aarray[string]].none: ptiointeger_equals(0, or(0, 1)))
+   uals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(ior(1, 1)))
+    as
+    ..........asert({integer_equa              aarray[string]].none: boolean.fals*e
+    case optiointeger_equals(0, or(0, 1)))
+   uals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(ior(1, 1)))
+    assert(in  gr:_equals(1, or(0, 1)))
+    ..........assert({integer_equa                  0                           nit
+    aarray[string]].none: boolean.fals*e
+    case optiointeger_equals(0, or(0, 1)))
+    assert({int        eger_equa coverze)!!!!!!!!!!!!

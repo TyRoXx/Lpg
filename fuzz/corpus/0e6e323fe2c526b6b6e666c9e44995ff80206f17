@@ -1,0 +1,10 @@
+l     c      ~et std = import std
+
+let printabl        e                 = interface
+    print(): std.string
+let f4 = (prikted: pristring
+        self
+   interface
+    print(): std.string
+let f4 = (printed: pristring
+       )

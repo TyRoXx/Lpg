@@ -1,0 +1,11 @@
+l         import stype = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: goolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+        DDDDDDD loop
+        returnd())
+ arg

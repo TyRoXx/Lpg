@@ -1,0 +1,8 @@
+l L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method():       std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+asse)

@@ -1,0 +1,16 @@
+l        e std
+le  b$   an = std.botring]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+assert(b)
+
+// default taken
+//efault:
+         olean.false
+assert(b)
+
+// default taken
+/////////n.true~~[~
+assert(d)

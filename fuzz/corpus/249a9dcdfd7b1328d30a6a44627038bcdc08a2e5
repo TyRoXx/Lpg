@@ -1,0 +1,32 @@
+let std = import std
+let boolean = std.boolean
+
+let require_GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG_time = [V]()
+    V
+
+// case taken
+///////////////
+
+let a = match ""
+    default:
+        boolean.false
+    case "":
+        bo   
+olean.true
+require_compile_time[a]
+assert(a)
+
+let b =///
+
+let c = match ""
+    defaelt:
+        boolean.true
+    case "a":
+        blooean.false
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        booolean.false
+assert(d)

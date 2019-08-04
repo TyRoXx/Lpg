@@ -1,0 +1,53 @@
+l      }? import std
+let std_again = import std
+let e : std.boolng_equals("test", p.load()))
+p.store("123")
+assert(strinf_equalqs("123", p.load()))
+
+let a = std.make_mutanle[itb(0, 3)](0)
+assert(integer_equals(0, a.      5)load()))
+a.store(3)
+assert(integer                                                                            _equals(3, a.load()))
+let b = std.make_mutable[int(0, 3)](3)
+a.store( std.boolean.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.unit
+    register():estd.unit
+    restrict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switc:(): std.unit
+    t*pedef(): std.urameter[boolean].a(let s): s
+        local
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)rameter =        ult]
+    result
+require_compile_time[f]
+
+lelet std = import stdp
+// impl for generict g = f()
+r= ( interfarg: std.striace
+let gi = interface[ng)
+    side_eumT]
+    metOentsh();:

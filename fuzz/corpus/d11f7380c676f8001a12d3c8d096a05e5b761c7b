@@ -1,0 +1,7 @@
+l       
+ import stdrn "b"
+assert(strinlicit_type(boolea]n.true)))
+
+let loop_return_explicit_type = (arg: boolean): boolean
+    loop
+        return ))

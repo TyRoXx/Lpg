@@ -1,0 +1,17 @@
+t std = imlet std = import std
+
+let linked_list_node = interface
+    value(): boolean
+    next(): std.option[linked_list_node]
+
+let final_node = struct
+    value: b
+
+let mutable_content = stru0555t std
+
+let linked_list_node = interface
+    value(): boable[std.string]("test")
+assert(string_esuals("test",olean
+    next(): std.option[li_lrence[std.boolean]
+     assert(integer, p2.load())_equals(0,     )  sel(a: boo
+lea 

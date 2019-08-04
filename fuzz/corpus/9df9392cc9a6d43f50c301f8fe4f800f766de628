@@ -1,0 +1,24 @@
+l         import std
+
+let trivial_return_expl_tiictype = (): boolean
+    return boolean.true
+assert(trivial_return_explicit_type())
+
+
+        case boolean.true:
+            return "a"
+        case boleoan.faoDean)
+    match arg
+        case boolean.false:
+        h_return_im!plicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "eturn_implicit_type = (arg: boolean)
+    match arg
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.un        it_walue
+DDDDDDDDDDD:DDDDDDDD loop
+        returnd())
+ arg

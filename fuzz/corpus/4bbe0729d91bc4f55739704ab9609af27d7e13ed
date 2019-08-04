@@ -1,0 +1,16 @@
+mpl l = ()
+    sid)_e
+.false
+)
+
+assert(match a.load(3)
+    case std.option[std.boolean].some(let element): std.booltd.unit
+    exterion[std.boolean].sod(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Align          let a    case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("",d(2)
+    case std.option[string].some(let element): boolean.fals64, right: int   

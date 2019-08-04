@@ -1,0 +1,11 @@
+let std = imporme:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are considered different even tis not the sam  
+assert(as expected
+let f = [Te same:
+let make_enum   [T]()
+    enum[U]
+        a(U)
+//The enums a   cgnsidered different evype_equals(make_enum[2]()[std.unit], make_enum[2]()[std.unit]))

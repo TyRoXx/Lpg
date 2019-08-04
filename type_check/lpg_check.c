@@ -2667,10 +2667,6 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
         return evaluate_match_expression_with_string(state, function, element, input, expected_result_type);
 
     case type_kind_unit:
-        emit_semantic_error(
-            state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*element)));
-        return evaluate_expression_result_empty;
-
     case type_kind_method_pointer:
     case type_kind_structure:
     case type_kind_function_pointer:
@@ -2681,7 +2677,9 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
     case type_kind_interface:
     case type_kind_generic_enum:
     case type_kind_generic_interface:
-        LPG_TO_DO();
+        emit_semantic_error(
+            state, semantic_error_create(semantic_error_type_mismatch, expression_source_begin(*element)));
+        return evaluate_expression_result_empty;
     }
     LPG_UNREACHABLE();
 }

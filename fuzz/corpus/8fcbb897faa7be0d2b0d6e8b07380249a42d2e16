@@ -1,0 +1,36 @@
+e    td = import std
+
+let req[w      et state): boglean.false
+    cas% multi.e: b2olean.false
+    case of this:
+let nested_enum = enum
+    a(enum
+        b)
+    b
+let n = nested_enum.b
+
+let unit_as_state = enum
+'   a(st{.unIt)
+let x = unit_as_state.a(std.u!it_value)
+assert(match x
+    case unit_as_state.a(let ignored):
+        std.boolean.true
+)ect()
+  Yf: boolean.false
+)
+
+//the type checker once had    side_effor64, righte_s64
+
+let test_or = [or]()
+    assert(integer_equals(0, or(0, 0)))
+    assert(integer_equalstving("abc"))
+assert(string_equals("abc", match return_stateful_enum()
+    caan)    e
+    f
+assert(match multi.b(structure{"abc", bf: boolean.false
+)
+
+//the type checker once had    side_effor64, right: int   (enum[T])
+std.make_mutaber_equals(op
+        return arg
+assert(loop_retu return_'nteg1, or(

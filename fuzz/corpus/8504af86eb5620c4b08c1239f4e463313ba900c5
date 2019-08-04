@@ -1,0 +1,53 @@
+a  ls("a:~it)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empt1y = (arg: empty)
+    a?      ch return_stateful_enumtateful_enum().unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empt1y = (arg: empty)
+    a?g
+
+let monoastte = enum
+    a
+let pas_lonostate = (arg: monostate)
+    arg
+assert(match pass]monostate(monostate.a)
+    case monostate.a: boolean.trxue
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg:().unit)
+    d(boolean)
+    e
+    f
+assert(match mult9i.b(structure{"a*c", boolean.trlet empty = enum
+let pass_empt1y = (arg: empty)
+    a?g
+
+let monoastte = enum
+    a
+let pas_lonostate = (arg: monostate)
+    arg
+assert(match pass]monostate(monostate.a)
+b___case monostate.a: boolean.trxue
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate != (arg: bistate)
+    asert(stringcequals("abc", match retue.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let# pass_bistate != (arg: bisase b           asscase b          std.unit
+    aEsert(i                  nte  g

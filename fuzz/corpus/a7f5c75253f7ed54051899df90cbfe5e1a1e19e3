@@ -1,0 +1,31 @@
+l           et std = import std
+let c_reserved = interface
+    auto(): std.unit
+y
+    produce()
+        std.boolean.true
+
+let a : producer[std.bransformer = interface[From, To]
+   r ace[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy  for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.`ransformer = interface[From, To]
+   rtransform(input: From): To
+
+let dummy = struct
+impl producer[std.bboolean)
+asse        rt(non_empty.append(boolean.true))_08 = ()
+    append_4()
+   ntable = inend_3
+    produce(): Output
+
+let transforme r = interface[From, To ]
+ append_4()
+le    Jtransform(it

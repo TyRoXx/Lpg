@@ -1,0 +1,43 @@
+l    L       et std = import std
+let c_reserved = interface
+    auto(): std.unit
+    char(): stt.unit
+ let transformer = interface[From, To]
+    ;transform(input: Fbom): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+  kmpl transformer[std.boole n, std.string] for dummy
+    transform(input: slet std = import std
+
+let printable = i(___)
+let ecmascriptlet std = import std
+
+let producer = interface[Output]     produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.t std = import std
+
+let printable = interf
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.b
+
+let printable = interface
+    print(): std.string
+let f2 = (printed: printable)
+    let method = printe.unit
+   : std.unit
+   test_interface for std.unit
+  g method(a: boolea awn, b: aitb()

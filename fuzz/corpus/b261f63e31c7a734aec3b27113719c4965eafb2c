@@ -1,0 +1,12 @@
+let std = import std
+let std_again = import std
+len
+let f = st(std.boolean)
+(a: host_valee) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].sd)
+mtoes.mxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxable[type_of(struct[T])](struct[T])
+std.make_mqtable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(lambda)](lambda)

@@ -1,0 +1,20 @@
+l   std = importCstd
+
+let producer =lse)))
+
+let captures_values = interface[T]
+    method(arg1: std.string, arg1: T): producer[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parae element: std.type
+impl accfor dummy;   ucer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parastd.tyc_capture_resolution[std.boolean](std.n.true)*/

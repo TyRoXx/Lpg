@@ -1,0 +1,23 @@
+let std = import std
+
+let s = struct
+let s_instance = s{}
+
+let t = struct
+    a: boolean
+let t_instance = t{boolean.true}
+assert(t_instance.a)
+
+let u = struct
+    a: t
+    b: std.string
+    c: int(0, 1)
+let u_instance = u{4{boolean.true}, "abc", 0}
+assert(u_instance.a.a)
+assert(strinequals("abc", u_instance.b))
+assert(integer_equals(0, u_instance.c))
+
+let f = (arg: u): boolean
+    arg.a.a
+assert(f(u{t{NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNboolean.true}, "", 1}))st{std.unit_value}
+assert(conversion.i.method())

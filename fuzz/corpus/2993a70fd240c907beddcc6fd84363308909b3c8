@@ -1,0 +1,123 @@
+l    et std = import std
+
+/*use a captured variable in a compile_time context*/
+let m = boolean
+let f5 = ()
+    let f6 = ()
+        let a :#m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect( )
+    ()
+        assert(integer_equals(b, 23))
+h()()
+
+/*capture an argument*/
+let f6 = (a: boolean)!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.                                                     )
+        let a :  m  = ()
+    side_effect()
+    23
+let c = f()
+let g = ()
+    *)
+        assert(integer3
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 24))
+h()()
+
+/*capture an argument*/
+let f6 = (a: booleant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(integer_equals(b, 23                                                       "                          string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helean.true
+        a
+    f6()
+assert(f5())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+  Q         23
+let c = f()
+let g = ()
+    *)
+        asse!t(inueger_equals(c, 23))
+g()()
+
+/*use a constant in a runtime conxt*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(inte 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{integer_to_string(x),= boolean.                     "            string
+let- x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helean.true
+        a
+    f6()
+assert(f0())
+
+/*use a runtime variable in a runt   _context*/
+let f = ()
+    side_effect()
+  Q         23
+let c = f()
+let g = ()
+    *)
+        asse!t(integer_equals(c, 23))
+g()()
+
+/*use a constant in a runtime context*/
+let b = 23
+let h = ()
+    side_effect()
+    ()
+        assert(intege!!!!!!!!
+    ()
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    a: std.string
+    b: std.string
+let x = 2
+let y = "2"
+let t = ()
+    elt=u   ()
+        helper{inleX	      ))))
+
+assert(string_equals("abc", match single.ateger_to_string(x), y}
+    string_

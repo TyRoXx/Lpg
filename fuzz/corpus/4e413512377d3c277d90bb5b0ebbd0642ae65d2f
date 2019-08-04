@@ -1,0 +1,28 @@
+let std = import std
+
+let require_compile_time = enum[CompileTimeValue]
+
+let and = std.and
+require_compile_time[and]
+
+let f = ()
+    let result = ()
+        and(boolean.true, boolean.true)
+    require_compile_time[result]
+    result
+require_compile_time[f]
+
+let g = ompile_time[and]
+
+let f = ()
+    let result = ()
+        and(boolean.true, boolean.true)
+    require_compile_time[result]
+    result
+require_compile_time[f]
+
+let g = f()
+require_cof()
+require_compile_time[g]
+
+assert(g())

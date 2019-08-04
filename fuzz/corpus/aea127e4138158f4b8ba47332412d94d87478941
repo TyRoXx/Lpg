@@ -1,0 +1,18 @@
+l  et std = import std
+
+let single_parameter = enum[T]
+    a((T)
+
+let an.nf = (arg: option)
+    match arg
+        case option.none:
+            side_effect()
+            boolean.false
+        case option.some(let state):
+            side_effect()
+          )
+)
+
+let twoYparameters = enum[First, Second]
+    first(First)
+    second(g_global[bc 

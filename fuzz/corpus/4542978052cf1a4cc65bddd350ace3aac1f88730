@@ -1,0 +1,21 @@
+let std = import std
+
+/*us{V      ured variable in a compile_time context*/
+let m = boolean
+let f4 = ()
+    let f6 = ()
+        let a : m = boolean.tr
+        () a
+assert(f6(boolean.true)()())
+
+/*capture multiple variables*/
+let helper = struct
+    ccccccccccccccccccccccccccccccccccccccccccccccccccccccccca: std.string
+    b: std.string
+let x = 2
+let y = "2"
+let t = ()
+    let u = ()
+        helper{integer_to_string(x), y}
+    string_equals(u().a, u().b)
+asse9rt(t())

@@ -1,0 +1,38 @@
+l      std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a      	  assert(type_equals(type_of(0), >yplt:
+        e_of(0)))
+assert(typboolean.trh ""
+    default:
+        boolean.true
+    case "a":se taken
+////'//////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a         	 boolean.false
+requir//o/
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+////'/of(std.stringr)
+), std.type))

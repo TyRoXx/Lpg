@@ -1,0 +1,13 @@
+l        impo 	 ()
+        helper{i       
+
+/*use a constant in runtime context*/
+let bp = 23       
+let h = ()
+    side_effect()
+    ()   ^     assert(integer_equals(b, 23))
+h()()
+
+)
+let g = ()
+   =ntext*/ b = 23    )

@@ -1,0 +1,95 @@
+l[w      et std = import std
+let boolean =]
+assert(a)
+
+let b = match std.runtime_value[std.string]("")
+    case "":
+        boolean.true
+    default:
+        boolean.false
+asserkt(b)
+
+// default taken
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+    default:
+ %      boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")""ssert(b)
+
+// default taken
+//////                  
+   n
+//////                  ////////////
+
+let c = match ""
+    ca6e "a":
+        boolean.false
+    default:
+        boolean.true
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY ////////////
+
+let c = match ""
+    ca2ean.false
+    default:     
+   n
+//////                  ////////////
+
+let c = match ""
+    ca3e "a":
+        boolean.false
+/ default taken
+//////                      0
+    ca  ////////////
+
+let c = match 
+   boolean.true
+assert////se boolean.true:
+        2
+assert(integer_equals(2, result))
+
+let runtime_var = ()
+    side_effect()
+    boolean.true
+
+let something: int(1, 40) = match runtime_var()
+    case boolean.true:
+        40
+    case boolean.fals  YYYYYYYYoolean.false
+assert(b)
+
+// default taken
+//////                  
+   n
+//////                  ////////////
+
+let c = match ""
+    ca6e "a")
+    case "a":
+        boolean.false
+    default:     
+   boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY ////////////
+
+let c = match ""
+    ca3ean.false
+    defallt:     
+ e:
+        1
+
+assert(integ  /n
+/////    er_equals(40, someth  ing)           )
+ /////////

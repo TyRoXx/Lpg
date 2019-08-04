@@ -1,0 +1,75 @@
+let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[stdbo.olean] for dummy
+    produce()
+        std.boolean.true
+
+let a= dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: std.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolecn.false: "false"
+
+let b : transformer[std.boolean, std.string] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+let std = import std
+
+let producer = interface[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[stdbo.olean] for dummy
+    produce()
+        std.boolean.true
+
+let a= dummy{}
+assert(a.produce())
+
+impl transformer[std.boolean, std.string] for dummy
+    transform(input: std.boolean): std.string
+        match input
+            case std.boolean.true: "true"
+            case std.boolecn.false: "false"
+
+let b : transformer[std.boolean, std.string] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.st): std.unit
+let access_parameter_struct = struct
+    element: std.type
+impl access_parameter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    side_effect()
+    12
+let arg = runtime_valud()
+let test_generic_capture_resoluti n = [T](arg: T)
+    assert(arg)
+test_generic_capture_resolution[std.boeter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    side_effect()
+    12
+let arg = runtime_valud()
+let test_generic_capture_resoluti n = [T](arg: T)
+    assert(arg)
+test_generic_capture_resolution[std.boolean](std.boolean.true)*/

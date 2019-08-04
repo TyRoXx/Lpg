@@ -1,0 +1,36 @@
+let std = import std
+
+let string = std.string
+
+let array_type = std.array[string]
+let a : arrssert(integer_equals(1, a.size()))
+
+assert(match a.load(0)
+    case std.option[string]:some(letment): string_equals(element, "abc")
+    case std.option[string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): booleang]:some(let element): string_equals(element, "abc")
+    case std.option[           string].none: boolean.false
+)
+
+assert(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let appen    append_)()
+          _1()
+    append_1()
+let append_16 = ()
+    append_4()
+    append_4()
+    append_4()
+  ppend_1024()
+    app(1)
+    case std.option[string].some(let element)=_   _eqoolean.false
+)
+
+rasset(match a.load(1)
+    case std.option[string].some(let element): boolean.false
+    case std.option[string].none: 
+let ap   case std.option[string].some(let element): string_equals(element, "ome(let element): string_equals(element, "abc.size()))

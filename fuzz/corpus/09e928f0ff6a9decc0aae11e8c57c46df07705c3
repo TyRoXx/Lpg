@@ -1,0 +1,23 @@
+l            et std = import std
+let c_reserved = interface
+    auto(): std.unit
+y
+    produce()
+        std.boolean.true
+
+let a : producer[std.bransformer = interface[From, To]
+   r ace[Output]
+    produce(): Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy  for dummy
+    produce()
+        std.boolean.truev|let a : producer[std.`rat transformer = interface[From, To]
+    transform(input: From): Tole = inend_3
+    produce ): Output
+
+let transforme r = interface[From, To']
+ append_4()
+le    JtRansform(it

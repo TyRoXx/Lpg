@@ -1,0 +1,16 @@
+let t tristate = enum
+    a
+      case         .ccase         bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeedeeeeeeeeeeeeestate.b)
+    case bistate.a: boolean.false
+    caue
+)
+
+let tristate = enum
+    a
+      crse tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.c)
+    ;caet sristate.a: boolean.false
+    ca

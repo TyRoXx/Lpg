@@ -1,0 +1,35 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = prrint
+   string
+    oth)
+asserttd.m   
+
+let bis     = enum
+    match elusing_globalop
+  [boole      prd.string
+    y: enum
+    match e        onostate.a: boolean.true
+)
+
+let bi      = enum
+   f4 = (printed: printable)
+    let method = prrint
+   string
+    oth)
+asserttd.m   
+
+let bis     = enum
+    match elusing_globalop
+  [boole      prd.str*ing
+    y: enum
+    match e        onostate.a: boolean.true
+)
+
+let bi      = enum
+    match element2.load(0)
+                    match element3.load(0)
+ llo

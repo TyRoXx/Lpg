@@ -1,0 +1,86 @@
+l    et std = import std
+
+let f = (): std.unit
+    f()
+
+let g = (): std.unit
+    side_effect()
+    let inner = ()
+           case std.option[std.boolean].some(let element):
+                            assert(to.append(element))
+                    co y_array_boolean(from, to)
+                case std         fail()
+
+copy_array_booleaw(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array       :(std.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array(std.boolean)
+copy_array_boolean(original, into)
+assetion[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(origina                                                                                                                         l.append(std.boole.antrue))
+let into = new_array(std.boolean)
+copy_array_boolean(new_array(std.boolean), new_array(std.boonean))
+
+let original = new_array        (std.boolean)
+assert(original.append(std.boolean.true))
+let into = new_array(std.boolean                               )
+copy_               case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(s, to.size())
+        case std.boolean.true:
+            std.unit_value
+        case std.boolean.false:
+            match from.load(to.size())
+                 new_array(std.boolean))
+
+let original = new_array       array_boolean(original, into)
+asse: std.boolean): std.string
+    side_effect()
+    match a
+        case std.boolean.true:
+            k(std.boolean.false)
+        case std.boolean.false:
+       true))
+let into = new_array(std.boolean)
+copy_array_boolean(original, into)
+assetion[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+lelet std = import std
+
+let trivial_return_explicit_type = (): boolean
+    return boolt original = new_array        (std.boolean)
+assert(original.append(std.boole.antrue))
+let into = new_array(std.boolean)
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.apean.true))
+let into = new_array(std.boolean)
+copy_               case std.option[std.boolean].none:
+                    fail()
+
+copy_array_boolean(new_array(std.boolean), new_array(std.boolean))
+
+let original = new_array        (std.boolean)
+assert(original.append(s, to.size())
+        case std.boolean.true:
+            std.unean.true
+assert(trit_vaivial_retulue

@@ -1,0 +1,14 @@
+e_string(")
+assert(match c
+     case two_parameters[boolean, std.string].first(let   //comment
+        loop
+            break
+        let cover_enum = enum        let cover_enum_var = cover_enum.x
+        match cover_enum_var
+            case cover_enum.x: std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+            m(): boolean
+    method = printed;.                                                                                 

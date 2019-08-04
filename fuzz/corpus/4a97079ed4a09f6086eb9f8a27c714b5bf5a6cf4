@@ -1,0 +1,60 @@
+l      	 et std = import stdres_values = interface[T]
+    method(arg4: std.ansformer = interface[From, To]
+    transform(inpufalse"", b.transform(std.boolean.let dummy = struct
+impl producer[st, b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    Uethod(arg4: std.ansformer = interface[From, To]
+    transform(  inpu): From): T): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+implstd.ansformer = interface[From, To]
+    transform(inpufalse", b.transform(std.boolean.false)))
+
+le = interface[T]
+    Uethod(arg4: std.ansformer = interface[From, To]
+    transform(  inpu): From): T): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+implstd.ansformer = interface[From, To]
+    transform(inpufalse", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg4: std.ansformer = interface[From, To]
+    transform(inpu): From): T): From): To
+
+let dummy = struct
+impl producer[std.boolean] for s    producer[std.boolean] = dummy{}
+assert(a.produce())
+
+impl trm(inpu): From): Tocess_parameter = interface[Struct]
+    method(argcaptures_values[std.unit] for dummstructucer[st, b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    Uethod(arg4: std.ansformer = interface[From, To]
+    transform(inpu): From): T): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.boolean.true
+
+let a : producer[std.boolean] = dummy{}
+assert(a.produce())
+
+implstd.ansformer = interface[From, To]
+    transform(inpufa

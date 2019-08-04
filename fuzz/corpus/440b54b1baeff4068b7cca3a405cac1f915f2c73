@@ -1,0 +1,21 @@
+                              nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 12=)
+    v: std.string
+//you can nest generic functions as expected
+let f = [T](.u             ort std
+
+l%t helper = struct
+    t: std.type
+ (  u: int(0, 12=)
+    v: std.string
+//you ca        n nert generi***************************************** = [T]()
+    [U]()
+        [V]()
+         
+assert(type_equa   case std.boolean.falparaassert(st    string_equals("abg"   l
+)
+
+  let t"o_params("hello

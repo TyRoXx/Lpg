@@ -1,0 +1,43 @@
+l `      et std = import std
+
+let single_parameter = enum[T]
+    a(T)
+
+let a = single_parameter[    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[bcovt)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.strie using_glob al[bcover_enum_var
+       c     ase cover_enum.x:   std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+        f___ WVE boolean
+                self
+        let cover_instantiation = sinl
+())
+assert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+     er[    a(T)
+    b(boolean)
+assert(match using_global[boolean].b(boolean.true)
+    case using_global[bcovt)
+    second(Second)
+
+let c = two_parameters[boolean, std.string].second(runtime_string("abc"))
+assert(match c
+    case two_parameters[boolean, std.strie using_glob al[bcover_enum_var
+       c     ase cover_enum.x:   std.unit
+        let cover_not = !boolean.true
+        let cover_interface = interface
+            m(): boolean
+        impl cover_interface for boolean
+        f___ WVE boole   s.m
+    

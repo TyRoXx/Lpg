@@ -1,0 +1,146 @@
+ake_runtime_structure{"abass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.ase tristate.c: boolean.false
+)
+assert(match pass_tristate(tristate.b)
+    case tristate.a: bool.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean     et a   ): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+     x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult2i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostaturn_stateful_enum()
+    case single.a(let state): state
+))
+
+let structure = struct
+    x: std.string
+    y: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult8i.b(structure{"abc", boolean.trlet empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    arg
+assert(match pass_bistate(bistate.a)
+    case bistate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bistate.b)
+    case bistate.a: boolean.false
+    case bistate.b: boolean.true
+)
+
+let tristate = enum
+    a
+    b
+    c
+let pass_tristate = (arg: tristate)
+    arg
+assert(match pass_tristate(tristate.ase tristate.c: boolean.false
+)
+assert(mat: boolean
+let multi = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult7i.b(structure{"abc", boolean  et empty = enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate tttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttt= enum
+    a
+let pass_monostate = (arg: monostate)
+    arg
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistat enum
+let pass_empty = (arg: empty)
+    arg
+
+let monostate = enum
+    a
+let pass_monostatelet std = import std
+
+let single_'ara  = (ar    
+g

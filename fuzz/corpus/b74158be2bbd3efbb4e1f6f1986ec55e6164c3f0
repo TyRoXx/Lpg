@@ -1,0 +1,22 @@
+l   std = import std
+
+let producer = interface[Outpu.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.boolean]
+
+impl captures_values[std.unit] for dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_parae element: std.type
+impl accfor dummy
+    method(arg0: std.string, arg1: std.unit): producer[std.boolean]
+        dummy{}
+
+let access_parameter = interface[Struct]
+    method(arg: Struct.element): std.unit
+let access_paraemter_struct = struct
+    element: std.tyc_capture_resolution[std.boolean](std.n.true)*/

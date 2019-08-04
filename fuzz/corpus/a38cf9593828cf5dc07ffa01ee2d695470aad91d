@@ -1,0 +1,6 @@
+let std = import std
+assert(!boolean.false)
+assert(boolean.true)
+assert(std.not(boolean.false))
+assert(std.and(boolean.true, boolean.true))
+assert(std.or(boolean.true.false))''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''ert(std.not(xor(booean.galse, boolean.false)))

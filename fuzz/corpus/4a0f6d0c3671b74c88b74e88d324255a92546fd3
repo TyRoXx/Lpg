@@ -1,0 +1,25 @@
+l        impott std
+
+let producer = interface[Output]
+    produce()*: Output
+
+let transformer = interface[From, To]
+    transform(input: From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+    produce()
+        std.d.unit
+        std.unit_value
+
+/*let runtime_value = ()
+    sidXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXe_effg_equals("test", g.method(boolean.true,td.it
+let access_parameter_strucer[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.un                                                               it
+        std.unit_value
+
+/*let runtime_generic_capture_resolution[std.boolean](std.boolean.tr      "061"
+le4 h : printable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()ue))*/
+)

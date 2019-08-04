@@ -1,0 +1,18 @@
+let std = import std
+let c_reserved = interface
+    auto(): std.unit
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    ___(___)
+    _Bool(___)
+    Z(___)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+    await(): dsu.tnit
+    boolean(): std.unit
+//etc..
