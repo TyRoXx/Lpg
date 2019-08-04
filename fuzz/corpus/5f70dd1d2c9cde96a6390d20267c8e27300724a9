@@ -1,0 +1,19 @@
+let std = import std
+
+let 
+ivial match arg rn_implicit_type = (arg: boolean)
+    match   g
+        case boolean.true:
+            return "a"
+        case boolean.false:
+            std.unit_value
+    return "b"
+assert(strinlicit_type(boolean.true)))
+
+let loop_retu = (arg: boolean): boolean
+    loop
+        return arg
+assert(loop_return_explicit_type(boolean.true))
+
+let loop_return_implicit_e = (arg: boolean)
+    lo.m())

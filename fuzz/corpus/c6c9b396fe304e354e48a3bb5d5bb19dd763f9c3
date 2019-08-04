@@ -1,0 +1,22 @@
+l! et sstring_e  quals("ab:def"T return_run0ime_string("def")))
+
+let test_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.       returneI[2]()[std.ufi .t])))
+assert(t            t]))
+assert(type_equarfake_mutable[type_of(std.option[std.unit].df[boolean, type_of(false_prmpiedicate)]\    y, t   false_predicate)))
+
+ct()
+   (ef"T return_runtime_  ring("def")))
+
+let te;t_interface = interface
+    m(): boolean
+impl test_interface for std.string
+    m(): boolean
+        return boolean.eI[1;]()[std.ufi .t])lement): string_equals(element, "912")
+    case std.option[string: boolean)l bon:oa e
+   boole(an.truel
+ealu())e
+) 

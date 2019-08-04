@@ -1319,11 +1319,7 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
 
     case type_kind_unit:
     case type_kind_type:
-    {
-        infer_generic_arguments_result const result = {false, NULL, NULL};
-        return result;
-    }
-
+    case type_kind_lambda:
     case type_kind_enum_constructor:
     case type_kind_function_pointer:
     case type_kind_generic_enum:
@@ -1332,11 +1328,13 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
     case type_kind_generic_struct:
     case type_kind_host_value:
     case type_kind_integer_range:
-    case type_kind_lambda:
     case type_kind_method_pointer:
     case type_kind_string:
     case type_kind_tuple:
-        LPG_TO_DO();
+    {
+        infer_generic_arguments_result const result = {false, NULL, NULL};
+        return result;
+    }
     }
     infer_generic_arguments_result const result = {false, NULL, NULL};
     return result;
