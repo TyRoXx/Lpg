@@ -219,8 +219,8 @@ static void run_c_test(unicode_view const test_name, unicode_view const c_source
                                           unicode_view_from_c_str("--leak-check=full"),
                                           unicode_view_from_string(test_executable)};
         create_process_result const process =
-            create_process(unicode_view_from_c_str("/usr/bin/valgrind"), arguments, LPG_ARRAY_SIZE(arguments),
-                           c_test_dir, get_standard_input(), get_standard_output(), get_standard_error());
+            create_process(unicode_view_from_c_str("valgrind"), arguments, LPG_ARRAY_SIZE(arguments), c_test_dir,
+                           get_standard_input(), get_standard_output(), get_standard_error());
 #else
         create_process_result const process =
             create_process(unicode_view_from_string(test_executable), NULL, 0, c_test_dir, get_standard_input(),
