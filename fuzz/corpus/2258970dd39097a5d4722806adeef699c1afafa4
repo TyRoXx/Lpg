@@ -1,0 +1,39 @@
+l           std.unit_value
+
+impl printable1 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_mettd.unit_value
+
+impl printable1 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method()
+        std.unit_value
+
+_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.   WVV)

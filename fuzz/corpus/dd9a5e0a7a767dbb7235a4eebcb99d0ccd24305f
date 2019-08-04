@@ -1,0 +1,60 @@
+                  std
+let c_resderve = interface
+    auto(): std.unit
+   b har(): std.unit
+    const(): std.unit
+   co ntinue(): std.unit
+    default(): std.unit
+    do(): std.un std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.uni       t
+    register(): std.unit
+W___ rict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): std.unit
+    switch(): std.
+let parameter = (const: boolean, _: boolean, ___: boolean)ean.true
+    a
+require_co!!!!!!howt.ea{{{{{{{{{{{{{alse
+a
+sert(not(aldler_a)](5, 0, 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+hand!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!host.ea{{{{{{{{{{{{{alse
+assert(!!!!!!!!!!!!!!!!!!!!!!!!!!!!!r = (const: boolean, _: boolean, ___: boolean)ean.tru_mutable[std.string]("test")
+as  (string_equals("test", p.load()))
+p.store("123")
+_mutable[iing():
+
+impl i for s _mutable[inem
+    to_striad

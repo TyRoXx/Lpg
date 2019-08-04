@@ -1,0 +1,33 @@
+l yt mpe = enum
+let pass_empty = (arg: empty)
+    arg
+
+let       case tristate.c: boolestate.a: boolean.true
+    case bistate.b: boolean.falseolean.false
+)
+assert(match pass_bistate(bieeeeeeeeeeeeeese bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeristate = enum
+    a
+      case tristate.c: b= enum
+    a
+      case tristate.c: booleanue
+)
+
+let tristate = enum
+    a
+      case tristate.c: boolean.false
+istate.a: boolean.true
+    casistate = enum
+    a
+      case tristate.c: boolean.false
+istate.a: boolean.true
+    case bistate.b: boolean.false
+)
+assert(match pass_bistate(bieeeeeeeeee.fals{e
+)
+assert(match pass_tristate(tristate.c)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.false
+    case tristate.c: boolean.true
+)

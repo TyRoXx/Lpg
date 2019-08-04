@@ -1,0 +1,62 @@
+let std = import JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJstd
+let integers = import integer
+
+loop
+    side_effect()
+    breake
+)
+
+let u = std.make_mutable[std.unit](std.unit_value)
+u.store(u.load())
+
+let d = std.make_mutable[std.array[std.unit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(1,dal d.(o).size()))
+d.store(new_array(std.uni;))lU8      et std = impor[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.me_b8      |ype_of(f_
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{std.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.falne})
+assert(not(f.load().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mloa)fd](_load)
+st         () std.unit_value
+std.make_ake_runtime_string("abc"mutable[type_of(lambutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interfag_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[iof(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum
+
+let gs = struct[alue, std.unit_value))
+
+/*catime context*/
+let m = booct()
+    23
+require_compile_time[f]
+let c = f()
+let g = ()
+    : std.unit, d: std.unit)
+        side_effect()
+        std.and(indirection(), b)
+assert(f6(boolean.true, boolean.true)(std.unit_value, std.unit_value))
+
+/*capture an argument at runtime  default:
+        boolean.true
+assert//////YYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY/////
+
+let a = match ""
+    case "":
+                boolean.true
+    default:
+       b oolean.false
+require_compileda)]_time[))a]
+asser)

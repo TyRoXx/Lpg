@@ -1,0 +1,69 @@
+let std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (printed: printable)
+    let method = printed.printd()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable4 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable1 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+impl printable2 for boolean
+    print()
+        match self
+            case boolean.true: "true"
+            case boolean.false: "false"
+    other_method()
+        std.unit_value
+
+assert(string_equals("", pure("")))
+assert(string_equals("a", pure("a")))
+assert(string_equals("unit", pure(std.unit_value)))
+assert(string_equals("0", pure(0)))
+assolean
+
+let different_method_order = struct
+impl printable2 for different_method_order
+    other_method(): std.unit
+        std.unit_value
+    print(): std.string
+        "123"
+let h : prhntable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.print()))

@@ -1,0 +1,22 @@
+let std = import std
+
+// impthod(): std.string
+
+impl[S] gi[S] for std.unit
+    method(ace
+    method(): std.boolean
+
+let L       gs = struct[dhod(): std.boolean
+
+let L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.bool`an
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u(2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

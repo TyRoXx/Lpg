@@ -1,0 +1,40 @@
+l oet std = import std
+
+let printable = interface
+    print(): std.string
+let f4 = (prin        ted: prinet string = method()
+
+let printable2 = interface
+    print(
+
+impl printable2 for std.string
+    print(): std.string
+        self
+    other_method(): std.unit
+        std.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+        "1"
+    other_method()
+        std.unit_value
+
+_method(): std.uni        std.unit_value
+
+impl printable2 for std.unit
+    print()
+       rintable2 = different_method_order{}
+h.other_method()
+assert(string_equals("123", h.   WVV)

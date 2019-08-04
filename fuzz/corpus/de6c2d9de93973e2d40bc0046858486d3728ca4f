@@ -1,0 +1,21 @@
+l mport std
+
+let single_p         =        e]
+    a std.string)
+    [[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[   c
+let tp_asrsistate => (arg: trista e) boodeant pass_tri[te.b: boolean.true
+)
+
+let yristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: trista e)
+       [[[[[[[[[[[te.b: booleant pass_tristate => (arg: tristate)
+    ar[[[et tristate = enum
+    a
+    b
+    c
+let pass_tristate => (arg: tristate)
+    a   s : print()
+       e

@@ -1,0 +1,71 @@
+port std
+let std_again = import std
+let e : std.blet std = import std
+
+let printable = interface
+<   print(): std.string
+let f4 = (printed: printable)
+    let method = printed.print
+    let string = method()
+
+let printable2 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = print()
+    s
+
+let runtime = (a: printable2)
+    side_effect()
+    let print = a.print
+    let s = print()
+    s
+
+impl printa                                                                        "?.mr std.unit
+    met od((): std.string
+        "0,0"
+
+i                                       mpl gi[int    (0, 1)]                    l  et std = import sinteger_equals]OS_  _B ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: option, d: [[[[[te.b: boooe ([or]()
+    assert(integer_equals]OS_  _B (a: boolean, b: std.string, c: 
+ [boole      prd.string
+    y: boolean
+let m
+let bis     = enum
+    match element4.lobd(0)
+                            case lern.true)*a./g_equads("helloboolean
+
+let require_compile_time = [V]()
+
+V    
+// case taken
+///////////////
+
+let a = match ""
+    default:
+        boolean.false
+    case "":
+        boolean.true
+require_compile_time[a]
+assert(a)
+
+let b = marequire_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        boolean.true
+    case "a":
+        boolean.false
+assert(d)
+                             e", runtime(boolean.false)))
+
+let a2 : printable2 = "abc"
+assert(string_equals("abc", a2.print()))
+
+let test_interface = interface
+    method(a: boolean, b: boolean): printable2
+
+impl test_interface f option, d: [[[[[te.b: boolean.truor e

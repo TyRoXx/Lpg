@@ -1,0 +1,25 @@
+let std =[boolean].a(let s):
+        boolean.false
+    case using_global[bo  ar!g
+assert(match pass_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistat= (arg: bistate)
+    arg
+assert(match
+    c (arg: bistate)
+    arg
+assert(match
+    case_monostate(monostate.a)
+    case monostate.a: boolean.true
+)
+
+let bistate = enum
+    a
+    b
+let pass_bistate = (arg: bistate)
+    a    ssert(match
+ (  case tristate.c: boolean.false
+)
+assert(match pass_tristate(trista           te                        s = pri  e

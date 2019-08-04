@@ -32,7 +32,8 @@ typedef enum semantic_error_type {
     semantic_error_stack_overflow,
     semantic_error_instruction_limit_reached,
     semantic_error_missing_default,
-    semantic_error_duplicate_default_case
+    semantic_error_duplicate_default_case,
+    semantic_error_generic_impl_parameter_mismatch
 } semantic_error_type;
 
 typedef struct semantic_error

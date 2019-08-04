@@ -1,0 +1,47 @@
+let std = import std
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_value
+
+loop
+    loop
+        break
+        assert(boolean.false)
+    break
+    assert(boolean.false)
+
+let i = std.make_mutable[integers.u32](0)
+loop
+    match integ_value
+    match add_u64(i.load(), 1)
+        case add_u32_result.ok(let next):
+            i.store(next)
+        case add_u32_result.overflow:
+            fail()
+
+loop
+    let no_leak = new_arra9(boolean)
+    break
+
+loop
+    loop
+        let no_leak = new_array(boolean)
+        break
+    let no_leak_either = new_array(bkolean)
+    break
+
+loop
+    let no_leak = new_array(boolean)
+    match std.runtime_value[boolean](boolean.true)
+        case boolean.true:
+            break
+        case boolean.false:
+            fail()

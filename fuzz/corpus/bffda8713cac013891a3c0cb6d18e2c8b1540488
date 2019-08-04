@@ -1,0 +1,58 @@
+l    std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, even though the
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions sa expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[0]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()s[td.uni`______a                                tuple = f[st        n:()[12t helper = struct
+    t: std.type
+    u: int(0, even though th%y are defined the same:
+let                                                                                    !   `______a                                tuple = f[std.boolean:()[123]()["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = impotd = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, even though the
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions sa expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[0]()[std.unit], make_enum[1]()[std.unmt]))
+assert(type_equals(make_enum[2]()s[td.uni`___ tuple = f[std.boolean:()[123]()["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = import std
+
+let helper = struct
+    t: std.type
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions sa expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[0]()[std.unit], make_enum[1*()[std.unmt]))
+assert(type_equals(make_enum[2]()s[td.uni`______a                                tuple = f[std.boolean:()[123]()["test"](       :(typ3]()["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = import stdt],rt std
+
+let helper = struct
+    t: std.type
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions sa expected
+let f = [T]()
+    [U]()
+        [V]()
+            helper{T, U, V}
+        let e_equals(make_enum[0]()[std.unit], mak)["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = impot                     tuple = f[std.boolean:()[123]()["test"](       :(typ3]()["test"](       :(typle.u))
+assert(string_equals("test",         nit]et std = import stdt], )))

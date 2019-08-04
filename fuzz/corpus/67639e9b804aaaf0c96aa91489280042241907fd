@@ -1,0 +1,35 @@
+l   s):
+= import std
+impl for generic interface
+let gibB_ nterfaceT]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method()erface
+    method(): std.boolean
+
+let L       gs = st]
+    dummy: T
+
+impl[T] i for gs[T]
+(   method():       std.boolean.true
+
+let z1 : i = gs[int(0, 0)]{0}
+assert(z2.method())
+
+let u(2   i = gsnt(0, 1)]{1}
+assert(u2.method()d.unit_value
+
+impl printable2 for boolean
+    print()
+        match sel  eslted_enum =  = n%8    um.b
+

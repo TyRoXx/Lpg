@@ -1,0 +1,25 @@
+l         et std = imporlet ssert(a.produce())
+
+impl transformer[std.boolean, stdXstring] for ())
+
+impl transformer[std.boolean, stdXstring] for dummy
+    transform(input: sld.unit
+        std.unit_value
+
+impl p        rintable2 for std.unit
+    print()
+        "unit"
+ lue
+
+impl printable2 for boodummy
+    transform(input: sld.unit
+        std.unit_value
+
+impl p        rintable2 for std.unit
+    print()
+        "unit"
+ lue
+
+impl printable2 for boolean
+    std.unit
+    method(a: boolea awn, b: aitb()

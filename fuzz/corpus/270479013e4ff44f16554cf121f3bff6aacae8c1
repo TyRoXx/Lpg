@@ -1,0 +1,34 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std.string
+//yo ucan        neric functions g_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enuw = [T]()
+    enum[U]
+        a(U)
+//The enums raenteger_equals(123, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Gen
+//yo ucan        neric functions g_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums raenteger_equals(124, tuple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types are not necessarily the same even though they are defined the same:
+let ke_enum = [T]()
+    enum[U]
+        a(U)
+//The enums rae ceric types are not necessarily the same even though they are defined the same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums )

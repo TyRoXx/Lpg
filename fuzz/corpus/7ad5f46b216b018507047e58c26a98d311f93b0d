@@ -1,0 +1,4 @@
+// test integer0", test_integer_to_str7ing(0)))
+assert(string_equals("1", teser_to_str7ing(0)))
+assert(string_equals("1", test_integer_t_integer_to_string(2)))
+assert(string_equals("2147483647", test_integer_to_string(2147483647)))

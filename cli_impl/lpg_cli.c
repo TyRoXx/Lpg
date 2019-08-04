@@ -254,6 +254,9 @@ static char const *semantic_error_text(semantic_error_type const error)
 
     case semantic_error_duplicate_default_case:
         return "A match must not have more than one default case";
+
+    case semantic_error_generic_impl_parameter_mismatch:
+        return "The generic parameters of the impl and the interface have to be exactly the same currently";
     }
     LPG_UNREACHABLE();
 }

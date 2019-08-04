@@ -1,0 +1,13 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method():g
+
+impl[S] gi[S] for std.unit
+    meThod(): std.string
+            
+assert(string_equals("u", u.method()))
+
+// i1)]{1}
+assert(u2.method())

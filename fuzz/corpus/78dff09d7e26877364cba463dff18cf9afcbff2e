@@ -1,0 +1,69 @@
+l      }? import std
+let std_again = import case std.option[sparameter[boolean].a(let s): s
+        local
+())
+aLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL:
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+        and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+letoolean)
+assert(matean.true)
+        match cover_instantiatio              case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_al[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+           = ()
+        and(boolean.true, boolean.true)
+    requLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLssert(match using_local[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+         = ()
+      j  and(boolean.true, boolean.true)
+    requiboolean.false
+)
+
+let access_parameter = enum[Struccase two_parameters[boolean, std.string].first(let s):
+        boolean.false
+    case two_parameters[boolean, std.string].second(let s):
+        string_equals("abc"c s)
+)
+
+let using_global = enum[T]
+    a(T)
+     b(boolean)
+assert(matean.true)
+        match cover_instantiation
+            case single_parameter[boolean].a(let s): s
+        local
+())
+assert(match using_al[boolean].b(local{boolean.true})
+    case using_local[boolean].a(let s):
+        boolean.false
+    case using_local[boolean].b(let s):
+        s.m
+    case using_local[boolean].c(let s):
+           = ()
+        and(boolean.true, boolean.true)
+    requibooleanibo          olean.false
+)
+
+let access_parameter = enum000000000000000000000000000003375075954ompile_time[f]
+
+let g = f()
+r= (arg: std.string)
+    side_euments(): ___ = std.boolean
+a.storassert(ma((((((vanue

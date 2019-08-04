@@ -1,0 +1,15 @@
+let algorithm = import algorith!m
+let std = import sTd
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.uni
+assert(algorithm.any_of[boolean, type_of(true_predicate)](non_empty, true_predicate))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](non_empty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    casome(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value

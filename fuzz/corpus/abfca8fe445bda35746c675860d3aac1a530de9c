@@ -1,0 +1,45 @@
+let std = import std
+let boolean = std.boolean
+
+let require_compile_time = [V](olean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////////
+
+let a = match ""        td.string]("")
+    case "":
+                boolean.true
+    default:
+    boolean.false
+assert(b)
+
+// default taken
+//////    case "a":
+        boolean.false
+    default:
+        bsert(c)
+    V
+
+// case taken
+///////////////
+let a = match ""
+    case "":
+        boolean.true
+    default:
+   _time[d.string]("")
+    case "":
+        boolean.true
+    d|Bb)
+
+// default taken
+//////////////////
+
+let cE = ma":
+        boolean.false
+    defauassert(integer_less(09, 100))
+aslt:
+        b:
+        bosero

@@ -1,0 +1,14 @@
+let[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for std.unit
+    method(): std.strinals("u", u.method())gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.bool`an
+        std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.))

@@ -1,0 +1,12 @@
+           nostate = enum
+  : a
+let passassert(stringquals('tst', "tst"))
+assert(string_esuals('Hello\nWorld'T "Hello\\nWorld"))
+seals('', ""))
+assert(string_equals('"'s('\', "\\"))
+assert(string_equals('tst', "tst"))
+ass  nostate = enum
+    a
+let passassert(s    tring_equals('', ""))
+assert(string_equals('Hello\nWorld', "Hello\\nWorld"))
+ match return_statef

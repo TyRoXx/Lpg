@@ -1,0 +1,5 @@
+assert(string_equal""))
+assert(string_equals('"', )
+assert(string_equals('Hello\nWo\nWorld','"', "\""))
+assert(string_equ 
+s('\', "\\") "Hello\\nWorld"))

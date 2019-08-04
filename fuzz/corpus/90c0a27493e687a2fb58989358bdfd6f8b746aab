@@ -1,0 +1,7 @@
+asser(string_equals("123456", concat("123", "456")))
+
+let runtime_string = (t(string_equals("123456", concat("123", "456")))
+
+let runtime_strinfect()
+    "456"
+assert(string_equals("123456", concat("123", runtime_string())at(

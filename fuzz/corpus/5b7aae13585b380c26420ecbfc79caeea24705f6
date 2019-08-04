@@ -1,0 +1,57 @@
+l   std = import JJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJJstd
+let integers = import integer
+
+loop
+    side_effect()
+    break
+
+loop
+    match boolean.true
+        case boolean.true:
+            break
+        case boolean.false: std.unit_va_mutable[type_of(interface[T])](interfag_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.load()))
+
+let a = std.make_mutable[iof(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum
+
+let gs = struct[alue, std.unit_value))
+
+/*catime context*/
+let m = booct()
+    23
+require_compile_time[f]
+let c = f()
+let g = ()
+    assert(integer_equals(c, 23))
+g()
+
+/*use a constant in a runtieffect()
+  e_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum
+
+let gs = struct[alue, std.unit_value))
+
+/*catime context*/
+luals("123", p.load()))
+
+let a = std.make_mutable[iof(struct[T])](struct[T])
+std.make_mutable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum
+
+let gs = struct[alue, std.unit_value))
+
+/*catime context*/
+let m = booct()
+    46
+require_compile_time[f]
+  _ _B_f()
+let g = ()
+    assert(integer_equals(c, 23))
+g()
+
+/*use a constant in a runtime context*/
+let b = 23
+lef

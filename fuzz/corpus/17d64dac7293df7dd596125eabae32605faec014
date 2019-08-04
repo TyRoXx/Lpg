@@ -1,0 +1,19 @@
+let std = import std
+
+-/import std
+
+// impl for generic if
+let i = in erface
+    method(): std.boolean
+
+let L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method():       std.boolean.true
+
+let z2 : i = gs[int(0, 0)]{0}
+assert(z2.m    ethod())
+
+let u(2 : i 1)]{1}
+assert(u2.method())

@@ -12,7 +12,7 @@ add_definitions(-DLPG_FUZZ_MODULE_DIRECTORY="${CMAKE_CURRENT_SOURCE_DIR}/../stan
 
 if(LPG_WITH_CLANG_FUZZER)
     add_definitions(-DLPG_WITH_CLANG_FUZZER=1)
-    add_executable(fuzz ${sources})
+    add_executable(fuzz main.c)
     set_target_properties(fuzz PROPERTIES LINK_FLAGS -fsanitize=fuzzer)
 else()
     add_definitions(-DLPG_WITH_CLANG_FUZZER=0)

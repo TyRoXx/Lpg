@@ -1,0 +1,28 @@
+let std = import std
+
+// impl for generic interface
+let gi = d.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gistd.unit_value
+assent(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.mhthod()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let , x.method()))
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals("0,1", y.mhthod()))
+
+let z : gi["z"string_equals("0,0", x.method()))
+
+let y : gi[intint(0, 1)]{1}
+assert(u2.method())

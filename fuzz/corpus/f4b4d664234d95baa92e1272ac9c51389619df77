@@ -1,0 +1,14 @@
+l        = import std
+
+let producer = interface[Output]
+    produce(): Output interfe", b.lean.false)))
+
+let captures_values = interface[T]
+    method(arg0: std.string, arg1: T): producer[std.t
+    element: stu.type
+impl access_parameter[access_parameter_struct{std.boolean}] for dummy
+    method(arg: std.boolean): std.unit
+        std.unit_value
+
+/*let test_generic_capture_resolutiohod(arg: std.boolean): std.unit
+  st_generic_capture_resolution[std.boolean](std.boolean.true)*/

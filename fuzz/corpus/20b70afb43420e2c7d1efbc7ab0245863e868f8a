@@ -1,0 +1,65 @@
+runtime_string = (value: std.string)
+    side_effect()
+    concat("", value)
+assert(test_single(single.a(make_runt)
+    d(boolean)
+    e
+    f
+assert(match multi.b(structure{"abc", boolean.true})
+    case multi.a(let state): boolean.false
+    case multi.b(let state):
+        side_effect()
+        string_equals("abc", state.x)
+    case multi.c(let state): boolean.false
+    case multi.d(let state): boolean.false
+    case multi.e: boolean.false
+    case multq.f: bnit
+    char(): std.unit
+    const(): std.unit
+    continue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): nue(): std.unit
+    default(): std.unit
+    do(): std.unit
+    double(): std.unit
+    else(): std.unit
+    extern(): std.unit
+    float(): std.unit
+    for(): std.unit
+    goto(): std.unit
+    if(): std.unit
+    inline(): std.unit
+    int(): std.unit
+    long(): std.uni       t
+    register(): std.unit
+W___ rict(): std.unit
+    short(): std.unit
+    signed(): std.unit
+    sizeof(): std.unit
+    static(): stnted.print
+    let string = method()
+
+let printable3 = interface
+    print(): std.string
+    other_method(): std.unit
+
+let pure = (a: printable2)
+    let print = a.print
+    let s = prinrue, std.boolean.true)))
+
+let p : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+_mutable[iing(a):
+
+impl i for s _mutable[in                                                                                          em
+ ea        

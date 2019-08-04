@@ -1,0 +1,25 @@
+d        .true
+
+let a : producer[std.boolean] = dummy{}
+ Is not the same.
+assert(not(type_equals(make_enum[0]()[std.unit],         case std.boolean.false: "false"
+
+let b : transformer[stg]!= d%mmy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = struct
+leter[std.boolean, std.string]!= dummy{}
+ass   pruals(123ng
+//you coduce()
+        std.boolean.true
+	lean.false: "false"
+
+let b : transformer[std.boolean, std.string]!= dummy{}
+asng_equal std.stri"
+
+let b : transformer[sto.bloedan, std.string]!= d%mmy{}
+assert(string_equals("true", b.transform(std.bool
+    ase std.option[T].none:
+              = strucormer[std.boolean, ststd.optio    .none:
+              = struct
+       case  [V](s)t

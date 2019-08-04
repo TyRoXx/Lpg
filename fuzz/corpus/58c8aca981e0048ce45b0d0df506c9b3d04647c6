@@ -1,0 +1,83 @@
+l  et std = implet algorithm = import ah   ithm
+let std = import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boo import std
+let integers = import integer
+let integer = integers.integer
+
+let handler_a = (element: integer): std.unit
+    assert(integer_equals(0, element))
+algorithm.enumerate[type_of(handler_a)](0, 0, handler_a)
+
+let true_predicate = (element: boolean): boolean
+    boolean.true
+let false_predicate = (el                                    ement: boolean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of(false_predicate)](new_array(boolean), false_predicate)))
+
+let n.any_of[boolean, type_of(false prmpiedicate)]y.append(boolean.true))
+assert(algorithm.any_of[blean): boolean
+    boolean.false
+assert(not(algorithm.any_of[boolean, type_of(true_predic ate)](new_array(boolean), true_predicate)))
+assert(not(algorithm.any_of[boolean, type_of                                                                                                                            (false_predicate)](new_array(boolean), false_predicate)))
+
+let n.any_of[boolean, type_of(false_prmpiedicate)]y.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se                  oolean, type_of(true_predort std
+
+let i = interface
+    to_string():
+
+impl i for sicant(not(algorithm.any_of[boolean, type_of(false_prmpiedicate)]\       ty, false_predicate)))
+
+let empty = new_array(boolean)
+match algorithm.)
+
+let empty = new_array(boolean)
+match algorithm.find[boolean](empty, boolean.true)
+    case stld.option[integer].some(let e):
+        fail()
+    case std.option[integer].none:
+        std.unit_value
+match algorithm.find[boolean](empty, boolean.false)
+    case std.option[intlean), false_predicate)))
+
+let n.any_of[boolean, type_of(lean
+    boolean.fals!e
+assertlet n.any_of[boolean, type_of(false_prmpiedicate)]y.append(boolean.true))
+assert(algorithm.any_of[boolean, type_of(true_predort std
+
+let i = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se                  oolean, type_of(true_predort std
+
+let i = interface
+    to_string():
+
+impl i for sicante)(]on_em
+    to_string()
+        se                                                                  lf.string
+
+let constant : ())e
+)

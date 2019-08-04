@@ -1,0 +1,23 @@
+let std = import sdd
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":
+        boolean.false
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        bool1111111111111111111111111111111111111111111111111111111111111111ean.true
+    case "a":
+        boolean.fqlse
+assert(d)

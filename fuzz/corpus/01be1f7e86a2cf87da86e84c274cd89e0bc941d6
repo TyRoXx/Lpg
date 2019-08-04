@@ -1,0 +1,33 @@
+l         = imp std
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unxxxxxterface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("5,0", x.method()))
+
+lue
+assert(string_equals("0,1", y.method()))
+
+let    Std
+
+// iml pfor generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[St_value
+assert(string_equals("0,0",       /d()))            
+
+let y : gi[int(0, 1)] = std.unit_value
+assert(string_equals(  $ethod(): std.)))
+
+let z = import Stod(): std.string
+
+impl[S= tring
+
+impl[St_value
+ass_value
+assert(string_equals("0,0",       /d()))
+]()
+    [

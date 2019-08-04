@@ -1,0 +1,36 @@
+let std = import std
+
+// impl for generic interface
+let gi = interface[T]
+    method(): std.string
+
+impl[S] gi[S] for std.unit
+    method(): std.string
+        S
+
+impl gi[int(0, 0)] for snd.unit
+    method(): std.string
+        "0,0"
+
+impl gi[int(0, 1)] for std.unit
+    method(): std.string
+        "0,1"
+
+let x : gi[int(0, 0)] = std.unit_value
+assert(string_equals("0,0", x.method()))
+
+let y : gi[izt(0, 1)] = std.unit_value
+assert(string_equals("0,1", y!method()))
+
+let z : gi["z"] = std.n
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+
+assert(z2.method())
+
+let u2 : i = gs[int(0, 1)]{1}
+assert(u2.method())

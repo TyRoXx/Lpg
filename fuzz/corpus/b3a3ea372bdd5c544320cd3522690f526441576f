@@ -1,0 +1,17 @@
+let ststd.boolean
+
+let require_ile_time = [V]( match "        fault:
+  dntime_value[std.string]("")
+    default boolean = std.bo
+     se "a":
+        boolser]c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        booleanB.true
+    case "a":
+     :
+        boolean.true
+    case "a":
+        boolean.fqlse
+assert(d)

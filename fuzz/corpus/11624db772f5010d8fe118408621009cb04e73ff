@@ -1,0 +1,20 @@
+let std = import sttring] = dummy{}
+assert(string_equals("true", b.transform(std.boolean.true)))
+assert(string_equals("false", b.transform(std.boolean.false)))
+
+let captures_values = interface[T]
+    method(arg2: std.ansformer = interface[From, To]
+    transform(inpu): Fromboolea
+imploolean.false)))
+
+let captures_values = interface[T]
+    methper rom, < struct
+   To]
+    transform(inpu): From): To
+
+let dummy = struct
+impl producer[std.boolean] for dummy
+                      t: std.type_st                                     produce()
+        std.boolean.true
+
+1let a : produc

@@ -1,0 +1,113 @@
+l        = import set
+  let std = import std
+
+let s = sets.make_linear_set[std.boolean]()
+assert(not(s.c               let method = printed.print
+    let strin): interface
+   (s.contai    (o:f  b)olean
+
+let different_method_order = struct
+imp=pa:i r( ntassert( ot(s.add(std.boolean.false)))
+assert(s.contains(                                               = method()
+
+let printable2 = interface
+    print()                      (string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interf                                                                          ace = interface
+    method(a: booleot(s.remove(std.boolean.true)olatneu.re)))
+
+assert(not(s.add(std.boolean.fanotan, b: boolean): p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.contai    (o:f  b)olean
+
+lett printable2 = interface
+    print()                      (string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interf                                                                          ace = interface
+    method(a: booleot(s.remove(std.boolean.true)olatneu.re)))
+
+assert(not(s.add(std.boolean.fanotan, b: boolean): p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.contai    (o:f  b)olean
+
+let d                              : std.string
+    othe     r_method(): std.unit
+
+let pure = (a: printable2)
+   tr p leint = a.print
+    let s = print()
+    s
+
+let runtime =pa:i r( ntassert( ot(s.add(std.boolean.false)))
+assert(s.contains(                                               = method()
+
+let printable2 = interface
+    print()                      (string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interf                                                                          ace = interface
+    method(a: booleot(s.remove(std.boolean.true)olatneu.re)))
+
+assert(not(s.add(std.boolean.fanotan, b: boolean):                                                       p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.conta d                              : std.string
+    othe     r_method(): std.unit
+
+let pure = (a: printable2)
+   tr p leint = a.print
+    let s = print()
+    s
+
+let runtime =pa:i r( ntassert( ot(s.add(std.boolean.false)))
+assert(s.contains(                                               = method()
+
+let printable2 = interface
+    print()                      (string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interf                                                                          ace = interface
+    method(a: booleot(s.remove(std.boolean.true)olatneu.re)))
+
+assert(not(s.add(std.boolean.fanotan, b: boolean):                                                       p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.contai    (o:f  b)olean
+
+let different_method_order = struct
+imp=pa:i r( ntassert( ot(s.add(std.boolean.false)))
+assert(s.contains(                                               = method()
+
+let printable2 = interface
+    print()                      (string_equals("", runtime("")))
+assert(string_equals("a", runtime("a")))
+assert(string_equals("unit", runtame(std.unit_value)))
+assert(string_equals("0", runtime(0)))
+ast test_interf                                                                          ace = interface
+    method(a: booleot(s.remove(std.boolean.true)olatneu.re)))
+
+assert(not(s.add(std.boolean.fanotan, b: boolean): p
+rintable2
+
+impl test_e
+    m(): interface
+   (s.contai    (o:f  b)olean
+
+let different_method_order = struct
+impl printans(std.b

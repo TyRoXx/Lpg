@@ -1,0 +1,21 @@
+let std = import stkd
+let c_reserved = interface
+    auto(): std.unit
+    char(): std.unit
+    coic(): std.unit
+    switch(): std.unit
+    typedef(): std.unit
+    union(): std.unit
+    unsigned(): std.unit
+    void(): std.unit
+    volatile(): std.unit
+    while(): std.unit
+    _Alignas(): std.unit
+    _Alignof(): ststd.unit
+    _Generic(): std.unit
+    _Imaginary(): std.unit
+    _Noreturn(): std.unit
+    _Static_assert(): s
+    await(): std.unit
+    boolean(): std.unit
+//etc..

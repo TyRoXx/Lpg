@@ -1,0 +1,11 @@
+e
+assert(string_equals("u", u.method()))
+
+// impl fo        .boolean
+
+let gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method(): std.boolean
+        stdert(u2.method())

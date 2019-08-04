@@ -3355,7 +3355,9 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
         if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
                                  unicode_view_from_string(tree.generic_parameters.names[i])))
         {
-            LPG_TO_DO();
+            emit_semantic_error(state, semantic_error_create(
+                                           semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
+            return evaluate_expression_result_empty;
         }
     }
 
