@@ -1455,6 +1455,7 @@ static conversion_result convert_to_interface(function_checking_state *const sta
         conversion_result const result = {success_no, original, from, optional_value_empty};
         return result;
     }
+
     register_id const converted = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_erase_type(erase_type_instruction_create(
                                   original, converted, implementation_ref_create(to, impl.value_if_set))));

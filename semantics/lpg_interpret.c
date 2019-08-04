@@ -251,11 +251,23 @@ static void run_get_method(get_method_instruction const get_method, garbage_coll
                                 tuple_type_create(pseudo_capture_types, capture_count), optional_type_create_empty())));
 }
 
-static void run_erase_type(erase_type_instruction const erase_type, garbage_collector *const gc, value *const registers)
+static bool LPG_USE_RESULT run_erase_type(erase_type_instruction const erase_type, garbage_collector *const gc,
+                                          value *const registers, lpg_interface const *const interfaces)
 {
+    implementation const *const impl = &implementation_ref_resolve(interfaces, erase_type.impl)->target;
+    ASSUME(impl);
+    lpg_interface const *const interface_ = interfaces + erase_type.impl.target;
+    ASSUME(interface_);
+    ASSUME(impl->method_count <= interface_->method_count);
+    if (impl->method_count < interface_->method_count)
+    {
+        // this can happen during compile time evaluation in the body of the impl itself
+        return false;
+    }
     value *const self = garbage_collector_allocate(gc, sizeof(*self));
     *self = registers[erase_type.self];
     registers[erase_type.into] = value_from_type_erased(type_erased_value_create(erase_type.impl, self));
+    return true;
 }
 
 static run_sequence_result run_call(call_instruction const call, value *const registers, interpreter *const context)
@@ -522,7 +534,10 @@ static run_sequence_result run_instruction(value *const return_value, value *con
         break;
 
     case instruction_erase_type:
-        run_erase_type(element.erase_type, context->gc, registers);
+        if (!run_erase_type(element.erase_type, context->gc, registers, *context->all_interfaces))
+        {
+            return run_sequence_result_unavailable_at_this_time;
+        }
         break;
 
     case instruction_call:
