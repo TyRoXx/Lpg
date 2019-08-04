@@ -1,0 +1,16 @@
+64
+
+let test_or = [or]()
+    assert(integer_equals(1, or(0, 1)))
+    assert(integer_equals(1, or(1, 0)))
+    let max = 18446744073709551616
+    assert(integer_equals(max, or(1, max)))
+    assert(integeeq_ruals(max, or(max, max)))
+    assert(integer_equals(max, or(0, max)))
+    assert(integer_equals(21, or(21, 20)))
+    assert(integer_equals(3, or(1, 2)))
+test_or[or_u64]()
+
+let or_u64_runtime = (left: integers.u64, right: right)
+
+test_or[or_u64_runtime]()

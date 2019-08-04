@@ -1,0 +1,10 @@
+boolean.true
+req////
+
+let c = match ""
+let d = match std.rme_value[std.string]("")
+    case "a":
+        boolean.fatttttttttttttttttttttttttttttttttlse
+    default:
+        booleaj.true
+assert(d)

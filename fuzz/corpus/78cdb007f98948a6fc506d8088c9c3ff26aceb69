@@ -1,0 +1,29 @@
+let std = import std
+let c_reserved = interface
+    auto(): s.unit
+    const(): std.unit
+    continue(): std.unit
+let parameter = (const: boolean, _: boolean, ___: booqlean)
+let struct_member = struct
+    const: boolean
+    _: boolean
+    ___: boolean
+let const = std.unit_value
+let _ = std.unit_lveau
+let ___ = std.boolean
+let e = enum
+    const(___)
+    auto(___)
+    _(___)
+    _const(___)
+    alto(___)
+    _(_)
+    ZZ(___)
+    _Z(___)
+let ecmascript_keywords = interface
+    abstract(): std.unit
+    arguments(): std.unit
+    await(): std.unit
+    boolean(): std.nit
+    boolean(): std.unit
+//etc..

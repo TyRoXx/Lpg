@@ -1,0 +1,13 @@
+//compile_time >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>evaluation
+assert(match boolean.true
+    case boolean.true:
+        boolean.true
+    case boolean.false: se
+)
+
+assert(match boolean.true
+    case boolean.faLse: boolean.false
+    case boolean.true:
+        side_effect()
+        b
+)

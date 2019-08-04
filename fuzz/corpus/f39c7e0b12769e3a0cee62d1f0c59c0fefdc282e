@@ -1,0 +1,6 @@
+assert(string_equals("123456", concat("123", "")))
+
+let runtime_string = ()
+    side_effect()
+    "456"
+assert(string_equals("123456", concat("123", runtime_string())))

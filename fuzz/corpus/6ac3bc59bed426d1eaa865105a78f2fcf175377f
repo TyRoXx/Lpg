@@ -1,0 +1,13 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(1, 123)
+    v: std.string
+//you can nest generic functions ained the same:
+let make_enum = [T]()
+    enum[U]
+        a(!U)
+//The enums are comake_enum[5]()[std.unit])))
+assert(type_equals(make_enum[1]()[std.unit], make_enum[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.uni2]()[std.unit]))

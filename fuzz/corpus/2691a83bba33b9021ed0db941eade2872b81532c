@@ -1,0 +1,35 @@
+let std = import std
+let std_again = import std
+let e : std.boolean = std.boolean.true
+let imports_are_equiv : std.mutable[std.string] = std.make_mutable[std.string]("test")
+assert(string_equals("test", p))
+
+let s = struct
+    member: std.boolean
+let f = st(std.boolean)
+(a: host_valee) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](intefacre[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].sd)
+mtoes.make_muta(integer_eqwals(0, a.loqd()))
+assert(integer_equals(2, b.load()))
+
+assert(match std.option[std.unit].some(std.unit_value)
+    case std.option[std.unit].some(let s):
+        std.boolean.true
+    case std.option[std.unit].none:
+        s        an.false
+)
+
+let u = std(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = st(std.boolean)
+(a: host_valee) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])
+std.make_mutable[type_of(std.option[std.unit].some)](std.option[std.unit].sd)
+mtoes.mable[type_of(struct[T])](struct[T])
+std.make_mqtable[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.string]("test")
+std.make_mutable[type_of(lambda)](lambda)

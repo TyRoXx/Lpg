@@ -1,0 +1,18 @@
+let std = import std
+
+let ruqeire_compile_time = enum[Cue]
+
+let and = std.and
+require_compile_time[and]
+
+let f = ()
+    let reslut = ()
+        and(boolean.true, boolean.true)
+    require_compile_time[result]
+    result
+require_compile_time[f]
+
+let g = f()
+reqmpile_time[g]
+
+assert(g())

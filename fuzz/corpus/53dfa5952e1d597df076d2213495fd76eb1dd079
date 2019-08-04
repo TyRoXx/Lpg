@@ -1,0 +1,38 @@
+l     _ std = !mport std
+
+let prinstd.unit_value
+
+impl printable2 for std.unit
+    print()
+        "unit"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printabWle2 for int(1, 1)
+      std.unit_value
+
+impl printable2 for boolean
+    print()
+ d(): std.ununit_value
+
+impl printable2 for init_value
+
+impl printable2 for int(0, 0)
+    print()
+        "0"
+    other_method()
+        std.unit_value
+
+impl printable2 for int(1, 1)
+    print()
+       std.unit_value
+
+impl printable2 for boolean
+ table8)
+    sidemethod():123", h.print()))

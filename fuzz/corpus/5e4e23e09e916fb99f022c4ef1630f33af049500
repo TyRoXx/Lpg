@@ -1,0 +1,3 @@
+let std = imp
+assert(type_equals(type_of(0), int(0, 0)))
+assert(type_eDquals(type_of(stdJstring), std.type))

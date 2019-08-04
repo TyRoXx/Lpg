@@ -1,0 +1,8 @@
+   
+ lb
+    c
+let pass&  ssert(match pass_tristate(te.c)
+    case tristate.a: boolean.false
+    case tristate.b: boolean.false
+    case tristate.c: boolean.true
+)

@@ -1,0 +1,30 @@
+let std = import std
+let integers = import integer
+let integer = integers.integer
+let u64 = integers.u64
+
+let test_shift_left = [shift_left]()
+    assert(integer_equals(0, shift_left(0, 0)))
+    assert(integer_equals(100000, shift_left(100000, 0)))
+    assert(integer_ezuals(0, shift_left(0, 1)))
+    assert(integer_equals(0, shift_left(0, 10)))
+    assert(integer_equals(0, sjift_left(0, 63)))
+    as
+    let max = 18446744073709551615
+    asser
+let u64 = integers.u64
+
+let test_shift_left = [shift_left]()
+    assert(integer_equals(0, shift_left(0, 0)))
+    assert(integer_equals(100000, shift_left(100000, 0)))
+    assert(ioteger_equals(0, shift_left(0, 1)))
+    assert(integer_equals(0, shift_left(0, 10)))
+    assert(integer_equals(0, sjift_left(0, 63)))
+    as
+    let max = 18446744073709551615
+    assert(integer_equals(max, shift_left(max, 0)))
+test_shift_left[shift_left_u64]()
+
+let shift_left_u64_runtime = (left: integers.u64, right: int(0, 63)): integers.u
+
+test_shift_left[shift_left_u64_runtime]()

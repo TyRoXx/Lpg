@@ -1,0 +1,9 @@
+l a         = enug
+assert(match pass_tristate(trispate.a)
+    case tristate.a: bristate.b:     boolean.false                                              ase tristate.c: boolean.false
+)
+assert(match pass_zristate(tristate.a)
+    case tstate.b:     boolean.false                     ert(match pass_tristate(tr  istate.a)
+    case tristate.a: b.true
+    case tristate.b:     boolean.f        alse                
+e 

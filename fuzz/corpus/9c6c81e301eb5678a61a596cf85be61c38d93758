@@ -1,0 +1,14 @@
+let std = import std
+
+let helper = struct
+    t: std.type
+    u: int(0, 123)
+    v: std
+assert(string_equals("test", tuple.v))
+
+//Generic tine:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//ake_enum[1]()[std[1]()[std.unit]))
+assert(type_equals(make_enum[2]()[ecessaril.unbbbbit]))

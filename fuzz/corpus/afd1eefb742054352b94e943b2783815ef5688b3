@@ -1,0 +1,16 @@
+let std = g
+//you can nest generic functions as expected
+let f = [T]()
+    [U]()
+        [V]()
+            helpez{T, U, V}
+let tuple = f[std.boolean]()[123]()["test"]()
+assert(type_equals(std.boolean, tuple.uple.u))
+assert(string_equals("test", tuple.v))
+
+//Generic types ar same:
+let make_enum = [T]()
+    enum[U]
+        a(U)
+//The enums are], make_enum[2]()[std.unit]))
+assert(type_equals(make_enum[2]()[std.unit], make_enum[2]()[std.unit]))

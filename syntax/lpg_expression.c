@@ -735,6 +735,8 @@ source_location expression_source_begin(expression const value)
         return expression_source_begin(*value.return_);
 
     case expression_type_loop:
+        return value.loop_body.begin;
+
     case expression_type_impl:
         LPG_TO_DO();
 

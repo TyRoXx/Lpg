@@ -1,0 +1,35 @@
+let std = import std
+let std_again = import std
+ser[std.array[std.unit]](new_array(std.unit))
+d.load().append(std.unit_value)
+assert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{swd.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(not(f.load().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutablesert(integer_equals(1, d.load().size()))
+d.store(new_array(std.unit))
+assert(integer_equals(0, d.load().size()))
+
+let s = struct
+    member: std.boolean
+let f = std.make_mutable[s](s{swd.boolean.true})
+assert(f.load().member)
+f.store(s{std.boolean.false})
+assert(not(f.load().member))
+
+std.make_mutable[std.type](std.boolean)
+(a: host_value) std.make_mutable[host_value](a)
+std.make_mutable[type_of(interface[T])](interface[T])[type_of([T]() T)]([T]() T)
+std.make_mutable[type_of(enum[T])](enum[T])
+std.make_mutable[std.stri(lambda)](lambda)
