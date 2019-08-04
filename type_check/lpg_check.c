@@ -373,9 +373,6 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_type:
         case type_kind_integer_range:
         case type_kind_interface:
-            emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
-            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
-
         case type_kind_structure:
         case type_kind_function_pointer:
         case type_kind_tuple:
@@ -386,7 +383,8 @@ static read_structure_element_result read_element(function_checking_state *state
         case type_kind_generic_interface:
         case type_kind_host_value:
         case type_kind_generic_lambda:
-            LPG_TO_DO();
+            emit_semantic_error(state, semantic_error_create(semantic_error_unknown_element, element->source));
+            return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
         case type_kind_enumeration:
         {
