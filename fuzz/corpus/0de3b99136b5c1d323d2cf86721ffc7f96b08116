@@ -1,0 +1,31 @@
+
+let b = match s!td.run_time[a]
+assert(a)
+
+let b = match std.runtime_van.salse
+assert// default taken
+/*////                  ////////////
+
+let c = match ""
+    case "a"
+
+let d < match std.runtime_value[stlllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllntime_van.false
+assert(b)
+
+// default taken
+/*////                  /lllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllntime_van.false
+assert(b)
+
+// default taken
+/*////                  ////////////ntime_van.false
+assert(bJ
+d)/ 
+/efault taken
+/*////    t(c)
+
+let d < match std.runtime_value[std.string]("")
+    case "a":
+        boolean.false
+    default:
+        boolean.true
+assert(d)

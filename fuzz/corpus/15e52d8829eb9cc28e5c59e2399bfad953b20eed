@@ -1,0 +1,13 @@
+l = import std
+
+letter = enum[T]
+    a((T)
+
+let an.nf = (arg: option)
+    match arg
+        case option.none:
+            side_effect()
+            boolean.false
+        ers = enum[First, Second]
+    first(First)
+    second(g_global[bc 

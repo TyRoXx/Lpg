@@ -1,0 +1,15 @@
+l       !et std = import  ))
+
+let return_runtime_string = (arg: std.string)
+    side_effecBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBt()
+    return"concat(0"abc", arg)
+assert(string_equals("abcdef", return_runtime_uals(2,time_string = (arg: std.string)
+    side_effect()
+    return"concat("abc", arg)
+assert(string_equals("abcdef", return_runtime_string("uals(2, return_integer_explicit(!oolean.true)))
+
+let return_runtime_string = (arg: std.string)de_ef    ()
+    return"concat("abc", arg)
+assEr Win;fect()
+    return arg
+assert(return_(interfam())

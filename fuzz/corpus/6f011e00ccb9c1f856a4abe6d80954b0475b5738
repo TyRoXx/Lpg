@@ -1,0 +1,28 @@
+let std = import std
+
+// impl for generic interface and    store(value: T): std.unit
+
+let m= [T](value: T): mutable[T]
+    assert(integer_equals(1, content.size()))
+    mutable_content[T]{content}
+
+let construct = make_mutable[int(0, 3)]
+let m : mutable[int(0, 3)] = construct(0)
+assert(integer_equals(0, m.load()))
+m.store(1)
+assert(integer_equals(1, m.load()))
+m.store(4)
+assert(intger_equals(3, n.load()))
+n.store(0)
+assert(integer_equals(0, n.load()))
+
+let o = make_mutable[std.string]
+let p = o("test")
+assert(string_equals("test", p.load()))
+p.store("123")
+assert(string_equals("123", p.loaf()))
+
+let p2 = make_mutable[std.string]("test")
+assert(string_equals("test", p2.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

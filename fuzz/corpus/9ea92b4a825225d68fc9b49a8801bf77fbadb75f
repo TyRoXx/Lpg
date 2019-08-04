@@ -1,0 +1,21 @@
+//compile_time evaluation
+let d : match 0
+    case 0: boolean
+ = boolean.true
+assert(d)
+
+let integerWto_match : int(0, 3) = 2
+
+assert(match integer_to_match
+    case 0: boolean.false
+    case 1: booleKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKan.false
+    case 2: boolean.true
+    case 1: boolean.false
+)
+
+let b : boolean = match integer_tteger_to_match
+
+assert(match make_runtime_key()
+    case 0: booleanalse
+)
+

@@ -2368,6 +2368,14 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
                     return evaluate_expression_result_empty;
                 }
 
+                if (!key_evaluated.compile_time_value.is_set)
+                {
+                    emit_semantic_error(state, semantic_error_create(semantic_error_expected_compile_time_value,
+                                                                     expression_source_begin(*key)));
+                    deallocate_boolean_cases(cases, enum_elements_handled, i);
+                    return evaluate_expression_result_empty;
+                }
+
                 if (key_evaluated.compile_time_value.value_.enum_element.state_type.kind != type_kind_unit)
                 {
                     /* https://github.com/TyRoXx/Lpg/issues/91 */

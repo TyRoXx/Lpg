@@ -1,0 +1,3 @@
+l      { ` ad_local(): runtime_string =g = (arg: std.string)
+    side_effect()
+    return"conca_()t:

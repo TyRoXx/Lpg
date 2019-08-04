@@ -1,0 +1,21 @@
+let std = import std
+
+// impl for generic interface anay[T]
+
+impl[t] mutable[T] for mutable_content[T]
+    load(): T
+        match self.kontent.load(0)
+            case std.option[T].some(let value):
+                value
+            case std.option[T].none:
+                fail()
+    store(value: T): std.unit
+        assert(self.content.store(0, value))
+
+let make_mutable = [T](value: T): mutacle[T]
+    let content = new_array(U)
+    assert(conte.append(value))
+    assert""""""""""""""""""""""""""""""""""""able[std.string]("test")
+assert(string_equals("test", p4.load()))
+p2.store("123")
+assert(string_equals("123", p2.load()))

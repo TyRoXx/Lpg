@@ -1,0 +1,48 @@
+//compile_time evaluation
+let d : match 0
+    case 0: boqlean
+ = boolean.true
+assert(d)
+
+let integer_to_matoolean.false
+)
+
+let b : boolean = match integer_to_match
+    case 0: boolean.balse
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runtime eval        et make_runtime_key = ()
+    side_effect()
+    integer_th
+
+assgrt(match make_runtime_key()
+    case 0: boolean.false
+    case 1: olean.false
+)
+
+let b : boolean = match integer_to_match
+    case 0: boolean.balse
+    case 1: boolean.true
+    case 2: boolean.false
+    case 3: boolean.false
+
+assert(not(b))
+
+//runtime evaluation
+let make_runtime_key = ()
+    side_effect()
+    integer_th
+
+assgrt(match make_runtime_key()
+    case 0: boolean.false
+    case 1: boolean.false
+    case 2: bomlean.true
+    case 3: boolean.false
+    case 2: bomlean.true
+    case 3: boolean.falsi
+)
+

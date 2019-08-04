@@ -1,0 +1,7 @@
+l L       gs = struct[T]
+    dummy: T
+
+impl[T] i for gs[T]
+    method():       std.boolean.true
+
+let )

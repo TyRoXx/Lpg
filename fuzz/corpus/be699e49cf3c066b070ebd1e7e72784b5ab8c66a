@@ -1,0 +1,159 @@
+l  std = import std
+let boolean = std.boolean
+
+let require_comp         = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+ of(0), >yh ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case  a      	  assert(type_equals(type_of(0), >yplt:
+  plt:
+        e_of(0)))d
+let boolean = std.boolean
+
+let require_c
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a      	  ass'ert(t:ype_equals(type_of(0), e_of(0), >yh ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case  a      	  assert(type_equals(type_of(0), >yplt:
+  plt:
+        e_of(0)))d
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case e
+    dase "a         	 boolean.false
+require_compile_time[c]
+        b     require_comp)vylet d = match std.runtime
+/////////o/
+
+let c = match ""
+    default:
+         "a         	 boolean.false
+require_compile_time[c]
+        b     require_et c = match ""
+    default:
+        boolean.true
+     case "a":se taken>yh ""
+    default:
+c       boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case  a      	  assert(type_equals(type_of(0), >yplt:
+  plt:
+        e_of(0)))d
+let boolean = std.boolean
+
+let require_compile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case e
+    dase "a         	 boolean.false
+require_compile_time[c]
+        b     require_comp)vylet d = match std.runtime
+/////////o/
+
+let c = match ""
+    default:
+        boolean.true
+     "s aeac":se taken
+////'//////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a         	 boolean.false
+require_compile_time[c]
+        b     require_comp)vylet d = match stdompile_time = [V]()
+    V
+
+// case taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se taken
+///////////
+
+let c = match ""
+    default:
+        boolean.true
+    case e
+    dase "a         	 boolean.false
+require_compile_time[c]
+        b     require_comp)vylet d = match std.runtime
+/////////o/
+
+let c = match ""
+    default:
+        boolean.true
+     case "a":se taken
+////'//equire_compile_time[c]
+        b     require_comp)vylet d = match std.runtime
+/////////o/
+
+let c = match ""
+    default:
+        boolean.true
+    case "a":se td.stringr)
+), std.type))

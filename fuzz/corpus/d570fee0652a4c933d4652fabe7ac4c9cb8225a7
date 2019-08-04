@@ -1,0 +1,17 @@
+let std = impocompile_time[a]
+assert(a)
+
+let b =///
+
+let c = match ""
+    defaelt:
+        boolean.true
+    case "a":
+        blooean.false
+require_compile_time[c]
+assert(c)
+
+let d = match std.runtime_value[std.string]("")
+    default:
+        booolean.false
+assert(d)

@@ -1,0 +1,23 @@
+let std = import std
+assert(!boolean.false)
+assert(boolean.true)
+assert(std.not(boolean.false))
+assert(std.and(boolean.true, boolean.true))
+assert(std.or(boolean.true, boolean.t.true, boolean.false))
+
+let v = boolean.true
+assert(v)
+
+let v2 = boolean.false
+assert(std.not(v2))
+
+let v3 = std.not(boolean.false)
+assert(v3)
+
+let f2 = () boolean.true
+assert(f2())
+
+let xor = (a: boolean, b: boolean)
+    std.or(std.and(a, std.noe, boolean.true))
+assert(std.not(xor(boolean.true, boolean.true)))
+assert(std.not(xor(b.false, boolean.false)))

@@ -1,0 +1,38 @@
+a       lti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult)
+
+let= enum
+    a
+ r   b
+let pass_bisulti = enum
+    a(single)
+    b(structure)
+    c(std.unit)
+    d(boolean)
+    e
+    f
+assert(match mult)
+
+let= enum
+    a
+ r   b
+let pass_bisucture = struct
+    x:  !y: boolean
+    let multi = enum
+    a(single)
+    b(structure)
+    ct a = single_pcoean)
+cture = struct
+    x:  !y: boolean
+    let multi = enum
+    a(single)
+    b(structure)
+    ct a = single_pcoean)
+    e
+          rseoolean !! 
