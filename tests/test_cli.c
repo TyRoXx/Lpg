@@ -118,7 +118,7 @@ static void test_web_cli(unicode_view const current_directory)
     char *arguments[] = {"lpg", "web", unicode_string_c_str(&input), unicode_string_c_str(&output)};
     expect_output(LPG_ARRAY_SIZE(arguments), arguments, false,
                   "Could not open source file\nCould not find template. Using "
-                  "default template.",
+                  "default template.\n",
                   current_directory);
     REQUIRE(0 == remove(unicode_string_c_str(&input)));
     unicode_string_free(&input);

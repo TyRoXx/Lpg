@@ -112,7 +112,7 @@ unicode_string generate_template(stream_writer diagnostics, const char *file_nam
     if (content.error)
     {
         stream_writer_write_string(diagnostics, content.error);
-        stream_writer_write_string(diagnostics, "Could not find template. Using default template.");
+        stream_writer_write_string(diagnostics, "Could not find template. Using default template.\n");
         return get_default_template();
     }
     content.success.length = remove_carriage_returns(content.success.data, content.success.length);
