@@ -182,10 +182,8 @@ tokenize_result tokenize(char const *input, size_t length)
 
     case '"':
     {
-        memory_writer decoded = {NULL, 0, 0};
         decode_string_literal_result const decoding_result =
-            decode_string_literal(unicode_view_create(input, length), memory_writer_erase(&decoded));
-        memory_writer_free(&decoded);
+            decode_string_literal(unicode_view_create(input, length), stream_writer_create_null_writer());
         if (decoding_result.is_valid)
         {
             return make_success(token_string, decoding_result.length);
