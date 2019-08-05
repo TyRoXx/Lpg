@@ -1976,10 +1976,9 @@ static pattern_evaluate_result check_for_pattern(function_checking_state *state,
         {
             return pattern_evaluate_result_no;
         }
-        return pattern_evaluate_result_create_pattern(
-            *enum_element_evaluated.type_.enum_constructor,
-            unicode_view_from_string(root.call.arguments.elements[0].placeholder.name),
-            root.call.arguments.elements[0].placeholder.where);
+        return pattern_evaluate_result_create_pattern(*enum_element_evaluated.type_.enum_constructor,
+                                                      root.call.arguments.elements[0].placeholder.name,
+                                                      root.call.arguments.elements[0].placeholder.where);
     }
 
     case expression_type_lambda:

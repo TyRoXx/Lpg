@@ -280,10 +280,10 @@ impl_expression impl_expression_clone(impl_expression const original);
 typedef struct placeholder_expression
 {
     source_location where;
-    unicode_string name;
+    unicode_view name;
 } placeholder_expression;
 
-placeholder_expression placeholder_expression_create(source_location where, unicode_string name);
+placeholder_expression placeholder_expression_create(source_location where, unicode_view name);
 void placeholder_expression_free(placeholder_expression const freed);
 bool placeholder_expression_equals(placeholder_expression const left, placeholder_expression const right);
 placeholder_expression placeholder_expression_clone(placeholder_expression const original);

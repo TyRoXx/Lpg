@@ -505,7 +505,7 @@ impl_expression impl_expression_clone(impl_expression const original)
                                   original.method_count);
 }
 
-placeholder_expression placeholder_expression_create(source_location where, unicode_string name)
+placeholder_expression placeholder_expression_create(source_location where, unicode_view name)
 {
     placeholder_expression const result = {where, name};
     return result;
@@ -513,17 +513,17 @@ placeholder_expression placeholder_expression_create(source_location where, unic
 
 void placeholder_expression_free(placeholder_expression const freed)
 {
-    unicode_string_free(&freed.name);
+    (void)freed;
 }
 
 bool placeholder_expression_equals(placeholder_expression const left, placeholder_expression const right)
 {
-    return source_location_equals(left.where, right.where) && unicode_string_equals(left.name, right.name);
+    return source_location_equals(left.where, right.where) && unicode_view_equals(left.name, right.name);
 }
 
 placeholder_expression placeholder_expression_clone(placeholder_expression const original)
 {
-    return placeholder_expression_create(original.where, unicode_view_copy(unicode_view_from_string(original.name)));
+    return placeholder_expression_create(original.where, original.name);
 }
 
 new_array_expression new_array_expression_create(expression *element)

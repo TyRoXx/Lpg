@@ -1611,8 +1611,8 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
 
     if (peek(parser).token == token_right_parenthesis)
     {
-        expression_parser_result const result = {true, expression_from_placeholder(placeholder_expression_create(
-                                                           name.where, unicode_view_copy(name.content)))};
+        expression_parser_result const result = {
+            true, expression_from_placeholder(placeholder_expression_create(name.where, name.content))};
         return result;
     }
     parse_optional_space(parser);
