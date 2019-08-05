@@ -89,10 +89,11 @@ success_indicator generate_ecmascript_web_site(checked_program const program, un
 static unicode_string get_default_template(void)
 {
     unicode_view first_part = unicode_view_from_c_str("<!DOCTYPE html><html>"
-                                                      "<head> <meta charset=\"UTF-8\"><title>LPG web</title>");
-    unicode_view last_part = unicode_view_from_c_str("</head>"
-                                                     "<body>"
-                                                     "</body></html>");
+                                                      "<head>"
+                                                      "<meta charset=\"UTF-8\">"
+                                                      "<title>LPG web</title>"
+                                                      "</head><body>");
+    unicode_view last_part = unicode_view_from_c_str("</body></html>");
 
     const unicode_string end_of_string =
         unicode_view_concat(unicode_view_create(web_template_marker, strlen(web_template_marker)), last_part);
