@@ -153,17 +153,17 @@ void test_parse_expression_success(void)
     }
 
     {
-        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
-        parameters[0] = unicode_string_from_c_str("a");
+        unicode_view *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_view_from_c_str("a");
         test_successful_parse(expression_from_enum(enum_expression_create(
                                   source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0)),
                               unicode_string_from_c_str("enum[a]"), false);
     }
 
     {
-        unicode_string *const parameters = allocate_array(2, sizeof(*parameters));
-        parameters[0] = unicode_string_from_c_str("a");
-        parameters[1] = unicode_string_from_c_str("b");
+        unicode_view *const parameters = allocate_array(2, sizeof(*parameters));
+        parameters[0] = unicode_view_from_c_str("a");
+        parameters[1] = unicode_view_from_c_str("b");
         test_successful_parse(expression_from_enum(enum_expression_create(
                                   source_location_create(0, 0), generic_parameter_list_create(parameters, 2), NULL, 0)),
                               unicode_string_from_c_str("enum[a, b]"), false);

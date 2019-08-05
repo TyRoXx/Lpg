@@ -499,7 +499,7 @@ static generic_parameter_list parse_generic_parameters(expression_parser *const 
         return result;
     }
     pop(parser);
-    unicode_string *generic_parameters = NULL;
+    unicode_view *generic_parameters = NULL;
     size_t generic_parameter_count = 0;
     for (;;)
     {
@@ -508,7 +508,7 @@ static generic_parameter_list parse_generic_parameters(expression_parser *const 
         {
             generic_parameters =
                 reallocate_array(generic_parameters, generic_parameter_count + 1, sizeof(*generic_parameters));
-            generic_parameters[generic_parameter_count] = unicode_view_copy(next.content);
+            generic_parameters[generic_parameter_count] = next.content;
             ++generic_parameter_count;
             pop(parser);
             rich_token const after_parameter = peek(parser);

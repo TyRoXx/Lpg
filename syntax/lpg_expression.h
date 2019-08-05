@@ -25,7 +25,7 @@ function_header_tree function_header_tree_clone(function_header_tree const origi
 
 typedef struct generic_parameter_list
 {
-    unicode_string *names;
+    unicode_view *names;
     size_t count;
 } generic_parameter_list;
 
@@ -200,7 +200,7 @@ typedef struct declare
 
 declare declare_clone(declare const original);
 
-generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count);
+generic_parameter_list generic_parameter_list_create(unicode_view *names, size_t count);
 void generic_parameter_list_free(generic_parameter_list const freed);
 bool generic_parameter_list_equals(generic_parameter_list const left, generic_parameter_list const right);
 generic_parameter_list generic_parameter_list_clone(generic_parameter_list const original);

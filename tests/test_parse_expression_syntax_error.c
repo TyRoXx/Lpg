@@ -242,8 +242,8 @@ void test_parse_expression_syntax_error(void)
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_right_bracket, source_location_create(0, 7))};
-        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
-        parameters[0] = unicode_string_from_c_str("a");
+        unicode_view *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_view_from_c_str("a");
         expression expected = expression_from_enum(enum_expression_create(
             source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0));
         test_syntax_error(
@@ -253,8 +253,8 @@ void test_parse_expression_syntax_error(void)
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_right_bracket, source_location_create(0, 6))};
-        unicode_string *const parameters = allocate_array(1, sizeof(*parameters));
-        parameters[0] = unicode_string_from_c_str("a");
+        unicode_view *const parameters = allocate_array(1, sizeof(*parameters));
+        parameters[0] = unicode_view_from_c_str("a");
         expression expected = expression_from_enum(enum_expression_create(
             source_location_create(0, 0), generic_parameter_list_create(parameters, 1), NULL, 0));
         test_syntax_error(

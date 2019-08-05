@@ -111,7 +111,7 @@ static success_indicator save_generic_parameters_if_not_empty(stream_writer cons
         {
             LPG_TRY(stream_writer_write_string(to, ", "));
         }
-        LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(parameters.names[i])));
+        LPG_TRY(stream_writer_write_unicode_view(to, parameters.names[i]));
     }
     return stream_writer_write_string(to, "]");
 }

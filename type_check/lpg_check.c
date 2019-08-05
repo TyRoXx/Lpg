@@ -1151,9 +1151,8 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
         register_id const argument_register = allocate_register(&interface_checking.used_registers);
         add_local_variable(
             &interface_checking.local_variables,
-            local_variable_create(unicode_view_copy(unicode_view_from_string(tree.generic_parameters.names[i])),
-                                  local_variable_phase_initialized, argument_types[i],
-                                  optional_value_create(arguments[i]), argument_register, NULL));
+            local_variable_create(unicode_view_copy(tree.generic_parameters.names[i]), local_variable_phase_initialized,
+                                  argument_types[i], optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     use_generic_closures(&interface_checking, closures);
@@ -3255,8 +3254,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         {
             LPG_TO_DO();
         }
-        if (!unicode_view_equals(
-                argument.identifier.value, unicode_view_from_string(element.generic_parameters.names[i])))
+        if (!unicode_view_equals(argument.identifier.value, element.generic_parameters.names[i]))
         {
             emit_semantic_error(state, semantic_error_create(
                                            semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
@@ -3393,7 +3391,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
         {
             LPG_TO_DO();
         }
-        if (!unicode_view_equals(argument.identifier.value, unicode_view_from_string(tree.generic_parameters.names[i])))
+        if (!unicode_view_equals(argument.identifier.value, tree.generic_parameters.names[i]))
         {
             emit_semantic_error(state, semantic_error_create(
                                            semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
@@ -3880,10 +3878,9 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
     {
         register_id const argument_register = allocate_register(&enum_checking.used_registers);
         add_local_variable(&enum_checking.local_variables,
-                           local_variable_create(
-                               unicode_view_copy(unicode_view_from_string(instantiated_enum.tree.parameters.names[i])),
-                               local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                               argument_register, NULL));
+                           local_variable_create(unicode_view_copy(instantiated_enum.tree.parameters.names[i]),
+                                                 local_variable_phase_initialized, argument_types[i],
+                                                 optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&enum_checking, argument_register, arguments[i]);
     }
     use_generic_closures(&enum_checking, instantiated_enum.closures);
@@ -4018,10 +4015,9 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
         register_id const argument_register = allocate_register(&struct_checking.used_registers);
         add_local_variable(
             &struct_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_struct.tree.generic_parameters.names[i])),
-                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register, NULL));
+            local_variable_create(unicode_view_copy(instantiated_struct.tree.generic_parameters.names[i]),
+                                  local_variable_phase_initialized, argument_types[i],
+                                  optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&struct_checking, argument_register, arguments[i]);
     }
     use_generic_closures(&struct_checking, instantiated_struct.closures);
@@ -4155,12 +4151,10 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
     for (size_t i = 0; i < instantiated_interface.tree.parameters.count; ++i)
     {
         register_id const argument_register = allocate_register(&interface_checking.used_registers);
-        add_local_variable(
-            &interface_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_interface.tree.parameters.names[i])),
-                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register, NULL));
+        add_local_variable(&interface_checking.local_variables,
+                           local_variable_create(unicode_view_copy(instantiated_interface.tree.parameters.names[i]),
+                                                 local_variable_phase_initialized, argument_types[i],
+                                                 optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&interface_checking, argument_register, arguments[i]);
     }
     use_generic_closures(&interface_checking, instantiated_interface.closures);
@@ -4279,10 +4273,9 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
         register_id const argument_register = allocate_register(&lambda_checking.used_registers);
         add_local_variable(
             &lambda_checking.local_variables,
-            local_variable_create(
-                unicode_view_copy(unicode_view_from_string(instantiated_lambda.tree.generic_parameters.names[i])),
-                local_variable_phase_initialized, argument_types[i], optional_value_create(arguments[i]),
-                argument_register, NULL));
+            local_variable_create(unicode_view_copy(instantiated_lambda.tree.generic_parameters.names[i]),
+                                  local_variable_phase_initialized, argument_types[i],
+                                  optional_value_create(arguments[i]), argument_register, NULL));
         write_register_compile_time_value(&lambda_checking, argument_register, arguments[i]);
     }
     use_generic_closures(&lambda_checking, instantiated_lambda.closures);

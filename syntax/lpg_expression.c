@@ -251,7 +251,7 @@ declare declare_clone(declare const original)
         expression_allocate(expression_clone(*original.initializer)));
 }
 
-generic_parameter_list generic_parameter_list_create(unicode_string *names, size_t count)
+generic_parameter_list generic_parameter_list_create(unicode_view *names, size_t count)
 {
     generic_parameter_list const result = {names, count};
     return result;
@@ -259,10 +259,6 @@ generic_parameter_list generic_parameter_list_create(unicode_string *names, size
 
 void generic_parameter_list_free(generic_parameter_list const freed)
 {
-    for (size_t i = 0; i < freed.count; ++i)
-    {
-        unicode_string_free(&freed.names[i]);
-    }
     if (freed.names)
     {
         deallocate(freed.names);
@@ -277,7 +273,7 @@ bool generic_parameter_list_equals(generic_parameter_list const left, generic_pa
     }
     for (size_t i = 0; i < left.count; ++i)
     {
-        if (!unicode_string_equals(left.names[i], right.names[i]))
+        if (!unicode_view_equals(left.names[i], right.names[i]))
         {
             return false;
         }
@@ -287,10 +283,10 @@ bool generic_parameter_list_equals(generic_parameter_list const left, generic_pa
 
 generic_parameter_list generic_parameter_list_clone(generic_parameter_list const original)
 {
-    unicode_string *const names = allocate_array(original.count, sizeof(*names));
+    unicode_view *const names = allocate_array(original.count, sizeof(*names));
     for (size_t i = 0; i < original.count; ++i)
     {
-        names[i] = unicode_view_copy(unicode_view_from_string(original.names[i]));
+        names[i] = original.names[i];
     }
     return generic_parameter_list_create(names, original.count);
 }
