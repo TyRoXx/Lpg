@@ -993,7 +993,7 @@ bool identifier_expression_equals(identifier_expression const left, identifier_e
     return unicode_view_equals(left.value, right.value) && source_location_equals(left.source, right.source);
 }
 
-string_expression string_expression_create(unicode_string value, source_location source)
+string_expression string_expression_create(unicode_view value, source_location source)
 {
     string_expression const result = {value, source};
     return result;
@@ -1001,17 +1001,17 @@ string_expression string_expression_create(unicode_string value, source_location
 
 void string_expression_free(string_expression const *value)
 {
-    unicode_string_free(&value->value);
+    (void)value;
 }
 
 string_expression string_expression_clone(string_expression const original)
 {
-    return string_expression_create(unicode_view_copy(unicode_view_from_string(original.value)), original.source);
+    return string_expression_create(original.value, original.source);
 }
 
 bool string_expression_equals(string_expression const left, string_expression const right)
 {
-    return source_location_equals(left.source, right.source) && unicode_string_equals(left.value, right.value);
+    return source_location_equals(left.source, right.source) && unicode_view_equals(left.value, right.value);
 }
 
 void comment_expression_free(comment_expression const *value)

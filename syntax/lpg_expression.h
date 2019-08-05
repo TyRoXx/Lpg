@@ -322,11 +322,11 @@ bool identifier_expression_equals(identifier_expression const left, identifier_e
 
 typedef struct string_expression
 {
-    unicode_string value;
+    unicode_view value;
     source_location source;
 } string_expression;
 
-string_expression string_expression_create(unicode_string value, source_location source);
+string_expression string_expression_create(unicode_view value, source_location source);
 void string_expression_free(LPG_NON_NULL(string_expression const *value));
 string_expression string_expression_clone(string_expression const original);
 bool string_expression_equals(string_expression const left, string_expression const right);

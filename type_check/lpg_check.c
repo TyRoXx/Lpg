@@ -4728,11 +4728,11 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
     {
         register_id const result = allocate_register(&state->used_registers);
         unicode_view literal;
-        if (element.string.value.data[0] == '"')
+        if (element.string.value.begin[0] == '"')
         {
             memory_writer decoded = {NULL, 0, 0};
             stream_writer const decoded_writer = memory_writer_erase(&decoded);
-            decode_string_literal(unicode_view_from_string(element.string.value), decoded_writer);
+            decode_string_literal(element.string.value, decoded_writer);
             char *const copy = garbage_collector_allocate(&state->program->memory, decoded.used);
             if (decoded.used > 0)
             {
@@ -4746,7 +4746,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
             const size_t length = element.string.value.length;
             char *const copy = garbage_collector_allocate(&state->program->memory, length - 2);
             ASSUME(length >= 2);
-            memcpy(copy, element.string.value.data + 1, length - 2);
+            memcpy(copy, element.string.value.begin + 1, length - 2);
             literal = unicode_view_create(copy, length - 2);
         }
 

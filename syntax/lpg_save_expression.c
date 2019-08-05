@@ -192,7 +192,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         LPG_TRY(stream_writer_write_string(to, "\""));
         LPG_FOR(size_t, i, value->string.value.length)
         {
-            switch (value->string.value.data[i])
+            switch (value->string.value.begin[i])
             {
             case '\"':
             case '\'':
@@ -200,7 +200,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
                 LPG_TRY(stream_writer_write_string(to, "\\"));
                 break;
             }
-            LPG_TRY(stream_writer_write_bytes(to, (value->string.value.data + i), 1));
+            LPG_TRY(stream_writer_write_bytes(to, (value->string.value.begin + i), 1));
         }
         return stream_writer_write_string(to, "\"");
 

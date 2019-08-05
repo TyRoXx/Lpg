@@ -1024,7 +1024,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         {
             pop(parser);
             expression_parser_result const result = {
-                1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
+                1, expression_from_string(string_expression_create(head.content, head.where))};
             return parse_callable_result_create(result, true);
         }
 
@@ -1032,7 +1032,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
         {
             pop(parser);
             expression_parser_result const result = {
-                1, expression_from_string(string_expression_create(unicode_view_copy(head.content), head.where))};
+                1, expression_from_string(string_expression_create(head.content, head.where))};
             return parse_callable_result_create(result, true);
         }
 
