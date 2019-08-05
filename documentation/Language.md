@@ -93,7 +93,7 @@ string_list.append("something")
 // Getting the size of the array
 string_list.size()
 
-// Setting element at index 0, it returns true on sucess
+// Setting element at index 0, it returns true on success
 string_list.store(0, "hello")
 ```
 Those are the basic functions of an array. Loading from the array is a little more complicated because it returns a `std.option` which has either a value if the index exists or none if the index does not exist.
@@ -309,7 +309,7 @@ End something */
 ### Modules
 
 #### Importing modules
-Most of the functions can be found in the standard libary and have to be imported when used in the current LPG file. To import a module you need to specify the module name and the handle.
+Most of the functions can be found in the standard library and have to be imported when used in the current LPG file. To import a module you need to specify the module name and the handle.
 ```lpg
 let handle = import std
 ```
