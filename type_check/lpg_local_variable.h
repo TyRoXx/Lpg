@@ -13,7 +13,7 @@ typedef enum local_variable_phase {
 
 typedef struct local_variable
 {
-    unicode_string name;
+    unicode_view name;
     local_variable_phase phase;
     type type_;
     optional_value compile_time_value;
@@ -21,7 +21,7 @@ typedef struct local_variable
     struct function_checking_state *lambda_origin;
 } local_variable;
 
-local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
+local_variable local_variable_create(unicode_view name, local_variable_phase phase, type const type_,
                                      optional_value compile_time_value, register_id where,
                                      struct function_checking_state *lambda_origin);
 

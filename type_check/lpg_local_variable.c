@@ -5,7 +5,7 @@
 #include "lpg_instruction.h"
 #include <lpg_source_location.h>
 
-local_variable local_variable_create(unicode_string name, local_variable_phase phase, type const type_,
+local_variable local_variable_create(unicode_view name, local_variable_phase phase, type const type_,
                                      optional_value compile_time_value, register_id where,
                                      struct function_checking_state *lambda_origin)
 {
@@ -15,7 +15,7 @@ local_variable local_variable_create(unicode_string name, local_variable_phase p
 
 void local_variable_free(local_variable const *const freed)
 {
-    unicode_string_free(&freed->name);
+    (void)freed;
 }
 
 void local_variable_container_free(local_variable_container const freed)
@@ -43,7 +43,7 @@ void local_variable_initialize(local_variable_container *variables, unicode_view
     LPG_FOR(size_t, i, variables->count)
     {
         local_variable *const variable = variables->elements + i;
-        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        if (unicode_view_equals(name, variable->name))
         {
             switch (variable->phase)
             {
@@ -69,7 +69,7 @@ static local_variable *find_local_variable(local_variable_container *variables, 
     LPG_FOR(size_t, i, variables->count)
     {
         local_variable *const variable = variables->elements + i;
-        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        if (unicode_view_equals(name, variable->name))
         {
             return variable;
         }
@@ -83,7 +83,7 @@ void initialize_early(local_variable_container *variables, unicode_view name, ty
     LPG_FOR(size_t, i, variables->count)
     {
         local_variable *const variable = variables->elements + i;
-        if (unicode_view_equals(name, unicode_view_from_string(variable->name)))
+        if (unicode_view_equals(name, variable->name))
         {
             switch (variable->phase)
             {
@@ -108,16 +108,15 @@ void initialize_lambda_being_checked(local_variable_container *variables, unicod
                                      struct function_checking_state *lambda_origin)
 {
     ASSUME(!local_variable_name_exists(*variables, name));
-    add_local_variable(
-        variables, local_variable_create(unicode_view_copy(name), local_variable_phase_lambda_being_checked, what,
-                                         optional_value_empty, ~(register_id)0, lambda_origin));
+    add_local_variable(variables, local_variable_create(name, local_variable_phase_lambda_being_checked, what,
+                                                        optional_value_empty, ~(register_id)0, lambda_origin));
 }
 
 bool local_variable_name_exists(local_variable_container const variables, unicode_view const name)
 {
     LPG_FOR(size_t, i, variables.count)
     {
-        if (unicode_view_equals(unicode_view_from_string(variables.elements[i].name), name))
+        if (unicode_view_equals(variables.elements[i].name, name))
         {
             return true;
         }
