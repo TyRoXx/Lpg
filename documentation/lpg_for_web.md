@@ -8,7 +8,7 @@ If you want to have customize the template just create a HTML file with the same
 
 ## Code examples
 
-If you want to write a web applcation with LPG that compiles to Ecmascript then you can use the `ecmascript` module in LPG.
+If you want to write a web application with LPG that compiles to Ecmascript then you can use the `ecmascript` module in LPG.
 
 A simple "Hello world" application would look like this:
 ```lpg
