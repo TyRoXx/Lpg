@@ -57,7 +57,7 @@ static success_indicator save_function_header(stream_writer const to, function_h
             LPG_TRY(stream_writer_write_string(to, ", "));
         }
         parameter const *param = header.parameters + i;
-        LPG_TRY(stream_writer_write_bytes(to, param->name.value.data, param->name.value.length));
+        LPG_TRY(stream_writer_write_bytes(to, param->name.value.begin, param->name.value.length));
         LPG_TRY(stream_writer_write_string(to, ": "));
         LPG_TRY(save_expression(to, param->type, whitespace));
     }
@@ -128,7 +128,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 
     case expression_type_import:
         LPG_TRY(stream_writer_write_string(to, "import "));
-        return stream_writer_write_unicode_view(to, unicode_view_from_string(value->import.name.value));
+        return stream_writer_write_unicode_view(to, value->import.name.value);
 
     case expression_type_lambda:
         LPG_TRY(space_here(to, &whitespace));
@@ -206,7 +206,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 
     case expression_type_identifier:
         LPG_TRY(space_here(to, &whitespace));
-        return stream_writer_write_unicode_view(to, unicode_view_from_string(value->identifier.value));
+        return stream_writer_write_unicode_view(to, value->identifier.value);
 
     case expression_type_not:
         LPG_TRY(stream_writer_write_string(to, "!"))
@@ -238,7 +238,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
 
     case expression_type_declare:
         LPG_TRY(stream_writer_write_string(to, "let "));
-        LPG_TRY(stream_writer_write_unicode_view(to, unicode_view_from_string(value->declare.name.value)));
+        LPG_TRY(stream_writer_write_unicode_view(to, value->declare.name.value));
         if (value->declare.optional_type)
         {
             LPG_TRY(stream_writer_write_string(to, " : "));
@@ -330,8 +330,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         {
             LPG_TRY(stream_writer_write_string(to, "\n"));
             LPG_TRY(indent(to, in_struct));
-            LPG_TRY(
-                stream_writer_write_unicode_view(to, unicode_view_from_string(value->struct_.elements[i].name.value)));
+            LPG_TRY(stream_writer_write_unicode_view(to, value->struct_.elements[i].name.value));
             LPG_TRY(stream_writer_write_string(to, ": "));
             LPG_TRY(save_expression(to, &value->struct_.elements[i].type, whitespace));
         }
@@ -366,8 +365,7 @@ success_indicator save_expression(stream_writer const to, expression const *valu
         {
             LPG_TRY(stream_writer_write_string(to, "\n"));
             LPG_TRY(indent(to, in_interface));
-            LPG_TRY(stream_writer_write_unicode_view(
-                to, unicode_view_from_string(value->interface_.methods[i].name.value)));
+            LPG_TRY(stream_writer_write_unicode_view(to, value->interface_.methods[i].name.value));
             LPG_TRY(save_function_header(to, value->interface_.methods[i].header, whitespace));
         }
         return success_yes;

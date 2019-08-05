@@ -100,7 +100,7 @@ comment_expression comment_expression_clone(comment_expression const original);
 
 typedef struct identifier_expression
 {
-    unicode_string value;
+    unicode_view value;
     source_location source;
 } identifier_expression;
 
@@ -316,7 +316,7 @@ expression expression_from_match(match value);
 expression expression_from_impl(impl_expression value);
 source_location expression_source_begin(expression const value);
 
-identifier_expression identifier_expression_create(unicode_string value, source_location source);
+identifier_expression identifier_expression_create(unicode_view value, source_location source);
 void identifier_expression_free(LPG_NON_NULL(identifier_expression const *value));
 bool identifier_expression_equals(identifier_expression const left, identifier_expression const right);
 

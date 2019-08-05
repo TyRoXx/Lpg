@@ -328,11 +328,11 @@ static read_structure_element_result read_element(function_checking_state *state
 
     case type_kind_structure:
         return read_structure_element(state, function, state->program->structs + actual_type->structure_, object.where,
-                                      unicode_view_from_string(element->value), element->source, result);
+                                      element->value, element->source, result);
 
     case type_kind_interface:
-        return read_interface_element(state, function, object.where, actual_type->interface_,
-                                      unicode_view_from_string(element->value), element->source, result);
+        return read_interface_element(
+            state, function, object.where, actual_type->interface_, element->value, element->source, result);
 
     case type_kind_enum_constructor:
     case type_kind_integer_range:
@@ -350,8 +350,8 @@ static read_structure_element_result read_element(function_checking_state *state
         return read_structure_element_result_create(false, type_from_unit(), optional_value_empty, false);
 
     case type_kind_tuple:
-        return read_tuple_element(state, function, actual_type->tuple_, object.where,
-                                  unicode_view_from_string(element->value), element->source, result);
+        return read_tuple_element(
+            state, function, actual_type->tuple_, object.where, element->value, element->source, result);
 
     case type_kind_type:
     {
@@ -392,8 +392,7 @@ static read_structure_element_result read_element(function_checking_state *state
             restore(previous_code);
             LPG_FOR(enum_element_id, i, enum_->size)
             {
-                if (unicode_view_equals(
-                        unicode_view_from_string(element->value), unicode_view_from_string(enum_->elements[i].name)))
+                if (unicode_view_equals(element->value, unicode_view_from_string(enum_->elements[i].name)))
                 {
                     if (!enum_->elements[i].state.is_set)
                     {
@@ -917,7 +916,7 @@ static evaluated_function_header evaluate_function_header(function_checking_stat
             return evaluated_function_header_failure;
         }
         parameter_types[i] = parameter_type.compile_time_value;
-        parameter_names[i] = unicode_view_copy(unicode_view_from_string(this_parameter.name.value));
+        parameter_names[i] = unicode_view_copy(this_parameter.name.value);
         restore(before);
     }
     optional_type return_type = optional_type_create_empty();
@@ -2851,8 +2850,7 @@ static void find_generic_closures_in_expression(generic_closures *const closures
         break;
 
     case expression_type_identifier:
-        resolve_generic_closure_identifier(
-            closures, state, unicode_view_from_string(from.identifier.value), from.identifier.source);
+        resolve_generic_closure_identifier(closures, state, from.identifier.value, from.identifier.source);
         break;
 
     case expression_type_not:
@@ -3051,15 +3049,14 @@ static evaluate_expression_result evaluate_interface(function_checking_state *st
         }
         for (size_t k = 0; k < checked_method_count; ++k)
         {
-            if (unicode_view_equals(
-                    unicode_view_from_string(checked_methods[k].name), unicode_view_from_string(method.name.value)))
+            if (unicode_view_equals(unicode_view_from_string(checked_methods[k].name), method.name.value))
             {
                 emit_semantic_error(
                     state, semantic_error_create(semantic_error_duplicate_method_name, method.name.source));
             }
         }
         checked_methods[checked_method_count] = method_description_create(
-            unicode_view_copy(unicode_view_from_string(method.name.value)),
+            unicode_view_copy(method.name.value),
             tuple_type_create(header.parameter_types, method.header.parameter_count), header.return_type.value);
         checked_method_count += 1;
     }
@@ -3141,8 +3138,7 @@ static evaluate_expression_result evaluate_struct(function_checking_state *state
             return evaluate_expression_result_empty;
         }
         elements[i] = structure_member_create(element_type_evaluated.compile_time_value.value_.type_,
-                                              unicode_view_copy(unicode_view_from_string(element.name.value)),
-                                              optional_value_empty);
+                                              unicode_view_copy(element.name.value), optional_value_empty);
     }
     struct_id const id = state->program->struct_count;
     state->program->structs = reallocate_array(state->program->structs, (id + 1), sizeof(*state->program->structs));
@@ -3259,8 +3255,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
         {
             LPG_TO_DO();
         }
-        if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
-                                 unicode_view_from_string(element.generic_parameters.names[i])))
+        if (!unicode_view_equals(
+                argument.identifier.value, unicode_view_from_string(element.generic_parameters.names[i])))
         {
             emit_semantic_error(state, semantic_error_create(
                                            semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
@@ -3397,8 +3393,7 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
         {
             LPG_TO_DO();
         }
-        if (!unicode_view_equals(unicode_view_from_string(argument.identifier.value),
-                                 unicode_view_from_string(tree.generic_parameters.names[i])))
+        if (!unicode_view_equals(argument.identifier.value, unicode_view_from_string(tree.generic_parameters.names[i])))
         {
             emit_semantic_error(state, semantic_error_create(
                                            semantic_error_generic_impl_parameter_mismatch, argument.identifier.source));
@@ -3513,8 +3508,7 @@ static optional_size evaluate_impl_core(function_checking_state *state, instruct
     for (size_t i = 0; i < defined_method_count; ++i)
     {
         lpg_interface *const implemented_interface = &state->program->interfaces[target_interface];
-        optional_size const canonical_method_index =
-            find_method(implemented_interface, unicode_view_from_string(method_trees[i].name.value));
+        optional_size const canonical_method_index = find_method(implemented_interface, method_trees[i].name.value);
         if (canonical_method_index.state == optional_empty)
         {
             emit_semantic_error(state, semantic_error_create(semantic_error_extra_method, method_trees[i].name.source));
@@ -4449,8 +4443,7 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
     for (size_t i = 0; i < state->root->module_count; ++i)
     {
         module const current_module = state->root->modules[i];
-        if (unicode_view_equals(
-                unicode_view_from_string(current_module.name), unicode_view_from_string(element.name.value)))
+        if (unicode_view_equals(unicode_view_from_string(current_module.name), element.name.value))
         {
             if (!current_module.content.is_set)
             {
@@ -4466,16 +4459,15 @@ static evaluate_expression_result evaluate_import(function_checking_state *const
                                                      optional_value_create(current_module.content.value_), true);
         }
     }
-    begin_load_module(state->root, unicode_view_copy(unicode_view_from_string(element.name.value)));
-    load_module_result const imported = load_module(state, unicode_view_from_string(element.name.value));
+    begin_load_module(state->root, unicode_view_copy(element.name.value));
+    load_module_result const imported = load_module(state, element.name.value);
     if (!imported.loaded.is_set)
     {
-        fail_load_module(state->root, unicode_view_from_string(element.name.value));
+        fail_load_module(state->root, element.name.value);
         emit_semantic_error(state, semantic_error_create(semantic_error_import_failed, element.begin));
         return evaluate_expression_result_empty;
     }
-    succeed_load_module(
-        state->root, unicode_view_from_string(element.name.value), imported.loaded.value_, imported.schema);
+    succeed_load_module(state->root, element.name.value, imported.loaded.value_, imported.schema);
     register_id const where = allocate_register(&state->used_registers);
     write_register_compile_time_value(state, where, imported.loaded.value_);
     add_instruction(function, instruction_create_literal(
@@ -4506,8 +4498,8 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
                                                          expression_source_begin(*element.element)));
         return evaluate_expression_result_empty;
     }
-    unicode_string array_module_name = {"array", 0};
-    array_module_name.length = strlen(array_module_name.data);
+    unicode_view array_module_name = {"array", 0};
+    array_module_name.length = strlen(array_module_name.begin);
     evaluate_expression_result const array_imported = evaluate_import(
         state, function, import_expression_create(expression_source_begin(*element.element),
                                                   identifier_expression_create(
@@ -4567,14 +4559,12 @@ static evaluate_expression_result evaluate_new_array(function_checking_state *co
 static evaluate_expression_result evaluate_declare(function_checking_state *const state,
                                                    instruction_sequence *const function, declare const element)
 {
-    bool const declaration_possible =
-        !local_variable_name_exists(state->local_variables, unicode_view_from_string(element.name.value));
+    bool const declaration_possible = !local_variable_name_exists(state->local_variables, element.name.value);
     if (declaration_possible)
     {
         add_local_variable(&state->local_variables,
-                           local_variable_create(unicode_view_copy(unicode_view_from_string(element.name.value)),
-                                                 local_variable_phase_declared, type_from_unit(), optional_value_empty,
-                                                 ~(register_id)0, NULL));
+                           local_variable_create(unicode_view_copy(element.name.value), local_variable_phase_declared,
+                                                 type_from_unit(), optional_value_empty, ~(register_id)0, NULL));
     }
     else
     {
@@ -4615,7 +4605,7 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     }
 
     instruction_checkpoint const before_initialization = make_checkpoint(state, function);
-    unicode_view const name = unicode_view_from_string(element.name.value);
+    unicode_view const name = element.name.value;
     evaluate_expression_result const initializer =
         evaluate_expression(state, function, *element.initializer, declaration_possible ? &name : NULL,
                             type_expectation_create_exact(declared_type));
@@ -4652,9 +4642,9 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
 
     if (declaration_possible)
     {
-        define_register_debug_name(state, final_where, unicode_view_copy(unicode_view_from_string(element.name.value)));
-        local_variable_initialize(&state->local_variables, unicode_view_from_string(element.name.value), final_type,
-                                  final_compile_time_value, final_where);
+        define_register_debug_name(state, final_where, unicode_view_copy(element.name.value));
+        local_variable_initialize(
+            &state->local_variables, element.name.value, final_type, final_compile_time_value, final_where);
     }
 
     register_id const unit_goes_into = allocate_register(&state->used_registers);
@@ -4778,7 +4768,7 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
 
     case expression_type_identifier:
     {
-        unicode_view const name = unicode_view_from_string(element.identifier.value);
+        unicode_view const name = element.identifier.value;
         evaluate_expression_result const address =
             read_variable(state, function, name, element.identifier.source, expected_result_type);
         return address;

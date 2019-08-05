@@ -468,9 +468,8 @@ static function_header_parse_result parse_function_header(expression_parser *con
         }
 
         parameters = reallocate_array(parameters, (parameter_count + 1), sizeof(*parameters));
-        parameters[parameter_count] =
-            parameter_create(identifier_expression_create(unicode_view_copy(name.content), name.where),
-                             expression_allocate(parsed_type.success));
+        parameters[parameter_count] = parameter_create(
+            identifier_expression_create(name.content, name.where), expression_allocate(parsed_type.success));
         ++parameter_count;
     }
     function_header_parse_result const result = {
@@ -596,7 +595,7 @@ static expression_parser_result parse_interface(expression_parser *const parser,
 
         methods = reallocate_array(methods, (method_count + 1), sizeof(*methods));
         methods[method_count] = interface_expression_method_create(
-            identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header);
+            identifier_expression_create(name.content, name.where), header_parsed.header);
         ++method_count;
     }
     interface_expression const parsed = interface_expression_create(parameters, begin, methods, method_count);
@@ -669,7 +668,7 @@ static expression_parser_result parse_struct(expression_parser *const parser, si
 
         elements = reallocate_array(elements, (element_count + 1), sizeof(*elements));
         elements[element_count] = struct_expression_element_create(
-            identifier_expression_create(unicode_view_copy(name.content), name.where), type_parsed.success);
+            identifier_expression_create(name.content, name.where), type_parsed.success);
         ++element_count;
     }
     struct_expression const parsed = struct_expression_create(generic_parameters, begin, elements, element_count);
@@ -805,9 +804,8 @@ static expression_parser_result parse_import(expression_parser *const parser, so
         return expression_parser_result_failure;
     }
     pop(parser);
-    expression_parser_result const result = {
-        true, expression_from_import(import_expression_create(
-                  begin, identifier_expression_create(unicode_view_copy(name.content), name.where)))};
+    expression_parser_result const result = {true, expression_from_import(import_expression_create(
+                                                       begin, identifier_expression_create(name.content, name.where)))};
     return result;
 }
 
@@ -867,7 +865,7 @@ static parse_callable_result parse_identifier(expression_parser *parser, rich_to
 {
     pop(parser);
     expression_parser_result const result = {
-        1, expression_from_identifier(identifier_expression_create(unicode_view_copy(head.content), head.where))};
+        1, expression_from_identifier(identifier_expression_create(head.content, head.where))};
     return parse_callable_result_create(result, true);
 }
 
@@ -1413,9 +1411,9 @@ static expression_parser_result parse_returnable_suffixes(expression_parser *con
             pop(parser);
             if ((element_name.token == token_identifier) || (element_name.token == token_integer))
             {
-                expression const access = expression_from_access_structure(access_structure_create(
-                    expression_allocate(result.success),
-                    identifier_expression_create(unicode_view_copy(element_name.content), element_name.where)));
+                expression const access = expression_from_access_structure(
+                    access_structure_create(expression_allocate(result.success),
+                                            identifier_expression_create(element_name.content, element_name.where)));
                 result.success = access;
                 continue;
             }
@@ -1582,7 +1580,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
 
         methods = reallocate_array(methods, (method_count + 1), sizeof(*methods));
         methods[method_count] = impl_expression_method_create(
-            identifier_expression_create(unicode_view_copy(name.content), name.where), header_parsed.header, body);
+            identifier_expression_create(name.content, name.where), header_parsed.header, body);
         ++method_count;
     }
     impl_expression const impl =
@@ -1655,7 +1653,7 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
     }
     expression_parser_result const result = {
         true, expression_from_declare(declare_create(
-                  identifier_expression_create(unicode_view_copy(name.content), name.where),
+                  identifier_expression_create(name.content, name.where),
                   (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success) : NULL),
                   expression_allocate(initial_value.success)))};
     return result;

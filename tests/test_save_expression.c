@@ -12,7 +12,7 @@ static void test_integer_saving(void);
 static expression expression_from_integer(const integer number);
 static identifier_expression identifier_expression_from_c_string(const char *c_string)
 {
-    return identifier_expression_create(unicode_string_from_c_str(c_string), source_location_create(0, 0));
+    return identifier_expression_create(unicode_view_from_c_str(c_string), source_location_create(0, 0));
 }
 
 static void check_expression_rendering(expression tree, char const *expected)

@@ -122,7 +122,7 @@ comment_expression comment_expression_clone(comment_expression const original)
 
 identifier_expression identifier_expression_clone(identifier_expression const original)
 {
-    return identifier_expression_create(unicode_view_copy(unicode_view_from_string(original.value)), original.source);
+    return identifier_expression_create(original.value, original.source);
 }
 
 parameter parameter_create(identifier_expression name, expression *type)
@@ -981,7 +981,7 @@ bool instantiate_struct_expression_equals(instantiate_struct_expression const le
     return expression_equals(left.type, right.type) && tuple_equals(&left.arguments, &right.arguments);
 }
 
-identifier_expression identifier_expression_create(unicode_string value, source_location source)
+identifier_expression identifier_expression_create(unicode_view value, source_location source)
 {
     identifier_expression const result = {value, source};
     return result;
@@ -989,12 +989,12 @@ identifier_expression identifier_expression_create(unicode_string value, source_
 
 void identifier_expression_free(identifier_expression const *value)
 {
-    unicode_string_free(&value->value);
+    (void)value;
 }
 
 bool identifier_expression_equals(identifier_expression const left, identifier_expression const right)
 {
-    return unicode_string_equals(left.value, right.value) && source_location_equals(left.source, right.source);
+    return unicode_view_equals(left.value, right.value) && source_location_equals(left.source, right.source);
 }
 
 string_expression string_expression_create(unicode_string value, source_location source)
@@ -1541,8 +1541,7 @@ bool expression_equals(expression const *left, expression const *right)
         return expression_equals(left->not.expr, right->not.expr);
 
     case expression_type_identifier:
-        return unicode_view_equals(unicode_view_from_string(left->identifier.value),
-                                   unicode_view_from_string(right->identifier.value)) &&
+        return unicode_view_equals(left->identifier.value, right->identifier.value) &&
                source_location_equals(left->identifier.source, right->identifier.source);
 
     case expression_type_return:
