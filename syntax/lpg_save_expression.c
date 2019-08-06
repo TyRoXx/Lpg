@@ -190,7 +190,10 @@ success_indicator save_expression(stream_writer const to, expression const *valu
     case expression_type_string:
         LPG_TRY(space_here(to, &whitespace));
         LPG_TRY(stream_writer_write_string(to, "\""));
-        LPG_FOR(size_t, i, value->string.value.length)
+        ASSUME(value->string.value.length >= 2);
+        ASSUME(value->string.value.begin[0] == '"');
+        ASSUME(value->string.value.begin[value->string.value.length - 1] == '"');
+        for (size_t i = 1; (i + 1) < value->string.value.length; ++i)
         {
             switch (value->string.value.begin[i])
             {

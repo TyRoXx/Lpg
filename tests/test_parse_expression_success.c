@@ -75,6 +75,10 @@ void test_parse_expression_success(void)
                               integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 0))),
                           unicode_string_from_c_str("123"), false);
 
+    test_successful_parse(expression_from_string(string_expression_create(
+                              unicode_view_from_c_str("\"test\""), source_location_create(0, 0))),
+                          unicode_string_from_c_str("\"test\""), false);
+
     test_successful_parse(expression_from_not(not_expression_create(expression_allocate(expression_from_integer_literal(
                               integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 1)))))),
                           unicode_string_from_c_str("!1"), true);
