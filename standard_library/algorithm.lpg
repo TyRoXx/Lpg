@@ -55,7 +55,7 @@ let find = [E](haystack: ranges.random_access[E], needle: E): std.option[integer
                             case add_result.overflow:
                                 return std.option[integer].none
             case std.option[E].none:
-                break 
+                break
     std.option[integer].none
 
 let export = struct

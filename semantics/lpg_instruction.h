@@ -191,6 +191,15 @@ void current_function_instruction_free(current_function_instruction const freed)
 bool current_function_instruction_equals(current_function_instruction const left,
                                          current_function_instruction const right);
 
+typedef struct break_instruction
+{
+    register_id unit_goes_into;
+    optional_register_id loop_result;
+} break_instruction;
+
+break_instruction break_instruction_create(register_id unit_goes_into, optional_register_id loop_result);
+bool break_instruction_equals(break_instruction const left, break_instruction const right);
+
 struct instruction
 {
     instruction_type type;
@@ -209,7 +218,7 @@ struct instruction
         lambda_with_captures_instruction lambda_with_captures;
         get_method_instruction get_method;
         erase_type_instruction erase_type;
-        register_id break_into;
+        break_instruction break_;
         instantiate_struct_instruction instantiate_struct;
         new_array_instruction new_array;
         current_function_instruction current_function;
@@ -260,7 +269,7 @@ instruction instruction_create_return(return_instruction argument);
 instruction instruction_create_global(register_id into);
 instruction instruction_create_read_struct(read_struct_instruction argument);
 instruction instruction_create_loop(loop_instruction loop);
-instruction instruction_create_break(register_id const into);
+instruction instruction_create_break(break_instruction content);
 instruction instruction_create_literal(literal_instruction const content);
 instruction instruction_create_tuple(tuple_instruction argument);
 instruction instruction_create_enum_construct(enum_construct_instruction argument);

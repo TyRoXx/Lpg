@@ -414,6 +414,17 @@ import_expression import_expression_create(source_location begin, identifier_exp
 void import_expression_free(import_expression const freed);
 bool import_expression_equals(import_expression const left, import_expression const right);
 
+typedef struct break_expression
+{
+    source_location begin;
+    expression *value;
+} break_expression;
+
+break_expression break_expression_create(source_location begin, expression *value);
+void break_expression_free(break_expression const freed);
+bool break_expression_equals(break_expression const left, break_expression const right);
+break_expression break_expression_clone(break_expression const original);
+
 struct expression
 {
     expression_type type;
@@ -445,6 +456,7 @@ struct expression
         type_of_expression type_of;
         import_expression import;
         new_array_expression new_array;
+        break_expression break_;
     };
 };
 
@@ -468,7 +480,7 @@ expression expression_from_string(string_expression content);
 expression expression_from_comment(comment_expression content);
 expression expression_from_call(call content);
 expression expression_from_identifier(identifier_expression identifier);
-expression expression_from_break(source_location source);
+expression expression_from_break(break_expression const content);
 expression expression_from_interface(interface_expression content);
 expression expression_from_struct(struct_expression content);
 expression expression_from_instantiate_struct(instantiate_struct_expression content);

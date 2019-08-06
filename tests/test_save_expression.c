@@ -132,7 +132,7 @@ void test_save_expression(void)
         body[0] = expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("a"))),
             expression_allocate(expression_from_integer(integer_create(0, 123))), equals));
-        body[1] = expression_from_break(source_location_create(0, 0));
+        body[1] = expression_from_break(break_expression_create(source_location_create(0, 0), NULL));
         check_expression_rendering(expression_from_loop(sequence_create(body, 2, source_location_create(0, 0))),
                                    "loop\n"
                                    "    a == 123\n"
@@ -140,7 +140,7 @@ void test_save_expression(void)
     }
     {
         expression *inner_loop = allocate_array(2, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break(source_location_create(0, 0));
+        inner_loop[0] = expression_from_break(break_expression_create(source_location_create(0, 0), NULL));
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_binary_operator(binary_operator_expression_create(
             expression_allocate(expression_from_identifier(identifier_expression_from_c_string("a"))),
@@ -153,11 +153,12 @@ void test_save_expression(void)
                                    "        break");
     }
 
-    check_expression_rendering(expression_from_break(source_location_create(0, 0)), "break");
+    check_expression_rendering(
+        expression_from_break(break_expression_create(source_location_create(0, 0), NULL)), "break");
 
     {
         expression *inner_loop = allocate_array(1, sizeof(*inner_loop));
-        inner_loop[0] = expression_from_break(source_location_create(0, 0));
+        inner_loop[0] = expression_from_break(break_expression_create(source_location_create(0, 0), NULL));
 
         expression *outer_loop = allocate_array(2, sizeof(*outer_loop));
         outer_loop[0] = expression_from_binary_operator(binary_operator_expression_create(
@@ -227,8 +228,8 @@ void test_save_expression(void)
         cases[0] = match_case_create(expression_allocate(expression_from_integer(integer_create(0, 123))),
                                      expression_allocate(expression_from_integer(integer_create(0, 456))));
         expression *const case_1 = allocate_array(2, sizeof(*case_1));
-        case_1[0] = expression_from_break(source_location_create(0, 0));
-        case_1[1] = expression_from_break(source_location_create(0, 0));
+        case_1[0] = expression_from_break(break_expression_create(source_location_create(0, 0), NULL));
+        case_1[1] = expression_from_break(break_expression_create(source_location_create(0, 0), NULL));
         cases[1] = match_case_create(
             expression_allocate(expression_from_integer(integer_create(0, 124))),
             expression_allocate(expression_from_sequence(sequence_create(case_1, 2, source_location_create(0, 0)))));

@@ -242,6 +242,18 @@ bool current_function_instruction_equals(current_function_instruction const left
     return (left.into == right.into);
 }
 
+break_instruction break_instruction_create(register_id unit_goes_into, optional_register_id loop_result)
+{
+    break_instruction const result = {unit_goes_into, loop_result};
+    return result;
+}
+
+bool break_instruction_equals(break_instruction const left, break_instruction const right)
+{
+    return (left.unit_goes_into == right.unit_goes_into) &&
+           optional_register_id_equals(left.loop_result, right.loop_result);
+}
+
 instruction instruction_create_tuple(tuple_instruction argument)
 {
     instruction result;
@@ -448,11 +460,11 @@ instruction instruction_create_loop(loop_instruction loop)
     return result;
 }
 
-instruction instruction_create_break(register_id const into)
+instruction instruction_create_break(break_instruction content)
 {
     instruction result;
     result.type = instruction_break;
-    result.break_into = into;
+    result.break_ = content;
     return result;
 }
 
@@ -552,7 +564,7 @@ bool instruction_equals(instruction const left, instruction const right)
         return read_struct_instruction_equals(left.read_struct, right.read_struct);
 
     case instruction_break:
-        return (left.break_into == right.break_into);
+        return break_instruction_equals(left.break_, right.break_);
 
     case instruction_literal:
         return (left.literal.into == right.literal.into) && value_equals(left.literal.value_, right.literal.value_);

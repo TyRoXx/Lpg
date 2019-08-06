@@ -1070,10 +1070,14 @@ static success_indicator generate_instruction(function_generation *const state, 
 
     case instruction_break:
         LPG_TRY(indent(indentation, ecmascript_output));
-        LPG_TRY(write_register(state, generated.break_into, type_from_unit(), optional_value_create(value_from_unit()),
-                               ecmascript_output));
+        LPG_TRY(write_register(state, generated.break_.unit_goes_into, type_from_unit(),
+                               optional_value_create(value_from_unit()), ecmascript_output));
         LPG_TRY(stream_writer_write_string(ecmascript_output, "undefined;"));
-        state->registers[generated.break_into].declaration_end = *state->current_output_position;
+        if (generated.break_.loop_result.is_set)
+        {
+            LPG_TO_DO();
+        }
+        state->registers[generated.break_.unit_goes_into].declaration_end = *state->current_output_position;
         LPG_TRY(stream_writer_write_string(ecmascript_output, "\n"));
         LPG_TRY(indent(indentation, ecmascript_output));
         return stream_writer_write_string(ecmascript_output, "break;\n");

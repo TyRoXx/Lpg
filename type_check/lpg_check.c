@@ -4644,6 +4644,67 @@ static evaluate_expression_result evaluate_declare(function_checking_state *cons
     return result;
 }
 
+static evaluate_expression_result evaluate_break_expression(function_checking_state *state, instruction_sequence *body,
+                                                            break_expression const break_)
+{
+
+    register_id const into = allocate_register(&state->used_registers);
+    if (state->innermost_loop)
+    {
+        if (break_.value)
+        {
+            evaluate_expression_result const returned_value = evaluate_expression(
+                state, body, *break_.value, NULL, type_expectation_create_exact(optional_type_create_empty()));
+            if (returned_value.status != evaluation_status_value)
+            {
+                LPG_TO_DO();
+            }
+            if (state->innermost_loop->result.is_set)
+            {
+                LPG_TO_DO();
+            }
+            state->innermost_loop->result = optional_type_create_set(returned_value.type_);
+            add_instruction(body, instruction_create_break(break_instruction_create(
+                                      into, optional_register_id_create_set(returned_value.where))));
+        }
+        else
+        {
+            add_instruction(
+                body, instruction_create_break(break_instruction_create(into, optional_register_id_create_empty())));
+        }
+    }
+    else
+    {
+        emit_semantic_error(state, semantic_error_create(semantic_error_break_outside_of_loop, break_.begin));
+    }
+    return evaluate_expression_result_create(
+        evaluation_status_value, into, type_from_unit(), optional_value_empty, false);
+}
+
+static evaluate_expression_result evaluate_loop_expression(function_checking_state *state,
+                                                           instruction_sequence *function, sequence const loop)
+{
+    instruction_sequence body = {NULL, 0};
+    loop_checking *const outer_loop = state->innermost_loop;
+    loop_checking current_loop = {optional_type_create_empty()};
+    state->innermost_loop = &current_loop;
+    evaluate_expression_result const loop_body_result =
+        check_sequence(state, &body, loop, type_expectation_create_exact(optional_type_create_empty()));
+    ASSUME(state->innermost_loop == &current_loop);
+    state->innermost_loop = outer_loop;
+    register_id const result_goes_into = allocate_register(&state->used_registers);
+    add_instruction(function, instruction_create_loop(loop_instruction_create(result_goes_into, body)));
+    if (current_loop.result.is_set)
+    {
+        evaluate_expression_result const loop_result = {
+            loop_body_result.status, current_loop.result.value, optional_value_empty, result_goes_into, true};
+        return loop_result;
+    }
+    evaluate_expression_result const loop_result = {
+        loop_body_result.status, type_from_unit(), optional_value_create(value_from_unit()), result_goes_into, true};
+    return loop_result;
+}
+
 static evaluate_expression_result evaluate_expression_core(function_checking_state *const state,
                                                            instruction_sequence *const function,
                                                            expression const element,
@@ -4766,36 +4827,10 @@ static evaluate_expression_result evaluate_expression_core(function_checking_sta
         return evaluate_return_expression(state, function, element.return_);
 
     case expression_type_loop:
-    {
-        instruction_sequence body = {NULL, 0};
-        bool const previous_is_in_loop = state->is_in_loop;
-        state->is_in_loop = true;
-        evaluate_expression_result const loop_body_result = check_sequence(
-            state, &body, element.loop_body, type_expectation_create_exact(optional_type_create_empty()));
-        ASSUME(state->is_in_loop);
-        state->is_in_loop = previous_is_in_loop;
-        register_id const unit_goes_into = allocate_register(&state->used_registers);
-        add_instruction(function, instruction_create_loop(loop_instruction_create(unit_goes_into, body)));
-        evaluate_expression_result const loop_result = {
-            loop_body_result.status, type_from_unit(), optional_value_create(value_from_unit()), unit_goes_into, true};
-        return loop_result;
-    }
+        return evaluate_loop_expression(state, function, element.loop_body);
 
     case expression_type_break:
-    {
-        register_id const into = allocate_register(&state->used_registers);
-        if (state->is_in_loop)
-        {
-            add_instruction(function, instruction_create_break(into));
-        }
-        else
-        {
-            emit_semantic_error(
-                state, semantic_error_create(semantic_error_break_outside_of_loop, expression_source_begin(element)));
-        }
-        return evaluate_expression_result_create(
-            evaluation_status_value, into, type_from_unit(), optional_value_empty, false);
-    }
+        return evaluate_break_expression(state, function, element.break_);
 
     case expression_type_sequence:
         return check_sequence(state, function, element.sequence, expected_result_type);

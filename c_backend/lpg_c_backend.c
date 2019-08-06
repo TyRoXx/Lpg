@@ -2584,12 +2584,17 @@ static success_indicator generate_instruction(c_backend_state *state, checked_fu
 
     case instruction_break:
         state->standard_library.using_unit = true;
-        set_register_variable(state, input.break_into, register_resource_ownership_borrows, type_from_unit());
+        set_register_variable(
+            state, input.break_.unit_goes_into, register_resource_ownership_borrows, type_from_unit());
         LPG_TRY(indent(indentation, c_output));
         LPG_TRY(stream_writer_write_string(c_output, "unit const "));
-        LPG_TRY(generate_register_name(input.break_into, current_function, c_output));
+        LPG_TRY(generate_register_name(input.break_.unit_goes_into, current_function, c_output));
         LPG_TRY(stream_writer_write_string(c_output, " = unit_impl;\n"));
         ASSUME(state->number_of_nested_loops > 0);
+        if (input.break_.loop_result.is_set)
+        {
+            LPG_TO_DO();
+        }
         LPG_TRY(generate_free_registers(state,
                                         state->number_of_registers_before_loops[state->number_of_nested_loops - 1],
                                         indentation, current_function, ~(register_id)0, c_output));

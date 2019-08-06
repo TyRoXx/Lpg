@@ -7,6 +7,11 @@
 
 typedef void check_error_handler(complete_semantic_error, void *);
 
+typedef struct loop_checking
+{
+    optional_type result;
+} loop_checking;
+
 typedef struct function_checking_state
 {
     program_check *root;
@@ -17,7 +22,7 @@ typedef struct function_checking_state
     register_id used_registers;
     unicode_string *register_debug_names;
     register_id register_debug_name_count;
-    bool is_in_loop;
+    loop_checking *innermost_loop;
     structure const *global;
     check_error_handler *on_error;
     local_variable_container local_variables;

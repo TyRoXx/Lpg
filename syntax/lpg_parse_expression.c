@@ -57,7 +57,7 @@ static bool is_same_indentation_level(rich_token const found, size_t const expec
     return (found.token == token_indentation) && ((indentation_level / spaces_for_indentation) == expected);
 }
 
-static bool line_is_empty(expression_parser *parser)
+static bool skip_line_break(expression_parser *parser)
 {
     rich_token head;
     size_t whitespace_token_count = 0;
@@ -123,7 +123,7 @@ static sequence parse_sequence(expression_parser *parser, size_t indentation)
             break;
         }
 
-        if (line_is_empty(parser))
+        if (skip_line_break(parser))
         {
             continue;
         }
@@ -869,10 +869,26 @@ static parse_callable_result parse_identifier(expression_parser *parser, rich_to
     return parse_callable_result_create(result, true);
 }
 
-static parse_callable_result parse_break(expression_parser *parser, rich_token const head)
+static parse_callable_result parse_break(expression_parser *parser, rich_token const head, size_t const indentation)
 {
     pop(parser);
-    expression_parser_result const result = {1, expression_from_break(head.where)};
+    rich_token const space = peek(parser);
+    if ((space.token == token_space) && (space.content.length >= 1))
+    {
+        pop(parser);
+        expression_parser_result const returned_value = parse_expression(parser, indentation, false);
+        if (returned_value.is_success)
+        {
+            expression *const allocated = expression_allocate(returned_value.success);
+            expression_parser_result const result = {
+                true, expression_from_break(break_expression_create(head.where, allocated))};
+            return parse_callable_result_create(result, true);
+        }
+        expression_parser_result const result = {
+            false, expression_from_break(break_expression_create(head.where, NULL))};
+        return parse_callable_result_create(result, true);
+    }
+    expression_parser_result const result = {true, expression_from_break(break_expression_create(head.where, NULL))};
     return parse_callable_result_create(result, true);
 }
 
@@ -971,7 +987,7 @@ static parse_callable_result parse_callable(expression_parser *parser, size_t in
             return parse_identifier(parser, head);
 
         case token_break:
-            return parse_break(parser, head);
+            return parse_break(parser, head, indentation);
 
         case token_loop:
             pop(parser);
@@ -1616,7 +1632,8 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
         return result;
     }
     parse_optional_space(parser);
-    expression_parser_result declared_variable_type = {false, expression_from_break(source_location_create(0, 0))};
+    expression_parser_result declared_variable_type = {
+        false, expression_from_break(break_expression_create(source_location_create(0, 0), NULL))};
     rich_token colon_or_assign = peek(parser);
     if (colon_or_assign.token == token_colon)
     {

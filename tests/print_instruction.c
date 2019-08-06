@@ -161,7 +161,14 @@ void print_instruction(instruction const printed, size_t const indentation)
         return;
 
     case instruction_break:
-        printf("break %u\n", printed.break_into);
+        if (printed.break_.loop_result.is_set)
+        {
+            printf("break %u %u\n", printed.break_.unit_goes_into, printed.break_.loop_result.value);
+        }
+        else
+        {
+            printf("break %u\n", printed.break_.unit_goes_into);
+        }
         return;
 
     case instruction_literal:

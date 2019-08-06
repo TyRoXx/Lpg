@@ -737,7 +737,7 @@ source_location expression_source_begin(expression const value)
         LPG_TO_DO();
 
     case expression_type_break:
-        return value.source;
+        return value.break_.begin;
 
     case expression_type_sequence:
         return value.sequence.begin;
@@ -971,6 +971,43 @@ bool import_expression_equals(import_expression const left, import_expression co
     return source_location_equals(left.begin, right.begin) && identifier_expression_equals(left.name, right.name);
 }
 
+break_expression break_expression_create(source_location begin, expression *value)
+{
+    break_expression const result = {begin, value};
+    return result;
+}
+
+void break_expression_free(break_expression const freed)
+{
+    if (freed.value)
+    {
+        expression_deallocate(freed.value);
+    }
+}
+
+bool break_expression_equals(break_expression const left, break_expression const right)
+{
+    if (!source_location_equals(left.begin, right.begin))
+    {
+        return false;
+    }
+    if (left.value)
+    {
+        if (right.value)
+        {
+            return expression_equals(left.value, right.value);
+        }
+        return false;
+    }
+    return !right.value;
+}
+
+break_expression break_expression_clone(break_expression const original)
+{
+    return break_expression_create(
+        original.begin, original.value ? expression_allocate(expression_clone(*original.value)) : NULL);
+}
+
 bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
                                           instantiate_struct_expression const right)
 {
@@ -1131,11 +1168,11 @@ expression expression_from_identifier(identifier_expression identifier)
     return result;
 }
 
-expression expression_from_break(source_location source)
+expression expression_from_break(break_expression const content)
 {
     expression result;
     result.type = expression_type_break;
-    result.source = source;
+    result.break_ = content;
     return result;
 }
 
@@ -1286,6 +1323,7 @@ void expression_free(expression const *this)
         break;
 
     case expression_type_break:
+        break_expression_free(this->break_);
         break;
 
     case expression_type_placeholder:
@@ -1370,7 +1408,7 @@ expression expression_clone(expression const original)
         return expression_from_loop(sequence_clone(original.loop_body));
 
     case expression_type_break:
-        return expression_from_break(original.source);
+        return expression_from_break(break_expression_clone(original.break_));
 
     case expression_type_enum:
         return expression_from_enum(enum_expression_clone(original.enum_));
@@ -1547,7 +1585,7 @@ bool expression_equals(expression const *left, expression const *right)
         return sequence_equals(left->loop_body, right->loop_body);
 
     case expression_type_break:
-        return source_location_equals(left->source, right->source);
+        return break_expression_equals(left->break_, right->break_);
 
     case expression_type_sequence:
         return sequence_equals(left->sequence, right->sequence);

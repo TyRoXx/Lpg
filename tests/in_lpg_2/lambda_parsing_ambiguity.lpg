@@ -1,0 +1,6 @@
+let f = ()
+    return 1
+
+// TODO: this comment should be unnecessary
+()
+    return 2

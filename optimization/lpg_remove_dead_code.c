@@ -43,7 +43,11 @@ static void find_used_registers(instruction_sequence const from, bool *const reg
             break;
 
         case instruction_break:
-            registers_read_from[current_instruction.break_into] = true;
+            registers_read_from[current_instruction.break_.unit_goes_into] = true;
+            if (current_instruction.break_.loop_result.is_set)
+            {
+                registers_read_from[current_instruction.break_.loop_result.value] = true;
+            }
             break;
 
         case instruction_current_function:
@@ -173,7 +177,11 @@ static bool change_register_ids(instruction *const where, register_id const *con
         return update_register_id(&where->read_struct.into, new_register_ids);
 
     case instruction_break:
-        ASSERT(update_register_id(&where->break_into, new_register_ids));
+        ASSERT(update_register_id(&where->break_.unit_goes_into, new_register_ids));
+        if (where->break_.loop_result.is_set)
+        {
+            update_register_id(&where->break_.loop_result.value, new_register_ids);
+        }
         return true;
 
     case instruction_literal:

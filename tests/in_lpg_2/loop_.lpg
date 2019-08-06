@@ -50,3 +50,13 @@
                 break
             case boolean.false:
                 fail()
+
+    // TODO implement compile time evaluatio for loop
+    /*let compile_time_result = loop
+        break boolean.true
+    assert(std.compile_time[compile_time_result]())*/
+
+    // TODO finish implementation of break with value
+    /*let runtime_result = loop
+        break std.runtime_value[boolean](boolean.true)
+    assert(runtime_result)*/

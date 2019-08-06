@@ -568,7 +568,11 @@ static run_sequence_result run_instruction(value *const return_value, value *con
     }
 
     case instruction_break:
-        registers[element.break_into] = value_from_unit();
+        registers[element.break_.unit_goes_into] = value_from_unit();
+        if (element.break_.loop_result.is_set)
+        {
+            LPG_TO_DO();
+        }
         return run_sequence_result_break;
 
     case instruction_literal:

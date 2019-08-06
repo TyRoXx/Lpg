@@ -391,7 +391,8 @@ static void test_loops(const standard_library_description *std_library)
                                          (*std_library).globals, LPG_COPY_ARRAY(expected_body_elements));
     }
     {
-        instruction const loop_body[] = {instruction_create_break(0)};
+        instruction const loop_body[] = {
+            instruction_create_break(break_instruction_create(0, optional_register_id_create_empty()))};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
         expected_body_elements[0] =
             instruction_create_loop(loop_instruction_create(1, instruction_sequence_create(LPG_COPY_ARRAY(loop_body))));
