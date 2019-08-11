@@ -91,11 +91,8 @@ source_file_lines_owning source_file_lines_owning_scan(unicode_view const source
         {
             continue;
         }
-        if (line_count == line_offsets_allocated)
-        {
-            line_offsets_allocated *= 2u;
-            line_offsets = reallocate_array(line_offsets, line_offsets_allocated, sizeof(*line_offsets));
-        }
+        line_offsets = reallocate_array_exponentially(
+            line_offsets, (line_count + 1), sizeof(*line_offsets), line_count, &line_offsets_allocated);
         line_offsets[line_count] = (i + 1u);
         line_count += 1u;
     }
