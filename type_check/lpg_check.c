@@ -19,7 +19,7 @@ check_function_result check_function_result_create(checked_function function, ca
     return result;
 }
 
-check_function_result const check_function_result_empty = {false, {NULL, {NULL, 0}, NULL, 0}, NULL, 0};
+check_function_result const check_function_result_empty = {false, {NULL, {NULL, 0, 0}, NULL, 0}, NULL, 0};
 
 typedef enum evaluation_status {
     evaluation_status_value = 1,
@@ -679,7 +679,7 @@ check_function(program_check *const root, function_checking_state *const parent,
                optional_function_id const current_function_id)
 {
     ASSUME(root);
-    instruction_sequence body_out = instruction_sequence_create(NULL, 0);
+    instruction_sequence body_out = instruction_sequence_create(NULL, 0, 0);
     function_checking_state state = function_checking_state_create(
         root, parent, may_capture_runtime_variables, &global, on_error, user, program, &body_out, explicit_return_type,
         explicit_return_type.is_set, source, current_import_directory);
@@ -947,7 +947,7 @@ static function_id reserve_function_id(function_checking_state *const state)
             function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
                                     tuple_type_create(NULL, 0), optional_type_create_empty());
         state->program->functions[this_lambda_id] =
-            checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
+            checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0, 0), NULL, 0);
     }
     return this_lambda_id;
 }
@@ -1141,7 +1141,7 @@ static optional_size instantiate_generic_impl(function_checking_state *const sta
                                               source_file_owning const *const original_source,
                                               unicode_view const original_current_import_directory)
 {
-    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, original_source, original_current_import_directory);
@@ -1190,7 +1190,7 @@ static infer_generic_arguments_result infer_generic_arguments(function_checking_
                                                               unicode_view const original_current_import_directory,
                                                               generic_closures const closures)
 {
-    instruction_sequence ignored = {NULL, 0};
+    instruction_sequence ignored = {NULL, 0, 0};
     function_checking_state inference_state = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored,
         optional_type_create_empty(), false, source, original_current_import_directory);
@@ -1360,7 +1360,7 @@ static optional_size try_to_instantiate_generic_impl(function_checking_state *co
         }
         else
         {
-            instruction_sequence ignored = instruction_sequence_create(NULL, 0);
+            instruction_sequence ignored = instruction_sequence_create(NULL, 0, 0);
             infer_generic_arguments_result const inferred =
                 infer_generic_arguments(state, &ignored, impl->self.generic, self, impl->source,
                                         unicode_view_from_string(impl->current_import_directory), impl->closures);
@@ -2158,7 +2158,7 @@ static evaluate_expression_result evaluate_match_expression_with_string(function
             default_index = make_optional_size(i);
         }
 
-        instruction_sequence action = instruction_sequence_create(NULL, 0);
+        instruction_sequence action = instruction_sequence_create(NULL, 0, 0);
         evaluate_expression_result const action_evaluated =
             evaluate_expression(state, &action, *case_tree.action, NULL, expected_result_type);
         if (action_evaluated.status != evaluation_status_value)
@@ -2291,7 +2291,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             match_case const case_tree = (*element).match.cases[i];
             bool is_always_this_case = false;
             register_id key_value = ~(register_id)0;
-            instruction_sequence action = instruction_sequence_create(NULL, 0);
+            instruction_sequence action = instruction_sequence_create(NULL, 0, 0);
             evaluate_expression_result action_evaluated;
             register_id placeholder_where = ~(register_id)0;
             if (!case_tree.key_or_default)
@@ -2598,7 +2598,7 @@ evaluate_expression_result evaluate_match_expression(function_checking_state *st
             /*TODO: support runtime values as keys?*/
             ASSERT(key_evaluated.compile_time_value.is_set);
 
-            instruction_sequence action = instruction_sequence_create(NULL, 0);
+            instruction_sequence action = instruction_sequence_create(NULL, 0, 0);
             evaluate_expression_result const action_evaluated =
                 evaluate_expression(state, &action, *case_tree.action, NULL, expected_result_type);
             switch (action_evaluated.status)
@@ -3866,7 +3866,7 @@ static evaluate_expression_result instantiate_generic_enum(function_checking_sta
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     enum_expression const original = instantiated_enum.tree;
-    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0, 0);
     function_checking_state enum_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
@@ -4002,7 +4002,7 @@ static evaluate_expression_result instantiate_generic_struct(function_checking_s
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     struct_expression const original = instantiated_struct.tree;
-    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0, 0);
     function_checking_state struct_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
@@ -4131,7 +4131,7 @@ static evaluate_expression_result instantiate_generic_interface(function_checkin
             evaluation_status_value, into, type_from_type(), optional_value_create(literal), true);
     }
     interface_expression const original = instantiated_interface.tree;
-    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0, 0);
     function_checking_state interface_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, state->source,
@@ -4259,7 +4259,7 @@ static evaluate_expression_result instantiate_generic_lambda(function_checking_s
             evaluation_status_value, into, function_type, optional_value_create(literal), true);
     }
     lambda const original = instantiated_lambda.tree;
-    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0);
+    instruction_sequence ignored_instructions = instruction_sequence_create(NULL, 0, 0);
     function_checking_state lambda_checking = function_checking_state_create(
         state->root, NULL, false, state->global, state->on_error, state->user, state->program, &ignored_instructions,
         optional_type_create_empty(), false, instantiated_lambda.file,
@@ -4684,7 +4684,7 @@ static evaluate_expression_result evaluate_break_expression(function_checking_st
 static evaluate_expression_result evaluate_loop_expression(function_checking_state *state,
                                                            instruction_sequence *function, sequence const loop)
 {
-    instruction_sequence body = {NULL, 0};
+    instruction_sequence body = {NULL, 0, 0};
     loop_checking *const outer_loop = state->innermost_loop;
     loop_checking current_loop = {optional_type_create_empty()};
     state->innermost_loop = &current_loop;
@@ -5028,7 +5028,8 @@ checked_program check(sequence const root, structure const global, check_error_h
         *dummy_signature =
             function_pointer_create(optional_type_create_set(type_from_unit()), tuple_type_create(NULL, 0),
                                     tuple_type_create(NULL, 0), optional_type_create_empty());
-        program.functions[0] = checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
+        program.functions[0] =
+            checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0, 0), NULL, 0);
     }
     program_check_free(check_root);
     expression_pool_free(pool);

@@ -451,7 +451,8 @@ void test_semantic_errors(void)
             instruction_create_call(call_instruction_create(1, NULL, 0, 2)),
             instruction_create_literal(literal_instruction_create(3, value_from_unit(), type_from_unit())),
             instruction_create_return(return_instruction_create(3, 4))};
-        instruction_sequence const expected_body = instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements));
+        instruction_sequence const expected_body =
+            instruction_sequence_create(LPG_COPY_ARRAY(expected_body_elements), LPG_ARRAY_SIZE(expected_body_elements));
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
@@ -1439,7 +1440,7 @@ void test_semantic_errors(void)
             simple_check("assert(boolean.true, boolean.false)", std_library.globals, &expected, module_directory_view);
         REQUIRE(expected.count == 0);
         REQUIRE(checked.function_count == 1);
-        instruction_sequence const expected_body = instruction_sequence_create(NULL, 0);
+        instruction_sequence const expected_body = instruction_sequence_create(NULL, 0, 0);
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);

@@ -52,7 +52,8 @@ static void check_single_wellformed_function(char const *const source, structure
               unicode_view_from_string(module_directory), 100000, NULL);
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
-    instruction_sequence const expected_body = instruction_sequence_create(expected_body_elements, expected_body_size);
+    instruction_sequence const expected_body =
+        instruction_sequence_create(expected_body_elements, expected_body_size, 0);
     if (!instruction_sequence_equals(&expected_body, &checked.functions[0].body))
     {
         printf("Expected instruction sequence:\n");
@@ -120,9 +121,9 @@ static void test_functions(const standard_library_description *std_library);
 
 void test_semantics(void)
 {
-    REQUIRE(
-        !instruction_equals(instruction_create_loop(loop_instruction_create(0, instruction_sequence_create(NULL, 0))),
-                            instruction_create_call(call_instruction_create(0, NULL, 0, 0))));
+    REQUIRE(!instruction_equals(
+        instruction_create_loop(loop_instruction_create(0, instruction_sequence_create(NULL, 0, 0))),
+        instruction_create_call(call_instruction_create(0, NULL, 0, 0))));
     REQUIRE(!instruction_equals(instruction_create_call(call_instruction_create(0, NULL, 0, 0)),
                                 instruction_create_call(call_instruction_create(1, NULL, 0, 0))));
     REQUIRE(!instruction_equals(instruction_create_call(call_instruction_create(0, NULL, 0, 0)),
@@ -139,17 +140,19 @@ void test_semantics(void)
                                     instruction_create_call(call_instruction_create(0, &right, 1, 0))));
     }
     {
-        instruction_sequence const left = instruction_sequence_create(NULL, 0);
-        instruction_sequence const right = instruction_sequence_create(allocate_array(1, sizeof(*right.elements)), 1);
+        instruction_sequence const left = instruction_sequence_create(NULL, 0, 0);
+        instruction_sequence const right =
+            instruction_sequence_create(allocate_array(1, sizeof(*right.elements)), 1, 1);
         right.elements[0] = instruction_create_call(call_instruction_create(0, NULL, 0, 0));
         REQUIRE(!instruction_sequence_equals(&left, &right));
         instruction_sequence_free(&left);
         instruction_sequence_free(&right);
     }
     {
-        instruction_sequence const left = instruction_sequence_create(allocate_array(1, sizeof(*left.elements)), 1);
-        left.elements[0] = instruction_create_loop(loop_instruction_create(0, instruction_sequence_create(NULL, 0)));
-        instruction_sequence const right = instruction_sequence_create(allocate_array(1, sizeof(*right.elements)), 1);
+        instruction_sequence const left = instruction_sequence_create(allocate_array(1, sizeof(*left.elements)), 1, 1);
+        left.elements[0] = instruction_create_loop(loop_instruction_create(0, instruction_sequence_create(NULL, 0, 0)));
+        instruction_sequence const right =
+            instruction_sequence_create(allocate_array(1, sizeof(*right.elements)), 1, 1);
         right.elements[0] = instruction_create_call(call_instruction_create(0, NULL, 0, 0));
         REQUIRE(!instruction_sequence_equals(&left, &right));
         instruction_sequence_free(&left);
@@ -173,7 +176,7 @@ void test_semantics(void)
         expected_body_elements[0] =
             instruction_create_literal(literal_instruction_create(0, value_from_unit(), type_from_unit()));
         expected_body_elements[1] = instruction_create_return(return_instruction_create(0, 1));
-        instruction_sequence const expected_body = instruction_sequence_create(expected_body_elements, 2);
+        instruction_sequence const expected_body = instruction_sequence_create(expected_body_elements, 2, 2);
         REQUIRE(instruction_sequence_equals(&expected_body, &checked.functions[0].body));
         checked_program_free(&checked);
         instruction_sequence_free(&expected_body);
@@ -224,16 +227,17 @@ static void test_functions(const standard_library_description *std_library)
                                                  tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[0] =
-                checked_function_create(signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[0] = checked_function_create(
+                signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main), LPG_ARRAY_SIZE(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[1] =
-                checked_function_create(signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[1] = checked_function_create(
+                signature_lambda,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda), LPG_ARRAY_SIZE(expected_lambda)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = () 123\n", (*std_library).globals, expected);
     }
@@ -262,16 +266,17 @@ static void test_functions(const standard_library_description *std_library)
                                                  tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[0] =
-                checked_function_create(signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[0] = checked_function_create(
+                signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main), LPG_ARRAY_SIZE(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[1] =
-                checked_function_create(signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[1] = checked_function_create(
+                signature_lambda,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda), LPG_ARRAY_SIZE(expected_lambda)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = (): int(123, 123)\n"
                                  "    return 123",
@@ -305,17 +310,18 @@ static void test_functions(const standard_library_description *std_library)
                                                  tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[0] =
-                checked_function_create(signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[0] = checked_function_create(
+                signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main), LPG_ARRAY_SIZE(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             unicode_string const register_debug_names[] = {unicode_string_from_c_str(""), unicode_string_from_c_str(""),
                                                            unicode_string_from_c_str(""), unicode_string_from_c_str(""),
                                                            unicode_string_from_c_str("")};
-            expected.functions[1] =
-                checked_function_create(signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[1] = checked_function_create(
+                signature_lambda,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda), LPG_ARRAY_SIZE(expected_lambda)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = ()\n"
                                  "    assert(boolean.true)\n",
@@ -350,16 +356,17 @@ static void test_functions(const standard_library_description *std_library)
                                                  tuple_type_create(NULL, 0), optional_type_create_empty());
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("f"), unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[0] =
-                checked_function_create(signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[0] = checked_function_create(
+                signature, instruction_sequence_create(LPG_COPY_ARRAY(expected_main), LPG_ARRAY_SIZE(expected_main)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         {
             unicode_string const register_debug_names[] = {
                 unicode_string_from_c_str("a"), unicode_string_from_c_str(""), unicode_string_from_c_str("")};
-            expected.functions[1] =
-                checked_function_create(signature_lambda, instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda)),
-                                        LPG_COPY_ARRAY(register_debug_names));
+            expected.functions[1] = checked_function_create(
+                signature_lambda,
+                instruction_sequence_create(LPG_COPY_ARRAY(expected_lambda), LPG_ARRAY_SIZE(expected_lambda)),
+                LPG_COPY_ARRAY(register_debug_names));
         }
         check_wellformed_program("let f = (a: boolean) 123\n", (*std_library).globals, expected);
     }
@@ -372,8 +379,8 @@ static void test_loops(const standard_library_description *std_library)
                                          instruction_create_read_struct(read_struct_instruction_create(0, 0, 1)),
                                          instruction_create_call(call_instruction_create(1, NULL, 0, 2))};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
-        expected_body_elements[0] =
-            instruction_create_loop(loop_instruction_create(3, instruction_sequence_create(LPG_COPY_ARRAY(loop_body))));
+        expected_body_elements[0] = instruction_create_loop(loop_instruction_create(
+            3, instruction_sequence_create(LPG_COPY_ARRAY(loop_body), LPG_ARRAY_SIZE(loop_body))));
         expected_body_elements[1] = instruction_create_return(return_instruction_create(3, 4));
         check_single_wellformed_function("loop\n"
                                          "    side_effect()",
@@ -387,7 +394,8 @@ static void test_loops(const standard_library_description *std_library)
                                          instruction_create_read_struct(read_struct_instruction_create(3, 0, 4)),
                                          instruction_create_call(call_instruction_create(4, NULL, 0, 5))};
         instruction const expected_body_elements[] = {
-            instruction_create_loop(loop_instruction_create(6, instruction_sequence_create(LPG_COPY_ARRAY(loop_body)))),
+            instruction_create_loop(loop_instruction_create(
+                6, instruction_sequence_create(LPG_COPY_ARRAY(loop_body), LPG_ARRAY_SIZE(loop_body)))),
             instruction_create_return(return_instruction_create(6, 7))};
         check_single_wellformed_function("loop\n"
                                          "    side_effect()\n"
@@ -398,8 +406,8 @@ static void test_loops(const standard_library_description *std_library)
         instruction const loop_body[] = {
             instruction_create_break(break_instruction_create(0, optional_register_id_create_empty()))};
         instruction *const expected_body_elements = allocate_array(2, sizeof(*expected_body_elements));
-        expected_body_elements[0] =
-            instruction_create_loop(loop_instruction_create(1, instruction_sequence_create(LPG_COPY_ARRAY(loop_body))));
+        expected_body_elements[0] = instruction_create_loop(loop_instruction_create(
+            1, instruction_sequence_create(LPG_COPY_ARRAY(loop_body), LPG_ARRAY_SIZE(loop_body))));
         expected_body_elements[1] = instruction_create_return(return_instruction_create(1, 2));
         check_single_wellformed_function("loop\n"
                                          "    break",

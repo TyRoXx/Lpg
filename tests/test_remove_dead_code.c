@@ -52,7 +52,8 @@ static void check_single_wellformed_function(char const *const source, structure
     sequence_free(&root);
     REQUIRE(checked.function_count == 1);
     remove_dead_code(&checked);
-    instruction_sequence const expected_body = instruction_sequence_create(expected_body_elements, expected_body_size);
+    instruction_sequence const expected_body =
+        instruction_sequence_create(expected_body_elements, expected_body_size, 0);
     if (!instruction_sequence_equals(&expected_body, &checked.functions[0].body))
     {
         printf("Expected instruction sequence:\n");

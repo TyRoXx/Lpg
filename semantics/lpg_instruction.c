@@ -612,7 +612,8 @@ bool instruction_equals(instruction const left, instruction const right)
 void add_instruction(LPG_NON_NULL(instruction_sequence *to), instruction const added)
 {
     ASSUME(to);
-    to->elements = reallocate_array(to->elements, (to->length + 1), sizeof(*to->elements));
+    to->elements = reallocate_array_exponentially(
+        to->elements, (to->length + 1), sizeof(*to->elements), to->length, &to->capacity);
     to->elements[to->length] = added;
     ++(to->length);
 }

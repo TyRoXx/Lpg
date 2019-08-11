@@ -3,9 +3,9 @@
 #include "lpg_for.h"
 #include "lpg_instruction.h"
 
-instruction_sequence instruction_sequence_create(instruction *elements, size_t length)
+instruction_sequence instruction_sequence_create(instruction *elements, size_t length, size_t capacity)
 {
-    instruction_sequence const result = {elements, length};
+    instruction_sequence const result = {elements, length, capacity};
     return result;
 }
 
