@@ -1,12 +1,12 @@
 #include "lpg_expression.h"
 #include "lpg_allocate.h"
 #include "lpg_assert.h"
+#include "lpg_expression_pool.h"
 #include "lpg_for.h"
 
 void expression_deallocate(expression *this)
 {
     expression_free(*this);
-    deallocate(this);
 }
 
 function_header_tree function_header_tree_create(parameter *parameters, size_t parameter_count, expression *return_type)
@@ -51,15 +51,15 @@ bool function_header_tree_equals(function_header_tree const left, function_heade
     return (left.return_type == right.return_type);
 }
 
-function_header_tree function_header_tree_clone(function_header_tree const original)
+function_header_tree function_header_tree_clone(function_header_tree const original, struct expression_pool *const pool)
 {
     parameter *const parameters = allocate_array(original.parameter_count, sizeof(*parameters));
     for (size_t i = 0; i < original.parameter_count; ++i)
     {
-        parameters[i] = parameter_clone(original.parameters[i]);
+        parameters[i] = parameter_clone(original.parameters[i], pool);
     }
     expression *const return_type =
-        original.return_type ? expression_allocate(expression_clone(*original.return_type)) : NULL;
+        original.return_type ? expression_allocate(expression_clone(*original.return_type, pool), pool) : NULL;
     function_header_tree const result = function_header_tree_create(parameters, original.parameter_count, return_type);
     ASSUME(function_header_tree_equals(original, result));
     return result;
@@ -86,19 +86,19 @@ bool lambda_equals(lambda const left, lambda const right)
            source_location_equals(left.source, right.source);
 }
 
-lambda lambda_clone(lambda const original)
+lambda lambda_clone(lambda const original, struct expression_pool *const pool)
 {
     return lambda_create(
-        generic_parameter_list_clone(original.generic_parameters), function_header_tree_clone(original.header),
-        original.result ? expression_allocate(expression_clone(*original.result)) : NULL, original.source);
+        generic_parameter_list_clone(original.generic_parameters), function_header_tree_clone(original.header, pool),
+        original.result ? expression_allocate(expression_clone(*original.result, pool), pool) : NULL, original.source);
 }
 
-tuple tuple_clone(tuple const original)
+tuple tuple_clone(tuple const original, struct expression_pool *const pool)
 {
     expression *const elements = allocate_array(original.length, sizeof(*elements));
     for (size_t i = 0; i < original.length; ++i)
     {
-        elements[i] = expression_clone(original.elements[i]);
+        elements[i] = expression_clone(original.elements[i], pool);
     }
     return tuple_create(elements, original.length, original.opening_brace);
 }
@@ -109,10 +109,10 @@ call call_create(expression *callee, tuple arguments, source_location closing_pa
     return result;
 }
 
-call call_clone(call const original)
+call call_clone(call const original, struct expression_pool *const pool)
 {
-    return call_create(expression_allocate(expression_clone(*original.callee)), tuple_clone(original.arguments),
-                       original.closing_parenthesis);
+    return call_create(expression_allocate(expression_clone(*original.callee, pool), pool),
+                       tuple_clone(original.arguments, pool), original.closing_parenthesis);
 }
 
 comment_expression comment_expression_clone(comment_expression const original)
@@ -142,11 +142,11 @@ bool parameter_equals(parameter const left, parameter const right)
     return identifier_expression_equals(left.name, right.name) && expression_equals(left.type, right.type);
 }
 
-parameter parameter_clone(parameter const original)
+parameter parameter_clone(parameter const original, struct expression_pool *const pool)
 {
     ASSUME(original.type);
     return parameter_create(
-        identifier_expression_clone(original.name), expression_allocate(expression_clone(*original.type)));
+        identifier_expression_clone(original.name), expression_allocate(expression_clone(*original.type, pool), pool));
 }
 
 access_structure access_structure_create(expression *object, identifier_expression member)
@@ -155,11 +155,11 @@ access_structure access_structure_create(expression *object, identifier_expressi
     return result;
 }
 
-access_structure access_structure_clone(access_structure const original)
+access_structure access_structure_clone(access_structure const original, struct expression_pool *const pool)
 {
     ASSUME(original.object);
-    return access_structure_create(
-        expression_allocate(expression_clone(*original.object)), identifier_expression_clone(original.member));
+    return access_structure_create(expression_allocate(expression_clone(*original.object, pool), pool),
+                                   identifier_expression_clone(original.member));
 }
 
 bool access_structure_equals(access_structure const left, access_structure const right)
@@ -202,11 +202,11 @@ bool match_case_equals(match_case const left, match_case const right)
     return expression_equals(left.action, right.action);
 }
 
-match_case match_case_clone(match_case const original)
+match_case match_case_clone(match_case const original, struct expression_pool *const pool)
 {
     return match_case_create(
-        original.key_or_default ? expression_allocate(expression_clone(*original.key_or_default)) : NULL,
-        expression_allocate(expression_clone(*original.action)));
+        original.key_or_default ? expression_allocate(expression_clone(*original.key_or_default, pool), pool) : NULL,
+        expression_allocate(expression_clone(*original.action, pool), pool));
 }
 
 match match_create(source_location begin, expression *input, match_case *cases, size_t number_of_cases)
@@ -215,15 +215,15 @@ match match_create(source_location begin, expression *input, match_case *cases, 
     return result;
 }
 
-match match_clone(match const original)
+match match_clone(match const original, struct expression_pool *const pool)
 {
     match_case *const cases = allocate_array(original.number_of_cases, sizeof(*cases));
     for (size_t i = 0; i < original.number_of_cases; ++i)
     {
-        cases[i] = match_case_clone(original.cases[i]);
+        cases[i] = match_case_clone(original.cases[i], pool);
     }
-    return match_create(
-        original.begin, expression_allocate(expression_clone(*original.input)), cases, original.number_of_cases);
+    return match_create(original.begin, expression_allocate(expression_clone(*original.input, pool), pool), cases,
+                        original.number_of_cases);
 }
 
 not not_expression_create(expression * value)
@@ -237,17 +237,17 @@ void not_free(LPG_NON_NULL(not const *value))
     expression_deallocate(value->expr);
 }
 
-not not_clone(not const original)
+not not_clone(not const original, struct expression_pool *const pool)
 {
-    return not_expression_create(expression_allocate(expression_clone(*original.expr)));
+    return not_expression_create(expression_allocate(expression_clone(*original.expr, pool), pool));
 }
 
-declare declare_clone(declare const original)
+declare declare_clone(declare const original, struct expression_pool *const pool)
 {
     return declare_create(
         identifier_expression_clone(original.name),
-        original.optional_type ? expression_allocate(expression_clone(*original.optional_type)) : NULL,
-        expression_allocate(expression_clone(*original.initializer)));
+        original.optional_type ? expression_allocate(expression_clone(*original.optional_type, pool), pool) : NULL,
+        expression_allocate(expression_clone(*original.initializer, pool), pool));
 }
 
 generic_parameter_list generic_parameter_list_create(unicode_view *names, size_t count)
@@ -308,10 +308,11 @@ bool interface_expression_method_equals(interface_expression_method const left, 
            function_header_tree_equals(left.header, right.header);
 }
 
-interface_expression_method interface_expression_method_clone(interface_expression_method const original)
+interface_expression_method interface_expression_method_clone(interface_expression_method const original,
+                                                              struct expression_pool *const pool)
 {
     return interface_expression_method_create(
-        identifier_expression_clone(original.name), function_header_tree_clone(original.header));
+        identifier_expression_clone(original.name), function_header_tree_clone(original.header, pool));
 }
 
 interface_expression interface_expression_create(generic_parameter_list parameters, source_location source,
@@ -354,12 +355,12 @@ bool interface_expression_equals(interface_expression const left, interface_expr
     return true;
 }
 
-interface_expression interface_expression_clone(interface_expression const original)
+interface_expression interface_expression_clone(interface_expression const original, struct expression_pool *const pool)
 {
     interface_expression_method *const methods = allocate_array(original.method_count, sizeof(*methods));
     for (size_t i = 0; i < original.method_count; ++i)
     {
-        methods[i] = interface_expression_method_clone(original.methods[i]);
+        methods[i] = interface_expression_method_clone(original.methods[i], pool);
     }
     interface_expression const result = interface_expression_create(
         generic_parameter_list_clone(original.parameters), original.source, methods, original.method_count);
@@ -410,12 +411,12 @@ bool struct_expression_equals(struct_expression const left, struct_expression co
     return true;
 }
 
-struct_expression struct_expression_clone(struct_expression const original)
+struct_expression struct_expression_clone(struct_expression const original, struct expression_pool *const pool)
 {
     struct_expression_element *const elements = allocate_array(original.element_count, sizeof(*elements));
     for (size_t i = 0; i < original.element_count; ++i)
     {
-        elements[i] = struct_expression_element_clone(original.elements[i]);
+        elements[i] = struct_expression_element_clone(original.elements[i], pool);
     }
     return struct_expression_create(
         generic_parameter_list_clone(original.generic_parameters), original.source, elements, original.element_count);
@@ -441,10 +442,12 @@ bool impl_expression_method_equals(impl_expression_method const left, impl_expre
            function_header_tree_equals(left.header, right.header) && sequence_equals(left.body, right.body);
 }
 
-impl_expression_method impl_expression_method_clone(impl_expression_method const original)
+impl_expression_method impl_expression_method_clone(impl_expression_method const original,
+                                                    struct expression_pool *const pool)
 {
     return impl_expression_method_create(identifier_expression_clone(original.name),
-                                         function_header_tree_clone(original.header), sequence_clone(original.body));
+                                         function_header_tree_clone(original.header, pool),
+                                         sequence_clone(original.body, pool));
 }
 
 impl_expression impl_expression_create(source_location begin, generic_parameter_list generic_parameters,
@@ -491,16 +494,16 @@ bool impl_expression_equals(impl_expression const left, impl_expression const ri
     return true;
 }
 
-impl_expression impl_expression_clone(impl_expression const original)
+impl_expression impl_expression_clone(impl_expression const original, struct expression_pool *const pool)
 {
     impl_expression_method *const methods = allocate_array(original.method_count, sizeof(*methods));
     for (size_t i = 0; i < original.method_count; ++i)
     {
-        methods[i] = impl_expression_method_clone(original.methods[i]);
+        methods[i] = impl_expression_method_clone(original.methods[i], pool);
     }
     return impl_expression_create(original.begin, generic_parameter_list_clone(original.generic_parameters),
-                                  expression_allocate(expression_clone(*original.interface_)),
-                                  expression_allocate(expression_clone(*original.self)), methods,
+                                  expression_allocate(expression_clone(*original.interface_, pool), pool),
+                                  expression_allocate(expression_clone(*original.self, pool), pool), methods,
                                   original.method_count);
 }
 
@@ -541,10 +544,10 @@ bool new_array_expression_equals(new_array_expression const left, new_array_expr
     return expression_equals(left.element, right.element);
 }
 
-new_array_expression new_array_expression_clone(new_array_expression const original)
+new_array_expression new_array_expression_clone(new_array_expression const original, struct expression_pool *const pool)
 {
     ASSUME(original.element);
-    return new_array_expression_create(expression_allocate(expression_clone(*original.element)));
+    return new_array_expression_create(expression_allocate(expression_clone(*original.element, pool), pool));
 }
 
 sequence sequence_create(expression *elements, size_t length, source_location begin)
@@ -770,6 +773,7 @@ comment_expression comment_expression_create(unicode_string value, source_locati
 
 instantiate_struct_expression instantiate_struct_expression_create(expression *const type, tuple arguments)
 {
+    ASSUME(expression_is_valid(*type));
     instantiate_struct_expression const result = {type, arguments};
     return result;
 }
@@ -780,10 +784,11 @@ void instantiate_struct_expression_free(instantiate_struct_expression const free
     tuple_free(&freed.arguments);
 }
 
-instantiate_struct_expression instantiate_struct_expression_clone(instantiate_struct_expression const original)
+instantiate_struct_expression instantiate_struct_expression_clone(instantiate_struct_expression const original,
+                                                                  struct expression_pool *const pool)
 {
     return instantiate_struct_expression_create(
-        expression_allocate(expression_clone(*original.type)), tuple_clone(original.arguments));
+        expression_allocate(expression_clone(*original.type, pool), pool), tuple_clone(original.arguments, pool));
 }
 
 enum_expression_element enum_expression_element_create(unicode_string name, expression *state)
@@ -818,11 +823,12 @@ bool enum_expression_element_equals(enum_expression_element const left, enum_exp
     return !right.state;
 }
 
-enum_expression_element enum_expression_element_clone(enum_expression_element const original)
+enum_expression_element enum_expression_element_clone(enum_expression_element const original,
+                                                      struct expression_pool *const pool)
 {
     return enum_expression_element_create(
         unicode_view_copy(unicode_view_from_string(original.name)),
-        original.state ? expression_allocate(expression_clone(*original.state)) : NULL);
+        original.state ? expression_allocate(expression_clone(*original.state, pool), pool) : NULL);
 }
 
 enum_expression enum_expression_create(source_location const begin, generic_parameter_list parameters,
@@ -869,12 +875,12 @@ bool enum_expression_equals(enum_expression const left, enum_expression const ri
     return true;
 }
 
-enum_expression enum_expression_clone(enum_expression const original)
+enum_expression enum_expression_clone(enum_expression const original, struct expression_pool *const pool)
 {
     enum_expression_element *const elements = allocate_array(original.element_count, sizeof(*elements));
     for (size_t i = 0; i < original.element_count; ++i)
     {
-        elements[i] = enum_expression_element_clone(original.elements[i]);
+        elements[i] = enum_expression_element_clone(original.elements[i], pool);
     }
     return enum_expression_create(
         original.begin, generic_parameter_list_clone(original.parameters), elements, original.element_count);
@@ -921,15 +927,16 @@ bool generic_instantiation_expression_equals(generic_instantiation_expression co
     return true;
 }
 
-generic_instantiation_expression generic_instantiation_expression_clone(generic_instantiation_expression const original)
+generic_instantiation_expression generic_instantiation_expression_clone(generic_instantiation_expression const original,
+                                                                        struct expression_pool *const pool)
 {
     expression *const arguments = allocate_array(original.count, sizeof(*arguments));
     for (size_t i = 0; i < original.count; ++i)
     {
-        arguments[i] = expression_clone(original.arguments[i]);
+        arguments[i] = expression_clone(original.arguments[i], pool);
     }
     return generic_instantiation_expression_create(
-        expression_allocate(expression_clone(*original.generic)), arguments, original.count);
+        expression_allocate(expression_clone(*original.generic, pool), pool), arguments, original.count);
 }
 
 type_of_expression type_of_expression_create(source_location begin, expression *target)
@@ -948,10 +955,11 @@ bool type_of_expression_equals(type_of_expression const left, type_of_expression
     return source_location_equals(left.begin, right.begin) && expression_equals(left.target, right.target);
 }
 
-type_of_expression type_of_expression_clone(type_of_expression const original)
+type_of_expression type_of_expression_clone(type_of_expression const original, struct expression_pool *const pool)
 {
     ASSUME(original.target);
-    return type_of_expression_create(original.begin, expression_allocate(expression_clone(*original.target)));
+    return type_of_expression_create(
+        original.begin, expression_allocate(expression_clone(*original.target, pool), pool));
 }
 
 import_expression import_expression_create(source_location begin, identifier_expression name)
@@ -1001,10 +1009,10 @@ bool break_expression_equals(break_expression const left, break_expression const
     return !right.value;
 }
 
-break_expression break_expression_clone(break_expression const original)
+break_expression break_expression_clone(break_expression const original, struct expression_pool *const pool)
 {
     return break_expression_create(
-        original.begin, original.value ? expression_allocate(expression_clone(*original.value)) : NULL);
+        original.begin, original.value ? expression_allocate(expression_clone(*original.value, pool), pool) : NULL);
 }
 
 bool instantiate_struct_expression_equals(instantiate_struct_expression const left,
@@ -1088,10 +1096,11 @@ bool struct_expression_element_equals(struct_expression_element const left, stru
     return identifier_expression_equals(left.name, right.name) && expression_equals(&left.type, &right.type);
 }
 
-struct_expression_element struct_expression_element_clone(struct_expression_element const original)
+struct_expression_element struct_expression_element_clone(struct_expression_element const original,
+                                                          struct expression_pool *const pool)
 {
     return struct_expression_element_create(
-        identifier_expression_clone(original.name), expression_clone(original.type));
+        identifier_expression_clone(original.name), expression_clone(original.type, pool));
 }
 
 expression expression_from_integer_literal(integer_literal_expression value)
@@ -1247,10 +1256,12 @@ expression expression_from_new_array(new_array_expression const content)
     return result;
 }
 
-expression *expression_allocate(expression value)
+expression *expression_allocate(expression value, struct expression_pool *const pool)
 {
-    expression *result = allocate(sizeof(*result));
+    ASSUME(expression_is_valid(value));
+    expression *result = expression_pool_allocate(pool);
     *result = value;
+    ASSUME(expression_is_valid(*result));
     return result;
 }
 
@@ -1359,34 +1370,34 @@ void expression_free(expression const freed)
     }
 }
 
-expression expression_clone(expression const original)
+expression expression_clone(expression const original, struct expression_pool *const pool)
 {
     switch (original.type)
     {
     case expression_type_new_array:
-        return expression_from_new_array(new_array_expression_clone(original.new_array));
+        return expression_from_new_array(new_array_expression_clone(original.new_array, pool));
 
     case expression_type_identifier:
         return expression_from_identifier(identifier_expression_clone(original.identifier));
 
     case expression_type_access_structure:
-        return expression_from_access_structure(access_structure_clone(original.access_structure));
+        return expression_from_access_structure(access_structure_clone(original.access_structure, pool));
 
     case expression_type_generic_instantiation:
         return expression_from_generic_instantiation(
-            generic_instantiation_expression_clone(original.generic_instantiation));
+            generic_instantiation_expression_clone(original.generic_instantiation, pool));
 
     case expression_type_call:
-        return expression_from_call(call_clone(original.call));
+        return expression_from_call(call_clone(original.call, pool));
 
     case expression_type_lambda:
-        return expression_from_lambda(lambda_clone(original.lambda));
+        return expression_from_lambda(lambda_clone(original.lambda, pool));
 
     case expression_type_sequence:
-        return expression_from_sequence(sequence_clone(original.sequence));
+        return expression_from_sequence(sequence_clone(original.sequence, pool));
 
     case expression_type_declare:
-        return expression_from_declare(declare_clone(original.declare));
+        return expression_from_declare(declare_clone(original.declare, pool));
 
     case expression_type_integer_literal:
         return expression_from_integer_literal(integer_literal_expression_clone(original.integer_literal));
@@ -1395,43 +1406,44 @@ expression expression_clone(expression const original)
         return expression_from_string(string_expression_clone(original.string));
 
     case expression_type_struct:
-        return expression_from_struct(struct_expression_clone(original.struct_));
+        return expression_from_struct(struct_expression_clone(original.struct_, pool));
 
     case expression_type_instantiate_struct:
-        return expression_from_instantiate_struct(instantiate_struct_expression_clone(original.instantiate_struct));
+        return expression_from_instantiate_struct(
+            instantiate_struct_expression_clone(original.instantiate_struct, pool));
 
     case expression_type_comment:
         return expression_from_comment(comment_expression_clone(original.comment));
 
     case expression_type_loop:
-        return expression_from_loop(sequence_clone(original.loop_body));
+        return expression_from_loop(sequence_clone(original.loop_body, pool));
 
     case expression_type_break:
-        return expression_from_break(break_expression_clone(original.break_));
+        return expression_from_break(break_expression_clone(original.break_, pool));
 
     case expression_type_enum:
-        return expression_from_enum(enum_expression_clone(original.enum_));
+        return expression_from_enum(enum_expression_clone(original.enum_, pool));
 
     case expression_type_match:
-        return expression_from_match(match_clone(original.match));
+        return expression_from_match(match_clone(original.match, pool));
 
     case expression_type_not:
-        return expression_from_not(not_clone(original.not));
+        return expression_from_not(not_clone(original.not, pool));
 
     case expression_type_interface:
-        return expression_from_interface(interface_expression_clone(original.interface_));
+        return expression_from_interface(interface_expression_clone(original.interface_, pool));
 
     case expression_type_impl:
-        return expression_from_impl(impl_expression_clone(original.impl));
+        return expression_from_impl(impl_expression_clone(original.impl, pool));
 
     case expression_type_placeholder:
         return expression_from_placeholder(placeholder_expression_clone(original.placeholder));
 
     case expression_type_type_of:
-        return expression_from_type_of(type_of_expression_clone(original.type_of));
+        return expression_from_type_of(type_of_expression_clone(original.type_of, pool));
 
     case expression_type_return:
-        return expression_from_return(expression_allocate(expression_clone(*original.return_)));
+        return expression_from_return(expression_allocate(expression_clone(*original.return_, pool), pool));
 
     case expression_type_binary:
     case expression_type_import:
@@ -1499,6 +1511,8 @@ bool expression_equals(expression const *left, expression const *right)
 {
     ASSUME(left);
     ASSUME(right);
+    ASSUME(expression_is_valid(*left));
+    ASSUME(expression_is_valid(*right));
     if (left->type != right->type)
     {
         return 0;
@@ -1617,12 +1631,12 @@ void binary_operator_expression_free(binary_operator_expression const *value)
     expression_deallocate(value->right);
 }
 
-sequence sequence_clone(sequence const original)
+sequence sequence_clone(sequence const original, struct expression_pool *const pool)
 {
     expression *const elements = allocate_array(original.length, sizeof(*elements));
     for (size_t i = 0; i < original.length; ++i)
     {
-        elements[i] = expression_clone(original.elements[i]);
+        elements[i] = expression_clone(original.elements[i], pool);
     }
     return sequence_create(elements, original.length, original.begin);
 }

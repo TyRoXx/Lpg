@@ -17,8 +17,9 @@ static void test_assignment(void);
 static void test_syntax_error(parse_error const *expected_errors, size_t const expected_count,
                               expression *const expected, unicode_string input)
 {
+    expression_pool pool = expression_pool_create();
     test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, expected_errors, expected_count};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, &pool);
     expression_parser_result result = parse_expression(&parser, 0, 1);
     if (expected)
     {
@@ -36,6 +37,7 @@ static void test_syntax_error(parse_error const *expected_errors, size_t const e
     expression_parser_free(parser);
     unicode_string_free(&input);
     REQUIRE(user.expected_count == 0);
+    expression_pool_free(pool);
 }
 
 void test_parse_expression_syntax_error(void)
@@ -56,18 +58,21 @@ void test_parse_expression_syntax_error(void)
     }
 
     {
+        expression_pool pool = expression_pool_create();
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_unexpected_indentation, source_location_create(1, 0))};
-        expression expected = expression_from_lambda(
-            lambda_create(generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
-                          expression_allocate(expression_from_sequence(sequence_create(
-                              expression_allocate(expression_from_identifier(identifier_expression_create(
-                                  unicode_view_from_c_str("a"), source_location_create(1, 8)))),
-                              1, source_location_create(1, 0)))),
-                          source_location_create(0, 0)));
+        expression *elements = allocate_array(1, sizeof(*elements));
+        elements[0] = expression_from_identifier(
+            identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(1, 8)));
+        expression expected = expression_from_lambda(lambda_create(
+            generic_parameter_list_create(NULL, 0), function_header_tree_create(NULL, 0, NULL),
+            expression_allocate(
+                expression_from_sequence(sequence_create(elements, 1, source_location_create(1, 0))), &pool),
+            source_location_create(0, 0)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("()\n"
                                                                                                    "        a"));
+        expression_pool_free(pool);
     }
 
     {
@@ -262,15 +267,18 @@ void test_parse_expression_syntax_error(void)
     }
 
     {
+        expression_pool pool = expression_pool_create();
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_expression, source_location_create(0, 9))};
         expression expected = expression_from_instantiate_struct(instantiate_struct_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("uyt"), source_location_create(0, 0)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("uyt"), source_location_create(0, 0))),
+                                &pool),
             tuple_create(NULL, 0, source_location_create(0, 3))));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("uyt{right\n"
                                                                                                    "int22222"));
+        expression_pool_free(pool);
     }
 
     {
@@ -292,14 +300,18 @@ void test_parse_expression_syntax_error(void)
 
 static void test_assignment(void)
 {
+    expression_pool pool = expression_pool_create();
+
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_space, source_location_create(0, 4))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 4))),
+                                &pool),
             equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a ==1"));
@@ -309,10 +321,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 3))),
+                                &pool),
             equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a==1"));
@@ -322,10 +336,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 3))),
+                                &pool),
             not_equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a!=1"));
@@ -335,10 +351,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 3))),
+                                &pool),
             less_than_or_equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a<=1"));
@@ -348,10 +366,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 3))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 3))),
+                                &pool),
             greater_than_or_equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a>=1"));
@@ -361,10 +381,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 2))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 2))),
+                                &pool),
             less_than));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a<1"));
@@ -374,10 +396,12 @@ static void test_assignment(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 1)),
             parse_error_create(parse_error_expected_space, source_location_create(0, 2))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 2))),
+                                &pool),
             greater_than));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a>1"));
@@ -386,10 +410,12 @@ static void test_assignment(void)
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_space, source_location_create(0, 1))};
         expression expected = expression_from_binary_operator(binary_operator_expression_create(
-            expression_allocate(expression_from_identifier(
-                identifier_expression_create(unicode_view_from_c_str("a"), source_location_create(0, 0)))),
-            expression_allocate(expression_from_integer_literal(
-                integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 4)))),
+            expression_allocate(expression_from_identifier(identifier_expression_create(
+                                    unicode_view_from_c_str("a"), source_location_create(0, 0))),
+                                &pool),
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 1), source_location_create(0, 4))),
+                                &pool),
             equals));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a== 1"));
@@ -403,6 +429,8 @@ static void test_assignment(void)
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("a == ?"));
     }
+
+    expression_pool_free(pool);
 }
 
 static void test_tokenizer_error(void)
@@ -531,6 +559,7 @@ static void test_unnamed_function(void)
 
 static void test_function(void)
 {
+    expression_pool pool = expression_pool_create();
     {
         parse_error const expected_error =
             parse_error_create(parse_error_expected_expression, source_location_create(0, 2));
@@ -538,8 +567,9 @@ static void test_function(void)
         arguments[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 3)));
         expression expected = expression_from_call(
-            call_create(expression_allocate(expression_from_identifier(
-                            identifier_expression_create(unicode_view_from_c_str("f"), source_location_create(0, 0)))),
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                                                unicode_view_from_c_str("f"), source_location_create(0, 0))),
+                                            &pool),
                         tuple_create(arguments, 1, source_location_create(0, 0)), source_location_create(0, 4)));
         test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(,1)"));
     }
@@ -551,8 +581,9 @@ static void test_function(void)
         arguments[0] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 2)));
         expression expected = expression_from_call(
-            call_create(expression_allocate(expression_from_identifier(
-                            identifier_expression_create(unicode_view_from_c_str("f"), source_location_create(0, 0)))),
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                                                unicode_view_from_c_str("f"), source_location_create(0, 0))),
+                                            &pool),
                         tuple_create(arguments, 1, source_location_create(0, 0)), source_location_create(0, 4)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("f(1,)"));
@@ -579,8 +610,9 @@ static void test_function(void)
         arguments[1] = expression_from_integer_literal(
             integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 4)));
         expression expected = expression_from_call(
-            call_create(expression_allocate(expression_from_identifier(
-                            identifier_expression_create(unicode_view_from_c_str("f"), source_location_create(0, 0)))),
+            call_create(expression_allocate(expression_from_identifier(identifier_expression_create(
+                                                unicode_view_from_c_str("f"), source_location_create(0, 0))),
+                                            &pool),
                         tuple_create(arguments, 2, source_location_create(0, 0)), source_location_create(0, 5)));
         test_syntax_error(&expected_error, 1, &expected, unicode_string_from_c_str("f(1,2)"));
     }
@@ -647,13 +679,18 @@ static void test_function(void)
             parse_error_create(parse_error_invalid_token, source_location_create(1, 4))};
         expression expected = expression_from_declare(declare_create(
             identifier_expression_create(unicode_view_from_c_str("f"), source_location_create(0, 4)), NULL,
-            expression_allocate(expression_from_lambda(lambda_create(
-                generic_parameter_list_create(NULL, 0),
-                function_header_tree_create(
-                    NULL, 0, expression_allocate(expression_from_identifier(identifier_expression_create(
-                                 unicode_view_from_c_str("unit"), source_location_create(0, 12))))),
-                expression_allocate(expression_from_sequence(sequence_create(NULL, 0, source_location_create(1, 0)))),
-                source_location_create(0, 8))))));
+            expression_allocate(
+                expression_from_lambda(lambda_create(
+                    generic_parameter_list_create(NULL, 0),
+                    function_header_tree_create(
+                        NULL, 0,
+                        expression_allocate(expression_from_identifier(identifier_expression_create(
+                                                unicode_view_from_c_str("unit"), source_location_create(0, 12))),
+                                            &pool)),
+                    expression_allocate(
+                        expression_from_sequence(sequence_create(NULL, 0, source_location_create(1, 0))), &pool),
+                    source_location_create(0, 8))),
+                &pool)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = (): unit\n"
                                                                                                    "    ?"));
@@ -701,12 +738,16 @@ static void test_function(void)
             parse_error_create(parse_error_expected_space, source_location_create(0, 12))};
         expression expected = expression_from_declare(declare_create(
             identifier_expression_create(unicode_view_from_c_str("f"), source_location_create(0, 4)), NULL,
-            expression_allocate(expression_from_binary_operator(binary_operator_expression_create(
-                expression_allocate(expression_from_integer_literal(
-                    integer_literal_expression_create(integer_create(0, 1), source_location_create(0, 8)))),
-                expression_allocate(expression_from_integer_literal(
-                    integer_literal_expression_create(integer_create(0, 2), source_location_create(0, 11)))),
-                equals)))));
+            expression_allocate(
+                expression_from_binary_operator(binary_operator_expression_create(
+                    expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                            integer_create(0, 1), source_location_create(0, 8))),
+                                        &pool),
+                    expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                            integer_create(0, 2), source_location_create(0, 11))),
+                                        &pool),
+                    equals)),
+                &pool)));
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected, unicode_string_from_c_str("let f = 1 ==2"));
     }
@@ -732,6 +773,7 @@ static void test_function(void)
         test_syntax_error(
             expected_errors, LPG_ARRAY_SIZE(expected_errors), NULL, unicode_string_from_c_str("let f = [A]"));
     }
+    expression_pool_free(pool);
 }
 
 static void test_let(void)
@@ -769,6 +811,7 @@ static void test_let(void)
 
 static void test_return(void)
 {
+    expression_pool pool = expression_pool_create();
     {
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_space, source_location_create(0, 6))};
@@ -785,11 +828,14 @@ static void test_return(void)
         parse_error const expected_errors[] = {
             parse_error_create(parse_error_expected_expression, source_location_create(0, 7)),
             parse_error_create(parse_error_expected_expression, source_location_create(0, 13))};
-        expression expected = expression_from_return(expression_allocate(expression_from_integer_literal(
-            integer_literal_expression_create(integer_create(0, 123), source_location_create(0, 14)))));
+        expression expected = expression_from_return(
+            expression_allocate(expression_from_integer_literal(integer_literal_expression_create(
+                                    integer_create(0, 123), source_location_create(0, 14))),
+                                &pool));
         test_syntax_error(expected_errors, LPG_ARRAY_SIZE(expected_errors), &expected,
                           unicode_string_from_c_str("return return 123"));
     }
+    expression_pool_free(pool);
 }
 
 static void test_match_case(void)

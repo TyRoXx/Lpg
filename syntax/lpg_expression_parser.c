@@ -5,10 +5,10 @@
 
 expression_parser expression_parser_create(rich_token_producer rich_token_producer_argument,
                                            callback_user find_next_token_user, parse_error_handler on_error,
-                                           callback_user on_error_user)
+                                           callback_user on_error_user, struct expression_pool *const pool)
 {
     expression_parser const result = {
-        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0};
+        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0, pool};
     return result;
 }
 

@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include <string.h>
 
-static sequence parse(unicode_view const input)
+static sequence parse(unicode_view const input, expression_pool *const pool)
 {
     test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -37,7 +37,8 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 
 static void check_generated_c_code(char const *const source, standard_library_description const standard_library)
 {
-    sequence root = parse(unicode_view_from_c_str(source));
+    expression_pool pool = expression_pool_create();
+    sequence root = parse(unicode_view_from_c_str(source), &pool);
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
@@ -59,6 +60,7 @@ static void check_generated_c_code(char const *const source, standard_library_de
         garbage_collector_free(additional_memory);
     }
     checked_program_free(&checked);
+    expression_pool_free(pool);
     memory_writer_free(&generated);
     unicode_string_free(&module_directory);
 }

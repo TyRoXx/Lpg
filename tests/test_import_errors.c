@@ -8,10 +8,10 @@
 #include "test.h"
 #include <string.h>
 
-static sequence parse(char const *input)
+static sequence parse(char const *input, expression_pool *const pool)
 {
     test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -64,7 +64,8 @@ void test_import_errors(void)
     standard_library_description const std_library = describe_standard_library();
 
     {
-        sequence root = parse("import syntaxerror\n");
+        expression_pool pool = expression_pool_create();
+        sequence root = parse("import syntaxerror\n", &pool);
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
         source_file_lines_owning const importing_lines = source_file_lines_owning_scan(importing_file_content);
@@ -103,11 +104,13 @@ void test_import_errors(void)
         unicode_string_free(&expected_file_name);
         source_file_lines_owning_free(importing_lines);
         source_file_lines_owning_free(expected_lines);
+        expression_pool_free(pool);
     }
 
     {
         char const *const source = "import semanticerror\n";
-        sequence root = parse(source);
+        expression_pool pool = expression_pool_create();
+        sequence root = parse(source, &pool);
         unicode_view const imported_file_pieces[] = {
             module_directory_view, unicode_view_from_c_str("semanticerror.lpg")};
         unicode_string const imported_file = path_combine(imported_file_pieces, LPG_ARRAY_SIZE(imported_file_pieces));
@@ -137,10 +140,12 @@ void test_import_errors(void)
         unicode_string_free(&imported_file);
         source_file_lines_owning_free(imported_lines);
         source_file_lines_owning_free(importing_lines);
+        expression_pool_free(pool);
     }
 
     {
-        sequence root = parse("import doesnotexist\n");
+        expression_pool pool = expression_pool_create();
+        sequence root = parse("import doesnotexist\n", &pool);
         unicode_view const importing_file = unicode_view_from_c_str("");
         unicode_view const importing_file_content = unicode_view_from_c_str("");
         source_file_lines_owning const lines = source_file_lines_owning_scan(importing_file_content);
@@ -157,11 +162,13 @@ void test_import_errors(void)
         REQUIRE(checked.function_count == 1);
         checked_program_free(&checked);
         source_file_lines_owning_free(lines);
+        expression_pool_free(pool);
     }
 
     {
         char const *const source = "import importsitself\n";
-        sequence root = parse(source);
+        expression_pool pool = expression_pool_create();
+        sequence root = parse(source, &pool);
         unicode_view const imported_file_pieces[] = {
             module_directory_view, unicode_view_from_c_str("importsitself.lpg")};
         unicode_string const imported_file = path_combine(imported_file_pieces, LPG_ARRAY_SIZE(imported_file_pieces));
@@ -191,6 +198,7 @@ void test_import_errors(void)
         unicode_string_free(&imported_file);
         source_file_lines_owning_free(importing_lines);
         source_file_lines_owning_free(imported_lines);
+        expression_pool_free(pool);
     }
 
     unicode_string_free(&module_directory);

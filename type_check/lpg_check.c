@@ -971,7 +971,7 @@ evaluate_generic_lambda_expression(function_checking_state *state, instruction_s
         reallocate_array(root->generic_lambdas, root->generic_lambda_count + 1, sizeof(*root->generic_lambdas));
     generic_lambda_id const id = root->generic_lambda_count;
     root->generic_lambdas[id] =
-        generic_lambda_create(lambda_clone(element), generic_closures_create(NULL, 0), state->source,
+        generic_lambda_create(lambda_clone(element, root->pool), generic_closures_create(NULL, 0), state->source,
                               unicode_view_copy(state->current_import_directory));
     root->generic_lambda_count += 1;
     register_id const into = allocate_register(&state->used_registers);
@@ -2985,7 +2985,7 @@ evaluate_generic_interface_expression(function_checking_state *state, instructio
 
     generic_closures const closures = find_generic_interface_closures(state, element);
     root->generic_interfaces[id] = generic_interface_create(
-        interface_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
+        interface_expression_clone(element, root->pool), closures, unicode_view_copy(state->current_import_directory));
     root->generic_interface_count += 1;
 
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3086,7 +3086,7 @@ evaluate_generic_struct_expression(function_checking_state *state, instruction_s
 
     generic_closures const closures = find_generic_struct_closures(state, element);
     root->generic_structs[id] = generic_struct_create(
-        struct_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
+        struct_expression_clone(element, root->pool), closures, unicode_view_copy(state->current_import_directory));
     root->generic_struct_count += 1;
 
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -3309,7 +3309,7 @@ static evaluate_expression_result evaluate_generic_impl_regular_self(function_ch
     interface_->generic_impls = reallocate_array(
         interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
     interface_->generic_impls[interface_->generic_impl_count] =
-        generic_impl_create(impl_expression_clone(element), closures,
+        generic_impl_create(impl_expression_clone(element, root->pool), closures,
                             generic_impl_self_create_regular(self.compile_time_value.value_.type_), state->source,
                             unicode_view_copy(state->current_import_directory));
     interface_->generic_impl_count += 1;
@@ -3363,8 +3363,8 @@ static evaluate_expression_result evaluate_generic_impl_regular_interface(functi
                                                                   sizeof(*root->generic_impls_for_regular_interfaces));
     root->generic_impls_for_regular_interfaces[root->generic_impls_for_regular_interfaces_count] =
         generic_impl_regular_interface_create(interface_evaluated.compile_time_value.value_.type_.interface_,
-                                              impl_expression_clone(tree), closures,
-                                              generic_instantiation_expression_clone(self), state->source,
+                                              impl_expression_clone(tree, root->pool), closures,
+                                              generic_instantiation_expression_clone(self, root->pool), state->source,
                                               unicode_view_copy(state->current_import_directory));
     root->generic_impls_for_regular_interfaces_count += 1;
     return make_unit(&state->used_registers, function);
@@ -3428,8 +3428,8 @@ evaluate_fully_generic_impl(function_checking_state *state, instruction_sequence
     interface_->generic_impls = reallocate_array(
         interface_->generic_impls, (interface_->generic_impl_count + 1), sizeof(*interface_->generic_impls));
     interface_->generic_impls[interface_->generic_impl_count] =
-        generic_impl_create(impl_expression_clone(tree), closures,
-                            generic_impl_self_create_generic(generic_instantiation_expression_clone(self)),
+        generic_impl_create(impl_expression_clone(tree, root->pool), closures,
+                            generic_impl_self_create_generic(generic_instantiation_expression_clone(self, root->pool)),
                             state->source, unicode_view_copy(state->current_import_directory));
     interface_->generic_impl_count += 1;
     return make_unit(&state->used_registers, function);
@@ -3702,7 +3702,7 @@ static evaluate_expression_result evaluate_generic_enum_expression(function_chec
     generic_enum_id const id = root->generic_enum_count;
     generic_closures const closures = find_generic_closures(state, element);
     root->generic_enums[id] = generic_enum_create(
-        enum_expression_clone(element), closures, unicode_view_copy(state->current_import_directory));
+        enum_expression_clone(element, root->pool), closures, unicode_view_copy(state->current_import_directory));
     root->generic_enum_count += 1;
     register_id const into = allocate_register(&state->used_registers);
     add_instruction(function, instruction_create_literal(literal_instruction_create(
@@ -5004,11 +5004,12 @@ checked_program check(sequence const root, structure const global, check_error_h
     size_t current_recursion = 0;
     uint64_t const max_executed_instructions = 10000;
     uint64_t executed_instructions = 0;
+    expression_pool pool = expression_pool_create();
     program_check check_root = {
         NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, NULL, 0, loader, global, globals, NULL,
         NULL, 0, 0, interpreter_create(globals, &program.memory, &program.functions, &program.interfaces, max_recursion,
                                        &current_recursion, max_executed_instructions, &executed_instructions),
-        NULL, 0};
+        NULL, 0, &pool};
     source_file_owning const source_copy = source_file_to_owning(source);
     check_function_result const checked =
         check_function(&check_root, NULL, expression_from_sequence(root), global, on_error, user, &program, NULL, NULL,
@@ -5030,5 +5031,6 @@ checked_program check(sequence const root, structure const global, check_error_h
         program.functions[0] = checked_function_create(dummy_signature, instruction_sequence_create(NULL, 0), NULL, 0);
     }
     program_check_free(check_root);
+    expression_pool_free(pool);
     return program;
 }

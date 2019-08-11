@@ -28,10 +28,10 @@
 #include "duktape.h"
 #endif
 
-static sequence parse(unicode_view const input)
+static sequence parse(unicode_view const input, expression_pool *const pool)
 {
     test_parser_user user = {{input.begin, input.length, source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -374,13 +374,14 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 static void expect_output_impl(unicode_view const test_name, unicode_view const source, structure const global_object,
                                unicode_view const in_lpg_directory, unicode_view const current_import_directory)
 {
-    sequence const root = parse(source);
+    expression_pool pool = expression_pool_create();
+    sequence const root = parse(source, &pool);
 
     {
         memory_writer buffer = {NULL, 0, 0};
         whitespace_state const whitespace = {0, false};
         REQUIRE(success_yes == save_sequence(memory_writer_erase(&buffer), root, whitespace));
-        sequence const reparsed = parse(unicode_view_create(buffer.data, buffer.used));
+        sequence const reparsed = parse(unicode_view_create(buffer.data, buffer.used), &pool);
         sequence_free(&reparsed);
         memory_writer_free(&buffer);
     }
@@ -423,6 +424,7 @@ static void expect_output_impl(unicode_view const test_name, unicode_view const 
 
     unicode_string_free(&module_directory);
     checked_program_free(&checked);
+    expression_pool_free(pool);
 }
 
 static void run_file(char const *const source_file_name, unicode_view const in_lpg_subdirectory,

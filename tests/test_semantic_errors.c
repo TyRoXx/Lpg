@@ -9,10 +9,10 @@
 #include "test.h"
 #include <string.h>
 
-static sequence parse(char const *input)
+static sequence parse(char const *input, expression_pool *const pool)
 {
     test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -58,11 +58,13 @@ static checked_program simple_check(char const *const source, structure const gl
     source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_c_str(source));
     user->source = source_file_create(
         unicode_view_from_c_str("test.lpg"), unicode_view_from_c_str(source), source_file_lines_from_owning(lines));
-    sequence const root = parse(source);
+    expression_pool pool = expression_pool_create();
+    sequence const root = parse(source, &pool);
     module_loader loader = module_loader_create(module_directory, expect_no_complete_parse_error, NULL);
     checked_program const result =
         check(root, global, expect_errors, &loader, user->source, module_directory, 100000, user);
     sequence_free(&root);
+    expression_pool_free(pool);
     source_file_lines_owning_free(lines);
     return result;
 }

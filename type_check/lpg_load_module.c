@@ -175,13 +175,15 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
         loader->on_parse_error, loader->on_parse_error_user, unicode_view_from_string(attempt.full_module_path),
         unicode_view_create(attempt.module_source.success.data, attempt.module_source.success.length),
         source_file_lines_from_owning(lines), false);
+    expression_pool pool = expression_pool_create();
     expression_parser parser =
-        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
+        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator, &pool);
     sequence const parsed = parse_program(&parser);
     expression_parser_free(parser);
     if (translator.has_error)
     {
         sequence_free(&parsed);
+        expression_pool_free(pool);
         import_attempt_result_free(attempt);
         source_file_lines_owning_free(lines);
         load_module_result const failure = {optional_value_empty, type_from_unit()};
@@ -197,6 +199,7 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
     load_module_result const result = type_check_module(
         state, parsed, module_source, path_remove_leaf(unicode_view_from_string(module_source->name)));
     sequence_free(&parsed);
+    expression_pool_free(pool);
     import_attempt_result_free(attempt);
     return result;
 }

@@ -141,12 +141,12 @@ static optional_sequence make_optional_sequence(sequence const content)
 static optional_sequence const optional_sequence_none = {false, {NULL, 0, {0, 0}}};
 
 optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source,
-                        source_file_lines const lines)
+                        source_file_lines const lines, expression_pool *const pool)
 {
     parser_user parser_state = {source.begin, source.length, source_location_create(0, 0)};
     parse_error_translator translator = {&user, file_name, source, lines};
     expression_parser parser =
-        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator);
+        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     if (user.has_error)
@@ -392,11 +392,13 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
 
     source_file_lines_owning const lines = source_file_lines_owning_scan(unicode_view_from_string(source));
     cli_parser_user user = {diagnostics, false};
+    expression_pool pool = expression_pool_create();
     optional_sequence const root = parse(user, unicode_view_from_c_str(arguments.file_name),
-                                         unicode_view_from_string(source), source_file_lines_from_owning(lines));
+                                         unicode_view_from_string(source), source_file_lines_from_owning(lines), &pool);
     if (!root.has_value)
     {
         sequence_free(&root.value);
+        expression_pool_free(pool);
         unicode_string_free(&source);
         source_file_lines_owning_free(lines);
         return true;
@@ -413,12 +415,14 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         {
             memory_writer_free(&format_buffer);
             sequence_free(&root.value);
+            expression_pool_free(pool);
             unicode_string_free(&source);
             source_file_lines_owning_free(lines);
             return true;
         }
 
         sequence_free(&root.value);
+        expression_pool_free(pool);
 
         unicode_string temporary = write_temporary_file(format_buffer.data);
         if (!rename_file(unicode_view_from_string(temporary), unicode_view_from_c_str(arguments.file_name)))
@@ -462,6 +466,7 @@ bool run_cli(int const argc, char **const argv, stream_writer const diagnostics,
         source_file_create(source_file_path, unicode_view_from_string(source), source_file_lines_from_owning(lines)),
         path_remove_leaf(source_file_path), 100000, &context);
     sequence_free(&root.value);
+    expression_pool_free(pool);
     switch (arguments.command)
     {
     case compiler_command_run:

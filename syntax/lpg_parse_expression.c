@@ -250,8 +250,9 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 return false;
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
-            (*cases)[*case_count] = match_case_create(is_default ? NULL : expression_allocate(key.success),
-                                                      expression_allocate(expression_from_sequence(value)));
+            (*cases)[*case_count] =
+                match_case_create(is_default ? NULL : expression_allocate(key.success, parser->pool),
+                                  expression_allocate(expression_from_sequence(value), parser->pool));
         }
         else
         {
@@ -282,8 +283,9 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 }
             }
             *cases = reallocate_array(*cases, (*case_count + 1), sizeof(**cases));
-            (*cases)[*case_count] = match_case_create(
-                is_default ? NULL : expression_allocate(key.success), expression_allocate(value.success));
+            (*cases)[*case_count] =
+                match_case_create(is_default ? NULL : expression_allocate(key.success, parser->pool),
+                                  expression_allocate(value.success, parser->pool));
         }
         ++(*case_count);
     }
@@ -316,7 +318,8 @@ static expression_parser_result parse_match(expression_parser *parser, size_t co
     if (parse_match_cases(parser, (indentation + 1), &cases, &case_count))
     {
         expression_parser_result const result = {
-            1, expression_from_match(match_create(begin, expression_allocate(input.success), cases, case_count))};
+            1, expression_from_match(
+                   match_create(begin, expression_allocate(input.success, parser->pool), cases, case_count))};
         return result;
     }
     expression_free(input.success);
@@ -359,8 +362,8 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
             return expression_parser_result_failure;
         }
         expression_parser_result const result = {
-            1, expression_from_lambda(
-                   lambda_create(generic_parameters, header, expression_allocate(body.success), lambda_begin))};
+            1, expression_from_lambda(lambda_create(
+                   generic_parameters, header, expression_allocate(body.success, parser->pool), lambda_begin))};
         return result;
     }
     if (next_token.token == token_newline)
@@ -368,8 +371,9 @@ static expression_parser_result parse_lambda_body(expression_parser *const parse
         pop(parser);
         sequence const body = parse_sequence(parser, (indentation + 1));
         expression_parser_result const result = {
-            1, expression_from_lambda(lambda_create(
-                   generic_parameters, header, expression_allocate(expression_from_sequence(body)), lambda_begin))};
+            1, expression_from_lambda(lambda_create(generic_parameters, header,
+                                                    expression_allocate(expression_from_sequence(body), parser->pool),
+                                                    lambda_begin))};
         return result;
     }
     pop(parser);
@@ -414,7 +418,7 @@ static function_header_parse_result parse_function_header(expression_parser *con
                     clean_up_parameters(parameters, parameter_count);
                     return function_header_parse_result_failure;
                 }
-                result_type = expression_allocate(type.success);
+                result_type = expression_allocate(type.success, parser->pool);
             }
             break;
         }
@@ -468,8 +472,8 @@ static function_header_parse_result parse_function_header(expression_parser *con
         }
 
         parameters = reallocate_array(parameters, (parameter_count + 1), sizeof(*parameters));
-        parameters[parameter_count] = parameter_create(
-            identifier_expression_create(name.content, name.where), expression_allocate(parsed_type.success));
+        parameters[parameter_count] = parameter_create(identifier_expression_create(name.content, name.where),
+                                                       expression_allocate(parsed_type.success, parser->pool));
         ++parameter_count;
     }
     function_header_parse_result const result = {
@@ -739,7 +743,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
                 expression_free(maybe_state.success);
                 break;
             }
-            state = expression_allocate(maybe_state.success);
+            state = expression_allocate(maybe_state.success, parser->pool);
         }
 
         elements = reallocate_array(elements, (element_count + 1), sizeof(*elements));
@@ -786,7 +790,8 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
     }
     pop(parser);
     expression_parser_result const result = {
-        true, expression_from_type_of(type_of_expression_create(begin, expression_allocate(target_parsed.success)))};
+        true, expression_from_type_of(
+                  type_of_expression_create(begin, expression_allocate(target_parsed.success, parser->pool)))};
     return result;
 }
 
@@ -845,7 +850,7 @@ static expression_parser_result parse_new_array(expression_parser *const parser,
     }
 
     expression_parser_result const result = {
-        1, expression_from_new_array(new_array_expression_create(expression_allocate(argument.success)))};
+        1, expression_from_new_array(new_array_expression_create(expression_allocate(argument.success, parser->pool)))};
     return result;
 }
 
@@ -879,7 +884,7 @@ static parse_callable_result parse_break(expression_parser *parser, rich_token c
         expression_parser_result const returned_value = parse_expression(parser, indentation, false);
         if (returned_value.is_success)
         {
-            expression *const allocated = expression_allocate(returned_value.success);
+            expression *const allocated = expression_allocate(returned_value.success, parser->pool);
             expression_parser_result const result = {
                 true, expression_from_break(break_expression_create(head.where, allocated))};
             return parse_callable_result_create(result, true);
@@ -957,7 +962,7 @@ static parse_callable_result parse_not(expression_parser *parser, size_t indenta
         return parse_callable_result_create(expression_parser_result_failure, false);
     }
 
-    expression *const success = allocate(sizeof(*success));
+    expression *const success = expression_pool_allocate(parser->pool);
     *success = result.success;
 
     expression const expr = expression_from_not(not_expression_create(success));
@@ -1171,7 +1176,7 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                     parser->on_error(
                         parse_error_create(parse_error_expected_expression, maybe_close.where), parser->on_error_user);
                 }
-                *result = expression_from_call(call_create(expression_allocate(*result),
+                *result = expression_from_call(call_create(expression_allocate(*result, parser->pool),
                                                            tuple_create(arguments, argument_count, opening_parenthesis),
                                                            maybe_close.where));
                 return 1;
@@ -1228,7 +1233,7 @@ static expression parse_instantiate_struct(expression_parser *parser, size_t ind
 {
     tuple const arguments = parse_tuple(parser, indentation, opening_brace);
     return expression_from_instantiate_struct(
-        instantiate_struct_expression_create(expression_allocate(structure), arguments));
+        instantiate_struct_expression_create(expression_allocate(structure, parser->pool), arguments));
 }
 
 static bool parse_generic_instantiation(expression_parser *const parser, size_t const indentation,
@@ -1279,7 +1284,7 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
     }
     pop(parser);
     *result = expression_from_generic_instantiation(
-        generic_instantiation_expression_create(expression_allocate(*result), arguments, argument_count));
+        generic_instantiation_expression_create(expression_allocate(*result, parser->pool), arguments, argument_count));
     return true;
 }
 
@@ -1305,10 +1310,10 @@ static expression_parser_result parse_binary_operator(expression_parser *const p
     }
 
     binary_operator_expression binary_operator_expression1;
-    binary_operator_expression1.left = allocate(sizeof(expression));
+    binary_operator_expression1.left = expression_pool_allocate(parser->pool);
     *binary_operator_expression1.left = left_side;
 
-    binary_operator_expression1.right = allocate(sizeof(*binary_operator_expression1.right));
+    binary_operator_expression1.right = expression_pool_allocate(parser->pool);
     *binary_operator_expression1.right = right.success;
 
     binary_operator_expression1.comparator = operator;
@@ -1428,7 +1433,7 @@ static expression_parser_result parse_returnable_suffixes(expression_parser *con
             if ((element_name.token == token_identifier) || (element_name.token == token_integer))
             {
                 expression const access = expression_from_access_structure(
-                    access_structure_create(expression_allocate(result.success),
+                    access_structure_create(expression_allocate(result.success, parser->pool),
                                             identifier_expression_create(element_name.content, element_name.where)));
                 result.success = access;
                 continue;
@@ -1599,9 +1604,9 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
             identifier_expression_create(name.content, name.where), header_parsed.header, body);
         ++method_count;
     }
-    impl_expression const impl =
-        impl_expression_create(impl_keyword, generic_parameters, expression_allocate(implemented_interface.success),
-                               expression_allocate(self.success), methods, method_count);
+    impl_expression const impl = impl_expression_create(
+        impl_keyword, generic_parameters, expression_allocate(implemented_interface.success, parser->pool),
+        expression_allocate(self.success, parser->pool), methods, method_count);
     if (is_success)
     {
         expression_parser_result const result = {true, expression_from_impl(impl)};
@@ -1671,8 +1676,9 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
     expression_parser_result const result = {
         true, expression_from_declare(declare_create(
                   identifier_expression_create(name.content, name.where),
-                  (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success) : NULL),
-                  expression_allocate(initial_value.success)))};
+                  (declared_variable_type.is_success ? expression_allocate(declared_variable_type.success, parser->pool)
+                                                     : NULL),
+                  expression_allocate(initial_value.success, parser->pool)))};
     return result;
 }
 
@@ -1701,7 +1707,7 @@ expression_parser_result parse_expression(expression_parser *const parser, size_
                 expression_parser_result result = parse_returnable(parser, indentation, true);
                 if (result.is_success)
                 {
-                    result.success = expression_from_return(expression_allocate(result.success));
+                    result.success = expression_from_return(expression_allocate(result.success, parser->pool));
                 }
                 parser->current_nesting_depth -= 1;
                 return result;

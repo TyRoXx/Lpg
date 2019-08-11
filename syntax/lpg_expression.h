@@ -21,7 +21,10 @@ function_header_tree function_header_tree_create(parameter *parameters, size_t p
                                                  expression *return_type);
 void function_header_tree_free(function_header_tree value);
 bool function_header_tree_equals(function_header_tree const left, function_header_tree const right);
-function_header_tree function_header_tree_clone(function_header_tree const original);
+
+struct expression_pool;
+function_header_tree function_header_tree_clone(function_header_tree const original,
+                                                struct expression_pool *const pool);
 
 typedef struct generic_parameter_list
 {
@@ -41,7 +44,7 @@ lambda lambda_create(generic_parameter_list generic_parameters, function_header_
                      source_location source);
 void lambda_free(LPG_NON_NULL(lambda const *this));
 bool lambda_equals(lambda const left, lambda const right);
-lambda lambda_clone(lambda const original);
+lambda lambda_clone(lambda const original, struct expression_pool *const pool);
 
 typedef enum expression_type {
     expression_type_lambda = 1,
@@ -78,7 +81,7 @@ typedef struct tuple
     source_location opening_brace;
 } tuple;
 
-tuple tuple_clone(tuple const original);
+tuple tuple_clone(tuple const original, struct expression_pool *const pool);
 
 typedef struct call
 {
@@ -88,7 +91,7 @@ typedef struct call
 } call;
 
 call call_create(LPG_NON_NULL(expression *callee), tuple arguments, source_location closing_parenthesis);
-call call_clone(call const original);
+call call_clone(call const original, struct expression_pool *const pool);
 
 typedef struct comment_expression
 {
@@ -115,7 +118,7 @@ struct parameter
 parameter parameter_create(identifier_expression name, LPG_NON_NULL(expression *type));
 void parameter_free(LPG_NON_NULL(parameter *value));
 bool parameter_equals(parameter const left, parameter const right);
-parameter parameter_clone(parameter const original);
+parameter parameter_clone(parameter const original, struct expression_pool *const pool);
 
 typedef struct access_structure
 {
@@ -124,7 +127,7 @@ typedef struct access_structure
 } access_structure;
 
 access_structure access_structure_create(LPG_NON_NULL(expression *object), identifier_expression member);
-access_structure access_structure_clone(access_structure const original);
+access_structure access_structure_clone(access_structure const original, struct expression_pool *const pool);
 bool access_structure_equals(access_structure const left, access_structure const right);
 
 typedef struct match_case
@@ -137,7 +140,7 @@ typedef struct match_case
 match_case match_case_create(expression *key_or_default, LPG_NON_NULL(expression *action));
 void match_case_free(LPG_NON_NULL(match_case *value));
 bool match_case_equals(match_case const left, match_case const right);
-match_case match_case_clone(match_case const original);
+match_case match_case_clone(match_case const original, struct expression_pool *const pool);
 
 typedef struct match
 {
@@ -148,7 +151,7 @@ typedef struct match
 } match;
 
 match match_create(source_location begin, LPG_NON_NULL(expression *input), match_case *cases, size_t number_of_cases);
-match match_clone(match const original);
+match match_clone(match const original, struct expression_pool *const pool);
 
 typedef struct not
 {
@@ -158,7 +161,7 @@ not;
 
 not not_expression_create(expression * value);
 void not_free(LPG_NON_NULL(not const *expression));
-not not_clone(not const original);
+not not_clone(not const original, struct expression_pool *const pool);
 
 typedef enum binary_operator {
     less_than = 1,
@@ -189,7 +192,7 @@ typedef struct sequence
     source_location begin;
 } sequence;
 
-sequence sequence_clone(sequence const original);
+sequence sequence_clone(sequence const original, struct expression_pool *const pool);
 
 typedef struct declare
 {
@@ -198,7 +201,7 @@ typedef struct declare
     expression *initializer;
 } declare;
 
-declare declare_clone(declare const original);
+declare declare_clone(declare const original, struct expression_pool *const pool);
 
 generic_parameter_list generic_parameter_list_create(unicode_view *names, size_t count);
 void generic_parameter_list_free(generic_parameter_list const freed);
@@ -215,7 +218,8 @@ interface_expression_method interface_expression_method_create(identifier_expres
 void interface_expression_method_free(interface_expression_method value);
 bool interface_expression_method_equals(interface_expression_method const left,
                                         interface_expression_method const right);
-interface_expression_method interface_expression_method_clone(interface_expression_method const original);
+interface_expression_method interface_expression_method_clone(interface_expression_method const original,
+                                                              struct expression_pool *const pool);
 
 typedef struct interface_expression
 {
@@ -229,7 +233,8 @@ interface_expression interface_expression_create(generic_parameter_list paramete
                                                  interface_expression_method *methods, size_t method_count);
 void interface_expression_free(interface_expression value);
 bool interface_expression_equals(interface_expression const left, interface_expression const right);
-interface_expression interface_expression_clone(interface_expression const original);
+interface_expression interface_expression_clone(interface_expression const original,
+                                                struct expression_pool *const pool);
 
 typedef struct struct_expression_element struct_expression_element;
 
@@ -245,7 +250,7 @@ struct_expression struct_expression_create(generic_parameter_list generic_parame
                                            struct_expression_element *elements, size_t element_count);
 void struct_expression_free(LPG_NON_NULL(struct_expression const *const value));
 bool struct_expression_equals(struct_expression const left, struct_expression const right);
-struct_expression struct_expression_clone(struct_expression const original);
+struct_expression struct_expression_clone(struct_expression const original, struct expression_pool *const pool);
 
 typedef struct impl_expression_method
 {
@@ -258,7 +263,8 @@ impl_expression_method impl_expression_method_create(identifier_expression name,
                                                      sequence body);
 void impl_expression_method_free(impl_expression_method value);
 bool impl_expression_method_equals(impl_expression_method const left, impl_expression_method const right);
-impl_expression_method impl_expression_method_clone(impl_expression_method const original);
+impl_expression_method impl_expression_method_clone(impl_expression_method const original,
+                                                    struct expression_pool *const pool);
 
 typedef struct impl_expression
 {
@@ -275,7 +281,7 @@ impl_expression impl_expression_create(source_location begin, generic_parameter_
                                        size_t method_count);
 void impl_expression_free(impl_expression value);
 bool impl_expression_equals(impl_expression const left, impl_expression const right);
-impl_expression impl_expression_clone(impl_expression const original);
+impl_expression impl_expression_clone(impl_expression const original, struct expression_pool *const pool);
 
 typedef struct placeholder_expression
 {
@@ -296,7 +302,8 @@ typedef struct new_array_expression
 new_array_expression new_array_expression_create(expression *element);
 void new_array_expression_free(new_array_expression const freed);
 bool new_array_expression_equals(new_array_expression const left, new_array_expression const right);
-new_array_expression new_array_expression_clone(new_array_expression const original);
+new_array_expression new_array_expression_clone(new_array_expression const original,
+                                                struct expression_pool *const pool);
 
 sequence sequence_create(expression *elements, size_t length, source_location begin);
 void sequence_free(LPG_NON_NULL(sequence const *value));
@@ -351,7 +358,8 @@ typedef struct instantiate_struct_expression
 
 instantiate_struct_expression instantiate_struct_expression_create(expression *const type, tuple arguments);
 void instantiate_struct_expression_free(instantiate_struct_expression const freed);
-instantiate_struct_expression instantiate_struct_expression_clone(instantiate_struct_expression const original);
+instantiate_struct_expression instantiate_struct_expression_clone(instantiate_struct_expression const original,
+                                                                  struct expression_pool *const pool);
 
 typedef struct enum_expression_element
 {
@@ -362,7 +370,8 @@ typedef struct enum_expression_element
 enum_expression_element enum_expression_element_create(unicode_string name, expression *state);
 void enum_expression_element_free(enum_expression_element const freed);
 bool enum_expression_element_equals(enum_expression_element const left, enum_expression_element const right);
-enum_expression_element enum_expression_element_clone(enum_expression_element const original);
+enum_expression_element enum_expression_element_clone(enum_expression_element const original,
+                                                      struct expression_pool *const pool);
 
 typedef struct enum_expression
 {
@@ -376,7 +385,7 @@ enum_expression enum_expression_create(source_location const begin, generic_para
                                        enum_expression_element *const elements, enum_element_id const element_count);
 void enum_expression_free(enum_expression const freed);
 bool enum_expression_equals(enum_expression const left, enum_expression const right);
-enum_expression enum_expression_clone(enum_expression const original);
+enum_expression enum_expression_clone(enum_expression const original, struct expression_pool *const pool);
 
 typedef struct generic_instantiation_expression
 {
@@ -390,8 +399,8 @@ generic_instantiation_expression generic_instantiation_expression_create(express
 void generic_instantiation_expression_free(generic_instantiation_expression const freed);
 bool generic_instantiation_expression_equals(generic_instantiation_expression const left,
                                              generic_instantiation_expression const right);
-generic_instantiation_expression
-generic_instantiation_expression_clone(generic_instantiation_expression const original);
+generic_instantiation_expression generic_instantiation_expression_clone(generic_instantiation_expression const original,
+                                                                        struct expression_pool *const pool);
 
 typedef struct type_of_expression
 {
@@ -402,7 +411,7 @@ typedef struct type_of_expression
 type_of_expression type_of_expression_create(source_location begin, expression *target);
 void type_of_expression_free(type_of_expression const freed);
 bool type_of_expression_equals(type_of_expression const left, type_of_expression const right);
-type_of_expression type_of_expression_clone(type_of_expression const original);
+type_of_expression type_of_expression_clone(type_of_expression const original, struct expression_pool *const pool);
 
 typedef struct import_expression
 {
@@ -423,7 +432,7 @@ typedef struct break_expression
 break_expression break_expression_create(source_location begin, expression *value);
 void break_expression_free(break_expression const freed);
 bool break_expression_equals(break_expression const left, break_expression const right);
-break_expression break_expression_clone(break_expression const original);
+break_expression break_expression_clone(break_expression const original, struct expression_pool *const pool);
 
 struct expression
 {
@@ -460,6 +469,11 @@ struct expression
     };
 };
 
+static inline bool expression_is_valid(expression const checked)
+{
+    return (checked.type >= expression_type_lambda) && (checked.type <= expression_type_new_array);
+}
+
 struct struct_expression_element
 {
     identifier_expression name;
@@ -469,7 +483,8 @@ struct struct_expression_element
 struct_expression_element struct_expression_element_create(identifier_expression name, expression type);
 void struct_expression_element_free(LPG_NON_NULL(struct_expression_element const *const value));
 bool struct_expression_element_equals(struct_expression_element const left, struct_expression_element const right);
-struct_expression_element struct_expression_element_clone(struct_expression_element const original);
+struct_expression_element struct_expression_element_clone(struct_expression_element const original,
+                                                          struct expression_pool *const pool);
 
 expression expression_from_integer_literal(integer_literal_expression value);
 void call_free(LPG_NON_NULL(call const *this));
@@ -490,9 +505,11 @@ expression expression_from_generic_instantiation(generic_instantiation_expressio
 expression expression_from_type_of(type_of_expression const content);
 expression expression_from_import(import_expression const content);
 expression expression_from_new_array(new_array_expression const content);
-expression *expression_allocate(expression content);
+
+struct expression_pool;
+expression *expression_allocate(expression content, struct expression_pool *const pool);
 void expression_free(expression const freed);
-expression expression_clone(expression const original);
+expression expression_clone(expression const original, struct expression_pool *const pool);
 bool sequence_equals(sequence const left, sequence const right);
 bool declare_equals(declare const left, declare const right);
 bool match_equals(match const left, match const right);

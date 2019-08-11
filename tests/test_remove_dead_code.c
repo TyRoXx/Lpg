@@ -11,10 +11,10 @@
 #include <stdio.h>
 #include <string.h>
 
-static sequence parse(char const *input)
+static sequence parse(char const *input, expression_pool *const pool)
 {
     test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user);
+    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
@@ -38,7 +38,8 @@ static void expect_no_complete_parse_error(complete_parse_error error, callback_
 static void check_single_wellformed_function(char const *const source, structure const non_empty_global,
                                              instruction *const expected_body_elements, size_t const expected_body_size)
 {
-    sequence root = parse(source);
+    expression_pool pool = expression_pool_create();
+    sequence root = parse(source, &pool);
     unicode_string const module_directory = find_builtin_module_directory();
     module_loader loader =
         module_loader_create(unicode_view_from_string(module_directory), expect_no_complete_parse_error, NULL);
@@ -64,6 +65,7 @@ static void check_single_wellformed_function(char const *const source, structure
     unicode_string_free(&module_directory);
     instruction_sequence_free(&expected_body);
     source_file_lines_owning_free(lines);
+    expression_pool_free(pool);
 }
 
 void test_remove_dead_code(void)

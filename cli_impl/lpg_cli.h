@@ -1,5 +1,5 @@
 #pragma once
-#include "lpg_expression.h"
+#include "lpg_expression_pool.h"
 #include "lpg_source_file.h"
 #include "lpg_stream_writer.h"
 #include <stdbool.h>
@@ -17,7 +17,7 @@ typedef struct optional_sequence
 } optional_sequence;
 
 optional_sequence parse(cli_parser_user user, unicode_view const file_name, unicode_view const source,
-                        source_file_lines const lines);
+                        source_file_lines const lines, expression_pool *const pool);
 
 typedef enum compiler_command {
     compiler_command_run = 1,

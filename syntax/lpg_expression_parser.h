@@ -1,5 +1,6 @@
 #pragma once
 
+#include "lpg_expression_pool.h"
 #include "lpg_find_next_token.h"
 
 typedef enum parse_error_type {
@@ -47,11 +48,13 @@ typedef struct expression_parser
     size_t cached_token_count;
     size_t cached_tokens_allocated;
     size_t current_nesting_depth;
+    expression_pool *pool;
 } expression_parser;
 
 expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),
                                            callback_user find_next_token_user,
-                                           LPG_NON_NULL(parse_error_handler on_error), callback_user on_error_user);
+                                           LPG_NON_NULL(parse_error_handler on_error), callback_user on_error_user,
+                                           struct expression_pool *const pool);
 void expression_parser_free(expression_parser const freed);
 bool expression_parser_has_remaining_non_empty_tokens(LPG_NON_NULL(expression_parser const *const parser));
 

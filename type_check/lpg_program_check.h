@@ -48,6 +48,7 @@ typedef struct program_check
     interpreter compile_time_interpreter;
     source_file_owning **module_sources;
     size_t module_source_count;
+    expression_pool *pool;
 } program_check;
 
 void program_check_free(program_check const freed);
