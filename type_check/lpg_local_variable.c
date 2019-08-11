@@ -32,7 +32,8 @@ void local_variable_container_free(local_variable_container const freed)
 
 void add_local_variable(local_variable_container *to, local_variable variable)
 {
-    to->elements = reallocate_array(to->elements, to->count + 1, sizeof(*to->elements));
+    to->elements =
+        reallocate_array_exponentially(to->elements, to->count + 1, sizeof(*to->elements), to->count, &to->capacity);
     to->elements[to->count] = variable;
     ++(to->count);
 }

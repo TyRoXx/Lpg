@@ -67,7 +67,7 @@ static function_checking_state function_checking_state_create(
                                             false,
                                             global,
                                             on_error,
-                                            {NULL, 0},
+                                            {NULL, 0, 0},
                                             user,
                                             program,
                                             body,

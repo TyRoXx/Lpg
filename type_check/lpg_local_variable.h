@@ -31,6 +31,7 @@ typedef struct local_variable_container
 {
     local_variable *elements;
     size_t count;
+    size_t capacity;
 } local_variable_container;
 
 void local_variable_container_free(local_variable_container const freed);
