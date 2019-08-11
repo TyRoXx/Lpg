@@ -1148,6 +1148,7 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
 {
     expression *arguments = NULL;
     size_t argument_count = 0;
+    size_t argument_capacity = 0;
     int expect_another_argument = 0;
     for (;;)
     {
@@ -1185,8 +1186,8 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
         expression_parser_result const argument = parse_expression(parser, indentation, 1);
         if (argument.is_success)
         {
-            /*TODO: avoid O(N^2)*/
-            arguments = reallocate_array(arguments, argument_count + 1, sizeof(*arguments));
+            arguments = reallocate_array_exponentially(
+                arguments, argument_count + 1, sizeof(*arguments), argument_count, &argument_capacity);
             arguments[argument_count] = argument.success;
             argument_count++;
         }
