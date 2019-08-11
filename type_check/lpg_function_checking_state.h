@@ -34,6 +34,7 @@ typedef struct function_checking_state
     bool has_declared_return_type;
     optional_value *register_compile_time_values;
     register_id register_compile_time_value_count;
+    size_t register_compile_time_value_capacity;
     source_file_owning const *source;
     unicode_view current_import_directory;
 } function_checking_state;

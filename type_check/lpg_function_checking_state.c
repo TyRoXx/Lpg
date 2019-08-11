@@ -30,8 +30,9 @@ void write_register_compile_time_value(function_checking_state *const state, reg
     }
     ASSUME(which != ~(register_id)0);
     ASSUME(state->register_compile_time_values || (state->register_compile_time_value_count == 0));
-    state->register_compile_time_values = reallocate_array(
-        state->register_compile_time_values, (which + 1), sizeof(*state->register_compile_time_values));
+    state->register_compile_time_values = reallocate_array_exponentially(
+        state->register_compile_time_values, (which + 1), sizeof(*state->register_compile_time_values),
+        state->register_compile_time_value_count, &state->register_compile_time_value_capacity);
     ASSUME(state->register_compile_time_values);
     for (register_id i = state->register_compile_time_value_count; i < which; ++i)
     {

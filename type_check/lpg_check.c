@@ -75,6 +75,7 @@ static function_checking_state function_checking_state_create(
                                             has_declared_return_type,
                                             NULL,
                                             0,
+                                            0,
                                             source,
                                             current_import_directory};
     return result;
