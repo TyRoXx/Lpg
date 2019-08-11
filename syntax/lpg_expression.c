@@ -5,7 +5,7 @@
 
 void expression_deallocate(expression *this)
 {
-    expression_free(this);
+    expression_free(*this);
     deallocate(this);
 }
 
@@ -234,8 +234,7 @@ not not_expression_create(expression * value)
 
 void not_free(LPG_NON_NULL(not const *value))
 {
-    expression_free(value->expr);
-    deallocate(value->expr);
+    expression_deallocate(value->expr);
 }
 
 not not_clone(not const original)
@@ -558,7 +557,7 @@ void sequence_free(sequence const *value)
 {
     LPG_FOR(size_t, i, value->length)
     {
-        expression_free(value->elements + i);
+        expression_free(value->elements[i]);
     }
     if (value->elements)
     {
@@ -609,7 +608,7 @@ void tuple_free(tuple const *value)
 {
     LPG_FOR(size_t, i, value->length)
     {
-        expression_free(value->elements + i);
+        expression_free(value->elements[i]);
     }
     if (value->elements)
     {
@@ -893,7 +892,7 @@ void generic_instantiation_expression_free(generic_instantiation_expression cons
     expression_deallocate(freed.generic);
     for (size_t i = 0; i < freed.count; ++i)
     {
-        expression_free(freed.arguments + i);
+        expression_free(freed.arguments[i]);
     }
     if (freed.arguments)
     {
@@ -1081,7 +1080,7 @@ struct_expression_element struct_expression_element_create(identifier_expression
 void struct_expression_element_free(struct_expression_element const *const value)
 {
     identifier_expression_free(&value->name);
-    expression_free(&value->type);
+    expression_free(value->type);
 }
 
 bool struct_expression_element_equals(struct_expression_element const left, struct_expression_element const right)
@@ -1255,107 +1254,107 @@ expression *expression_allocate(expression value)
     return result;
 }
 
-void expression_free(expression const *this)
+void expression_free(expression const freed)
 {
-    switch (this->type)
+    switch (freed.type)
     {
     case expression_type_new_array:
-        new_array_expression_free(this->new_array);
+        new_array_expression_free(freed.new_array);
         break;
 
     case expression_type_import:
-        import_expression_free(this->import);
+        import_expression_free(freed.import);
         break;
 
     case expression_type_generic_instantiation:
-        generic_instantiation_expression_free(this->generic_instantiation);
+        generic_instantiation_expression_free(freed.generic_instantiation);
         break;
 
     case expression_type_type_of:
-        type_of_expression_free(this->type_of);
+        type_of_expression_free(freed.type_of);
         break;
 
     case expression_type_enum:
-        enum_expression_free(this->enum_);
+        enum_expression_free(freed.enum_);
         break;
 
     case expression_type_instantiate_struct:
-        instantiate_struct_expression_free(this->instantiate_struct);
+        instantiate_struct_expression_free(freed.instantiate_struct);
         break;
 
     case expression_type_lambda:
-        lambda_free(&this->lambda);
+        lambda_free(&freed.lambda);
         break;
 
     case expression_type_call:
-        call_free(&this->call);
+        call_free(&freed.call);
         break;
 
     case expression_type_integer_literal:
         break;
 
     case expression_type_access_structure:
-        access_structure_free(&this->access_structure);
+        access_structure_free(&freed.access_structure);
         break;
 
     case expression_type_not:
-        not_free(&this->not);
+        not_free(&freed.not);
         break;
 
     case expression_type_match:
-        match_free(&this->match);
+        match_free(&freed.match);
         break;
 
     case expression_type_string:
-        string_expression_free(&this->string);
+        string_expression_free(&freed.string);
         break;
 
     case expression_type_identifier:
-        identifier_expression_free(&this->identifier);
+        identifier_expression_free(&freed.identifier);
         break;
 
     case expression_type_return:
-        expression_deallocate(this->return_);
+        expression_deallocate(freed.return_);
         break;
 
     case expression_type_loop:
-        sequence_free(&this->loop_body);
+        sequence_free(&freed.loop_body);
         break;
 
     case expression_type_break:
-        break_expression_free(this->break_);
+        break_expression_free(freed.break_);
         break;
 
     case expression_type_placeholder:
-        placeholder_expression_free(this->placeholder);
+        placeholder_expression_free(freed.placeholder);
         break;
 
     case expression_type_sequence:
-        sequence_free(&this->sequence);
+        sequence_free(&freed.sequence);
         break;
 
     case expression_type_declare:
-        declare_free(&this->declare);
+        declare_free(&freed.declare);
         break;
 
     case expression_type_comment:
-        comment_expression_free(&this->comment);
+        comment_expression_free(&freed.comment);
         break;
 
     case expression_type_binary:
-        binary_operator_expression_free(&this->binary);
+        binary_operator_expression_free(&freed.binary);
         break;
 
     case expression_type_interface:
-        interface_expression_free(this->interface_);
+        interface_expression_free(freed.interface_);
         break;
 
     case expression_type_impl:
-        impl_expression_free(this->impl);
+        impl_expression_free(freed.impl);
         break;
 
     case expression_type_struct:
-        struct_expression_free(&this->struct_);
+        struct_expression_free(&freed.struct_);
         break;
     }
 }
@@ -1614,10 +1613,8 @@ binary_operator_expression binary_operator_expression_create(expression *left, e
 
 void binary_operator_expression_free(binary_operator_expression const *value)
 {
-    expression_free(value->left);
-    deallocate(value->left);
-    expression_free(value->right);
-    deallocate(value->right);
+    expression_deallocate(value->left);
+    expression_deallocate(value->right);
 }
 
 sequence sequence_clone(sequence const original)

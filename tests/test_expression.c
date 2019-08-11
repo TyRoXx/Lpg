@@ -7,15 +7,15 @@
 static void test_equal(expression left, expression right)
 {
     REQUIRE(expression_equals(&left, &right));
-    expression_free(&left);
-    expression_free(&right);
+    expression_free(left);
+    expression_free(right);
 }
 
 static void test_not_equal(expression left, expression right)
 {
     REQUIRE(!expression_equals(&left, &right));
-    expression_free(&left);
-    expression_free(&right);
+    expression_free(left);
+    expression_free(right);
 }
 
 void test_expression(void)

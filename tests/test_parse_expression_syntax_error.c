@@ -24,8 +24,8 @@ static void test_syntax_error(parse_error const *expected_errors, size_t const e
     {
         REQUIRE(result.is_success);
         REQUIRE(expression_equals(expected, &result.success));
-        expression_free(expected);
-        expression_free(&result.success);
+        expression_free(*expected);
+        expression_free(result.success);
         REQUIRE(user.base.remaining_size == 0);
         REQUIRE(!expression_parser_has_remaining_non_empty_tokens(&parser));
     }

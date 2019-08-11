@@ -229,7 +229,7 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                 parser->on_error(parse_error_create(parse_error_expected_colon, colon.where), parser->on_error_user);
                 if (!is_default)
                 {
-                    expression_free(&key.success);
+                    expression_free(key.success);
                 }
                 return false;
             }
@@ -245,7 +245,7 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                     parse_error_create(parse_error_expected_expression, peek(parser).where), parser->on_error_user);
                 if (!is_default)
                 {
-                    expression_free(&key.success);
+                    expression_free(key.success);
                 }
                 return false;
             }
@@ -262,7 +262,7 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
             {
                 if (!is_default)
                 {
-                    expression_free(&key.success);
+                    expression_free(key.success);
                 }
                 return false;
             }
@@ -275,9 +275,9 @@ static bool parse_match_cases(expression_parser *parser, size_t const indentatio
                         parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
                     if (!is_default)
                     {
-                        expression_free(&key.success);
+                        expression_free(key.success);
                     }
-                    expression_free(&value.success);
+                    expression_free(value.success);
                     return false;
                 }
             }
@@ -307,7 +307,7 @@ static expression_parser_result parse_match(expression_parser *parser, size_t co
         if (newline.token != token_newline)
         {
             parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
-            expression_free(&input.success);
+            expression_free(input.success);
             return expression_parser_result_failure;
         }
     }
@@ -319,7 +319,7 @@ static expression_parser_result parse_match(expression_parser *parser, size_t co
             1, expression_from_match(match_create(begin, expression_allocate(input.success), cases, case_count))};
         return result;
     }
-    expression_free(&input.success);
+    expression_free(input.success);
     LPG_FOR(size_t, i, case_count)
     {
         match_case_free(cases + i);
@@ -736,7 +736,7 @@ static expression_parser_result parse_enum(expression_parser *const parser, size
                 parser->on_error(
                     parse_error_create(parse_error_expected_right_parenthesis, name.where), parser->on_error_user);
                 is_success = false;
-                expression_free(&maybe_state.success);
+                expression_free(maybe_state.success);
                 break;
             }
             state = expression_allocate(maybe_state.success);
@@ -780,7 +780,7 @@ static expression_parser_result parse_type_of(expression_parser *const parser, s
         {
             parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where),
                              parser->on_error_user);
-            expression_free(&target_parsed.success);
+            expression_free(target_parsed.success);
             return expression_parser_result_failure;
         }
     }
@@ -836,7 +836,7 @@ static expression_parser_result parse_new_array(expression_parser *const parser,
         rich_token const right_parenthesis = peek(parser);
         if (right_parenthesis.token != token_right_parenthesis)
         {
-            expression_free(&argument.success);
+            expression_free(argument.success);
             parser->on_error(parse_error_create(parse_error_expected_right_parenthesis, right_parenthesis.where),
                              parser->on_error_user);
             return expression_parser_result_failure;
@@ -1120,11 +1120,11 @@ static tuple parse_tuple(expression_parser *parser, size_t indentation, source_l
         {
             if (parser_result.is_success)
             {
-                expression_free(&parser_result.success);
+                expression_free(parser_result.success);
             }
             for (size_t i = 0; i < element_count; ++i)
             {
-                expression_free(tuple_elements + i);
+                expression_free(tuple_elements[i]);
             }
             if (tuple_elements)
             {
@@ -1155,7 +1155,7 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                     parse_error_create(parse_error_expected_arguments, maybe_close.where), parser->on_error_user);
                 for (size_t i = 0; i < argument_count; ++i)
                 {
-                    expression_free(arguments + i);
+                    expression_free(arguments[i]);
                 }
                 if (arguments)
                 {
@@ -1193,7 +1193,7 @@ static int parse_call(expression_parser *parser, size_t indentation, expression 
                 parse_error_create(parse_error_expected_arguments, maybe_comma.where), parser->on_error_user);
             for (size_t i = 0; i < argument_count; ++i)
             {
-                expression_free(arguments + i);
+                expression_free(arguments[i]);
             }
             if (arguments)
             {
@@ -1263,11 +1263,11 @@ static bool parse_generic_instantiation(expression_parser *const parser, size_t 
         {
             if (parser_result.is_success)
             {
-                expression_free(&parser_result.success);
+                expression_free(parser_result.success);
             }
             for (size_t i = 0; i < argument_count; ++i)
             {
-                expression_free(arguments + i);
+                expression_free(arguments[i]);
             }
             if (arguments)
             {
@@ -1347,7 +1347,7 @@ static expression_parser_result parse_returnable_suffixes(expression_parser *con
             }
             else
             {
-                expression_free(&result.success);
+                expression_free(result.success);
                 return expression_parser_result_failure;
             }
         }
@@ -1436,7 +1436,7 @@ static expression_parser_result parse_returnable_suffixes(expression_parser *con
             parser->on_error(
                 parse_error_create(parse_error_expected_element_name, element_name.where), parser->on_error_user);
             ASSUME(result.is_success);
-            expression_free(&result.success);
+            expression_free(result.success);
             return expression_parser_result_failure;
         }
         return result;
@@ -1485,7 +1485,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if (space.token != token_space || space.content.length != 1)
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
-            expression_free(&implemented_interface.success);
+            expression_free(implemented_interface.success);
             generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
@@ -1497,7 +1497,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if ((for_.token != token_identifier) || !unicode_view_equals_c_str(for_.content, "for"))
         {
             parser->on_error(parse_error_create(parse_error_expected_for, for_.where), parser->on_error_user);
-            expression_free(&implemented_interface.success);
+            expression_free(implemented_interface.success);
             generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
@@ -1509,7 +1509,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if (space.token != token_space)
         {
             parser->on_error(parse_error_create(parse_error_expected_space, space.where), parser->on_error_user);
-            expression_free(&implemented_interface.success);
+            expression_free(implemented_interface.success);
             generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
@@ -1518,7 +1518,7 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
     expression_parser_result const self = parse_expression(parser, indentation, false);
     if (!self.is_success)
     {
-        expression_free(&implemented_interface.success);
+        expression_free(implemented_interface.success);
         generic_parameter_list_free(generic_parameters);
         return expression_parser_result_failure;
     }
@@ -1529,8 +1529,8 @@ static expression_parser_result parse_impl(expression_parser *const parser, size
         if (newline.token != token_newline)
         {
             parser->on_error(parse_error_create(parse_error_expected_newline, newline.where), parser->on_error_user);
-            expression_free(&implemented_interface.success);
-            expression_free(&self.success);
+            expression_free(implemented_interface.success);
+            expression_free(self.success);
             generic_parameter_list_free(generic_parameters);
             return expression_parser_result_failure;
         }
@@ -1651,7 +1651,7 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
     {
         if (declared_variable_type.is_success)
         {
-            expression_free(&declared_variable_type.success);
+            expression_free(declared_variable_type.success);
         }
         parser->on_error(parse_error_create(parse_error_expected_declaration_or_assignment, colon_or_assign.where),
                          parser->on_error_user);
@@ -1664,7 +1664,7 @@ expression_parser_result parse_let_expression(expression_parser *const parser, s
     {
         if (declared_variable_type.is_success)
         {
-            expression_free(&declared_variable_type.success);
+            expression_free(declared_variable_type.success);
         }
         return expression_parser_result_failure;
     }

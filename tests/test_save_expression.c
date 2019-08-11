@@ -29,7 +29,7 @@ static void check_expression_rendering(expression tree, char const *expected)
         FAIL();
     }
     memory_writer_free(&buffer);
-    expression_free(&tree);
+    expression_free(tree);
 }
 
 void test_save_expression(void)

@@ -491,7 +491,7 @@ expression expression_from_type_of(type_of_expression const content);
 expression expression_from_import(import_expression const content);
 expression expression_from_new_array(new_array_expression const content);
 expression *expression_allocate(expression content);
-void expression_free(LPG_NON_NULL(expression const *this));
+void expression_free(expression const freed);
 expression expression_clone(expression const original);
 bool sequence_equals(sequence const left, sequence const right);
 bool declare_equals(declare const left, declare const right);
