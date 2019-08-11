@@ -63,6 +63,7 @@ static function_checking_state function_checking_state_create(
                                             0,
                                             NULL,
                                             0,
+                                            0,
                                             false,
                                             global,
                                             on_error,
@@ -592,7 +593,8 @@ static void define_register_debug_name(function_checking_state *const state, reg
     {
         register_id const new_size = (which + 1);
         state->register_debug_names =
-            reallocate_array(state->register_debug_names, new_size, sizeof(*state->register_debug_names));
+            reallocate_array_exponentially(state->register_debug_names, new_size, sizeof(*state->register_debug_names),
+                                           state->register_debug_name_count, &state->register_debug_name_capacity);
         for (size_t i = previous_size; i < new_size; ++i)
         {
             state->register_debug_names[i] = unicode_string_from_c_str("");

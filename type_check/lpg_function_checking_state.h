@@ -22,6 +22,7 @@ typedef struct function_checking_state
     register_id used_registers;
     unicode_string *register_debug_names;
     register_id register_debug_name_count;
+    size_t register_debug_name_capacity;
     loop_checking *innermost_loop;
     structure const *global;
     check_error_handler *on_error;
