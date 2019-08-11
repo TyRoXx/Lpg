@@ -61,20 +61,10 @@ rich_token peek_at(expression_parser *parser, size_t const offset)
     return parser->cached_tokens[offset];
 }
 
-rich_token peek(expression_parser *parser)
-{
-    return peek_at(parser, 0);
-}
-
 void pop_n(expression_parser *parser, size_t const count)
 {
     ASSUME(parser->cached_token_count >= count);
     parser->cached_token_count -= count;
     memmove(parser->cached_tokens, parser->cached_tokens + count,
             (sizeof(*parser->cached_tokens) * parser->cached_token_count));
-}
-
-void pop(expression_parser *parser)
-{
-    pop_n(parser, 1);
 }

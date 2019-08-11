@@ -56,7 +56,15 @@ void expression_parser_free(expression_parser const freed);
 bool expression_parser_has_remaining_non_empty_tokens(LPG_NON_NULL(expression_parser const *const parser));
 
 rich_token peek_at(expression_parser *parser, size_t const offset);
-rich_token peek(expression_parser *parser);
+
+static inline rich_token peek(expression_parser *parser)
+{
+    return peek_at(parser, 0);
+}
 
 void pop_n(expression_parser *parser, size_t const count);
-void pop(expression_parser *parser);
+
+static inline void pop(expression_parser *parser)
+{
+    pop_n(parser, 1);
+}
