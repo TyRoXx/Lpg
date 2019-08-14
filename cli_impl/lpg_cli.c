@@ -53,7 +53,12 @@ static void print_source_location_hint(unicode_view const source, source_file_li
     unicode_view const affected_line = find_whole_line(source, lines, where.line);
     ASSERT(success_yes == stream_writer_write_bytes(diagnostics, affected_line.begin, affected_line.length));
     ASSERT(success_yes == stream_writer_write_string(diagnostics, "\n"));
-    for (column_number i = 0; i < where.approximate_column; ++i)
+    char const *const bunch_of_spaces = "        ";
+    for (column_number i = 0; i < (where.approximate_column / strlen(bunch_of_spaces)); ++i)
+    {
+        ASSERT(success_yes == stream_writer_write_string(diagnostics, bunch_of_spaces));
+    }
+    for (column_number i = 0; i < (where.approximate_column % strlen(bunch_of_spaces)); ++i)
     {
         ASSERT(success_yes == stream_writer_write_string(diagnostics, " "));
     }
