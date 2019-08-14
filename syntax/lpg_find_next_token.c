@@ -8,7 +8,7 @@ static rich_token rich_token_create(tokenize_status status, token_type token, un
     return result;
 }
 
-rich_token find_next_token(callback_user user)
+rich_token find_next_token(parser_user *user)
 {
     parser_user *const actual_user = user;
     if (actual_user->remaining_size == 0)

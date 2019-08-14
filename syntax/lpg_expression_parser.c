@@ -3,7 +3,7 @@
 #include "lpg_array_size.h"
 #include "lpg_assert.h"
 
-expression_parser expression_parser_create(callback_user find_next_token_user, parse_error_handler on_error,
+expression_parser expression_parser_create(parser_user *find_next_token_user, parse_error_handler on_error,
                                            callback_user on_error_user, struct expression_pool *const pool)
 {
     expression_parser const result = {find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0, pool};

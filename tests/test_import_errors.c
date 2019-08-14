@@ -11,7 +11,7 @@
 static sequence parse(char const *input, expression_pool *const pool)
 {
     test_parser_user user = {{input, strlen(input), source_location_create(0, 0)}, NULL, 0};
-    expression_parser parser = expression_parser_create(&user, handle_error, &user, pool);
+    expression_parser parser = expression_parser_create(&user.base, handle_error, &user, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     REQUIRE(user.base.remaining_size == 0);
