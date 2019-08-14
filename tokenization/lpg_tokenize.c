@@ -61,6 +61,90 @@ static int can_follow_integer(char c)
     }
 }
 
+static tokenize_result tokenize_single_line_comment(char const *input, size_t length)
+{
+    size_t comment_length = 1;
+    while (comment_length < length)
+    {
+        if (is_new_line(input[comment_length]))
+        {
+            return make_success(token_comment, comment_length);
+        }
+        ++comment_length;
+    }
+    return make_success(token_comment, comment_length);
+}
+
+static tokenize_result tokenize_multi_line_comment(char const *input, size_t length)
+{
+    size_t comment_length = 1;
+    bool asterisk = false;
+    while (comment_length < length)
+    {
+        if (asterisk && input[comment_length] == '/')
+        {
+            return make_success(token_comment, comment_length + 1);
+        }
+        asterisk = (input[comment_length] == '*');
+        ++comment_length;
+    }
+    tokenize_result const result = {tokenize_invalid, token_comment, comment_length};
+    return result;
+}
+
+static tokenize_result tokenize_integer(char const *input, size_t length)
+{
+    size_t i;
+    for (i = 1; (i < length) && is_digit(input[i]); ++i)
+    {
+    }
+    if ((i < length) && !can_follow_integer(input[i]))
+    {
+        tokenize_result const result = {tokenize_invalid, token_space, i};
+        return result;
+    }
+    return make_success(token_integer, i);
+}
+
+static tokenize_result tokenize_string(char const *input, size_t length)
+{
+    decode_string_literal_result const decoding_result =
+        decode_string_literal(unicode_view_create(input, length), stream_writer_create_null_writer());
+    if (decoding_result.is_valid)
+    {
+        return make_success(token_string, decoding_result.length);
+    }
+    tokenize_result const result = {tokenize_invalid, token_string, decoding_result.length};
+    return result;
+}
+
+static tokenize_result tokenize_raw_string(char const *input, size_t length)
+{
+    tokenize_result result = {tokenize_invalid, token_raw_string, length};
+    if (length == 1)
+    {
+        return result;
+    }
+
+    size_t string_length;
+    for (string_length = 1; string_length < length; ++string_length)
+    {
+        if (input[string_length] == '\'')
+        {
+            break;
+        }
+    }
+    if ((string_length < length) && input[string_length] == '\'')
+    {
+        return make_success(token_raw_string, string_length + 1);
+    }
+    else
+    {
+        result.length = string_length;
+        return result;
+    }
+}
+
 tokenize_result tokenize(char const *input, size_t length)
 {
     ASSUME(length > 0);
@@ -81,35 +165,14 @@ tokenize_result tokenize(char const *input, size_t length)
             return result;
         }
 
-        size_t comment_length = 1;
-
         // Single line comment
-        if (input[comment_length] == '/')
+        if (input[1] == '/')
         {
-            while (comment_length < length)
-            {
-                if (is_new_line(input[comment_length]))
-                {
-                    return make_success(token_comment, comment_length);
-                }
-                ++comment_length;
-            }
-            return make_success(token_comment, comment_length);
+            return tokenize_single_line_comment(input, length);
         }
-        if (input[comment_length] == '*')
+        if (input[1] == '*')
         {
-            bool asterisk = false;
-            while (comment_length < length)
-            {
-                if (asterisk && input[comment_length] == '/')
-                {
-                    return make_success(token_comment, comment_length + 1);
-                }
-                asterisk = (input[comment_length] == '*');
-                ++comment_length;
-            }
-            tokenize_result const result = {tokenize_invalid, token_comment, comment_length};
-            return result;
+            return tokenize_multi_line_comment(input, length);
         }
     }
     if (is_identifier_begin(*input))
@@ -118,16 +181,7 @@ tokenize_result tokenize(char const *input, size_t length)
     }
     if (is_digit(*input))
     {
-        size_t i;
-        for (i = 1; (i < length) && is_digit(input[i]); ++i)
-        {
-        }
-        if ((i < length) && !can_follow_integer(input[i]))
-        {
-            tokenize_result const result = {tokenize_invalid, token_space, i};
-            return result;
-        }
-        return make_success(token_integer, i);
+        return tokenize_integer(input, length);
     }
     switch (*input)
     {
@@ -181,43 +235,11 @@ tokenize_result tokenize(char const *input, size_t length)
         return tokenize_less_greater(input, length);
 
     case '"':
-    {
-        decode_string_literal_result const decoding_result =
-            decode_string_literal(unicode_view_create(input, length), stream_writer_create_null_writer());
-        if (decoding_result.is_valid)
-        {
-            return make_success(token_string, decoding_result.length);
-        }
-        tokenize_result const result = {tokenize_invalid, token_string, decoding_result.length};
-        return result;
-    }
+        return tokenize_string(input, length);
 
     case '\'':
-    {
-        tokenize_result result = {tokenize_invalid, token_raw_string, length};
-        if (length == 1)
-        {
-            return result;
-        }
+        return tokenize_raw_string(input, length);
 
-        size_t string_length;
-        for (string_length = 1; string_length < length; ++string_length)
-        {
-            if (input[string_length] == '\'')
-            {
-                break;
-            }
-        }
-        if ((string_length < length) && input[string_length] == '\'')
-        {
-            return make_success(token_raw_string, string_length + 1);
-        }
-        else
-        {
-            result.length = string_length;
-            return result;
-        }
-    }
     default:
     {
         tokenize_result const result = {tokenize_invalid, token_space, 1};
