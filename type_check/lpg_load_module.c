@@ -176,8 +176,7 @@ load_module_result load_module(function_checking_state *const state, unicode_vie
         unicode_view_create(attempt.module_source.success.data, attempt.module_source.success.length),
         source_file_lines_from_owning(lines), false);
     expression_pool pool = expression_pool_create();
-    expression_parser parser =
-        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator, &pool);
+    expression_parser parser = expression_parser_create(&parser_state, translate_parse_error, &translator, &pool);
     sequence const parsed = parse_program(&parser);
     expression_parser_free(parser);
     if (translator.has_error)

@@ -145,8 +145,7 @@ optional_sequence parse(cli_parser_user user, unicode_view const file_name, unic
 {
     parser_user parser_state = {source.begin, source.length, source_location_create(0, 0)};
     parse_error_translator translator = {&user, file_name, source, lines};
-    expression_parser parser =
-        expression_parser_create(find_next_token, &parser_state, translate_parse_error, &translator, pool);
+    expression_parser parser = expression_parser_create(&parser_state, translate_parse_error, &translator, pool);
     sequence const result = parse_program(&parser);
     expression_parser_free(parser);
     if (user.has_error)

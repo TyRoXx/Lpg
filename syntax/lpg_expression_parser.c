@@ -3,12 +3,10 @@
 #include "lpg_array_size.h"
 #include "lpg_assert.h"
 
-expression_parser expression_parser_create(rich_token_producer rich_token_producer_argument,
-                                           callback_user find_next_token_user, parse_error_handler on_error,
+expression_parser expression_parser_create(callback_user find_next_token_user, parse_error_handler on_error,
                                            callback_user on_error_user, struct expression_pool *const pool)
 {
-    expression_parser const result = {
-        rich_token_producer_argument, find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0, pool};
+    expression_parser const result = {find_next_token_user, on_error, on_error_user, NULL, 0, 0, 0, pool};
     return result;
 }
 
@@ -43,7 +41,7 @@ rich_token peek_at(expression_parser *parser, size_t const offset)
         parser->cached_tokens =
             reallocate_array_exponentially(parser->cached_tokens, (offset + 1), sizeof(*parser->cached_tokens),
                                            parser->cached_token_count, &parser->cached_tokens_allocated);
-        parser->cached_tokens[parser->cached_token_count] = parser->find_next_token(parser->find_next_token_user);
+        parser->cached_tokens[parser->cached_token_count] = find_next_token(parser->find_next_token_user);
         switch (parser->cached_tokens[parser->cached_token_count].status)
         {
         case tokenize_success:

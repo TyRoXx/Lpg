@@ -19,7 +19,7 @@ static void test_syntax_error(parse_error const *expected_errors, size_t const e
 {
     expression_pool pool = expression_pool_create();
     test_parser_user user = {{input.data, input.length, source_location_create(0, 0)}, expected_errors, expected_count};
-    expression_parser parser = expression_parser_create(find_next_token, &user, handle_error, &user, &pool);
+    expression_parser parser = expression_parser_create(&user, handle_error, &user, &pool);
     expression_parser_result result = parse_expression(&parser, 0, 1);
     if (expected)
     {

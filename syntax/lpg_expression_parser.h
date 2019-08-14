@@ -40,7 +40,6 @@ typedef void (*parse_error_handler)(parse_error, callback_user);
 
 typedef struct expression_parser
 {
-    rich_token_producer find_next_token;
     callback_user find_next_token_user;
     parse_error_handler on_error;
     callback_user on_error_user;
@@ -51,8 +50,7 @@ typedef struct expression_parser
     expression_pool *pool;
 } expression_parser;
 
-expression_parser expression_parser_create(LPG_NON_NULL(rich_token_producer find_next_token),
-                                           callback_user find_next_token_user,
+expression_parser expression_parser_create(callback_user find_next_token_user,
                                            LPG_NON_NULL(parse_error_handler on_error), callback_user on_error_user,
                                            struct expression_pool *const pool);
 void expression_parser_free(expression_parser const freed);
