@@ -148,16 +148,85 @@ static tokenize_result tokenize_raw_string(char const *input, size_t length)
 tokenize_result tokenize(char const *input, size_t length)
 {
     ASSUME(length > 0);
-    if (*input == ' ')
+    switch (*input)
     {
+    case ' ':
         return tokenize_space(input, length);
-    }
-    if (*input == '\t')
+
+    case '\t':
     {
         tokenize_result const result = {tokenize_success, token_indentation, 1};
         return result;
     }
-    if (*input == '/')
+
+    case '0':
+    case '1':
+    case '2':
+    case '3':
+    case '4':
+    case '5':
+    case '6':
+    case '7':
+    case '8':
+    case '9':
+        return tokenize_integer(input, length);
+
+    case '_':
+    case 'a':
+    case 'b':
+    case 'c':
+    case 'd':
+    case 'e':
+    case 'f':
+    case 'g':
+    case 'h':
+    case 'i':
+    case 'j':
+    case 'k':
+    case 'l':
+    case 'm':
+    case 'n':
+    case 'o':
+    case 'p':
+    case 'q':
+    case 'r':
+    case 's':
+    case 't':
+    case 'u':
+    case 'v':
+    case 'w':
+    case 'x':
+    case 'y':
+    case 'z':
+    case 'A':
+    case 'B':
+    case 'C':
+    case 'D':
+    case 'E':
+    case 'F':
+    case 'G':
+    case 'H':
+    case 'I':
+    case 'J':
+    case 'K':
+    case 'L':
+    case 'M':
+    case 'N':
+    case 'O':
+    case 'P':
+    case 'Q':
+    case 'R':
+    case 'S':
+    case 'T':
+    case 'U':
+    case 'V':
+    case 'W':
+    case 'X':
+    case 'Y':
+    case 'Z':
+        return tokenize_identifier(input, length);
+
+    case '/':
     {
         if (length == 1)
         {
@@ -174,17 +243,10 @@ tokenize_result tokenize(char const *input, size_t length)
         {
             return tokenize_multi_line_comment(input, length);
         }
+        tokenize_result const result = {tokenize_invalid, token_space, 1};
+        return result;
     }
-    if (is_identifier_begin(*input))
-    {
-        return tokenize_identifier(input, length);
-    }
-    if (is_digit(*input))
-    {
-        return tokenize_integer(input, length);
-    }
-    switch (*input)
-    {
+
     case '\n':
         return make_success(token_newline, 1);
 
