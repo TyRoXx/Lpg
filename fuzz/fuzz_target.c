@@ -1,5 +1,4 @@
 #include "fuzz_target.h"
-#include "lpg_allocate.h"
 #include "lpg_array_size.h"
 #include "lpg_ascii.h"
 #include "lpg_check.h"
@@ -26,7 +25,6 @@ void ParserTypeCheckerFuzzTarget(uint8_t const *const data, size_t const size)
     {
         return;
     }
-    size_t const allocations_before = count_active_allocations();
     cli_parser_user user = {stream_writer_create_null_writer(), false};
     unicode_view const source = unicode_view_create((char const *)data, size);
     source_file_lines_owning const lines = source_file_lines_owning_scan(source);
@@ -48,10 +46,4 @@ void ParserTypeCheckerFuzzTarget(uint8_t const *const data, size_t const size)
     sequence_free(&result.value);
     expression_pool_free(pool);
     source_file_lines_owning_free(lines);
-    size_t const allocations_after = count_active_allocations();
-    if (allocations_after != allocations_before)
-    {
-        fprintf(stderr, "leak detected\n");
-        abort();
-    }
 }
